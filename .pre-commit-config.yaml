@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_docs
+      - id: terraform_tfsec
+        files: ^infra/
+        args:
+          - --args=--exclude-downloaded-modules
+      - id: terraform_validate
+        args:
+          - --init-args=-lockfile=readonly
+          - --args=-json
+          - --args=-no-color
