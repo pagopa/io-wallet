@@ -1,5 +1,5 @@
 {
-  "name": "ts-monorepo-scaffold",
+  "name": "io-wallet-workspace",
   "private": true,
   "scripts": {
     "test": "turbo run test --no-daemon",
