@@ -1,0 +1,22 @@
+{
+  "name": "ts-monorepo-scaffold",
+  "private": true,
+  "scripts": {
+    "test": "turbo run test --no-daemon",
+    "format": "turbo run format --no-daemon",
+    "lint": "turbo run lint --no-daemon --",
+    "build": "turbo run build --no-daemon",
+    "generate": "turbo run generate --no-daemon",
+    "code-review": "turbo run typecheck lint test",
+    "version": "changeset version",
+    "release": "changeset tag"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@changesets/cli": "^2.26.1",
+    "turbo": "^1.10.3"
+  }
+}
