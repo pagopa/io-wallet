@@ -49,12 +49,18 @@ jobs:
 
       - name: "Code review"
         run: yarn run code-review
-    
+
   show_updated_dependencies:
     timeout-minutes: 5
     runs-on: ubuntu-22.04
     steps:
-      # Comment PR if there are changes on yarn.lock
-      # Useful to spot and observe dependency changes
+      - name: Checkout
+        uses: actions/checkout@v3
+
+        # Comment PR if there are changes on yarn.lock
+        # Useful to spot and observe dependency changes
       - name: Yarn Lock Changes
-        uses: Simek/yarn-lock-changes@v0.11.1
+        uses: Simek/yarn-lock-changes@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          collapsibleThreshold: 5
