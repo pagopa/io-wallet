@@ -5,6 +5,6 @@ import * as H from "@pagopa/handler-kit";
 
 import { logErrorAndReturnResponse } from "../utils";
 
-export const GetEntityConfigurationHandler = H.of(() =>
+export const HelloWorldHandler = H.of(() =>
   pipe(RTE.Do, RTE.map(H.successJson), RTE.orElseW(logErrorAndReturnResponse))
 );

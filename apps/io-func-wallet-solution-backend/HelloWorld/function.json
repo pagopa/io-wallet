@@ -5,7 +5,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "route": ".well-known/openid-federation",
+      "route": "hello-world",
       "methods": ["get"]
     },
     {
@@ -15,5 +15,5 @@
     }
   ],
   "scriptFile": "../dist/main.js",
-  "entryPoint": "GetEntityConfiguration"
+  "entryPoint": "HelloWorld"
 }

@@ -1,3 +1,3 @@
-import { GetEntityConfigurationFunction } from "../infra/azure/functions/get-entity-configuration";
+import { HelloWorldFunction } from "../infra/azure/functions/hello-world";
 
-export const GetEntityConfiguration = GetEntityConfigurationFunction({});
+export const HelloWorld = HelloWorldFunction({});
