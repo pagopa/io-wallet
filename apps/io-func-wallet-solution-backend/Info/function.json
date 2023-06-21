@@ -5,7 +5,7 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "route": "hello-world",
+      "route": "info",
       "methods": ["get"]
     },
     {
