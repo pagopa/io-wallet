@@ -3,14 +3,6 @@ import { pipe } from "fp-ts/function";
 
 import * as H from "@pagopa/handler-kit";
 
-import { logErrorAndReturnResponse } from "../utils";
-import { healthCheck } from "../../../health-check";
-
-export const InfoHandler = H.of(() =>
-  pipe(
-    RTE.Do,
-    RTE.chainTaskEitherK(healthCheck),
-    RTE.map(H.successJson),
-    RTE.orElseW(logErrorAndReturnResponse)
-  )
+export const InfoHandler = H.of((_: H.HttpRequest) =>
+  pipe(RTE.right({ message: "it works!" }), RTE.map(H.successJson))
 );
