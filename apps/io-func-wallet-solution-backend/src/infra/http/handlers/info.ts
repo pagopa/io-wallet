@@ -4,12 +4,12 @@ import { pipe } from "fp-ts/function";
 import * as H from "@pagopa/handler-kit";
 
 import { logErrorAndReturnResponse } from "../utils";
-import { hello } from "../../../hello";
+import { healthCheck } from "../../../health-check";
 
-export const HelloWorldHandler = H.of(() =>
+export const InfoHandler = H.of(() =>
   pipe(
     RTE.Do,
-    RTE.chain(hello),
+    RTE.chainTaskEitherK(healthCheck),
     RTE.map(H.successJson),
     RTE.orElseW(logErrorAndReturnResponse)
   )

@@ -15,5 +15,5 @@
     }
   ],
   "scriptFile": "../dist/main.js",
-  "entryPoint": "HelloWorld"
+  "entryPoint": "Info"
 }

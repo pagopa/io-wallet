@@ -1,3 +1,3 @@
-import { HelloWorldFunction } from "../infra/azure/functions/hello-world";
+import { InfoFunction } from "../infra/azure/functions/info";
 
-export const HelloWorld = HelloWorldFunction({ myName: "world" });
+export const Info = InfoFunction({ myName: "world" });
