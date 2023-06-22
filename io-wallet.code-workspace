@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "apps/io-func-wallet-solution-backend",
+      "name": "io-func-wallet-solution-backend"
+    },
+  ],
+  "settings": {
+    "azureFunctions.funcCliPath": "../../node_modules/.bin/func"
+  }
+}

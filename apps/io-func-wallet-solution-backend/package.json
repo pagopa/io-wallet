@@ -1,0 +1,38 @@
+{
+  "name": "io-func-wallet-solution-backend",
+  "version": "0.0.1",
+  "private": true,
+  "files": [
+    "**/function.json",
+    "dist",
+    "host.json",
+    "extensions.csproj"
+  ],
+  "scripts": {
+    "build": "tsup-node",
+    "format": "prettier --write .",
+    "lint": "eslint \"src/**\"",
+    "lint:fix": "eslint --fix \"src/**\"",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc",
+    "start": "func start",
+    "build:package": "npm-pack-zip --add-version"
+  },
+  "dependencies": {
+    "@pagopa/handler-kit-azure-func": "^1.2.0"
+  },
+  "devDependencies": {
+    "@azure/functions": "^3.2.0",
+    "@pagopa/eslint-config": "^3.0.0",
+    "@rushstack/eslint-patch": "^1.2.0",
+    "@vitest/coverage-c8": "^0.30.1",
+    "azure-functions-core-tools": "^4.0.5148",
+    "eslint": "^8.28.0",
+    "npm-pack-zip": "^1.3.0",
+    "prettier": "2.7.1",
+    "tsup": "^6.4.0",
+    "typescript": "^4.8.4",
+    "vitest": "^0.30.1"
+  }
+}
