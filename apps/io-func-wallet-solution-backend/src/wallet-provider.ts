@@ -12,3 +12,18 @@ export const WalletProviderMetadata = t.type({
 });
 
 export type WalletProviderMetadata = t.TypeOf<typeof WalletProviderMetadata>;
+
+// Level of Agreement
+
+export enum LoA {
+  basic = "https://wallet.italia.it/LoA/basic",
+  medium = "https://wallet.italia.it/LoA/medium",
+  hight = "https://wallet.italia.it/LoA/hight",
+}
+
+export const LoAValues = t.union([
+  t.literal(LoA.basic),
+  t.literal(LoA.medium),
+  t.literal(LoA.hight),
+]);
+export type LoAValues = t.TypeOf<typeof LoAValues>;
