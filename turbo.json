@@ -1,77 +1,27 @@
-// 20230616102916
-// https://raw.githubusercontent.com/pagopa/io-services-cms/master/turbo.json
-
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
-    "generate": {
-      "inputs": [
-        "../../openapi.yaml",
-        "src/generated/**/*"
-      ],
-      "outputMode": "errors-only"
-    },
     "build": {
-      "inputs": [
-        "src/**/*.ts"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "dependsOn": [
-        "generate",
-        "^build"
-      ]
+      "inputs": ["src/**/*.ts"],
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build"]
     },
     "typecheck": {
-      "inputs": [
-        "src/**/*.ts"
-      ],
-      "outputs": [
-        
-      ],
-      "dependsOn": [
-        "^build"
-      ]
+      "inputs": ["src/**/*.ts"],
+      "outputs": [],
+      "dependsOn": ["^build"]
     },
-    "format": {
-      
-    },
+    "format": {},
     "lint": {
-      "inputs": [
-        "src/**/*.ts"
-      ],
-      "outputs": [
-        
-      ],
-      "dependsOn": [
-        "^build"
-      ]
+      "inputs": ["src/**/*.ts"],
+      "outputs": [],
+      "dependsOn": ["^build"]
     },
     "test": {
-      "inputs": [
-        "src/**/*.spec.ts",
-        "src/**/*.test.ts"
-      ],
-      "outputs": [
-        
-      ],
-      "outputMode": "errors-only",
-      "dependsOn": [
-        "^build"
-      ]
-    },
-    "test:integrations": {
-      "inputs": [
-        "__integrations__/**/*"
-      ],
-      "outputs": [
-        
-      ],
-      "outputMode": "errors-only",
-      "dependsOn": [
-        "^build"
-      ]
+      "inputs": ["src/**/*.spec.ts", "src/**/*.test.ts"],
+      "outputs": [],
+      "outputMode": "hash-only",
+      "dependsOn": ["^build"]
     }
   }
 }
