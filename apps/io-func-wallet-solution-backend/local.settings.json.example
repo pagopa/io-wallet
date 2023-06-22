@@ -5,6 +5,12 @@
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "NODE_ENV": "development",
-    "AzureFunctionsJobHost__logging__logLevel__Function": "Trace"
+    "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
+    "WalletProviderBasePath": "WALLET_PROVIDER_BASE_PATH",
+    "WalletProviderOrganizationName": "WALLET_PROVIDER_ORGANIZATION_NAME",
+    "WalletProviderHomepageUri": "WALLET_PROVIDER_HOMEPAGE_URI",
+    "WalletProviderPolicyUri": "WALLET_PROVIDER_PRIVACY_URI",
+    "WalletProviderTosUri": "WALLET_PROVIDER_TOS_URI",
+    "WalletProviderLogoUri": "WALLET_PROVIDER_LOGO_URI"
   }
 }
