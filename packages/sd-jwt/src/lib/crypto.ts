@@ -1,4 +1,5 @@
 // FIXME: create an hash function that works on nodejs, browser and react native runtimes
+//
 export function hash(alg: string, value: string, salt: string): string {
   return (
     // eslint-disable-next-line @typescript-eslint/no-var-requires
