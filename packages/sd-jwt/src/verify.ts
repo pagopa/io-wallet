@@ -6,7 +6,7 @@ import { SdJwt, SupportedAlgorithm } from "./types";
 type VerifyOptions = { jwksUri: string };
 type VerifyResult = SdJwt;
 
-const supportedAlgorithm = new Set([
+const supportedAlgorithm = new Set<SupportedAlgorithm>([
   "HS256",
   "HS384",
   "HS512",
@@ -21,7 +21,10 @@ const supportedAlgorithm = new Set([
   "PS512",
 ]);
 function isSupportedAlgorithm(alg: string): alg is SupportedAlgorithm {
-  return supportedAlgorithm.has(alg);
+  return supportedAlgorithm.has(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    alg as any /* to look for unknown value into a typed set */
+  );
 }
 
 // Check a jwt has the attributes defined in the SD-JWT specification
