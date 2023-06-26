@@ -1,26 +1,27 @@
 import * as jwt from "jsonwebtoken";
 import * as jose from "jose";
 import * as jwks from "jwks-rsa";
-import { SdJwt } from "./types";
+import { SdJwt, SupportedAlgorithm } from "./types";
 
 type VerifyOptions = { jwksUri: string };
 type VerifyResult = SdJwt;
 
-function isSupportedAlgorithm(alg: string): alg is jwt.Algorithm {
-  return [
-    "HS256",
-    "HS384",
-    "HS512",
-    "RS256",
-    "RS384",
-    "RS512",
-    "ES256",
-    "ES384",
-    "ES512",
-    "PS256",
-    "PS384",
-    "PS512",
-  ].includes(alg);
+const supportedAlgorithm = new Set([
+  "HS256",
+  "HS384",
+  "HS512",
+  "RS256",
+  "RS384",
+  "RS512",
+  "ES256",
+  "ES384",
+  "ES512",
+  "PS256",
+  "PS384",
+  "PS512",
+]);
+function isSupportedAlgorithm(alg: string): alg is SupportedAlgorithm {
+  return supportedAlgorithm.has(alg);
 }
 
 // Check a jwt has the attributes defined in the SD-JWT specification
@@ -61,17 +62,17 @@ async function verifyJWT(
   // parse header to extract signing informations
   const { kid, alg } = jose.decodeProtectedHeader(token);
 
+  // check that the hashing algorithm is defined and supported
+  if (!alg || !isSupportedAlgorithm(alg)) {
+    throw new Error(`Unsupported algorithm: ${alg}`);
+  }
+
   // retrieve the signing key from the public JWK endpoint
   const signingKey = await new jwks.JwksClient({
     cache: true,
     jwksUri,
     rateLimit: false,
   }).getSigningKey(kid);
-
-  // check that the hashing algorithm is defined and supported
-  if (!alg || !isSupportedAlgorithm(alg)) {
-    throw new Error(`Unsupported algorithm: ${alg}`);
-  }
 
   // verify the whole token
   return jwt.verify(token, signingKey.getPublicKey(), {
