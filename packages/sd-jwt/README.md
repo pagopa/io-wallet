@@ -1,6 +1,7 @@
 # SD-JWT
+A typescript package to verify, read, and present data using [SD-JWT](https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-04.html
+) format.
 
-## A typescript package to verify, read, and present data using SD-JWT format.
 
 ## API
 
