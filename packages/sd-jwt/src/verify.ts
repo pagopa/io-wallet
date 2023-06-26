@@ -1,10 +1,10 @@
 import * as jwt from "jsonwebtoken";
 import * as jose from "jose";
 import * as jwks from "jwks-rsa";
-import { SdJwt, SupportedAlgorithm } from "./types";
+import { Disclosure, SdJwt, SupportedAlgorithm } from "./types";
 
 type VerifyOptions = { jwksUri: string };
-type VerifyResult = SdJwt;
+type VerifyResult = [SdJwt, ...Disclosure[]];
 
 const supportedAlgorithm = new Set<SupportedAlgorithm>([
   "HS256",
@@ -85,6 +85,38 @@ async function verifyJWT(
 }
 
 /**
+ * Parse an encoded disclosure token into a triple [salt, claim name, claim value].
+ *
+ * @example
+ * // returns ["rSLuznhiLPBDRZE1CZ88KQ", "sub", "john_doe_42"]
+ * parseDisclosureToken("WyJyU0x1em5oaUxQQkRSWkUxQ1o4OEtRIiwgInN1YiIsICJqb2huX2RvZV80MiJd")
+ *
+ * @param token A base64 string representing the disclosure
+ * @returns The triple representing the parsed disclosure
+ * @throws An error in case the token is failed to decode and parse
+ */
+function parseDisclosureToken(token: string): Disclosure {
+  // token is a base64 string
+  const decoded = atob(token);
+  const parsed = JSON.parse(decoded);
+
+  // validate the structure:
+  // - is a triple
+  // - first two elements are string
+  // - last element is either a string or a record
+  if (
+    Array.isArray(parsed) &&
+    parsed.length === 3 &&
+    typeof parsed[0] === "string" &&
+    typeof parsed[1] === "string" &&
+    (typeof parsed[2] === "string" || typeof parsed[2] === "object")
+  ) {
+    return parsed as Disclosure;
+  }
+  throw new Error(`Failed to validate disclosure token: ${token}`);
+}
+
+/**
  * Verify a token is a valid SD-JWT with disclosures.
  * It verifies the first part is a valid JWT.
  * It also verifies each disclosure is well-formed and their values are consistent
@@ -103,15 +135,17 @@ async function verify(
   token: string,
   options: VerifyOptions
 ): Promise<VerifyResult> {
-  const [sdjwt_token /* , ...disclosure_tokens */] = token.split(`~`);
+  const [sdjwt_token, ...disclosure_tokens] = token.split(`~`).filter(Boolean);
 
-  const parsed = await verifyJWT(sdjwt_token, options);
+  const parsed_sdjwt = await verifyJWT(sdjwt_token, options);
 
-  if (!jwtIsSdJwt(parsed)) {
+  if (!jwtIsSdJwt(parsed_sdjwt)) {
     throw new Error(`JWT is not a valid SD-JWT`);
   }
 
-  return parsed;
+  const parsed_disclosures = disclosure_tokens.map(parseDisclosureToken);
+
+  return [parsed_sdjwt, ...parsed_disclosures];
 }
 
 export { verify };

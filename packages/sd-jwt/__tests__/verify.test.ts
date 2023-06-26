@@ -14,12 +14,18 @@ const disclosure_tokens = [
   "WyI2VWhsZU5HUmJtc0xDOFRndTh2OFdnIiwgImZhbWlseV9uYW1lIiwgIkRvZSJd",
   "WyJ2S0t6alFSOWtsbFh2OWVkNUJ1ZHZRIiwgImVtYWlsIiwgImpvaG5kb2VAZXhhbXBsZS5jb20iXQ",
   "WyJVZEVmXzY0SEN0T1BpZDRFZmhPQWNRIiwgInBob25lX251bWJlciIsICIrMS0yMDItNTU1LTAxMDEiXQ",
-  "WyJOYTNb0ZGblZ3MjhqT0FyazdJTlZnIiwgImFkZHJlc3MiLCB7InN0cmVldF9hZGRyZXNzIjogIjEyMyBNYWluIFN0IiwgImxvY2FsaXR5IjogIkFueXRvd24iLCAicmVnaW9uIjogIkFueXN0YXRlIiwgImNvdW50cnkiOiAiVVMifV0",
+  "WyJOYTNWb0ZGblZ3MjhqT0FyazdJTlZnIiwgImFkZHJlc3MiLCB7InN0cmVldF9hZGRyZXNzIjogIjEyMyBNYWluIFN0IiwgImxvY2FsaXR5IjogIkFueXRvd24iLCAicmVnaW9uIjogIkFueXN0YXRlIiwgImNvdW50cnkiOiAiVVMifV0",
   "WyJkQW9mNHNlZTFGdDBXR2dHanVjZ2pRIiwgImJpcnRoZGF0ZSIsICIxOTQwLTAxLTAxIl0",
 ];
 const sdjwt_with_disclosures_signed_with_key_a = [
   sdjwt_signed_with_key_a,
-  disclosure_tokens,
+  ...disclosure_tokens,
+].join("~");
+
+const sdjwt_with_wrong_disclosures_signed_with_key_a = [
+  sdjwt_signed_with_key_a,
+  ...disclosure_tokens,
+  "malformed-disclosure",
 ].join("~");
 
 // A local server to serve JWKS files
@@ -72,9 +78,26 @@ describe("Verify", () => {
   });
 
   it("should verify a valid token", async () => {
-    await verify(sdjwt_with_disclosures_signed_with_key_a, {
-      jwksUri: wellKnownUrl("a-and-b"),
-    });
+    const [parsed_sdjwt, ...parsed_disclosures] = await verify(
+      sdjwt_with_disclosures_signed_with_key_a,
+      {
+        jwksUri: wellKnownUrl("a-and-b"),
+      }
+    );
+
+    expect(parsed_sdjwt).toEqual(
+      expect.objectContaining({ payload: expect.any(Object) })
+    );
+    // All disclosure are included in the parsed result
+    expect(parsed_disclosures).toHaveLength(disclosure_tokens.length);
+    // Every parsed disclosure is a triplet
+    for (const pd of parsed_disclosures) {
+      expect(pd).toEqual([
+        expect.any(String),
+        expect.any(String),
+        expect.anything(),
+      ]);
+    }
   });
   it("should fail when the token is signed with a non-valid key", () => {
     const op = verify(sdjwt_with_disclosures_signed_with_key_a, {
@@ -93,6 +116,13 @@ describe("Verify", () => {
       jwksUri: "http://example.com/.well-known/a-and-b.jwks.json",
     });
 
+    expect(op).rejects.toBeInstanceOf(Error);
+  });
+
+  it("should fail if at least one disclosure fails to parse", () => {
+    const op = verify(sdjwt_with_wrong_disclosures_signed_with_key_a, {
+      jwksUri: wellKnownUrl("a-and-b"),
+    });
     expect(op).rejects.toBeInstanceOf(Error);
   });
 });
