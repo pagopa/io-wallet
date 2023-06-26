@@ -34,3 +34,25 @@ It throws an error if the validation fails.
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<VerifyResult>** the parsed token object along with its related disclosures
 
 
+## Tests
+Tests are expected to be written in files that end with `.test.ts`; they are organized in `__tests__` folders placed in the same directory of the module to test.
+<details>
+  <summary>Example</summary>
+  ```
+  /src
+    |_ __tests__
+      |_ file_a.test.ts
+    |_ /lib
+      |_ __tests__
+      | |_ file_b.test.ts
+      |_ file_b.ts
+    |_ file_a.ts
+  ```
+</details>
+
+To execute tests, run:
+```sh
+yarn test
+```
+
+The `__tests__` folder at the root of the project is meant to contain tests that check the whole package API - hence they only import `src/index.ts` file users would do.
