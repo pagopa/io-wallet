@@ -1,4 +1,5 @@
 internal: packages/**/*
+sd-jwt: packages/sd-jwt/*
 apps: apps/**/*
 docs: docs/**/*
 ci: .github/workflows/**/*
