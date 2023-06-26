@@ -169,7 +169,7 @@ function verifyDisclosures(
 /**
  * Verify a token is a valid SD-JWT with disclosures.
  * It verifies the first part is a valid JWT.
- * It also verifies each disclosure is well-formed and their values are consistent
+ * It also verifies each disclosure is well-formed and its values are consistent
  *  with the claims exposed in the SD-JWT.
  * It returns the parsed JWT object along with its related disclosures.
  * It throws an error if the validation fails.

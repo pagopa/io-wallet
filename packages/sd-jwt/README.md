@@ -1,7 +1,6 @@
 # SD-JWT
-A typescript package to verify, read, and present data using [SD-JWT](https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-04.html
-) format.
 
+A typescript package to verify, read, and present data using [SD-JWT](https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-04.html) format.
 
 ## API
 
@@ -16,7 +15,7 @@ A typescript package to verify, read, and present data using [SD-JWT](https://ww
 
 Verify a token is a valid SD-JWT with disclosures.
 It verifies the first part is a valid JWT.
-It also verifies each disclosure is well-formed and their values are consistent
+It also verifies each disclosure is well-formed and its values are consistent
 with the claims exposed in the SD-JWT.
 It returns the parsed JWT object along with its related disclosures.
 It throws an error if the validation fails.
@@ -34,9 +33,10 @@ It throws an error if the validation fails.
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<VerifyResult>** the parsed token object along with its related disclosures
 
-
 ## Tests
+
 Tests are expected to be written in files that end with `.test.ts`; they are organized in `__tests__` folders placed in the same directory of the module to test.
+
 <details>
   <summary>Example</summary>
   ```
@@ -52,6 +52,7 @@ Tests are expected to be written in files that end with `.test.ts`; they are org
 </details>
 
 To execute tests, run:
+
 ```sh
 yarn test
 ```
