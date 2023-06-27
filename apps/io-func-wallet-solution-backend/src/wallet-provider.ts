@@ -1,20 +1,3 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { UrlFromString } from "@pagopa/ts-commons/lib/url";
-import * as t from "io-ts";
-
-export const FederationEntityMetadata = t.type({
-  basePath: UrlFromString,
-  organizationName: NonEmptyString,
-  homePageUri: UrlFromString,
-  policyUri: UrlFromString,
-  tosUri: UrlFromString,
-  logoUri: UrlFromString,
-});
-
-export type FederationEntityMetadata = t.TypeOf<
-  typeof FederationEntityMetadata
->;
-
 // Level of Agreement
 export enum LoA {
   basic = "LoA/basic",

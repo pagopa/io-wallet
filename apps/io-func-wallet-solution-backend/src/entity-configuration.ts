@@ -2,27 +2,34 @@ import * as t from "io-ts";
 
 import * as RE from "fp-ts/ReaderEither";
 import { pipe } from "fp-ts/function";
+
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
+import { validate } from "./validation";
 import {
   GRANT_TYPE_KEY_ATTESTATION,
   LoA,
   RELATIVE_TOKEN_ENDPOINT,
   TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
-  FederationEntityMetadata,
 } from "./wallet-provider";
-import { validate } from "./validation";
+
+export const FederationEntityMetadata = t.type({
+  basePath: UrlFromString,
+  organizationName: NonEmptyString,
+  homePageUri: UrlFromString,
+  policyUri: UrlFromString,
+  tosUri: UrlFromString,
+  logoUri: UrlFromString,
+});
+
+export type FederationEntityMetadata = t.TypeOf<
+  typeof FederationEntityMetadata
+>;
 
 type EntityConfigurationEnvironment = {
   federationEntityMetadata: FederationEntityMetadata;
   supportedSignAlgorithms: string[];
 };
-
-const FederationEntity = t.type({
-  organizationName: t.string,
-  homepageUri: t.string,
-  policyUri: t.string,
-  tosUri: t.string,
-  logoUri: t.string,
-});
 
 const WalletProviderMetadataPayload = t.type({
   tokenEndpoint: t.string,
@@ -36,7 +43,7 @@ export const EntityConfigurationPayload = t.type({
   iss: t.string,
   sub: t.string,
   walletProviderMetadata: WalletProviderMetadataPayload,
-  federationEntity: FederationEntity,
+  federationEntity: FederationEntityMetadata,
 });
 export type EntityConfigurationPayload = t.TypeOf<
   typeof EntityConfigurationPayload
@@ -68,13 +75,7 @@ export const getEntityConfiguration =
           tokenEndpointAuthMethodsSupported:
             TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
         },
-        federationEntity: {
-          organizationName: federationEntityMetadata.organizationName,
-          homepageUri: federationEntityMetadata.homePageUri.href,
-          policyUri: federationEntityMetadata.policyUri.href,
-          tosUri: federationEntityMetadata.tosUri.href,
-          logoUri: federationEntityMetadata.logoUri.href,
-        },
+        federationEntity: federationEntityMetadata,
       },
       validate(
         EntityConfigurationPayload,

@@ -3,7 +3,7 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { pipe } from "fp-ts/lib/function";
 
 import { readFromEnvironment } from "../env";
-import { FederationEntityMetadata } from "../../wallet-provider";
+import { FederationEntityMetadata } from "../../entity-configuration";
 import { validate } from "../../validation";
 
 export const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
