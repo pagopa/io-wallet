@@ -20,17 +20,19 @@ export const supportedSignAlgorithms = [
 ];
 
 export const CryptoConfiguration = t.type({
-  privateJwks: t.string,
+  privateJwkEc: t.string,
+  supportedSignAlgorithms: t.array(t.string),
 });
 
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
-export const getJwtConfigFromEnvironment: RE.ReaderEither<
+export const getCryptoConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   CryptoConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    privateJwks: readFromEnvironment("privateJwks"),
+    privateJwkEc: readFromEnvironment("PrivateBase64JwkEc"),
+    supportedSignAlgorithms: RE.right(supportedSignAlgorithms),
   })
 );

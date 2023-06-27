@@ -6,11 +6,12 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "NODE_ENV": "development",
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
-    "WalletProviderBasePath": "WALLET_PROVIDER_BASE_PATH",
-    "WalletProviderOrganizationName": "WALLET_PROVIDER_ORGANIZATION_NAME",
-    "WalletProviderHomepageUri": "WALLET_PROVIDER_HOMEPAGE_URI",
-    "WalletProviderPolicyUri": "WALLET_PROVIDER_PRIVACY_URI",
-    "WalletProviderTosUri": "WALLET_PROVIDER_TOS_URI",
-    "WalletProviderLogoUri": "WALLET_PROVIDER_LOGO_URI"
+    "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
+    "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME",
+    "FederationEntityHomepageUri": "FEDERATION_ENTITY_HOMEPAGE_URI",
+    "FederationEntityPolicyUri": "FEDERATION_ENTITY_PRIVACY_URI",
+    "FederationEntityTosUri": "FEDERATION_ENTITY_TOS_URI",
+    "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI"
+    "PrivateBase64JwkEc": "FEDERATION_ENTITY_PRIVATE_JWK_IN_BASE_64"
   }
 }

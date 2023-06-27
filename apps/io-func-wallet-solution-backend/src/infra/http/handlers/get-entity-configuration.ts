@@ -9,7 +9,7 @@ import { getEntityConfiguration } from "../../../entity-configuration";
 export const GetEntityConfigurationHandler = H.of(() =>
   pipe(
     RTE.Do,
-    RTE.chain(getEntityConfiguration),
+    RTE.chainReaderEitherK(getEntityConfiguration),
     RTE.map(H.successJson),
     RTE.orElseW(logErrorAndReturnResponse)
   )

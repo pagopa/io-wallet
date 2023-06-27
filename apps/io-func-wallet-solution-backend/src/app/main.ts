@@ -19,5 +19,6 @@ const config = configOrError;
 export const Info = InfoFunction({});
 
 export const GetEntityConfiguration = GetEntityConfigurationFunction({
-  walletProviderMetadata: config.pagopa.walletProvider,
+  federationEntityMetadata: config.pagopa.federationEntity,
+  supportedSignAlgorithms: config.pagopa.crypto.supportedSignAlgorithms,
 });

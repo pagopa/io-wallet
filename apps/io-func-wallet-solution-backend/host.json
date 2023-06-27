@@ -3,7 +3,11 @@
   "logging": {
     "logLevel": {
       "default": "None",
-      "Function": "Error"
+      "Function": "Error",
+      "Host.Aggregator": "Information",
+      "Host.Results": "Information",
+      "Microsoft": "Information",
+      "Worker": "Information"
     },
     "applicationInsights": {
       "samplingSettings": {
