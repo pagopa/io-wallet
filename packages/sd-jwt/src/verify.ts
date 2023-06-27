@@ -1,5 +1,4 @@
 import * as jwt from "jsonwebtoken";
-import * as jose from "jose";
 import * as jwks from "jwks-rsa";
 import { SdJwt, SupportedAlgorithm } from "./types";
 
@@ -60,7 +59,13 @@ async function verifyJWT(
   { jwksUri }: VerifyOptions
 ): Promise<jwt.Jwt> {
   // parse header to extract signing informations
-  const { kid, alg } = jose.decodeProtectedHeader(token);
+  const decoded = jwt.decode(token, { complete: true });
+  if (!decoded) {
+    throw new Error("Failed to decode JWT");
+  }
+  const {
+    header: { kid, alg },
+  } = decoded;
 
   // check that the hashing algorithm is defined and supported
   if (!alg || !isSupportedAlgorithm(alg)) {
