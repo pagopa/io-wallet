@@ -7,9 +7,6 @@ type VerifyOptions = { jwksUri: string };
 type VerifyResult = SdJwt;
 
 const supportedAlgorithm = new Set<SupportedAlgorithm>([
-  "HS256",
-  "HS384",
-  "HS512",
   "RS256",
   "RS384",
   "RS512",
