@@ -19,7 +19,7 @@ describe("CryptoSigner", async () => {
 
   const signer = new CryptoSigner({ jwks });
 
-  it("should return a jwks", () => {
+  it("should return a jwks of only public keys", () => {
     const run = signer.getPublicKeys();
     expect(run).toEqual(
       expect.objectContaining({
