@@ -5,71 +5,66 @@ import * as E from "fp-ts/Either";
 
 import { validate } from "./validation";
 
-// TODO: [SIW-241] Integrate the new types into io-ts-commons
-
-/**
- * This is the JWK JSON type for the EC keys.
- */
-export const ECKey = t.exact(
-  t.intersection([
-    t.type({
-      crv: t.string,
-      kty: t.literal("EC"),
-      x: t.string,
-      y: t.string,
-    }),
-    t.partial({
-      kid: t.string,
-    }),
-  ])
-);
+export const ECKey = t.intersection([
+  t.type({
+    crv: t.string,
+    kty: t.literal("EC"),
+    x: t.string,
+    y: t.string,
+  }),
+  t.partial({
+    kid: t.string,
+  }),
+]);
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
 export const ECPrivateKey = t.intersection([
-  ECKey,
-  t.exact(
-    t.type({
-      d: t.string,
-    })
-  ),
+  t.type({
+    crv: t.string,
+    kty: t.literal("EC"),
+    x: t.string,
+    y: t.string,
+    d: t.string,
+  }),
+  t.partial({
+    kid: t.string,
+  }),
 ]);
 
 export type ECPrivateKey = t.TypeOf<typeof ECPrivateKey>;
 
-/**
- * This is the JWK JSON type for the RSA keys.
- */
-export const RSAKey = t.exact(
-  t.intersection([
-    t.type({
-      alg: t.string,
-      e: t.string,
-      kty: t.literal("RSA"),
-      n: t.string,
-    }),
-    t.partial({
-      kid: t.string,
-    }),
-  ])
-);
+export const RSAKey = t.intersection([
+  t.type({
+    e: t.string,
+    kty: t.literal("RSA"),
+    n: t.string,
+  }),
+  t.partial({
+    alg: t.string,
+    kid: t.string,
+  }),
+]);
 
 export type RSAKey = t.TypeOf<typeof RSAKey>;
 
 export const RSAPrivateKey = t.intersection([
-  RSAKey,
-  t.exact(
-    t.intersection([
-      t.type({
-        d: t.string,
-      }),
-      t.partial({
-        p: t.string,
-        q: t.string,
-        u: t.string,
-      }),
-    ])
-  ),
+  t.type({
+    e: t.string,
+    kty: t.literal("RSA"),
+    n: t.string,
+    d: t.string,
+  }),
+  t.partial({
+    alg: t.string,
+    kid: t.string,
+    p: t.string,
+    q: t.string,
+    u: t.string,
+    dp: t.string,
+    dq: t.string,
+    qi: t.string,
+  }),
 ]);
 
 export type RSAPrivateKey = t.TypeOf<typeof RSAPrivateKey>;
