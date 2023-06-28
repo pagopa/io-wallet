@@ -1,27 +1,15 @@
-import * as RE from "fp-ts/lib/ReaderEither";
 import * as t from "io-ts";
 
+import * as RE from "fp-ts/lib/ReaderEither";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { pipe } from "fp-ts/lib/function";
 
 import { readFromEnvironment } from "../env";
-
-export const supportedSignAlgorithms = [
-  "ES256",
-  "ES256K",
-  "ES384",
-  "ES512",
-  "RS256",
-  "RS384",
-  "RS512",
-  "PS256",
-  "PS384",
-  "PS512",
-];
+import { JWK } from "../../wallet-provider";
+import { fromBase64ToJwks } from "../../jwk";
 
 export const CryptoConfiguration = t.type({
-  privateJwkEc: t.string,
-  supportedSignAlgorithms: t.array(t.string),
+  jwks: t.array(JWK),
 });
 
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
@@ -32,7 +20,9 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
   CryptoConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    privateJwkEc: readFromEnvironment("PrivateBase64JwkEc"),
-    supportedSignAlgorithms: RE.right(supportedSignAlgorithms),
+    jwks: pipe(
+      readFromEnvironment("WalletKeys"),
+      RE.chainEitherKW(fromBase64ToJwks)
+    ),
   })
 );

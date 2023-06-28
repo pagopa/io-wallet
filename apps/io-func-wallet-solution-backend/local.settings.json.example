@@ -12,6 +12,6 @@
     "FederationEntityPolicyUri": "FEDERATION_ENTITY_PRIVACY_URI",
     "FederationEntityTosUri": "FEDERATION_ENTITY_TOS_URI",
     "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI"
-    "PrivateBase64JwkEc": "FEDERATION_ENTITY_PRIVATE_JWK_IN_BASE_64"
+    "WalletKeys": "ARRAY_OF_WALLET_KEYS"
   }
 }

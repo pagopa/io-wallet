@@ -3,6 +3,7 @@ import { pipe, identity } from "fp-ts/function";
 
 import { GetEntityConfigurationFunction } from "../infra/azure/functions/get-entity-configuration";
 import { InfoFunction } from "../infra/azure/functions/info";
+import { CryptoSigner } from "../infra/crypto/signer";
 import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(
@@ -18,7 +19,9 @@ const config = configOrError;
 
 export const Info = InfoFunction({});
 
+const signer = new CryptoSigner(config.pagopa.crypto);
+
 export const GetEntityConfiguration = GetEntityConfigurationFunction({
   federationEntityMetadata: config.pagopa.federationEntity,
-  supportedSignAlgorithms: config.pagopa.crypto.supportedSignAlgorithms,
+  signer,
 });
