@@ -30,14 +30,15 @@ function jwtIsSdJwt(j: jwt.Jwt): j is SdJwt {
   if (typeof j.payload !== "object") {
     return false;
   }
+  const payload = j.payload as SdJwt["payload"];
 
   const hasValidSd =
-    "_sd" in j.payload &&
-    Array.isArray(j.payload["_sd"]) && // eslint-disable-line @typescript-eslint/dot-notation
-    j.payload["_sd"].every((s) => typeof s === "string"); // eslint-disable-line @typescript-eslint/dot-notation
+    "_sd" in payload &&
+    Array.isArray(payload["_sd"]) && // eslint-disable-line @typescript-eslint/dot-notation
+    payload["_sd"].every((s) => typeof s === "string"); // eslint-disable-line @typescript-eslint/dot-notation
   const hasValidSdAlg =
-    "_sd_alg" in j.payload && typeof j.payload["_sd_alg"] === "string"; // eslint-disable-line @typescript-eslint/dot-notation
-  const hasNotSdAlg = !("_sd_alg" in j.payload);
+    "_sd_alg" in payload && typeof payload["_sd_alg"] === "string"; // eslint-disable-line @typescript-eslint/dot-notation
+  const hasNotSdAlg = !("_sd_alg" in payload);
 
   return hasValidSd && (hasValidSdAlg || hasNotSdAlg);
 }

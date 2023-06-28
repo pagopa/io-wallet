@@ -53,7 +53,7 @@ const server: http.Server = http
           if (error.code == "ENOENT") {
             notFound(`file not found: ${filePath}`);
           } else {
-            // TODO: provide insights of the error fot troubleshooting
+            // TODO: provide insights of the error for troubleshooting
             notFound(error === null ? "unknown error" : error.message);
           }
         } else {
@@ -105,7 +105,7 @@ describe("Verify", () => {
 
   it("should not support symmetrical signature algorithms", () => {
     const op = verify(sdjwt_with_disclosures_signed_with_hs256, {
-      jwksUri: "anything", // it shoulen't even be called
+      jwksUri: "anything", // it shouldn't even be called
     });
 
     expect(op).rejects.toBeInstanceOf(Error);
