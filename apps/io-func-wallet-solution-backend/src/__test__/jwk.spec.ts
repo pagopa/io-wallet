@@ -84,14 +84,12 @@ describe("fromBase64ToJwks", async () => {
   const privateEcKey = await jose.exportJWK(privateJoseEcKey);
 
   const jwks = [privateRsaKey, privateEcKey];
-  console.log(jwks);
 
   it("should return JWKs form base64 representation", () => {
     const stringJwks = JSON.stringify(jwks);
     const b64 = Buffer.from(stringJwks, "utf-8").toString("base64");
 
     const result = fromBase64ToJwks(b64);
-    console.log(result);
     expect(E.isRight(result)).toBeTruthy();
     if (E.isRight(result)) {
       expect(result.right).toStrictEqual(jwks);

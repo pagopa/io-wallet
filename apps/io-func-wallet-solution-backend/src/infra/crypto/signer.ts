@@ -4,7 +4,7 @@ import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 
 import { Signer } from "../../signer";
-import { JwkPublicKey } from "../../jwk";
+import { ECKey, RSAKey } from "../../jwk";
 import { validate } from "../../validation";
 import { CryptoConfiguration } from "./config";
 
@@ -32,7 +32,7 @@ export class CryptoSigner implements Signer {
     pipe(
       this.#configuration.jwks,
       validate(
-        t.array(JwkPublicKey),
+        t.array(t.union([t.exact(ECKey), t.exact(RSAKey)])),
         "JWKs appears to not be a public key array"
       )
     );

@@ -20,15 +20,9 @@ export const ECKey = t.intersection([
 export type ECKey = t.TypeOf<typeof ECKey>;
 
 export const ECPrivateKey = t.intersection([
+  ECKey,
   t.type({
-    crv: t.string,
-    kty: t.literal("EC"),
-    x: t.string,
-    y: t.string,
     d: t.string,
-  }),
-  t.partial({
-    kid: t.string,
   }),
 ]);
 
@@ -49,15 +43,11 @@ export const RSAKey = t.intersection([
 export type RSAKey = t.TypeOf<typeof RSAKey>;
 
 export const RSAPrivateKey = t.intersection([
+  RSAKey,
   t.type({
-    e: t.string,
-    kty: t.literal("RSA"),
-    n: t.string,
     d: t.string,
   }),
   t.partial({
-    alg: t.string,
-    kid: t.string,
     p: t.string,
     q: t.string,
     u: t.string,

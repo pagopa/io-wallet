@@ -5,20 +5,25 @@ import * as jose from "jose";
 import { CryptoSigner } from "../signer";
 
 describe("CryptoSigner", async () => {
-  const publicJoseRsaKey = (await jose.generateKeyPair("PS256")).publicKey;
-  const publicJoseEcKey = (await jose.generateKeyPair("ES256")).publicKey;
+  const joseRsaKeys = await jose.generateKeyPair("PS256");
+  const joseEcKeys = await jose.generateKeyPair("ES256");
 
-  const publicRsaKey = await jose.exportJWK(publicJoseRsaKey);
-  const publicEcKey = await jose.exportJWK(publicJoseEcKey);
+  const privateRsaKey = await jose.exportJWK(joseRsaKeys.privateKey);
+  const privateEcKey = await jose.exportJWK(joseEcKeys.privateKey);
 
-  const jwks = [publicRsaKey, publicEcKey];
+  const publicRsaKey = await jose.exportJWK(joseRsaKeys.publicKey);
+  const publicEcKey = await jose.exportJWK(joseEcKeys.publicKey);
+
+  const jwks = [privateEcKey, privateRsaKey];
+  const publicJwks = [publicEcKey, publicRsaKey];
+
   const signer = new CryptoSigner({ jwks });
 
   it("should return a jwks", () => {
     const run = signer.getPublicKeys();
     expect(run).toEqual(
       expect.objectContaining({
-        right: expect.objectContaining(jwks),
+        right: expect.objectContaining(publicJwks),
       })
     );
   });
