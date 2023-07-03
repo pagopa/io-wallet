@@ -1,5 +1,5 @@
 {
-  "name": "@io-wallet/eudiw-pid-react-native",
+  "name": "@io-wallet/react-native-eudiw-pid",
   "version": "0.0.0",
   "typesVersions": {
     "*": {
