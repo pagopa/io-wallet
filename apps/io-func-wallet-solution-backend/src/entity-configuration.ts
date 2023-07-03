@@ -107,5 +107,5 @@ export const getEntityConfiguration =
         )
       ),
       TE.fromEither,
-      TE.chain(signer.sign("entity-statement+jwt"))
+      TE.chain(signer.createJwtAndsign("entity-statement+jwt"))
     );

@@ -6,7 +6,7 @@ import { JwkPublicKey } from "./jwk";
 export type Signer = {
   getPublicKeys: () => E.Either<Error, JwkPublicKey[]>;
   getSupportedSignAlgorithms: () => E.Either<Error, string[]>;
-  sign: (
+  createJwtAndsign: (
     typ: string
   ) => (payload: jose.JWTPayload) => TE.TaskEither<Error, string>;
 };

@@ -41,7 +41,7 @@ export class CryptoSigner implements Signer {
     );
 
   // TODO: Make algorithm management separate and not hard-coded
-  sign = (typ: string) => (payload: jose.JWTPayload) =>
+  createJwtAndsign = (typ: string) => (payload: jose.JWTPayload) =>
     pipe(
       getFirstPrivateKeyByAlg(this.#configuration.jwks, "EC"),
       TE.fromOption(() => new Error("No keys found for this algorithm")),

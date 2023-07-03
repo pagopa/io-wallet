@@ -83,7 +83,7 @@ describe("CryptoSigner", async () => {
   });
 
   it("should create and sign a JWT", async () => {
-    const result = await signer.sign("demo")({
+    const result = await signer.createJwtAndsign("demo")({
       sub: "Subjet of JWT",
       iss: "Issuer of JWT",
     })();
@@ -102,7 +102,7 @@ describe("CryptoSigner", async () => {
 
   it("should fail to create and sign a JWT", async () => {
     const signerWithOnlyRsa = new CryptoSigner({ jwks: [privateRsaKey] });
-    const result = await signerWithOnlyRsa.sign("demo")({
+    const result = await signerWithOnlyRsa.createJwtAndsign("demo")({
       sub: "Subjet of JWT",
       iss: "Issuer of JWT",
     })();
