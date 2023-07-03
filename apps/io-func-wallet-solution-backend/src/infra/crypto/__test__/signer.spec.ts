@@ -1,7 +1,10 @@
 import { it, expect, describe } from "vitest";
-
+import * as E from "fp-ts/lib/Either";
+import * as TE from "fp-ts/lib/TaskEither";
+import { pipe } from "fp-ts/function";
 import { CryptoSigner } from "../signer";
 import { ECKey, ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "../../../jwk";
+import * as jose from "jose";
 
 const publicRsaKey = {
   kty: "RSA",
@@ -77,5 +80,33 @@ describe("CryptoSigner", async () => {
         ]),
       })
     );
+  });
+
+  it("should create and sign a JWT", async () => {
+    const result = await signer.sign("demo")({
+      sub: "Subjet of JWT",
+      iss: "Issuer of JWT",
+    })();
+
+    expect(E.isRight(result)).toBeTruthy();
+    if (E.isRight(result)) {
+      let verification = await pipe(
+        TE.tryCatch(() => jose.importJWK(publicEcKey), E.toError),
+        TE.chain((joseKey) =>
+          TE.tryCatch(() => jose.jwtVerify(result.right, joseKey), E.toError)
+        )
+      )();
+      expect(E.isRight(verification)).toBeTruthy();
+    }
+  });
+
+  it("should fail to create and sign a JWT", async () => {
+    const signerWithOnlyRsa = new CryptoSigner({ jwks: [privateRsaKey] });
+    const result = await signerWithOnlyRsa.sign("demo")({
+      sub: "Subjet of JWT",
+      iss: "Issuer of JWT",
+    })();
+
+    expect(E.isRight(result)).toBeFalsy();
   });
 });
