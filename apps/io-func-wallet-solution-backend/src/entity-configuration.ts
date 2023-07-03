@@ -1,7 +1,8 @@
 import * as t from "io-ts";
 
+import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
-import * as RE from "fp-ts/ReaderEither";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 
@@ -65,11 +66,7 @@ export type EntityConfigurationPayload = t.TypeOf<
 >;
 
 export const getEntityConfiguration =
-  (): RE.ReaderEither<
-    EntityConfigurationEnvironment,
-    Error,
-    EntityConfigurationPayload
-  > =>
+  (): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({ federationEntityMetadata, signer }) =>
     pipe(
       sequenceS(E.Apply)({
@@ -108,5 +105,7 @@ export const getEntityConfiguration =
           EntityConfigurationPayload,
           "Invalid entity configuration payload"
         )
-      )
+      ),
+      TE.fromEither,
+      TE.chain(signer.sign("entity-statement+jwt"))
     );

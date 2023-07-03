@@ -1,12 +1,13 @@
 import { it, expect, describe } from "vitest";
 
 import { CryptoSigner } from "../signer";
+import { ECKey, ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "../../../jwk";
 
 const publicRsaKey = {
   kty: "RSA",
   n: "s-rm_5nl9JIqpMVk97FXAFZ0O7Gej5Trnh8GNCSq3PUGWJGGevZ072J69HnnsFqh0f-h1_WaTX7su_9YX7Q8ktOe9ov8aNORMh9dAIsofFf_tPSflJY95gyLbX1QoZ3G7tv8ZspZKjLDuHZMv2R8WPNpnrF8UFNXN_IUcfBMI3kOXCgwaKUZhQ7A-DIcZWpfhT-CjGsDia_vtIFYK5PlFBOQtLCUlrZUES91gP-Dp_WO0lYLMiJZkOB1LzX_4Q1vqE9ihR4tsCsXWhWzxLr-OQSrbp8UMuTHlJSRBEBfWLBwdRE6mcaOJknabD0ROwI_Rkw4-6490tET1YJ7tBPN9w",
   e: "AQAB",
-};
+} as RSAKey;
 
 const privateRsaKey = {
   ...publicRsaKey,
@@ -16,19 +17,19 @@ const privateRsaKey = {
   dp: "paS7gPmk_7cGjlzy_MBMY9V7W4g3AzX8zi9ezAajICpeEdYBLn2yM4uL6CyOdqa_fZVoQ1zvDX6cYHpmEFRcbulBPWOkqeApCy07R1M0qLFAWk-uLh1k2my2C5d7PAEBVSChnmQc8D_A37XH_gyndQfKhiHOrytYdPgB3lc6QGE",
   dq: "zNnMobhozaF0hzdVpaNF4aV0OvEUbLCuLMipOd0MK4tHK-kUdA1EOBLk6yqkyAk3422oodU-2oP5A7dH2FYwYB4CVc4ad8F9fixNoOZ2KTWeByrYkwVfdHmVcUgd5KYK_qFrn2vJJBBaz-l3a-DXfaF1aKgj9cCKsq-UyVi_VrU",
   qi: "r3FVQGWOMqNykr8wfkFlYFDWW06J8-jBr4sAmRQbu52esUmg6cE36EkiN6RvZSvSBUquPBsqM3rU1e3SBEL-2tImlMRMfXFSE6c4-ScnFNN7rhcYURBwokej9-Kq83Ll-sr60I-fJz9riMLVMC4A7jfeikj7intD0z-omczcQA",
-};
+} as RSAPrivateKey;
 
 const publicEcKey = {
   kty: "EC",
   x: "CakCjesDBwXeReRwLRzmhg6UwOKfM0NZpHYHjC0iucU",
   y: "a5cs0ywZzV6MGeBR8eIHyrs8KoAqv0DuW6qqSkZFCMM",
   crv: "P-256",
-};
+} as ECKey;
 
 const privateEcKey = {
   ...publicEcKey,
   d: "vOTIOnH_rDol5cyaWL25DX4iGu_WU_l-AoTLmGIV_tg",
-};
+} as ECPrivateKey;
 
 describe("CryptoSigner", async () => {
   const jwks = [privateEcKey, privateRsaKey];
@@ -46,7 +47,7 @@ describe("CryptoSigner", async () => {
   });
 
   it("shouldn't return a jwks", () => {
-    const jwks = [{ thisIsNotAKey: "00" }];
+    const jwks = [{ thisIsNotAKey: "00" } as unknown as Jwk];
     const signer = new CryptoSigner({ jwks });
 
     const run = signer.getPublicKeys();

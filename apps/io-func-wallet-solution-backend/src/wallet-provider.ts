@@ -1,5 +1,3 @@
-import * as t from "io-ts";
-
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 
 // Level of Agreement
@@ -17,6 +15,3 @@ export const GRANT_TYPE_KEY_ATTESTATION =
 
 export const TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED = "private_key_jwt";
 export const RELATIVE_TOKEN_ENDPOINT = "token";
-
-export const JWK = t.UnknownRecord;
-export type JWK = t.TypeOf<typeof JWK>;

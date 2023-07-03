@@ -5,11 +5,11 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { pipe } from "fp-ts/lib/function";
 
 import { readFromEnvironment } from "../env";
-import { JWK } from "../../wallet-provider";
+import { Jwk } from "../../jwk";
 import { fromBase64ToJwks } from "../../jwk";
 
 export const CryptoConfiguration = t.type({
-  jwks: t.array(JWK),
+  jwks: t.array(Jwk),
 });
 
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
