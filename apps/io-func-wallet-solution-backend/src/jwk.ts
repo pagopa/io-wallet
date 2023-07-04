@@ -2,7 +2,7 @@ import * as t from "io-ts";
 
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/Either";
-
+import * as J from "fp-ts/Json";
 import { validate } from "./validation";
 
 export const ECKey = t.intersection([
@@ -83,6 +83,6 @@ export type Jwk = t.TypeOf<typeof Jwk>;
 export const fromBase64ToJwks = (b64: string) =>
   pipe(
     E.tryCatch(() => Buffer.from(b64, "base64").toString(), E.toError),
-    E.map(JSON.parse),
+    E.chain(J.parse),
     E.chainW(validate(t.array(Jwk), "Invalid JWKs"))
   );
