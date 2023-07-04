@@ -40,7 +40,7 @@ export class CryptoSigner implements Signer {
       )
     );
 
-  // TODO: Make algorithm management separate and not hard-coded
+  // TODO: [SIW-260] Make algorithm management separate and not hard-coded
   createJwtAndsign = (typ: string) => (payload: jose.JWTPayload) =>
     pipe(
       getFirstPrivateKeyByAlg(this.#configuration.jwks, "EC"),

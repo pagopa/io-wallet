@@ -1,5 +1,4 @@
 import * as t from "io-ts";
-
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -19,6 +18,7 @@ import {
 } from "./wallet-provider";
 import { JwkPublicKey } from "./jwk";
 import { Signer } from "./signer";
+import { EntityConfigurationToJwtModel } from "./jwt-encoders/entity-configuration";
 
 export const FederationEntityMetadata = t.type({
   basePath: UrlFromString,
@@ -52,7 +52,7 @@ const WalletProviderMetadataPayload = t.type({
   tokenEndpointAuthSigningAlgValuesSupported: t.array(t.string),
   ascValues: t.array(t.string),
   grantTypesSupported: t.array(t.string),
-  tokenEndpointAuthMethodsSupported: t.string,
+  tokenEndpointAuthMethodsSupported: t.array(t.string),
 });
 
 export const EntityConfigurationPayload = t.type({
@@ -89,8 +89,9 @@ export const getEntityConfiguration =
             pipe(federationEntityMetadata.basePath, getLoAUri(LoA.hight)),
           ],
           grantTypesSupported: [GRANT_TYPE_KEY_ATTESTATION],
-          tokenEndpointAuthMethodsSupported:
+          tokenEndpointAuthMethodsSupported: [
             TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
+          ],
         },
         federationEntity: {
           organizationName: federationEntityMetadata.organizationName,
@@ -106,6 +107,7 @@ export const getEntityConfiguration =
           "Invalid entity configuration payload"
         )
       ),
+      E.map(EntityConfigurationToJwtModel.encode),
       TE.fromEither,
       TE.chain(signer.createJwtAndsign("entity-statement+jwt"))
     );
