@@ -28,8 +28,7 @@ It throws an error if the validation fails.
     *   `options.jwksUri`  URI of the public endpoint of the emitter
 
 <!---->
-
-*   Throws **any** a verification error
+Throws **any** verification error
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<VerifyResult>** the parsed token object along with its related disclosures
 
@@ -52,7 +51,6 @@ Tests are expected to be written in files that end with `.test.ts`; they are org
 </details>
 
 To execute tests, run:
-
 ```sh
 yarn test
 ```
