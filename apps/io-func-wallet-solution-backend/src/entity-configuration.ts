@@ -61,6 +61,7 @@ export const EntityConfigurationPayload = t.type({
   walletProviderMetadata: WalletProviderMetadataPayload,
   federationEntity: FederationEntity,
 });
+
 export type EntityConfigurationPayload = t.TypeOf<
   typeof EntityConfigurationPayload
 >;
