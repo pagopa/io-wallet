@@ -84,5 +84,6 @@ export const fromBase64ToJwks = (b64: string) =>
   pipe(
     E.tryCatch(() => Buffer.from(b64, "base64").toString(), E.toError),
     E.chain(J.parse),
+    E.mapLeft(() => new Error("Unable to parse JWKs string")),
     E.chainW(validate(t.array(Jwk), "Invalid JWKs"))
   );
