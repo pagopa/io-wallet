@@ -23,14 +23,10 @@
     "lint": "eslint \"src/**\"",
     "lint:fix": "eslint --fix \"src/**\""
   },
-  "dependencies": {
-    "jsonwebtoken": "^9.0.0",
-    "jwks-rsa": "^3.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
     "@rushstack/eslint-patch": "^1.2.0",
-    "@types/jsonwebtoken": "^9.0.2",
     "eslint": "^8.38.0",
     "prettier": "^2.8.7",
     "typescript": "^5.0.4",
