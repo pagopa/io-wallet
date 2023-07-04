@@ -18,3 +18,10 @@ export type SupportedAlgorithm =
   | "PS256"
   | "PS384"
   | "PS512";
+
+type DisclosureValue = string | Record<string, JSON>;
+export type Disclosure = [
+  /* salt */ string,
+  /* claim name */ string,
+  /* claim value */ DisclosureValue
+];
