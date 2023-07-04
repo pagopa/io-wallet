@@ -35,6 +35,13 @@ const sdjwt_with_disclosures_signed_with_key_a_missing_claims = [
   ...disclosure_tokens,
 ].join("~");
 
+const sdjwt_signed_with_hs256 =
+  "eyJhbGciOiJIUzI1NiIsImN0eSI6IkpXVCJ9.eyJfc2QiOlsiNW5YeTBaM1FpRWJhMVYxbEp6ZUtoQU9HUVhGbEtMSVdDTGxoZl9PLWNtbyIsIjlnWmhIQWhWN0xabk9GWnFfcTdGaDhyemRxcnJOTS1oUldzVk9sVzNudXciLCJTLUpQQlNrdnFsaUZ2MV9fdGh1WHQzSXpYNUJfWlhtNFcycXM0Qm9ORnJBIiwiYnZpdzdwV0FrYnpJMDc4Wk5WYV9lTVp2azB0ZFBhNXcybzlSM1p5Y2pvNCIsIm8tTEJDRHJGRjZ0QzlldzF2QWxVbXc2WTMwQ0haRjVqT1VGaHB4NW1vZ0kiLCJwemtISU05c3Y3b1pINllLRHNScU5nRkdMcEVLSWozYzVHNlVLYVRzQWpRIiwicm5BekNUNkRUeTRUc1g5UUNEdjJ3d0FFNFplMjB1UmlndFZOUWtBNTJYMCJdLCJpc3MiOiJodHRwczovL2V4YW1wbGUuY29tL2lzc3VlciIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNzM1Njg5NjYxLCJfc2RfYWxnIjoic2hhLTI1NiIsImNuZiI6eyJqd2siOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJUQ0FFUjE5WnZ1M09IRjRqNFc0dmZTVm9ISVAxSUxpbERsczd2Q2VHZW1jIiwieSI6Ilp4amlXV2JaTVFHSFZXS1ZRNGhiU0lpcnNWZnVlY0NFNnQ0alQ5RjJIWlEifX19.nkSextGKqSz-s3X0sJmALGhx_Q88LrHPIm5B3r0Jv04";
+const sdjwt_with_disclosures_signed_with_hs256 = [
+  sdjwt_signed_with_key_a,
+  disclosure_tokens,
+].join("~");
+
 // A local server to serve JWKS files
 // It retrieves any file that ends with jwks.json
 const SERVER_PORT = 8125;
@@ -59,7 +66,7 @@ const server: http.Server = http
           if (error.code == "ENOENT") {
             notFound(`file not found: ${filePath}`);
           } else {
-            // TODO: provide insights of the error fot troubleshooting
+            // TODO: provide insights of the error for troubleshooting
             notFound(error === null ? "unknown error" : error.message);
           }
         } else {
@@ -136,6 +143,11 @@ describe("Verify", () => {
   it("should fail if at least one disclosure is missing in the SD-JWT", () => {
     const op = verify(sdjwt_with_disclosures_signed_with_key_a_missing_claims, {
       jwksUri: wellKnownUrl("a-and-b"),
+    });
+
+  it("should not support symmetrical signature algorithms", () => {
+    const op = verify(sdjwt_with_disclosures_signed_with_hs256, {
+      jwksUri: "anything", // it shouldn't even be called
     });
     expect(op).rejects.toBeInstanceOf(Error);
   });

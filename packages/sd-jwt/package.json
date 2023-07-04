@@ -24,7 +24,6 @@
     "lint:fix": "eslint --fix \"src/**\""
   },
   "dependencies": {
-    "jose": "^4.14.4",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^3.0.1"
   },
