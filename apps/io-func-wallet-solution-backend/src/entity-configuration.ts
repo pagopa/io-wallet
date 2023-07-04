@@ -18,7 +18,7 @@ import {
 } from "./wallet-provider";
 import { JwkPublicKey } from "./jwk";
 import { Signer } from "./signer";
-import { EntityConfigurationToJwtModel } from "./jwt-encoders/entity-configuration";
+import { EntityConfigurationToJwtModel } from "./encoders/entity-configuration";
 
 export const FederationEntityMetadata = t.type({
   basePath: UrlFromString,
