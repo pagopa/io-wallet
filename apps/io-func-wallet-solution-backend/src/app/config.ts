@@ -2,12 +2,14 @@ import * as t from "io-ts";
 
 import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
-import { getFederationEntityConfigFromEnvironment } from "../infra/federation-entity/config";
+import { sequenceS } from "fp-ts/lib/Apply";
+import { validate } from "../validation";
 import { FederationEntityMetadata } from "../entity-configuration";
 import {
   CryptoConfiguration,
   getCryptoConfigFromEnvironment,
 } from "../infra/crypto/config";
+import { readFromEnvironment } from "../infra/env";
 
 export const Config = t.type({
   pagopa: t.type({
@@ -32,4 +34,25 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       crypto: config.crypto,
     },
   }))
+);
+
+const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  FederationEntityMetadata
+> = pipe(
+  sequenceS(RE.Apply)({
+    basePath: readFromEnvironment("FederationEntityBasePath"),
+    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
+    homePageUri: readFromEnvironment("FederationEntityHomepageUri"),
+    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
+    tosUri: readFromEnvironment("FederationEntityTosUri"),
+    logoUri: readFromEnvironment("FederationEntityLogoUri"),
+  }),
+  RE.chainEitherKW(
+    validate(
+      FederationEntityMetadata,
+      "Federation entity configuration is invalid"
+    )
+  )
 );
