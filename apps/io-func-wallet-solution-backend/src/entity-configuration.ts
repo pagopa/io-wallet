@@ -20,6 +20,7 @@ import { JwkPublicKey } from "./jwk";
 import { Signer } from "./signer";
 import { EntityConfigurationToJwtModel } from "./encoders/entity-configuration";
 
+// OIDC Federation standard entity metadata
 export const FederationEntityMetadata = t.type({
   basePath: UrlFromString,
   organizationName: NonEmptyString,
@@ -66,6 +67,7 @@ export type EntityConfigurationPayload = t.TypeOf<
   typeof EntityConfigurationPayload
 >;
 
+// Build the JWT body for the entity configuration metadata and return the signed JWT
 export const getEntityConfiguration =
   (): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({ federationEntityMetadata, signer }) =>
