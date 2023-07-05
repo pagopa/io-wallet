@@ -2,13 +2,6 @@ type CountryCode = string;
 type EvidenceType = string;
 type VerificationAssuranceLevel = string;
 type OIDCFederationEntityStatement = unknown;
-type JWK = {
-  kty: "RSA";
-  use: "sig";
-  n: string;
-  e: string;
-  kid: string;
-};
 type UnixTime = number;
 type DisclosureHashAlgorithm = "sha-256";
 
@@ -68,7 +61,12 @@ export type SdJwt4VC = {
     exp: UnixTime;
     status: string;
     cnf: {
-      jwk: JWK;
+      jwk: {
+        kty: string;
+        use: "sig";
+        n: string;
+        e: string;
+      };
     };
     type: "PersonIdentificationData";
     verified_claims: {
