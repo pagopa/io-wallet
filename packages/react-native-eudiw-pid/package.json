@@ -1,0 +1,34 @@
+{
+  "name": "@io-wallet/react-native-eudiw-pid",
+  "version": "0.0.0",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "index.js"
+  ],
+  "packageManager": "yarn@3.3.0",
+  "scripts": {
+    "build": "rm -rf ./dist & tsc",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**\"",
+    "lint:fix": "eslint --fix \"src/**\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@pagopa/eslint-config": "^3.0.0",
+    "@rushstack/eslint-patch": "^1.2.0",
+    "eslint": "^8.38.0",
+    "prettier": "^2.8.7",
+    "typescript": "^5.0.4",
+    "vitest": "^0.30.1"
+  }
+}
