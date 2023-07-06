@@ -62,7 +62,7 @@ export type SdJwt4VC = {
     status: string;
     cnf: {
       jwk: {
-        kty: "RSA"| "EC";
+        kty: "RSA" | "EC";
         use: "sig";
         n: string;
         e: string;
@@ -77,9 +77,14 @@ export type SdJwt4VC = {
   };
 };
 
-type DisclosureValue = string | Record<string, JSON>;
+/**
+ * A triple of values in the form of {salt, claim name, claim value} that represent a parsed disclosure.
+ *
+ * @see https://datatracker.ietf.org/doc/html/draft-ietf-oauth-selective-disclosure-jwt-04
+ * @see https://vcstuff.github.io/draft-terbu-sd-jwt-vc/draft-terbu-oauth-sd-jwt-vc.html
+ */
 export type Disclosure = [
   /* salt */ string,
   /* claim name */ string,
-  /* claim value */ DisclosureValue
+  /* claim value */ string | Record<string, JSON>
 ];

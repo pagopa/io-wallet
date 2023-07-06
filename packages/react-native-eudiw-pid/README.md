@@ -25,8 +25,18 @@ import * as MDocCbor from "react-native-eudiw-pid/mdoc-cbor";
     *   [Parameters](#parameters)
 *   [verify](#verify)
     *   [Parameters](#parameters-1)
-*   [PID](#pid)
+*   [VerifyOptions](#verifyoptions)
     *   [Properties](#properties)
+    *   [jwksUri](#jwksuri)
+*   [VerifyResult](#verifyresult)
+    *   [Properties](#properties-1)
+    *   [pid](#pid)
+    *   [sdJwt](#sdjwt)
+    *   [disclosures](#disclosures)
+*   [PID](#pid-1)
+    *   [Properties](#properties-2)
+*   [Disclosure](#disclosure)
+*   [](#)
 
 #### decode
 
@@ -54,7 +64,7 @@ It throws an error if the validation fails.
 ##### Parameters
 
 *   `token` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The encoded token to be verified
-*   `options` **{jwksUri: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}**&#x20;
+*   `options` **[VerifyOptions](#verifyoptions)**&#x20;
 
     *   `options.jwksUri`  URI of the public endpoint of the emitter
 
@@ -62,7 +72,55 @@ It throws an error if the validation fails.
 
 *   Throws **any** A verification error
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)<{pid: [PID](#pid), sdJwt: SdJwt4VC, disclosures: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)\<Disclosure>}>** The parsed token object along with its related disclosures
+Returns **[VerifyResult](#verifyresult)** The parsed token object along with its related disclosures
+
+#### VerifyOptions
+
+Options for [verify](#verify)
+
+Type: {jwksUri: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}
+
+##### Properties
+
+*   `jwksUri` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+
+##### jwksUri
+
+URI of the public endpoint of the emitter
+
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
+
+#### VerifyResult
+
+Rwsult object for [verify](#verify)
+
+Type: {pid: [PID](#pid), sdJwt: SdJwt4VC, disclosures: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>}
+
+##### Properties
+
+*   `pid` **[PID](#pid)**&#x20;
+*   `sdJwt` **SdJwt4VC**&#x20;
+*   `disclosures` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>**&#x20;
+
+##### pid
+
+The object with the parsed data for PID
+
+Type: [PID](#pid)
+
+##### sdJwt
+
+The object with the parsed SD-JWT token that shipped the PID.
+It will be needed to present PID data.
+
+Type: SdJwt4VC
+
+##### disclosures
+
+Parsed list of discloures with PID values.
+It will be needed to present PID data.
+
+Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>
 
 #### PID
 
@@ -77,6 +135,19 @@ Type: {verification: any, claims: {unique\_id: [string](https://developer.mozill
 
 *   `verification` **any**&#x20;
 *   `claims` **{unique\_id: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), given\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), family\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), birthdate: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), place\_of\_birth: {country: CountryCode, locality: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}, tax\_id\_number: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}**&#x20;
+
+#### Disclosure
+
+*   **See**: <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-selective-disclosure-jwt-04>
+*   **See**: <https://vcstuff.github.io/draft-terbu-sd-jwt-vc/draft-terbu-oauth-sd-jwt-vc.html>
+
+A triple of values in the form of {salt, claim name, claim value} that represent a parsed disclosure.
+
+Type: \[[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), ([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), [JSON](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)>)]
+
+####
+
+Salt
 
 ### MDOC-CBOR
 

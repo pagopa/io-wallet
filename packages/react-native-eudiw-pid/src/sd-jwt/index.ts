@@ -26,14 +26,40 @@ export declare function decode(token: string): Promise<SdJwt4VC>;
  * @param options.jwksUri URI of the public endpoint of the emitter
  *
  * @throws A verification error
- * @returns The parsed token object along with its related disclosures
+ * @returns {VerifyResult} The parsed token object along with its related disclosures
  *
  */
 export declare function verify(
   token: string,
-  options: {
-    jwksUri: string;
-  }
-): Promise<{ pid: PID; sdJwt: SdJwt4VC; disclosures: Disclosure[] }>;
+  options: VerifyOptions
+): Promise<VerifyResult>;
+
+/**
+ * Options for {@link verify}
+ */
+export type VerifyOptions = {
+  /** URI of the public endpoint of the emitter */
+  jwksUri: string;
+};
+
+/**
+ * Rwsult object for {@link verify}
+ */
+export type VerifyResult = {
+  /**
+   * The object with the parsed data for PID
+   */
+  pid: PID;
+  /**
+   * The object with the parsed SD-JWT token that shipped the PID.
+   * It will be needed to present PID data.
+   */
+  sdJwt: SdJwt4VC;
+  /**
+   * Parsed list of discloures with PID values.
+   * It will be needed to present PID data.
+   */
+  disclosures: Disclosure[];
+};
 
 export { PID } from "./types";
