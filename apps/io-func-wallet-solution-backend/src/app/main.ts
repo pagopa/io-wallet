@@ -20,15 +20,15 @@ const config = configOrError;
 
 export const Info = InfoFunction({});
 
-const signer = new CryptoSigner(config.pagopa.crypto);
+const signer = new CryptoSigner(config.crypto);
 
 export const GetEntityConfiguration = GetEntityConfigurationFunction({
-  federationEntityMetadata: config.pagopa.federationEntity,
+  federationEntityMetadata: config.federationEntity,
   signer,
 });
 
 export const CreateWalletInstanceAttestation =
   CreateWalletInstanceAttestationFunction({
-    federationEntityMetadata: config.pagopa.federationEntity,
+    federationEntityMetadata: config.federationEntity,
     signer,
   });

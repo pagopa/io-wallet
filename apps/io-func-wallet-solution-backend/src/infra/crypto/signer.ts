@@ -9,7 +9,7 @@ import * as jose from "jose";
 import { Signer } from "../../signer";
 import { ECKey, Jwk, RSAKey } from "../../jwk";
 import { validate } from "../../validation";
-import { CryptoConfiguration } from "./config";
+import { CryptoConfiguration } from "../../app/config";
 
 const supportedSignAlgorithms = [
   "ES256",
@@ -55,9 +55,13 @@ export class CryptoSigner implements Signer {
         TE.tryCatch(
           () =>
             new jose.SignJWT(payload)
-              .setProtectedHeader({ kid, alg: "ES256", typ })
+              .setProtectedHeader({
+                kid,
+                alg: this.#configuration.jwtDefaultAlg,
+                typ,
+              })
               .setIssuedAt()
-              .setExpirationTime("1h")
+              .setExpirationTime(this.#configuration.jwtDuration)
               .sign(joseKey),
           E.toError
         )
