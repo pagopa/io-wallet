@@ -20,7 +20,9 @@
     "build:package": "npm-pack-zip --add-version"
   },
   "dependencies": {
-    "@pagopa/handler-kit-azure-func": "^1.2.0"
+    "@pagopa/handler-kit-azure-func": "^1.2.0",
+    "@pagopa/ts-commons": "^12.0.0",
+    "jose": "^4.14.4"
   },
   "devDependencies": {
     "@azure/functions": "^3.2.0",
