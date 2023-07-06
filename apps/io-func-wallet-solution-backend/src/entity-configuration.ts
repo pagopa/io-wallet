@@ -34,7 +34,7 @@ export type FederationEntityMetadata = t.TypeOf<
   typeof FederationEntityMetadata
 >;
 
-type EntityConfigurationEnvironment = {
+export type EntityConfigurationEnvironment = {
   federationEntityMetadata: FederationEntityMetadata;
   signer: Signer;
 };
