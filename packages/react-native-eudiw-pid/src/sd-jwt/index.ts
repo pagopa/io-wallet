@@ -43,7 +43,7 @@ export type VerifyOptions = {
 };
 
 /**
- * Rwsult object for {@link verify}
+ * Result object for {@link verify}
  */
 export type VerifyResult = {
   /**
