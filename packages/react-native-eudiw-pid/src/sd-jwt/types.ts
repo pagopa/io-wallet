@@ -62,7 +62,7 @@ export type SdJwt4VC = {
     status: string;
     cnf: {
       jwk: {
-        kty: string;
+        kty: "RSA"| "EC";
         use: "sig";
         n: string;
         e: string;
