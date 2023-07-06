@@ -38,7 +38,11 @@ describe("CryptoSigner", async () => {
   const jwks = [privateEcKey, privateRsaKey];
   const publicJwks = [publicEcKey, publicRsaKey];
 
-  const signer = new CryptoSigner({ jwks });
+  const signer = new CryptoSigner({
+    jwks,
+    jwtDefaultAlg: "ES256",
+    jwtDuration: "1h",
+  });
 
   it("should return a jwks of only public keys", () => {
     const run = signer.getPublicKeys();
@@ -51,7 +55,11 @@ describe("CryptoSigner", async () => {
 
   it("shouldn't return a jwks", () => {
     const jwks = [{ thisIsNotAKey: "00" } as unknown as Jwk];
-    const signer = new CryptoSigner({ jwks });
+    const signer = new CryptoSigner({
+      jwks,
+      jwtDefaultAlg: "ES256",
+      jwtDuration: "1h",
+    });
 
     const run = signer.getPublicKeys();
 
@@ -101,7 +109,11 @@ describe("CryptoSigner", async () => {
   });
 
   it("should fail to create and sign a JWT", async () => {
-    const signerWithOnlyRsa = new CryptoSigner({ jwks: [privateRsaKey] });
+    const signerWithOnlyRsa = new CryptoSigner({
+      jwks: [privateRsaKey],
+      jwtDefaultAlg: "ES256",
+      jwtDuration: "1h",
+    });
     const result = await signerWithOnlyRsa.createJwtAndsign("demo")({
       sub: "Subjet of JWT",
       iss: "Issuer of JWT",
