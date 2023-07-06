@@ -9,7 +9,7 @@ import * as jose from "jose";
 import { Signer } from "../../signer";
 import { ECKey, Jwk, RSAKey } from "../../jwk";
 import { validate } from "../../validation";
-import { CryptoConfiguration } from "./config";
+import { CryptoConfiguration } from "../../app/config";
 
 const supportedSignAlgorithms = [
   "ES256",
