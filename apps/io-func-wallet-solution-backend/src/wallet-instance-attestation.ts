@@ -4,17 +4,17 @@ import { pipe } from "fp-ts/function";
 
 import { EntityConfigurationEnvironment } from "./entity-configuration";
 
-// Build the JWT body for the entity configuration metadata and return the signed JWT
+// Build the JWT of the Wallet Instance Attestation given a Wallet Instance Attestation Request
 export const createWalletInstanceAttestation =
   (
-    assertion: string
+    walletInstanceAttestationRequest: string
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({ federationEntityMetadata, signer }) =>
     pipe(
       {
         iss: federationEntityMetadata.basePath.href,
         sub: federationEntityMetadata.basePath.href,
-        assertion,
+        walletInstanceAttestationRequest,
       },
       TE.of,
       TE.chain(signer.createJwtAndsign("entity-statement+jwt"))

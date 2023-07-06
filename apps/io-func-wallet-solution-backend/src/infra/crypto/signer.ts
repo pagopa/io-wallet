@@ -41,32 +41,34 @@ export class CryptoSigner implements Signer {
     );
 
   // TODO: [SIW-260] Make algorithm management separate and not hard-coded
-  createJwtAndsign = (typ: string) => (payload: jose.JWTPayload) =>
-    pipe(
-      getFirstPrivateKeyByAlg(this.#configuration.jwks, "EC"),
-      TE.fromOption(() => new Error("No keys found for this algorithm")),
-      TE.chain((privateKey) =>
-        pipe(
-          TE.tryCatch(() => jose.importJWK(privateKey), E.toError),
-          TE.map((joseKey) => ({ joseKey, kid: privateKey.kid }))
+  createJwtAndsign =
+    (typ: string, jwtDuration = this.#configuration.jwtDuration) =>
+    (payload: jose.JWTPayload) =>
+      pipe(
+        getFirstPrivateKeyByAlg(this.#configuration.jwks, "EC"),
+        TE.fromOption(() => new Error("No keys found for this algorithm")),
+        TE.chain((privateKey) =>
+          pipe(
+            TE.tryCatch(() => jose.importJWK(privateKey), E.toError),
+            TE.map((joseKey) => ({ joseKey, kid: privateKey.kid }))
+          )
+        ),
+        TE.chain(({ joseKey, kid }) =>
+          TE.tryCatch(
+            () =>
+              new jose.SignJWT(payload)
+                .setProtectedHeader({
+                  kid,
+                  alg: this.#configuration.jwtDefaultAlg,
+                  typ,
+                })
+                .setIssuedAt()
+                .setExpirationTime(jwtDuration)
+                .sign(joseKey),
+            E.toError
+          )
         )
-      ),
-      TE.chain(({ joseKey, kid }) =>
-        TE.tryCatch(
-          () =>
-            new jose.SignJWT(payload)
-              .setProtectedHeader({
-                kid,
-                alg: this.#configuration.jwtDefaultAlg,
-                typ,
-              })
-              .setIssuedAt()
-              .setExpirationTime(this.#configuration.jwtDuration)
-              .sign(joseKey),
-          E.toError
-        )
-      )
-    );
+      );
 
   getSupportedSignAlgorithms = () => E.right(supportedSignAlgorithms);
 }

@@ -26,7 +26,7 @@ const requireWalletInstanceAttestationRequest = (req: H.HttpRequest) =>
     H.parse(WalletInstanceAttestationRequestPayload),
     E.chain(({ assertion, grant_type }) =>
       sequenceS(E.Apply)({
-        assertion: E.right(assertion),
+        walletInstanceAttestationRequest: E.right(assertion),
         grantType: E.right(grant_type),
       })
     ),
@@ -38,7 +38,9 @@ export const CreateWalletInstanceAttestationHandler = H.of(
     pipe(
       req,
       requireWalletInstanceAttestationRequest,
-      RTE.chain(({ assertion }) => createWalletInstanceAttestation(assertion)),
+      RTE.chain(({ walletInstanceAttestationRequest }) =>
+        createWalletInstanceAttestation(walletInstanceAttestationRequest)
+      ),
       RTE.map(H.successJson),
       RTE.orElseW(logErrorAndReturnResponse)
     )
