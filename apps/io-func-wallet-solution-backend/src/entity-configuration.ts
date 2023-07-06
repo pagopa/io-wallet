@@ -8,7 +8,6 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 
-import { validate } from "./validation";
 import {
   GRANT_TYPE_KEY_ATTESTATION,
   LoA,
@@ -104,12 +103,6 @@ export const getEntityConfiguration =
           logoUri: federationEntityMetadata.logoUri.href,
         },
       })),
-      E.chainW(
-        validate(
-          EntityConfigurationPayload,
-          "Invalid entity configuration payload"
-        )
-      ),
       E.map(EntityConfigurationToJwtModel.encode),
       TE.fromEither,
       TE.chain(signer.createJwtAndsign("entity-statement+jwt"))

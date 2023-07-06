@@ -12,10 +12,8 @@ import {
 import { readFromEnvironment } from "../infra/env";
 
 export const Config = t.type({
-  pagopa: t.type({
-    federationEntity: FederationEntityMetadata,
-    crypto: CryptoConfiguration,
-  }),
+  federationEntity: FederationEntityMetadata,
+  crypto: CryptoConfiguration,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -29,10 +27,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("federationEntity", () => getFederationEntityConfigFromEnvironment),
   RE.bind("crypto", () => getCryptoConfigFromEnvironment),
   RE.map((config) => ({
-    pagopa: {
-      federationEntity: config.federationEntity,
-      crypto: config.crypto,
-    },
+    federationEntity: config.federationEntity,
+    crypto: config.crypto,
   }))
 );
 
