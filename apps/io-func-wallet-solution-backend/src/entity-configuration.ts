@@ -33,12 +33,12 @@ export type FederationEntityMetadata = t.TypeOf<
   typeof FederationEntityMetadata
 >;
 
-type EntityConfigurationEnvironment = {
+export type EntityConfigurationEnvironment = {
   federationEntityMetadata: FederationEntityMetadata;
   signer: Signer;
 };
 
-const FederationEntity = t.type({
+export const FederationEntity = t.type({
   organizationName: t.string,
   homepageUri: t.string,
   policyUri: t.string,
