@@ -10,6 +10,7 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 import { createWalletInstanceAttestation } from "../../../wallet-instance-attestation";
+import { ValidationError } from "../../../validation";
 
 const WalletInstanceAttestationRequestPayload = t.type({
   grant_type: NonEmptyString,
@@ -38,10 +39,13 @@ export const CreateWalletInstanceAttestationHandler = H.of(
     pipe(
       req,
       requireWalletInstanceAttestationRequest,
-      RTE.chain(({ walletInstanceAttestationRequest }) =>
-        createWalletInstanceAttestation(walletInstanceAttestationRequest)
+      RTE.chain(({ walletInstanceAttestationRequest, grantType }) =>
+        grantType ===
+        "urn:ietf:params:oauth:client-assertion-type:jwt-key-attestation"
+          ? createWalletInstanceAttestation(walletInstanceAttestationRequest)
+          : RTE.left(new ValidationError(["Invalid grant type!"]))
       ),
-      RTE.map(H.successJson),
+      RTE.map(H.createdJson),
       RTE.orElseW(logErrorAndReturnResponse)
     )
 );
