@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 
-import { pipe } from "fp-ts/function";
+import { pipe, flow } from "fp-ts/function";
 import * as A from "fp-ts/lib/Array";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -79,11 +79,14 @@ export class CryptoSigner implements Signer {
   // Return the first public key in Wallet Provider JWKS given the kty
   getFirstPublicKeyByKty = (kty: Jwk["kty"]) =>
     pipe(
-      this.#configuration.jwks,
-      A.findFirst((key) => key.kty === kty),
-      validate(
-        t.union([t.exact(ECKey), t.exact(RSAKey)]),
-        "JWK appears to not be a public key"
+      this.getPublicKeys(),
+      E.chain(
+        flow(
+          A.findFirst((key) => key.kty === kty),
+          E.fromOption(
+            () => new Error(`First public key with kty ${kty} not found`)
+          )
+        )
       )
     );
 }

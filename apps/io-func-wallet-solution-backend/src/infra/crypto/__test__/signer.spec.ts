@@ -46,6 +46,15 @@ describe("CryptoSigner", async () => {
     jwtDuration: "1h",
   });
 
+  it("should return first jwk with EC kty", () => {
+    const run = signer.getFirstPublicKeyByKty("EC");
+    expect(run).toEqual(
+      expect.objectContaining({
+        right: expect.objectContaining(publicEcKey),
+      })
+    );
+  });
+
   it("should return a jwks of only public keys", () => {
     const run = signer.getPublicKeys();
     expect(run).toEqual(

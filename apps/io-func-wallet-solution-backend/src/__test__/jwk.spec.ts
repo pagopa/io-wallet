@@ -25,7 +25,7 @@ const publicEcKey = {
   x: "CakCjesDBwXeReRwLRzmhg6UwOKfM0NZpHYHjC0iucU",
   y: "a5cs0ywZzV6MGeBR8eIHyrs8KoAqv0DuW6qqSkZFCMM",
   crv: "P-256",
-  kid: "ec#1",
+  kid: "rsa#1",
 };
 
 const privateEcKey = {
