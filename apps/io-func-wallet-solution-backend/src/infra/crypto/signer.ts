@@ -3,6 +3,7 @@ import * as t from "io-ts";
 import { pipe, flow } from "fp-ts/function";
 import * as A from "fp-ts/lib/Array";
 import * as E from "fp-ts/lib/Either";
+import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
@@ -45,12 +46,20 @@ export class CryptoSigner implements Signer {
     (
       header: JwtHeader,
       kid: string,
+      alg = this.#configuration.jwtDefaultAlg,
       jwtDuration = this.#configuration.jwtDuration
     ) =>
     (payload: jose.JWTPayload) =>
       pipe(
-        getPrivateKeyByKid(this.#configuration.jwks, kid),
-        TE.fromOption(() => new Error("No keys found for this algorithm")),
+        this.isAlgorithmSupported(alg)
+          ? getPrivateKeyByKid(this.#configuration.jwks, kid)
+          : O.none,
+        TE.fromOption(
+          () =>
+            new Error(
+              "No keys found for this algorithm or the algorithm is not supported"
+            )
+        ),
         TE.chain((privateKey) =>
           pipe(
             TE.tryCatch(() => jose.importJWK(privateKey), E.toError),
@@ -64,7 +73,7 @@ export class CryptoSigner implements Signer {
                 .setProtectedHeader({
                   ...header,
                   kid,
-                  alg: this.#configuration.jwtDefaultAlg,
+                  alg,
                 })
                 .setIssuedAt()
                 .setExpirationTime(jwtDuration)
@@ -75,6 +84,13 @@ export class CryptoSigner implements Signer {
       );
 
   getSupportedSignAlgorithms = () => E.right(supportedSignAlgorithms);
+
+  isAlgorithmSupported = (alg: string) =>
+    pipe(
+      supportedSignAlgorithms,
+      A.findFirst((supportedAlg) => supportedAlg === alg),
+      O.isSome
+    );
 
   // Return the first public key in Wallet Provider JWKS given the kty
   getFirstPublicKeyByKty = (kty: Jwk["kty"]) =>

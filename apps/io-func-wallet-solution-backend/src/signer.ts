@@ -15,7 +15,9 @@ export type Signer = {
   createJwtAndsign: (
     header: JwtHeader,
     kid: string,
+    alg?: string,
     jwtDuration?: string
   ) => (payload: jose.JWTPayload) => TE.TaskEither<Error, string>;
   getFirstPublicKeyByKty: (kty: Jwk["kty"]) => E.Either<Error, JwkPublicKey>;
+  isAlgorithmSupported: (alg: string) => boolean;
 };
