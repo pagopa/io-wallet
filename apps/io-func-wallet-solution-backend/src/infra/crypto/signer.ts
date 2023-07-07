@@ -6,7 +6,7 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
-import { Signer } from "../../signer";
+import { JwtHeader, Signer } from "../../signer";
 import { ECKey, Jwk, RSAKey } from "../../jwk";
 import { validate } from "../../validation";
 import { CryptoConfiguration } from "../../app/config";
@@ -42,10 +42,14 @@ export class CryptoSigner implements Signer {
 
   // TODO: [SIW-260] Make algorithm management separate and not hard-coded
   createJwtAndsign =
-    (typ: string, jwtDuration = this.#configuration.jwtDuration) =>
+    (
+      header: JwtHeader,
+      kid: string,
+      jwtDuration = this.#configuration.jwtDuration
+    ) =>
     (payload: jose.JWTPayload) =>
       pipe(
-        getFirstPrivateKeyByAlg(this.#configuration.jwks, "EC"),
+        getPrivateKeyByKid(this.#configuration.jwks, kid),
         TE.fromOption(() => new Error("No keys found for this algorithm")),
         TE.chain((privateKey) =>
           pipe(
@@ -58,9 +62,9 @@ export class CryptoSigner implements Signer {
             () =>
               new jose.SignJWT(payload)
                 .setProtectedHeader({
+                  ...header,
                   kid,
                   alg: this.#configuration.jwtDefaultAlg,
-                  typ,
                 })
                 .setIssuedAt()
                 .setExpirationTime(jwtDuration)
@@ -71,13 +75,21 @@ export class CryptoSigner implements Signer {
       );
 
   getSupportedSignAlgorithms = () => E.right(supportedSignAlgorithms);
+
+  // Return the first public key in Wallet Provider JWKS given the kty
+  getFirstPublicKeyByKty = (kty: Jwk["kty"]) =>
+    pipe(
+      this.#configuration.jwks,
+      A.findFirst((key) => key.kty === kty),
+      validate(
+        t.union([t.exact(ECKey), t.exact(RSAKey)]),
+        "JWK appears to not be a public key"
+      )
+    );
 }
 
-const getFirstPrivateKeyByAlg = (
-  jwks: CryptoConfiguration["jwks"],
-  alg: Jwk["kty"]
-) =>
+const getPrivateKeyByKid = (jwks: CryptoConfiguration["jwks"], kid: string) =>
   pipe(
     jwks,
-    A.findFirst((key) => key.kty === alg)
+    A.findFirst((key) => key.kid === kid)
   );

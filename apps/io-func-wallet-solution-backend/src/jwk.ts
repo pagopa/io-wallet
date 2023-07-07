@@ -5,17 +5,13 @@ import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
 import { validate } from "./validation";
 
-export const ECKey = t.intersection([
-  t.type({
-    crv: t.string,
-    kty: t.literal("EC"),
-    x: t.string,
-    y: t.string,
-  }),
-  t.partial({
-    kid: t.string,
-  }),
-]);
+export const ECKey = t.type({
+  crv: t.string,
+  kty: t.literal("EC"),
+  x: t.string,
+  y: t.string,
+  kid: t.string,
+});
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
@@ -33,10 +29,10 @@ export const RSAKey = t.intersection([
     e: t.string,
     kty: t.literal("RSA"),
     n: t.string,
+    kid: t.string,
   }),
   t.partial({
     alg: t.string,
-    kid: t.string,
   }),
 ]);
 

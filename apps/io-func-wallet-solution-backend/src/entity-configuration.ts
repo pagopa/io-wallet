@@ -73,37 +73,46 @@ export const getEntityConfiguration =
     pipe(
       sequenceS(E.Apply)({
         jwks: signer.getPublicKeys(),
+        publicJwk: signer.getFirstPublicKeyByKty("EC"),
         supportedSignAlgorithms: signer.getSupportedSignAlgorithms(),
       }),
-      E.map(({ jwks, supportedSignAlgorithms }) => ({
-        iss: federationEntityMetadata.basePath.href,
-        sub: federationEntityMetadata.basePath.href,
-        walletProviderMetadata: {
-          jwks,
-          tokenEndpoint: new URL(
-            RELATIVE_TOKEN_ENDPOINT,
-            federationEntityMetadata.basePath.href
-          ).href,
-          tokenEndpointAuthSigningAlgValuesSupported: supportedSignAlgorithms,
-          ascValues: [
-            pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
-            pipe(federationEntityMetadata.basePath, getLoAUri(LoA.medium)),
-            pipe(federationEntityMetadata.basePath, getLoAUri(LoA.hight)),
-          ],
-          grantTypesSupported: [GRANT_TYPE_KEY_ATTESTATION],
-          tokenEndpointAuthMethodsSupported: [
-            TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
-          ],
-        },
-        federationEntity: {
-          organizationName: federationEntityMetadata.organizationName,
-          homepageUri: federationEntityMetadata.homePageUri.href,
-          policyUri: federationEntityMetadata.policyUri.href,
-          tosUri: federationEntityMetadata.tosUri.href,
-          logoUri: federationEntityMetadata.logoUri.href,
-        },
-      })),
-      E.map(EntityConfigurationToJwtModel.encode),
       TE.fromEither,
-      TE.chain(signer.createJwtAndsign("entity-statement+jwt"))
+      TE.chain(({ jwks, publicJwk, supportedSignAlgorithms }) =>
+        pipe(
+          {
+            iss: federationEntityMetadata.basePath.href,
+            sub: federationEntityMetadata.basePath.href,
+            walletProviderMetadata: {
+              jwks,
+              tokenEndpoint: new URL(
+                RELATIVE_TOKEN_ENDPOINT,
+                federationEntityMetadata.basePath.href
+              ).href,
+              tokenEndpointAuthSigningAlgValuesSupported:
+                supportedSignAlgorithms,
+              ascValues: [
+                pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
+                pipe(federationEntityMetadata.basePath, getLoAUri(LoA.medium)),
+                pipe(federationEntityMetadata.basePath, getLoAUri(LoA.hight)),
+              ],
+              grantTypesSupported: [GRANT_TYPE_KEY_ATTESTATION],
+              tokenEndpointAuthMethodsSupported: [
+                TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
+              ],
+            },
+            federationEntity: {
+              organizationName: federationEntityMetadata.organizationName,
+              homepageUri: federationEntityMetadata.homePageUri.href,
+              policyUri: federationEntityMetadata.policyUri.href,
+              tosUri: federationEntityMetadata.tosUri.href,
+              logoUri: federationEntityMetadata.logoUri.href,
+            },
+          },
+          EntityConfigurationToJwtModel.encode,
+          signer.createJwtAndsign(
+            { typ: "entity-statement+jwt" },
+            publicJwk.kid
+          )
+        )
+      )
     );
