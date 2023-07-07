@@ -28,6 +28,7 @@ export const WalletInstanceAttestationJwtModel = t.type({
   request_object_signing_alg_values_supported: t.array(t.string),
   presentation_definition_uri_supported: t.boolean,
 });
+
 export type WalletInstanceAttestationJwtModel = t.TypeOf<
   typeof WalletInstanceAttestationJwtModel
 >;

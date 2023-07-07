@@ -9,6 +9,7 @@
     },
   ],
   "settings": {
-    "azureFunctions.funcCliPath": "../../node_modules/.bin/func"
+    "azureFunctions.funcCliPath": "../../node_modules/.bin/func",
+    "debug.internalConsoleOptions": "neverOpen"
   }
 }
