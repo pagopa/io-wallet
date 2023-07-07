@@ -11,6 +11,7 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 import { createWalletInstanceAttestation } from "../../../wallet-instance-attestation";
 import { ValidationError } from "../../../validation";
+import { GRANT_TYPE_KEY_ATTESTATION } from "../../../wallet-provider";
 
 const WalletInstanceAttestationRequestPayload = t.type({
   grant_type: NonEmptyString,
@@ -40,8 +41,7 @@ export const CreateWalletInstanceAttestationHandler = H.of(
       req,
       requireWalletInstanceAttestationRequest,
       RTE.chain(({ walletInstanceAttestationRequest, grantType }) =>
-        grantType ===
-        "urn:ietf:params:oauth:client-assertion-type:jwt-key-attestation"
+        grantType === GRANT_TYPE_KEY_ATTESTATION
           ? createWalletInstanceAttestation(walletInstanceAttestationRequest)
           : RTE.left(new ValidationError(["Invalid grant type!"]))
       ),

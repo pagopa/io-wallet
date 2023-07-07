@@ -10,6 +10,7 @@ import { CryptoSigner } from "../../../crypto/signer";
 import { UrlFromString, ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { FederationEntityMetadata } from "../../../../entity-configuration";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { GRANT_TYPE_KEY_ATTESTATION } from "../../../../wallet-provider";
 
 const publicEcKey = {
   kty: "EC",
@@ -78,8 +79,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         ...req,
         method: "POST",
         body: {
-          grant_type:
-            "urn:ietf:params:oauth:client-assertion-type:jwt-key-attestation",
+          grant_type: GRANT_TYPE_KEY_ATTESTATION,
           assertion: walletInstanceAttestationRequest,
         },
       })),
