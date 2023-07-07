@@ -1,12 +1,11 @@
 type CountryCode = string;
 type EvidenceType = string;
-type VerificationAssuranceLevel = string;
 type OIDCFederationEntityStatement = unknown;
 type UnixTime = number;
 type DisclosureHashAlgorithm = "sha-256";
 
 type ObfuscatedDisclosures = { _sd: string[] };
-export type VerificationEvidence = Array<{
+type VerificationEvidence = Array<{
   type: EvidenceType;
   record: {
     type: string;
@@ -18,10 +17,28 @@ export type VerificationEvidence = Array<{
   };
 }>;
 
-export type Verification = {
+/**
+ * Contain the information as sub claims regarding the identity proofing evidence during the issuing phase of the PID
+ *
+ * @see https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type Verification = {
   trust_framework: "eidas";
-  assurance_level: VerificationAssuranceLevel;
+  assurance_level: string;
+  evidence: VerificationEvidence;
 };
+
+/**
+ * Same as Verification, but the evidences are obfuscated and provided as disclosures.
+ * This because the evenidences refers to the User and might reveal personal data.
+ *
+ * @see https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html
+ */
+type ObfuscatedVerification = {
+  trust_framework: "eidas";
+  assurance_level: string;
+} & ObfuscatedDisclosures;
 
 /**
  * Data structure for the PID.
@@ -30,9 +47,7 @@ export type Verification = {
  * @see https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html
  */
 export type PID = {
-  verification: Verification & {
-    evidence: VerificationEvidence;
-  };
+  issuer: string;
   claims: {
     unique_id: string;
     given_name: string;
@@ -70,7 +85,7 @@ export type SdJwt4VC = {
     };
     type: "PersonIdentificationData";
     verified_claims: {
-      verification: Verification & ObfuscatedDisclosures;
+      verification: ObfuscatedVerification;
       claims: ObfuscatedDisclosures;
     };
     _sd_alg: DisclosureHashAlgorithm;

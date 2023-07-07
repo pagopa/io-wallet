@@ -33,10 +33,12 @@ import * as MDocCbor from "react-native-eudiw-pid/mdoc-cbor";
     *   [pid](#pid)
     *   [sdJwt](#sdjwt)
     *   [disclosures](#disclosures)
-*   [PID](#pid-1)
+*   [Verification](#verification)
     *   [Properties](#properties-2)
+*   [ObfuscatedVerification](#obfuscatedverification)
+*   [PID](#pid-1)
+    *   [Properties](#properties-3)
 *   [Disclosure](#disclosure)
-*   [](#)
 
 #### decode
 
@@ -92,7 +94,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### VerifyResult
 
-Rwsult object for [verify](#verify)
+Result object for [verify](#verify)
 
 Type: {pid: [PID](#pid), sdJwt: SdJwt4VC, disclosures: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>}
 
@@ -122,6 +124,29 @@ It will be needed to present PID data.
 
 Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>
 
+#### Verification
+
+*   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
+
+Contain the information as sub claims regarding the identity proofing evidence during the issuing phase of the PID
+
+Type: {trust\_framework: `"eidas"`, assurance\_level: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), evidence: VerificationEvidence}
+
+##### Properties
+
+*   `trust_framework` **`"eidas"`**&#x20;
+*   `assurance_level` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
+*   `evidence` **VerificationEvidence**&#x20;
+
+#### ObfuscatedVerification
+
+*   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
+
+Same as Verification, but the evidences are obfuscated and provided as disclosures.
+This because the evenidences refers to the User and might reveal personal data.
+
+Type: any
+
 #### PID
 
 *   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
@@ -129,11 +154,11 @@ Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global
 Data structure for the PID.
 It contains PID claims in plain text as well as verification data with emitter' information
 
-Type: {verification: any, claims: {unique\_id: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), given\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), family\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), birthdate: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), place\_of\_birth: {country: CountryCode, locality: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}, tax\_id\_number: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}}
+Type: {issuer: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), claims: {unique\_id: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), given\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), family\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), birthdate: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), place\_of\_birth: {country: CountryCode, locality: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}, tax\_id\_number: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}}
 
 ##### Properties
 
-*   `verification` **any**&#x20;
+*   `issuer` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
 *   `claims` **{unique\_id: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), given\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), family\_name: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), birthdate: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), place\_of\_birth: {country: CountryCode, locality: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}, tax\_id\_number: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}**&#x20;
 
 #### Disclosure
@@ -144,10 +169,6 @@ Type: {verification: any, claims: {unique\_id: [string](https://developer.mozill
 A triple of values in the form of {salt, claim name, claim value} that represent a parsed disclosure.
 
 Type: \[[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), ([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), [JSON](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)>)]
-
-####
-
-Salt
 
 ### MDOC-CBOR
 
