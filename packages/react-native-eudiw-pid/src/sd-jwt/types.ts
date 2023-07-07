@@ -10,9 +10,9 @@ type VerificationEvidence = Array<{
   record: {
     type: string;
     source: {
-      organization_name: string;
-      organization_id: string;
-      country_code: CountryCode;
+      organizationName: string;
+      organizationId: string;
+      countryCode: CountryCode;
     };
   };
 }>;
@@ -24,21 +24,10 @@ type VerificationEvidence = Array<{
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type Verification = {
-  trust_framework: "eidas";
-  assurance_level: string;
+  trustFramework: "eidas";
+  assuranceLevel: string;
   evidence: VerificationEvidence;
 };
-
-/**
- * Same as Verification, but the evidences are obfuscated and provided as disclosures.
- * This because the evenidences refers to the User and might reveal personal data.
- *
- * @see https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html
- */
-type ObfuscatedVerification = {
-  trust_framework: "eidas";
-  assurance_level: string;
-} & ObfuscatedDisclosures;
 
 /**
  * Data structure for the PID.
@@ -48,16 +37,19 @@ type ObfuscatedVerification = {
  */
 export type PID = {
   issuer: string;
+  issuedAt: Date;
+  expiration: Date;
+  verification: Verification;
   claims: {
-    unique_id: string;
-    given_name: string;
-    family_name: string;
+    uniqueId: string;
+    givenName: string;
+    familyName: string;
     birthdate: string;
-    place_of_birth: {
+    placeOfBirth: {
       country: CountryCode;
       locality: string;
     };
-    tax_id_number: string;
+    taxIdNumber: string;
   };
 };
 
@@ -85,7 +77,10 @@ export type SdJwt4VC = {
     };
     type: "PersonIdentificationData";
     verified_claims: {
-      verification: ObfuscatedVerification;
+      verification: {
+        trust_framework: "eidas";
+        assurance_level: string;
+      } & ObfuscatedDisclosures;
       claims: ObfuscatedDisclosures;
     };
     _sd_alg: DisclosureHashAlgorithm;
