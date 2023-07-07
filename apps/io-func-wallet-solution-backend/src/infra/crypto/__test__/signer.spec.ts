@@ -10,6 +10,7 @@ const publicRsaKey = {
   kty: "RSA",
   n: "s-rm_5nl9JIqpMVk97FXAFZ0O7Gej5Trnh8GNCSq3PUGWJGGevZ072J69HnnsFqh0f-h1_WaTX7su_9YX7Q8ktOe9ov8aNORMh9dAIsofFf_tPSflJY95gyLbX1QoZ3G7tv8ZspZKjLDuHZMv2R8WPNpnrF8UFNXN_IUcfBMI3kOXCgwaKUZhQ7A-DIcZWpfhT-CjGsDia_vtIFYK5PlFBOQtLCUlrZUES91gP-Dp_WO0lYLMiJZkOB1LzX_4Q1vqE9ihR4tsCsXWhWzxLr-OQSrbp8UMuTHlJSRBEBfWLBwdRE6mcaOJknabD0ROwI_Rkw4-6490tET1YJ7tBPN9w",
   e: "AQAB",
+  kid: "rsa#1",
 } as RSAKey;
 
 const privateRsaKey = {
@@ -27,6 +28,7 @@ const publicEcKey = {
   x: "CakCjesDBwXeReRwLRzmhg6UwOKfM0NZpHYHjC0iucU",
   y: "a5cs0ywZzV6MGeBR8eIHyrs8KoAqv0DuW6qqSkZFCMM",
   crv: "P-256",
+  kid: "ec#1",
 } as ECKey;
 
 const privateEcKey = {
@@ -91,7 +93,10 @@ describe("CryptoSigner", async () => {
   });
 
   it("should create and sign a JWT", async () => {
-    const result = await signer.createJwtAndsign("demo")({
+    const result = await signer.createJwtAndsign(
+      { typ: "demo" },
+      publicEcKey.kid
+    )({
       sub: "Subjet of JWT",
       iss: "Issuer of JWT",
     })();
@@ -114,7 +119,10 @@ describe("CryptoSigner", async () => {
       jwtDefaultAlg: "ES256",
       jwtDuration: "1h",
     });
-    const result = await signerWithOnlyRsa.createJwtAndsign("demo")({
+    const result = await signerWithOnlyRsa.createJwtAndsign(
+      { typ: "demo" },
+      publicEcKey.kid
+    )({
       sub: "Subjet of JWT",
       iss: "Issuer of JWT",
     })();
