@@ -36,6 +36,7 @@ export type WalletInstanceAttestationRequestPayload = t.TypeOf<
   typeof WalletInstanceAttestationRequestPayload
 >;
 
+// Verify and extract header and payload from Wallet Instance Attestation Request
 export const verifyWalletInstanceAttestationRequest = (jwt: string) =>
   pipe(
     jwt,
