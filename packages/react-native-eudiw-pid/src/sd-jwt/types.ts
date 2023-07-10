@@ -39,7 +39,7 @@ const Verification = z.object({
 
 /**
  * Data structure for the PID.
- * It contains PID claims in plain text as well as verification data with emitter' information
+ * It contains PID claims in plain text as well as verification data with the issuer's information
  *
  * @see https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html
  */

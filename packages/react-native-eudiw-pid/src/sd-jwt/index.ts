@@ -4,7 +4,7 @@ import { pidFromToken } from "./converters";
 
 /**
  * Decode a given SD-JWT with Disclosures to get the parsed PID object they define.
- * It ensures provided data is in the valid shape.
+ * It ensures provided data is in a valid shape.
  *
  * It DOES NOT verify token signature nor check disclosures are correctly referenced by the SD-JWT.
  * Use {@link verify} instead
@@ -65,7 +65,7 @@ export function decode(token: string): PidWithToken {
  * @throws A decoding error if the token doesn't resolve in a valid SD-JWT
  * @throws A validation error if the provided data doesn't result in a valid PID
  * @throws A validation error if the provided disclosures are not defined in the SD-JWT
- * @throws An invalid signature error if the token signature is not valid
+ * @throws Invalid signature error if the token signature is not valid
  *
  */
 export async function verify(
@@ -87,7 +87,7 @@ export async function verify(
  * Options for {@link verify}
  */
 export type VerifyOptions = {
-  /** URI of the public endpoint of the emitter */
+  /** URI of the public endpoint of the issuer */
   jwksUri: string;
 };
 

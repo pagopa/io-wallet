@@ -38,7 +38,7 @@ import * as MDocCbor from "react-native-eudiw-pid/mdoc-cbor";
 #### decode
 
 Decode a given SD-JWT with Disclosures to get the parsed PID object they define.
-It ensures provided data is in the valid shape.
+It ensures provided data is in a valid shape.
 
 It DOES NOT verify token signature nor check disclosures are correctly referenced by the SD-JWT.
 Use [verify](#verify) instead
@@ -72,7 +72,7 @@ Same as [decode](#decode) plus:
 *   Throws **any** A decoding error if the token doesn't resolve in a valid SD-JWT
 *   Throws **any** A validation error if the provided data doesn't result in a valid PID
 *   Throws **any** A validation error if the provided disclosures are not defined in the SD-JWT
-*   Throws **any** An invalid signature error if the token signature is not valid
+*   Throws **any** Invalid signature error if the token signature is not valid
 
 Returns **[VerifyResult](#verifyresult)** The validated PID object along with the parsed SD-JWT token and the parsed disclosures
 
@@ -88,7 +88,7 @@ Type: {jwksUri: [string](https://developer.mozilla.org/docs/Web/JavaScript/Refer
 
 ##### jwksUri
 
-URI of the public endpoint of the emitter
+URI of the public endpoint of the issuer
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
@@ -128,7 +128,7 @@ Type: z.infer\<any>
 *   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
 
 Data structure for the PID.
-It contains PID claims in plain text as well as verification data with emitter' information
+It contains PID claims in plain text as well as verification data with the issuer's information
 
 Type: z.infer\<any>
 
