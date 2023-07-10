@@ -23,8 +23,7 @@
     "lint:fix": "eslint --fix \"src/**\"",
     "docs": "documentation readme src/sd-jwt/index.ts --parse-extension ts  --section=SD-JWT"
   },
-    "dependencies": {
-    "jwt-decode": "^3.1.2",
+  "dependencies": {
     "zod": "^3.21.4"
   },
   "devDependencies": {

@@ -1,4 +1,3 @@
-import jwtDecode from "jwt-decode";
 import base64decode from "../lib/base64";
 import { PID, Disclosure, SdJwt4VC } from "./types";
 import { pidFromToken } from "./converters";
@@ -24,9 +23,14 @@ export function decode(token: string): PidWithToken {
 
   // get the sd-jwt as object
   // validate it's a valid SD-JWT for Verifiable Credentials
+  const [header, payload] = rawSdJwt
+    .split(".")
+    .slice(0, 2)
+    .map(base64decode)
+    .map((e) => JSON.parse(e));
   const sdJwt = SdJwt4VC.parse({
-    header: jwtDecode(rawSdJwt, { header: true }),
-    payload: jwtDecode(rawSdJwt),
+    header,
+    payload,
   });
 
   // get disclosures as list of triples
