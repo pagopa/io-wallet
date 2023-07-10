@@ -70,14 +70,18 @@
     "react-native": "0.71.8",
     "react-native-builder-bob": "^0.20.0",
     "release-it": "^15.0.0",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "react-native-quick-crypto": "^0.6.1",
+    "react-native-web": "~0.18.10"
   },
   "resolutions": {
     "@types/react": "17.0.21"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-quick-crypto": "*",
+    "react-native-web": "*"
   },
   "engines": {
     "node": ">= 16.0.0"
