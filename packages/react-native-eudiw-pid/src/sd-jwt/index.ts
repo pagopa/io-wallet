@@ -92,19 +92,11 @@ export type VerifyOptions = {
 };
 
 type PidWithToken = {
-  /**
-   * The object with the parsed data for PID
-   */
+  // The object with the parsed data for PID
   pid: PID;
-  /**
-   * The object with the parsed SD-JWT token that shipped the PID.
-   * It will be needed to present PID data.
-   */
+  // The object with the parsed SD-JWT token that shipped the PID. It will be needed to present PID data.
   sdJwt: SdJwt4VC;
-  /**
-   * Parsed list of discloures with PID values.
-   * It will be needed to present PID data.
-   */
+  // Parsed list of discloures with PID values. It will be needed to present PID data.
   disclosures: Disclosure[];
 };
 
