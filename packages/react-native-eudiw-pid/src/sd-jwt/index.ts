@@ -18,7 +18,7 @@ import { pidFromToken } from "./converters";
  *
  */
 export function decode(token: string): PidWithToken {
-  // token are expected in the for "sd-jwt~disclosure0~disclosure1~...~disclosureN"
+  // token are expected in the form "sd-jwt~disclosure0~disclosure1~...~disclosureN"
   const [rawSdJwt, ...rawDisclosures] = token.split("~");
 
   // get the sd-jwt as object
