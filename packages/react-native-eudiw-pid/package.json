@@ -20,12 +20,14 @@
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**\"",
-    "lint:fix": "eslint --fix \"src/**\""
+    "lint:fix": "eslint --fix \"src/**\"",
+    "docs": "documentation readme src/sd-jwt/index.ts --parse-extension ts  --section=SD-JWT"
   },
   "dependencies": {},
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
     "@rushstack/eslint-patch": "^1.2.0",
+    "documentation": "^14.0.2",
     "eslint": "^8.38.0",
     "prettier": "^2.8.7",
     "typescript": "^5.0.4",
