@@ -68,7 +68,7 @@ export const SdJwt4VC = z.object({
     typ: z.literal("vc+sd-jwt"),
     alg: z.string(),
     kid: z.string(),
-    trust_chain: z.array(z.unknown()),
+    trust_chain: z.array(z.string()),
   }),
   payload: z.object({
     iss: z.string(),
