@@ -36,8 +36,15 @@ export type WalletInstanceAttestationRequestPayload = t.TypeOf<
   typeof WalletInstanceAttestationRequestPayload
 >;
 
+type WalletInstanceAttestationRequest = {
+  header: WalletInstanceAttestationRequestHeader;
+  payload: WalletInstanceAttestationRequestPayload;
+};
+
 // Verify and extract header and payload from Wallet Instance Attestation Request
-export const verifyWalletInstanceAttestationRequest = (jwt: string) =>
+export const verifyWalletInstanceAttestationRequest = (
+  jwt: string
+): TE.TaskEither<Error, WalletInstanceAttestationRequest> =>
   pipe(
     jwt,
     getPublicKeyFromCnf,

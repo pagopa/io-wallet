@@ -43,7 +43,7 @@ describe("CryptoSigner", async () => {
   const signer = new CryptoSigner({
     jwks,
     jwtDefaultAlg: "ES256",
-    jwtDuration: "1h",
+    jwtDefaultDuration: "1h",
   });
 
   it("should return first jwk with EC kty", () => {
@@ -69,7 +69,7 @@ describe("CryptoSigner", async () => {
     const signer = new CryptoSigner({
       jwks,
       jwtDefaultAlg: "ES256",
-      jwtDuration: "1h",
+      jwtDefaultDuration: "1h",
     });
 
     const run = signer.getPublicKeys();
@@ -126,7 +126,7 @@ describe("CryptoSigner", async () => {
     const signerWithOnlyRsa = new CryptoSigner({
       jwks: [privateRsaKey],
       jwtDefaultAlg: "ES256",
-      jwtDuration: "1h",
+      jwtDefaultDuration: "1h",
     });
     const result = await signerWithOnlyRsa.createJwtAndsign(
       { typ: "demo" },

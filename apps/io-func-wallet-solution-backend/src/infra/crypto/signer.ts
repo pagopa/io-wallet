@@ -47,18 +47,22 @@ export class CryptoSigner implements Signer {
       header: JwtHeader,
       kid: string,
       alg = this.#configuration.jwtDefaultAlg,
-      jwtDuration = this.#configuration.jwtDuration
+      jwtDuration = this.#configuration.jwtDefaultDuration
     ) =>
     (payload: jose.JWTPayload) =>
       pipe(
-        this.isAlgorithmSupported(alg)
-          ? getPrivateKeyByKid(this.#configuration.jwks, kid)
-          : O.none,
-        TE.fromOption(
-          () =>
-            new Error(
-              "No keys found for this algorithm or the algorithm is not supported"
+        alg,
+        TE.fromPredicate(
+          this.isAlgorithmSupported,
+          (a) => new Error(`The algorithm ${a} is not supported`)
+        ),
+        TE.chain((a) =>
+          pipe(
+            getPrivateKeyByKid(this.#configuration.jwks, kid),
+            TE.fromOption(
+              () => new Error(`No keys found for the algorithm ${a}`)
             )
+          )
         ),
         TE.chain((privateKey) =>
           pipe(

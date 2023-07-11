@@ -7,6 +7,9 @@ const AlgValueSupported = t.type({
   alg_values_supported: t.array(t.string),
 });
 
+/* WalletInstanceAttestationJwtModel is the model of how the Wallet Instance Attestation JWT
+ *is represented outside the code base
+ */
 export const WalletInstanceAttestationJwtModel = t.type({
   iss: t.string,
   sub: t.string,

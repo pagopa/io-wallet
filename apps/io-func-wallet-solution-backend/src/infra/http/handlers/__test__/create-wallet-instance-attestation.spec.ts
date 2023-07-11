@@ -30,7 +30,7 @@ const jwks = [privateEcKey];
 const signer = new CryptoSigner({
   jwks,
   jwtDefaultAlg: "ES256",
-  jwtDuration: "1h",
+  jwtDefaultDuration: "1h",
 });
 
 const federationEntityMetadata: FederationEntityMetadata = {
