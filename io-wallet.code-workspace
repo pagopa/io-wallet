@@ -7,6 +7,10 @@
       "path": "apps/io-func-wallet-solution-backend",
       "name": "io-func-wallet-solution-backend"
     },
+    {
+      "path": "packages/react-native-eudiw-pid",
+      "name": "react-native-eudiw-pid"
+    },
   ],
   "settings": {
     "azureFunctions.funcCliPath": "../../node_modules/.bin/func",
