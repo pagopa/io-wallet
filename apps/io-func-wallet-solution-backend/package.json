@@ -22,10 +22,12 @@
   "dependencies": {
     "@pagopa/handler-kit-azure-func": "^1.2.0",
     "@pagopa/ts-commons": "^12.0.0",
+    "fp-ts": "^2.16.0",
+    "io-ts": "^2.2.20",
     "jose": "^4.14.4"
   },
   "devDependencies": {
-    "@azure/functions": "^3.2.0",
+    "@azure/functions": "^3.5.0",
     "@pagopa/eslint-config": "^3.0.0",
     "@rushstack/eslint-patch": "^1.2.0",
     "@vitest/coverage-c8": "^0.30.1",

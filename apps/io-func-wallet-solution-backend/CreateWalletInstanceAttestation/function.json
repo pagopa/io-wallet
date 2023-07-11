@@ -1,12 +1,12 @@
 {
   "bindings": [
     {
-      "authLevel": "anonymous",
+      "authLevel": "function",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "route": ".well-known/openid-federation",
-      "methods": ["get"]
+      "route": "token",
+      "methods": ["post"]
     },
     {
       "type": "http",
@@ -15,5 +15,5 @@
     }
   ],
   "scriptFile": "../dist/main.js",
-  "entryPoint": "GetEntityConfiguration"
+  "entryPoint": "CreateWalletInstanceAttestation"
 }
