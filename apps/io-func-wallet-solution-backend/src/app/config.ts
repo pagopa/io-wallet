@@ -11,7 +11,7 @@ import { Jwk, fromBase64ToJwks } from "../jwk";
 
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
-  jwtDuration: t.string,
+  jwtDefaultDuration: t.string,
   jwtDefaultAlg: t.string,
 });
 
@@ -69,8 +69,8 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("WalletKeys"),
       RE.chainEitherKW(fromBase64ToJwks)
     ),
-    jwtDuration: pipe(
-      readFromEnvironment("JwtDuration"),
+    jwtDefaultDuration: pipe(
+      readFromEnvironment("JwtDefaultDuration"),
       RE.orElse(() => RE.right("1h"))
     ),
     jwtDefaultAlg: pipe(
