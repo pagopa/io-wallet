@@ -17,7 +17,7 @@ export const WalletInstanceAttestationJwtModel = t.type({
   policy_uri: t.string,
   tos_uri: t.string,
   logo_uri: t.string,
-  asc: t.string,
+  attested_security_context: t.string,
   cnf: t.type({
     jwk: JwkPublicKey,
   }),
@@ -56,7 +56,7 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
     policy_uri: federationEntity.policyUri,
     tos_uri: federationEntity.tosUri,
     logo_uri: federationEntity.logoUri,
-    asc,
+    attested_security_context: asc,
     cnf: {
       jwk: publicJwk,
     },
