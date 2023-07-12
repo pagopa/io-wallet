@@ -64,7 +64,10 @@ export const createWalletInstanceAttestation =
             algValueSupported: supportedSignAlgorithms,
           },
           WalletInstanceAttestationToJwtModel.encode,
-          signer.createJwtAndsign({ typ: "va+jwt", x5c: [] }, publicJwk.kid)
+          signer.createJwtAndsign(
+            { typ: "wallet-attestation+jwt", x5c: [] },
+            publicJwk.kid
+          )
         )
       )
     );
