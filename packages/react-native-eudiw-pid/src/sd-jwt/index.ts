@@ -1,65 +1,108 @@
+import base64decode from "../lib/base64";
 import { PID, Disclosure, SdJwt4VC } from "./types";
+import { pidFromToken } from "./converters";
 
 /**
- * Decode a given SD-JWT to get its readable header and payload
+ * Decode a given SD-JWT with Disclosures to get the parsed PID object they define.
+ * It ensures provided data is in a valid shape.
  *
- * @async @function
- * @param token The encoded token
+ * It DOES NOT verify token signature nor check disclosures are correctly referenced by the SD-JWT.
+ * Use {@link verify} instead
  *
- * @throws A decoding error
- * @returns the parsed token object
+ * @function
+ * @param token The encoded token that represents a valid sd-jwt for verifiable credentials
+ *
+ * @returns The validated PID object along with the parsed SD-JWT token and the parsed disclosures
+ * @throws A decoding error if the token doesn't resolve in a valid SD-JWT
+ * @throws A validation error if the provided data doesn't result in a valid PID
  *
  */
-export declare function decode(token: string): Promise<SdJwt4VC>;
+export function decode(token: string): PidWithToken {
+  // token are expected in the form "sd-jwt~disclosure0~disclosure1~...~disclosureN"
+  const [rawSdJwt, ...rawDisclosures] = token.split("~");
+
+  // get the sd-jwt as object
+  // validate it's a valid SD-JWT for Verifiable Credentials
+  const [header, payload] = rawSdJwt
+    .split(".")
+    .slice(0, 2)
+    .map(base64decode)
+    .map((e) => JSON.parse(e));
+  const sdJwt = SdJwt4VC.parse({
+    header,
+    payload,
+  });
+
+  // get disclosures as list of triples
+  // validate each triple
+  // throw a validation error if at least one fails to parse
+  const disclosures = rawDisclosures
+    .map(base64decode)
+    .map((e) => JSON.parse(e))
+    .map((e) => Disclosure.parse(e));
+
+  // compose and validate pid object from input data
+  const pid = pidFromToken(sdJwt, disclosures);
+
+  return { pid, sdJwt, disclosures };
+}
 
 /**
- * Verify a token is a valid SD-JWT with disclosures.
- * It verifies the first part is a valid JWT.
- * It also verifies each disclosure is well-formed and its values are consistent
- * with the claims exposed in the SD-JWT.
- * It returns the PID, along with the parsed SD-JWT object and its related disclosures.
- * It throws an error if the validation fails.
+ * Verify a given SD-JWT with Disclosures to get the parsed PID object they define.
+ * Same as {@link decode} plus:
+ *   - token signature verification
+ *   - ensure disclosures are well-defined inside the SD-JWT
  *
  * @async @function
- * @param token The encoded token to be verified
- * @param options
- * @param options.jwksUri URI of the public endpoint of the emitter
  *
- * @throws A verification error
- * @returns {VerifyResult} The parsed token object along with its related disclosures
+ * @todo implement signature validation
+ * @todo check disclosures in sd-jwt
+ *
+ * @param token The encoded token that represents a valid sd-jwt for verifiable credentials
+ * @param {VerifyOptions} options
+ *
+ * @returns {VerifyResult} The validated PID object along with the parsed SD-JWT token and the parsed disclosures
+ * @throws A decoding error if the token doesn't resolve in a valid SD-JWT
+ * @throws A validation error if the provided data doesn't result in a valid PID
+ * @throws A validation error if the provided disclosures are not defined in the SD-JWT
+ * @throws Invalid signature error if the token signature is not valid
  *
  */
-export declare function verify(
+export async function verify(
   token: string,
-  options: VerifyOptions
-): Promise<VerifyResult>;
+  options: VerifyOptions // eslint-disable-line @typescript-eslint/no-unused-vars
+): Promise<VerifyResult> {
+  // TODO: signature validation
+
+  // get decoded data
+  // eslint-disable-next-line sonarjs/prefer-immediate-return
+  const decoded = decode(token);
+
+  // TODO: check disclosures in sd-jwt
+
+  return decoded;
+}
 
 /**
  * Options for {@link verify}
  */
 export type VerifyOptions = {
-  /** URI of the public endpoint of the emitter */
+  /** URI of the public endpoint of the issuer */
   jwksUri: string;
+};
+
+type PidWithToken = {
+  // The object with the parsed data for PID
+  pid: PID;
+  // The object with the parsed SD-JWT token that shipped the PID. It will be needed to present PID data.
+  sdJwt: SdJwt4VC;
+  // Parsed list of discloures with PID values. It will be needed to present PID data.
+  disclosures: Disclosure[];
 };
 
 /**
  * Result object for {@link verify}
  */
-export type VerifyResult = {
-  /**
-   * The object with the parsed data for PID
-   */
-  pid: PID;
-  /**
-   * The object with the parsed SD-JWT token that shipped the PID.
-   * It will be needed to present PID data.
-   */
-  sdJwt: SdJwt4VC;
-  /**
-   * Parsed list of discloures with PID values.
-   * It will be needed to present PID data.
-   */
-  disclosures: Disclosure[];
-};
+export type VerifyResult = PidWithToken;
 
 export { PID } from "./types";

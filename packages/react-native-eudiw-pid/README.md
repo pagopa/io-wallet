@@ -7,7 +7,7 @@ Verify and present a EUDIW PID object.
 Module API support both [`SD-JWT`](https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html#id1) and [`MDOC-CBOR`](https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html#mdoc-cbor).
 
 ```ts
-import { SdJwt, MDocCbor} from "react-native-eudiw-pid";
+import { SdJwt, MDocCbor } from "react-native-eudiw-pid";
 // or
 import * as SdJwt from "react-native-eudiw-pid/sd-jwt";
 import * as MDocCbor from "react-native-eudiw-pid/mdoc-cbor";
@@ -29,51 +29,52 @@ import * as MDocCbor from "react-native-eudiw-pid/mdoc-cbor";
     *   [Properties](#properties)
     *   [jwksUri](#jwksuri)
 *   [VerifyResult](#verifyresult)
-    *   [Properties](#properties-1)
-    *   [pid](#pid)
-    *   [sdJwt](#sdjwt)
-    *   [disclosures](#disclosures)
-*   [Verification](#verification)
-    *   [Properties](#properties-2)
-*   [PID](#pid-1)
-    *   [Properties](#properties-3)
+*   [chars](#chars)
+*   [b64DecodeUnicode](#b64decodeunicode)
+    *   [Parameters](#parameters-2)
 *   [Disclosure](#disclosure)
+*   [PID](#pid)
 
 #### decode
 
-Decode a given SD-JWT to get its readable header and payload
+Decode a given SD-JWT with Disclosures to get the parsed PID object they define.
+It ensures provided data is in a valid shape.
+
+It DOES NOT verify token signature nor check disclosures are correctly referenced by the SD-JWT.
+Use [verify](#verify) instead
 
 ##### Parameters
 
-*   `token` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The encoded token
+*   `token` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The encoded token that represents a valid sd-jwt for verifiable credentials
 
 <!---->
 
-*   Throws **any** A decoding error
+*   Throws **any** A decoding error if the token doesn't resolve in a valid SD-JWT
+*   Throws **any** A validation error if the provided data doesn't result in a valid PID
 
-Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<SdJwt4VC>** the parsed token object
+Returns **PidWithToken** The validated PID object along with the parsed SD-JWT token and the parsed disclosures
 
 #### verify
 
-Verify a token is a valid SD-JWT with disclosures.
-It verifies the first part is a valid JWT.
-It also verifies each disclosure is well-formed and its values are consistent
-with the claims exposed in the SD-JWT.
-It returns the PID, along with the parsed SD-JWT object and its related disclosures.
-It throws an error if the validation fails.
+Verify a given SD-JWT with Disclosures to get the parsed PID object they define.
+Same as [decode](#decode) plus:
+
+*   token signature verification
+*   ensure disclosures are well-defined inside the SD-JWT
 
 ##### Parameters
 
-*   `token` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The encoded token to be verified
+*   `token` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The encoded token that represents a valid sd-jwt for verifiable credentials
 *   `options` **[VerifyOptions](#verifyoptions)**&#x20;
-
-    *   `options.jwksUri`  URI of the public endpoint of the emitter
 
 <!---->
 
-*   Throws **any** A verification error
+*   Throws **any** A decoding error if the token doesn't resolve in a valid SD-JWT
+*   Throws **any** A validation error if the provided data doesn't result in a valid PID
+*   Throws **any** A validation error if the provided disclosures are not defined in the SD-JWT
+*   Throws **any** Invalid signature error if the token signature is not valid
 
-Returns **[VerifyResult](#verifyresult)** The parsed token object along with its related disclosures
+Returns **[VerifyResult](#verifyresult)** The validated PID object along with the parsed SD-JWT token and the parsed disclosures
 
 #### VerifyOptions
 
@@ -87,7 +88,7 @@ Type: {jwksUri: [string](https://developer.mozilla.org/docs/Web/JavaScript/Refer
 
 ##### jwksUri
 
-URI of the public endpoint of the emitter
+URI of the public endpoint of the issuer
 
 Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
@@ -95,64 +96,23 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 Result object for [verify](#verify)
 
-Type: {pid: [PID](#pid), sdJwt: SdJwt4VC, disclosures: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>}
+Type: PidWithToken
 
-##### Properties
+#### chars
 
-*   `pid` **[PID](#pid)**&#x20;
-*   `sdJwt` **SdJwt4VC**&#x20;
-*   `disclosures` **[Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>**&#x20;
+The code was extracted from:
+<https://github.com/davidchambers/Base64.js>
 
-##### pid
+Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)
 
-The object with the parsed data for PID
+#### b64DecodeUnicode
 
-Type: [PID](#pid)
+The code was extracted from:
+<https://github.com/auth0/jwt-decode>
 
-##### sdJwt
+##### Parameters
 
-The object with the parsed SD-JWT token that shipped the PID.
-It will be needed to present PID data.
-
-Type: SdJwt4VC
-
-##### disclosures
-
-Parsed list of discloures with PID values.
-It will be needed to present PID data.
-
-Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)<[Disclosure](#disclosure)>
-
-#### Verification
-
-*   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
-
-Contain the information as sub claims regarding the identity proofing evidence during the issuing phase of the PID
-
-Type: {trustFramework: `"eidas"`, assuranceLevel: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), evidence: VerificationEvidence}
-
-##### Properties
-
-*   `trustFramework` **`"eidas"`**&#x20;
-*   `assuranceLevel` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
-*   `evidence` **VerificationEvidence**&#x20;
-
-#### PID
-
-*   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
-
-Data structure for the PID.
-It contains PID claims in plain text as well as verification data with emitter' information
-
-Type: {issuer: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), issuedAt: [Date](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date), expiration: [Date](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date), verification: [Verification](#verification), claims: {uniqueId: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), givenName: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), familyName: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), birthdate: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), placeOfBirth: {country: CountryCode, locality: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}, taxIdNumber: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}}
-
-##### Properties
-
-*   `issuer` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
-*   `issuedAt` **[Date](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date)**&#x20;
-*   `expiration` **[Date](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date)**&#x20;
-*   `verification` **[Verification](#verification)**&#x20;
-*   `claims` **{uniqueId: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), givenName: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), familyName: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), birthdate: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), placeOfBirth: {country: CountryCode, locality: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}, taxIdNumber: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)}**&#x20;
+*   `str` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)**&#x20;
 
 #### Disclosure
 
@@ -161,7 +121,16 @@ Type: {issuer: [string](https://developer.mozilla.org/docs/Web/JavaScript/Refere
 
 A triple of values in the form of {salt, claim name, claim value} that represent a parsed disclosure.
 
-Type: \[[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), ([string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String) | Record<[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String), [JSON](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/JSON)>)]
+Type: z.infer\<any>
+
+#### PID
+
+*   **See**: <https://italia.github.io/eidas-it-wallet-docs/en/pid-data-model.html>
+
+Data structure for the PID.
+It contains PID claims in plain text as well as verification data with the issuer's information
+
+Type: z.infer\<any>
 
 ### MDOC-CBOR
 
