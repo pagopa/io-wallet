@@ -1,30 +1,20 @@
 # io-react-native-wallet-instance-attestation
 
-Provide data structures, helpers and API to IO Wallet to obtain and manage Wallet Instance Attestations
+Provide data structures, helpers, and API to IO Wallet to obtain and manage Wallet Instance Attestations
 
-## Installation
+
+## Example app
+To test on the example app:
 
 ```sh
-npm install io-react-native-wallet-instance-attestation
+# ios
+yarn example ios
+
+# android
+yarn example android
 ```
 
-## Usage
 
-```js
-import { multiply } from 'io-react-native-wallet-instance-attestation';
-
-// ...
-
-const result = await multiply(3, 7);
-```
-
-## Contributing
-
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
-
-## License
-
-MIT
 
 ---
 

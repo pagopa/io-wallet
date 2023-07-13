@@ -60,6 +60,12 @@ yarn workspace my-package add -D jest
 yarn workspace foreach add io-ts
 ```
 
+### Stand-alone workspaces
+Some workspaces don't cope well with `yarn workspace` and its dependency hoisting structure. Such packages are under `packages-sa` (`sa` stands for stand-alone); they have their own dependency set (that is: a dedicated `node_module` folder).
+Being they are not listed as workspaces, they have the following limitations:
+* `turbo` cannot be used to run commands on them; it must `cd` into the specific folder and treat them as a usual package
+* they cannot be referenced by other workspaces before being distributed to public registries
+
 ## Infrastructure resources
 
 Resources are defined using `Terraform` into `/infra`. 
