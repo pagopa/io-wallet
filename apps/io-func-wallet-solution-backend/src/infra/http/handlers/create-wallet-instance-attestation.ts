@@ -11,7 +11,7 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 import { createWalletInstanceAttestation } from "../../../wallet-instance-attestation";
 import { GRANT_TYPE_KEY_ATTESTATION } from "../../../wallet-provider";
-import { createdJwt } from "./utils";
+import { createdEntityStatementJwt } from "./utils";
 
 const WalletInstanceAttestationRequestPayload = t.type({
   grant_type: t.literal(GRANT_TYPE_KEY_ATTESTATION),
@@ -43,7 +43,7 @@ export const CreateWalletInstanceAttestationHandler = H.of(
       RTE.chain(({ walletInstanceAttestationRequest }) =>
         createWalletInstanceAttestation(walletInstanceAttestationRequest)
       ),
-      RTE.map(createdJwt),
+      RTE.map(createdEntityStatementJwt),
       RTE.orElseW(logErrorAndReturnResponse)
     )
 );
