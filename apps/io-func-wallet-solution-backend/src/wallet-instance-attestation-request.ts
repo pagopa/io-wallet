@@ -22,7 +22,7 @@ export type WalletInstanceAttestationRequestHeader = t.TypeOf<
 
 export const WalletInstanceAttestationRequestPayload = t.type({
   iss: t.string,
-  sub: t.string,
+  aud: t.string,
   jti: t.string,
   type: t.literal("WalletInstanceAttestationRequest"),
   cnf: t.type({
