@@ -20,7 +20,7 @@ export const WalletInstanceAttestationPayload = t.type({
   type: t.literal("WalletInstanceAttestation"),
   federationEntity: FederationEntity,
   asc: t.string,
-  publicJwk: JwkPublicKey,
+  walletInstancePublicKey: JwkPublicKey,
   algValueSupported: t.array(t.string),
 });
 
@@ -60,7 +60,7 @@ export const createWalletInstanceAttestation =
               logoUri: federationEntityMetadata.logoUri.href,
             },
             asc: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
-            publicJwk,
+            walletInstancePublicKey: request.payload.cnf.jwk,
             algValueSupported: supportedSignAlgorithms,
           },
           WalletInstanceAttestationToJwtModel.encode,
