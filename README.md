@@ -1,7 +1,10 @@
 # io-wallet
 EUDI Wallet and Italian Wallet implementation for App IO
 
-
+## Related repositories:
+- 🪪 [io-react-native-wallet](https://github.com/pagopa/io-react-native-wallet)
+- 🔐 [io-react-native-jwt](https://github.com/pagopa/io-react-native-jwt)
+  
 ## Prerequisites
 
 In order to run the applications locally you need the following tool installed on your machine.
