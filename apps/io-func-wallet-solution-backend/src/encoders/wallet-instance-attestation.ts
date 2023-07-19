@@ -46,7 +46,7 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
     type,
     federationEntity,
     asc,
-    publicJwk,
+    walletInstancePublicKey,
     algValueSupported,
   }) => ({
     iss,
@@ -58,7 +58,7 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
     logo_uri: federationEntity.logoUri,
     asc,
     cnf: {
-      jwk: publicJwk,
+      jwk: walletInstancePublicKey,
     },
     authorization_endpoint: "eudiw",
     response_types_supported: ["vp_token"],
