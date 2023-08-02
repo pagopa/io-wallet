@@ -58,6 +58,7 @@ export const createWalletInstanceAttestation =
               policyUri: federationEntityMetadata.policyUri.href,
               tosUri: federationEntityMetadata.tosUri.href,
               logoUri: federationEntityMetadata.logoUri.href,
+              trustAnchorUri: federationEntityMetadata.trustAnchorUri.href,
             },
             asc: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
             walletInstancePublicKey: request.payload.cnf.jwk,

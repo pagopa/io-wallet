@@ -12,6 +12,7 @@
     "FederationEntityPolicyUri": "FEDERATION_ENTITY_PRIVACY_URI",
     "FederationEntityTosUri": "FEDERATION_ENTITY_TOS_URI",
     "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI"
+    "FederationEntityTrustAnchorUri": "FEDERATION_ENTITY_TUST_ANCHOR_URI",
     "WalletKeys": "ARRAY_OF_WALLET_KEYS_IN_JWK_FORMAT_BASE64_ENCODED"
   }
 }

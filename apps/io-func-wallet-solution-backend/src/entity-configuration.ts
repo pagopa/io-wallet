@@ -27,6 +27,7 @@ export const FederationEntityMetadata = t.type({
   policyUri: UrlFromString,
   tosUri: UrlFromString,
   logoUri: UrlFromString,
+  trustAnchorUri: UrlFromString,
 });
 
 export type FederationEntityMetadata = t.TypeOf<
@@ -44,6 +45,7 @@ export const FederationEntity = t.type({
   policyUri: t.string,
   tosUri: t.string,
   logoUri: t.string,
+  trustAnchorUri: t.string,
 });
 
 const WalletProviderMetadataPayload = t.type({
@@ -106,6 +108,7 @@ export const getEntityConfiguration =
               policyUri: federationEntityMetadata.policyUri.href,
               tosUri: federationEntityMetadata.tosUri.href,
               logoUri: federationEntityMetadata.logoUri.href,
+              trustAnchorUri: federationEntityMetadata.trustAnchorUri.href,
             },
           },
           EntityConfigurationToJwtModel.encode,

@@ -50,6 +50,9 @@ const federationEntityMetadata: FederationEntityMetadata = {
   logoUri: new URL(
     "https://wallet-provider.example.org/logo.svg"
   ) as unknown as ValidUrl,
+  trustAnchorUri: new URL(
+    "https://trust-anchor.example.org/logo.svg"
+  ) as unknown as ValidUrl,
 };
 
 describe("CreateWalletInstanceAttestationHandler", async () => {
