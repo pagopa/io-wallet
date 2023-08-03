@@ -6,7 +6,7 @@ import { EntityConfigurationPayload } from "../entity-configuration";
 export const EntityConfigurationJwtModel = t.type({
   iss: t.string,
   sub: t.string,
-  authority_hints: t.string,
+  authority_hints: t.array(t.string),
   jwks: t.type({
     keys: t.array(JwkPublicKey),
   }),
@@ -41,7 +41,7 @@ export const EntityConfigurationToJwtModel: E.Encoder<
   encode: ({ iss, sub, walletProviderMetadata, federationEntity }) => ({
     iss,
     sub,
-    authority_hints: federationEntity.trustAnchorUri,
+    authority_hints: [federationEntity.trustAnchorUri],
     jwks: {
       keys: walletProviderMetadata.jwks,
     },
