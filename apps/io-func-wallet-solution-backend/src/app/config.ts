@@ -50,6 +50,7 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
+    trustAnchorUri: readFromEnvironment("FederationEntityTrustAnchorUri"),
   }),
   RE.chainEitherKW(
     validate(

@@ -6,9 +6,15 @@ import { EntityConfigurationPayload } from "../entity-configuration";
 export const EntityConfigurationJwtModel = t.type({
   iss: t.string,
   sub: t.string,
+  authority_hints: t.array(t.string),
+  jwks: t.type({
+    keys: t.array(JwkPublicKey),
+  }),
   metadata: t.type({
-    eudi_wallet_provider: t.type({
-      jwks: t.array(JwkPublicKey),
+    wallet_provider: t.type({
+      jwks: t.type({
+        keys: t.array(JwkPublicKey),
+      }),
       token_endpoint: t.string,
       asc_values_supported: t.array(t.string),
       grant_types_supported: t.array(t.string),
@@ -35,9 +41,15 @@ export const EntityConfigurationToJwtModel: E.Encoder<
   encode: ({ iss, sub, walletProviderMetadata, federationEntity }) => ({
     iss,
     sub,
+    authority_hints: [federationEntity.trustAnchorUri],
+    jwks: {
+      keys: walletProviderMetadata.jwks,
+    },
     metadata: {
-      eudi_wallet_provider: {
-        jwks: walletProviderMetadata.jwks,
+      wallet_provider: {
+        jwks: {
+          keys: walletProviderMetadata.jwks,
+        },
         token_endpoint: walletProviderMetadata.tokenEndpoint,
         asc_values_supported: walletProviderMetadata.ascValues,
         grant_types_supported: walletProviderMetadata.grantTypesSupported,
