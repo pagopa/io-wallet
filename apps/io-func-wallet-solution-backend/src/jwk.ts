@@ -1,6 +1,7 @@
 import * as t from "io-ts";
 
 import { pipe } from "fp-ts/function";
+import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
 import { validate } from "./validation";
@@ -76,10 +77,21 @@ export type JwkPrivateKey = t.TypeOf<typeof JwkPrivateKey>;
 export const Jwk = t.union([JwkPublicKey, JwkPrivateKey], "Jwk");
 export type Jwk = t.TypeOf<typeof Jwk>;
 
+export const JwksMetadata = t.type({
+  keys: t.array(JwkPublicKey),
+});
+export type JwksMetadata = t.TypeOf<typeof JwksMetadata>;
+
 export const fromBase64ToJwks = (b64: string) =>
   pipe(
     E.tryCatch(() => Buffer.from(b64, "base64").toString(), E.toError),
     E.chain(J.parse),
     E.mapLeft(() => new Error("Unable to parse JWKs string")),
     E.chainW(validate(t.array(Jwk), "Invalid JWKs"))
+  );
+
+export const getKeyByKid = (kid: string) => (jwks: JwkPublicKey[]) =>
+  pipe(
+    jwks,
+    A.findFirst((key) => key.kid === kid)
   );
