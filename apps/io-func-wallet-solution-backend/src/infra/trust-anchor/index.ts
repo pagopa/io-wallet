@@ -22,6 +22,8 @@ import { validate } from "../../validation";
 import { getKeyByKid } from "../../jwk";
 import { verifyJwtSignature } from "../../verifier";
 
+const oidFederation = "/.well-known/openid-federation";
+
 export class EidasTrustAnchor implements TrustAnchor {
   #configuration: FederationEntityMetadata;
 
@@ -35,13 +37,10 @@ export class EidasTrustAnchor implements TrustAnchor {
     this.#configuration = cnf;
   }
 
-  getPublicKeys = () => {
-    const metadataUrl = new URL(
-      "/.well-known/openid-federation",
-      this.#configuration.trustAnchorUri.href
-    );
-    return pipe(
-      metadataUrl.href,
+   getPublicKeys = () =>
+    pipe(
+      new URL(oidFederation, this.#configuration.trustAnchorUri.href),
+      (metadataUrl) => metadataUrl.href,
       getRequest(this.fetchWithTimeout),
       TE.map(jose.decodeJwt),
       TE.chainEitherKW(
@@ -52,22 +51,22 @@ export class EidasTrustAnchor implements TrustAnchor {
       ),
       TE.map((metadata) => metadata.jwks.keys)
     );
-  };
 
-  getEntityStatement = () => {
-    const fetchUrl = new URL("fetch", this.#configuration.trustAnchorUri.href);
-    fetchUrl.searchParams.append("sub", this.#configuration.basePath.href);
-    fetchUrl.searchParams.append(
-      "anchor",
-      this.#configuration.trustAnchorUri.href
-    );
-
-    return pipe(
-      fetchUrl.href,
+ getEntityStatement = () =>
+    pipe(
+      this.#configuration.trustAnchorUri.href,
+      (href) => {
+        const fetchUrl = new URL("fetch", href);
+        fetchUrl.searchParams.append("sub", this.#configuration.basePath.href);
+        fetchUrl.searchParams.append(
+          "anchor",
+          this.#configuration.trustAnchorUri.href
+        );
+        return fetchUrl.href;
+      },
       getRequest(this.fetchWithTimeout),
       TE.chain(this.validateEntityStatementJwt)
     );
-  };
 
   validateEntityStatementJwt = (jwt: string) =>
     pipe(
