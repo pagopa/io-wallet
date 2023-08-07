@@ -37,7 +37,7 @@ export class EidasTrustAnchor implements TrustAnchor {
     this.#configuration = cnf;
   }
 
-   getPublicKeys = () =>
+  getPublicKeys = () =>
     pipe(
       new URL(oidFederation, this.#configuration.trustAnchorUri.href),
       (metadataUrl) => metadataUrl.href,
@@ -52,7 +52,7 @@ export class EidasTrustAnchor implements TrustAnchor {
       TE.map((metadata) => metadata.jwks.keys)
     );
 
- getEntityStatement = () =>
+  getEntityStatement = () =>
     pipe(
       this.#configuration.trustAnchorUri.href,
       (href) => {
