@@ -13,6 +13,7 @@ import { verifyWalletInstanceAttestationRequest } from "./wallet-instance-attest
 import { LoA, getLoAUri } from "./wallet-provider";
 import { JwkPublicKey } from "./jwk";
 import { WalletInstanceAttestationToJwtModel } from "./encoders/wallet-instance-attestation";
+import { EidasTrustAnchor } from "./infra/trust-anchor";
 
 export const WalletInstanceAttestationPayload = t.type({
   iss: t.string,
@@ -45,8 +46,13 @@ export const createWalletInstanceAttestation =
           signer.getSupportedSignAlgorithms(),
           TE.fromEither
         ),
+        trustChain: pipe(
+          new EidasTrustAnchor(federationEntityMetadata),
+          (ta) => ta.getEntityStatement(),
+          TE.map(({ encoded }) => [encoded])
+        ),
       }),
-      TE.chain(({ request, publicJwk, supportedSignAlgorithms }) =>
+      TE.chain(({ request, publicJwk, supportedSignAlgorithms, trustChain }) =>
         pipe(
           {
             iss: federationEntityMetadata.basePath.href,
@@ -66,7 +72,7 @@ export const createWalletInstanceAttestation =
           },
           WalletInstanceAttestationToJwtModel.encode,
           signer.createJwtAndsign(
-            { typ: "va+jwt", x5c: [], trust_chain: [] },
+            { typ: "va+jwt", x5c: [], trust_chain: trustChain },
             publicJwk.kid
           )
         )
