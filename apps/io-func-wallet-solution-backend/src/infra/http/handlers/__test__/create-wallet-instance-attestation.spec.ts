@@ -106,7 +106,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     .setExpirationTime("2h")
     .sign(josePrivateKey);
 
-  it("should return a 201 HTTP response", () => {
+  it("should return a 201 HTTP response", async () => {
     const run = CreateWalletInstanceAttestationHandler({
       input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
         ...req,
@@ -124,11 +124,16 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       federationEntityMetadata,
       signer,
     });
-    expect(run()).resolves.toEqual(
+    const result = await run();
+
+    if (E.isLeft(result)) {
+      throw new Error(`Failed with error: ${result.left.message}`);
+    }
+
+    expect(result.right).toEqual(
       expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 201,
-        }),
+        statusCode: 201,
+        body: expect.any(String),
       })
     );
   });
