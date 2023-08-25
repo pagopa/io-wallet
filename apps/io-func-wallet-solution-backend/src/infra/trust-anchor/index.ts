@@ -58,7 +58,10 @@ export class EidasTrustAnchor implements TrustAnchor {
       this.#configuration.trustAnchorUri.href,
       (href) => {
         const fetchUrl = new URL("fetch", href);
-        fetchUrl.searchParams.append("sub", removeTrailingSlash(this.#configuration.basePath.href));
+        fetchUrl.searchParams.append(
+          "sub",
+          removeTrailingSlash(this.#configuration.basePath.href)
+        );
         fetchUrl.searchParams.append(
           "anchor",
           removeTrailingSlash(this.#configuration.trustAnchorUri.href)
