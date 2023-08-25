@@ -1,4 +1,4 @@
-import { it, expect, describe } from "vitest";
+import { it, expect, describe, vi } from "vitest";
 
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -76,8 +76,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     .setExpirationTime("2h")
     .sign(josePrivateKey);
 
-  it("should return a 201 HTTP response", () => {
-    const run = CreateWalletInstanceAttestationHandler({
+  it("should return a 201 HTTP response", async () => {
+    const handler = CreateWalletInstanceAttestationHandler({
       input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
         ...req,
         method: "POST",
@@ -94,12 +94,21 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       federationEntityMetadata,
       signer,
     });
-    expect(run()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 201,
-        }),
-      })
-    );
+
+    const result = await handler();
+
+    if(result._tag === "Left"){
+      throw new Error("Expecting Right");
+    }
+    const { right: { statusCode, body}} = result;
+    
+    expect(statusCode).toBe(201);
+    expect(body).toEqual(expect.any(String));
+
+    // check trailing slashes are removed
+    const decoded = jose.decodeJwt(body as string)
+    expect((decoded.iss || "").endsWith("/")).toBe(false)
+    expect((decoded.sub || "").endsWith("/")).toBe(false)
+   
   });
 });

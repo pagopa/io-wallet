@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "../jwk";
 import { WalletInstanceAttestationPayload } from "../wallet-instance-attestation";
+import { removeTrailingSlash } from "../url";
 
 const AlgValueSupported = t.type({
   alg_values_supported: t.array(t.string),
@@ -49,13 +50,13 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
     walletInstancePublicKey,
     algValueSupported,
   }) => ({
-    iss,
-    sub,
+    iss: removeTrailingSlash(iss),
+    sub: removeTrailingSlash(sub),
     type,
-    homepage_uri: federationEntity.homepageUri,
-    policy_uri: federationEntity.policyUri,
-    tos_uri: federationEntity.tosUri,
-    logo_uri: federationEntity.logoUri,
+    homepage_uri: removeTrailingSlash(federationEntity.homepageUri.href),
+    policy_uri: removeTrailingSlash(federationEntity.policyUri.href),
+    tos_uri: removeTrailingSlash(federationEntity.tosUri.href),
+    logo_uri: removeTrailingSlash(federationEntity.logoUri.href),
     asc,
     cnf: {
       jwk: walletInstancePublicKey,
