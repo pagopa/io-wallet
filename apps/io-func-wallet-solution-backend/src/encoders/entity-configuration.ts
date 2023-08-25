@@ -40,9 +40,9 @@ export const EntityConfigurationToJwtModel: E.Encoder<
   EntityConfigurationPayload
 > = {
   encode: ({ iss, sub, walletProviderMetadata, federationEntity }) => ({
-    iss: removeTrailingSlash(iss),
-    sub: removeTrailingSlash(sub),
-    authority_hints: [federationEntity.trustAnchorUri],
+    iss: removeTrailingSlash(iss.href),
+    sub: removeTrailingSlash(sub.href),
+    authority_hints: [federationEntity.trustAnchorUri.href],
     jwks: {
       keys: walletProviderMetadata.jwks,
     },
@@ -61,10 +61,10 @@ export const EntityConfigurationToJwtModel: E.Encoder<
       },
       federation_entity: {
         organization_name: federationEntity.organizationName,
-        homepage_uri: removeTrailingSlash( federationEntity.homepageUri),
-        policy_uri: removeTrailingSlash( federationEntity.policyUri),
-        tos_uri: removeTrailingSlash( federationEntity.tosUri),
-        logo_uri: removeTrailingSlash( federationEntity.logoUri),
+        homepage_uri: removeTrailingSlash(federationEntity.homepageUri.href),
+        policy_uri: removeTrailingSlash(federationEntity.policyUri.href),
+        tos_uri: removeTrailingSlash(federationEntity.tosUri.href),
+        logo_uri: removeTrailingSlash(federationEntity.logoUri.href),
       },
     },
   }),
