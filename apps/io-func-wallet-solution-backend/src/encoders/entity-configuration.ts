@@ -2,6 +2,7 @@ import * as t from "io-ts";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "../jwk";
 import { EntityConfigurationPayload } from "../entity-configuration";
+import { removeTrailingSlash } from "../url";
 
 export const EntityConfigurationJwtModel = t.type({
   iss: t.string,
@@ -39,8 +40,8 @@ export const EntityConfigurationToJwtModel: E.Encoder<
   EntityConfigurationPayload
 > = {
   encode: ({ iss, sub, walletProviderMetadata, federationEntity }) => ({
-    iss,
-    sub,
+    iss: removeTrailingSlash(iss),
+    sub: removeTrailingSlash(sub),
     authority_hints: [federationEntity.trustAnchorUri],
     jwks: {
       keys: walletProviderMetadata.jwks,
@@ -60,10 +61,10 @@ export const EntityConfigurationToJwtModel: E.Encoder<
       },
       federation_entity: {
         organization_name: federationEntity.organizationName,
-        homepage_uri: federationEntity.homepageUri,
-        policy_uri: federationEntity.policyUri,
-        tos_uri: federationEntity.tosUri,
-        logo_uri: federationEntity.logoUri,
+        homepage_uri: removeTrailingSlash( federationEntity.homepageUri),
+        policy_uri: removeTrailingSlash( federationEntity.policyUri),
+        tos_uri: removeTrailingSlash( federationEntity.tosUri),
+        logo_uri: removeTrailingSlash( federationEntity.logoUri),
       },
     },
   }),
