@@ -1,4 +1,5 @@
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
+import { removeTrailingSlash } from "./url";
 
 // Level of Agreement
 export enum LoA {

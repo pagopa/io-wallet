@@ -2,12 +2,12 @@ import { it, expect, describe, vi } from "vitest";
 
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { pipe, flow } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as jose from "jose";
 import { CreateWalletInstanceAttestationHandler } from "../create-wallet-instance-attestation";
 import { ECKey, ECPrivateKey } from "../../../../jwk";
 import { CryptoSigner } from "../../../crypto/signer";
-import { UrlFromString, ValidUrl } from "@pagopa/ts-commons/lib/url";
+import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { FederationEntityMetadata } from "../../../../entity-configuration";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { GRANT_TYPE_KEY_ATTESTATION } from "../../../../wallet-provider";
@@ -97,18 +97,19 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const result = await handler();
 
-    if(result._tag === "Left"){
+    if (result._tag === "Left") {
       throw new Error("Expecting Right");
     }
-    const { right: { statusCode, body}} = result;
-    
+    const {
+      right: { statusCode, body },
+    } = result;
+
     expect(statusCode).toBe(201);
     expect(body).toEqual(expect.any(String));
 
     // check trailing slashes are removed
-    const decoded = jose.decodeJwt(body as string)
-    expect((decoded.iss || "").endsWith("/")).toBe(false)
-    expect((decoded.sub || "").endsWith("/")).toBe(false)
-   
+    const decoded = jose.decodeJwt(body as string);
+    expect((decoded.iss || "").endsWith("/")).toBe(false);
+    expect((decoded.sub || "").endsWith("/")).toBe(false);
   });
 });
