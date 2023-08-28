@@ -22,6 +22,7 @@ import { FederationEntityMetadata } from "../../entity-configuration";
 import { validate } from "../../validation";
 import { getKeyByKid } from "../../jwk";
 import { verifyJwtSignature } from "../../verifier";
+import { removeTrailingSlash } from "../../url";
 
 const oidFederation = "/.well-known/openid-federation";
 
@@ -41,7 +42,7 @@ export class EidasTrustAnchor implements TrustAnchor {
   getPublicKeys = () =>
     pipe(
       new URL(oidFederation, this.#configuration.trustAnchorUri.href),
-      (metadataUrl) => metadataUrl.href,
+      (metadataUrl) => removeTrailingSlash(metadataUrl.href),
       getRequest(this.fetchWithTimeout),
       TE.chain((value) =>
         TE.tryCatch(async () => jose.decodeJwt(value), E.toError)
@@ -60,10 +61,13 @@ export class EidasTrustAnchor implements TrustAnchor {
       this.#configuration.trustAnchorUri.href,
       (href) => {
         const fetchUrl = new URL("fetch", href);
-        fetchUrl.searchParams.append("sub", this.#configuration.basePath.href);
+        fetchUrl.searchParams.append(
+          "sub",
+          removeTrailingSlash(this.#configuration.basePath.href)
+        );
         fetchUrl.searchParams.append(
           "anchor",
-          this.#configuration.trustAnchorUri.href
+          removeTrailingSlash(this.#configuration.trustAnchorUri.href)
         );
         return fetchUrl.href;
       },

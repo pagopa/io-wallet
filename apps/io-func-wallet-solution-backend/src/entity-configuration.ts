@@ -41,11 +41,11 @@ export type EntityConfigurationEnvironment = {
 
 export const FederationEntity = t.type({
   organizationName: t.string,
-  homepageUri: t.string,
-  policyUri: t.string,
-  tosUri: t.string,
-  logoUri: t.string,
-  trustAnchorUri: t.string,
+  homepageUri: UrlFromString,
+  policyUri: UrlFromString,
+  tosUri: UrlFromString,
+  logoUri: UrlFromString,
+  trustAnchorUri: UrlFromString,
 });
 
 const WalletProviderMetadataPayload = t.type({
@@ -58,8 +58,8 @@ const WalletProviderMetadataPayload = t.type({
 });
 
 export const EntityConfigurationPayload = t.type({
-  iss: t.string,
-  sub: t.string,
+  iss: UrlFromString,
+  sub: UrlFromString,
   walletProviderMetadata: WalletProviderMetadataPayload,
   federationEntity: FederationEntity,
 });
@@ -82,8 +82,8 @@ export const getEntityConfiguration =
       TE.chain(({ jwks, publicJwk, supportedSignAlgorithms }) =>
         pipe(
           {
-            iss: federationEntityMetadata.basePath.href,
-            sub: federationEntityMetadata.basePath.href,
+            iss: federationEntityMetadata.basePath,
+            sub: federationEntityMetadata.basePath,
             walletProviderMetadata: {
               jwks,
               tokenEndpoint: new URL(
@@ -104,11 +104,11 @@ export const getEntityConfiguration =
             },
             federationEntity: {
               organizationName: federationEntityMetadata.organizationName,
-              homepageUri: federationEntityMetadata.homePageUri.href,
-              policyUri: federationEntityMetadata.policyUri.href,
-              tosUri: federationEntityMetadata.tosUri.href,
-              logoUri: federationEntityMetadata.logoUri.href,
-              trustAnchorUri: federationEntityMetadata.trustAnchorUri.href,
+              homepageUri: federationEntityMetadata.homePageUri,
+              policyUri: federationEntityMetadata.policyUri,
+              tosUri: federationEntityMetadata.tosUri,
+              logoUri: federationEntityMetadata.logoUri,
+              trustAnchorUri: federationEntityMetadata.trustAnchorUri,
             },
           },
           EntityConfigurationToJwtModel.encode,

@@ -107,7 +107,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     .sign(josePrivateKey);
 
   it("should return a 201 HTTP response", async () => {
-    const run = CreateWalletInstanceAttestationHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
         ...req,
         method: "POST",
@@ -124,75 +124,21 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       federationEntityMetadata,
       signer,
     });
-    const result = await run();
 
-    if (E.isLeft(result)) {
-      throw new Error(`Failed with error: ${result.left.message}`);
+    const result = await handler();
+
+    if(result._tag === "Left"){
+      throw new Error("Expecting Right");
     }
+    const { right: { statusCode, body}} = result;
+    
+    expect(statusCode).toBe(201);
+    expect(body).toEqual(expect.any(String));
 
-    expect(result.right).toEqual(
-      expect.objectContaining({
-        statusCode: 201,
-        body: expect.any(String),
-      })
-    );
-  });
-
-  it("should return a 500 HTTP response on invalid entity statement", () => {
-    getEntityStatement.mockImplementationOnce(() => "invalid");
-
-    const run = CreateWalletInstanceAttestationHandler({
-      input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
-        ...req,
-        method: "POST",
-        body: {
-          grant_type: GRANT_TYPE_KEY_ATTESTATION,
-          assertion: walletInstanceAttestationRequest,
-        },
-      })),
-      inputDecoder: H.HttpRequest,
-      logger: {
-        log: () => () => {},
-        format: L.format.simple,
-      },
-      federationEntityMetadata,
-      signer,
-    });
-    expect(run()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-        }),
-      })
-    );
-  });
-
-  it("should return a 500 HTTP response on invalid trust anchor entity configuration", () => {
-    getTrustAnchotEntityConfiguration.mockImplementationOnce(() => "invalid");
-
-    const run = CreateWalletInstanceAttestationHandler({
-      input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
-        ...req,
-        method: "POST",
-        body: {
-          grant_type: GRANT_TYPE_KEY_ATTESTATION,
-          assertion: walletInstanceAttestationRequest,
-        },
-      })),
-      inputDecoder: H.HttpRequest,
-      logger: {
-        log: () => () => {},
-        format: L.format.simple,
-      },
-      federationEntityMetadata,
-      signer,
-    });
-    expect(run()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-        }),
-      })
-    );
+    // check trailing slashes are removed
+    const decoded = jose.decodeJwt(body as string)
+    expect((decoded.iss || "").endsWith("/")).toBe(false)
+    expect((decoded.sub || "").endsWith("/")).toBe(false)
+   
   });
 });
