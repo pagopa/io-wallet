@@ -19,7 +19,7 @@ Please refer to `.node-version` for the actual runtime version used.
 ## Bundles
 Applications are bundled into zip file into the `./bundles` folder.
 
-```
+```sh
 # Install dependencies
 yarn
 # Build applications
