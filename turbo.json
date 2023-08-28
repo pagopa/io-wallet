@@ -18,9 +18,9 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "inputs": ["src/**/*.spec.ts", "src/**/*.test.ts"],
+      "inputs": ["src/**/*.spec.ts", "src/**/*.test.ts", "src/**/*"],
       "outputs": [],
-      "outputMode": "hash-only",
+      "outputMode": "errors-only",
       "dependsOn": ["^build"]
     }
   }
