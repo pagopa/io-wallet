@@ -8,7 +8,7 @@ export enum LoA {
 }
 
 export const getLoAUri = (level: LoA) => (basePath: UrlFromString) =>
-  new URL(level, basePath.href).href;
+  removeTrailingSlash(new URL(level, basePath.href).href);
 
 export const GRANT_TYPE_KEY_ATTESTATION =
   "urn:ietf:params:oauth:client-assertion-type:jwt-key-attestation";
