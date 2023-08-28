@@ -44,9 +44,7 @@ export class EidasTrustAnchor implements TrustAnchor {
       new URL(oidFederation, this.#configuration.trustAnchorUri.href),
       (metadataUrl) => removeTrailingSlash(metadataUrl.href),
       getRequest(this.fetchWithTimeout),
-      TE.chain((value) =>
-        TE.tryCatch(async () => jose.decodeJwt(value), E.toError)
-      ),
+      TE.map((value) => jose.decodeJwt(value)),
       TE.chainEitherKW(
         validate(
           TrustAnchorEntityConfigurationPayload,
