@@ -1,4 +1,5 @@
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
+import { removeTrailingSlash } from "./url";
 
 // Level of Agreement
 export enum LoA {
@@ -8,7 +9,7 @@ export enum LoA {
 }
 
 export const getLoAUri = (level: LoA) => (basePath: UrlFromString) =>
-  new URL(level, basePath.href).href;
+  removeTrailingSlash(new URL(level, basePath.href).href);
 
 export const GRANT_TYPE_KEY_ATTESTATION =
   "urn:ietf:params:oauth:client-assertion-type:jwt-key-attestation";

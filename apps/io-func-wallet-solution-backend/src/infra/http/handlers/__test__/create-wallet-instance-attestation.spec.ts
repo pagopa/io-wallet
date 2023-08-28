@@ -9,7 +9,7 @@ import * as jose from "jose";
 import { CreateWalletInstanceAttestationHandler } from "../create-wallet-instance-attestation";
 import { ECKey, ECPrivateKey } from "../../../../jwk";
 import { CryptoSigner } from "../../../crypto/signer";
-import { UrlFromString, ValidUrl } from "@pagopa/ts-commons/lib/url";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { FederationEntityMetadata } from "../../../../entity-configuration";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { GRANT_TYPE_KEY_ATTESTATION } from "../../../../wallet-provider";
