@@ -42,26 +42,87 @@ const url = flow(
   })
 );
 
-const getEntityStatement = vi
-  .fn()
-  .mockImplementation(
-    () =>
-      `eyJ0eXAiOiJlbnRpdHktc3RhdGVtZW50K2p3dCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiNGNPVDU3eGNmdmIzejlqYWtVcmpYRzM5TDNjbzB6OUJLXzVsS0t4VHl0USJ9.eyJleHAiOjE2OTE2ODE5NDcsImlhdCI6MTY5MTUwOTE0NywiaXNzIjoiaHR0cHM6Ly9kZW1vLmZlZGVyYXRpb24uZXVkaS53YWxsZXQuZGV2ZWxvcGVycy5pdGFsaWEuaXQiLCJzdWIiOiJodHRwczovL2lvLWQtd2FsbGV0LWl0LmF6dXJld2Vic2l0ZXMubmV0LyIsImp3a3MiOnsia2V5cyI6W3siY3J2IjoiUC0yNTYiLCJrdHkiOiJFQyIsIngiOiJxckpyajNBZl9CNTdzYk9JUnJjQk03YnI3d09jOHluajdsSEZQVGVmZlVrIiwieSI6IjFIMGNXRHlHZ3ZVOHcta1BLVV94eWNPQ1VOVDJvMGJ3c2xJUXRuUFU2aU0iLCJraWQiOiJFQyMxIn1dfSwibWV0YWRhdGFfcG9saWN5Ijp7IndhbGxldF9wcm92aWRlciI6eyJjb250YWN0cyI6eyJhZGQiOlsiaW8td2FsbGV0QHBhZ29wYS5pdCJdfX19LCJzb3VyY2VfZW5kcG9pbnQiOiJodHRwczovL2RlbW8uZmVkZXJhdGlvbi5ldWRpLndhbGxldC5kZXZlbG9wZXJzLml0YWxpYS5pdC9mZXRjaCIsInRydXN0X21hcmtzIjpbeyJpZCI6Imh0dHBzOi8vZGVtby5mZWRlcmF0aW9uLmV1ZGkud2FsbGV0LmRldmVsb3BlcnMuaXRhbGlhLml0L2VudGl0eS93YWxsZXRfcHJvdmlkZXIiLCJ0cnVzdF9tYXJrIjoiZXlKMGVYQWlPaUowY25WemRDMXRZWEpySzJwM2RDSXNJbUZzWnlJNklsSlRNalUySWl3aWEybGtJam9pTkdOUFZEVTNlR05tZG1JemVqbHFZV3RWY21wWVJ6TTVURE5qYnpCNk9VSkxYelZzUzB0NFZIbDBVU0o5LmV5SnBjM01pT2lKb2RIUndjem92TDJSbGJXOHVabVZrWlhKaGRHbHZiaTVsZFdScExuZGhiR3hsZEM1a1pYWmxiRzl3WlhKekxtbDBZV3hwWVM1cGRDSXNJbk4xWWlJNkltaDBkSEJ6T2k4dmFXOHRaQzEzWVd4c1pYUXRhWFF1WVhwMWNtVjNaV0p6YVhSbGN5NXVaWFF2SWl3aWFXRjBJam94TmpreE5UQTVNVFEzTENKcFpDSTZJbWgwZEhCek9pOHZaR1Z0Ynk1bVpXUmxjbUYwYVc5dUxtVjFaR2t1ZDJGc2JHVjBMbVJsZG1Wc2IzQmxjbk11YVhSaGJHbGhMbWwwTDJWdWRHbDBlUzkzWVd4c1pYUmZjSEp2ZG1sa1pYSWlmUS5WMElLaVZWcHlNQUNJZEFLdVdGbGc0YUVFM0RHVU9XaDI2MENIUHZmOTEwQnV3NjltMlhGY1NsNlFNTkk4Wl9iVGo1ODZEYzNvOWZJM1NKRFE0SU4xSUIwR1NVXzZzTUtOMGFvWDVqa2VLaUlndnQ1YmF0X0lGVk1FVUtObmZVT2ZPVEpCLXJaNmdYTEd2d1Q3OWN6dXdsU0p2MkNiM1hYdUU3ZlkwLWRFSWdKejB2cEZtNk5RZFpzNUVRbVh5OC1IZS1hbkFTbTBsNTJKTTZkMzctamdnRTUxZl9GM0lEQWYyTTdNbF9wQVJaX3hrTkhBOGpLekFEU3ktLXE0X3Z2dTVNYWdJX2kwbHhkR1AyVEY1dUxxVVZackJGYlRqeC1BRDJUaUZYaGhtZko4d094Mm4zOWxvVWg4UlRIekpIR0JYNG96bVliQXVSMHJWOHVjeFk5MUEifV19.HSDrSLaMClE1cFsrW1TUv30sk-YJnwRi3aRkC-piiDiznTsf2G-07q285tQRygpwp-vtIIfvhFWPsl2OQErzqRbwzPgQ5ck-4bUo5kVJm_a8g6Oz-55cyK1g_7Rqxk_cw7nm0mFGKkaCP6QiI0kB7Whhapp9CnHPOKiKMUQNseXhcSTfswxBR3oqoE5HPOvEnf3-TmhoVXFf1BDaxp-canY8SHPtZVZKaKTssEkhcLW8Syrk8-HsMGu_dyAaHWi6bmraqFDrUGrrM1EubF2Hb0xs1153_UIasFCtl16WWDVo9OhHeeRcG_MA78TXt66knyXp0YD92g64b3o7fFgejA`
-  );
+const getEntityStatement = vi.fn().mockImplementation(async () => {
+  const josePrivateKey = await jose.importJWK(privateEcKey);
+  const signed = await new jose.SignJWT({
+    iss: "https://wallet-trust-anchor.example.org",
+    sub: "https://wallet-provider.example.org",
+    jwks: {
+      keys: jwks,
+    },
+    metadata_policy: {
+      wallet_provider: {
+        contacts: {
+          add: ["io-wallet@example.org"],
+        },
+      },
+    },
+    source_endpoint: "https://wallet-trust-anchor.example.org/fetch",
+    trust_marks: [
+      {
+        id: "https://wallet-trust-anchor.example.org/entity/wallet_provider",
+        trust_mark:
+          "eyJ0eXAiOiJ0cnVzdC1tYXJrK2p3dCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiNGNPVDU3eGNmdmIzejlqYWtVcmpYRzM5TDNjbzB6OUJLXzVsS0t4VHl0USJ9.eyJpc3MiOiJodHRwczovL2RlbW8uZmVkZXJhdGlvbi5ldWRpLndhbGxldC5kZXZlbG9wZXJzLml0YWxpYS5pdCIsInN1YiI6Imh0dHBzOi8vaW8tZC13YWxsZXQtaXQuYXp1cmV3ZWJzaXRlcy5uZXQvIiwiaWF0IjoxNjkxNTA5MTQ3LCJpZCI6Imh0dHBzOi8vZGVtby5mZWRlcmF0aW9uLmV1ZGkud2FsbGV0LmRldmVsb3BlcnMuaXRhbGlhLml0L2VudGl0eS93YWxsZXRfcHJvdmlkZXIifQ.V0IKiVVpyMACIdAKuWFlg4aEE3DGUOWh260CHPvf910Buw69m2XFcSl6QMNI8Z_bTj586Dc3o9fI3SJDQ4IN1IB0GSU_6sMKN0aoX5jkeKiIgvt5bat_IFVMEUKNnfUOfOTJB-rZ6gXLGvwT79czuwlSJv2Cb3XXuE7fY0-dEIgJz0vpFm6NQdZs5EQmXy8-He-anASm0l52JM6d37-jggE51f_F3IDAf2M7Ml_pARZ_xkNHA8jKzADSy--q4_vvu5MagI_i0lxdGP2TF5uLqUVZrBFbTjx-AD2TiFXhhmfJ8wOx2n39loUh8RTHzJHGBX4ozmYbAuR0rV8ucxY91A",
+      },
+    ],
+  })
+    .setProtectedHeader({
+      typ: "entity-statement+jwt",
+      alg: "ES256",
+      kid: privateEcKey.kid,
+    })
+    .setIssuedAt()
+    .setExpirationTime("2h")
+    .sign(josePrivateKey);
+  return signed;
+});
 
 const getTrustAnchotEntityConfiguration = vi
   .fn()
-  .mockImplementation(
-    () =>
-      `eyJ0eXAiOiJlbnRpdHktc3RhdGVtZW50K2p3dCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiNGNPVDU3eGNmdmIzejlqYWtVcmpYRzM5TDNjbzB6OUJLXzVsS0t4VHl0USJ9.eyJleHAiOjE2OTE2ODQ2NjYsImlhdCI6MTY5MTUxMTg2NiwiaXNzIjoiaHR0cHM6Ly9kZW1vLmZlZGVyYXRpb24uZXVkaS53YWxsZXQuZGV2ZWxvcGVycy5pdGFsaWEuaXQiLCJzdWIiOiJodHRwczovL2RlbW8uZmVkZXJhdGlvbi5ldWRpLndhbGxldC5kZXZlbG9wZXJzLml0YWxpYS5pdCIsImp3a3MiOnsia2V5cyI6W3sia3R5IjoiUlNBIiwibiI6InVJQnZRR3kyVGVqd1FHVXYyUjFhUWd3dlQxek0xdk0xVzNVc2xFaTduT2k3Zmk3blNleGdPZmFlcmdxb1Q1M2hQaENicV8tYk14Tl9JelA0end5c01lamFCREdNMk9hZHJ0QjNUb0JhOEVoWmZoVmgwTi1tNG9LYk5WWC1ETWtObnpNeDVkdlpTWVdlRm1PUUU4Vm9PODB3ZmpSZjB4ZWVfdGRtWDBvcEE1TTU2azFRY3JrR29ZOHFWWnJJQkZGSDd4R05wRUtZZEt0OGx4TDE5Qmx2aUJkMk5YSXg0WnRDV1phR2RoU184LVg3ZHhRV2tkdkhOZmxBdDhoNXRkUl93Y0xPaldtY3hsMG05eTgzTWhrNzlwNzAyUUdVb09QTUlETnZCNlpjV08tTlRHY2dtYXlKVEFTVUpHVzhWRl9wbHhQTnN6MldzSGZVQl9VY3Qta0tRUSIsImUiOiJBUUFCIiwia2lkIjoiNGNPVDU3eGNmdmIzejlqYWtVcmpYRzM5TDNjbzB6OUJLXzVsS0t4VHl0USJ9XX0sIm1ldGFkYXRhIjp7ImZlZGVyYXRpb25fZW50aXR5Ijp7ImNvbnRhY3RzIjpbImRlbWFyY29nODNAZ21haWwuY29tIl0sImZlZGVyYXRpb25fZmV0Y2hfZW5kcG9pbnQiOiJodHRwczovL2RlbW8uZmVkZXJhdGlvbi5ldWRpLndhbGxldC5kZXZlbG9wZXJzLml0YWxpYS5pdC9mZXRjaCIsImZlZGVyYXRpb25fcmVzb2x2ZV9lbmRwb2ludCI6Imh0dHBzOi8vZGVtby5mZWRlcmF0aW9uLmV1ZGkud2FsbGV0LmRldmVsb3BlcnMuaXRhbGlhLml0L3Jlc29sdmUiLCJmZWRlcmF0aW9uX3RydXN0X21hcmtfc3RhdHVzX2VuZHBvaW50IjoiaHR0cHM6Ly9kZW1vLmZlZGVyYXRpb24uZXVkaS53YWxsZXQuZGV2ZWxvcGVycy5pdGFsaWEuaXQvdHJ1c3RfbWFya19zdGF0dXMiLCJob21lcGFnZV91cmkiOiJodHRwczovL2RlbW8uZmVkZXJhdGlvbi5ldWRpLndhbGxldC5kZXZlbG9wZXJzLml0YWxpYS5pdCIsIm5hbWUiOiJUcnVzdCBBbmNob3IgLSBXYWxsZXQgaW50ZXJvcCBsYWIiLCJmZWRlcmF0aW9uX2xpc3RfZW5kcG9pbnQiOiJodHRwczovL2RlbW8uZmVkZXJhdGlvbi5ldWRpLndhbGxldC5kZXZlbG9wZXJzLml0YWxpYS5pdC9saXN0In19LCJjb25zdHJhaW50cyI6eyJtYXhfcGF0aF9sZW5ndGgiOjF9fQ.Yy15BIS8lyKA3ND2yhsK1kZiKPhiXXMbcWMT03ZsqcplaVhMY1Z40QnuOSXmPcAdBeCYZrYkbWX8-bUVCpYY21s5anP3Wum8hWfaPevp6nnaYZwN-2zPueQcoQO0_1AnCeOPpG5LkKD-8nuj-sn3IlOCtMT5sq2UWiFOJgrDDQC247qNJuZN1OhugLAbUqrpnQY2011s_RJiVADMN2JshkajmiruipJ8VVkI9kF_81UOOQJd4D3yUWUdthF8S6aeA5L6ZzWpQZNNkiB3EnvKR3B7_ksIuHG0yg1gyfQ6h9IWW292QjGAkRedr_F7BtkjT1wkWsSHHH0GhC-FdJTHWA`
-  );
-const trustAnchorServerMock = http.createServer(function (req, res) {
+  .mockImplementation(async () => {
+    const josePrivateKey = await jose.importJWK(privateEcKey);
+    const signed = await new jose.SignJWT({
+      iss: "https://wallet-trust-anchor.example.org",
+      sub: "https://wallet-trust-anchor.example.org",
+      jwks: {
+        keys: jwks,
+      },
+      metadata: {
+        federation_entity: {
+          contacts: ["io-wallet@example.org"],
+          federation_fetch_endpoint:
+            "https://wallet-trust-anchor.example.org/fetch",
+          federation_resolve_endpoint:
+            "https://wallet-trust-anchor.example.org/resolve",
+          federation_trust_mark_status_endpoint:
+            "https://wallet-trust-anchor.example.org/trust_mark_status",
+          homepage_uri: "https://wallet-trust-anchor.example.org",
+          name: "Trust Anchor - Wallet interop lab",
+          federation_list_endpoint:
+            "https://wallet-trust-anchor.example.org/list",
+        },
+      },
+      constraints: {
+        max_path_length: 1,
+      },
+    })
+      .setProtectedHeader({
+        typ: "entity-statement+jwt",
+        alg: "ES256",
+        kid: privateEcKey.kid,
+      })
+      .setIssuedAt()
+      .setExpirationTime("2h")
+      .sign(josePrivateKey);
+    return signed;
+  });
+const trustAnchorServerMock = http.createServer(async function (req, res) {
   const { pathname } = new URL(req.url || "", `https://${req.headers.host}`);
-  res.setHeader("Content-Type", "applicationz/entity-statement+jwt");
+  res.setHeader("Content-Type", "application/entity-statement+jwt");
   if (pathname.endsWith("/.well-known/openid-federation")) {
-    res.write(getTrustAnchotEntityConfiguration());
+    res.write(await getTrustAnchotEntityConfiguration());
   } else if (pathname.endsWith("/fetch")) {
-    res.write(getEntityStatement());
+    res.write(await getEntityStatement());
   }
   res.end();
 });
@@ -127,18 +188,19 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const result = await handler();
 
-    if(result._tag === "Left"){
+    if (result._tag === "Left") {
       throw new Error("Expecting Right");
     }
-    const { right: { statusCode, body}} = result;
-    
+    const {
+      right: { statusCode, body },
+    } = result;
+
     expect(statusCode).toBe(201);
     expect(body).toEqual(expect.any(String));
 
     // check trailing slashes are removed
-    const decoded = jose.decodeJwt(body as string)
-    expect((decoded.iss || "").endsWith("/")).toBe(false)
-    expect((decoded.sub || "").endsWith("/")).toBe(false)
-   
+    const decoded = jose.decodeJwt(body as string);
+    expect((decoded.iss || "").endsWith("/")).toBe(false);
+    expect((decoded.sub || "").endsWith("/")).toBe(false);
   });
 });
