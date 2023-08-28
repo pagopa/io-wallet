@@ -16,17 +16,20 @@ The preferred way to set up the local environment is using [nodenv](https://gith
 Please refer to `.node-version` for the actual runtime version used.
 
 
-## Release management
+## Bundles
+Applications are bundled into zip file into the `./bundles` folder.
 
-This project uses [changesets](https://github.com/changesets/changesets) to automate updating package versions, and changelogs.
-
-Each Pull Request that includes changes that require a version bump should include a `changeset` file that describe that changes.
-
-To create a new `changeset` file run the following command from the project root:
-
-```bash
-yarn changeset
 ```
+# Install dependencies
+yarn
+# Build applications
+yarn build
+# Bundle packages 
+yarn build:package
+# Check created bundles
+ls ./bundles
+```
+
 
 ## Useful commands
 
