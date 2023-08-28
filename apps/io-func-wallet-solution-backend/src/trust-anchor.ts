@@ -47,5 +47,8 @@ export type EntityStatementPayload = t.TypeOf<typeof EntityStatementPayload>;
 
 export type TrustAnchor = {
   getPublicKeys: () => TE.TaskEither<Error, JwkPublicKey[]>;
-  getEntityStatement: () => TE.TaskEither<Error, EntityStatementPayload>;
+  getEntityStatement: () => TE.TaskEither<
+    Error,
+    { encoded: string; decoded: EntityStatementPayload }
+  >;
 };
