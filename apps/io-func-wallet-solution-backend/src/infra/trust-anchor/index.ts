@@ -11,6 +11,7 @@ import {
 } from "@pagopa/ts-commons/lib/fetch";
 import { Millisecond } from "@pagopa/ts-commons/lib/units";
 
+import { sequenceS } from "fp-ts/lib/Apply";
 import {
   EntityStatementHeader,
   EntityStatementPayload,
@@ -43,7 +44,7 @@ export class EidasTrustAnchor implements TrustAnchor {
       new URL(oidFederation, this.#configuration.trustAnchorUri.href),
       (metadataUrl) => removeTrailingSlash(metadataUrl.href),
       getRequest(this.fetchWithTimeout),
-      TE.map(jose.decodeJwt),
+      TE.map((value) => jose.decodeJwt(value)),
       TE.chainEitherKW(
         validate(
           TrustAnchorEntityConfigurationPayload,
@@ -69,16 +70,21 @@ export class EidasTrustAnchor implements TrustAnchor {
         return fetchUrl.href;
       },
       getRequest(this.fetchWithTimeout),
-      TE.chain(this.validateEntityStatementJwt)
+      TE.map((jwt) => ({
+        encoded: TE.right(jwt),
+        decoded: this.validateEntityStatementJwt(jwt),
+      })),
+      TE.chain(sequenceS(TE.ApplicativePar))
     );
 
   validateEntityStatementJwt = (jwt: string) =>
     pipe(
-      jwt,
-      jose.decodeProtectedHeader,
-      validate(
-        EntityStatementHeader,
-        "Invalid trust anchor entity statement header"
+      E.tryCatch(() => jose.decodeProtectedHeader(jwt), E.toError),
+      E.chainW(
+        validate(
+          EntityStatementHeader,
+          "Invalid trust anchor entity statement header"
+        )
       ),
       TE.fromEither,
       TE.chain((es) =>
