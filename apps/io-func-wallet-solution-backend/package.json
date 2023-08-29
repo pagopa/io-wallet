@@ -17,7 +17,7 @@
     "coverage": "vitest run --coverage",
     "typecheck": "tsc",
     "start": "func start",
-    "build:package": "npm-pack-zip --add-version"
+    "build:package": "npm-pack-zip --add-version --dst=$TURBO_BUNDLES_DIR"
   },
   "dependencies": {
     "@pagopa/handler-kit-azure-func": "^1.2.0",
@@ -38,5 +38,6 @@
     "tsup": "^6.4.0",
     "typescript": "^4.8.4",
     "vitest": "^0.30.1"
-  }
+  },
+  "bundleDependencies": true
 }
