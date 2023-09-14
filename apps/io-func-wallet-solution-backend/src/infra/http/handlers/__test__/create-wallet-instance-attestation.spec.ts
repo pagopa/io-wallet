@@ -151,9 +151,9 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletInstanceAttestationRequest = await new jose.SignJWT({
     iss: "demokey",
-    sub: "https://wallet-provider.example.org/",
+    aud: "https://wallet-provider.example.org/",
     jti: "demoJTI",
-    type: "WalletInstanceAttestationRequest",
+    nonce: "...",
     cnf: {
       jwk: publicEcKey,
     },
@@ -161,7 +161,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     .setProtectedHeader({
       alg: "ES256",
       kid: publicEcKey.kid,
-      typ: "var+jwt",
+      typ: "wiar+jwt",
     })
     .setIssuedAt()
     .setExpirationTime("2h")

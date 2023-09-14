@@ -12,7 +12,7 @@ export const getLoAUri = (level: LoA) => (basePath: UrlFromString) =>
   removeTrailingSlash(new URL(level, basePath.href).href);
 
 export const GRANT_TYPE_KEY_ATTESTATION =
-  "urn:ietf:params:oauth:client-assertion-type:jwt-key-attestation";
+  "urn:ietf:params:oauth:client-assertion-type:jwt-client-attestation";
 
 export const TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED = "private_key_jwt";
 export const RELATIVE_TOKEN_ENDPOINT = "token";

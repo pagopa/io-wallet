@@ -14,11 +14,7 @@ const AlgValueSupported = t.type({
 export const WalletInstanceAttestationJwtModel = t.type({
   iss: t.string,
   sub: t.string,
-  type: t.literal("WalletInstanceAttestation"),
-  policy_uri: t.string,
-  tos_uri: t.string,
-  logo_uri: t.string,
-  asc: t.string,
+  attested_security_context: t.string,
   cnf: t.type({
     jwk: JwkPublicKey,
   }),
@@ -28,7 +24,6 @@ export const WalletInstanceAttestationJwtModel = t.type({
     jwt_vp_json: AlgValueSupported,
     jwt_vc_json: AlgValueSupported,
   }),
-
   request_object_signing_alg_values_supported: t.array(t.string),
   presentation_definition_uri_supported: t.boolean,
 });
@@ -44,20 +39,15 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
   encode: ({
     iss,
     sub,
-    type,
     federationEntity,
-    asc,
+    attested_security_context,
     walletInstancePublicKey,
     algValueSupported,
   }) => ({
     iss: removeTrailingSlash(iss),
     sub: removeTrailingSlash(sub),
-    type,
     homepage_uri: removeTrailingSlash(federationEntity.homepageUri.href),
-    policy_uri: removeTrailingSlash(federationEntity.policyUri.href),
-    tos_uri: removeTrailingSlash(federationEntity.tosUri.href),
-    logo_uri: removeTrailingSlash(federationEntity.logoUri.href),
-    asc,
+    attested_security_context,
     cnf: {
       jwk: walletInstancePublicKey,
     },

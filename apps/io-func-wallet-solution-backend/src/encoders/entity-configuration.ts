@@ -17,7 +17,7 @@ export const EntityConfigurationJwtModel = t.type({
         keys: t.array(JwkPublicKey),
       }),
       token_endpoint: t.string,
-      asc_values_supported: t.array(t.string),
+      attested_security_context_values_supported: t.array(t.string),
       grant_types_supported: t.array(t.string),
       token_endpoint_auth_methods_supported: t.array(t.string),
       token_endpoint_auth_signing_alg_values_supported: t.array(t.string),
@@ -54,7 +54,8 @@ export const EntityConfigurationToJwtModel: E.Encoder<
           keys: walletProviderMetadata.jwks,
         },
         token_endpoint: walletProviderMetadata.tokenEndpoint,
-        asc_values_supported: walletProviderMetadata.ascValues,
+        attested_security_context_values_supported:
+          walletProviderMetadata.ascValues,
         grant_types_supported: walletProviderMetadata.grantTypesSupported,
         token_endpoint_auth_methods_supported:
           walletProviderMetadata.tokenEndpointAuthMethodsSupported,
