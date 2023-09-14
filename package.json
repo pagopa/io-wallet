@@ -13,7 +13,6 @@
     "release": "changeset tag"
   },
   "workspaces": [
-    "packages/*",
     "apps/*"
   ],
   "devDependencies": {

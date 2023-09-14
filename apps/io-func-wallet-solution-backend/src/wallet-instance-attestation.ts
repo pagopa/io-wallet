@@ -19,9 +19,8 @@ import { EidasTrustAnchor } from "./infra/trust-anchor";
 export const WalletInstanceAttestationPayload = t.type({
   iss: t.string,
   sub: t.string,
-  type: t.literal("WalletInstanceAttestation"),
   federationEntity: FederationEntity,
-  asc: t.string,
+  attested_security_context: t.string,
   walletInstancePublicKey: JwkPublicKey,
   algValueSupported: t.array(t.string),
 });
@@ -77,7 +76,6 @@ export const createWalletInstanceAttestation =
           {
             iss: federationEntityMetadata.basePath.href,
             sub: request.header.kid,
-            type: "WalletInstanceAttestation",
             federationEntity: {
               organizationName: federationEntityMetadata.organizationName,
               homepageUri: federationEntityMetadata.homePageUri,
@@ -86,13 +84,16 @@ export const createWalletInstanceAttestation =
               logoUri: federationEntityMetadata.logoUri,
               trustAnchorUri: federationEntityMetadata.trustAnchorUri,
             },
-            asc: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
+            attested_security_context: pipe(
+              federationEntityMetadata.basePath,
+              getLoAUri(LoA.basic)
+            ),
             walletInstancePublicKey: request.payload.cnf.jwk,
             algValueSupported: supportedSignAlgorithms,
           },
           WalletInstanceAttestationToJwtModel.encode,
           signer.createJwtAndsign(
-            { typ: "va+jwt", x5c: [], trust_chain: trustChain },
+            { typ: "wallet-attestation+jwt", x5c: [], trust_chain: trustChain },
             publicJwk.kid
           )
         )
