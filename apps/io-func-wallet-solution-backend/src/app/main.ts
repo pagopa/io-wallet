@@ -5,6 +5,7 @@ import { GetEntityConfigurationFunction } from "../infra/azure/functions/get-ent
 import { InfoFunction } from "../infra/azure/functions/info";
 import { CryptoSigner } from "../infra/crypto/signer";
 import { CreateWalletInstanceAttestationFunction } from "../infra/azure/functions/create-wallet-instance-attestation";
+import { CreateWalletInstanceFunction } from "../infra/azure/functions/create-wallet-instance";
 import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(
@@ -32,3 +33,8 @@ export const CreateWalletInstanceAttestation =
     federationEntityMetadata: config.federationEntity,
     signer,
   });
+
+export const CreateWalletInstance = CreateWalletInstanceFunction({
+  federationEntityMetadata: config.federationEntity,
+  signer,
+});
