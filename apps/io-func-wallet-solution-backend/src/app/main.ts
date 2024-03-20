@@ -34,7 +34,4 @@ export const CreateWalletInstanceAttestation =
     signer,
   });
 
-export const CreateWalletInstance = CreateWalletInstanceFunction({
-  federationEntityMetadata: config.federationEntity,
-  signer,
-});
+export const CreateWalletInstance = CreateWalletInstanceFunction({});
