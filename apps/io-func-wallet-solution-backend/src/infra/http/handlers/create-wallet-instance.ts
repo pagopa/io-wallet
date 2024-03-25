@@ -40,7 +40,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req,
     requireWalletInstanceRequest,
-    // TODO: Add logic here
+    // TODO: [SIW-956] - Add key attestation validation and device registration
     RTE.chain((_walletInstanceRequest) => RTE.right("OK")),
     RTE.map(createdEntityStatementJwt),
     RTE.orElseW(logErrorAndReturnResponse)
