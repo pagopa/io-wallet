@@ -5,8 +5,8 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "route": "info",
-      "methods": ["get"]
+      "route": "wallet-instance",
+      "methods": ["put"]
     },
     {
       "type": "http",
@@ -15,5 +15,5 @@
     }
   ],
   "scriptFile": "../dist/main.js",
-  "entryPoint": "Info"
+  "entryPoint": "CreateWalletInstance"
 }
