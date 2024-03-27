@@ -13,7 +13,7 @@ import { validate } from "./validation";
 export const WalletInstanceAttestationRequestHeader = t.type({
   alg: t.string,
   kid: t.string,
-  typ: t.literal("wiar+jwt"),
+  typ: t.literal("war+jwt"),
 });
 
 export type WalletInstanceAttestationRequestHeader = t.TypeOf<
@@ -23,8 +23,10 @@ export type WalletInstanceAttestationRequestHeader = t.TypeOf<
 export const WalletInstanceAttestationRequestPayload = t.type({
   iss: t.string,
   aud: t.string,
-  jti: t.string,
-  nonce: t.string,
+  challenge: t.string,
+  hardware_signature: t.string,
+  integrity_assertion: t.string,
+  hardware_key_tag: t.string,
   cnf: t.type({
     jwk: JwkPublicKey,
   }),
