@@ -67,6 +67,48 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cbor-extract/cbor-extract-darwin-arm64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@cbor-extract/cbor-extract-darwin-arm64@npm:2.2.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@cbor-extract/cbor-extract-darwin-x64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@cbor-extract/cbor-extract-darwin-x64@npm:2.2.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@cbor-extract/cbor-extract-linux-arm64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@cbor-extract/cbor-extract-linux-arm64@npm:2.2.0"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@cbor-extract/cbor-extract-linux-arm@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@cbor-extract/cbor-extract-linux-arm@npm:2.2.0"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@cbor-extract/cbor-extract-linux-x64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@cbor-extract/cbor-extract-linux-x64@npm:2.2.0"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@cbor-extract/cbor-extract-win32-x64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@cbor-extract/cbor-extract-win32-x64@npm:2.2.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@changesets/apply-release-plan@npm:^6.1.4":
   version: 6.1.4
   resolution: "@changesets/apply-release-plan@npm:6.1.4"
@@ -1872,6 +1914,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cbor-extract@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "cbor-extract@npm:2.2.0"
+  dependencies:
+    "@cbor-extract/cbor-extract-darwin-arm64": 2.2.0
+    "@cbor-extract/cbor-extract-darwin-x64": 2.2.0
+    "@cbor-extract/cbor-extract-linux-arm": 2.2.0
+    "@cbor-extract/cbor-extract-linux-arm64": 2.2.0
+    "@cbor-extract/cbor-extract-linux-x64": 2.2.0
+    "@cbor-extract/cbor-extract-win32-x64": 2.2.0
+    node-gyp: latest
+    node-gyp-build-optional-packages: 5.1.1
+  dependenciesMeta:
+    "@cbor-extract/cbor-extract-darwin-arm64":
+      optional: true
+    "@cbor-extract/cbor-extract-darwin-x64":
+      optional: true
+    "@cbor-extract/cbor-extract-linux-arm":
+      optional: true
+    "@cbor-extract/cbor-extract-linux-arm64":
+      optional: true
+    "@cbor-extract/cbor-extract-linux-x64":
+      optional: true
+    "@cbor-extract/cbor-extract-win32-x64":
+      optional: true
+  bin:
+    download-cbor-prebuilds: bin/download-prebuilds.js
+  checksum: 0953e849e01885746d9433d81eef54f333feb39bfdd721f7c8fd639f1ca5ae0c6644cb5306d200241380013bae3edd858333173ef6a65a7816f39d179ce5372e
+  languageName: node
+  linkType: hard
+
+"cbor-x@npm:^1.5.9":
+  version: 1.5.9
+  resolution: "cbor-x@npm:1.5.9"
+  dependencies:
+    cbor-extract: ^2.2.0
+  dependenciesMeta:
+    cbor-extract:
+      optional: true
+  checksum: cfb032d662e222f5076edfd5945aa7f2d4edb4c0d9d94cbe24b8866a3bfb3943334b01224555403a669f174e9c43e0f38324139451ca363dc09c9b308107100e
+  languageName: node
+  linkType: hard
+
 "chai@npm:^4.3.7":
   version: 4.3.8
   resolution: "chai@npm:4.3.8"
@@ -2232,6 +2317,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crypto@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "crypto@npm:1.0.1"
+  checksum: 087fe3165bd94c333a49e6ed66a0193911f63eac38a24f379b3001a5fe260a59c413646e53a0f67875ba13902b2686d81dc703cb2c147a4ec727dcdc04e5645e
+  languageName: node
+  linkType: hard
+
 "csv-generate@npm:^3.4.3":
   version: 3.4.3
   resolution: "csv-generate@npm:3.4.3"
@@ -2377,6 +2469,13 @@ __metadata:
   version: 6.1.0
   resolution: "detect-indent@npm:6.1.0"
   checksum: ab953a73c72dbd4e8fc68e4ed4bfd92c97eb6c43734af3900add963fd3a9316f3bc0578b018b24198d4c31a358571eff5f0656e81a1f3b9ad5c547d58b2d093d
+  languageName: node
+  linkType: hard
+
+"detect-libc@npm:^2.0.1":
+  version: 2.0.3
+  resolution: "detect-libc@npm:2.0.3"
+  checksum: 2ba6a939ae55f189aea996ac67afceb650413c7a34726ee92c40fb0deb2400d57ef94631a8a3f052055eea7efb0f99a9b5e6ce923415daa3e68221f963cfc27d
   languageName: node
   linkType: hard
 
@@ -3967,6 +4066,8 @@ __metadata:
     "@rushstack/eslint-patch": ^1.2.0
     "@vitest/coverage-c8": ^0.30.1
     azure-functions-core-tools: ^4.0.5148
+    cbor-x: ^1.5.9
+    crypto: ^1.0.1
     eslint: ^8.28.0
     fp-ts: ^2.16.0
     io-ts: ^2.2.20
@@ -5193,6 +5294,19 @@ __metadata:
     encoding:
       optional: true
   checksum: d76d2f5edb451a3f05b15115ec89fc6be39de37c6089f1b6368df03b91e1633fd379a7e01b7ab05089a25034b2023d959b47e59759cb38d88341b2459e89d6e5
+  languageName: node
+  linkType: hard
+
+"node-gyp-build-optional-packages@npm:5.1.1":
+  version: 5.1.1
+  resolution: "node-gyp-build-optional-packages@npm:5.1.1"
+  dependencies:
+    detect-libc: ^2.0.1
+  bin:
+    node-gyp-build-optional-packages: bin.js
+    node-gyp-build-optional-packages-optional: optional.js
+    node-gyp-build-optional-packages-test: build-test.js
+  checksum: f3cb197862516e6879377adaa58142ae9013ab69c86cf2645f8b008db339354145d8ebd9140a13ec7ece5ce28a372ca7e14660379d3a3dd7b908a6f2743606e9
   languageName: node
   linkType: hard
 

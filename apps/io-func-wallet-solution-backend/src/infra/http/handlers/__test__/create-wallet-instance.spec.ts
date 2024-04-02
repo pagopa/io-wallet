@@ -39,6 +39,9 @@ describe("CreateWalletInstanceHandler", async () => {
         log: () => () => {},
         format: L.format.simple,
       },
+      iOsBundleIdentifier: "it.grausof.integritydemo",
+      iOsTeamIdentifier: "DSEVY6MV9G",
+      androidBundleIdentifier: "it.grausof.integritydemo",
     });
 
     const result = await handler();

@@ -17,9 +17,20 @@ export const CryptoConfiguration = t.type({
 
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
+export const AttestationServiceConfiguration = t.type({
+  iOsBundleIdentifier: t.string,
+  iOsTeamIdentifier: t.string,
+  androidBundleIdentifier: t.string,
+});
+
+export type AttestationServiceConfiguration = t.TypeOf<
+  typeof AttestationServiceConfiguration
+>;
+
 export const Config = t.type({
   federationEntity: FederationEntityMetadata,
   crypto: CryptoConfiguration,
+  attestationService: AttestationServiceConfiguration,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -32,9 +43,14 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.Do,
   RE.bind("federationEntity", () => getFederationEntityConfigFromEnvironment),
   RE.bind("crypto", () => getCryptoConfigFromEnvironment),
+  RE.bind(
+    "attestationService",
+    () => getAttestationServiceConfigFromEnvironment
+  ),
   RE.map((config) => ({
     federationEntity: config.federationEntity,
     crypto: config.crypto,
+    attestationService: config.attestationService,
   }))
 );
 
@@ -77,6 +93,27 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
     jwtDefaultAlg: pipe(
       readFromEnvironment("JwtDefaultAlg"),
       RE.orElse(() => RE.right("ES256"))
+    ),
+  })
+);
+
+export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AttestationServiceConfiguration
+> = pipe(
+  sequenceS(RE.Apply)({
+    iOsBundleIdentifier: pipe(
+      readFromEnvironment("IosBundleIdentifier"),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
+    ),
+    iOsTeamIdentifier: pipe(
+      readFromEnvironment("IosTeamIdentifier"),
+      RE.orElse(() => RE.right("DSEVY6MV9G"))
+    ),
+    androidBundleIdentifier: pipe(
+      readFromEnvironment("AndroidBundleIdentifier"),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
     ),
   })
 );
