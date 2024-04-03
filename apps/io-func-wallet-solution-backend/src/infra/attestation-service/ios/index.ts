@@ -4,9 +4,11 @@ import { pipe } from "fp-ts/function";
 import { decode } from "cbor-x";
 import * as t from "io-ts";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { JWK } from "jose";
 import { validate } from "../../../validation";
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";
+import { verifyAssertion } from "./assertion";
 
 const buffer = new t.Type<Buffer, Buffer, unknown>(
   "buffer",
@@ -55,6 +57,45 @@ export const valiateiOSAttestation = (
             teamIdentifier,
             allowDevelopmentEnvironment,
             appleRootCertificate,
+          }),
+        E.toError
+      )
+    )
+  );
+
+// iOS assertion type
+export const iOsAssertion = t.type({
+  signature: buffer,
+  authenticatorData: buffer,
+});
+
+export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
+
+export const valiateiOSAssertion = (
+  data: Buffer,
+  payload: NonEmptyString,
+  bundleIdentifier: string,
+  teamIdentifier: string,
+  hardwareKey: JWK,
+  signCount: number
+) =>
+  pipe(
+    E.tryCatch(
+      () => decode(data),
+      () => new Error(`Unable to decode data`)
+    ),
+    E.chainW(validate(iOsAssertion, "iOS assertion format is invalid")),
+    TE.fromEither,
+    TE.chain((decodedAssertion) =>
+      TE.tryCatch(
+        () =>
+          verifyAssertion({
+            decodedAssertion,
+            payload,
+            bundleIdentifier,
+            teamIdentifier,
+            hardwareKey,
+            signCount,
           }),
         E.toError
       )

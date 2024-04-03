@@ -152,11 +152,12 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   if (credentialId.toString("base64") !== keyId) {
     throw new Error("credentialId does not match");
   }
-  const publicJwk = await jose.exportJWK(clientCertificate.publicKey);
+
+  const hardwareKey = await jose.exportJWK(clientCertificate.publicKey);
 
   return {
     keyId,
-    publicKey: publicJwk,
+    hardwareKey,
     environment: aaguid === APPATTESTPROD ? "production" : "development",
   };
 };

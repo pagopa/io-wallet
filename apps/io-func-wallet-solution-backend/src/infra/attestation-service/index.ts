@@ -4,6 +4,7 @@ import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
+import { sequenceS } from "fp-ts/lib/Apply";
 
 import {
   AttestationService,
@@ -11,7 +12,7 @@ import {
 } from "../../attestation-service";
 import { AttestationServiceConfiguration } from "../../app/config";
 import { validateAndroidAttestation } from "./android";
-import { valiateiOSAttestation } from "./ios";
+import { valiateiOSAssertion, valiateiOSAttestation } from "./ios";
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -57,7 +58,34 @@ export class MobileAttestationService implements AttestationService {
       )
     );
 
-  validateAssertion = (_assertion: NonEmptyString, _nonce: NonEmptyString) =>
-    pipe(true, TE.right);
+  validateAssertion = (
+    assertion: NonEmptyString,
+    payload: NonEmptyString,
+    _hardwareKeyTag: NonEmptyString
+  ): TE.TaskEither<Error, boolean> =>
+    pipe(
+      sequenceS(TE.ApplicativeSeq)({
+        assertionData: pipe(
+          E.tryCatch(
+            () => Buffer.from(assertion, "base64"),
+            () => new Error(`Invalid assertion: ${assertion}`)
+          ),
+          TE.fromEither
+        ),
+        // TODO: [SIW-969] Add getting the public hardware key from the DB with keyTag and the signCount
+        hardwareKey: TE.left(new Error("Not implemented")),
+        signCount: TE.left(new Error("Not implemented")),
+      }),
+      TE.chain(({ assertionData, hardwareKey, signCount }) =>
+        valiateiOSAssertion(
+          assertionData,
+          payload,
+          this.#configuration.iOsBundleIdentifier,
+          this.#configuration.iOsTeamIdentifier,
+          hardwareKey,
+          signCount
+        )
+      )
+    );
 }
 export { ValidatedAttestation };
