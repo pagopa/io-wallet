@@ -30,7 +30,7 @@ export const iOsAttestation = t.type({
 
 export type iOsAttestation = t.TypeOf<typeof iOsAttestation>;
 
-export const valiateiOSAttestation = (
+export const validateiOSAttestation = (
   data: Buffer,
   challenge: NonEmptyString,
   keyId: string,
@@ -71,7 +71,7 @@ export const iOsAssertion = t.type({
 
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
 
-export const valiateiOSAssertion = (
+export const validateiOSAssertion = (
   data: Buffer,
   payload: NonEmptyString,
   bundleIdentifier: string,

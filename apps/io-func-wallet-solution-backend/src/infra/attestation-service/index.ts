@@ -12,7 +12,7 @@ import {
 } from "../../attestation-service";
 import { AttestationServiceConfiguration } from "../../app/config";
 import { validateAndroidAttestation } from "./android";
-import { valiateiOSAssertion, valiateiOSAttestation } from "./ios";
+import { validateiOSAssertion, validateiOSAttestation } from "./ios";
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -35,7 +35,7 @@ export class MobileAttestationService implements AttestationService {
       TE.chainW((data) =>
         pipe(
           [
-            valiateiOSAttestation(
+            validateiOSAttestation(
               data,
               nonce,
               hardwareKeyTag,
@@ -77,7 +77,7 @@ export class MobileAttestationService implements AttestationService {
         signCount: TE.left(new Error("Not implemented")),
       }),
       TE.chain(({ assertionData, hardwareKey, signCount }) =>
-        valiateiOSAssertion(
+        validateiOSAssertion(
           assertionData,
           payload,
           this.#configuration.iOsBundleIdentifier,
