@@ -11,6 +11,9 @@ export type VerifyAssertionParams = {
   signCount: number;
 };
 
+/* This function does not lend itself well to functional programming,
+ * therefore the validation was written in imperative language
+ */
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
     decodedAssertion,

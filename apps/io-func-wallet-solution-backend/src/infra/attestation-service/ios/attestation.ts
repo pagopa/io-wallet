@@ -21,6 +21,9 @@ export type VerifyAttestationParams = {
   appleRootCertificate: string;
 };
 
+/* This function does not lend itself well to functional programming,
+ * therefore the validation was written in imperative language
+ */
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const {
     decodedAttestation,

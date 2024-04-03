@@ -10,7 +10,7 @@ import { ValidatedAttestation } from "../../attestation-service";
 const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
 
-// TODO: [SIW-944] Add Android integrity check
+// TODO: [SIW-944] Add Android integrity check. This is a mock
 export const validateAndroidAttestation = (
   data: Buffer,
   _nonce: NonEmptyString
@@ -30,7 +30,7 @@ export const validateAndroidAttestation = (
     TE.fromEither,
     TE.map(() => ({
       keyId: "test",
-      publicKey: {},
+      hardwareKey: {},
       environment: "development",
     }))
   );
