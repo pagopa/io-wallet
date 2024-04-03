@@ -4,18 +4,9 @@ import * as L from "@pagopa/logger";
 import { pipe, flow } from "fp-ts/function";
 import * as jose from "jose";
 
-import { trustAnchorPort, trustAnchorServerMock } from "./trust-anchor";
-
 import { privateEcKey } from "./keys";
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
-
-beforeAll(() => {
-  trustAnchorServerMock.listen(trustAnchorPort);
-});
-
-afterAll(() => {
-  trustAnchorServerMock.close();
-});
+import { APPLE_APP_ATTESTATION_ROOT_CA } from "../../../../app/config";
 
 describe("CreateWalletInstanceHandler", async () => {
   //Create a mock of Wallet Instance Request
@@ -42,6 +33,8 @@ describe("CreateWalletInstanceHandler", async () => {
       iOsBundleIdentifier: "it.grausof.integritydemo",
       iOsTeamIdentifier: "DSEVY6MV9G",
       androidBundleIdentifier: "it.grausof.integritydemo",
+      appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
+      allowDevelopmentEnvironment: true,
     });
 
     const result = await handler();

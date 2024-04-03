@@ -24,7 +24,8 @@ export const createWalletInstance =
           (attestationService) =>
             attestationService.validateAttestation(
               request.keyAttestation,
-              request.challenge
+              request.challenge,
+              request.hardwareKeyTag
             )
         )
       ),

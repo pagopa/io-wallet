@@ -1,12 +1,17 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { pipe } from "fp-ts/function";
+import { pipe, identity } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
 import * as RA from "fp-ts/ReadonlyArray";
-import { AttestationService } from "../../attestation-service";
+import * as T from "fp-ts/Task";
+
+import {
+  AttestationService,
+  ValidatedAttestation,
+} from "../../attestation-service";
 import { AttestationServiceConfiguration } from "../../app/config";
-import { valiateiOSAttestation } from "./ios";
 import { validateAndroidAttestation } from "./android";
+import { valiateiOSAttestation } from "./ios";
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -15,30 +20,44 @@ export class MobileAttestationService implements AttestationService {
     this.#configuration = cnf;
   }
 
-  validateAttestation = (attestation: NonEmptyString, nonce: NonEmptyString) =>
+  validateAttestation = (
+    attestation: NonEmptyString,
+    nonce: NonEmptyString,
+    hardwareKeyTag: NonEmptyString
+  ): TE.TaskEither<Error, ValidatedAttestation> =>
     pipe(
       E.tryCatch(
         () => Buffer.from(attestation, "base64"),
         () => new Error(`Invalid attestation: ${attestation}`)
       ),
-      E.chainW((data) =>
+      TE.fromEither,
+      TE.chainW((data) =>
         pipe(
           [
-            valiateiOSAttestation(data, nonce),
+            valiateiOSAttestation(
+              data,
+              nonce,
+              hardwareKeyTag,
+              this.#configuration.iOsBundleIdentifier,
+              this.#configuration.iOsTeamIdentifier,
+              this.#configuration.appleRootCertificate,
+              this.#configuration.allowDevelopmentEnvironment
+            ),
             validateAndroidAttestation(data, nonce),
           ],
-          RA.separate,
-          (validated) =>
+          RA.wilt(T.ApplicativePar)(identity),
+          T.map((validated) =>
             pipe(
               validated.right,
               RA.head,
               E.fromOption(() => new Error("No validation passed"))
             )
+          )
         )
-      ),
-      TE.fromEither
+      )
     );
 
-  validateAssertion = (assertion: NonEmptyString, nonce: NonEmptyString) =>
+  validateAssertion = (_assertion: NonEmptyString, _nonce: NonEmptyString) =>
     pipe(true, TE.right);
 }
+export { ValidatedAttestation };
