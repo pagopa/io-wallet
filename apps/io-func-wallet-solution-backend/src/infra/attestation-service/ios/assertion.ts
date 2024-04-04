@@ -11,9 +11,6 @@ export type VerifyAssertionParams = {
   signCount: number;
 };
 
-/* This function does not lend itself well to functional programming,
- * therefore the validation was written in imperative language
- */
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
     decodedAssertion,
@@ -24,6 +21,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     signCount,
   } = params;
 
+  // 1. The input buffer is already decoded so it is used directly here.
   const { signature, authenticatorData } = decodedAssertion;
 
   // Convert JWK to PEM
