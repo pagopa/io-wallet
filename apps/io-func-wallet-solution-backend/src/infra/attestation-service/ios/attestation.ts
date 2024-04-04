@@ -108,7 +108,6 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   }
 
   // 5. Create the SHA256 hash of the public key in credCert, and verify that it matches the key identifier from your app
-  // const publicKey = await certificate.getPublicKey()
   const publicKey = Buffer.from(
     certificate.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex
   );
