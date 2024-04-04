@@ -11,8 +11,8 @@ import {
   ValidatedAttestation,
 } from "../../attestation-service";
 import { AttestationServiceConfiguration } from "../../app/config";
-import { validateAndroidAttestation } from "./android";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
+import { validateAndroidAttestation } from "./android";
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;

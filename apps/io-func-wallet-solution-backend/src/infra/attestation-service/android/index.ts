@@ -5,6 +5,7 @@ import * as S from "fp-ts/lib/string";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { JWK } from "jose";
 import { ValidatedAttestation } from "../../attestation-service";
 
 const base64ToPem = (b64cert: string) =>
@@ -34,3 +35,12 @@ export const validateAndroidAttestation = (
       environment: "development",
     }))
   );
+
+export const validateAndroidAssertion = (
+  _data: Buffer,
+  _payload: NonEmptyString,
+  _bundleIdentifier: string,
+  _teamIdentifier: string,
+  _hardwareKey: JWK,
+  _signCount: number
+) => pipe(TE.left(new Error("Not implemented yet")));
