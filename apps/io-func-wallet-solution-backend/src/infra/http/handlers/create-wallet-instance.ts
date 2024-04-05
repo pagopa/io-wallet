@@ -10,6 +10,7 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 
+import { createWalletInstance } from "../../../wallet-instance";
 import { createdEntityStatementJwt } from "./utils";
 
 const WalletInstanceRequestPayload = t.type({
@@ -40,8 +41,9 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req,
     requireWalletInstanceRequest,
-    // TODO: [SIW-956] - Add key attestation validation and device registration
-    RTE.chain((_walletInstanceRequest) => RTE.right("OK")),
+    RTE.chain((walletInstanceRequest) =>
+      createWalletInstance(walletInstanceRequest)
+    ),
     RTE.map(createdEntityStatementJwt),
     RTE.orElseW(logErrorAndReturnResponse)
   )
