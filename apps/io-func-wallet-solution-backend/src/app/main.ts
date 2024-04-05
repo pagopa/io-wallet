@@ -34,4 +34,6 @@ export const CreateWalletInstanceAttestation =
     signer,
   });
 
-export const CreateWalletInstance = CreateWalletInstanceFunction({});
+export const CreateWalletInstance = CreateWalletInstanceFunction({
+  ...config.attestationService,
+});

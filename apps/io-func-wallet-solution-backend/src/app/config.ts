@@ -9,6 +9,9 @@ import { FederationEntityMetadata } from "../entity-configuration";
 import { readFromEnvironment } from "../infra/env";
 import { Jwk, fromBase64ToJwks } from "../jwk";
 
+export const APPLE_APP_ATTESTATION_ROOT_CA =
+  "-----BEGIN CERTIFICATE-----\nMIICITCCAaegAwIBAgIQC/O+DvHN0uD7jG5yH2IXmDAKBggqhkjOPQQDAzBSMSYwJAYDVQQDDB1BcHBsZSBBcHAgQXR0ZXN0YXRpb24gUm9vdCBDQTETMBEGA1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTAeFw0yMDAzMTgxODMyNTNaFw00NTAzMTUwMDAwMDBaMFIxJjAkBgNVBAMMHUFwcGxlIEFwcCBBdHRlc3RhdGlvbiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJbmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAERTHhmLW07ATaFQIEVwTtT4dyctdhNbJhFs/Ii2FdCgAHGbpphY3+d8qjuDngIN3WVhQUBHAoMeQ/cLiP1sOUtgjqK9auYen1mMEvRq9Sk3Jm5X8U62H+xTD3FE9TgS41o0IwQDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSskRBTM72+aEH/pwyp5frq5eWKoTAOBgNVHQ8BAf8EBAMCAQYwCgYIKoZIzj0EAwMDaAAwZQIwQgFGnByvsiVbpTKwSga0kP0e8EeDS4+sQmTvb7vn53O5+FRXgeLhpJ06ysC5PrOyAjEAp5U4xDgEgllF7En3VcE3iexZZtKeYnpqtijVoyFraWVIyd/dganmrduC1bmTBGwD\n-----END CERTIFICATE-----";
+
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
   jwtDefaultDuration: t.string,
@@ -17,9 +20,22 @@ export const CryptoConfiguration = t.type({
 
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
+export const AttestationServiceConfiguration = t.type({
+  iOsBundleIdentifier: t.string,
+  iOsTeamIdentifier: t.string,
+  androidBundleIdentifier: t.string,
+  appleRootCertificate: t.string,
+  allowDevelopmentEnvironment: t.boolean,
+});
+
+export type AttestationServiceConfiguration = t.TypeOf<
+  typeof AttestationServiceConfiguration
+>;
+
 export const Config = t.type({
   federationEntity: FederationEntityMetadata,
   crypto: CryptoConfiguration,
+  attestationService: AttestationServiceConfiguration,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -32,9 +48,14 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.Do,
   RE.bind("federationEntity", () => getFederationEntityConfigFromEnvironment),
   RE.bind("crypto", () => getCryptoConfigFromEnvironment),
+  RE.bind(
+    "attestationService",
+    () => getAttestationServiceConfigFromEnvironment
+  ),
   RE.map((config) => ({
     federationEntity: config.federationEntity,
     crypto: config.crypto,
+    attestationService: config.attestationService,
   }))
 );
 
@@ -77,6 +98,39 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
     jwtDefaultAlg: pipe(
       readFromEnvironment("JwtDefaultAlg"),
       RE.orElse(() => RE.right("ES256"))
+    ),
+  })
+);
+
+export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AttestationServiceConfiguration
+> = pipe(
+  sequenceS(RE.Apply)({
+    iOsBundleIdentifier: pipe(
+      readFromEnvironment("IosBundleIdentifier"),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
+    ),
+    iOsTeamIdentifier: pipe(
+      readFromEnvironment("IosTeamIdentifier"),
+      RE.orElse(() => RE.right("DSEVY6MV9G"))
+    ),
+    appleRootCertificate: pipe(
+      readFromEnvironment("AppleRootCertificate"),
+      RE.orElse(() => RE.right(APPLE_APP_ATTESTATION_ROOT_CA))
+    ),
+    androidBundleIdentifier: pipe(
+      readFromEnvironment("AndroidBundleIdentifier"),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
+    ),
+    allowDevelopmentEnvironment: pipe(
+      readFromEnvironment("AllowDevelopmentEnvironment"),
+      RE.map(
+        (devAllowedString) =>
+          devAllowedString === "true" || devAllowedString === "1"
+      ),
+      RE.orElse(() => RE.right(false))
     ),
   })
 );

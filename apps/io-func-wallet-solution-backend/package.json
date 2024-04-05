@@ -22,9 +22,13 @@
   "dependencies": {
     "@pagopa/handler-kit-azure-func": "^1.2.0",
     "@pagopa/ts-commons": "^12.0.0",
+    "asn1js": "^3.0.5",
+    "cbor-x": "^1.5.9",
+    "crypto": "^1.0.1",
     "fp-ts": "^2.16.0",
     "io-ts": "^2.2.20",
-    "jose": "^4.14.4"
+    "jose": "^4.14.4",
+    "pkijs": "^3.0.16"
   },
   "devDependencies": {
     "@azure/functions": "^3.5.0",
