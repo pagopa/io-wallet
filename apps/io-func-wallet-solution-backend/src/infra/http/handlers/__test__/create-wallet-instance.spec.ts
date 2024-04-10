@@ -1,10 +1,8 @@
-import { it, expect, describe, vi, beforeAll, afterAll } from "vitest";
+import { it, expect, describe } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { pipe, flow } from "fp-ts/function";
-import * as jose from "jose";
+import { pipe } from "fp-ts/function";
 
-import { privateEcKey } from "./keys";
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 import { APPLE_APP_ATTESTATION_ROOT_CA } from "../../../../app/config";
 import { iOSMockAttestationData } from "../../../attestation-service/ios/__test__/config";
@@ -13,7 +11,6 @@ describe("CreateWalletInstanceHandler", async () => {
   const { challenge, attestation, keyId } = iOSMockAttestationData;
 
   //Create a mock of Wallet Instance Request
-  const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletInstanceRequest = {
     challenge,
     key_attestation: attestation,
