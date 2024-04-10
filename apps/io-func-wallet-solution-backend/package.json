@@ -20,7 +20,8 @@
     "build:package": "npm-pack-zip --add-version --dst=$TURBO_BUNDLES_DIR"
   },
   "dependencies": {
-    "@pagopa/handler-kit-azure-func": "^1.2.0",
+    "@azure/functions": "^4.4.0",
+    "@pagopa/handler-kit-azure-func": "^2.0.3",
     "@pagopa/ts-commons": "^12.0.0",
     "asn1js": "^3.0.5",
     "cbor-x": "^1.5.9",
@@ -31,11 +32,10 @@
     "pkijs": "^3.0.16"
   },
   "devDependencies": {
-    "@azure/functions": "^3.5.0",
     "@pagopa/eslint-config": "^3.0.0",
     "@rushstack/eslint-patch": "^1.2.0",
     "@vitest/coverage-c8": "^0.30.1",
-    "azure-functions-core-tools": "^4.0.5148",
+    "azure-functions-core-tools": "^4.0.5611",
     "eslint": "^8.28.0",
     "npm-pack-zip": "^1.3.0",
     "prettier": "2.7.1",
@@ -43,5 +43,6 @@
     "typescript": "^4.8.4",
     "vitest": "^0.30.1"
   },
-  "bundleDependencies": true
+  "bundleDependencies": true,
+  "main": "dist/main.js"
 }

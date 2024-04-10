@@ -1,10 +1,12 @@
+import { app } from "@azure/functions";
+
 import * as E from "fp-ts/Either";
 import { pipe, identity } from "fp-ts/function";
 
 import { GetEntityConfigurationFunction } from "../infra/azure/functions/get-entity-configuration";
 import { InfoFunction } from "../infra/azure/functions/info";
 import { CryptoSigner } from "../infra/crypto/signer";
-import { CreateWalletInstanceAttestationFunction } from "../infra/azure/functions/create-wallet-instance-attestation";
+import { CreateWalletAttestationFunction } from "../infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "../infra/azure/functions/create-wallet-instance";
 import { getConfigFromEnvironment } from "./config";
 
@@ -19,21 +21,40 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
-export const Info = InfoFunction({});
-
 const signer = new CryptoSigner(config.crypto);
 
-export const GetEntityConfiguration = GetEntityConfigurationFunction({
-  federationEntityMetadata: config.federationEntity,
-  signer,
+app.http("healthCheck", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "info",
+  handler: InfoFunction({}),
 });
 
-export const CreateWalletInstanceAttestation =
-  CreateWalletInstanceAttestationFunction({
+app.http("getEntityConfiguration", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: ".well-known/openid-federation",
+  handler: GetEntityConfigurationFunction({
     federationEntityMetadata: config.federationEntity,
     signer,
-  });
+  }),
+});
 
-export const CreateWalletInstance = CreateWalletInstanceFunction({
-  ...config.attestationService,
+app.http("createWalletAttestation", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "token",
+  handler: CreateWalletAttestationFunction({
+    federationEntityMetadata: config.federationEntity,
+    signer,
+  }),
+});
+
+app.http("createWalletInstance", {
+  methods: ["PUT"],
+  authLevel: "anonymous",
+  route: "wallet-instance",
+  handler: CreateWalletInstanceFunction({
+    ...config.attestationService,
+  }),
 });

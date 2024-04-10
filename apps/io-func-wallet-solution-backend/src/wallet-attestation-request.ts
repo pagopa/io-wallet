@@ -10,17 +10,17 @@ import { JwkPublicKey } from "./jwk";
 import { getPublicKeyFromCnf, verifyJwtSignature } from "./verifier";
 import { validate } from "./validation";
 
-export const WalletInstanceAttestationRequestHeader = t.type({
+export const WalletAttestationRequestHeader = t.type({
   alg: t.string,
   kid: t.string,
   typ: t.literal("war+jwt"),
 });
 
-export type WalletInstanceAttestationRequestHeader = t.TypeOf<
-  typeof WalletInstanceAttestationRequestHeader
+export type WalletAttestationRequestHeader = t.TypeOf<
+  typeof WalletAttestationRequestHeader
 >;
 
-export const WalletInstanceAttestationRequestPayload = t.type({
+export const WalletAttestationRequestPayload = t.type({
   iss: t.string,
   aud: t.string,
   challenge: t.string,
@@ -34,19 +34,19 @@ export const WalletInstanceAttestationRequestPayload = t.type({
   exp: t.number,
 });
 
-export type WalletInstanceAttestationRequestPayload = t.TypeOf<
-  typeof WalletInstanceAttestationRequestPayload
+export type WalletAttestationRequestPayload = t.TypeOf<
+  typeof WalletAttestationRequestPayload
 >;
 
-type WalletInstanceAttestationRequest = {
-  header: WalletInstanceAttestationRequestHeader;
-  payload: WalletInstanceAttestationRequestPayload;
+type WalletAttestationRequest = {
+  header: WalletAttestationRequestHeader;
+  payload: WalletAttestationRequestPayload;
 };
 
-// Verify and extract header and payload from Wallet Instance Attestation Request
-export const verifyWalletInstanceAttestationRequest = (
+// Verify and extract header and payload from Wallet Attestation Request
+export const verifyWalletAttestationRequest = (
   jwt: string
-): TE.TaskEither<Error, WalletInstanceAttestationRequest> =>
+): TE.TaskEither<Error, WalletAttestationRequest> =>
   pipe(
     jwt,
     getPublicKeyFromCnf,
@@ -57,15 +57,15 @@ export const verifyWalletInstanceAttestationRequest = (
         payload: pipe(
           verifiedJwt.payload,
           validate(
-            WalletInstanceAttestationRequestPayload,
-            "Invalid Wallet Instance Attestation Request payload"
+            WalletAttestationRequestPayload,
+            "Invalid Wallet Attestation Request payload"
           )
         ),
         header: pipe(
           verifiedJwt.protectedHeader,
           validate(
-            WalletInstanceAttestationRequestHeader,
-            "Invalid Wallet Instance Attestation Request header"
+            WalletAttestationRequestHeader,
+            "Invalid Wallet Attestation Request header"
           )
         ),
       })
