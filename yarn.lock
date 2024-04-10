@@ -12,14 +12,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/functions@npm:^3.5.0":
-  version: 3.5.1
-  resolution: "@azure/functions@npm:3.5.1"
+"@azure/functions@npm:^4.0.1, @azure/functions@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "@azure/functions@npm:4.4.0"
   dependencies:
-    iconv-lite: ^0.6.3
+    cookie: ^0.6.0
     long: ^4.0.0
-    uuid: ^8.3.0
-  checksum: f2616ae78ed57df195e7243efbc726163471b0dbe93b6e0b05410a3fe362220ce0eab93d18e218dacc51dc99e30a47bc991d451e60cf50be573a060046d5ad52
+    undici: ^5.13.0
+  checksum: 042ac419daec6d1b37755d59b069fc7c1d093010c9b6ee12534ebbed7c5388e036f1f83c291563af5d83e204cb4bcf87d02737057186fe283379e71570e70780
   languageName: node
   linkType: hard
 
@@ -706,6 +706,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/busboy@npm:^2.0.0":
+  version: 2.1.1
+  resolution: "@fastify/busboy@npm:2.1.1"
+  checksum: 42c32ef75e906c9a4809c1e1930a5ca6d4ddc8d138e1a8c8ba5ea07f997db32210617d23b2e4a85fe376316a41a1a0439fc6ff2dedf5126d96f45a9d80754fb2
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.11":
   version: 0.11.11
   resolution: "@humanwhocodes/config-array@npm:0.11.11"
@@ -878,15 +885,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pagopa/handler-kit-azure-func@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@pagopa/handler-kit-azure-func@npm:1.2.0"
+"@pagopa/handler-kit-azure-func@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@pagopa/handler-kit-azure-func@npm:2.0.3"
   dependencies:
+    "@azure/functions": ^4.0.1
     "@pagopa/handler-kit": ^1.0.1
     "@pagopa/logger": ^1.0.1
     fp-ts: ^2.13.1
     io-ts: ^2.2.20
-  checksum: 845554b25b50c00c40e1a333a533f24a250ca7e7e33a32781de9420ebb19032c49ecd0141959000da756a027b738c961b6d12b4b144a8a1ef8f30adcc2582e01
+  checksum: c7867533c9e88f4ef4fb690862379df79b1817fd62086595d1ad6ca57daf246d958745ffef8700242777d4a74d937d4fde7e94465dcbf36c28f9c80f05f32005
   languageName: node
   linkType: hard
 
@@ -1673,20 +1681,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"azure-functions-core-tools@npm:^4.0.5148":
-  version: 4.0.5348
-  resolution: "azure-functions-core-tools@npm:4.0.5348"
+"azure-functions-core-tools@npm:^4.0.5611":
+  version: 4.0.5611
+  resolution: "azure-functions-core-tools@npm:4.0.5611"
   dependencies:
     chalk: 3.0.0
     extract-zip: ^2.0.1
     https-proxy-agent: 5.0.0
     progress: 2.0.3
-    rimraf: 3.0.2
+    rimraf: 4.0.0
   bin:
     azfun: lib/main.js
     azurefunctions: lib/main.js
     func: lib/main.js
-  checksum: ad744b3b78d6cdc1a8ec9ce71290986c13b5745e16d37212b571c4308ff4a6994edea7642ecbb37708882e77ff48a92569d51516a7951c099e81da51d9e9ebfe
+  checksum: 88b2f510e04793483cad5f0de32c20954ccb8d97b02964ce9642919894a84a3288de2242a709ad067cec71783e4cc9b421df5c38c30b8dad11f6b4f6d4577a91
   conditions: (os=win32 | os=darwin | os=linux)
   languageName: node
   linkType: hard
@@ -2262,6 +2270,13 @@ __metadata:
   version: 1.9.0
   resolution: "convert-source-map@npm:1.9.0"
   checksum: dc55a1f28ddd0e9485ef13565f8f756b342f9a46c4ae18b843fe3c30c675d058d6a4823eff86d472f187b176f0adf51ea7b69ea38be34be4a63cbbf91b0593c8
+  languageName: node
+  linkType: hard
+
+"cookie@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "cookie@npm:0.6.0"
+  checksum: f56a7d32a07db5458e79c726b77e3c2eff655c36792f2b6c58d351fb5f61531e5b1ab7f46987150136e366c65213cbe31729e02a3eaed630c3bf7334635fb410
   languageName: node
   linkType: hard
 
@@ -3982,7 +3997,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iconv-lite@npm:^0.6.2, iconv-lite@npm:^0.6.3":
+"iconv-lite@npm:^0.6.2":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
   dependencies:
@@ -4077,14 +4092,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "io-func-wallet-solution-backend@workspace:apps/io-func-wallet-solution-backend"
   dependencies:
-    "@azure/functions": ^3.5.0
+    "@azure/functions": ^4.4.0
     "@pagopa/eslint-config": ^3.0.0
-    "@pagopa/handler-kit-azure-func": ^1.2.0
+    "@pagopa/handler-kit-azure-func": ^2.0.3
     "@pagopa/ts-commons": ^12.0.0
     "@rushstack/eslint-patch": ^1.2.0
     "@vitest/coverage-c8": ^0.30.1
     asn1js: ^3.0.5
-    azure-functions-core-tools: ^4.0.5148
+    azure-functions-core-tools: ^4.0.5611
     cbor-x: ^1.5.9
     crypto: ^1.0.1
     eslint: ^8.28.0
@@ -6330,7 +6345,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:3.0.2, rimraf@npm:^3.0.2":
+"rimraf@npm:4.0.0":
+  version: 4.0.0
+  resolution: "rimraf@npm:4.0.0"
+  bin:
+    rimraf: dist/cjs/src/bin.js
+  checksum: 0512f25f3959eaeb5fd5b616765d73b187ba5b3b9a2e697bc4b66cd1f5cb51c299ae2e48a32c176115148599356492f004de0c468817f09fa3b841bf31f0421a
+  languageName: node
+  linkType: hard
+
+"rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
   dependencies:
@@ -7408,6 +7432,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici@npm:^5.13.0":
+  version: 5.28.4
+  resolution: "undici@npm:5.28.4"
+  dependencies:
+    "@fastify/busboy": ^2.0.0
+  checksum: a8193132d84540e4dc1895ecc8dbaa176e8a49d26084d6fbe48a292e28397cd19ec5d13bc13e604484e76f94f6e334b2bdc740d5f06a6e50c44072818d0c19f9
+  languageName: node
+  linkType: hard
+
 "unique-filename@npm:^3.0.0":
   version: 3.0.0
   resolution: "unique-filename@npm:3.0.0"
@@ -7453,15 +7486,6 @@ __metadata:
   version: 1.0.2
   resolution: "util-deprecate@npm:1.0.2"
   checksum: 474acf1146cb2701fe3b074892217553dfcf9a031280919ba1b8d651a068c9b15d863b7303cb15bd00a862b498e6cf4ad7b4a08fb134edd5a6f7641681cb54a2
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.0":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 
