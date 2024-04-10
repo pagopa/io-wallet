@@ -51,8 +51,4 @@ describe("CreateWalletInstanceHandler", async () => {
     expect(body).toEqual(expect.any(String));
     expect(body).toEqual("OK");
   });
-
-  it("test", () => {
-    expect(1).toBe(1);
-  });
 });
