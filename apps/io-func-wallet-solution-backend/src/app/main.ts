@@ -52,7 +52,7 @@ app.http("createWalletInstance", {
 app.http("getEntityConfiguration", {
   methods: ["GET"],
   authLevel: "anonymous",
-  route: ".well-known/openid-federation!!",
+  route: ".well-known/openid-federation",
   handler: GetEntityConfigurationFunction({
     federationEntityMetadata: config.federationEntity,
     signer,
