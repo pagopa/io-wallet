@@ -5,7 +5,7 @@ name: "Code Review"
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: ["master"]
     paths:
       - apps/**
       - packages/**
