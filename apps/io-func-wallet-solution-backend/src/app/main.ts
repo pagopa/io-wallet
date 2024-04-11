@@ -30,16 +30,6 @@ app.http("healthCheck", {
   handler: InfoFunction({}),
 });
 
-app.http("getEntityConfiguration", {
-  methods: ["GET"],
-  authLevel: "anonymous",
-  route: ".well-known/openid-federation",
-  handler: GetEntityConfigurationFunction({
-    federationEntityMetadata: config.federationEntity,
-    signer,
-  }),
-});
-
 app.http("createWalletAttestation", {
   methods: ["POST"],
   authLevel: "anonymous",
@@ -56,5 +46,15 @@ app.http("createWalletInstance", {
   route: "wallet-instance",
   handler: CreateWalletInstanceFunction({
     ...config.attestationService,
+  }),
+});
+
+app.http("getEntityConfiguration", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: ".well-known/openid-federation",
+  handler: GetEntityConfigurationFunction({
+    federationEntityMetadata: config.federationEntity,
+    signer,
   }),
 });
