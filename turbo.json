@@ -26,7 +26,6 @@
     "test": {
       "inputs": ["src/**/*.spec.ts", "src/**/*.test.ts"],
       "outputs": [],
-      "outputMode": "errors-only",
       "dependsOn": ["^build"]
     }
   }
