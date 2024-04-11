@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.2
+
+### Patch Changes
+
+- 207000d: Upgraded typescript and ES version
+
 ## 0.1.1
 
 ### Patch Changes
