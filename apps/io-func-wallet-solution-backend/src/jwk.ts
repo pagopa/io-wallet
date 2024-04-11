@@ -95,5 +95,3 @@ export const getKeyByKid = (kid: string) => (jwks: JwkPublicKey[]) =>
     jwks,
     A.findFirst((key) => key.kid === kid)
   );
-
-// this is a test comment
