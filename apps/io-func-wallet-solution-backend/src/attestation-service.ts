@@ -8,9 +8,7 @@ export enum OperatingSystem {
 }
 
 export type ValidatedAttestation = {
-  keyId: string;
   hardwareKey: JWK;
-  environment: string;
 };
 
 export type AttestationService = {

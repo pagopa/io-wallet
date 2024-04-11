@@ -155,8 +155,6 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const hardwareKey = await jose.exportJWK(clientCertificate.publicKey);
 
   return {
-    keyId,
     hardwareKey,
-    environment: aaguid === APPATTESTPROD ? "production" : "development",
   };
 };

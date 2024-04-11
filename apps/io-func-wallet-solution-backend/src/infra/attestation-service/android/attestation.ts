@@ -1,6 +1,6 @@
 import { X509Certificate, createPublicKey } from "crypto";
 import { AsnConvert } from "@peculiar/asn1-schema";
-
+import * as jose from "jose";
 import * as asn1js from "asn1js";
 import * as pkijs from "pkijs";
 import {
@@ -18,12 +18,16 @@ type CRL = {
   >;
 };
 
-// Certificate Revocation status List
-// https://developer.android.com/privacy-and-security/security-key-attestation#certificate_status
+/**
+ * Certificate Revocation status List
+ * https://developer.android.com/privacy-and-security/security-key-attestation#certificate_status
+ */
 const CRL_URL = "https://android.googleapis.com/attestation/status";
 
-// Key attestation extension data schema OID
-// https://developer.android.com/privacy-and-security/security-key-attestation#key_attestation_ext_schema
+/**
+ * Key attestation extension data schema OID
+ * https://developer.android.com/privacy-and-security/security-key-attestation#key_attestation_ext_schema
+ */
 const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 
 export type VerifyAttestationParams = {
@@ -42,10 +46,15 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 
   validateIssuance(x509Chain, googlePublicKey);
   await validateRevokation(x509Chain);
-  const extension = validateKeyAttestationExtension(x509Chain);
+  const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
-  validateExtension(extension, params);
-  console.log(x509Chain);
+  validateExtension(certWithExtension, params);
+
+  const hardwareKey = await jose.exportJWK(certWithExtension.publicKey);
+
+  return {
+    hardwareKey,
+  };
 };
 
 /**
@@ -127,16 +136,23 @@ export const validateRevokation = async (
 const validateKeyAttestationExtension = (
   x509Chain: ReadonlyArray<X509Certificate>
 ) => {
-  const certsWithExtension = x509Chain.filter((certificate) => {
+  /**
+   * Parse the attestation record that is closest to the root. This prevents an adversary from
+   * attesting an attestation record of their choice with an otherwise trusted chain using the
+   * following attack:
+   * 1) having the TEE attest a key under the adversary's control,
+   * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
+   * 3) appending that certificate to the original certificate chain.
+   */
+  const certWithExtension = x509Chain.findLast((certificate) => {
     const ext = extractExtension(certificate, KEY_OID);
     return ext ?? false;
   });
-  if (certsWithExtension.length === 1) {
-    const found = extractExtension(certsWithExtension[0], KEY_OID);
-    if (found !== undefined) {
-      return found;
-    }
+
+  if (certWithExtension) {
+    return certWithExtension;
   }
+
   throw new Error("No key attestation extension found");
 };
 
@@ -155,10 +171,15 @@ const extractExtension = (certificate: X509Certificate, oid: string) => {
  * @throws {Error} - If the validation fail.
  */
 const validateExtension = (
-  extension: pkijs.Extension,
+  certWithExtension: X509Certificate,
   attestationParams: VerifyAttestationParams
 ) => {
   const { challenge, bundleIdentifier } = attestationParams;
+
+  const extension = extractExtension(certWithExtension, KEY_OID);
+  if (extension === undefined) {
+    throw new Error("Unable to extract extension from certificate");
+  }
 
   const extensionBerEncoded = extension.extnValue.getValue();
 
@@ -166,6 +187,30 @@ const validateExtension = (
     extensionBerEncoded,
     NonStandardKeyDescription
   );
+
+  /*
+   * Check security level of attestation and key master.
+   * 0: Software
+   * 1: TrustedEnvironment
+   * 2: StrongBox
+   *
+   * Warning: Although it is possible to attest keys that are stored in the Android system—that is,
+   * if the value of attestationSecurityLevel is set to Software—you can't trust these attestations
+   * if the Android system becomes compromised.
+   */
+  if (keyDescription.attestationSecurityLevel <= 0) {
+    throw new Error(
+      `Attestation security level too low: ${keyDescription.attestationSecurityLevel}.`
+    );
+  }
+
+  if (keyDescription.keymasterSecurityLevel <= 0) {
+    throw new Error(
+      `Key master security level too low: ${keyDescription.keymasterSecurityLevel}.`
+    );
+  }
+
+  // Check challenge
   const receivedChallenge = Buffer.from(
     keyDescription.attestationChallenge.buffer
   ).toString("utf-8");
@@ -176,7 +221,7 @@ const validateExtension = (
     );
   }
 
-  // Check softwareEnforced AuthorizationList
+  // Check softwareEnforced authorization list
   const softwareEnforced = keyDescription.softwareEnforced.find(
     (softwareEnforced) =>
       softwareEnforced.attestationApplicationId !== undefined
@@ -193,6 +238,7 @@ const validateExtension = (
     AttestationApplicationId
   );
 
+  // Check package name
   const packageInfo = attestationApplicationId.packageInfos.find(
     (packageInfo) => packageInfo.packageName.byteLength > 0
   );
@@ -208,6 +254,38 @@ const validateExtension = (
   if (packageName !== bundleIdentifier) {
     throw new Error(
       `The bundle identifier ${packageName} does not match ${bundleIdentifier}.`
+    );
+  }
+
+  // Check teeEnforced Root Of Trust
+  const teeEnforcedWithRoT = keyDescription.teeEnforced.find(
+    (el) => el.rootOfTrust
+  );
+  if (!teeEnforcedWithRoT || !teeEnforcedWithRoT.rootOfTrust) {
+    throw new Error(`Unable to found a Root Of Trust in teeEnforced data.`);
+  }
+
+  const rootOfTrust = teeEnforcedWithRoT.rootOfTrust;
+
+  // Check if bootloader in locked
+  if (!rootOfTrust.deviceLocked) {
+    throw new Error(`BootLoader unlocked!`);
+  }
+
+  /*
+   * This data structure provides the device's current boot state,
+   * which represents the level of protection provided to the user and to
+   * apps after the device finishes booting.
+   *
+   * This data structure is an enumeration, so it takes on exactly one of the following values:
+   * 0) Verified
+   * 1) SelfSigned
+   * 2) Unverified
+   * 3) Failed
+   */
+  if (rootOfTrust.verifiedBootState !== 0) {
+    throw new Error(
+      `VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`
     );
   }
 };

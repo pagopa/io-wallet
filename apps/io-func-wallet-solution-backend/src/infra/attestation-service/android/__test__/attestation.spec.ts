@@ -7,7 +7,7 @@ import { GOOGLE_PUBLIC_KEY } from "../../../../app/config";
 import { base64ToPem } from "..";
 
 describe("AndroidAttestationValidation", async () => {
-  const { challenge, attestation, keyId } = androidMockAttestationData;
+  const { hardwareKey, attestation } = androidMockAttestationData;
 
   const data = Buffer.from(attestation, "base64");
   const x509ChainString = data.toString("utf-8").split(",");
@@ -25,9 +25,7 @@ describe("AndroidAttestationValidation", async () => {
     });
 
     const expectedResult = {
-      environment: "development",
-      keyId: keyId,
-      hardwareKey: "",
+      hardwareKey,
     };
     expect(result).toEqual(expectedResult);
   });

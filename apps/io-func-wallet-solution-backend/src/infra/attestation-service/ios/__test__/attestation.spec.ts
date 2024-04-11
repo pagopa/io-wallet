@@ -30,8 +30,6 @@ describe("iOSAttestationValidation", async () => {
     });
 
     const expectedResult = {
-      environment: "development",
-      keyId: keyId,
       hardwareKey,
     };
     expect(result).toEqual(expectedResult);
