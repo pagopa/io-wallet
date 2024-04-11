@@ -933,6 +933,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@peculiar/asn1-android@npm:^2.3.10":
+  version: 2.3.10
+  resolution: "@peculiar/asn1-android@npm:2.3.10"
+  dependencies:
+    "@peculiar/asn1-schema": ^2.3.8
+    asn1js: ^3.0.5
+    tslib: ^2.6.2
+  checksum: 882a1b5129c9ad99abf7e8bc1b4373c454af1f8921e571a638e0ec27e77327703db0cb669cd13bc71f4c8e2e7f39e344d6c6741405184148ea1e3bd4b9d5fb59
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-schema@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@peculiar/asn1-schema@npm:2.3.8"
+  dependencies:
+    asn1js: ^3.0.5
+    pvtsutils: ^1.3.5
+    tslib: ^2.6.2
+  checksum: 1f4dd421f1411df8bc52bca12b1cef710434c13ff0a8b5746ede42b10d62b5ad06a3925c4a6db53102aaf1e589947539a6955fa8554a9b8ebb1ffa38b0155a24
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -4081,6 +4103,7 @@ __metadata:
     "@pagopa/eslint-config": ^3.0.0
     "@pagopa/handler-kit-azure-func": ^1.2.0
     "@pagopa/ts-commons": ^12.0.0
+    "@peculiar/asn1-android": ^2.3.10
     "@rushstack/eslint-patch": ^1.2.0
     "@vitest/coverage-c8": ^0.30.1
     asn1js: ^3.0.5
@@ -6052,7 +6075,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pvtsutils@npm:^1.3.2":
+"pvtsutils@npm:^1.3.2, pvtsutils@npm:^1.3.5":
   version: 1.3.5
   resolution: "pvtsutils@npm:1.3.5"
   dependencies:
@@ -7127,7 +7150,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.4.0, tslib@npm:^2.6.1":
+"tslib@npm:^2.4.0, tslib@npm:^2.6.1, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad

@@ -7,14 +7,18 @@ import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { JWK } from "jose";
 import { ValidatedAttestation } from "../../attestation-service";
+import { verifyAttestation } from "./attestation";
 
-const base64ToPem = (b64cert: string) =>
+export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
 
 // TODO: [SIW-944] Add Android integrity check. This is a mock
 export const validateAndroidAttestation = (
   data: Buffer,
-  _nonce: NonEmptyString
+  nonce: NonEmptyString,
+  hardwareKeyTag: NonEmptyString,
+  bundleIdentifier: string,
+  googlePublicKey: string
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
     data.toString("utf-8"),
@@ -29,8 +33,20 @@ export const validateAndroidAttestation = (
     ),
     RA.sequence(E.Applicative),
     TE.fromEither,
+    TE.chain((x509Chain) =>
+      TE.tryCatch(
+        () =>
+          verifyAttestation({
+            x509Chain,
+            googlePublicKey,
+            challenge: nonce,
+            bundleIdentifier,
+          }),
+        E.toError
+      )
+    ),
     TE.map(() => ({
-      keyId: "test",
+      keyId: hardwareKeyTag,
       hardwareKey: {},
       environment: "development",
     }))

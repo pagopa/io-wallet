@@ -44,7 +44,13 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.appleRootCertificate,
               this.#configuration.allowDevelopmentEnvironment
             ),
-            validateAndroidAttestation(data, nonce),
+            validateAndroidAttestation(
+              data,
+              nonce,
+              hardwareKeyTag,
+              this.#configuration.androidBundleIdentifier,
+              this.#configuration.googlePublicKey
+            ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
           T.map((validated) =>

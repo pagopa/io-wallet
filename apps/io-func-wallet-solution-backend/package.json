@@ -22,6 +22,7 @@
   "dependencies": {
     "@pagopa/handler-kit-azure-func": "^1.2.0",
     "@pagopa/ts-commons": "^12.0.0",
+    "@peculiar/asn1-android": "^2.3.10",
     "asn1js": "^3.0.5",
     "cbor-x": "^1.5.9",
     "crypto": "^1.0.1",
