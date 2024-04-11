@@ -210,6 +210,4 @@ const validateExtension = (
       `The bundle identifier ${packageName} does not match ${bundleIdentifier}.`
     );
   }
-
-  console.log(keyDescription.teeEnforced);
 };
