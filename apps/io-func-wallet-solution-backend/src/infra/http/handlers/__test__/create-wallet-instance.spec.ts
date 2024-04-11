@@ -6,6 +6,7 @@ import { pipe } from "fp-ts/function";
 import { privateEcKey } from "./keys";
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 import {
+  ANDROID_CRL_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
 } from "../../../../app/config";
@@ -41,6 +42,7 @@ describe("CreateWalletInstanceHandler", async () => {
       appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
       allowDevelopmentEnvironment: true,
       googlePublicKey: GOOGLE_PUBLIC_KEY,
+      androidCrlUrl: ANDROID_CRL_URL,
     });
 
     const result = await handler();
