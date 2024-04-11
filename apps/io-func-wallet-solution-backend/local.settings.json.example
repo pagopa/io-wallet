@@ -6,12 +6,14 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "NODE_ENV": "development",
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
+    "CosmosDbConnectionString": "COSMOS_DB_CONNECTION_STRING",
+    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
     "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME",
     "FederationEntityHomepageUri": "FEDERATION_ENTITY_HOMEPAGE_URI",
     "FederationEntityPolicyUri": "FEDERATION_ENTITY_PRIVACY_URI",
     "FederationEntityTosUri": "FEDERATION_ENTITY_TOS_URI",
-    "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI"
+    "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI",
     "FederationEntityTrustAnchorUri": "FEDERATION_ENTITY_TRUST_ANCHOR_URI",
     "WalletKeys": "ARRAY_OF_WALLET_KEYS_IN_JWK_FORMAT_BASE64_ENCODED"
   }

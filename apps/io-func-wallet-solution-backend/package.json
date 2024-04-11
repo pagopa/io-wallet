@@ -20,6 +20,7 @@
     "build:package": "npm-pack-zip --add-version --dst=$TURBO_BUNDLES_DIR"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.0.0",
     "@azure/functions": "^4.4.0",
     "@pagopa/handler-kit-azure-func": "^2.0.3",
     "@pagopa/ts-commons": "^12.0.0",
