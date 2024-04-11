@@ -18,7 +18,8 @@ export const validateAndroidAttestation = (
   nonce: NonEmptyString,
   hardwareKeyTag: NonEmptyString,
   bundleIdentifier: string,
-  googlePublicKey: string
+  googlePublicKey: string,
+  androidCrlUrl: string
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
     data.toString("utf-8"),
@@ -41,6 +42,7 @@ export const validateAndroidAttestation = (
             googlePublicKey,
             challenge: nonce,
             bundleIdentifier,
+            androidCrlUrl,
           }),
         E.toError
       )

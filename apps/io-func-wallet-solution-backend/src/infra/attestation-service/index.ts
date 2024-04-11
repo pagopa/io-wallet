@@ -49,7 +49,8 @@ export class MobileAttestationService implements AttestationService {
               nonce,
               hardwareKeyTag,
               this.#configuration.androidBundleIdentifier,
-              this.#configuration.googlePublicKey
+              this.#configuration.googlePublicKey,
+              this.#configuration.androidCrlUrl
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),

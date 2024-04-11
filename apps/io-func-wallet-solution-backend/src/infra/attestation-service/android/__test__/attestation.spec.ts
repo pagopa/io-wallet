@@ -3,7 +3,7 @@ import { verifyAttestation } from "../attestation";
 
 import { androidMockAttestationData } from "./config";
 import { X509Certificate } from "crypto";
-import { GOOGLE_PUBLIC_KEY } from "../../../../app/config";
+import { ANDROID_CRL_URL, GOOGLE_PUBLIC_KEY } from "../../../../app/config";
 import { base64ToPem } from "..";
 
 describe("AndroidAttestationValidation", async () => {
@@ -22,6 +22,7 @@ describe("AndroidAttestationValidation", async () => {
       googlePublicKey: GOOGLE_PUBLIC_KEY,
       challenge: "randomvalue",
       bundleIdentifier: "com.ioreactnativeintegrityexample",
+      androidCrlUrl: ANDROID_CRL_URL,
     });
 
     const expectedResult = {

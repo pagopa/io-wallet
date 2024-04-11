@@ -19,12 +19,6 @@ type CRL = {
 };
 
 /**
- * Certificate Revocation status List
- * https://developer.android.com/privacy-and-security/security-key-attestation#certificate_status
- */
-const CRL_URL = "https://android.googleapis.com/attestation/status";
-
-/**
  * Key attestation extension data schema OID
  * https://developer.android.com/privacy-and-security/security-key-attestation#key_attestation_ext_schema
  */
@@ -33,19 +27,20 @@ const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 export type VerifyAttestationParams = {
   x509Chain: ReadonlyArray<X509Certificate>;
   googlePublicKey: string;
+  androidCrlUrl: string;
   challenge: string;
   bundleIdentifier: string;
 };
 
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
-  const { x509Chain, googlePublicKey } = params;
+  const { x509Chain, googlePublicKey, androidCrlUrl } = params;
 
   if (x509Chain.length <= 0) {
     throw new Error("No certificates provided");
   }
 
   validateIssuance(x509Chain, googlePublicKey);
-  await validateRevokation(x509Chain);
+  await validateRevocation(x509Chain, androidCrlUrl);
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
   validateExtension(certWithExtension, params);
@@ -109,10 +104,11 @@ export const validateIssuance = (
  * @param x509Chain - The chain of {@link X509Certificate} certificates.
  * @throws {Error} - If any certificate in the chain is revoked.
  */
-export const validateRevokation = async (
-  x509Chain: ReadonlyArray<X509Certificate>
+export const validateRevocation = async (
+  x509Chain: ReadonlyArray<X509Certificate>,
+  androidCrlUrl: string
 ) => {
-  const res = await fetch(CRL_URL, { method: "GET" });
+  const res = await fetch(androidCrlUrl, { method: "GET" });
   if (!res.ok) {
     throw new Error("Failed to fetch CRL");
   }
