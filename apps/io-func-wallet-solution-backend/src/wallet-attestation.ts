@@ -10,13 +10,13 @@ import {
   FederationEntity,
   getEntityConfiguration,
 } from "./entity-configuration";
-import { verifyWalletInstanceAttestationRequest } from "./wallet-instance-attestation-request";
+import { verifyWalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
 import { JwkPublicKey } from "./jwk";
-import { WalletInstanceAttestationToJwtModel } from "./encoders/wallet-instance-attestation";
+import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
 import { EidasTrustAnchor } from "./infra/trust-anchor";
 
-export const WalletInstanceAttestationPayload = t.type({
+export const WalletAttestationPayload = t.type({
   iss: t.string,
   sub: t.string,
   federationEntity: FederationEntity,
@@ -25,8 +25,8 @@ export const WalletInstanceAttestationPayload = t.type({
   algValueSupported: t.array(t.string),
 });
 
-export type WalletInstanceAttestationPayload = t.TypeOf<
-  typeof WalletInstanceAttestationPayload
+export type WalletAttestationPayload = t.TypeOf<
+  typeof WalletAttestationPayload
 >;
 
 const composeTrustChain = ({
@@ -52,18 +52,15 @@ const composeTrustChain = ({
   );
 };
 
-// Build the JWT of the Wallet Instance Attestation given a Wallet Instance Attestation Request
-export const createWalletInstanceAttestation =
+// Build the JWT of the Wallet Attestation given a Wallet Attestation Request
+export const createWalletAttestation =
   (
-    walletInstanceAttestationRequest: string
+    walletAttestationRequest: string
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({ federationEntityMetadata, signer }) =>
     pipe(
       sequenceS(TE.ApplicativePar)({
-        request: pipe(
-          walletInstanceAttestationRequest,
-          verifyWalletInstanceAttestationRequest
-        ),
+        request: pipe(walletAttestationRequest, verifyWalletAttestationRequest),
         publicJwk: pipe(signer.getFirstPublicKeyByKty("EC"), TE.fromEither),
         supportedSignAlgorithms: pipe(
           signer.getSupportedSignAlgorithms(),
@@ -91,7 +88,7 @@ export const createWalletInstanceAttestation =
             walletInstancePublicKey: request.payload.cnf.jwk,
             algValueSupported: supportedSignAlgorithms,
           },
-          WalletInstanceAttestationToJwtModel.encode,
+          WalletAttestationToJwtModel.encode,
           signer.createJwtAndsign(
             { typ: "wallet-attestation+jwt", x5c: [], trust_chain: trustChain },
             publicJwk.kid

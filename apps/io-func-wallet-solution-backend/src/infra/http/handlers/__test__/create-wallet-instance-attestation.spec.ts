@@ -1,9 +1,9 @@
-import { it, expect, describe, vi, beforeAll, afterAll } from "vitest";
+import { it, expect, describe, beforeAll, afterAll } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { pipe } from "fp-ts/function";
 import * as jose from "jose";
-import { CreateWalletInstanceAttestationHandler } from "../create-wallet-instance-attestation";
+import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
 import { GRANT_TYPE_KEY_ATTESTATION } from "../../../../wallet-provider";
 import {
   federationEntityMetadata,
@@ -20,10 +20,10 @@ afterAll(() => {
   trustAnchorServerMock.close();
 });
 
-describe("CreateWalletInstanceAttestationHandler", async () => {
-  //Create a mock of Wallet Instance Attestation Request
+describe("CreateWalletAttestationHandler", async () => {
+  //Create a mock of Wallet Attestation Request
   const josePrivateKey = await jose.importJWK(privateEcKey);
-  const walletInstanceAttestationRequest = await new jose.SignJWT({
+  const walletAttestationRequest = await new jose.SignJWT({
     iss: "demokey",
     aud: "https://wallet-provider.example.org/",
     challenge: "...",
@@ -44,13 +44,13 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     .sign(josePrivateKey);
 
   it("should return a 201 HTTP response", async () => {
-    const handler = CreateWalletInstanceAttestationHandler({
+    const handler = CreateWalletAttestationHandler({
       input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
         ...req,
         method: "POST",
         body: {
           grant_type: GRANT_TYPE_KEY_ATTESTATION,
-          assertion: walletInstanceAttestationRequest,
+          assertion: walletAttestationRequest,
         },
       })),
       inputDecoder: H.HttpRequest,

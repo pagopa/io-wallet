@@ -1,17 +1,17 @@
 import * as t from "io-ts";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "../jwk";
-import { WalletInstanceAttestationPayload } from "../wallet-instance-attestation";
+import { WalletAttestationPayload } from "../wallet-attestation";
 import { removeTrailingSlash } from "../url";
 
 const AlgValueSupported = t.type({
   alg_values_supported: t.array(t.string),
 });
 
-/* WalletInstanceAttestationJwtModel is the model of how the Wallet Instance Attestation JWT
+/* WalletAttestationJwtModel is the model of how the Wallet Attestation JWT
  *is represented outside the code base
  */
-export const WalletInstanceAttestationJwtModel = t.type({
+export const WalletAttestationJwtModel = t.type({
   iss: t.string,
   sub: t.string,
   attested_security_context: t.string,
@@ -28,13 +28,13 @@ export const WalletInstanceAttestationJwtModel = t.type({
   presentation_definition_uri_supported: t.boolean,
 });
 
-export type WalletInstanceAttestationJwtModel = t.TypeOf<
-  typeof WalletInstanceAttestationJwtModel
+export type WalletAttestationJwtModel = t.TypeOf<
+  typeof WalletAttestationJwtModel
 >;
 
-export const WalletInstanceAttestationToJwtModel: E.Encoder<
-  WalletInstanceAttestationJwtModel,
-  WalletInstanceAttestationPayload
+export const WalletAttestationToJwtModel: E.Encoder<
+  WalletAttestationJwtModel,
+  WalletAttestationPayload
 > = {
   encode: ({
     iss,
