@@ -46,12 +46,7 @@ export const validateAndroidAttestation = (
           }),
         E.toError
       )
-    ),
-    TE.map(() => ({
-      keyId: hardwareKeyTag,
-      hardwareKey: {},
-      environment: "development",
-    }))
+    )
   );
 
 export const validateAndroidAssertion = (
