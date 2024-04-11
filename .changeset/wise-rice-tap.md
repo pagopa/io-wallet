@@ -2,4 +2,4 @@
 "io-func-wallet-solution-backend": patch
 ---
 
-Azure functions programming model v4
+Migrated `Azure functions` to v4 programming model.
