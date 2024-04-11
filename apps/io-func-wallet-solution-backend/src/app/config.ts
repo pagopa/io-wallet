@@ -32,10 +32,20 @@ export type AttestationServiceConfiguration = t.TypeOf<
   typeof AttestationServiceConfiguration
 >;
 
+const AzureConfiguration = t.type({
+  cosmos: t.type({
+    connectionString: t.string,
+    dbName: t.string,
+  }),
+});
+
+type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
+
 export const Config = t.type({
   federationEntity: FederationEntityMetadata,
   crypto: CryptoConfiguration,
   attestationService: AttestationServiceConfiguration,
+  azure: AzureConfiguration,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -52,10 +62,12 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     "attestationService",
     () => getAttestationServiceConfigFromEnvironment
   ),
+  RE.bind("azure", () => getAzureConfigFromEnvironment),
   RE.map((config) => ({
     federationEntity: config.federationEntity,
     crypto: config.crypto,
     attestationService: config.attestationService,
+    azure: config.azure,
   }))
 );
 
@@ -133,4 +145,21 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.orElse(() => RE.right(false))
     ),
   })
+);
+
+export const getAzureConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureConfiguration
+> = pipe(
+  sequenceS(RE.Apply)({
+    cosmosDbConnectionString: readFromEnvironment("CosmosDbConnectionString"),
+    cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
+  }),
+  RE.map(({ cosmosDbConnectionString, cosmosDbDatabaseName }) => ({
+    cosmos: {
+      connectionString: cosmosDbConnectionString,
+      dbName: cosmosDbDatabaseName,
+    },
+  }))
 );
