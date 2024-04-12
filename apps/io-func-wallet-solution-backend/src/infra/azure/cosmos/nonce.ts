@@ -1,5 +1,5 @@
 import { Container, Database } from "@azure/cosmos";
-import { NonceRepository } from "../../../nonce";
+import { NonceRepository } from "@/nonce";
 
 export class CosmosDbNonceRepository implements NonceRepository {
   #container: Container;

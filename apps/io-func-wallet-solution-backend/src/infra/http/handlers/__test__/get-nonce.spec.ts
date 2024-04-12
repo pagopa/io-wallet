@@ -1,8 +1,23 @@
-import { it, expect, describe } from "vitest";
+import { it, expect, describe, vi } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { GetNonceHandler } from "../get-nonce";
-import { NonceRepository } from "../../../../nonce";
+import { NonceRepository, generateNonce } from "@/nonce";
+import * as E from "fp-ts/Either";
+
+const mocks = vi.hoisted(() => ({
+  generateNonce: vi.fn(),
+}));
+
+vi.mocked(generateNonce).mockReturnValue(E.right("nonce"));
+
+vi.mock("@/nonce", async (importOriginal) => {
+  const module = await importOriginal<typeof import("@/nonce")>();
+  return {
+    ...module,
+    generateNonce: mocks.generateNonce,
+  };
+});
 
 describe("GetNonceHandler", async () => {
   const nonceRepository: NonceRepository = {
@@ -28,7 +43,48 @@ describe("GetNonceHandler", async () => {
             "Content-Type": "application/json",
           }),
           body: expect.objectContaining({
-            nonce: expect.stringMatching(/^[0-9a-f]{64}$/),
+            nonce: "nonce",
+          }),
+        }),
+      })
+    );
+  });
+
+  it("should return a 500 HTTP response when generateNonce returns error", () => {
+    vi.mocked(generateNonce).mockReturnValueOnce(E.left(new Error("error")));
+    expect(handler()).resolves.toEqual(
+      expect.objectContaining({
+        right: expect.objectContaining({
+          statusCode: 500,
+          headers: expect.objectContaining({
+            "Content-Type": "application/problem+json",
+          }),
+        }),
+      })
+    );
+  });
+
+  it("should return a 500 HTTP response when insertNonce returns error", () => {
+    const nonceRepositoryThatFailsOnInsert: NonceRepository = {
+      insert: () => Promise.reject(new Error("failed on insert!")),
+    };
+
+    const handler = GetNonceHandler({
+      input: H.request("https://api.test.it/"),
+      inputDecoder: H.HttpRequest,
+      logger: {
+        log: () => () => {},
+        format: L.format.simple,
+      },
+      nonceRepository: nonceRepositoryThatFailsOnInsert,
+    });
+
+    expect(handler()).resolves.toEqual(
+      expect.objectContaining({
+        right: expect.objectContaining({
+          statusCode: 500,
+          headers: expect.objectContaining({
+            "Content-Type": "application/problem+json",
           }),
         }),
       })

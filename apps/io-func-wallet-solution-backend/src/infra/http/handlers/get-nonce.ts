@@ -2,7 +2,7 @@ import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { logErrorAndReturnResponse } from "../utils";
-import { insertNonce, generateNonce } from "../../../nonce";
+import { insertNonce, generateNonce } from "@/nonce";
 
 export const GetNonceHandler = H.of(() =>
   pipe(
