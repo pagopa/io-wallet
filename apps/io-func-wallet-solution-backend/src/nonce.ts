@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
-import * as IO from "fp-ts/lib/IO";
+import * as IOE from "fp-ts/IOEither";
 
 export type NonceRepository = {
   insert: (nonce: string) => Promise<void>;
@@ -11,8 +11,10 @@ export type NonceEnvironment = {
   nonceRepository: NonceRepository;
 };
 
-export const generateNonce: IO.IO<string> = () =>
-  randomBytes(32).toString("hex");
+export const generateNonceIOEither: IOE.IOEither<Error, string> = IOE.tryCatch(
+  () => randomBytes(32).toString("hex"),
+  (error) => new Error(`Failed to generate nonce: ${error}`)
+);
 
 export const insertNonce: (
   nonce: string
