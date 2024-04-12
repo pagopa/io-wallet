@@ -19,7 +19,7 @@ describe("GetNonceHandler", async () => {
     nonceRepository,
   });
 
-  it("should return a 200 HTTP response", () => {
+  it("should return a 200 HTTP response on success", () => {
     expect(handler()).resolves.toEqual(
       expect.objectContaining({
         right: expect.objectContaining({
@@ -28,7 +28,7 @@ describe("GetNonceHandler", async () => {
             "Content-Type": "application/json",
           }),
           body: expect.objectContaining({
-            nonce: expect.any(String),
+            nonce: expect.stringMatching(/^[0-9a-f]{64}$/),
           }),
         }),
       })
