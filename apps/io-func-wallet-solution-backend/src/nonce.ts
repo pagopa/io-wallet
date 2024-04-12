@@ -11,7 +11,7 @@ export type NonceEnvironment = {
   nonceRepository: NonceRepository;
 };
 
-export const generateNonce: () => IO.IO<string> = () => () =>
+export const generateNonce: IO.IO<string> = () =>
   randomBytes(32).toString("hex");
 
 export const insertNonce: (

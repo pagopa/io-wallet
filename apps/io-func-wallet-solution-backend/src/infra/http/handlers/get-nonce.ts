@@ -7,7 +7,7 @@ import { insertNonce, generateNonce } from "../../../nonce";
 
 export const GetNonceHandler = H.of(() =>
   pipe(
-    generateNonce(),
+    generateNonce,
     TE.fromIO,
     RTE.fromTaskEither,
     RTE.chainFirstW(insertNonce),
