@@ -1,6 +1,6 @@
 import { Container, Database } from "@azure/cosmos";
-import { NonceRepository } from "@/nonce";
 import * as TE from "fp-ts/lib/TaskEither";
+import { NonceRepository } from "@/nonce";
 
 export class CosmosDbNonceRepository implements NonceRepository {
   #container: Container;
