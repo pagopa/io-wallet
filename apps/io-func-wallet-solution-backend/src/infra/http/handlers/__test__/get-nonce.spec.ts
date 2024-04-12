@@ -4,6 +4,7 @@ import * as L from "@pagopa/logger";
 import { GetNonceHandler } from "../get-nonce";
 import { NonceRepository, generateNonce } from "@/nonce";
 import * as E from "fp-ts/Either";
+import * as TE from "fp-ts/TaskEither";
 
 const mocks = vi.hoisted(() => ({
   generateNonce: vi.fn(),
@@ -21,7 +22,7 @@ vi.mock("@/nonce", async (importOriginal) => {
 
 describe("GetNonceHandler", async () => {
   const nonceRepository: NonceRepository = {
-    insert: () => Promise.resolve(undefined),
+    insert: () => TE.right(undefined),
   };
 
   const handler = GetNonceHandler({
@@ -66,7 +67,7 @@ describe("GetNonceHandler", async () => {
 
   it("should return a 500 HTTP response when insertNonce returns error", () => {
     const nonceRepositoryThatFailsOnInsert: NonceRepository = {
-      insert: () => Promise.reject(new Error("failed on insert!")),
+      insert: () => TE.left(new Error("failed on insert!")),
     };
 
     const handler = GetNonceHandler({

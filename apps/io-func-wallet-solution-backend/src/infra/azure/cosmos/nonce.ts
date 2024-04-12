@@ -1,5 +1,6 @@
 import { Container, Database } from "@azure/cosmos";
 import { NonceRepository } from "@/nonce";
+import * as TE from "fp-ts/lib/TaskEither";
 
 export class CosmosDbNonceRepository implements NonceRepository {
   #container: Container;
@@ -8,13 +9,14 @@ export class CosmosDbNonceRepository implements NonceRepository {
     this.#container = db.container("nonces");
   }
 
-  async insert(nonce: string) {
-    try {
-      await this.#container.items.create({
-        id: nonce,
-      });
-    } catch (e) {
-      throw new Error("Error inserting nonce");
-    }
+  insert(nonce: string) {
+    return TE.tryCatch(
+      async () => {
+        await this.#container.items.create({
+          id: nonce,
+        });
+      },
+      (error) => new Error(`Error inserting nonce: ${error}`)
+    );
   }
 }

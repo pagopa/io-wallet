@@ -4,7 +4,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as IOE from "fp-ts/IOEither";
 
 export type NonceRepository = {
-  insert: (nonce: string) => Promise<void>;
+  insert: (nonce: string) => TE.TaskEither<Error, void>;
 };
 
 export type NonceEnvironment = {
@@ -21,7 +21,4 @@ export const insertNonce: (
 ) => RTE.ReaderTaskEither<NonceEnvironment, Error, void> =
   (nonce) =>
   ({ nonceRepository }) =>
-    TE.tryCatch(
-      () => nonceRepository.insert(nonce),
-      (error) => new Error(`Failed to insert nonce: ${error}`)
-    );
+    nonceRepository.insert(nonce);
