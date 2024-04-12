@@ -11,7 +11,7 @@ export type NonceEnvironment = {
   nonceRepository: NonceRepository;
 };
 
-export const generateNonceIOEither: IOE.IOEither<Error, string> = IOE.tryCatch(
+export const generateNonce: IOE.IOEither<Error, string> = IOE.tryCatch(
   () => randomBytes(32).toString("hex"),
   (error) => new Error(`Failed to generate nonce: ${error}`)
 );
