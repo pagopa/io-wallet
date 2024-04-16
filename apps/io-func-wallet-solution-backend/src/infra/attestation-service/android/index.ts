@@ -2,12 +2,15 @@ import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import * as S from "fp-ts/lib/string";
+import * as J from "fp-ts/Json";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { JWK } from "jose";
 import { ValidatedAttestation } from "../../attestation-service";
+import { validate } from "../../../validation";
 import { verifyAttestation } from "./attestation";
+import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -50,10 +53,36 @@ export const validateAndroidAttestation = (
   );
 
 export const validateAndroidAssertion = (
-  _data: Buffer,
-  _payload: NonEmptyString,
-  _bundleIdentifier: string,
-  _teamIdentifier: string,
-  _hardwareKey: JWK,
-  _signCount: number
-) => pipe(TE.left(new Error("Not implemented yet")));
+  integrityAssertion: NonEmptyString,
+  hardwareSignature: NonEmptyString,
+  clientData: string,
+  hardwareKey: JWK,
+  bundleIdentifier: string,
+  googleAppCredentialsEncoded: string,
+  androidPlayIntegrityUrl: string
+) =>
+  pipe(
+    E.tryCatch(
+      () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
+      E.toError
+    ),
+    E.chain(J.parse),
+    E.mapLeft(() => new Error("Unable to parse Google App Credentials string")),
+    E.chainW(validate(GoogleAppCredentials, "Invalid Google App Credentials")),
+    TE.fromEither,
+    TE.chain((googleAppCredentials) =>
+      TE.tryCatch(
+        () =>
+          verifyAssertion({
+            integrityAssertion,
+            hardwareSignature,
+            clientData,
+            hardwareKey,
+            bundleIdentifier,
+            googleAppCredentials,
+            androidPlayIntegrityUrl,
+          }),
+        E.toError
+      )
+    )
+  );

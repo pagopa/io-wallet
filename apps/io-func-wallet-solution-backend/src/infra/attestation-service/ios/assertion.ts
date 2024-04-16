@@ -4,7 +4,7 @@ import { iOsAssertion } from ".";
 
 export type VerifyAssertionParams = {
   decodedAssertion: iOsAssertion;
-  payload: string;
+  clientData: string;
   bundleIdentifier: string;
   teamIdentifier: string;
   hardwareKey: JWK;
@@ -14,7 +14,7 @@ export type VerifyAssertionParams = {
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
     decodedAssertion,
-    payload,
+    clientData,
     hardwareKey,
     bundleIdentifier,
     teamIdentifier,
@@ -29,7 +29,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
 
   // 2. Compute the SHA256 hash of the client data, and store it as clientDataHash.
-  const clientDataHash = createHash("sha256").update(payload).digest();
+  const clientDataHash = createHash("sha256").update(clientData).digest();
 
   // 3. Compute the SHA256 hash of the concatenation of the authenticator
   // data and the client data hash, and store it as nonce.

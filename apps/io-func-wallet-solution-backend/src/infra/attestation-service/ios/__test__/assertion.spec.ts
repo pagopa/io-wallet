@@ -17,12 +17,12 @@ describe("iOSAssertionValidation", async () => {
   const data = Buffer.from(assertion, "base64");
   const decodedAssertion = decode(data);
 
-  const payload = JSON.stringify({ challenge, jwk: ephemeralKey });
+  const clientData = JSON.stringify({ challenge, jwk: ephemeralKey });
 
   it("should return true", async () => {
     const result = await verifyAssertion({
       decodedAssertion,
-      payload,
+      clientData,
       hardwareKey,
       bundleIdentifier,
       teamIdentifier,

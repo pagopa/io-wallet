@@ -7,6 +7,7 @@ import { privateEcKey } from "./keys";
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 import {
   ANDROID_CRL_URL,
+  ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
 } from "../../../../app/config";
@@ -43,6 +44,8 @@ describe("CreateWalletInstanceHandler", async () => {
       allowDevelopmentEnvironment: true,
       googlePublicKey: GOOGLE_PUBLIC_KEY,
       androidCrlUrl: ANDROID_CRL_URL,
+      androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
+      googleAppCredentialsEncoded: "",
     });
 
     const result = await handler();
