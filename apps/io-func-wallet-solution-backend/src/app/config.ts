@@ -63,11 +63,11 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     () => getAttestationServiceConfigFromEnvironment
   ),
   RE.bind("azure", () => getAzureConfigFromEnvironment),
-  RE.map((config) => ({
-    federationEntity: config.federationEntity,
-    crypto: config.crypto,
-    attestationService: config.attestationService,
-    azure: config.azure,
+  RE.map(({  federationEntity, crypto, attestationService, azure }) => ({
+    federationEntity,
+    crypto,
+    attestationService,
+    azure,
   }))
 );
 
