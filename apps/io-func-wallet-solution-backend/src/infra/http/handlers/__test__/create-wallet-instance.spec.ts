@@ -11,10 +11,10 @@ import {
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
 } from "../../../../app/config";
-import { iOSMockAttestationData } from "../../../attestation-service/ios/__test__/config";
+import { iOSMockData } from "../../../attestation-service/ios/__test__/config";
 
 describe("CreateWalletInstanceHandler", async () => {
-  const { challenge, attestation, keyId } = iOSMockAttestationData;
+  const { challenge, attestation, keyId } = iOSMockData;
 
   //Create a mock of Wallet Instance Request
   const walletInstanceRequest = {
