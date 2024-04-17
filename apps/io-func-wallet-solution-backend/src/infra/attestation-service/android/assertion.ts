@@ -2,7 +2,7 @@ import { createHash, createVerify } from "crypto";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 import { google, playintegrity_v1 } from "googleapis";
-import { JWK, KeyLike, exportSPKI, importJWK } from "jose";
+import { JWK, exportSPKI, importJWK } from "jose";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60; // 60 seconds
 
@@ -99,7 +99,10 @@ export const validateAssertionSignature = async (
   clientData: string,
   hardwareSignature: string
 ) => {
-  const joseHardwareKey = (await importJWK(hardwareKey)) as KeyLike;
+  const joseHardwareKey = await importJWK(hardwareKey);
+  if (!("type" in joseHardwareKey)) {
+    throw new Error("Invalid Hardware Key format");
+  }
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
 
   const clientDataHash = createHash("sha256").update(clientData).digest();

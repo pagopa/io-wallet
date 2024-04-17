@@ -1,5 +1,5 @@
 import { createHash, createVerify } from "crypto";
-import { JWK, KeyLike, exportSPKI, importJWK } from "jose";
+import { JWK, exportSPKI, importJWK } from "jose";
 import { iOsAssertion } from ".";
 
 export type VerifyAssertionParams = {
@@ -25,7 +25,12 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const { signature, authenticatorData } = decodedAssertion;
 
   // Convert JWK to PEM
-  const joseHardwareKey = (await importJWK(hardwareKey)) as KeyLike;
+  const joseHardwareKey = await importJWK(hardwareKey);
+
+  if (!("type" in joseHardwareKey)) {
+    throw new Error("Invalid Hardware Key format");
+  }
+
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
 
   // 2. Compute the SHA256 hash of the client data, and store it as clientDataHash.
