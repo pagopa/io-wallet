@@ -30,6 +30,7 @@ export type VerifyAssertionParams = {
   bundleIdentifier: string;
   googleAppCredentials: GoogleAppCredentials;
   androidPlayIntegrityUrl: string;
+  allowDevelopmentEnvironment: boolean;
 };
 
 export const playintegrity = google.playintegrity("v1");
@@ -43,6 +44,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     bundleIdentifier,
     googleAppCredentials,
     androidPlayIntegrityUrl,
+    allowDevelopmentEnvironment,
   } = params;
 
   // First check whether the clientData has been signed correctly with the hardware key
@@ -81,7 +83,8 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const responseValidated = validateIntegrityResponse(
     tokenPayloadExternal,
     bundleIdentifier,
-    clientData
+    clientData,
+    allowDevelopmentEnvironment
   );
 
   if (!responseValidated) {
@@ -109,7 +112,8 @@ export const validateAssertionSignature = async (
 export const validateIntegrityResponse = (
   integrityResponse: playintegrity_v1.Schema$TokenPayloadExternal,
   bundleIdentifier: string,
-  clientData: string
+  clientData: string,
+  allowDevelopmentEnvironment: boolean
 ) => {
   /**
    * 1. You must first check that the values in the requestDetails field match those of the original
@@ -158,7 +162,10 @@ export const validateIntegrityResponse = (
     throw new Error(`Invalid App Integrity field.`);
   }
 
-  if (appIntegrity.appRecognitionVerdict !== "PLAY_RECOGNIZED") {
+  if (
+    !allowDevelopmentEnvironment &&
+    appIntegrity.appRecognitionVerdict !== "PLAY_RECOGNIZED"
+  ) {
     throw new Error(
       `The app and certificate does not match the versions distributed by Google Play.`
     );
@@ -198,7 +205,10 @@ export const validateIntegrityResponse = (
     throw new Error(`Invalid Account Details field.`);
   }
 
-  if (accountDetails.appLicensingVerdict !== "LICENSED") {
+  if (
+    !allowDevelopmentEnvironment &&
+    accountDetails.appLicensingVerdict !== "LICENSED"
+  ) {
     throw new Error(`The user doesn't have an app entitlement.`);
   }
 

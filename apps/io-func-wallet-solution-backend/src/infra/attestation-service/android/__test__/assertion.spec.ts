@@ -59,7 +59,38 @@ describe("AndroidAssertionValidation", async () => {
     const responseValidated = validateIntegrityResponse(
       fakeTokenpayloadIntegrityResponse,
       bundleIdentifier,
-      clientData
+      clientData,
+      false
+    );
+
+    expect(responseValidated).toEqual(true);
+  });
+
+  it("should validate integrity response in development mode", async () => {
+    const fakeTokenpayloadIntegrityResponse = {
+      requestDetails: {
+        requestPackageName: "com.ioreactnativeintegrityexample",
+        timestampMillis: new Date().getTime().toString(),
+        requestHash:
+          "d2ac5449d0c7a781db49cb292c3a8cd2c57207cc62cb36160b1dc9a160c571b0",
+      },
+      appIntegrity: {
+        appRecognitionVerdict: "UNRECOGNIZED_VERSION",
+        packageName: "com.ioreactnativeintegrityexample",
+        certificateSha256Digest: [
+          "-sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w",
+        ],
+        versionCode: "1",
+      },
+      deviceIntegrity: { deviceRecognitionVerdict: ["MEETS_DEVICE_INTEGRITY"] },
+      accountDetails: { appLicensingVerdict: "UNLICENSED" },
+    } as playintegrity_v1.Schema$TokenPayloadExternal;
+
+    const responseValidated = validateIntegrityResponse(
+      fakeTokenpayloadIntegrityResponse,
+      bundleIdentifier,
+      clientData,
+      true
     );
 
     expect(responseValidated).toEqual(true);

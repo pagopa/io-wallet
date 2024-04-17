@@ -111,7 +111,8 @@ export class MobileAttestationService implements AttestationService {
               hardwareKey,
               this.#configuration.androidBundleIdentifier,
               this.#configuration.googleAppCredentialsEncoded,
-              this.#configuration.androidPlayIntegrityUrl
+              this.#configuration.androidPlayIntegrityUrl,
+              this.#configuration.allowDevelopmentEnvironment
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),

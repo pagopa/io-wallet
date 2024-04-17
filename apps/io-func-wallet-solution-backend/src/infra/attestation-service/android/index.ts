@@ -59,7 +59,8 @@ export const validateAndroidAssertion = (
   hardwareKey: JWK,
   bundleIdentifier: string,
   googleAppCredentialsEncoded: string,
-  androidPlayIntegrityUrl: string
+  androidPlayIntegrityUrl: string,
+  allowDevelopmentEnvironment: boolean
 ) =>
   pipe(
     E.tryCatch(
@@ -81,6 +82,7 @@ export const validateAndroidAssertion = (
             bundleIdentifier,
             googleAppCredentials,
             androidPlayIntegrityUrl,
+            allowDevelopmentEnvironment,
           }),
         E.toError
       )
