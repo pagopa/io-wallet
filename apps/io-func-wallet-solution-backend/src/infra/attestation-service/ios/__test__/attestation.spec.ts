@@ -3,7 +3,7 @@ import { verifyAttestation } from "../attestation";
 import { APPLE_APP_ATTESTATION_ROOT_CA } from "../../../../app/config";
 import { decode } from "cbor-x";
 
-import { iOSMockAttestationData } from "./config";
+import { iOSMockData } from "./config";
 
 describe("iOSAttestationValidation", async () => {
   const {
@@ -13,7 +13,7 @@ describe("iOSAttestationValidation", async () => {
     hardwareKey,
     bundleIdentifier,
     teamIdentifier,
-  } = iOSMockAttestationData;
+  } = iOSMockData;
 
   const data = Buffer.from(attestation, "base64");
   const decodedAttestation = decode(data);

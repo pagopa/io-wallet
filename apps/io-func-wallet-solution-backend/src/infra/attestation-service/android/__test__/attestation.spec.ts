@@ -1,13 +1,13 @@
 import { it, expect, describe } from "vitest";
 import { verifyAttestation } from "../attestation";
 
-import { androidMockAttestationData } from "./config";
+import { androidMockData } from "./config";
 import { X509Certificate } from "crypto";
 import { ANDROID_CRL_URL, GOOGLE_PUBLIC_KEY } from "../../../../app/config";
 import { base64ToPem } from "..";
 
 describe("AndroidAttestationValidation", async () => {
-  const { hardwareKey, attestation } = androidMockAttestationData;
+  const { hardwareKey, attestation } = androidMockData;
 
   const data = Buffer.from(attestation, "base64");
   const x509ChainString = data.toString("utf-8").split(",");

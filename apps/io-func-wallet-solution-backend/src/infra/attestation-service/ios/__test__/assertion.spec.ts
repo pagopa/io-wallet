@@ -1,7 +1,7 @@
 import { it, expect, describe } from "vitest";
 import { decode } from "cbor-x";
 
-import { iOSMockAttestationData } from "./config";
+import { iOSMockData } from "./config";
 import { verifyAssertion } from "../assertion";
 
 describe("iOSAssertionValidation", async () => {
@@ -12,17 +12,17 @@ describe("iOSAssertionValidation", async () => {
     bundleIdentifier,
     teamIdentifier,
     ephemeralKey,
-  } = iOSMockAttestationData;
+  } = iOSMockData;
 
   const data = Buffer.from(assertion, "base64");
   const decodedAssertion = decode(data);
 
-  const payload = JSON.stringify({ challenge, jwk: ephemeralKey });
+  const clientData = JSON.stringify({ challenge, jwk: ephemeralKey });
 
   it("should return true", async () => {
     const result = await verifyAssertion({
       decodedAssertion,
-      payload,
+      clientData,
       hardwareKey,
       bundleIdentifier,
       teamIdentifier,

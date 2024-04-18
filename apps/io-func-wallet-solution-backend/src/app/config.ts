@@ -22,6 +22,9 @@ export const GOOGLE_PUBLIC_KEY =
 export const ANDROID_CRL_URL =
   "https://android.googleapis.com/attestation/status";
 
+export const ANDROID_PLAY_INTEGRITY_URL =
+  "https://www.googleapis.com/auth/playintegrity";
+
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
   jwtDefaultDuration: t.string,
@@ -34,10 +37,13 @@ export const AttestationServiceConfiguration = t.type({
   iOsBundleIdentifier: t.string,
   iOsTeamIdentifier: t.string,
   androidBundleIdentifier: t.string,
+  androidPlayStoreCertificateHash: t.string,
   appleRootCertificate: t.string,
   googlePublicKey: t.string,
   androidCrlUrl: t.string,
   allowDevelopmentEnvironment: t.boolean,
+  googleAppCredentialsEncoded: t.string,
+  androidPlayIntegrityUrl: t.string,
 });
 
 export type AttestationServiceConfiguration = t.TypeOf<
@@ -151,6 +157,16 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
           devAllowedString === "true" || devAllowedString === "1"
       ),
       RE.orElse(() => RE.right(false))
+    ),
+    googleAppCredentialsEncoded: readFromEnvironment(
+      "GoogleAppCredentialsEncoded"
+    ),
+    androidPlayIntegrityUrl: pipe(
+      readFromEnvironment("AndroidPlayIntegrityUrl"),
+      RE.orElse(() => RE.right(ANDROID_PLAY_INTEGRITY_URL))
+    ),
+    androidPlayStoreCertificateHash: readFromEnvironment(
+      "AndroidPlayStoreCertificateHash"
     ),
   })
 );
