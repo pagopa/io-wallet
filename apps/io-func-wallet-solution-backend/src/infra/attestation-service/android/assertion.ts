@@ -28,6 +28,7 @@ export type VerifyAssertionParams = {
   clientData: string;
   hardwareKey: JWK;
   bundleIdentifier: string;
+  androidPlayStoreCertificateHash: string;
   googleAppCredentials: GoogleAppCredentials;
   androidPlayIntegrityUrl: string;
   allowDevelopmentEnvironment: boolean;
@@ -42,6 +43,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     clientData,
     hardwareKey,
     bundleIdentifier,
+    androidPlayStoreCertificateHash,
     googleAppCredentials,
     androidPlayIntegrityUrl,
     allowDevelopmentEnvironment,
@@ -84,7 +86,8 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     tokenPayloadExternal,
     bundleIdentifier,
     clientData,
-    allowDevelopmentEnvironment
+    allowDevelopmentEnvironment,
+    androidPlayStoreCertificateHash
   );
 
   if (!responseValidated) {
@@ -116,7 +119,8 @@ export const validateIntegrityResponse = (
   integrityResponse: playintegrity_v1.Schema$TokenPayloadExternal,
   bundleIdentifier: string,
   clientData: string,
-  allowDevelopmentEnvironment: boolean
+  allowDevelopmentEnvironment: boolean,
+  androidPlayStoreCertificateHash: string
 ) => {
   /**
    * 1. You must first check that the values in the requestDetails field match those of the original
@@ -170,13 +174,27 @@ export const validateIntegrityResponse = (
     appIntegrity.appRecognitionVerdict !== "PLAY_RECOGNIZED"
   ) {
     throw new Error(
-      `The app and certificate does not match the versions distributed by Google Play.`
+      `The app does not match the versions distributed by Google Play.`
     );
   }
 
   if (appIntegrity.packageName !== bundleIdentifier) {
     throw new Error(
       `The package name ${appIntegrity.packageName} does not match ${bundleIdentifier}.`
+    );
+  }
+
+  const certificateSha256Digest = appIntegrity.certificateSha256Digest;
+  if (!certificateSha256Digest) {
+    throw new Error(`Certificate digest not present`);
+  }
+
+  if (
+    !allowDevelopmentEnvironment &&
+    certificateSha256Digest.indexOf(androidPlayStoreCertificateHash) === -1
+  ) {
+    throw new Error(
+      `The app certificate does not match the versions distributed by Google Play.`
     );
   }
 

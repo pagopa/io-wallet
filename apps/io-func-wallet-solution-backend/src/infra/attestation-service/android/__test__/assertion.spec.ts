@@ -60,7 +60,8 @@ describe("AndroidAssertionValidation", async () => {
       fakeTokenpayloadIntegrityResponse,
       bundleIdentifier,
       clientData,
-      false
+      false,
+      "-sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w"
     );
 
     expect(responseValidated).toEqual(true);
@@ -90,7 +91,8 @@ describe("AndroidAssertionValidation", async () => {
       fakeTokenpayloadIntegrityResponse,
       bundleIdentifier,
       clientData,
-      true
+      true,
+      "-sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w"
     );
 
     expect(responseValidated).toEqual(true);

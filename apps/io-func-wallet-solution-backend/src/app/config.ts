@@ -37,6 +37,7 @@ export const AttestationServiceConfiguration = t.type({
   iOsBundleIdentifier: t.string,
   iOsTeamIdentifier: t.string,
   androidBundleIdentifier: t.string,
+  androidPlayStoreCertificateHash: t.string,
   appleRootCertificate: t.string,
   googlePublicKey: t.string,
   androidCrlUrl: t.string,
@@ -163,6 +164,9 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     androidPlayIntegrityUrl: pipe(
       readFromEnvironment("AndroidPlayIntegrityUrl"),
       RE.orElse(() => RE.right(ANDROID_PLAY_INTEGRITY_URL))
+    ),
+    androidPlayStoreCertificateHash: readFromEnvironment(
+      "AndroidPlayStoreCertificateHash"
     ),
   })
 );

@@ -110,6 +110,7 @@ export class MobileAttestationService implements AttestationService {
               clientData,
               hardwareKey,
               this.#configuration.androidBundleIdentifier,
+              this.#configuration.androidPlayStoreCertificateHash,
               this.#configuration.googleAppCredentialsEncoded,
               this.#configuration.androidPlayIntegrityUrl,
               this.#configuration.allowDevelopmentEnvironment

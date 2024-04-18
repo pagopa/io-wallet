@@ -58,6 +58,7 @@ export const validateAndroidAssertion = (
   clientData: string,
   hardwareKey: JWK,
   bundleIdentifier: string,
+  androidPlayStoreCertificateHash: string,
   googleAppCredentialsEncoded: string,
   androidPlayIntegrityUrl: string,
   allowDevelopmentEnvironment: boolean
@@ -80,6 +81,7 @@ export const validateAndroidAssertion = (
             clientData,
             hardwareKey,
             bundleIdentifier,
+            androidPlayStoreCertificateHash,
             googleAppCredentials,
             androidPlayIntegrityUrl,
             allowDevelopmentEnvironment,
