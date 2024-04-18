@@ -40,6 +40,7 @@ describe("CreateWalletInstanceHandler", async () => {
       iOsTeamIdentifier: "M2X5YQ4BJ7",
       androidBundleIdentifier:
         "org.reactjs.native.example.IoReactNativeIntegrityExample",
+      androidPlayStoreCertificateHash: "",
       appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
       allowDevelopmentEnvironment: true,
       googlePublicKey: GOOGLE_PUBLIC_KEY,
