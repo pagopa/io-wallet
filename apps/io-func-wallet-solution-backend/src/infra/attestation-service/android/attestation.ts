@@ -173,7 +173,7 @@ const validateExtension = (
   const { challenge, bundleIdentifier } = attestationParams;
 
   const extension = extractExtension(certWithExtension, KEY_OID);
-  if (extension === undefined) {
+  if (!extension) {
     throw new Error("Unable to extract extension from certificate");
   }
 
