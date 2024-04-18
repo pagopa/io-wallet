@@ -4,7 +4,7 @@ import * as t from "io-ts";
 import { google, playintegrity_v1 } from "googleapis";
 import { JWK, exportSPKI, importJWK } from "jose";
 
-const ALLOWED_WINDOW_MILLIS = 1000 * 60; // 60 seconds
+const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
 export const GoogleAppCredentials = t.type({
   type: NonEmptyString,
