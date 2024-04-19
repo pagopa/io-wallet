@@ -3,12 +3,18 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { pipe } from "fp-ts/function";
 
+import { privateEcKey } from "./keys";
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
-import { APPLE_APP_ATTESTATION_ROOT_CA } from "../../../../app/config";
-import { iOSMockAttestationData } from "../../../attestation-service/ios/__test__/config";
+import {
+  ANDROID_CRL_URL,
+  ANDROID_PLAY_INTEGRITY_URL,
+  APPLE_APP_ATTESTATION_ROOT_CA,
+  GOOGLE_PUBLIC_KEY,
+} from "../../../../app/config";
+import { iOSMockData } from "../../../attestation-service/ios/__test__/config";
 
 describe("CreateWalletInstanceHandler", async () => {
-  const { challenge, attestation, keyId } = iOSMockAttestationData;
+  const { challenge, attestation, keyId } = iOSMockData;
 
   //Create a mock of Wallet Instance Request
   const walletInstanceRequest = {
@@ -34,8 +40,13 @@ describe("CreateWalletInstanceHandler", async () => {
       iOsTeamIdentifier: "M2X5YQ4BJ7",
       androidBundleIdentifier:
         "org.reactjs.native.example.IoReactNativeIntegrityExample",
+      androidPlayStoreCertificateHash: "",
       appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
       allowDevelopmentEnvironment: true,
+      googlePublicKey: GOOGLE_PUBLIC_KEY,
+      androidCrlUrl: ANDROID_CRL_URL,
+      androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
+      googleAppCredentialsEncoded: "",
     });
 
     const result = await handler();

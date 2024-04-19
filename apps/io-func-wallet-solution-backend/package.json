@@ -23,10 +23,12 @@
     "@azure/functions": "^4.4.0",
     "@pagopa/handler-kit-azure-func": "^2.0.3",
     "@pagopa/ts-commons": "^12.0.0",
+    "@peculiar/asn1-android": "^2.3.10",
     "asn1js": "^3.0.5",
     "cbor-x": "^1.5.9",
     "crypto": "^1.0.1",
     "fp-ts": "^2.16.0",
+    "googleapis": "^134.0.0",
     "io-ts": "^2.2.20",
     "jose": "5.2.4",
     "pkijs": "^3.0.16"

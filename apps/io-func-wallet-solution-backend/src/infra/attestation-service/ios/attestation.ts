@@ -36,7 +36,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 
   // Convert X509 string to X509Certificate obj
   const rootCertificate = new X509Certificate(appleRootCertificate);
-  if (rootCertificate === undefined) {
+  if (!rootCertificate) {
     throw new Error("Invalid Apple root certificate");
   }
 
@@ -155,8 +155,6 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const hardwareKey = await jose.exportJWK(clientCertificate.publicKey);
 
   return {
-    keyId,
     hardwareKey,
-    environment: aaguid === APPATTESTPROD ? "production" : "development",
   };
 };
