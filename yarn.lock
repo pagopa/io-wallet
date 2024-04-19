@@ -12,6 +12,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ampproject/remapping@npm:^2.2.1":
+  version: 2.3.0
+  resolution: "@ampproject/remapping@npm:2.3.0"
+  dependencies:
+    "@jridgewell/gen-mapping": ^0.3.5
+    "@jridgewell/trace-mapping": ^0.3.24
+  checksum: d3ad7b89d973df059c4e8e6d7c972cbeb1bb2f18f002a3bd04ae0707da214cb06cc06929b65aa2313b9347463df2914772298bae8b1d7973f246bb3f2ab3e8f0
+  languageName: node
+  linkType: hard
+
 "@azure/abort-controller@npm:^1.0.0":
   version: 1.1.0
   resolution: "@azure/abort-controller@npm:1.1.0"
@@ -1030,7 +1040,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/gen-mapping@npm:^0.3.2":
+"@jridgewell/gen-mapping@npm:^0.3.2, @jridgewell/gen-mapping@npm:^0.3.5":
   version: 0.3.5
   resolution: "@jridgewell/gen-mapping@npm:0.3.5"
   dependencies:
@@ -1563,16 +1573,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-c8@npm:^0.30.1":
-  version: 0.30.1
-  resolution: "@vitest/coverage-c8@npm:0.30.1"
+"@vitest/coverage-c8@npm:^0.33.0":
+  version: 0.33.0
+  resolution: "@vitest/coverage-c8@npm:0.33.0"
   dependencies:
-    c8: ^7.13.0
+    "@ampproject/remapping": ^2.2.1
+    c8: ^7.14.0
+    magic-string: ^0.30.1
     picocolors: ^1.0.0
-    std-env: ^3.3.2
+    std-env: ^3.3.3
   peerDependencies:
     vitest: ">=0.30.0 <1"
-  checksum: 3688f5d1807eb65b753fa0c008464b9f0500b3847600a9b50c6fa51ee69b303bf2d0d4d5174a8e12baab9b692bb991423ded4d947f63d30b0635ac5c5cbe8737
+  checksum: 67573fa400995871fa8f615411d21dd9937a78fac13bc6789427a7857fa780e71188ff43a35e19bb31e6393f9334d4376456ff24b7bb0591c64357036ff6a594
   languageName: node
   linkType: hard
 
@@ -2237,7 +2249,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"c8@npm:^7.13.0":
+"c8@npm:^7.14.0":
   version: 7.14.0
   resolution: "c8@npm:7.14.0"
   dependencies:
@@ -4591,7 +4603,7 @@ __metadata:
     "@pagopa/handler-kit-azure-func": ^2.0.3
     "@pagopa/ts-commons": ^12.0.0
     "@rushstack/eslint-patch": ^1.2.0
-    "@vitest/coverage-c8": ^0.30.1
+    "@vitest/coverage-c8": ^0.33.0
     asn1js: ^3.0.5
     azure-functions-core-tools: ^4.0.5611
     cbor-x: ^1.5.9
@@ -5495,6 +5507,15 @@ __metadata:
   dependencies:
     yallist: ^4.0.0
   checksum: f97f499f898f23e4585742138a22f22526254fdba6d75d41a1c2526b3b6cc5747ef59c5612ba7375f42aca4f8461950e925ba08c991ead0651b4918b7c978297
+  languageName: node
+  linkType: hard
+
+"magic-string@npm:^0.30.1":
+  version: 0.30.10
+  resolution: "magic-string@npm:0.30.10"
+  dependencies:
+    "@jridgewell/sourcemap-codec": ^1.4.15
+  checksum: 456fd47c39b296c47dff967e1965121ace35417eab7f45a99e681e725b8661b48e1573c366ee67a27715025b3740773c46b088f115421c7365ea4ea6fa10d399
   languageName: node
   linkType: hard
 
@@ -7365,7 +7386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"std-env@npm:^3.3.2, std-env@npm:^3.5.0":
+"std-env@npm:^3.3.3, std-env@npm:^3.5.0":
   version: 3.7.0
   resolution: "std-env@npm:3.7.0"
   checksum: 4f489d13ff2ab838c9acd4ed6b786b51aa52ecacdfeaefe9275fcb220ff2ac80c6e95674723508fd29850a694569563a8caaaea738eb82ca16429b3a0b50e510
