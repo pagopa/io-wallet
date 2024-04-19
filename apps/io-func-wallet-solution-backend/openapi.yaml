@@ -49,6 +49,8 @@ paths:
                 properties:
                   message:
                     type: string
+        "500":
+          $ref: "#/components/responses/Unexpected"
 
 components:
   responses:
