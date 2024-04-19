@@ -5,13 +5,13 @@ import { CosmosClient } from "@azure/cosmos";
 
 export const getCosmosHealth: RTE.ReaderTaskEither<
   { cosmosClient: CosmosClient },
-  string,
+  Error,
   true
 > = ({ cosmosClient }) =>
   pipe(
     TE.tryCatch(
       () => cosmosClient.getDatabaseAccount(),
-      () => "cosmos-db-error"
+      () => new Error("cosmos-db-error")
     ),
     TE.map(() => true)
   );
