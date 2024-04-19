@@ -1,4 +1,5 @@
 import { app } from "@azure/functions";
+import { CosmosClient } from "@azure/cosmos";
 
 import * as E from "fp-ts/Either";
 import { pipe, identity } from "fp-ts/function";
@@ -8,6 +9,8 @@ import { InfoFunction } from "../infra/azure/functions/info";
 import { CryptoSigner } from "../infra/crypto/signer";
 import { CreateWalletAttestationFunction } from "../infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "../infra/azure/functions/create-wallet-instance";
+import { GetNonceFunction } from "../infra/azure/functions/get-nonce";
+import { CosmosDbNonceRepository } from "../infra/azure/cosmos/nonce";
 import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(
@@ -21,13 +24,18 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
+const cosmosClient = new CosmosClient(config.azure.cosmos.connectionString);
+const database = cosmosClient.database(config.azure.cosmos.dbName);
+
+const nonceRepository = new CosmosDbNonceRepository(database);
+
 const signer = new CryptoSigner(config.crypto);
 
 app.http("healthCheck", {
   methods: ["GET"],
   authLevel: "anonymous",
   route: "info",
-  handler: InfoFunction({}),
+  handler: InfoFunction({ cosmosClient }),
 });
 
 app.http("createWalletAttestation", {
@@ -57,4 +65,11 @@ app.http("getEntityConfiguration", {
     federationEntityMetadata: config.federationEntity,
     signer,
   }),
+});
+
+app.http("getNonce", {
+  methods: ["GET"],
+  authLevel: "anonymous",
+  route: "nonce",
+  handler: GetNonceFunction({ nonceRepository }),
 });
