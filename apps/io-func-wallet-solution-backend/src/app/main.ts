@@ -35,7 +35,7 @@ app.http("healthCheck", {
   methods: ["GET"],
   authLevel: "anonymous",
   route: "info",
-  handler: InfoFunction({}),
+  handler: InfoFunction({ cosmosClient }),
 });
 
 app.http("createWalletAttestation", {
