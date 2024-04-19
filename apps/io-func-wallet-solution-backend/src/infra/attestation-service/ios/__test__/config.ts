@@ -27,7 +27,7 @@ const ephemeralKey = {
 const assertion =
   "omlzaWduYXR1cmVYRzBFAiAqy9VNUCbjpk9JkkvbURxyRZN8gDYyTZjWH1UNZ7CDkAIhAI/9DpOi7fBeaTDNVDGYlG/2SuYKan/Fzt7a2RQhEDopcWF1dGhlbnRpY2F0b3JEYXRhWCWeDBnBGvrDhnvbN8megL4yLGEW8DZpXwCJQizAYkg3ykAAAAAB";
 
-export const iOSMockAttestationData = {
+export const iOSMockData = {
   challenge,
   attestation,
   assertion,

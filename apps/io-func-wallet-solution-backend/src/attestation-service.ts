@@ -8,9 +8,7 @@ export enum OperatingSystem {
 }
 
 export type ValidatedAttestation = {
-  keyId: string;
   hardwareKey: JWK;
-  environment: string;
 };
 
 export type AttestationService = {
@@ -20,8 +18,10 @@ export type AttestationService = {
     hardwareKeyTag: NonEmptyString
   ) => TE.TaskEither<Error, ValidatedAttestation>;
   validateAssertion: (
-    assertion: NonEmptyString,
+    integrityAssertion: NonEmptyString,
+    hardwareSignature: NonEmptyString,
     nonce: NonEmptyString,
+    jwk: JWK,
     hardwareKeyTag: NonEmptyString
   ) => TE.TaskEither<Error, boolean>;
 };

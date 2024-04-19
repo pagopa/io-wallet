@@ -5,6 +5,7 @@ import { decode } from "cbor-x";
 import * as t from "io-ts";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { JWK } from "jose";
+import { sequenceS } from "fp-ts/lib/Apply";
 import { validate } from "../../../validation";
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";
@@ -72,18 +73,25 @@ export const iOsAssertion = t.type({
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
 
 export const validateiOSAssertion = (
-  data: Buffer,
-  payload: NonEmptyString,
-  bundleIdentifier: string,
-  teamIdentifier: string,
+  integrityAssertion: NonEmptyString,
+  hardwareSignature: NonEmptyString,
+  clientData: string,
   hardwareKey: JWK,
-  signCount: number
+  signCount: number,
+  bundleIdentifier: string,
+  teamIdentifier: string
 ) =>
   pipe(
-    E.tryCatch(
-      () => decode(data),
-      () => new Error(`Unable to decode data`)
-    ),
+    sequenceS(E.Applicative)({
+      authenticatorData: E.tryCatch(
+        () => Buffer.from(integrityAssertion, "base64"),
+        E.toError
+      ),
+      signature: E.tryCatch(
+        () => Buffer.from(hardwareSignature, "base64"),
+        E.toError
+      ),
+    }),
     E.chainW(validate(iOsAssertion, "iOS assertion format is invalid")),
     TE.fromEither,
     TE.chain((decodedAssertion) =>
@@ -91,7 +99,7 @@ export const validateiOSAssertion = (
         () =>
           verifyAssertion({
             decodedAssertion,
-            payload,
+            clientData,
             bundleIdentifier,
             teamIdentifier,
             hardwareKey,
