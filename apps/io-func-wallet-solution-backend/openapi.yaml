@@ -35,6 +35,35 @@ paths:
         "500":
           $ref: "#/components/responses/Unexpected"
 
+  /wallet-instance:
+    put:
+      operationId: createWalletInstance
+      summary: Create a wallet instance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                challenge:
+                  type: string
+                key_attestation:
+                  type: string
+                hardware_key_tag:
+                  type: string
+      responses:
+        "201":
+          description: Wallet instance successfully created
+          content:
+            application/entity-statement+jwt:
+              schema:
+                type: string
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+
   /info:
     get:
       operationId: healthCheck
@@ -54,6 +83,13 @@ paths:
 
 components:
   responses:
+    UnprocessableContent:
+      description: Unprocessable Content
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+
     Unexpected:
       description: Unexpected error
       content:
