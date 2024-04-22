@@ -53,7 +53,8 @@ app.http("createWalletInstance", {
   authLevel: "anonymous",
   route: "wallet-instance",
   handler: CreateWalletInstanceFunction({
-    ...config.attestationService,
+    attestationServiceConfiguration: config.attestationService,
+    nonceRepository,
   }),
 });
 

@@ -19,4 +19,19 @@ export class CosmosDbNonceRepository implements NonceRepository {
       (error) => new Error(`Error inserting nonce: ${error}`)
     );
   }
+
+  delete(nonce: string) {
+    return TE.tryCatch(
+      async () => {
+        await this.#container.item(nonce, nonce).delete();
+      },
+      (error) =>
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === 404
+          ? new Error("Invalid nonce")
+          : new Error(`Error deleting nonce: ${error}`)
+    );
+  }
 }
