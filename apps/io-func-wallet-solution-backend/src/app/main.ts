@@ -4,13 +4,13 @@ import { CosmosClient } from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import { pipe, identity } from "fp-ts/function";
 
-import { GetEntityConfigurationFunction } from "../infra/azure/functions/get-entity-configuration";
-import { InfoFunction } from "../infra/azure/functions/info";
-import { CryptoSigner } from "../infra/crypto/signer";
-import { CreateWalletAttestationFunction } from "../infra/azure/functions/create-wallet-attestation";
-import { CreateWalletInstanceFunction } from "../infra/azure/functions/create-wallet-instance";
-import { GetNonceFunction } from "../infra/azure/functions/get-nonce";
-import { CosmosDbNonceRepository } from "../infra/azure/cosmos/nonce";
+import { GetEntityConfigurationFunction } from "@/infra/azure/functions/get-entity-configuration";
+import { InfoFunction } from "@/infra/azure/functions/info";
+import { CryptoSigner } from "@/infra/crypto/signer";
+import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
+import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
+import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
+import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(

@@ -10,8 +10,8 @@ import {
   ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
-} from "../../../../app/config";
-import { iOSMockData } from "../../../attestation-service/ios/__test__/config";
+} from "@/app/config";
+import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 
 describe("CreateWalletInstanceHandler", async () => {
