@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { NonceEnvironment, deleteNonce } from "./nonce";
 
-export const WalletInstanceRequest = t.type({
+const WalletInstanceRequest = t.type({
   challenge: NonEmptyString,
   keyAttestation: NonEmptyString,
   hardwareKeyTag: NonEmptyString,
