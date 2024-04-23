@@ -36,7 +36,7 @@ paths:
           $ref: "#/components/responses/Unexpected"
 
   /wallet-instance:
-    put:
+    post:
       operationId: createWalletInstance
       summary: Create a wallet instance
       requestBody:

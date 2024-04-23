@@ -11,7 +11,7 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 
 import { createWalletInstance } from "@/wallet-instance";
-import { validateChallenge } from "@/wallet-instance-request";
+import { consumeNonce } from "@/wallet-instance-request";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -41,7 +41,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     req,
     requireWalletInstanceRequest,
     RTE.fromEither,
-    RTE.chainFirst(({ challenge }) => validateChallenge(challenge)),
+    RTE.chainFirst(({ challenge }) => consumeNonce(challenge)),
     RTE.chainW(createWalletInstance),
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse)

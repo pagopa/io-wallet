@@ -20,6 +20,11 @@ export class CosmosDbNonceRepository implements NonceRepository {
     );
   }
 
+  /*
+  This method is used for nonce validation.
+  Instead of checking if the nonce exists and then deleting it, we delete it directly to ensure an atomic operation. The `delete` method used will return a 404 error if the item to be deleted does not exist.
+  Therefore, if the nonce does not exist, we will receive a 404 and thus the nonce will not be valid
+  */
   delete(nonce: string) {
     return TE.tryCatch(
       async () => {

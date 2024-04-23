@@ -49,7 +49,7 @@ app.http("createWalletAttestation", {
 });
 
 app.http("createWalletInstance", {
-  methods: ["PUT"],
+  methods: ["POST"],
   authLevel: "anonymous",
   route: "wallet-instance",
   handler: CreateWalletInstanceFunction({
