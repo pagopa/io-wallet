@@ -53,12 +53,8 @@ paths:
                 hardware_key_tag:
                   type: string
       responses:
-        "201":
+        "204":
           description: Wallet instance successfully created
-          content:
-            application/entity-statement+jwt:
-              schema:
-                type: string
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":

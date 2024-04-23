@@ -64,11 +64,9 @@ describe("CreateWalletInstanceHandler", async () => {
       throw new Error("Expecting Right");
     }
     const {
-      right: { statusCode, body },
+      right: { statusCode },
     } = result;
 
-    expect(statusCode).toBe(201);
-    // expect(body).toEqual(expect.any(String));
-    // expect(body).toEqual("OK");
+    expect(statusCode).toBe(204);
   });
 });

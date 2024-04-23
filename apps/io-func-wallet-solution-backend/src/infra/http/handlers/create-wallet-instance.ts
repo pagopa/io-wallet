@@ -9,7 +9,6 @@ import * as E from "fp-ts/lib/Either";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
-import { createdEntityStatementJwt } from "./utils";
 
 import { createWalletInstance } from "@/wallet-instance";
 import { validateChallenge } from "@/wallet-instance-request";
@@ -44,7 +43,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     RTE.fromEither,
     RTE.chainFirst(({ challenge }) => validateChallenge(challenge)),
     RTE.chainW(createWalletInstance),
-    RTE.map(createdEntityStatementJwt),
+    RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse)
   )
 );
