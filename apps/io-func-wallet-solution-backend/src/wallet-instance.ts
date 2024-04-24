@@ -1,6 +1,6 @@
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
-import { pipe } from "fp-ts/function";
+import { constVoid, pipe } from "fp-ts/function";
 
 import { WalletInstanceRequest } from "./wallet-instance-request";
 import { AttestationServiceConfiguration } from "./app/config";
@@ -24,5 +24,5 @@ export const createWalletInstance =
           walletInstanceRequest.hardwareKeyTag
         ),
       // TODO: [SIW-456] - Add device registration
-      TE.map(() => void 0)
+      TE.map(constVoid)
     );
