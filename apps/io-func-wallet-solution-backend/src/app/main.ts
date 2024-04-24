@@ -11,6 +11,7 @@ import { CryptoSigner } from "@/infra/crypto/signer";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
+import { GetUserIdByFiscalCodeFunction } from "@/infra/azure/functions/get-user-id-by-fiscal-code";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 
 const configOrError = pipe(
@@ -73,4 +74,11 @@ app.http("getNonce", {
   authLevel: "anonymous",
   route: "nonce",
   handler: GetNonceFunction({ nonceRepository }),
+});
+
+app.http("getUserIdByFiscalCode", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "users",
+  handler: GetUserIdByFiscalCodeFunction({}),
 });
