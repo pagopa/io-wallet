@@ -48,8 +48,10 @@ paths:
               properties:
                 challenge:
                   type: string
+                  format: binary
                 key_attestation:
                   type: string
+                  format: binary
                 hardware_key_tag:
                   type: string
       responses:
