@@ -23,6 +23,7 @@ vi.mock("@/nonce", async (importOriginal) => {
 describe("GetNonceHandler", async () => {
   const nonceRepository: NonceRepository = {
     insert: () => TE.right(undefined),
+    delete: () => TE.left(new Error("not implemented")),
   };
 
   const handler = GetNonceHandler({
@@ -68,6 +69,7 @@ describe("GetNonceHandler", async () => {
   it("should return a 500 HTTP response when insertNonce returns error", () => {
     const nonceRepositoryThatFailsOnInsert: NonceRepository = {
       insert: () => TE.left(new Error("failed on insert!")),
+      delete: () => TE.left(new Error("not implemented")),
     };
 
     const handler = GetNonceHandler({

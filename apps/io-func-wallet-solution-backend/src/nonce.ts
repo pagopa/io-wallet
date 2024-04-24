@@ -5,6 +5,7 @@ import * as IOE from "fp-ts/IOEither";
 
 export type NonceRepository = {
   insert: (nonce: string) => TE.TaskEither<Error, void>;
+  delete: (nonce: string) => TE.TaskEither<Error, void>;
 };
 
 export type NonceEnvironment = {
@@ -22,3 +23,10 @@ export const insertNonce: (
   (nonce) =>
   ({ nonceRepository }) =>
     nonceRepository.insert(nonce);
+
+export const deleteNonce: (
+  nonce: string
+) => RTE.ReaderTaskEither<NonceEnvironment, Error, void> =
+  (nonce) =>
+  ({ nonceRepository }) =>
+    nonceRepository.delete(nonce);
