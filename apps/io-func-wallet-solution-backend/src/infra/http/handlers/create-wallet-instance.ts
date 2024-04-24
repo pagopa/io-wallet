@@ -10,8 +10,8 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 
-import { createWalletInstance } from "../../../wallet-instance";
-import { createdEntityStatementJwt } from "./utils";
+import { createWalletInstance } from "@/wallet-instance";
+import { consumeNonce } from "@/wallet-instance-request";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -33,18 +33,17 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
         keyAttestation: E.right(key_attestation),
         hardwareKeyTag: E.right(hardware_key_tag),
       })
-    ),
-    RTE.fromEither
+    )
   );
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req,
     requireWalletInstanceRequest,
-    RTE.chain((walletInstanceRequest) =>
-      createWalletInstance(walletInstanceRequest)
-    ),
-    RTE.map(createdEntityStatementJwt),
+    RTE.fromEither,
+    RTE.chainFirst(({ challenge }) => consumeNonce(challenge)),
+    RTE.chainW(createWalletInstance),
+    RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse)
   )
 );
