@@ -2,6 +2,7 @@ import { it, expect, describe } from "vitest";
 
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
@@ -122,32 +123,28 @@ describe("HealthHandler", () => {
 
     const result = await handler();
 
-    expect(result).toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-          headers: expect.objectContaining({
-            "Content-Type": "application/problem+json",
-          }),
-          body: expect.objectContaining({
-            detail: expect.stringContaining("cosmos-db-error"),
-          }),
+    expect.assertions(3);
+    expect(result).toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 500,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
         }),
-      })
-    );
-
-    expect(result).toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-          headers: expect.objectContaining({
-            "Content-Type": "application/problem+json",
-          }),
-          body: expect.objectContaining({
-            detail: expect.stringContaining("pdv-tokenizer-error"),
-          }),
-        }),
-      })
-    );
+      }),
+    });
+    if (E.isRight(result)) {
+      const body = result.right.body;
+      expect(body).toEqual({
+        title: "Internal Server Error",
+        status: 500,
+        detail: expect.stringContaining("cosmos-db-error"),
+      });
+      expect(body).toEqual(
+        expect.objectContaining({
+          detail: expect.stringContaining("pdv-tokenizer-error"),
+        })
+      );
+    }
   });
 });
