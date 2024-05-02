@@ -24,14 +24,14 @@ describe("AndroidAssertionValidation", async () => {
   signer.update(clientDataHash);
   const hardwareSignature = signer.sign(hardwareKeyPair.privateKey, "base64");
 
-  it("should validate assertion signature", async () => {
-    const signatureValidated = await validateAssertionSignature(
+  it("should validate assertion signature", () => {
+    const signatureValidated = validateAssertionSignature(
       hardwareKey,
       clientData,
       hardwareSignature
     );
 
-    expect(signatureValidated).toEqual(true);
+    expect(signatureValidated).resolves.toEqual(true);
   });
 
   it("should validate integrity response", () => {
