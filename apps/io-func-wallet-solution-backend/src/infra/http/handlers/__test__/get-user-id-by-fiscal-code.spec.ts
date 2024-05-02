@@ -1,7 +1,6 @@
 import { it, expect, describe } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import { GetUserIdByFiscalCodeHandler } from "../get-user-id-by-fiscal-code";
 import { UserIdRepository } from "@/user";
@@ -14,14 +13,15 @@ describe("GetUserIdByFiscalCodeHandler", () => {
   };
 
   it("should return a 200 HTTP response on success", () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: {
+        fiscal_code: "GSPMTA98L25E625O",
+      },
+    };
     const handler = GetUserIdByFiscalCodeHandler({
-      input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
-        ...req,
-        method: "POST",
-        body: {
-          fiscal_code: "GSPMTA98L25E625O",
-        },
-      })),
+      input: req,
       inputDecoder: H.HttpRequest,
       logger: {
         log: () => () => {},
@@ -30,28 +30,28 @@ describe("GetUserIdByFiscalCodeHandler", () => {
       userIdRepository,
     });
 
-    expect(handler()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 200,
-          headers: expect.objectContaining({
-            "Content-Type": "application/json",
-          }),
-          body: { id: "pdv_id" },
+    expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        statusCode: 200,
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
         }),
-      })
-    );
+        body: { id: "pdv_id" },
+      },
+    });
   });
 
   it("should return a 422 HTTP response on invalid body", () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: {
+        foo: "GSPMTA98L25E625O",
+      },
+    };
     const handler = GetUserIdByFiscalCodeHandler({
-      input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
-        ...req,
-        method: "POST",
-        body: {
-          foo: "GSPMTA98L25E625O",
-        },
-      })),
+      input: req,
       inputDecoder: H.HttpRequest,
       logger: {
         log: () => () => {},
@@ -60,16 +60,15 @@ describe("GetUserIdByFiscalCodeHandler", () => {
       userIdRepository,
     });
 
-    expect(handler()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 422,
-          headers: expect.objectContaining({
-            "Content-Type": "application/problem+json",
-          }),
+    expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 422,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
         }),
-      })
-    );
+      }),
+    });
   });
 
   it("should return a 500 HTTP response when getUserIdByFiscalCode returns error", () => {
@@ -78,15 +77,15 @@ describe("GetUserIdByFiscalCodeHandler", () => {
         TE.left(new Error("failed on getIdByFiscalCode!")),
       getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     };
-
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: {
+        fiscal_code: "GSPMTA98L25E625O",
+      },
+    };
     const handler = GetUserIdByFiscalCodeHandler({
-      input: pipe(H.request("https://wallet-provider.example.org"), (req) => ({
-        ...req,
-        method: "POST",
-        body: {
-          fiscal_code: "GSPMTA98L25E625O",
-        },
-      })),
+      input: req,
       inputDecoder: H.HttpRequest,
       logger: {
         log: () => () => {},
@@ -95,15 +94,14 @@ describe("GetUserIdByFiscalCodeHandler", () => {
       userIdRepository: userIdRepositoryThatFailsOnGetUserIdByFiscalCode,
     });
 
-    expect(handler()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-          headers: expect.objectContaining({
-            "Content-Type": "application/problem+json",
-          }),
+    expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 500,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
         }),
-      })
-    );
+      }),
+    });
   });
 });
