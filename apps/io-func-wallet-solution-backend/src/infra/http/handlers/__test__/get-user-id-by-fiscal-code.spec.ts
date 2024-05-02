@@ -9,7 +9,7 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
 describe("GetUserIdByFiscalCodeHandler", () => {
   const userIdRepository: UserIdRepository = {
-    getUserIdByFiscalCode: () => TE.right("pdv_id" as NonEmptyString),
+    getUserIdByFiscalCode: () => TE.right({ id: "pdv_id" as NonEmptyString }),
     getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
   };
 
@@ -37,7 +37,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
           headers: expect.objectContaining({
             "Content-Type": "application/json",
           }),
-          body: "pdv_id",
+          body: { id: "pdv_id" },
         }),
       })
     );

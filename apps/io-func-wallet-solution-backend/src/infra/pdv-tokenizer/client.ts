@@ -67,7 +67,7 @@ export class PdvTokenizerClient
           TE.fromEither
         )
       ),
-      TE.map(({ token }) => token)
+      TE.map(({ token }) => ({ id: token }))
     );
 
   getFiscalCodeByUserId = (id: string) =>
@@ -94,7 +94,9 @@ export class PdvTokenizerClient
           TE.fromEither
         )
       ),
-      TE.map(({ pii }) => pii)
+      TE.map(({ pii }) => ({
+        fiscalCode: pii,
+      }))
     );
 
   healthCheck = () =>
