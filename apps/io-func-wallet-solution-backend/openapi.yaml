@@ -94,7 +94,7 @@ paths:
         "500":
           $ref: "#/components/responses/Unexpected"
 
-  /info:
+  /health:
     get:
       operationId: healthCheck
       summary: Used to check if the function is active

@@ -20,7 +20,7 @@ vi.mock("@/nonce", async (importOriginal) => {
   };
 });
 
-describe("GetNonceHandler", async () => {
+describe("GetNonceHandler", () => {
   const nonceRepository: NonceRepository = {
     insert: () => TE.right(undefined),
     delete: () => TE.left(new Error("not implemented")),

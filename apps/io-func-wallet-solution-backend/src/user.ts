@@ -1,14 +1,21 @@
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as t from "io-ts";
 import * as TE from "fp-ts/lib/TaskEither";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
 
-export const User = t.type({
-  id: NonEmptyString,
-});
-
-export type User = t.TypeOf<typeof User>;
-
-export type UserRepository = {
-  getUserByFiscalCode: (fiscalCode: FiscalCode) => TE.TaskEither<Error, User>;
-  getFiscalCodeByUserId: (id: User["id"]) => TE.TaskEither<Error, FiscalCode>;
+export type UserIdRepository = {
+  getUserIdByFiscalCode: (
+    fiscalCode: FiscalCode
+  ) => TE.TaskEither<Error, NonEmptyString>;
+  getFiscalCodeByUserId: (id: string) => TE.TaskEither<Error, FiscalCode>;
 };
+
+export type UserIdEnvironment = {
+  userIdRepository: UserIdRepository;
+};
+
+export const getUserIdByFiscalCode: (
+  fiscalCode: FiscalCode
+) => RTE.ReaderTaskEither<UserIdEnvironment, Error, NonEmptyString> =
+  (fiscalCode) =>
+  ({ userIdRepository }) =>
+    userIdRepository.getUserIdByFiscalCode(fiscalCode);

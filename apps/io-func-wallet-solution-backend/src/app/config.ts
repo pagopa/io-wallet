@@ -59,11 +59,21 @@ const AzureConfiguration = t.type({
 
 type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
 
+export const PdvTokenizerApiClientConfig = t.type({
+  baseURL: t.string,
+  apiKey: t.string,
+});
+
+export type PdvTokenizerApiClientConfig = t.TypeOf<
+  typeof PdvTokenizerApiClientConfig
+>;
+
 export const Config = t.type({
   federationEntity: FederationEntityMetadata,
   crypto: CryptoConfiguration,
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfiguration,
+  pdvTokenizer: PdvTokenizerApiClientConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -81,12 +91,22 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     () => getAttestationServiceConfigFromEnvironment
   ),
   RE.bind("azure", () => getAzureConfigFromEnvironment),
-  RE.map(({ federationEntity, crypto, attestationService, azure }) => ({
-    federationEntity,
-    crypto,
-    attestationService,
-    azure,
-  }))
+  RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
+  RE.map(
+    ({
+      federationEntity,
+      crypto,
+      attestationService,
+      azure,
+      pdvTokenizer,
+    }) => ({
+      federationEntity,
+      crypto,
+      attestationService,
+      azure,
+      pdvTokenizer,
+    })
+  )
 );
 
 const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
@@ -197,5 +217,20 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       connectionString: cosmosDbConnectionString,
       dbName: cosmosDbDatabaseName,
     },
+  }))
+);
+
+const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  PdvTokenizerApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    pdvTokenizerApiBaseURL: readFromEnvironment("PdvTokenizerApiBaseURL"),
+    pdvTokenizerApiKey: readFromEnvironment("PdvTokenizerApiKey"),
+  }),
+  RE.map(({ pdvTokenizerApiBaseURL, pdvTokenizerApiKey }) => ({
+    baseURL: pdvTokenizerApiBaseURL,
+    apiKey: pdvTokenizerApiKey,
   }))
 );

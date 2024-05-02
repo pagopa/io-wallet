@@ -25,6 +25,8 @@
     "AndroidCrlUrl": "https://android.googleapis.com/attestation/status",
     "AndroidPlayIntegrityUrl": "https://www.googleapis.com/auth/playintegrity",
     "AllowDevelopmentEnvironment": "false",
-    "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED"
+    "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
+    "PdvTokenizerApiBaseURL": "PDV_TOKENIZER_API_BASE_URL",
+    "PdvTokenizerApiKey": "PDV_TOKENIZER_API_KEY",
   }
 }

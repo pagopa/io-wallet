@@ -31,11 +31,13 @@
     "googleapis": "^134.0.0",
     "io-ts": "^2.2.20",
     "jose": "5.2.4",
-    "pkijs": "^3.0.16"
+    "pkijs": "^3.0.16",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
     "@rushstack/eslint-patch": "^1.2.0",
+    "@types/uuid": "^9.0.8",
     "@vitest/coverage-c8": "^0.33.0",
     "azure-functions-core-tools": "^4.0.5611",
     "eslint": "^8.28.0",
