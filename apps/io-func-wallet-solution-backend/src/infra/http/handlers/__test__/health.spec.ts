@@ -40,19 +40,18 @@ describe("HealthHandler", () => {
       pdvTokenizerClient,
     });
 
-    expect(handler()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 200,
-          headers: expect.objectContaining({
-            "Content-Type": "application/json",
-          }),
-          body: expect.objectContaining({
-            message: "it works!",
-          }),
+    expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        statusCode: 200,
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
         }),
-      })
-    );
+        body: expect.objectContaining({
+          message: "it works!",
+        }),
+      },
+    });
   });
 
   it("should return a 500 HTTP response when getCosmosHealth returns an error", () => {
@@ -67,19 +66,20 @@ describe("HealthHandler", () => {
       pdvTokenizerClient,
     });
 
-    expect(handler()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-          headers: expect.objectContaining({
-            "Content-Type": "application/problem+json",
-          }),
-          body: expect.objectContaining({
-            detail: "The function is not healthy. Error: cosmos-db-error",
-          }),
+    expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        statusCode: 500,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
         }),
-      })
-    );
+        body: {
+          title: "Internal Server Error",
+          status: 500,
+          detail: "The function is not healthy. Error: cosmos-db-error",
+        },
+      },
+    });
   });
 
   it("should return a 500 HTTP response when getPdvTokenizerHealth returns an error", () => {
@@ -94,19 +94,20 @@ describe("HealthHandler", () => {
       pdvTokenizerClient: pdvTokenizerClientThatFails,
     });
 
-    expect(handler()).resolves.toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining({
-          statusCode: 500,
-          headers: expect.objectContaining({
-            "Content-Type": "application/problem+json",
-          }),
-          body: expect.objectContaining({
-            detail: "The function is not healthy. Error: pdv-tokenizer-error",
-          }),
+    expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        statusCode: 500,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
         }),
-      })
-    );
+        body: {
+          title: "Internal Server Error",
+          status: 500,
+          detail: "The function is not healthy. Error: pdv-tokenizer-error",
+        },
+      },
+    });
   });
 
   it("should return a 500 HTTP response when getCosmosHealth and getPdvTokenizerHealth return an error", async () => {
