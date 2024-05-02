@@ -1,6 +1,7 @@
 import { it, expect, describe, beforeAll, afterAll } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import * as E from "fp-ts/Either";
 import * as jose from "jose";
 import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
 import {
@@ -63,19 +64,26 @@ describe("CreateWalletAttestationHandler", async () => {
 
     const result = await handler();
 
-    if (result._tag === "Left") {
-      throw new Error("Expecting Right");
-    }
-    const {
-      right: { statusCode, body },
-    } = result;
-
-    expect(statusCode).toBe(201);
-    expect(body).toEqual(expect.any(String));
+    expect.assertions(3);
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
+        statusCode: 201,
+        headers: expect.objectContaining({
+          "Content-Type": "application/entity-statement+jwt",
+        }),
+        body: expect.any(String),
+      },
+    });
 
     // check trailing slashes are removed
-    const decoded = jose.decodeJwt(body as string);
-    expect((decoded.iss || "").endsWith("/")).toBe(false);
-    expect((decoded.sub || "").endsWith("/")).toBe(false);
+    if (E.isRight(result)) {
+      const body = result.right.body;
+      if (typeof body === "string") {
+        const decoded = jose.decodeJwt(body);
+        expect((decoded.iss || "").endsWith("/")).toBe(false);
+        expect((decoded.sub || "").endsWith("/")).toBe(false);
+      }
+    }
   });
 });
