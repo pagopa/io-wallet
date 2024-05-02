@@ -14,17 +14,19 @@ let publicKey = {
   kid: "vbeXJksM45xphtANnCiG6mCyuU4jfGNzopGuKvogg9c",
 };
 
-describe("getPublicKeyFromCnf", async () => {
+describe("getPublicKeyFromCnf", () => {
   it("should return public key from custom jwt", () => {
     const result = getPublicKeyFromCnf(mockWalletAttestationRequest);
-    expect(E.isRight(result)).toBeTruthy();
-    if (E.isRight(result)) {
-      expect(result.right).toStrictEqual(publicKey);
-    }
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: publicKey,
+    });
   });
 
   it("must not find any keys", () => {
     const result = getPublicKeyFromCnf("");
+
     expect(E.isRight(result)).toBeFalsy();
   });
 });

@@ -34,7 +34,7 @@ describe("AndroidAssertionValidation", async () => {
     expect(signatureValidated).toEqual(true);
   });
 
-  it("should validate integrity response", async () => {
+  it("should validate integrity response", () => {
     const fakeTokenpayloadIntegrityResponse = {
       requestDetails: {
         requestPackageName: "com.ioreactnativeintegrityexample",
@@ -67,7 +67,7 @@ describe("AndroidAssertionValidation", async () => {
     expect(responseValidated).toEqual(true);
   });
 
-  it("should validate integrity response in development mode", async () => {
+  it("should validate integrity response in development mode", () => {
     const fakeTokenpayloadIntegrityResponse = {
       requestDetails: {
         requestPackageName: "com.ioreactnativeintegrityexample",

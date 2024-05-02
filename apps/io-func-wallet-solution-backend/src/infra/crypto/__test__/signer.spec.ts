@@ -3,8 +3,8 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/function";
 import { CryptoSigner } from "../signer";
-import { ECKey, ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "../../../jwk";
 import * as jose from "jose";
+import { ECKey, ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "@/jwk";
 
 const publicRsaKey = {
   kty: "RSA",
@@ -36,7 +36,7 @@ const privateEcKey = {
   d: "vOTIOnH_rDol5cyaWL25DX4iGu_WU_l-AoTLmGIV_tg",
 } as ECPrivateKey;
 
-describe("CryptoSigner", async () => {
+describe("CryptoSigner", () => {
   const jwks = [privateEcKey, privateRsaKey];
   const publicJwks = [publicEcKey, publicRsaKey];
 
@@ -47,21 +47,21 @@ describe("CryptoSigner", async () => {
   });
 
   it("should return first jwk with EC kty", () => {
-    const run = signer.getFirstPublicKeyByKty("EC");
-    expect(run).toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining(publicEcKey),
-      })
-    );
+    const result = signer.getFirstPublicKeyByKty("EC");
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: publicEcKey,
+    });
   });
 
   it("should return a jwks of only public keys", () => {
-    const run = signer.getPublicKeys();
-    expect(run).toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining(publicJwks),
-      })
-    );
+    const result = signer.getPublicKeys();
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: publicJwks,
+    });
   });
 
   it("shouldn't return a jwks", () => {
@@ -71,34 +71,29 @@ describe("CryptoSigner", async () => {
       jwtDefaultAlg: "ES256",
       jwtDefaultDuration: "1h",
     });
+    const result = signer.getPublicKeys();
 
-    const run = signer.getPublicKeys();
-
-    expect(run).toEqual(
-      expect.objectContaining({
-        _tag: "Left",
-      })
-    );
+    expect(E.isLeft(result)).toBe(true);
   });
 
   it("should return supported sign algorithms", () => {
-    const run = signer.getSupportedSignAlgorithms();
-    expect(run).toEqual(
-      expect.objectContaining({
-        right: expect.objectContaining([
-          "ES256",
-          "ES256K",
-          "ES384",
-          "ES512",
-          "RS256",
-          "RS384",
-          "RS512",
-          "PS256",
-          "PS384",
-          "PS512",
-        ]),
-      })
-    );
+    const result = signer.getSupportedSignAlgorithms();
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: [
+        "ES256",
+        "ES256K",
+        "ES384",
+        "ES512",
+        "RS256",
+        "RS384",
+        "RS512",
+        "PS256",
+        "PS384",
+        "PS512",
+      ],
+    });
   });
 
   it("should create and sign a JWT", async () => {
@@ -106,11 +101,11 @@ describe("CryptoSigner", async () => {
       { typ: "demo" },
       publicEcKey.kid
     )({
-      sub: "Subjet of JWT",
+      sub: "Subject of JWT",
       iss: "Issuer of JWT",
     })();
 
-    expect(E.isRight(result)).toBeTruthy();
+    expect(E.isRight(result)).toBe(true);
     if (E.isRight(result)) {
       let verification = await pipe(
         TE.tryCatch(() => jose.importJWK(publicEcKey), E.toError),
@@ -118,24 +113,27 @@ describe("CryptoSigner", async () => {
           TE.tryCatch(() => jose.jwtVerify(result.right, joseKey), E.toError)
         )
       )();
-      expect(E.isRight(verification)).toBeTruthy();
+      expect(E.isRight(verification)).toBe(true);
     }
   });
 
-  it("should fail to create and sign a JWT", async () => {
+  it("should fail to create and sign a JWT", () => {
     const signerWithOnlyRsa = new CryptoSigner({
       jwks: [privateRsaKey],
       jwtDefaultAlg: "ES256",
       jwtDefaultDuration: "1h",
     });
-    const result = await signerWithOnlyRsa.createJwtAndsign(
+    const createJwtAndsign = signerWithOnlyRsa.createJwtAndsign(
       { typ: "demo" },
       publicEcKey.kid
     )({
-      sub: "Subjet of JWT",
+      sub: "Subject of JWT",
       iss: "Issuer of JWT",
-    })();
+    });
 
-    expect(E.isRight(result)).toBeFalsy();
+    expect(createJwtAndsign()).resolves.toEqual({
+      _tag: "Left",
+      left: expect.any(Error),
+    });
   });
 });
