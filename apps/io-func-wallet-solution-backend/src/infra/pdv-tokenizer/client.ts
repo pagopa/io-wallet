@@ -4,7 +4,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { v4 as uuidv4 } from "uuid";
-import { PdvTokenizerHealthCheck } from "../http/handlers/health";
+import { PdvTokenizerHealthCheck } from "./health-check";
 import { UserIdRepository } from "@/user";
 import { PdvTokenizerApiClientConfig } from "@/app/config";
 

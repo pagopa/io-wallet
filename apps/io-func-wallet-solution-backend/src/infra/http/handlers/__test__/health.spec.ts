@@ -4,8 +4,10 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as TE from "fp-ts/TaskEither";
 
-import { HealthHandler, PdvTokenizerHealthCheck } from "../health";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
+
+import { HealthHandler } from "../health";
+import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
 
 describe("HealthHandler", () => {
   const cosmosClient = {

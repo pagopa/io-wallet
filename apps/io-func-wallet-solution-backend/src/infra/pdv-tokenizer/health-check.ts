@@ -1,7 +1,10 @@
 import * as TE from "fp-ts/lib/TaskEither";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
-import { PdvTokenizerHealthCheck } from "../http/handlers/health";
+
+export type PdvTokenizerHealthCheck = {
+  healthCheck: () => TE.TaskEither<Error, boolean>;
+};
 
 export const getPdvTokenizerHealth: RTE.ReaderTaskEither<
   {

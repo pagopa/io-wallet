@@ -7,7 +7,10 @@ import { CosmosClient } from "@azure/cosmos";
 import * as O from "fp-ts/Option";
 import * as H from "@pagopa/handler-kit";
 import { logErrorAndReturnResponse } from "../utils";
-import { getPdvTokenizerHealth } from "@/infra/pdv-tokenizer/health-check";
+import {
+  PdvTokenizerHealthCheck,
+  getPdvTokenizerHealth,
+} from "@/infra/pdv-tokenizer/health-check";
 import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
 
 class HealthCheckError extends Error {
@@ -16,10 +19,6 @@ class HealthCheckError extends Error {
     super(`The function is not healthy. ${cause}`);
   }
 }
-
-export type PdvTokenizerHealthCheck = {
-  healthCheck: () => TE.TaskEither<Error, boolean>;
-};
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {
