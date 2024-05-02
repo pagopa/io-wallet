@@ -97,7 +97,7 @@ describe("CryptoSigner", () => {
   });
 
   it("should create and sign a JWT", async () => {
-    const result = await signer.createJwtAndsign(
+    const result = await signer.createJwtAndSign(
       { typ: "demo" },
       publicEcKey.kid
     )({
@@ -123,7 +123,7 @@ describe("CryptoSigner", () => {
       jwtDefaultAlg: "ES256",
       jwtDefaultDuration: "1h",
     });
-    const createJwtAndsign = signerWithOnlyRsa.createJwtAndsign(
+    const createJwtAndsign = signerWithOnlyRsa.createJwtAndSign(
       { typ: "demo" },
       publicEcKey.kid
     )({
