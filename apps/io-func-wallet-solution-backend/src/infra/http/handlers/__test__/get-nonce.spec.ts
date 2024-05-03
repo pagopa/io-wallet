@@ -36,8 +36,8 @@ describe("GetNonceHandler", () => {
     nonceRepository,
   });
 
-  it("should return a 200 HTTP response on success", () => {
-    expect(handler()).resolves.toEqual(
+  it("should return a 200 HTTP response on success", async () => {
+    await expect(handler()).resolves.toEqual(
       expect.objectContaining({
         right: expect.objectContaining({
           statusCode: 200,
@@ -52,9 +52,9 @@ describe("GetNonceHandler", () => {
     );
   });
 
-  it("should return a 500 HTTP response when generateNonce returns error", () => {
+  it("should return a 500 HTTP response when generateNonce returns error", async () => {
     vi.mocked(generateNonce).mockReturnValueOnce(E.left(new Error("error")));
-    expect(handler()).resolves.toEqual(
+    await expect(handler()).resolves.toEqual(
       expect.objectContaining({
         right: expect.objectContaining({
           statusCode: 500,
@@ -66,7 +66,7 @@ describe("GetNonceHandler", () => {
     );
   });
 
-  it("should return a 500 HTTP response when insertNonce returns error", () => {
+  it("should return a 500 HTTP response when insertNonce returns error", async () => {
     const nonceRepositoryThatFailsOnInsert: NonceRepository = {
       insert: () => TE.left(new Error("failed on insert!")),
       delete: () => TE.left(new Error("not implemented")),
@@ -82,7 +82,7 @@ describe("GetNonceHandler", () => {
       nonceRepository: nonceRepositoryThatFailsOnInsert,
     });
 
-    expect(handler()).resolves.toEqual(
+    await expect(handler()).resolves.toEqual(
       expect.objectContaining({
         right: expect.objectContaining({
           statusCode: 500,

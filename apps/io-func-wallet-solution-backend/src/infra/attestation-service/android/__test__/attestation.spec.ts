@@ -16,7 +16,7 @@ describe("AndroidAttestationValidation", () => {
     (el) => new X509Certificate(base64ToPem(el))
   );
 
-  it("should return a validated attestation", () => {
+  it("should return a validated attestation", async () => {
     const result = verifyAttestation({
       x509Chain,
       googlePublicKey: GOOGLE_PUBLIC_KEY,
@@ -28,6 +28,6 @@ describe("AndroidAttestationValidation", () => {
       hardwareKey,
     };
 
-    expect(result).resolves.toEqual(expectedResult);
+    await expect(result).resolves.toEqual(expectedResult);
   });
 });

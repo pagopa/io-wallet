@@ -119,7 +119,7 @@ describe("CryptoSigner", () => {
     }
   });
 
-  it("should fail to create and sign a JWT", () => {
+  it("should fail to create and sign a JWT", async () => {
     const signerWithOnlyRsa = new CryptoSigner({
       jwks: [privateRsaKey],
       jwtDefaultAlg: "ES256",
@@ -133,7 +133,7 @@ describe("CryptoSigner", () => {
       iss: "Issuer of JWT",
     });
 
-    expect(createJwtAndsign()).resolves.toEqual({
+    await expect(createJwtAndsign()).resolves.toEqual({
       _tag: "Left",
       left: expect.any(Error),
     });

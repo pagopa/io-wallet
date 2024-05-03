@@ -19,7 +19,7 @@ describe("iOSAssertionValidation", () => {
 
   const clientData = JSON.stringify({ challenge, jwk: ephemeralKey });
 
-  it("should return true", () => {
+  it("should return true", async () => {
     const result = verifyAssertion({
       decodedAssertion,
       clientData,
@@ -29,6 +29,6 @@ describe("iOSAssertionValidation", () => {
       signCount: 0,
     });
 
-    expect(result).resolves.toEqual(true);
+    await expect(result).resolves.toEqual(true);
   });
 });

@@ -47,7 +47,7 @@ describe("CreateWalletInstanceHandler", () => {
     googleAppCredentialsEncoded: "",
   };
 
-  it("should return a 204 HTTP response on success", () => {
+  it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",
@@ -61,7 +61,7 @@ describe("CreateWalletInstanceHandler", () => {
       nonceRepository,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
         statusCode: 204,
@@ -69,7 +69,7 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 422 HTTP response on invalid body", () => {
+  it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",
@@ -85,7 +85,7 @@ describe("CreateWalletInstanceHandler", () => {
       nonceRepository,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
         statusCode: 422,
@@ -96,7 +96,7 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on validateChallenge error", () => {
+  it("should return a 500 HTTP response on validateChallenge error", async () => {
     const nonceRepositoryThatFailsOnDelete: NonceRepository = {
       insert: () => TE.left(new Error("not implemented")),
       delete: () => TE.left(new Error("failed on delete!")),
@@ -114,7 +114,7 @@ describe("CreateWalletInstanceHandler", () => {
       nonceRepository: nonceRepositoryThatFailsOnDelete,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
         statusCode: 500,

@@ -18,7 +18,7 @@ describe("iOSAttestationValidation", () => {
   const data = Buffer.from(attestation, "base64");
   const decodedAttestation = decode(data);
 
-  it("should return a validated attestation", () => {
+  it("should return a validated attestation", async () => {
     const result = verifyAttestation({
       decodedAttestation,
       challenge,
@@ -32,12 +32,12 @@ describe("iOSAttestationValidation", () => {
       hardwareKey,
     };
 
-    expect(result).resolves.toEqual(expectedResult);
+    await expect(result).resolves.toEqual(expectedResult);
   });
 
-  it("should return throw an Error", async () => {
-    try {
-      await verifyAttestation({
+  it("should reject", async () => {
+    await expect(
+      verifyAttestation({
         decodedAttestation,
         challenge: "invalidChallenge",
         keyId,
@@ -45,9 +45,7 @@ describe("iOSAttestationValidation", () => {
         teamIdentifier,
         allowDevelopmentEnvironment: true,
         appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-      });
-    } catch (error) {
-      expect(error);
-    }
+      })
+    ).rejects.toThrow();
   });
 });
