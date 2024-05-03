@@ -28,13 +28,15 @@ const getHealthCheck: RTE.ReaderTaskEither<
   Error,
   void
 > = ({ cosmosClient, pdvTokenizerClient }) =>
-  // It runs multiple health checks in parallel and collect the errors, if any.
+  // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
+    // If there are no errors => `left` is an empty array => return TE.right
+    // If there are errors => `left` contains the errors => return TE.left
     T.chain(({ left }) =>
       pipe(
         left,
@@ -45,6 +47,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
         )
       )
     ),
+    // It collects the errors, if any
     TE.mapLeft((errors) => new HealthCheckError(errors.join(". ")))
   );
 
