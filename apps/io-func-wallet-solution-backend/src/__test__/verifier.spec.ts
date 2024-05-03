@@ -27,6 +27,6 @@ describe("getPublicKeyFromCnf", () => {
   it("must not find any keys", () => {
     const result = getPublicKeyFromCnf("");
 
-    expect(E.isRight(result)).toBeFalsy();
+    expect(E.isRight(result)).toBe(false);
   });
 });
