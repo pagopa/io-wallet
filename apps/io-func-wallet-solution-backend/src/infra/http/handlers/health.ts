@@ -28,6 +28,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
   Error,
   void
 > = ({ cosmosClient, pdvTokenizerClient }) =>
+  // It runs multiple health checks in parallel and collect the errors, if any.
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
