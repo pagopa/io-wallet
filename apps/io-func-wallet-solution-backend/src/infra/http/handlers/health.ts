@@ -40,6 +40,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
         errors,
         RA.head,
         O.fold(
+          // return undefined in case errors array is empty
           () => TE.right(undefined),
           () => TE.left(errors)
         )
