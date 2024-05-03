@@ -105,9 +105,11 @@ describe("CryptoSigner", () => {
       iss: "Issuer of JWT",
     })();
 
+    expect.assertions(2);
     expect(E.isRight(result)).toBe(true);
+
     if (E.isRight(result)) {
-      let verification = await pipe(
+      const verification = await pipe(
         TE.tryCatch(() => jose.importJWK(publicEcKey), E.toError),
         TE.chain((joseKey) =>
           TE.tryCatch(() => jose.jwtVerify(result.right, joseKey), E.toError)
