@@ -41,7 +41,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
         RA.head,
         O.fold(
           () => TE.right(undefined),
-          () => TE.left(left)
+          () => TE.left(errors)
         )
       )
     ),
