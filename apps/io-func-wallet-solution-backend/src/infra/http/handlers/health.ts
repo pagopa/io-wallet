@@ -37,7 +37,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ errors }) =>
       pipe(
-        left,
+        errors,
         RA.head,
         O.fold(
           () => TE.right(undefined),
