@@ -12,7 +12,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
     getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
   };
 
-  it("should return a 200 HTTP response on success", () => {
+  it("should return a 200 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",
@@ -30,7 +30,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
       userIdRepository,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
         statusCode: 200,
@@ -42,7 +42,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
     });
   });
 
-  it("should return a 422 HTTP response on invalid body", () => {
+  it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",
@@ -60,7 +60,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
       userIdRepository,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
         statusCode: 422,
@@ -71,7 +71,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getUserIdByFiscalCode returns error", () => {
+  it("should return a 500 HTTP response when getUserIdByFiscalCode returns error", async () => {
     const userIdRepositoryThatFailsOnGetUserIdByFiscalCode: UserIdRepository = {
       getUserIdByFiscalCode: () =>
         TE.left(new Error("failed on getIdByFiscalCode!")),
@@ -94,7 +94,7 @@ describe("GetUserIdByFiscalCodeHandler", () => {
       userIdRepository: userIdRepositoryThatFailsOnGetUserIdByFiscalCode,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
         statusCode: 500,

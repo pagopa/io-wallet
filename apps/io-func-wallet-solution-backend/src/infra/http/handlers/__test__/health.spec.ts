@@ -28,7 +28,7 @@ describe("HealthHandler", () => {
     healthCheck: () => TE.left(new Error("pdv-tokenizer-error")),
   } as PdvTokenizerHealthCheck;
 
-  it("should return a 200 HTTP response on success", () => {
+  it("should return a 200 HTTP response on success", async () => {
     const handler = HealthHandler({
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
@@ -40,7 +40,7 @@ describe("HealthHandler", () => {
       pdvTokenizerClient,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
         statusCode: 200,
@@ -54,7 +54,7 @@ describe("HealthHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getCosmosHealth returns an error", () => {
+  it("should return a 500 HTTP response when getCosmosHealth returns an error", async () => {
     const handler = HealthHandler({
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
@@ -66,7 +66,7 @@ describe("HealthHandler", () => {
       pdvTokenizerClient,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
         statusCode: 500,
@@ -82,7 +82,7 @@ describe("HealthHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getPdvTokenizerHealth returns an error", () => {
+  it("should return a 500 HTTP response when getPdvTokenizerHealth returns an error", async () => {
     const handler = HealthHandler({
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
@@ -94,7 +94,7 @@ describe("HealthHandler", () => {
       pdvTokenizerClient: pdvTokenizerClientThatFails,
     });
 
-    expect(handler()).resolves.toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
         statusCode: 500,
