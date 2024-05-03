@@ -35,8 +35,6 @@ const getHealthCheck: RTE.ReaderTaskEither<
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
-    // If there are no errors => `left` is an empty array => return TE.right
-    // If there are errors => `left` contains the errors => return TE.left
     T.chain(({ errors }) =>
       pipe(
         left,
