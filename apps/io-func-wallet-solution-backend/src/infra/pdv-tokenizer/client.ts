@@ -38,7 +38,7 @@ export class PdvTokenizerClient
       TE.tryCatch(
         async () => {
           const result = await fetch(
-            `${this.#baseURL}/tokenizer/v1/tokens/search`,
+            new URL("/tokenizer/v1/tokens/search", this.#baseURL),
             {
               ...this.#options,
               signal: AbortSignal.timeout(3000),
@@ -112,7 +112,7 @@ export class PdvTokenizerClient
     );
 
   private async getFiscalCode(id: string) {
-    return fetch(`${this.#baseURL}/tokenizer/v1/tokens/${id}/pii`, {
+    return fetch(new URL(`/tokenizer/v1/tokens/${id}/pii`, this.#baseURL), {
       ...this.#options,
       signal: AbortSignal.timeout(3000),
       method: "GET",
