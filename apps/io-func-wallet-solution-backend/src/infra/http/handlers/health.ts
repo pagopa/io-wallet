@@ -35,7 +35,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
-    T.chain(({ errors }) =>
+    T.chain(({ left: errors }) =>
       pipe(
         errors,
         RA.head,
