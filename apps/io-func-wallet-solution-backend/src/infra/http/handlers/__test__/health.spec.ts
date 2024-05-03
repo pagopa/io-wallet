@@ -47,9 +47,9 @@ describe("HealthHandler", () => {
         headers: expect.objectContaining({
           "Content-Type": "application/json",
         }),
-        body: expect.objectContaining({
+        body: {
           message: "it works!",
-        }),
+        },
       },
     });
   });
