@@ -51,22 +51,3 @@ export const validateAttestation: (
           walletInstanceRequest.hardwareKeyTag
         )
     );
-
-// export const createWalletInstance: (request: {
-//   walletInstanceRequest: WalletInstanceRequest;
-//   user: User;
-// }) => RTE.ReaderTaskEither<Dependencies, Error, void> = ({
-//   walletInstanceRequest,
-//   user,
-// }) =>
-//   pipe(
-//     walletInstanceRequest,
-//     validateAttestation,
-//     RTE.chainW(({ hardwareKey }) =>
-//       insertWalletInstance({
-//         id: walletInstanceRequest.hardwareKeyTag,
-//         userId: user.id,
-//         hardwareKey,
-//       })
-//     )
-//   );

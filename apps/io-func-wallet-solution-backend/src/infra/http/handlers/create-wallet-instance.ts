@@ -84,19 +84,3 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     RTE.orElseW(logErrorAndReturnResponse)
   )
 );
-
-// export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
-//   pipe(
-//     sequenceS(E.Apply)({
-//       user: requireUser(req),
-//       walletInstanceRequest: requireWalletInstanceRequest(req),
-//     }),
-//     RTE.fromEither,
-//     RTE.chainFirst(({ walletInstanceRequest: { challenge } }) =>
-//       consumeNonce(challenge)
-//     ),
-//     RTE.chainW(createWalletInstance),
-//     RTE.map(() => H.empty),
-//     RTE.orElseW(logErrorAndReturnResponse)
-//   )
-// );
