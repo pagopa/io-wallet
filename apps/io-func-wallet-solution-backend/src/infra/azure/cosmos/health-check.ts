@@ -1,4 +1,4 @@
-import { pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { CosmosClient } from "@azure/cosmos";

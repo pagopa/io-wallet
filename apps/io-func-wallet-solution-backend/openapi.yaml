@@ -35,6 +35,38 @@ paths:
         "500":
           $ref: "#/components/responses/Unexpected"
 
+  /users:
+    post:
+      operationId: getUserIdByFiscalCode
+      summary: Returns the user id given the fiscal code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fiscal_code:
+                  $ref: "#/components/schemas/FiscalCode"
+              required:
+                - fiscal_code
+      responses:
+        "200":
+          description: User id successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: "#/components/schemas/Id"
+                required:
+                  - id
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/Unexpected"
+
   /wallet-instance:
     post:
       operationId: createWalletInstance
@@ -62,7 +94,7 @@ paths:
         "500":
           $ref: "#/components/responses/Unexpected"
 
-  /info:
+  /health:
     get:
       operationId: healthCheck
       summary: Used to check if the function is active
@@ -136,3 +168,15 @@ components:
             An absolute URI that identifies the specific occurrence of the
             problem. It may or may not yield further information if
             dereferenced.
+
+    FiscalCode:
+      type: string
+      description: User's fiscal code.
+      format: FiscalCode
+      x-import: "@pagopa/ts-commons/lib/strings"
+      example: SPNDNL80R13C555X
+
+    Id:
+      type: string
+      description: UUID
+      example: 32928ece-6ca0-488c-9a6a-eb8ee66ab69a
