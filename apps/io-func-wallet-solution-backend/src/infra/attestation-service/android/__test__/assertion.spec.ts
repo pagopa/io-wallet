@@ -25,16 +25,16 @@ describe("AndroidAssertionValidation", async () => {
   const hardwareSignature = signer.sign(hardwareKeyPair.privateKey, "base64");
 
   it("should validate assertion signature", async () => {
-    const signatureValidated = await validateAssertionSignature(
+    const signatureValidated = validateAssertionSignature(
       hardwareKey,
       clientData,
       hardwareSignature
     );
 
-    expect(signatureValidated).toEqual(true);
+    await expect(signatureValidated).resolves.toEqual(true);
   });
 
-  it("should validate integrity response", async () => {
+  it("should validate integrity response", () => {
     const fakeTokenpayloadIntegrityResponse = {
       requestDetails: {
         requestPackageName: "com.ioreactnativeintegrityexample",
@@ -67,7 +67,7 @@ describe("AndroidAssertionValidation", async () => {
     expect(responseValidated).toEqual(true);
   });
 
-  it("should validate integrity response in development mode", async () => {
+  it("should validate integrity response in development mode", () => {
     const fakeTokenpayloadIntegrityResponse = {
       requestDetails: {
         requestPackageName: "com.ioreactnativeintegrityexample",

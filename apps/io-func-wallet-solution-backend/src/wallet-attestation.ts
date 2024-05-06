@@ -89,7 +89,7 @@ export const createWalletAttestation =
             algValueSupported: supportedSignAlgorithms,
           },
           WalletAttestationToJwtModel.encode,
-          signer.createJwtAndsign(
+          signer.createJwtAndSign(
             { typ: "wallet-attestation+jwt", x5c: [], trust_chain: trustChain },
             publicJwk.kid
           )

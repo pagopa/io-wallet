@@ -42,7 +42,7 @@ export class CryptoSigner implements Signer {
     );
 
   // TODO: [SIW-260] Make algorithm management separate and not hard-coded
-  createJwtAndsign =
+  createJwtAndSign =
     (
       header: JwtHeader,
       kid: string,

@@ -112,7 +112,7 @@ export const getEntityConfiguration =
             },
           },
           EntityConfigurationToJwtModel.encode,
-          signer.createJwtAndsign(
+          signer.createJwtAndSign(
             { typ: "entity-statement+jwt" },
             publicJwk.kid
           )
