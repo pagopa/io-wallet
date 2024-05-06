@@ -24,11 +24,6 @@ type WalletInstanceEnvironment = {
   walletInstanceRepository: WalletInstanceRepository;
 };
 
-type Dependencies = {
-  attestationServiceConfiguration: AttestationServiceConfiguration;
-  walletInstanceRepository: WalletInstanceRepository;
-};
-
 export type WalletInstance = {
   id: NonEmptyString;
   userId: User["id"];
