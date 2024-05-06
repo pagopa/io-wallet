@@ -13,6 +13,7 @@ import { logErrorAndReturnResponse } from "../utils";
 
 import { createWalletInstance } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
+import { User } from "@/user";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -23,12 +24,6 @@ const WalletInstanceRequestPayload = t.type({
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
-
-export const User = t.type({
-  id: NonEmptyString,
-});
-
-export type User = t.TypeOf<typeof User>;
 
 const requireUserId = (req: H.HttpRequest) =>
   pipe(
@@ -69,7 +64,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
       // da vedere sequenceS
-      userId: requireUser(req),
+      user: requireUser(req),
       walletInstanceRequest: requireWalletInstanceRequest(req),
     }),
     RTE.fromEither,

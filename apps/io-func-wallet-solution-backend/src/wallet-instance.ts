@@ -10,7 +10,7 @@ import {
   MobileAttestationService,
   ValidatedAttestation,
 } from "./infra/attestation-service";
-import { User } from "./infra/http/handlers/create-wallet-instance";
+import { User } from "./user";
 
 type AttestationService = {
   attestationServiceConfiguration: AttestationServiceConfiguration;
@@ -59,10 +59,10 @@ const validateAttestation: (
 
 export const createWalletInstance: (request: {
   walletInstanceRequest: WalletInstanceRequest;
-  userId: User;
+  user: User;
 }) => RTE.ReaderTaskEither<Dependencies, Error, void> = ({
   walletInstanceRequest,
-  userId,
+  user,
 }) =>
   pipe(
     walletInstanceRequest,
@@ -70,7 +70,7 @@ export const createWalletInstance: (request: {
     RTE.chainW(({ hardwareKey }) =>
       insertWalletInstance({
         id: walletInstanceRequest.hardwareKeyTag,
-        userId: userId.id,
+        userId: user.id,
         hardwareKey,
       })
     )
