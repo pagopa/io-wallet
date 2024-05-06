@@ -105,7 +105,7 @@ export class PdvTokenizerClient
       TE.tryCatch(
         async () => {
           const result = await this.getFiscalCode(this.#testUUID);
-          return result.status === 200 || result.status === 404;
+          return result.status === 200;
         },
         (error) => new Error(`error checking pdv tokenizer health: ${error}`)
       )
