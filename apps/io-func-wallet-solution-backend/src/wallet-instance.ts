@@ -35,14 +35,14 @@ export type WalletInstance = {
   hardwareKey: JWK;
 };
 
-const insertWalletInstance: (
+export const insertWalletInstance: (
   walletInstance: WalletInstance
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (walletInstance) =>
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
 
-const validateAttestation: (
+export const validateAttestation: (
   walletInstanceRequest: WalletInstanceRequest
 ) => RTE.ReaderTaskEither<AttestationService, Error, ValidatedAttestation> =
   (walletInstanceRequest) =>
@@ -57,21 +57,21 @@ const validateAttestation: (
         )
     );
 
-export const createWalletInstance: (request: {
-  walletInstanceRequest: WalletInstanceRequest;
-  user: User;
-}) => RTE.ReaderTaskEither<Dependencies, Error, void> = ({
-  walletInstanceRequest,
-  user,
-}) =>
-  pipe(
-    walletInstanceRequest,
-    validateAttestation,
-    RTE.chainW(({ hardwareKey }) =>
-      insertWalletInstance({
-        id: walletInstanceRequest.hardwareKeyTag,
-        userId: user.id,
-        hardwareKey,
-      })
-    )
-  );
+// export const createWalletInstance: (request: {
+//   walletInstanceRequest: WalletInstanceRequest;
+//   user: User;
+// }) => RTE.ReaderTaskEither<Dependencies, Error, void> = ({
+//   walletInstanceRequest,
+//   user,
+// }) =>
+//   pipe(
+//     walletInstanceRequest,
+//     validateAttestation,
+//     RTE.chainW(({ hardwareKey }) =>
+//       insertWalletInstance({
+//         id: walletInstanceRequest.hardwareKeyTag,
+//         userId: user.id,
+//         hardwareKey,
+//       })
+//     )
+//   );

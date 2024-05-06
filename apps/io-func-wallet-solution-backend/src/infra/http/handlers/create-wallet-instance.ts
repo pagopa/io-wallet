@@ -11,7 +11,7 @@ import { sequenceS } from "fp-ts/Apply";
 import { lookup } from "fp-ts/Record";
 import { logErrorAndReturnResponse } from "../utils";
 
-import { createWalletInstance } from "@/wallet-instance";
+import { insertWalletInstance, validateAttestation } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 import { User } from "@/user";
 
@@ -63,15 +63,40 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
-      user: requireUser(req),
       walletInstanceRequest: requireWalletInstanceRequest(req),
+      user: requireUser(req),
     }),
     RTE.fromEither,
-    RTE.chainFirst(({ walletInstanceRequest: { challenge } }) =>
-      consumeNonce(challenge)
+    RTE.chain(({ walletInstanceRequest, user }) =>
+      pipe(
+        consumeNonce(walletInstanceRequest.challenge),
+        RTE.chainW(() => validateAttestation(walletInstanceRequest)),
+        RTE.chainW(({ hardwareKey }) =>
+          insertWalletInstance({
+            id: walletInstanceRequest.hardwareKeyTag,
+            userId: user.id,
+            hardwareKey,
+          })
+        )
+      )
     ),
-    RTE.chainW(createWalletInstance),
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse)
   )
 );
+
+// export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
+//   pipe(
+//     sequenceS(E.Apply)({
+//       user: requireUser(req),
+//       walletInstanceRequest: requireWalletInstanceRequest(req),
+//     }),
+//     RTE.fromEither,
+//     RTE.chainFirst(({ walletInstanceRequest: { challenge } }) =>
+//       consumeNonce(challenge)
+//     ),
+//     RTE.chainW(createWalletInstance),
+//     RTE.map(() => H.empty),
+//     RTE.orElseW(logErrorAndReturnResponse)
+//   )
+// );
