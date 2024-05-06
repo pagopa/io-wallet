@@ -62,6 +62,7 @@ type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
 export const PdvTokenizerApiClientConfig = t.type({
   baseURL: t.string,
   apiKey: t.string,
+  testUUID: t.string,
 });
 
 export type PdvTokenizerApiClientConfig = t.TypeOf<
@@ -228,9 +229,13 @@ const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     pdvTokenizerApiBaseURL: readFromEnvironment("PdvTokenizerApiBaseURL"),
     pdvTokenizerApiKey: readFromEnvironment("PdvTokenizerApiKey"),
+    pdvTokenizerTestUUID: readFromEnvironment("PdvTokenizerTestUUID"),
   }),
-  RE.map(({ pdvTokenizerApiBaseURL, pdvTokenizerApiKey }) => ({
-    baseURL: pdvTokenizerApiBaseURL,
-    apiKey: pdvTokenizerApiKey,
-  }))
+  RE.map(
+    ({ pdvTokenizerApiBaseURL, pdvTokenizerApiKey, pdvTokenizerTestUUID }) => ({
+      baseURL: pdvTokenizerApiBaseURL,
+      apiKey: pdvTokenizerApiKey,
+      testUUID: pdvTokenizerTestUUID,
+    })
+  )
 );

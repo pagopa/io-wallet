@@ -1465,13 +1465,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^9.0.8":
-  version: 9.0.8
-  resolution: "@types/uuid@npm:9.0.8"
-  checksum: b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
-  languageName: node
-  linkType: hard
-
 "@types/yauzl@npm:^2.9.1":
   version: 2.10.3
   resolution: "@types/yauzl@npm:2.10.3"
@@ -4732,7 +4725,6 @@ __metadata:
     "@pagopa/ts-commons": ^12.0.0
     "@peculiar/asn1-android": ^2.3.10
     "@rushstack/eslint-patch": ^1.2.0
-    "@types/uuid": ^9.0.8
     "@vitest/coverage-c8": ^0.33.0
     asn1js: ^3.0.5
     azure-functions-core-tools: ^4.0.5611
@@ -4747,7 +4739,6 @@ __metadata:
     prettier: 2.7.1
     tsup: ^8.0.2
     typescript: ^5.4.5
-    uuid: ^9.0.1
     vitest: ^1.5.0
   languageName: unknown
   linkType: soft

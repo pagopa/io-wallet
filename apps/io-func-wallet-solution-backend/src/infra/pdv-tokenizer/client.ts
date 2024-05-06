@@ -3,7 +3,6 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { v4 as uuidv4 } from "uuid";
 import { PdvTokenizerHealthCheck } from "./health-check";
 import { UserIdRepository } from "@/user";
 import { PdvTokenizerApiClientConfig } from "@/app/config";
@@ -21,8 +20,9 @@ export class PdvTokenizerClient
 {
   #baseURL: string;
   #options: RequestInit;
+  #testUUID: string;
 
-  constructor({ baseURL, apiKey }: PdvTokenizerApiClientConfig) {
+  constructor({ baseURL, apiKey, testUUID }: PdvTokenizerApiClientConfig) {
     this.#baseURL = baseURL;
     this.#options = {
       headers: {
@@ -31,6 +31,7 @@ export class PdvTokenizerClient
         "Content-Type": "application/json",
       },
     };
+    this.#testUUID = testUUID;
   }
 
   getUserIdByFiscalCode = (fiscalCode: FiscalCode) =>
@@ -103,8 +104,7 @@ export class PdvTokenizerClient
     pipe(
       TE.tryCatch(
         async () => {
-          const uuid = uuidv4();
-          const result = await this.getFiscalCode(uuid);
+          const result = await this.getFiscalCode(this.#testUUID);
           return result.status === 200 || result.status === 404;
         },
         (error) => new Error(`error checking pdv tokenizer health: ${error}`)
