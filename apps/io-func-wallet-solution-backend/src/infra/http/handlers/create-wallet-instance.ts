@@ -63,7 +63,6 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
-      // da vedere sequenceS
       user: requireUser(req),
       walletInstanceRequest: requireWalletInstanceRequest(req),
     }),

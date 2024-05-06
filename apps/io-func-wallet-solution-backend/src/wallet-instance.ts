@@ -31,7 +31,7 @@ type Dependencies = {
 
 export type WalletInstance = {
   id: NonEmptyString;
-  userId: string; // User["id"] ?
+  userId: User["id"];
   hardwareKey: JWK;
 };
 
