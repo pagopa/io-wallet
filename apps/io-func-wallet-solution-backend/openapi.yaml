@@ -37,8 +37,8 @@ paths:
 
   /users:
     post:
-      operationId: getUserIdByFiscalCode
-      summary: Returns the user id given the fiscal code
+      operationId: getUserByFiscalCode
+      summary: Returns the user given the fiscal code
       requestBody:
         required: true
         content:
@@ -52,7 +52,7 @@ paths:
                 - fiscal_code
       responses:
         "200":
-          description: User id successfully retrieved
+          description: User successfully retrieved
           content:
             application/json:
               schema:

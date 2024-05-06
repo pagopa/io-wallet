@@ -9,20 +9,20 @@ export const User = t.type({
 
 export type User = t.TypeOf<typeof User>;
 
-export type UserIdRepository = {
+export type UserRepository = {
   getUserByFiscalCode: (fiscalCode: FiscalCode) => TE.TaskEither<Error, User>;
   getFiscalCodeByUserId: (
     id: string
   ) => TE.TaskEither<Error, { fiscalCode: FiscalCode }>;
 };
 
-export type UserIdEnvironment = {
-  userIdRepository: UserIdRepository;
+type UserEnvironment = {
+  userRepository: UserRepository;
 };
 
-export const getUserIdByFiscalCode: (
+export const getUserByFiscalCode: (
   fiscalCode: FiscalCode
-) => RTE.ReaderTaskEither<UserIdEnvironment, Error, { id: NonEmptyString }> =
+) => RTE.ReaderTaskEither<UserEnvironment, Error, User> =
   (fiscalCode) =>
-  ({ userIdRepository }) =>
-    userIdRepository.getUserByFiscalCode(fiscalCode);
+  ({ userRepository }) =>
+    userRepository.getUserByFiscalCode(fiscalCode);
