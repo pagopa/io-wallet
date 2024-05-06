@@ -20,7 +20,7 @@ export type WalletInstanceRepository = {
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
 };
 
-export type WalletInstanceEnvironment = {
+type WalletInstanceEnvironment = {
   walletInstanceRepository: WalletInstanceRepository;
 };
 
