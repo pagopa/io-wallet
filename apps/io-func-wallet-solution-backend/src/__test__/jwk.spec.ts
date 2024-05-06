@@ -33,19 +33,20 @@ const privateEcKey = {
   d: "vOTIOnH_rDol5cyaWL25DX4iGu_WU_l-AoTLmGIV_tg",
 };
 
-describe("JwkPublicKey", async () => {
+describe("JwkPublicKey", () => {
   it("should decode an ECKey with optional kid parameter", () => {
     const result = JwkPublicKey.decode({
       ...publicEcKey,
       kid: "KID#1",
     });
-    expect(E.isRight(result)).toBeTruthy();
-    if (E.isRight(result)) {
-      expect(result.right).toStrictEqual({
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
         ...publicEcKey,
         kid: "KID#1",
-      });
-    }
+      },
+    });
   });
 
   it("should decode an RSAKey with optional kid parameter", () => {
@@ -53,29 +54,31 @@ describe("JwkPublicKey", async () => {
       ...publicRsaKey,
       kid: "KID#1",
     });
-    expect(E.isRight(result)).toBeTruthy();
-    if (E.isRight(result)) {
-      expect(result.right).toStrictEqual({
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
         ...publicRsaKey,
         kid: "KID#1",
-      });
-    }
+      },
+    });
   });
 });
 
-describe("JwkPrivateKey", async () => {
+describe("JwkPrivateKey", () => {
   it("should decode an ECKey with optional kid parameter", () => {
     const result = JwkPrivateKey.decode({
       ...privateEcKey,
       kid: "KID#1",
     });
-    expect(E.isRight(result)).toBeTruthy();
-    if (E.isRight(result)) {
-      expect(result.right).toStrictEqual({
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
         ...privateEcKey,
         kid: "KID#1",
-      });
-    }
+      },
+    });
   });
 
   it("should decode an RSAKey with optional kid parameter", () => {
@@ -83,27 +86,28 @@ describe("JwkPrivateKey", async () => {
       ...privateRsaKey,
       kid: "KID#1",
     });
-    expect(E.isRight(result)).toBeTruthy();
-    if (E.isRight(result)) {
-      expect(result.right).toStrictEqual({
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
         ...privateRsaKey,
         kid: "KID#1",
-      });
-    }
+      },
+    });
   });
 });
 
-describe("fromBase64ToJwks", async () => {
+describe("fromBase64ToJwks", () => {
   const jwks = [privateRsaKey, privateEcKey];
 
   it("should return JWKs form base64 representation", () => {
     const stringJwks = JSON.stringify(jwks);
     const b64 = Buffer.from(stringJwks, "utf-8").toString("base64");
-
     const result = fromBase64ToJwks(b64);
-    expect(E.isRight(result)).toBeTruthy();
-    if (E.isRight(result)) {
-      expect(result.right).toStrictEqual(jwks);
-    }
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: jwks,
+    });
   });
 });

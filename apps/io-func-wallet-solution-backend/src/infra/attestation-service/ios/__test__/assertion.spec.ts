@@ -4,7 +4,7 @@ import { decode } from "cbor-x";
 import { iOSMockData } from "./config";
 import { verifyAssertion } from "../assertion";
 
-describe("iOSAssertionValidation", async () => {
+describe("iOSAssertionValidation", () => {
   const {
     challenge,
     assertion,
@@ -20,7 +20,7 @@ describe("iOSAssertionValidation", async () => {
   const clientData = JSON.stringify({ challenge, jwk: ephemeralKey });
 
   it("should return true", async () => {
-    const result = await verifyAssertion({
+    const result = verifyAssertion({
       decodedAssertion,
       clientData,
       hardwareKey,
@@ -29,6 +29,6 @@ describe("iOSAssertionValidation", async () => {
       signCount: 0,
     });
 
-    expect(result).toEqual(true);
+    await expect(result).resolves.toEqual(true);
   });
 });

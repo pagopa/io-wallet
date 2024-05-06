@@ -3,10 +3,10 @@ import { verifyAttestation } from "../attestation";
 
 import { androidMockData } from "./config";
 import { X509Certificate } from "crypto";
-import { ANDROID_CRL_URL, GOOGLE_PUBLIC_KEY } from "../../../../app/config";
 import { base64ToPem } from "..";
+import { ANDROID_CRL_URL, GOOGLE_PUBLIC_KEY } from "@/app/config";
 
-describe("AndroidAttestationValidation", async () => {
+describe("AndroidAttestationValidation", () => {
   const { hardwareKey, attestation } = androidMockData;
 
   const data = Buffer.from(attestation, "base64");
@@ -17,17 +17,17 @@ describe("AndroidAttestationValidation", async () => {
   );
 
   it("should return a validated attestation", async () => {
-    const result = await verifyAttestation({
+    const result = verifyAttestation({
       x509Chain,
       googlePublicKey: GOOGLE_PUBLIC_KEY,
       challenge: "randomvalue",
       bundleIdentifier: "com.ioreactnativeintegrityexample",
       androidCrlUrl: ANDROID_CRL_URL,
     });
-
     const expectedResult = {
       hardwareKey,
     };
-    expect(result).toEqual(expectedResult);
+
+    await expect(result).resolves.toEqual(expectedResult);
   });
 });

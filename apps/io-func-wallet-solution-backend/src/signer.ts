@@ -12,7 +12,7 @@ export type JwtHeader = {
 export type Signer = {
   getPublicKeys: () => E.Either<Error, JwkPublicKey[]>;
   getSupportedSignAlgorithms: () => E.Either<Error, string[]>;
-  createJwtAndsign: (
+  createJwtAndSign: (
     header: JwtHeader,
     kid: string,
     alg?: string,
