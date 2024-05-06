@@ -73,7 +73,7 @@ paths:
       summary: Create a wallet instance
       parameters:
         - in: header
-          name: x-iowallet-fiscal-code
+          name: x-iowallet-user-id
           required: true
           schema:
             type: string
