@@ -19,6 +19,8 @@ const toHttpError = (e: Error): Error => {
       return new H.HttpBadRequestError(e.message);
     case "TooManyRequestsError":
       return new H.HttpTooManyRequestsError(e.message);
+    case "HealthCheckError":
+      return new H.HttpError(e.message);
   }
   return e;
 };
