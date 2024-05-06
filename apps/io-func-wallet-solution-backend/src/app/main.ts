@@ -11,7 +11,7 @@ import { CryptoSigner } from "@/infra/crypto/signer";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
-import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-id-by-fiscal-code";
+import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";

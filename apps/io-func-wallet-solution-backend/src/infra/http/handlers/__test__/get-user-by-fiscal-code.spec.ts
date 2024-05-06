@@ -2,7 +2,7 @@ import { it, expect, describe } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as TE from "fp-ts/TaskEither";
-import { GetUserByFiscalCodeHandler } from "../get-user-id-by-fiscal-code";
+import { GetUserByFiscalCodeHandler } from "../get-user-by-fiscal-code";
 import { UserRepository } from "@/user";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
