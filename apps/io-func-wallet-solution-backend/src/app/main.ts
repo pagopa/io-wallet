@@ -44,7 +44,7 @@ app.http("healthCheck", {
 
 app.http("createWalletAttestation", {
   methods: ["POST"],
-  authLevel: "anonymous",
+  authLevel: "function",
   route: "token",
   handler: CreateWalletAttestationFunction({
     federationEntityMetadata: config.federationEntity,
@@ -54,7 +54,7 @@ app.http("createWalletAttestation", {
 
 app.http("createWalletInstance", {
   methods: ["POST"],
-  authLevel: "anonymous",
+  authLevel: "function",
   route: "wallet-instance",
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
@@ -74,14 +74,14 @@ app.http("getEntityConfiguration", {
 
 app.http("getNonce", {
   methods: ["GET"],
-  authLevel: "anonymous",
+  authLevel: "function",
   route: "nonce",
   handler: GetNonceFunction({ nonceRepository }),
 });
 
 app.http("getUserIdByFiscalCode", {
   methods: ["POST"],
-  authLevel: "anonymous",
+  authLevel: "function",
   route: "users",
   handler: GetUserIdByFiscalCodeFunction({
     userIdRepository: pdvTokenizerClient,
