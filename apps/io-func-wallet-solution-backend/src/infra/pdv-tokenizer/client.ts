@@ -4,7 +4,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { PdvTokenizerHealthCheck } from "./health-check";
-import { UserIdRepository } from "@/user";
+import { UserRepository } from "@/user";
 import { PdvTokenizerApiClientConfig } from "@/app/config";
 
 const Token = t.type({
@@ -16,7 +16,7 @@ const Pii = t.type({
 });
 
 export class PdvTokenizerClient
-  implements UserIdRepository, PdvTokenizerHealthCheck
+  implements UserRepository, PdvTokenizerHealthCheck
 {
   #baseURL: string;
   #options: RequestInit;
@@ -34,7 +34,7 @@ export class PdvTokenizerClient
     this.#testUUID = testUUID;
   }
 
-  getUserIdByFiscalCode = (fiscalCode: FiscalCode) =>
+  getUserByFiscalCode = (fiscalCode: FiscalCode) =>
     pipe(
       TE.tryCatch(
         async () => {

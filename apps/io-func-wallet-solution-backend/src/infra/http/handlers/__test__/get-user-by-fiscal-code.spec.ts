@@ -2,13 +2,13 @@ import { it, expect, describe } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as TE from "fp-ts/TaskEither";
-import { GetUserIdByFiscalCodeHandler } from "../get-user-id-by-fiscal-code";
-import { UserIdRepository } from "@/user";
+import { GetUserByFiscalCodeHandler } from "../get-user-by-fiscal-code";
+import { UserRepository } from "@/user";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
-describe("GetUserIdByFiscalCodeHandler", () => {
-  const userIdRepository: UserIdRepository = {
-    getUserIdByFiscalCode: () => TE.right({ id: "pdv_id" as NonEmptyString }),
+describe("GetUserByFiscalCodeHandler", () => {
+  const userRepository: UserRepository = {
+    getUserByFiscalCode: () => TE.right({ id: "pdv_id" as NonEmptyString }),
     getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
   };
 
@@ -20,14 +20,14 @@ describe("GetUserIdByFiscalCodeHandler", () => {
         fiscal_code: "GSPMTA98L25E625O",
       },
     };
-    const handler = GetUserIdByFiscalCodeHandler({
+    const handler = GetUserByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
       logger: {
         log: () => () => {},
         format: L.format.simple,
       },
-      userIdRepository,
+      userRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -50,14 +50,14 @@ describe("GetUserIdByFiscalCodeHandler", () => {
         foo: "GSPMTA98L25E625O",
       },
     };
-    const handler = GetUserIdByFiscalCodeHandler({
+    const handler = GetUserByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
       logger: {
         log: () => () => {},
         format: L.format.simple,
       },
-      userIdRepository,
+      userRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -71,9 +71,9 @@ describe("GetUserIdByFiscalCodeHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getUserIdByFiscalCode returns error", async () => {
-    const userIdRepositoryThatFailsOnGetUserIdByFiscalCode: UserIdRepository = {
-      getUserIdByFiscalCode: () =>
+  it("should return a 500 HTTP response when getUserByFiscalCode returns error", async () => {
+    const userRepositoryThatFailsOnGetUserByFiscalCode: UserRepository = {
+      getUserByFiscalCode: () =>
         TE.left(new Error("failed on getIdByFiscalCode!")),
       getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     };
@@ -84,14 +84,14 @@ describe("GetUserIdByFiscalCodeHandler", () => {
         fiscal_code: "GSPMTA98L25E625O",
       },
     };
-    const handler = GetUserIdByFiscalCodeHandler({
+    const handler = GetUserByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
       logger: {
         log: () => () => {},
         format: L.format.simple,
       },
-      userIdRepository: userIdRepositoryThatFailsOnGetUserIdByFiscalCode,
+      userRepository: userRepositoryThatFailsOnGetUserByFiscalCode,
     });
 
     await expect(handler()).resolves.toEqual({

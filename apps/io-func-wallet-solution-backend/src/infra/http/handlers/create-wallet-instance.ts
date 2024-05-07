@@ -1,17 +1,19 @@
 import * as t from "io-ts";
 
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 
 import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "fp-ts/lib/Either";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { sequenceS } from "fp-ts/lib/Apply";
+import { sequenceS } from "fp-ts/Apply";
+import { lookup } from "fp-ts/Record";
 import { logErrorAndReturnResponse } from "../utils";
 
-import { createWalletInstance } from "@/wallet-instance";
+import { insertWalletInstance, validateAttestation } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
+import { User } from "@/user";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -22,6 +24,28 @@ const WalletInstanceRequestPayload = t.type({
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
+
+const requireUserId = (req: H.HttpRequest) =>
+  pipe(
+    req.headers,
+    lookup("x-iowallet-user-id"),
+    E.fromOption(
+      () => new H.HttpBadRequestError("Missing x-iowallet-user-id in header")
+    ),
+    E.chainW(
+      H.parse(
+        User.props.id,
+        "The content of x-iowallet-user-id is not a valid id"
+      )
+    )
+  );
+
+const requireUser: (
+  req: H.HttpRequest
+) => E.Either<H.HttpBadRequestError | H.ValidationError, User> = flow(
+  requireUserId,
+  E.map((id) => ({ id }))
+);
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -38,11 +62,24 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    req,
-    requireWalletInstanceRequest,
+    sequenceS(E.Apply)({
+      walletInstanceRequest: requireWalletInstanceRequest(req),
+      user: requireUser(req),
+    }),
     RTE.fromEither,
-    RTE.chainFirst(({ challenge }) => consumeNonce(challenge)),
-    RTE.chainW(createWalletInstance),
+    RTE.chain(({ walletInstanceRequest, user }) =>
+      pipe(
+        consumeNonce(walletInstanceRequest.challenge),
+        RTE.chainW(() => validateAttestation(walletInstanceRequest)),
+        RTE.chainW(({ hardwareKey }) =>
+          insertWalletInstance({
+            id: walletInstanceRequest.hardwareKeyTag,
+            userId: user.id,
+            hardwareKey,
+          })
+        )
+      )
+    ),
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse)
   )
