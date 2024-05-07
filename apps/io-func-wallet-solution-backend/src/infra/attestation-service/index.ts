@@ -1,16 +1,17 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe, identity } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import * as E from "fp-ts/Either";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
 import * as J from "fp-ts/Json";
 import { sequenceS } from "fp-ts/lib/Apply";
 
-import { JWK } from "jose";
 import {
   AttestationService,
   ValidatedAttestation,
+  ValidateAssertionRequest,
 } from "../../attestation-service";
 import { AttestationServiceConfiguration } from "../../app/config";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
@@ -18,6 +19,7 @@ import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
+import { getWalletInstance } from "@/wallet-instance";
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -70,15 +72,16 @@ export class MobileAttestationService implements AttestationService {
       )
     );
 
-  validateAssertion = (
-    integrityAssertion: NonEmptyString,
-    hardwareSignature: NonEmptyString,
-    nonce: NonEmptyString,
-    jwk: JWK,
-    _hardwareKeyTag: NonEmptyString
-  ): TE.TaskEither<Error, boolean> =>
+  validateAssertion = ({
+    integrityAssertion,
+    hardwareSignature,
+    nonce,
+    jwk,
+    hardwareKeyTag,
+    userId,
+  }: ValidateAssertionRequest) =>
     pipe(
-      sequenceS(TE.ApplicativeSeq)({
+      sequenceS(RTE.ApplicativeSeq)({
         clientData: pipe(
           {
             challenge: nonce,
@@ -86,13 +89,11 @@ export class MobileAttestationService implements AttestationService {
           },
           J.stringify,
           E.mapLeft(() => new Error("Unable to create clientData")),
-          TE.fromEither
+          RTE.fromEither
         ),
-        // TODO: [SIW-969] Add getting the public hardware key from the DB with keyTag and the signCount
-        hardwareKey: TE.left(new Error("Not implemented")),
-        signCount: TE.left(new Error("Not implemented")),
+        walletInstance: getWalletInstance(hardwareKeyTag, userId),
       }),
-      TE.chain(({ clientData, hardwareKey, signCount }) =>
+      RTE.chainW(({ clientData, walletInstance: { hardwareKey, signCount } }) =>
         pipe(
           [
             validateiOSAssertion(
@@ -123,7 +124,8 @@ export class MobileAttestationService implements AttestationService {
               RA.head,
               E.fromOption(() => new Error("No assertion validation passed"))
             )
-          )
+          ),
+          RTE.fromTaskEither
         )
       )
     );
