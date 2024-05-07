@@ -1,6 +1,8 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/TaskEither";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import { JWK } from "jose";
+import { WalletInstanceEnvironment } from "./wallet-instance";
 
 export enum OperatingSystem {
   iOS = "Apple iOS",
@@ -11,6 +13,15 @@ export type ValidatedAttestation = {
   hardwareKey: JWK;
 };
 
+export type ValidateAssertionRequest = {
+  integrityAssertion: NonEmptyString;
+  hardwareSignature: NonEmptyString;
+  nonce: NonEmptyString;
+  jwk: JWK;
+  hardwareKeyTag: NonEmptyString;
+  userId: NonEmptyString;
+};
+
 export type AttestationService = {
   validateAttestation: (
     attestation: NonEmptyString,
@@ -18,10 +29,6 @@ export type AttestationService = {
     hardwareKeyTag: NonEmptyString
   ) => TE.TaskEither<Error, ValidatedAttestation>;
   validateAssertion: (
-    integrityAssertion: NonEmptyString,
-    hardwareSignature: NonEmptyString,
-    nonce: NonEmptyString,
-    jwk: JWK,
-    hardwareKeyTag: NonEmptyString
-  ) => TE.TaskEither<Error, boolean>;
+    request: ValidateAssertionRequest
+  ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, boolean>;
 };

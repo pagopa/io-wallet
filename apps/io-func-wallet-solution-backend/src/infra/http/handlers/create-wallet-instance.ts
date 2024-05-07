@@ -76,6 +76,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             id: walletInstanceRequest.hardwareKeyTag,
             userId: user.id,
             hardwareKey,
+            signCount: 0,
+            isRevoked: false,
           })
         )
       )
