@@ -11,9 +11,10 @@ import { CryptoSigner } from "@/infra/crypto/signer";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
-import { GetUserIdByFiscalCodeFunction } from "@/infra/azure/functions/get-user-id-by-fiscal-code";
+import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
+import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -34,6 +35,8 @@ const nonceRepository = new CosmosDbNonceRepository(database);
 const signer = new CryptoSigner(config.crypto);
 
 const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
+
+const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
 app.http("healthCheck", {
   methods: ["GET"],
@@ -59,6 +62,7 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
+    walletInstanceRepository,
   }),
 });
 
@@ -79,11 +83,11 @@ app.http("getNonce", {
   handler: GetNonceFunction({ nonceRepository }),
 });
 
-app.http("getUserIdByFiscalCode", {
+app.http("getUserByFiscalCode", {
   methods: ["POST"],
   authLevel: "function",
   route: "users",
-  handler: GetUserIdByFiscalCodeFunction({
-    userIdRepository: pdvTokenizerClient,
+  handler: GetUserByFiscalCodeFunction({
+    userRepository: pdvTokenizerClient,
   }),
 });
