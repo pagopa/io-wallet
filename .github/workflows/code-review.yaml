@@ -1,51 +1,15 @@
-# This workflow will perform the code review on each code change.
-# It uses "actions/cache" and turborepo in order to perform tasks only on changed files.
-
-name: "Code Review"
+name: Code Review
 
 on:
-  push:
-    branches: ["master"]
-    paths:
-      - apps/**
-      - packages/**
+  workflow_dispatch:
   pull_request:
     types: [opened, synchronize]
     paths:
       - apps/**
       - packages/**
-  workflow_dispatch: {}
 
 jobs:
-  code_review:
-    timeout-minutes: 5
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab #v3.5.2
-        with:
-          fetch-depth: 2
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: 18
-          cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Cache turbo build setup
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 #v3.3.1
-        with:
-          path: node_modules/.cache/turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
-      - name: "Build"
-        run: yarn run build
-
-      - name: "Code review"
-        run: yarn run code-review
+  js_code_review:
+    uses: pagopa/dx/.github/workflows/js_code_review.yaml@44d30b91731e81d3d5eb03937ee07358d8beb884
+    name: Code Review
+    secrets: inherit
