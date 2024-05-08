@@ -50,6 +50,9 @@ describe("CreateWalletAttestationHandler", async () => {
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
         assertion: walletAttestationRequest,
       },
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
     };
     const handler = CreateWalletAttestationHandler({
       input: req,
