@@ -2,32 +2,9 @@ import * as t from "io-ts";
 
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
-import { pipe } from "fp-ts/function";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { WalletInstanceRequest } from "./wallet-instance-request";
-import { AttestationServiceConfiguration } from "./app/config";
-import {
-  MobileAttestationService,
-  ValidatedAttestation,
-} from "./infra/attestation-service";
 import { User } from "./user";
-
-type AttestationService = {
-  attestationServiceConfiguration: AttestationServiceConfiguration;
-};
-
-export type WalletInstanceRepository = {
-  get: (
-    id: WalletInstance["id"],
-    userId: WalletInstance["userId"]
-  ) => TE.TaskEither<Error, WalletInstance>;
-  insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
-};
-
-export type WalletInstanceEnvironment = {
-  walletInstanceRepository: WalletInstanceRepository;
-};
 
 export const WalletInstance = t.type({
   id: NonEmptyString,
@@ -38,6 +15,18 @@ export const WalletInstance = t.type({
 });
 
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
+
+export type WalletInstanceRepository = {
+  get: (
+    id: WalletInstance["id"],
+    userId: WalletInstance["userId"]
+  ) => TE.TaskEither<Error, WalletInstance>;
+  insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
+};
+
+type WalletInstanceEnvironment = {
+  walletInstanceRepository: WalletInstanceRepository;
+};
 
 export const insertWalletInstance: (
   walletInstance: WalletInstance
@@ -53,18 +42,3 @@ export const getWalletInstance: (
   (id, userId) =>
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.get(id, userId);
-
-export const validateAttestation: (
-  walletInstanceRequest: WalletInstanceRequest
-) => RTE.ReaderTaskEither<AttestationService, Error, ValidatedAttestation> =
-  (walletInstanceRequest) =>
-  ({ attestationServiceConfiguration }) =>
-    pipe(
-      new MobileAttestationService(attestationServiceConfiguration),
-      (attestationService) =>
-        attestationService.validateAttestation(
-          walletInstanceRequest.keyAttestation,
-          walletInstanceRequest.challenge,
-          walletInstanceRequest.hardwareKeyTag
-        )
-    );

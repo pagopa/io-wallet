@@ -1,7 +1,6 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe, identity } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
-import * as RTE from "fp-ts/ReaderTaskEither";
 import * as E from "fp-ts/Either";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
@@ -19,7 +18,6 @@ import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
-import { getWalletInstance } from "@/wallet-instance";
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -72,16 +70,17 @@ export class MobileAttestationService implements AttestationService {
       )
     );
 
+  // TODO: the calling function will get (hardwareKey, signCount) from WalletInstanceEnvironment
   validateAssertion = ({
     integrityAssertion,
     hardwareSignature,
     nonce,
     jwk,
-    hardwareKeyTag,
-    userId,
+    hardwareKey,
+    signCount,
   }: ValidateAssertionRequest) =>
     pipe(
-      sequenceS(RTE.ApplicativeSeq)({
+      sequenceS(TE.ApplicativeSeq)({
         clientData: pipe(
           {
             challenge: nonce,
@@ -89,11 +88,10 @@ export class MobileAttestationService implements AttestationService {
           },
           J.stringify,
           E.mapLeft(() => new Error("Unable to create clientData")),
-          RTE.fromEither
+          TE.fromEither
         ),
-        walletInstance: getWalletInstance(hardwareKeyTag, userId),
       }),
-      RTE.chainW(({ clientData, walletInstance: { hardwareKey, signCount } }) =>
+      TE.chain(({ clientData }) =>
         pipe(
           [
             validateiOSAssertion(
@@ -124,8 +122,7 @@ export class MobileAttestationService implements AttestationService {
               RA.head,
               E.fromOption(() => new Error("No assertion validation passed"))
             )
-          ),
-          RTE.fromTaskEither
+          )
         )
       )
     );

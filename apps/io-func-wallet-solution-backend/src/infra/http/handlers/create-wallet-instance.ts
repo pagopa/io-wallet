@@ -11,9 +11,10 @@ import { sequenceS } from "fp-ts/Apply";
 import { lookup } from "fp-ts/Record";
 import { logErrorAndReturnResponse } from "../utils";
 
-import { insertWalletInstance, validateAttestation } from "@/wallet-instance";
+import { insertWalletInstance } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 import { User } from "@/user";
+import { validateAttestation } from "@/attestation-service";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
