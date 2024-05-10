@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 
+import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 
@@ -35,10 +36,17 @@ export const insertWalletInstance: (
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
 
-export const getWalletInstance: (
+export const getValidWalletInstance: (
   id: WalletInstance["id"],
   userId: WalletInstance["userId"]
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
   (id, userId) =>
   ({ walletInstanceRepository }) =>
-    walletInstanceRepository.get(id, userId);
+    pipe(
+      walletInstanceRepository.get(id, userId),
+      TE.chain((walletInstance) =>
+        walletInstance.isRevoked
+          ? TE.left(new Error("The wallet instance has been revoked"))
+          : TE.right(walletInstance)
+      )
+    );
