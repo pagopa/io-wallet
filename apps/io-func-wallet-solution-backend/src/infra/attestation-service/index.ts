@@ -70,7 +70,7 @@ export class MobileAttestationService implements AttestationService {
       )
     );
 
-  // TODO: the calling function will get (hardwareKey, signCount) from WalletInstanceEnvironment
+  // TODO: [SIW-970] The calling function will get (hardwareKey, signCount) from WalletInstanceEnvironment
   validateAssertion = ({
     integrityAssertion,
     hardwareSignature,
