@@ -30,6 +30,7 @@ describe("CreateWalletInstanceHandler", () => {
 
   const walletInstanceRepository: WalletInstanceRepository = {
     insert: () => TE.right(undefined),
+    get: () => TE.left(new Error("not implemented")),
   };
 
   const logger = {
@@ -201,6 +202,7 @@ describe("CreateWalletInstanceHandler", () => {
     const walletInstanceRepositoryThatFailsOnInsert: WalletInstanceRepository =
       {
         insert: () => TE.left(new Error("failed on insert!")),
+        get: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
