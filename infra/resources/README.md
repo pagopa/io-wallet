@@ -1,3 +1,28 @@
 # Wallet Provider Cloud Architecture
 
 ![alt text](https://www.plantuml.com/plantuml/png/bPJVRzis4CVVzLVSZ3ueG1m_37qnXg1kd7J6riImj-HbG70YpmfXcIJ8amLtwFy-af8gDSwmDK0aa_VvtW_UKHyye-FwK6K_AIsgMXByWbzgHxD5VDwOmy7ewpFZ4XaBzEHxp1-CNnRdO71WQwOPLjL_UjcGLFu6nGkTeriIjLDyQidVwFI8TSNNS0P-Heqb7KXpxzIRsWdwv4nj_Hk29ogw8fRtRvYNT7omNO8BQoiba9NHA-rL-S9lERmdRepRArscgi-1BHk79PrPIPQdMNnyjykrHUb-deck5UUM0p8vXTNClXXDpwYbCqg-HUwCvYasvCs1fkzddjoHtFy0wq3wwopBAjeni04NYmUf78bu6bbsjtZ_lBtTFDvkSg4kONBZI9Bca1MilA_9JIx6ZBE1sL1rKhg4DJe-TVO_0x3DOxoBB7jdQWvbKpvPOsdMYyabsF33uWNydG6yYxDpXu8udwmUu0chYZWmqXnGwPO1w7kR2wb3q2PHqx08v2I-BWRihjQfddodqTg1tYLurraXs0RLCFsvB4O1qcQKTUQFWsGOu7n_72Jx9kB11CasvhVaZahGhPRMACqv3SbTANFLdigLukZ0jonG1u_zVAnCqOrVJiBp4DmpiXBX5LqK0GFVSj-bKHUQEFUQnafDRTnaZAFVIyxlN-xAGUZAA7CT06KaalHh-EylN5Tvhan1WKPhfmMAFMavQPVGrPkKen5hA7OZpWKLhsrMncDVa_D6OmNnEpGwyy-BFsutgyNlp-jV7-vldnVtoyt3Qfc7MCe4MKWALW-9VFrL-8HC3PuYMZPTjcMxbx8TIEYt1pVd7vSSLLIfQNltNxjG7JRuMDvlSwbzu5uFnS3SAKUn0VakPlYqk4kZtMqEsADoN6FLVSpoOzlo-1fbSsmX6Fh-DOj_koRsVpgzXdGIMRpFtzRAPCxsTY7r7Dfv0ElCKSb0acR59n16xrHPkrHj9jIFQrAqfDarGS9qsUkKzenQ43WInic1_37lPPCqSJYp-6XZwM39qZEjPJ7_bx3-BwrDM8xW_N4ENfKQkNO4UphvB6JKLHwlR32dgmhznV4WKBoCVQ2Q0sgiJX5ZXu4PEx5pg9Hdqi0ces-jaDhFWK-MOD6VIhpQhJ4sFcke01XAd0_bn9Hg3wXba1vDEw2ZZAmCPR7ParPV2D8uA9bz82thG_KF)
+
+
+## Usage
+
+The infrastructure uses Terraform's HCL language. See `.terraform-version` for the right version to use. Optionally use [tfenv](https://github.com/tfutils/tfenv) to sync the correct Terraform version
+
+### tfenv setup
+
+Set the terraform version with tfenv, before launch pre-commit to avoid errors
+
+```bash
+tfenv use <x.y.x>
+```
+
+### Terraform commands
+```
+# first use
+terraform init
+
+# when adding/editing/removing a reference to a module
+terraform init --upgrade
+
+# to apply changes
+terraform apply
+```
