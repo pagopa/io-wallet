@@ -7,10 +7,10 @@ import * as T from "fp-ts/Task";
 import * as J from "fp-ts/Json";
 import { sequenceS } from "fp-ts/lib/Apply";
 
-import { JWK } from "jose";
 import {
   AttestationService,
   ValidatedAttestation,
+  ValidateAssertionRequest,
 } from "../../attestation-service";
 import { AttestationServiceConfiguration } from "../../app/config";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
@@ -70,13 +70,15 @@ export class MobileAttestationService implements AttestationService {
       )
     );
 
-  validateAssertion = (
-    integrityAssertion: NonEmptyString,
-    hardwareSignature: NonEmptyString,
-    nonce: NonEmptyString,
-    jwk: JWK,
-    _hardwareKeyTag: NonEmptyString
-  ): TE.TaskEither<Error, boolean> =>
+  // TODO: [SIW-970] The calling function will get (hardwareKey, signCount) from WalletInstanceEnvironment
+  validateAssertion = ({
+    integrityAssertion,
+    hardwareSignature,
+    nonce,
+    jwk,
+    hardwareKey,
+    signCount,
+  }: ValidateAssertionRequest) =>
     pipe(
       sequenceS(TE.ApplicativeSeq)({
         clientData: pipe(
@@ -88,11 +90,8 @@ export class MobileAttestationService implements AttestationService {
           E.mapLeft(() => new Error("Unable to create clientData")),
           TE.fromEither
         ),
-        // TODO: [SIW-969] Add getting the public hardware key from the DB with keyTag and the signCount
-        hardwareKey: TE.left(new Error("Not implemented")),
-        signCount: TE.left(new Error("Not implemented")),
       }),
-      TE.chain(({ clientData, hardwareKey, signCount }) =>
+      TE.chain(({ clientData }) =>
         pipe(
           [
             validateiOSAssertion(

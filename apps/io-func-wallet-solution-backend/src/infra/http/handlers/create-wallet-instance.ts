@@ -12,8 +12,10 @@ import { sequenceS } from "fp-ts/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 
 import { requireUser } from "./utils";
-import { insertWalletInstance, validateAttestation } from "@/wallet-instance";
+import { insertWalletInstance } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
+import { User } from "@/user";
+import { validateAttestation } from "@/attestation-service";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -54,6 +56,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             id: walletInstanceRequest.hardwareKeyTag,
             userId: user.id,
             hardwareKey,
+            signCount: 0,
+            isRevoked: false,
           })
         )
       )
