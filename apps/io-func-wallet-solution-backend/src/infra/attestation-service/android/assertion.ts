@@ -93,8 +93,6 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   if (!responseValidated) {
     throw new Error("Integrity Response did not pass validation");
   }
-
-  return true;
 };
 
 export const validateAssertionSignature = async (

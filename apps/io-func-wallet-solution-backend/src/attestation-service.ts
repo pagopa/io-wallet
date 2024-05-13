@@ -35,7 +35,7 @@ export type AttestationService = {
   ) => TE.TaskEither<Error, ValidatedAttestation>;
   validateAssertion: (
     request: ValidateAssertionRequest
-  ) => TE.TaskEither<Error, boolean>;
+  ) => TE.TaskEither<Error, void>;
 };
 
 export const validateAttestation: (
@@ -64,7 +64,7 @@ export const validateAssertion: (
 ) => RTE.ReaderTaskEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
-  boolean
+  void
 > =
   (walletAttestationRequest, hardwareKey: JwkPublicKey, signCount: number) =>
   ({ attestationServiceConfiguration }) =>

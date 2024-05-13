@@ -64,6 +64,4 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   if (nextSignCount <= signCount) {
     throw new Error("invalid signCount");
   }
-
-  return true;
 };

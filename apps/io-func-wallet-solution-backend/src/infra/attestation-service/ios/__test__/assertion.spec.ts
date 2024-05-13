@@ -29,6 +29,6 @@ describe("iOSAssertionValidation", () => {
       signCount: 0,
     });
 
-    await expect(result).resolves.toEqual(true);
+    await expect(result).resolves.empty;
   });
 });
