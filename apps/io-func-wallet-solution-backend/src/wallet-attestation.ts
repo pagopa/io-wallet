@@ -1,5 +1,6 @@
 import * as t from "io-ts";
 
+import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
@@ -12,7 +13,7 @@ import {
 } from "./entity-configuration";
 import { verifyWalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
-import { JwkPublicKey } from "./jwk";
+import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
 import { EidasTrustAnchor } from "./infra/trust-anchor";
 
@@ -39,7 +40,7 @@ const composeTrustChain = ({
     TE.map(({ encoded }) => encoded)
   );
 
-  const walletProviderEntityConfiguration = getEntityConfiguration()({
+  const walletProviderEntityConfiguration = getEntityConfiguration({
     federationEntityMetadata,
     signer,
   });
@@ -61,7 +62,11 @@ export const createWalletAttestation =
     pipe(
       sequenceS(TE.ApplicativePar)({
         request: pipe(walletAttestationRequest, verifyWalletAttestationRequest),
-        publicJwk: pipe(signer.getFirstPublicKeyByKty("EC"), TE.fromEither),
+        publicJwk: pipe(
+          signer.getFirstPublicKeyByKty("EC"),
+          E.chainW(validateJwkKid),
+          TE.fromEither
+        ),
         supportedSignAlgorithms: pipe(
           signer.getSupportedSignAlgorithms(),
           TE.fromEither

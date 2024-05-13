@@ -4,12 +4,12 @@ import { pipe } from "fp-ts/function";
 import { decode } from "cbor-x";
 import * as t from "io-ts";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { JWK } from "jose";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { validate } from "../../../validation";
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";
 import { verifyAssertion } from "./assertion";
+import { JwkPublicKey } from "@/jwk";
 
 const buffer = new t.Type<Buffer, Buffer, unknown>(
   "buffer",
@@ -48,18 +48,28 @@ export const validateiOSAttestation = (
     E.chainW(validate(iOsAttestation, "iOS attestation format is invalid")),
     TE.fromEither,
     TE.chain((decodedAttestation) =>
-      TE.tryCatch(
-        () =>
-          verifyAttestation({
-            decodedAttestation,
-            challenge,
-            keyId,
-            bundleIdentifier,
-            teamIdentifier,
-            allowDevelopmentEnvironment,
-            appleRootCertificate,
-          }),
-        E.toError
+      pipe(
+        TE.tryCatch(
+          () =>
+            verifyAttestation({
+              decodedAttestation,
+              challenge,
+              keyId,
+              bundleIdentifier,
+              teamIdentifier,
+              allowDevelopmentEnvironment,
+              appleRootCertificate,
+            }),
+          E.toError
+        ),
+        TE.chainW(({ hardwareKey }) =>
+          pipe(
+            hardwareKey,
+            validate(JwkPublicKey, "Invalid JWK Public Key"),
+            E.map((hardwareKey) => ({ hardwareKey })),
+            TE.fromEither
+          )
+        )
       )
     )
   );
@@ -76,7 +86,7 @@ export const validateiOSAssertion = (
   integrityAssertion: NonEmptyString,
   hardwareSignature: NonEmptyString,
   clientData: string,
-  hardwareKey: JWK,
+  hardwareKey: JwkPublicKey,
   signCount: number,
   bundleIdentifier: string,
   teamIdentifier: string
