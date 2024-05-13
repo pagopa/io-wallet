@@ -1,4 +1,5 @@
 import { it, expect, describe } from "vitest";
+import * as E from "fp-ts/lib/Either";
 import { androidMockData } from "./config";
 import {
   validateAssertionSignature,
@@ -7,6 +8,7 @@ import {
 import { generateKeyPairSync, createSign, createHash } from "crypto";
 import { exportJWK } from "jose";
 import { playintegrity_v1 } from "googleapis";
+import { ECKey } from "@/jwk";
 
 describe("AndroidAssertionValidation", async () => {
   const { challenge, bundleIdentifier, ephemeralKey } = androidMockData;
@@ -25,13 +27,19 @@ describe("AndroidAssertionValidation", async () => {
   const hardwareSignature = signer.sign(hardwareKeyPair.privateKey, "base64");
 
   it("should validate assertion signature", async () => {
-    const signatureValidated = validateAssertionSignature(
-      hardwareKey,
-      clientData,
-      hardwareSignature
-    );
+    const ecKeyDecoded = ECKey.decode(hardwareKey);
 
-    await expect(signatureValidated).resolves.toEqual(true);
+    expect.assertions(1);
+
+    if (E.isRight(ecKeyDecoded)) {
+      const signatureValidated = validateAssertionSignature(
+        ecKeyDecoded.right,
+        clientData,
+        hardwareSignature
+      );
+
+      await expect(signatureValidated).resolves.toEqual(true);
+    }
   });
 
   it("should validate integrity response", () => {

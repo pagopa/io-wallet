@@ -2,7 +2,8 @@ import { createHash, createVerify } from "crypto";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 import { google, playintegrity_v1 } from "googleapis";
-import { JWK, exportSPKI, importJWK } from "jose";
+import { exportSPKI, importJWK } from "jose";
+import { JwkPublicKey } from "@/jwk";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
@@ -26,7 +27,7 @@ export type VerifyAssertionParams = {
   integrityAssertion: NonEmptyString;
   hardwareSignature: string;
   clientData: string;
-  hardwareKey: JWK;
+  hardwareKey: JwkPublicKey;
   bundleIdentifier: string;
   androidPlayStoreCertificateHash: string;
   googleAppCredentials: GoogleAppCredentials;
@@ -98,7 +99,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
 };
 
 export const validateAssertionSignature = async (
-  hardwareKey: JWK,
+  hardwareKey: JwkPublicKey,
   clientData: string,
   hardwareSignature: string
 ) => {
