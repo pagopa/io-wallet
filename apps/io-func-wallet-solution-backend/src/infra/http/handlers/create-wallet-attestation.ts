@@ -5,13 +5,18 @@ import { pipe } from "fp-ts/function";
 import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "fp-ts/lib/Either";
+import * as TE from "fp-ts/lib/TaskEither";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
-import { createWalletAttestation } from "../../../wallet-attestation";
 import { GRANT_TYPE_KEY_ATTESTATION } from "../../../wallet-provider";
 import { createdEntityStatementJwt, requireUser } from "./utils";
+import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
+import { consumeNonce } from "@/wallet-instance-request";
+import { createWalletAttestation } from "@/wallet-attestation";
+import { getValidWalletInstance } from "@/wallet-instance";
+import { validateAssertion } from "@/attestation-service";
 
 const WalletAttestationRequestPayload = t.type({
   grant_type: t.literal(GRANT_TYPE_KEY_ATTESTATION),
@@ -36,13 +41,36 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
 
 export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(E.Apply)({
-      walletAttestationRequest: requireWalletAttestationRequest(req),
-      user: requireUser(req),
+    sequenceS(TE.ApplicativePar)({
+      walletAttestationRequest: pipe(
+        req,
+        requireWalletAttestationRequest,
+        TE.fromEither,
+        TE.chain((payload) =>
+          pipe(payload.assertion, verifyWalletAttestationRequest)
+        )
+      ),
+      user: pipe(req, requireUser, TE.fromEither),
     }),
-    RTE.fromEither,
-    RTE.chain(({ walletAttestationRequest }) =>
-      pipe(walletAttestationRequest.assertion, createWalletAttestation)
+    RTE.fromTaskEither,
+    RTE.chain(({ walletAttestationRequest, user }) =>
+      pipe(
+        consumeNonce(walletAttestationRequest.payload.challenge),
+        RTE.chainW(() =>
+          getValidWalletInstance(
+            walletAttestationRequest.payload.hardware_key_tag,
+            user.id
+          )
+        ),
+        RTE.chainW((walletInstance) =>
+          validateAssertion(
+            walletAttestationRequest,
+            walletInstance.hardwareKey,
+            walletInstance.signCount
+          )
+        ),
+        RTE.chainW(() => createWalletAttestation(walletAttestationRequest))
+      )
     ),
     RTE.map(createdEntityStatementJwt),
     RTE.orElseW(logErrorAndReturnResponse)

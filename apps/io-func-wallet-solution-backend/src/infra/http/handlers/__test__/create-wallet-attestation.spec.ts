@@ -11,6 +11,18 @@ import {
 } from "./trust-anchor";
 import { privateEcKey, publicEcKey, signer } from "./keys";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
+import { NonceRepository } from "@/nonce";
+import * as TE from "fp-ts/TaskEither";
+import {
+  ANDROID_CRL_URL,
+  ANDROID_PLAY_INTEGRITY_URL,
+  APPLE_APP_ATTESTATION_ROOT_CA,
+  GOOGLE_PUBLIC_KEY,
+} from "@/app/config";
+import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { WalletInstanceRepository } from "@/wallet-instance";
+
+const { challenge, assertion, hardwareKey, keyId, ephemeralKey } = iOSMockData;
 
 beforeAll(() => {
   trustAnchorServerMock.listen(trustAnchorPort);
@@ -20,15 +32,40 @@ afterAll(() => {
   trustAnchorServerMock.close();
 });
 
+const nonceRepository: NonceRepository = {
+  insert: () => TE.left(new Error("not implemented")),
+  delete: () => TE.right(void 0),
+};
+
+const attestationServiceConfiguration = {
+  iOsBundleIdentifier:
+    "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  iOsTeamIdentifier: "M2X5YQ4BJ7",
+  androidBundleIdentifier:
+    "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  androidPlayStoreCertificateHash: "",
+  appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
+  allowDevelopmentEnvironment: true,
+  googlePublicKey: GOOGLE_PUBLIC_KEY,
+  androidCrlUrl: ANDROID_CRL_URL,
+  androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
+  googleAppCredentialsEncoded: "",
+};
+
+const walletInstanceRepository: WalletInstanceRepository = {
+  insert: () => TE.right(undefined),
+  get: () => TE.left(new Error("not implemented")),
+};
+
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
     iss: "demokey",
-    aud: "https://wallet-provider.example.org/",
-    challenge: "...",
+    sub: "https://wallet-provider.example.org/",
+    challenge,
     hardware_signature: "...",
-    integrity_assertion: "...",
-    hardware_key_tag: "...",
+    integrity_assertion: assertion,
+    hardware_key_tag: keyId,
     cnf: {
       jwk: publicEcKey,
     },
@@ -63,10 +100,12 @@ describe("CreateWalletAttestationHandler", async () => {
       },
       federationEntityMetadata,
       signer,
+      nonceRepository,
+      attestationServiceConfiguration,
+      walletInstanceRepository,
     });
 
     const result = await handler();
-
     expect.assertions(3);
     expect(result).toEqual({
       _tag: "Right",

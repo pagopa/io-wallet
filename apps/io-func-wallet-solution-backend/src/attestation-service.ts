@@ -6,6 +6,8 @@ import { JWK } from "jose";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
+import { WalletAttestationRequest } from "./wallet-attestation-request";
+import { JwkPublicKey } from "./jwk";
 
 export enum OperatingSystem {
   iOS = "Apple iOS",
@@ -53,4 +55,30 @@ export const validateAttestation: (
           walletInstanceRequest.challenge,
           walletInstanceRequest.hardwareKeyTag
         )
+    );
+
+export const validateAssertion: (
+  walletAttestationRequest: WalletAttestationRequest,
+  hardwareKey: JwkPublicKey,
+  signCount: number
+) => RTE.ReaderTaskEither<
+  { attestationServiceConfiguration: AttestationServiceConfiguration },
+  Error,
+  boolean
+> =
+  (walletAttestationRequest, hardwareKey: JwkPublicKey, signCount: number) =>
+  ({ attestationServiceConfiguration }) =>
+    pipe(
+      new MobileAttestationService(attestationServiceConfiguration),
+      (attestationService) =>
+        attestationService.validateAssertion({
+          integrityAssertion:
+            walletAttestationRequest.payload.integrity_assertion,
+          hardwareSignature:
+            walletAttestationRequest.payload.hardware_signature,
+          nonce: walletAttestationRequest.payload.challenge,
+          jwk: walletAttestationRequest.payload.cnf.jwk,
+          hardwareKey,
+          signCount,
+        })
     );

@@ -14,7 +14,7 @@ import { logErrorAndReturnResponse } from "../utils";
 import { requireUser } from "./utils";
 import { insertWalletInstance } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
-import { User } from "@/user";
+
 import { validateAttestation } from "@/attestation-service";
 
 const WalletInstanceRequestPayload = t.type({
