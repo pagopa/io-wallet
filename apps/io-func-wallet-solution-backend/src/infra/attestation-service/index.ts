@@ -7,6 +7,8 @@ import * as T from "fp-ts/Task";
 import * as J from "fp-ts/Json";
 import { sequenceS } from "fp-ts/lib/Apply";
 
+import { ValidationError } from "@pagopa/handler-kit";
+import { Separated } from "fp-ts/lib/Separated";
 import {
   AttestationService,
   ValidatedAttestation,
@@ -18,6 +20,18 @@ import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
+
+const separatedValidationToEither = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validated: Separated<ReadonlyArray<Error>, ReadonlyArray<any>>
+) =>
+  pipe(
+    validated.right,
+    RA.head,
+    E.fromOption(
+      () => new ValidationError(validated.left.map((el) => el.message))
+    )
+  );
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -59,20 +73,7 @@ export class MobileAttestationService implements AttestationService {
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map((validated) =>
-            pipe(
-              validated.right,
-              RA.head,
-              E.fromOption(
-                () =>
-                  new Error(
-                    `No attestation validation passed:\n${validated.left
-                      .map((el) => el.message)
-                      .join("\n")}`
-                  )
-              )
-            )
-          )
+          T.map(separatedValidationToEither)
         )
       )
     );
@@ -93,7 +94,7 @@ export class MobileAttestationService implements AttestationService {
             jwk,
           },
           J.stringify,
-          E.mapLeft(() => new Error("Unable to create clientData")),
+          E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
           TE.fromEither
         ),
       }),
@@ -122,20 +123,7 @@ export class MobileAttestationService implements AttestationService {
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map((validated) =>
-            pipe(
-              validated.right,
-              RA.head,
-              E.fromOption(
-                () =>
-                  new Error(
-                    `No assertion validation passed:\n${validated.left
-                      .map((el) => el.message)
-                      .join("\n")}`
-                  )
-              )
-            )
-          )
+          T.map(separatedValidationToEither)
         )
       )
     );
