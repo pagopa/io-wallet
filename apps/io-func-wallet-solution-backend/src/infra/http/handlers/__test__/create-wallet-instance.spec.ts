@@ -31,6 +31,8 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     insert: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
+    batchPatch: () => TE.right(undefined),
+    getAllByUserId: () => TE.right([]),
   };
 
   const logger = {
@@ -204,6 +206,8 @@ describe("CreateWalletInstanceHandler", () => {
       {
         insert: () => TE.left(new Error("failed on insert!")),
         get: () => TE.left(new Error("not implemented")),
+        batchPatch: () => TE.left(new Error("not implemented")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -220,6 +224,79 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 500,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response on getAllByUserId error", async () => {
+    const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
+      {
+        insert: () => TE.left(new Error("not implemented")),
+        get: () => TE.left(new Error("not implemented")),
+        batchPatch: () => TE.left(new Error("not implemented")),
+        getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
+      };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: walletInstanceRequest,
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
+    };
+    const handler = CreateWalletInstanceHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      attestationServiceConfiguration,
+      nonceRepository,
+      walletInstanceRepository:
+        walletInstanceRepositoryThatFailsOnGetAllByUserId,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 500,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response on batchPatch error", async () => {
+    const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
+      {
+        insert: () => TE.left(new Error("not implemented")),
+        get: () => TE.left(new Error("not implemented")),
+        batchPatch: () => TE.left(new Error("failed on batchPatch!")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
+      };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: walletInstanceRequest,
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
+    };
+    const handler = CreateWalletInstanceHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      attestationServiceConfiguration,
+      nonceRepository,
+      walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
     await expect(handler()).resolves.toEqual({
