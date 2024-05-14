@@ -24,6 +24,18 @@ export type WalletInstanceRepository = {
     userId: WalletInstance["userId"]
   ) => TE.TaskEither<Error, WalletInstance>;
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
+  batchPatch: (
+    operations: {
+      id: string;
+      path: string;
+      value: unknown;
+      op: "add" | "replace" | "remove" | "set" | "incr";
+    }[],
+    userId: string
+  ) => TE.TaskEither<Error, void>;
+  getAllByUserId: (
+    userId: WalletInstance["userId"]
+  ) => TE.TaskEither<Error, WalletInstance[]>;
 };
 
 type WalletInstanceEnvironment = {
@@ -49,5 +61,25 @@ export const getValidWalletInstance: (
         walletInstance.isRevoked
           ? TE.left(new Error("The wallet instance has been revoked"))
           : TE.right(walletInstance)
+      )
+    );
+
+export const revokeAllWalletInstancesByUserId: (
+  userId: WalletInstance["userId"]
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
+  (userId) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      walletInstanceRepository.getAllByUserId(userId),
+      TE.chain((walletInstances) =>
+        walletInstanceRepository.batchPatch(
+          walletInstances.map((item) => ({
+            id: item.id,
+            path: "/isRevoked",
+            value: true,
+            op: "replace",
+          })),
+          userId
+        )
       )
     );
