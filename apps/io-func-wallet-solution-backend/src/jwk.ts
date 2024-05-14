@@ -4,15 +4,20 @@ import { pipe } from "fp-ts/function";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
+import * as H from "@pagopa/handler-kit";
 import { validate } from "./validation";
 
-export const ECKey = t.type({
-  crv: t.string,
-  kty: t.literal("EC"),
-  x: t.string,
-  y: t.string,
-  kid: t.string,
-});
+export const ECKey = t.intersection([
+  t.type({
+    crv: t.string,
+    kty: t.literal("EC"),
+    x: t.string,
+    y: t.string,
+  }),
+  t.partial({
+    kid: t.string,
+  }),
+]);
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
@@ -30,10 +35,10 @@ export const RSAKey = t.intersection([
     e: t.string,
     kty: t.literal("RSA"),
     n: t.string,
-    kid: t.string,
   }),
   t.partial({
     alg: t.string,
+    kid: t.string,
   }),
 ]);
 
@@ -94,4 +99,19 @@ export const getKeyByKid = (kid: string) => (jwks: JwkPublicKey[]) =>
   pipe(
     jwks,
     A.findFirst((key) => key.kid === kid)
+  );
+
+export const validateJwkKid: (
+  jwk: JwkPublicKey
+) => E.Either<
+  H.ValidationError,
+  Required<Pick<JwkPublicKey, "kid">> & JwkPublicKey
+> = (jwk) =>
+  pipe(
+    jwk.kid,
+    validate(t.string, "JWK Public Key kid is undefined"),
+    E.map((kid) => ({
+      ...jwk,
+      kid,
+    }))
   );

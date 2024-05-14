@@ -6,11 +6,11 @@ import * as J from "fp-ts/Json";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { JWK } from "jose";
 import { ValidatedAttestation } from "../../attestation-service";
 import { validate } from "../../../validation";
 import { verifyAttestation } from "./attestation";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
+import { JwkPublicKey } from "@/jwk";
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -38,16 +38,26 @@ export const validateAndroidAttestation = (
     RA.sequence(E.Applicative),
     TE.fromEither,
     TE.chain((x509Chain) =>
-      TE.tryCatch(
-        () =>
-          verifyAttestation({
-            x509Chain,
-            googlePublicKey,
-            challenge: nonce,
-            bundleIdentifier,
-            androidCrlUrl,
-          }),
-        E.toError
+      pipe(
+        TE.tryCatch(
+          () =>
+            verifyAttestation({
+              x509Chain,
+              googlePublicKey,
+              challenge: nonce,
+              bundleIdentifier,
+              androidCrlUrl,
+            }),
+          E.toError
+        ),
+        TE.chainW(({ hardwareKey }) =>
+          pipe(
+            hardwareKey,
+            validate(JwkPublicKey, "Invalid JWK Public Key"),
+            E.map((hardwareKey) => ({ hardwareKey })),
+            TE.fromEither
+          )
+        )
       )
     )
   );
@@ -56,7 +66,7 @@ export const validateAndroidAssertion = (
   integrityAssertion: NonEmptyString,
   hardwareSignature: NonEmptyString,
   clientData: string,
-  hardwareKey: JWK,
+  hardwareKey: JwkPublicKey,
   bundleIdentifier: string,
   androidPlayStoreCertificateHash: string,
   googleAppCredentialsEncoded: string,

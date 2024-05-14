@@ -6,11 +6,12 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { User } from "./user";
+import { JwkPublicKey } from "./jwk";
 
 export const WalletInstance = t.type({
   id: NonEmptyString,
   userId: User.props.id,
-  hardwareKey: t.record(t.string, t.unknown),
+  hardwareKey: JwkPublicKey,
   signCount: t.number,
   isRevoked: t.boolean,
 });

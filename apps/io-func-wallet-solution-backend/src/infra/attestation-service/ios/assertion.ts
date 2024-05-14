@@ -1,13 +1,14 @@
 import { createHash, createVerify } from "crypto";
-import { JWK, exportSPKI, importJWK } from "jose";
+import { exportSPKI, importJWK } from "jose";
 import { iOsAssertion } from ".";
+import { JwkPublicKey } from "@/jwk";
 
 export type VerifyAssertionParams = {
   decodedAssertion: iOsAssertion;
   clientData: string;
   bundleIdentifier: string;
   teamIdentifier: string;
-  hardwareKey: JWK;
+  hardwareKey: JwkPublicKey;
   signCount: number;
 };
 
