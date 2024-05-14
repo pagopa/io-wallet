@@ -108,7 +108,8 @@ export class MobileAttestationService implements AttestationService {
               hardwareKey,
               signCount,
               this.#configuration.iOsBundleIdentifier,
-              this.#configuration.iOsTeamIdentifier
+              this.#configuration.iOsTeamIdentifier,
+              this.#configuration.skipSignatureValidation
             ),
             validateAndroidAssertion(
               integrityAssertion,

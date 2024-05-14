@@ -10,6 +10,7 @@ export type VerifyAssertionParams = {
   teamIdentifier: string;
   hardwareKey: JwkPublicKey;
   signCount: number;
+  skipSignatureValidation: boolean;
 };
 
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
@@ -20,6 +21,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     bundleIdentifier,
     teamIdentifier,
     signCount,
+    skipSignatureValidation,
   } = params;
 
   // 1. The input buffer is already decoded so it is used directly here.
@@ -46,7 +48,10 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   // 4. Verify the signature using the public key and nonce.
   const verifier = createVerify("SHA256");
   verifier.update(nonce);
-  if (!verifier.verify(publicHardwareKeyPem, signature)) {
+  if (
+    !skipSignatureValidation &&
+    !verifier.verify(publicHardwareKeyPem, signature)
+  ) {
     throw new Error("[iOS Assertion] invalid signature");
   }
 

@@ -44,6 +44,7 @@ export const AttestationServiceConfiguration = t.type({
   allowDevelopmentEnvironment: t.boolean,
   googleAppCredentialsEncoded: t.string,
   androidPlayIntegrityUrl: t.string,
+  skipSignatureValidation: t.boolean,
 });
 
 export type AttestationServiceConfiguration = t.TypeOf<
@@ -187,7 +188,9 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("AllowDevelopmentEnvironment"),
       RE.map(
         (devAllowedString) =>
-          devAllowedString === "true" || devAllowedString === "1"
+          devAllowedString === "true" ||
+          devAllowedString === "1" ||
+          devAllowedString === "yes"
       ),
       RE.orElse(() => RE.right(false))
     ),
@@ -200,6 +203,16 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     ),
     androidPlayStoreCertificateHash: readFromEnvironment(
       "AndroidPlayStoreCertificateHash"
+    ),
+    skipSignatureValidation: pipe(
+      readFromEnvironment("SkipSignatureValidation"),
+      RE.map(
+        (skipSignatureValidationString) =>
+          skipSignatureValidationString === "true" ||
+          skipSignatureValidationString === "1" ||
+          skipSignatureValidationString === "yes"
+      ),
+      RE.orElse(() => RE.right(false))
     ),
   })
 );

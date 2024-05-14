@@ -94,7 +94,8 @@ export const validateiOSAssertion = (
   hardwareKey: JwkPublicKey,
   signCount: number,
   bundleIdentifier: string,
-  teamIdentifier: string
+  teamIdentifier: string,
+  skipSignatureValidation: boolean
 ) =>
   pipe(
     sequenceS(E.Applicative)({
@@ -121,6 +122,7 @@ export const validateiOSAssertion = (
             teamIdentifier,
             hardwareKey,
             signCount,
+            skipSignatureValidation,
           }),
         E.toError
       )

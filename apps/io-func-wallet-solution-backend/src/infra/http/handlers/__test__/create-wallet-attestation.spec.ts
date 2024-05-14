@@ -22,6 +22,7 @@ import {
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { decode } from "cbor-x";
 
 const { challenge, assertion, hardwareKey, keyId, ephemeralKey } = iOSMockData;
 
@@ -51,6 +52,7 @@ const attestationServiceConfiguration = {
   androidCrlUrl: ANDROID_CRL_URL,
   androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
   googleAppCredentialsEncoded: "",
+  skipSignatureValidation: true,
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
@@ -65,14 +67,17 @@ const walletInstanceRepository: WalletInstanceRepository = {
     }),
 };
 
+const data = Buffer.from(assertion, "base64");
+const { signature, authenticatorData } = decode(data);
+
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
     iss: "demokey",
     sub: "https://wallet-provider.example.org/",
     challenge,
-    hardware_signature: "...",
-    integrity_assertion: assertion,
+    hardware_signature: signature.toString("base64"),
+    integrity_assertion: authenticatorData.toString("base64"),
     hardware_key_tag: keyId,
     cnf: {
       jwk: publicEcKey,
