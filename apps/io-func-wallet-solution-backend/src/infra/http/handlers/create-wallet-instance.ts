@@ -12,7 +12,10 @@ import { sequenceS } from "fp-ts/Apply";
 import { logErrorAndReturnResponse } from "../utils";
 
 import { requireUser } from "./utils";
-import { insertWalletInstance } from "@/wallet-instance";
+import {
+  insertWalletInstance,
+  revokeAllWalletInstancesByUserId,
+} from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 
 import { validateAttestation } from "@/attestation-service";
@@ -51,6 +54,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
+        RTE.chainFirstW(() => revokeAllWalletInstancesByUserId(user.id)),
         RTE.chainW(({ hardwareKey }) =>
           insertWalletInstance({
             id: walletInstanceRequest.hardwareKeyTag,
