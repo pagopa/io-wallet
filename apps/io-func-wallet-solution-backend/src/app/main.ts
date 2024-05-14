@@ -52,6 +52,9 @@ app.http("createWalletAttestation", {
   handler: CreateWalletAttestationFunction({
     federationEntityMetadata: config.federationEntity,
     signer,
+    nonceRepository,
+    walletInstanceRepository,
+    attestationServiceConfiguration: config.attestationService,
   }),
 });
 

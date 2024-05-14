@@ -51,6 +51,7 @@ describe("CreateWalletInstanceHandler", () => {
     androidCrlUrl: ANDROID_CRL_URL,
     androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
     googleAppCredentialsEncoded: "",
+    skipSignatureValidation: false,
   };
 
   it("should return a 204 HTTP response on success", async () => {

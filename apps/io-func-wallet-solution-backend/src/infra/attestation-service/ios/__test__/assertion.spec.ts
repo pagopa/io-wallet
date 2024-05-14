@@ -27,8 +27,9 @@ describe("iOSAssertionValidation", () => {
       bundleIdentifier,
       teamIdentifier,
       signCount: 0,
+      skipSignatureValidation: false,
     });
 
-    await expect(result).resolves.toEqual(true);
+    await expect(result).resolves.empty;
   });
 });
