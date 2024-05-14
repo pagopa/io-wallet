@@ -61,7 +61,7 @@ app.http("createWalletAttestation", {
 app.http("createWalletInstance", {
   methods: ["POST"],
   authLevel: "function",
-  route: "wallet-instance",
+  route: "wallet-instances",
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
