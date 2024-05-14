@@ -65,7 +65,7 @@ export const validateAssertion: (
   Error,
   void
 > =
-  (walletAttestationRequest, hardwareKey: JwkPublicKey, signCount: number) =>
+  (walletAttestationRequest, hardwareKey, signCount) =>
   ({ attestationServiceConfiguration }) =>
     pipe(
       new MobileAttestationService(attestationServiceConfiguration),

@@ -21,7 +21,7 @@ import {
   validateAndroidAttestation,
 } from "./android";
 
-const separatedValidationToEither = (
+const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validated: Separated<ReadonlyArray<Error>, ReadonlyArray<any>>
 ) =>
@@ -73,7 +73,7 @@ export class MobileAttestationService implements AttestationService {
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map(separatedValidationToEither)
+          T.map(getErrorsOrFirstValidValue)
         )
       )
     );
@@ -124,7 +124,7 @@ export class MobileAttestationService implements AttestationService {
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map(separatedValidationToEither)
+          T.map(getErrorsOrFirstValidValue)
         )
       )
     );
