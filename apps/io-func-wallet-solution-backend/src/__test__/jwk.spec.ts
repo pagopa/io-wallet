@@ -1,7 +1,11 @@
 import { it, expect, describe } from "vitest";
-import * as E from "fp-ts/lib/Either";
 
-import { JwkPrivateKey, JwkPublicKey, fromBase64ToJwks } from "../jwk";
+import {
+  JwkPrivateKey,
+  JwkPublicKey,
+  fromBase64ToJwks,
+  validateJwkKid,
+} from "../jwk";
 
 const publicRsaKey = {
   kty: "RSA",
@@ -21,7 +25,7 @@ const privateRsaKey = {
 };
 
 const publicEcKey = {
-  kty: "EC",
+  kty: "EC" as const,
   x: "CakCjesDBwXeReRwLRzmhg6UwOKfM0NZpHYHjC0iucU",
   y: "a5cs0ywZzV6MGeBR8eIHyrs8KoAqv0DuW6qqSkZFCMM",
   crv: "P-256",
@@ -108,6 +112,24 @@ describe("fromBase64ToJwks", () => {
     expect(result).toEqual({
       _tag: "Right",
       right: jwks,
+    });
+  });
+});
+
+describe("validateJwkKid", () => {
+  it("should return JWK when kid is a string", () => {
+    const result = validateJwkKid(publicEcKey);
+    expect(result).toEqual({
+      _tag: "Right",
+      right: publicEcKey,
+    });
+  });
+
+  it("should return a error when kid is undefined", () => {
+    const result = validateJwkKid({ ...publicEcKey, kid: undefined });
+    expect(result).toEqual({
+      _tag: "Left",
+      left: expect.any(Error),
     });
   });
 });

@@ -1,4 +1,4 @@
-import { JWK } from "jose";
+import { JwkPublicKey } from "@/jwk";
 
 const challenge = "586e95ef-43a0-43f6-982d-0aeab3611bd9";
 const attestation =
@@ -9,7 +9,7 @@ const bundleIdentifier =
   "org.reactjs.native.example.IoReactNativeIntegrityExample";
 const teamIdentifier = "M2X5YQ4BJ7";
 
-const hardwareKey: JWK = {
+const hardwareKey: JwkPublicKey = {
   crv: "P-256",
   kty: "EC",
   x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
