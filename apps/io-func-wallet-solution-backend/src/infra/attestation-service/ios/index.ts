@@ -62,11 +62,11 @@ export const validateiOSAttestation = (
             }),
           E.toError
         ),
-        TE.chainW(({ hardwareKey }) =>
+        TE.chainW((result) =>
           pipe(
-            hardwareKey,
+            result.hardwareKey,
             validate(JwkPublicKey, "Invalid JWK Public Key"),
-            E.map((hardwareKey) => ({ hardwareKey })),
+            E.map((hardwareKey) => ({ ...result, hardwareKey })),
             TE.fromEither
           )
         )
