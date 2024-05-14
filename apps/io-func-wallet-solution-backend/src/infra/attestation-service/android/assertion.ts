@@ -58,7 +58,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   if (!signatureValidated) {
-    throw new Error("Invalid hardware signature");
+    throw new Error("[Android Assertion] Invalid hardware signature");
   }
 
   // Then verify the integrity token
@@ -80,7 +80,9 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const tokenPayloadExternal = result.data.tokenPayloadExternal;
 
   if (!tokenPayloadExternal) {
-    throw new Error("Invalid token payload from Play Integrity API response");
+    throw new Error(
+      "[Android Assertion] Invalid token payload from Play Integrity API response"
+    );
   }
 
   const responseValidated = validateIntegrityResponse(
@@ -92,7 +94,9 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   if (!responseValidated) {
-    throw new Error("Integrity Response did not pass validation");
+    throw new Error(
+      "[Android Assertion] Integrity Response did not pass validation"
+    );
   }
 };
 
@@ -103,7 +107,7 @@ export const validateAssertionSignature = async (
 ) => {
   const joseHardwareKey = await importJWK(hardwareKey);
   if (!("type" in joseHardwareKey)) {
-    throw new Error("Invalid Hardware Key format");
+    throw new Error("[Android Assertion] Invalid Hardware Key format");
   }
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
 
@@ -130,7 +134,7 @@ export const validateIntegrityResponse = (
   const requestDetails = integrityResponse.requestDetails;
 
   if (!requestDetails) {
-    throw new Error("Invalid requestDetails");
+    throw new Error("[Android Assertion] Invalid requestDetails");
   }
 
   if (requestDetails.requestPackageName !== bundleIdentifier) {
@@ -148,14 +152,14 @@ export const validateIntegrityResponse = (
   }
 
   if (!requestDetails.timestampMillis) {
-    throw new Error("Invalid timestamp");
+    throw new Error("[Android Assertion] Invalid timestamp");
   }
 
   const tsMills = parseInt(requestDetails.timestampMillis, 10);
   const tsMillsDiff = new Date().getTime() - new Date(tsMills).getTime();
 
   if (tsMillsDiff > ALLOWED_WINDOW_MILLIS) {
-    throw new Error("It's been too long since the request");
+    throw new Error("[Android Assertion] It's been too long since the request");
   }
 
   /**
@@ -165,7 +169,7 @@ export const validateIntegrityResponse = (
 
   const appIntegrity = integrityResponse.appIntegrity;
   if (!appIntegrity) {
-    throw new Error(`Invalid App Integrity field.`);
+    throw new Error(`[Android Assertion] Invalid App Integrity field.`);
   }
 
   if (
@@ -185,7 +189,7 @@ export const validateIntegrityResponse = (
 
   const certificateSha256Digest = appIntegrity.certificateSha256Digest;
   if (!certificateSha256Digest) {
-    throw new Error(`Certificate digest not present`);
+    throw new Error(`[Android Assertion] Certificate digest not present`);
   }
 
   if (
@@ -205,16 +209,16 @@ export const validateIntegrityResponse = (
 
   const deviceIntegrity = integrityResponse.deviceIntegrity;
   if (!deviceIntegrity) {
-    throw new Error(`Invalid Device Integrity field.`);
+    throw new Error(`[Android Assertion] Invalid Device Integrity field.`);
   }
 
   const deviceRecognitionVerdict = deviceIntegrity.deviceRecognitionVerdict;
   if (!deviceRecognitionVerdict || deviceRecognitionVerdict.length <= 0) {
-    throw new Error(`Invalid Device Recognition Verdict.`);
+    throw new Error(`[Android Assertion] Invalid Device Recognition Verdict.`);
   }
 
   if (deviceRecognitionVerdict.indexOf("MEETS_DEVICE_INTEGRITY") === -1) {
-    throw new Error("Device no meets integrity check");
+    throw new Error("[Android Assertion] Device no meets integrity check");
   }
 
   /**
@@ -222,14 +226,16 @@ export const validateIntegrityResponse = (
    */
   const accountDetails = integrityResponse.accountDetails;
   if (!accountDetails) {
-    throw new Error(`Invalid Account Details field.`);
+    throw new Error(`[Android Assertion] Invalid Account Details field.`);
   }
 
   if (
     !allowDevelopmentEnvironment &&
     accountDetails.appLicensingVerdict !== "LICENSED"
   ) {
-    throw new Error(`The user doesn't have an app entitlement.`);
+    throw new Error(
+      `[Android Assertion] The user doesn't have an app entitlement.`
+    );
   }
 
   return true;

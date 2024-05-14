@@ -63,7 +63,14 @@ export class MobileAttestationService implements AttestationService {
             pipe(
               validated.right,
               RA.head,
-              E.fromOption(() => new Error("No attestation validation passed"))
+              E.fromOption(
+                () =>
+                  new Error(
+                    `No attestation validation passed:\n${validated.left
+                      .map((el) => el.message)
+                      .join("\n")}`
+                  )
+              )
             )
           )
         )
@@ -119,7 +126,14 @@ export class MobileAttestationService implements AttestationService {
             pipe(
               validated.right,
               RA.head,
-              E.fromOption(() => new Error("No assertion validation passed"))
+              E.fromOption(
+                () =>
+                  new Error(
+                    `No assertion validation passed:\n${validated.left
+                      .map((el) => el.message)
+                      .join("\n")}`
+                  )
+              )
             )
           )
         )

@@ -21,6 +21,7 @@ import {
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
 const { challenge, assertion, hardwareKey, keyId, ephemeralKey } = iOSMockData;
 
@@ -53,8 +54,15 @@ const attestationServiceConfiguration = {
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
-  insert: () => TE.right(undefined),
-  get: () => TE.left(new Error("not implemented")),
+  insert: () => TE.left(new Error("not implemented")),
+  get: () =>
+    TE.right({
+      id: "123" as NonEmptyString,
+      userId: "123" as NonEmptyString,
+      hardwareKey,
+      signCount: 0,
+      isRevoked: false,
+    }),
 };
 
 describe("CreateWalletAttestationHandler", async () => {
