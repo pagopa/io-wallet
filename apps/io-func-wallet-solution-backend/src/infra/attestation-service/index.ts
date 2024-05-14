@@ -7,6 +7,8 @@ import * as T from "fp-ts/Task";
 import * as J from "fp-ts/Json";
 import { sequenceS } from "fp-ts/lib/Apply";
 
+import { ValidationError } from "@pagopa/handler-kit";
+import { Separated } from "fp-ts/lib/Separated";
 import {
   AttestationService,
   ValidatedAttestation,
@@ -18,6 +20,18 @@ import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
+
+const getErrorsOrFirstValidValue = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  validated: Separated<ReadonlyArray<Error>, ReadonlyArray<any>>
+) =>
+  pipe(
+    validated.right,
+    RA.head,
+    E.fromOption(
+      () => new ValidationError(validated.left.map((el) => el.message))
+    )
+  );
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -59,18 +73,11 @@ export class MobileAttestationService implements AttestationService {
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map((validated) =>
-            pipe(
-              validated.right,
-              RA.head,
-              E.fromOption(() => new Error("No attestation validation passed"))
-            )
-          )
+          T.map(getErrorsOrFirstValidValue)
         )
       )
     );
 
-  // TODO: [SIW-970] The calling function will get (hardwareKey, signCount) from WalletInstanceEnvironment
   validateAssertion = ({
     integrityAssertion,
     hardwareSignature,
@@ -87,7 +94,7 @@ export class MobileAttestationService implements AttestationService {
             jwk,
           },
           J.stringify,
-          E.mapLeft(() => new Error("Unable to create clientData")),
+          E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
           TE.fromEither
         ),
       }),
@@ -101,7 +108,8 @@ export class MobileAttestationService implements AttestationService {
               hardwareKey,
               signCount,
               this.#configuration.iOsBundleIdentifier,
-              this.#configuration.iOsTeamIdentifier
+              this.#configuration.iOsTeamIdentifier,
+              this.#configuration.skipSignatureValidation
             ),
             validateAndroidAssertion(
               integrityAssertion,
@@ -116,13 +124,7 @@ export class MobileAttestationService implements AttestationService {
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map((validated) =>
-            pipe(
-              validated.right,
-              RA.head,
-              E.fromOption(() => new Error("No assertion validation passed"))
-            )
-          )
+          T.map(getErrorsOrFirstValidValue)
         )
       )
     );

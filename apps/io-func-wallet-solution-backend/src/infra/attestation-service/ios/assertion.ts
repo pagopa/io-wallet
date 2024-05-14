@@ -10,6 +10,7 @@ export type VerifyAssertionParams = {
   teamIdentifier: string;
   hardwareKey: JwkPublicKey;
   signCount: number;
+  skipSignatureValidation: boolean;
 };
 
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
@@ -20,6 +21,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     bundleIdentifier,
     teamIdentifier,
     signCount,
+    skipSignatureValidation,
   } = params;
 
   // 1. The input buffer is already decoded so it is used directly here.
@@ -29,7 +31,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const joseHardwareKey = await importJWK(hardwareKey);
 
   if (!("type" in joseHardwareKey)) {
-    throw new Error("Invalid Hardware Key format");
+    throw new Error("[iOS Assertion] Invalid Hardware Key format");
   }
 
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
@@ -46,8 +48,11 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   // 4. Verify the signature using the public key and nonce.
   const verifier = createVerify("SHA256");
   verifier.update(nonce);
-  if (!verifier.verify(publicHardwareKeyPem, signature)) {
-    throw new Error("invalid signature");
+  if (
+    !skipSignatureValidation &&
+    !verifier.verify(publicHardwareKeyPem, signature)
+  ) {
+    throw new Error("[iOS Assertion] invalid signature");
   }
 
   // 5. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
@@ -57,14 +62,12 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const rpiIdHash = authenticatorData.subarray(0, 32).toString("base64");
 
   if (appIdHash !== rpiIdHash) {
-    throw new Error("appId does not match");
+    throw new Error("[iOS Assertion] appId does not match");
   }
 
   // 6. Verify that the authenticator data’s counter field is larger than the stored signCount.
   const nextSignCount = authenticatorData.subarray(33, 37).readInt32BE();
   if (nextSignCount <= signCount) {
-    throw new Error("invalid signCount");
+    throw new Error("[iOS Assertion] invalid signCount");
   }
-
-  return true;
 };

@@ -36,7 +36,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const { x509Chain, googlePublicKey, androidCrlUrl } = params;
 
   if (x509Chain.length <= 0) {
-    throw new Error("No certificates provided");
+    throw new Error("[Android Attestation] No certificates provided");
   }
 
   validateIssuance(x509Chain, googlePublicKey);
@@ -69,7 +69,7 @@ export const validateIssuance = (
     (c) => new Date(c.validFrom) < now && now < new Date(c.validTo)
   );
   if (!datesValid) {
-    throw new Error("Certificates expired");
+    throw new Error("[Android Attestation] Certificates expired");
   }
 
   // Check that each certificate, except for the last, is issued by the subsequent one.
@@ -83,7 +83,7 @@ export const validateIssuance = (
           subject.checkIssued(issuer) === false ||
           subject.verify(issuer.publicKey) === false
         ) {
-          throw new Error("Certificate chain is invalid");
+          throw new Error("[Android Attestation] Certificate chain is invalid");
         }
       }
     });
@@ -93,7 +93,7 @@ export const validateIssuance = (
   const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
   if (!rootCert || !rootCert.verify(publicKey)) {
     throw new Error(
-      "Root certificate is not signed by Google Hardware Attestation Root CA"
+      "[Android Attestation] Root certificate is not signed by Google Hardware Attestation Root CA"
     );
   }
 };
@@ -110,12 +110,12 @@ export const validateRevocation = async (
 ) => {
   const res = await fetch(androidCrlUrl, { method: "GET" });
   if (!res.ok) {
-    throw new Error("Failed to fetch CRL");
+    throw new Error("[Android Attestation] Failed to fetch CRL");
   }
   const crl = (await res.json()) as CRL; // Add type assertion for crl
   const isRevoked = x509Chain.some((cert) => cert.serialNumber in crl.entries);
   if (isRevoked) {
-    throw new Error("Certificate is revoked");
+    throw new Error("[Android Attestation] Certificate is revoked");
   }
   return x509Chain;
 };
@@ -149,7 +149,7 @@ const validateKeyAttestationExtension = (
     return certWithExtension;
   }
 
-  throw new Error("No key attestation extension found");
+  throw new Error("[Android Attestation] No key attestation extension found");
 };
 
 const extractExtension = (certificate: X509Certificate, oid: string) => {
@@ -174,7 +174,9 @@ const validateExtension = (
 
   const extension = extractExtension(certWithExtension, KEY_OID);
   if (!extension) {
-    throw new Error("Unable to extract extension from certificate");
+    throw new Error(
+      "[Android Attestation] Unable to extract extension from certificate"
+    );
   }
 
   const extensionBerEncoded = extension.extnValue.getValue();
@@ -196,13 +198,13 @@ const validateExtension = (
    */
   if (keyDescription.attestationSecurityLevel <= 0) {
     throw new Error(
-      `Attestation security level too low: ${keyDescription.attestationSecurityLevel}.`
+      `[Android Attestation] Attestation security level too low: ${keyDescription.attestationSecurityLevel}.`
     );
   }
 
   if (keyDescription.keymasterSecurityLevel <= 0) {
     throw new Error(
-      `Key master security level too low: ${keyDescription.keymasterSecurityLevel}.`
+      `[Android Attestation] Key master security level too low: ${keyDescription.keymasterSecurityLevel}.`
     );
   }
 
@@ -213,7 +215,7 @@ const validateExtension = (
 
   if (receivedChallenge !== challenge) {
     throw new Error(
-      "The received challenge does not match the one contained in the certificate."
+      "[Android Attestation] The received challenge does not match the one contained in the certificate."
     );
   }
 
@@ -225,7 +227,7 @@ const validateExtension = (
 
   if (!softwareEnforced || !softwareEnforced.attestationApplicationId) {
     throw new Error(
-      `Unable to found attestationApplicationId in key attestation.`
+      `[Android Attestation] Unable to found attestationApplicationId in key attestation.`
     );
   }
 
@@ -240,7 +242,9 @@ const validateExtension = (
   );
 
   if (!packageInfo) {
-    throw new Error(`Unable to found packageInfo in key attestation.`);
+    throw new Error(
+      `[Android Attestation] Unable to found packageInfo in key attestation.`
+    );
   }
 
   const packageName = Buffer.from(
@@ -249,7 +253,7 @@ const validateExtension = (
 
   if (packageName !== bundleIdentifier) {
     throw new Error(
-      `The bundle identifier ${packageName} does not match ${bundleIdentifier}.`
+      `[Android Attestation] The bundle identifier ${packageName} does not match ${bundleIdentifier}.`
     );
   }
 
@@ -258,14 +262,16 @@ const validateExtension = (
     (el) => el.rootOfTrust
   );
   if (!teeEnforcedWithRoT || !teeEnforcedWithRoT.rootOfTrust) {
-    throw new Error(`Unable to found a Root Of Trust in teeEnforced data.`);
+    throw new Error(
+      `[Android Attestation] Unable to found a Root Of Trust in teeEnforced data.`
+    );
   }
 
   const rootOfTrust = teeEnforcedWithRoT.rootOfTrust;
 
   // Check if bootloader in locked
   if (!rootOfTrust.deviceLocked) {
-    throw new Error(`BootLoader unlocked!`);
+    throw new Error(`[Android Attestation] BootLoader unlocked!`);
   }
 
   /*
@@ -281,7 +287,7 @@ const validateExtension = (
    */
   if (rootOfTrust.verifiedBootState !== 0) {
     throw new Error(
-      `VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`
+      `[Android Attestation] VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`
     );
   }
 };

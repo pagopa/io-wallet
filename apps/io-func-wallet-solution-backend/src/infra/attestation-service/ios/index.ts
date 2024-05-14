@@ -43,9 +43,14 @@ export const validateiOSAttestation = (
   pipe(
     E.tryCatch(
       () => decode(data),
-      () => new Error(`Unable to decode data`)
+      () => new Error(`[iOS Attestation] Unable to decode data`)
     ),
-    E.chainW(validate(iOsAttestation, "iOS attestation format is invalid")),
+    E.chainW(
+      validate(
+        iOsAttestation,
+        "[iOS Attestation] attestation format is invalid"
+      )
+    ),
     TE.fromEither,
     TE.chain((decodedAttestation) =>
       pipe(
@@ -89,7 +94,8 @@ export const validateiOSAssertion = (
   hardwareKey: JwkPublicKey,
   signCount: number,
   bundleIdentifier: string,
-  teamIdentifier: string
+  teamIdentifier: string,
+  skipSignatureValidation: boolean
 ) =>
   pipe(
     sequenceS(E.Applicative)({
@@ -102,7 +108,9 @@ export const validateiOSAssertion = (
         E.toError
       ),
     }),
-    E.chainW(validate(iOsAssertion, "iOS assertion format is invalid")),
+    E.chainW(
+      validate(iOsAssertion, "[iOS Assertion] assertion format is invalid")
+    ),
     TE.fromEither,
     TE.chain((decodedAssertion) =>
       TE.tryCatch(
@@ -114,6 +122,7 @@ export const validateiOSAssertion = (
             teamIdentifier,
             hardwareKey,
             signCount,
+            skipSignatureValidation,
           }),
         E.toError
       )

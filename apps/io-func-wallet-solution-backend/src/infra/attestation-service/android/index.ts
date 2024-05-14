@@ -31,7 +31,8 @@ export const validateAndroidAttestation = (
       flow(base64ToPem, (cert) =>
         E.tryCatch(
           () => new X509Certificate(cert),
-          () => new Error(`Unable to decode X509 certificate`)
+          () =>
+            new Error(`[Android Attestation] Unable to decode X509 certificate`)
         )
       )
     ),
@@ -79,7 +80,12 @@ export const validateAndroidAssertion = (
       E.toError
     ),
     E.chain(J.parse),
-    E.mapLeft(() => new Error("Unable to parse Google App Credentials string")),
+    E.mapLeft(
+      () =>
+        new Error(
+          "[Android Assertion] Unable to parse Google App Credentials string"
+        )
+    ),
     E.chainW(validate(GoogleAppCredentials, "Invalid Google App Credentials")),
     TE.fromEither,
     TE.chain((googleAppCredentials) =>
