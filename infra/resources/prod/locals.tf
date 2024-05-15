@@ -20,6 +20,6 @@ locals {
     Environment    = "Prod"
     Owner          = "IO"
     ManagementTeam = "IO Wallet"
-    Source         = "https://github.com/pagopa/eudi-wallet-it-wallet-solution/blob/main/infra/resources/prod/italynorth"
+    Source         = "https://github.com/pagopa/eudi-wallet-it-wallet-solution/blob/main/infra/resources/prod"
   }
 }
