@@ -35,10 +35,9 @@ variable "subnet_private_endpoints_id" {
 
 variable "cosmos_db" {
   type = object({
+    name        = string
     endpoint    = string
-    primary_key = string
   })
 
-  sensitive   = true
-  description = "Cosmos Account endpoint and primary key that Function Apps must use"
+  description = "Cosmos Account name and endpoint that Function Apps must use"
 }

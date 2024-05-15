@@ -13,15 +13,21 @@ module "functions" {
 
   cosmos_db = {
     endpoint    = module.cosmos.cosmos_account_wallet_endpoint
-    primary_key = module.cosmos.cosmos_account_wallet_primary_key
+    name        = module.cosmos.cosmos_account_wallet.name
   }
 }
+
+# 
+# Managed Identities
+# 
+# see https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
+# for role definitions
+# 
 
 # Allow the Function App to access the Storage Account
 # to write the signed entity configuration to the blob storage
 resource "azurerm_role_assignment" "function_to_storage" {
   scope                 = module.cdn.storage_account.id
-  # see https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
   role_definition_name  = "Contributor"
   principal_id          = module.functions.function_app_wallet.id
 }
@@ -29,7 +35,13 @@ resource "azurerm_role_assignment" "function_to_storage" {
 # Allow the Function App to access the Key Vault
 resource "azurerm_role_assignment" "function_to_keyvault" {
   scope                 = module.keyvault.id
-  # see https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
   role_definition_name  = "Reader"
   principal_id          = module.functions.function_app_wallet.id
+}
+
+# Allow the Function App to access the Cosmos DB
+resource "azurerm_role_assignment" "function_to_cosmosdb" {
+  scope                = module.cosmos.cosmos_account_wallet.id
+  role_definition_name = "DocumentDB Account Contributor"
+  principal_id         = module.functions.function_app_wallet.id
 }
