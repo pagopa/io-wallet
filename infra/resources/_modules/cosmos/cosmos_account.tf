@@ -32,7 +32,7 @@ module "cosmos_account_wallet" {
 
   backup_continuous_enabled = true
 
-  is_virtual_network_filter_enabled = true
+  is_virtual_network_filter_enabled = false
 
   ip_range = ""
 
