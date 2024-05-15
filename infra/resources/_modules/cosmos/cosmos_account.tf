@@ -1,7 +1,7 @@
 module "cosmos_account_wallet" {
   source = "github.com/pagopa/terraform-azurerm-v3//cosmosdb_account?ref=v8.12.2"
 
-  name                = "${var.project}-cosmos-wallet"
+  name                = "${var.project}-wallet-cosmos-01"
   resource_group_name = var.resource_group_name
   location            = var.location
   domain              = "WALLET"
