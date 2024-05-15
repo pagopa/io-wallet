@@ -5,7 +5,7 @@ module "function_wallet" {
   resource_group_name          = var.resource_group_name
   name                         = "${var.project}-wallet-func-01"
   location                     = var.location
-  app_service_plan_id          = azurerm_app_service_plan.app_service_plan_wallet_common.id
+  app_service_plan_id          = azurerm_service_plan.app_service_plan_wallet_common.id
   health_check_path            = "/api/v1/wallet/info"
   health_check_maxpingfailures = 2
 
@@ -63,7 +63,7 @@ module "function_wallet_staging_slot" {
   location                     = var.location
   resource_group_name          = var.resource_group_name
   function_app_id              = module.function_wallet.id
-  app_service_plan_id          = azurerm_app_service_plan.app_service_plan_wallet_common.id
+  app_service_plan_id          = azurerm_service_plan.app_service_plan_wallet_common.id
   health_check_path            = "/api/v1/wallet/info"
   health_check_maxpingfailures = 2
 

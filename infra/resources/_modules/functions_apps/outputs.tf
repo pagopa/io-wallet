@@ -1,8 +1,8 @@
 output "app_service_plan_common" {
   value = {
-    id       = azurerm_app_service_plan.app_service_plan_wallet_common.id
-    name     = azurerm_app_service_plan.app_service_plan_wallet_common.name
-    location = azurerm_app_service_plan.app_service_plan_wallet_common.location
+    id       = azurerm_service_plan.app_service_plan_wallet_common.id
+    name     = azurerm_service_plan.app_service_plan_wallet_common.name
+    location = azurerm_service_plan.app_service_plan_wallet_common.location
   }
 }
 
