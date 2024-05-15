@@ -25,10 +25,8 @@ locals {
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
 
       // CosmosDB connection
-      COSMOSDB_URI           = var.cosmos_db.endpoint
-      COSMOSDB_KEY           = var.cosmos_db.primary_key
-      COSMOSDB_DATABASE_NAME = "db"
-      COSMOSDB_CONNECTION_STRING = format("AccountEndpoint=%s;AccountKey=%s;", var.cosmos_db.endpoint, var.cosmos_db.primary_key)
+      COSMOS_DB_URI           = var.cosmos_db.endpoint
+      COSMOS_DB_NAME          = var.cosmos_db.name
     }
   }
 }
