@@ -1,7 +1,7 @@
 module "subnet" {
   source = "github.com/pagopa/terraform-azurerm-v3//subnet?ref=v8.12.2"
 
-  name                 = "${var.project}-wallet-snet-001"
+  name                 = "${var.project}-wallet-func-snet-01"
   resource_group_name  = data.azurerm_virtual_network.vnet_common.resource_group_name
   virtual_network_name = data.azurerm_virtual_network.vnet_common.name
 
