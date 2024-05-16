@@ -2,8 +2,8 @@ import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
-import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 import * as t from "io-ts";
+import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 import { validate } from "@/validation";
 
 export class CosmosDbWalletInstanceRepository
@@ -74,12 +74,12 @@ export class CosmosDbWalletInstanceRepository
   }
 
   batchPatch(
-    operationsInput: {
+    operationsInput: Array<{
       id: string;
       path: string;
       value: unknown;
       op: "add" | "replace" | "remove" | "set" | "incr";
-    }[],
+    }>,
     userId: string
   ) {
     return TE.tryCatch(
