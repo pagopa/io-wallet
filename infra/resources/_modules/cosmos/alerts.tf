@@ -23,7 +23,7 @@ resource "azurerm_monitor_metric_alert" "cosmos_wallet_throttling_alert" {
     dimension {
       name     = "Region"
       operator = "Include"
-      values   = ["North Italy"]
+      values   = ["Italy North"]
     }
     dimension {
       name     = "StatusCode"
