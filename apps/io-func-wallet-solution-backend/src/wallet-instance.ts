@@ -25,12 +25,12 @@ export type WalletInstanceRepository = {
   ) => TE.TaskEither<Error, WalletInstance>;
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
   batchPatch: (
-    operations: {
+    operations: Array<{
       id: string;
       path: string;
       value: unknown;
       op: "add" | "replace" | "remove" | "set" | "incr";
-    }[],
+    }>,
     userId: string
   ) => TE.TaskEither<Error, void>;
   getAllByUserId: (
