@@ -85,15 +85,15 @@ export class CosmosDbWalletInstanceRepository
     return TE.tryCatch(
       async () => {
         const operations: PatchOperationInput[] = operationsInput.map(
-          (item) => ({
+          ({ id, op, path, value }) => ({
             operationType: "Patch",
-            id: item.id,
+            id,
             resourceBody: {
               operations: [
                 {
-                  op: item.op,
-                  path: item.path,
-                  value: item.value,
+                  op,
+                  path,
+                  value,
                 },
               ],
             },
