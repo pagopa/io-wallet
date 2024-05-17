@@ -1179,16 +1179,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pagopa/handler-kit-azure-func@npm:^2.0.5":
-  version: 2.0.5
-  resolution: "@pagopa/handler-kit-azure-func@npm:2.0.5"
+"@pagopa/handler-kit-azure-func@npm:^2.0.7":
+  version: 2.0.7
+  resolution: "@pagopa/handler-kit-azure-func@npm:2.0.7"
   dependencies:
     "@azure/functions": ^4.0.1
     "@pagopa/handler-kit": ^1.0.1
     "@pagopa/logger": ^1.0.1
     fp-ts: ^2.13.1
     io-ts: ^2.2.20
-  checksum: 9be67cc51156bfc03078b700f4bd7d1301648639afbf404121a079a1cea01d48cc3b8ffb2cf8ccafd6d3a34432d71f2524162d977b68ab6ea3d1025ea83b9397
+  checksum: ae22c74c50aa77782a9cad959ea7217eb0d07f50b2f1dac46be2011fd5deee945c651eff29167b96a559bbff2301d520740bde32562858d0888ac751cc045f5a
   languageName: node
   linkType: hard
 
@@ -4722,7 +4722,7 @@ __metadata:
     "@azure/functions": ^4.4.0
     "@pagopa/eslint-config": ^3.0.0
     "@pagopa/handler-kit": ^1.1.0
-    "@pagopa/handler-kit-azure-func": ^2.0.5
+    "@pagopa/handler-kit-azure-func": ^2.0.7
     "@pagopa/ts-commons": ^12.0.0
     "@peculiar/asn1-android": ^2.3.10
     "@rushstack/eslint-patch": ^1.2.0
