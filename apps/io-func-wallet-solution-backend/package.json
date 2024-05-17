@@ -23,7 +23,7 @@
     "@azure/cosmos": "^4.0.0",
     "@azure/functions": "^4.4.0",
     "@pagopa/handler-kit": "^1.1.0",
-    "@pagopa/handler-kit-azure-func": "^2.0.5",
+    "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^12.0.0",
     "@peculiar/asn1-android": "^2.3.10",
     "asn1js": "^3.0.5",
