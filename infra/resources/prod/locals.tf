@@ -21,6 +21,6 @@ locals {
     Environment    = "Prod"
     Owner          = "IO"
     ManagementTeam = "IO Wallet"
-    Source         = "https://github.com/pagopa/eudi-wallet-it-wallet-solution/blob/main/infra/resources/prod"
+    Source         = "https://github.com/pagopa/io-wallet/blob/main/infra/resources/prod"
   }
 }
