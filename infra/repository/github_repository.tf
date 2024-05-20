@@ -1,6 +1,6 @@
 resource "github_repository" "this" {
   name        = "io-wallet"
-  description = "EUDI Wallet and Italian Wallet implementation for App IO"
+  description = "Wallet Provider implementation for EUDI Wallet and IT-Wallet for App IO"
 
   #tfsec:ignore:github-repositories-private
   visibility = "public"
