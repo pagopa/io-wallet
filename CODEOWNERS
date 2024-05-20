@@ -4,6 +4,6 @@
 
 # engineering-team-cloud-eng
 
-/.github @pagopa/engineering-team-cloud-eng @pagopa/io-wallet
-/infra @pagopa/engineering-team-cloud-eng
+/.github/ @pagopa/engineering-team-cloud-eng @pagopa/io-wallet
+/infra/ @pagopa/engineering-team-cloud-eng
 /.terraform-version @pagopa/engineering-team-cloud-eng
