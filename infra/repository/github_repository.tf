@@ -20,7 +20,7 @@ resource "github_repository" "this" {
   has_issues      = false
   has_downloads   = false
 
-  topics = ["io", "wallet"]
+  topics = ["io", "it-wallet", "eudiw"]
 
   vulnerability_alerts = true
 
