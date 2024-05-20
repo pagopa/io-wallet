@@ -6,8 +6,7 @@ on:
     branches:
       - main
     paths:
-      # Trigger the workflow when resources are modified
-      - "infra/resources"
+      - "infra/resources/prod/**"
 
 jobs:
   release_prod:
