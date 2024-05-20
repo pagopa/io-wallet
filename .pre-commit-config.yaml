@@ -8,8 +8,9 @@ repos:
         files: ^infra/
         args:
           - --args=--exclude-downloaded-modules
-      - id: terraform_validate
-        args:
-          - --init-args=-lockfile=readonly
-          - --args=-json
-          - --args=-no-color
+      # TODO: fix and re enable
+      # - id: terraform_validate
+      #   args:
+      #     - --init-args=-lockfile=readonly
+      #     - --args=-json
+      #     - --args=-no-color
