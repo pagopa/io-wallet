@@ -1,0 +1,19 @@
+name: Release Infrastructure
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      # Trigger the workflow when resources are modified
+      - "infra/resources"
+
+jobs:
+  release_prod:
+    uses: pagopa/dx/.github/workflows/infra_apply.yaml@main
+    name: Release Infrastructure
+    secrets: inherit
+    with:
+      environment: prod
+      base_path: infra/resources
