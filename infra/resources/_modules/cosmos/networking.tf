@@ -15,4 +15,6 @@ resource "azurerm_private_endpoint" "sql" {
     name                 = "private-dns-zone-group"
     private_dns_zone_ids = [var.private_link_documents_id]
   }
+
+  tags = var.tags
 }
