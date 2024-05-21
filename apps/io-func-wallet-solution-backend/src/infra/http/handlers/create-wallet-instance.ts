@@ -54,7 +54,6 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
-        RTE.chainFirstW(() => revokeAllWalletInstancesByUserId(user.id)),
         RTE.chainW(({ hardwareKey }) =>
           insertWalletInstance({
             id: walletInstanceRequest.hardwareKeyTag,
@@ -63,7 +62,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             signCount: 0,
             isRevoked: false,
           })
-        )
+        ),
+        RTE.chainW(() => revokeAllWalletInstancesByUserId(user.id))
       )
     ),
     RTE.map(() => H.empty),
