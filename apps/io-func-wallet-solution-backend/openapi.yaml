@@ -44,12 +44,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                fiscal_code:
-                  $ref: "#/components/schemas/FiscalCode"
-              required:
-                - fiscal_code
+              $ref: "#/components/schemas/GetUserByFiscalCodeBody"
       responses:
         "200":
           description: User successfully retrieved
@@ -171,6 +166,14 @@ components:
             $ref: "#/components/schemas/ProblemDetail"
 
   schemas:
+    GetUserByFiscalCodeBody:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: "#/components/schemas/FiscalCode"
+      required:
+        - fiscal_code
+
     ProblemDetail:
       type: object
       properties:
