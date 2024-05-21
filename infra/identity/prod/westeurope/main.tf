@@ -29,6 +29,41 @@ module "federated_identities" {
 
   repositories = [local.repo_name]
 
+  continuos_integration = {
+    enable = true
+    roles = {
+      subscription = [
+        "Reader",
+        "Reader and Data Access",
+        "PagoPA IaC Reader",
+        "DocumentDB Account Contributor"
+      ]
+      resource_groups = {
+        terraform-state-rg = [
+          "Storage Blob Data Contributor"
+        ]
+        io-p-itn-wallet-rg-01 = [
+          "Key Vault Reader"
+        ]
+      }
+    }
+  }
+
+  continuos_delivery = {
+    enable = true
+    roles = {
+      subscription = ["Contributor"]
+      resource_groups = {
+        terraform-state-rg = [
+          "Storage Blob Data Contributor"
+        ]
+        io-p-itn-wallet-rg-01 = [
+          "Key Vault Administrator"
+        ]
+      }
+    }
+  }
+
   tags = local.tags
 }
 
