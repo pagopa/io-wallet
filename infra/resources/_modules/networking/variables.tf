@@ -23,8 +23,8 @@ variable "virtual_network_name" {
   description = "Name of the existing vnet to create subnet in"
 }
 
-variable "cidr_subnet_wallet" {
+variable "cidr_subnet_func_wallet" {
   type        = string
-  description = "CIDR block for wallet subnet"
+  description = "CIDR block for wallet function app subnet"
 }
 
