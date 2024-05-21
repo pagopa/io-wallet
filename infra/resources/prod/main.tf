@@ -38,3 +38,17 @@ module "key_vaults" {
 
   tags = local.tags
 }
+
+module "networking" {
+  source = "../_modules/networking"
+
+  project              = local.project
+  location             = local.location
+  resource_group_name  = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
+  virtual_network_name = data.azurerm_virtual_network.vnet_common_itn.name
+
+  # inferred from vnet-common with cidr 10.20.0.0/16
+  cidr_subnet_func_wallet = "10.20.0.0/24"
+
+  tags = local.tags
+}
