@@ -24,12 +24,11 @@ export type WalletInstanceRepository = {
     userId: WalletInstance["userId"]
   ) => TE.TaskEither<Error, WalletInstance>;
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
-  batchPatch: (
+  batchPatchWithReplaceOperation: (
     operations: Array<{
       id: string;
       path: string;
       value: unknown;
-      op: "add" | "replace" | "remove" | "set" | "incr";
     }>,
     userId: string
   ) => TE.TaskEither<Error, void>;
@@ -72,12 +71,11 @@ export const revokeAllWalletInstancesByUserId: (
     pipe(
       walletInstanceRepository.getAllByUserId(userId),
       TE.chain((walletInstances) =>
-        walletInstanceRepository.batchPatch(
+        walletInstanceRepository.batchPatchWithReplaceOperation(
           walletInstances.map((item) => ({
             id: item.id,
             path: "/isRevoked",
             value: true,
-            op: "replace",
           })),
           userId
         )

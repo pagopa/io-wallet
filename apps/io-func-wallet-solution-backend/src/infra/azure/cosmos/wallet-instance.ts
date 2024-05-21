@@ -73,25 +73,24 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  batchPatch(
+  batchPatchWithReplaceOperation(
     operationsInput: Array<{
       id: string;
       path: string;
       value: unknown;
-      op: "add" | "replace" | "remove" | "set" | "incr";
     }>,
     userId: string
   ) {
     return TE.tryCatch(
       async () => {
         const operations: PatchOperationInput[] = operationsInput.map(
-          ({ id, op, path, value }) => ({
+          ({ id, path, value }) => ({
             operationType: "Patch",
             id,
             resourceBody: {
               operations: [
                 {
-                  op,
+                  op: "replace",
                   path,
                   value,
                 },
