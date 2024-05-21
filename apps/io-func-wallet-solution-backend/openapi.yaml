@@ -77,16 +77,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                challenge:
-                  type: string
-                  format: binary
-                key_attestation:
-                  type: string
-                  format: binary
-                hardware_key_tag:
-                  type: string
+              $ref: "#/components/schemas/CreateWalletInstanceBody"
       responses:
         "204":
           description: Wallet instance successfully created
@@ -173,6 +164,18 @@ components:
           $ref: "#/components/schemas/FiscalCode"
       required:
         - fiscal_code
+
+    CreateWalletInstanceBody:
+      type: object
+      properties:
+        challenge:
+          type: string
+          format: binary
+        key_attestation:
+          type: string
+          format: binary
+        hardware_key_tag:
+          type: string
 
     ProblemDetail:
       type: object
