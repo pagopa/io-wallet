@@ -14,7 +14,7 @@ import { logErrorAndReturnResponse } from "../utils";
 import { requireUser } from "./utils";
 import {
   insertWalletInstance,
-  revokeAllWalletInstancesByUserId,
+  revokeUserWalletInstancesExceptOne,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 
@@ -63,7 +63,12 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             isRevoked: false,
           })
         ),
-        RTE.chainW(() => revokeAllWalletInstancesByUserId(user.id))
+        RTE.chainW(() =>
+          revokeUserWalletInstancesExceptOne(
+            user.id,
+            walletInstanceRequest.hardwareKeyTag
+          )
+        )
       )
     ),
     RTE.map(() => H.empty),

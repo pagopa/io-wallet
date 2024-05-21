@@ -63,17 +63,20 @@ export const getValidWalletInstance: (
       )
     );
 
-export const revokeAllWalletInstancesByUserId: (
-  userId: WalletInstance["userId"]
+export const revokeUserWalletInstancesExceptOne: (
+  userId: WalletInstance["userId"],
+  walletInstanceId: WalletInstance["id"]
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
-  (userId) =>
+  (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
     pipe(
       walletInstanceRepository.getAllByUserId(userId),
-      TE.chain((walletInstances) =>
+      TE.map((walletInstances) => walletInstances.map((item) => item.id)),
+      TE.map((ids) => ids.filter((id) => id !== walletInstanceId)),
+      TE.chain((walletInstancesId) =>
         walletInstanceRepository.batchPatchWithReplaceOperation(
-          walletInstances.map((item) => ({
-            id: item.id,
+          walletInstancesId.map((id) => ({
+            id,
             path: "/isRevoked",
             value: true,
           })),
