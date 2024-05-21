@@ -1,6 +1,8 @@
 import * as t from "io-ts";
 
-import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
+import { flow, pipe } from "fp-ts/function";
+import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 
@@ -74,7 +76,9 @@ export const revokeUserWalletInstancesExceptOne: (
       TE.map(
         flow(
           RA.filterMap((walletInstance) =>
-            walletInstance.id !== walletInstanceId ? O.some(walletInstance.id) : O.none
+            walletInstance.id !== walletInstanceId
+              ? O.some(walletInstance.id)
+              : O.none
           )
         )
       ),
