@@ -21,3 +21,8 @@ data "azurerm_private_dns_zone" "privatelink_documents" {
 data "azuread_group" "io_admin" {
   display_name = format("%s-%s-adgroup-admin", local.prefix, local.env_short)
 }
+
+data "azurerm_application_insights" "common" {
+  name                = "${local.project_legacy}-ai-common"
+  resource_group_name = "${local.project_legacy}-rg-common"
+}

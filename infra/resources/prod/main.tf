@@ -46,20 +46,6 @@ module "key_vaults" {
   tags = local.tags
 }
 
-module "networking" {
-  source = "../_modules/networking"
-
-  project              = local.project
-  location             = local.location
-  resource_group_name  = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
-  virtual_network_name = data.azurerm_virtual_network.vnet_common_itn.name
-
-  # inferred from vnet-common with cidr 10.20.0.0/16
-  cidr_subnet_func_wallet = "10.20.0.0/24"
-
-  tags = local.tags
-}
-
 module "cosmos" {
   source = "../_modules/cosmos"
 
@@ -75,6 +61,31 @@ module "cosmos" {
 
   private_endpoint_subnet_id = data.azurerm_subnet.pep.id
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
+
+  tags = local.tags
+}
+
+module "function_apps" {
+  source = "../_modules/function_apps"
+
+  prefix              = local.prefix
+  env_short           = local.env_short
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  cidr_subnet_func_wallet    = "10.20.0.0/24"
+  private_endpoint_subnet_id = data.azurerm_subnet.pep.id
+  virtual_network = {
+    resource_group_name = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
+    name                = data.azurerm_virtual_network.vnet_common_itn.name
+  }
+
+  application_insights_connection_string = data.azurerm_application_insights.common.connection_string
+
+  cosmos_db = {
+    endpoint = module.cosmos.cosmos_account_wallet.endpoint
+    name     = module.cosmos.cosmos_account_wallet.name
+  }
 
   tags = local.tags
 }
