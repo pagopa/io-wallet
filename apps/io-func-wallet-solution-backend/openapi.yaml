@@ -2,6 +2,8 @@ openapi: 3.0.3
 info:
   title: IO Wallet
   version: 1.0.0
+security:
+  - FunctionsKey: []
 paths:
   /.well-known/openid-federation:
     get:
@@ -133,6 +135,12 @@ paths:
           $ref: "#/components/responses/Unexpected"
 
 components:
+  securitySchemes:
+    FunctionsKey:
+      type: apiKey
+      name: X-Functions-Key
+      in: header
+
   responses:
     UnprocessableContent:
       description: Unprocessable Content
