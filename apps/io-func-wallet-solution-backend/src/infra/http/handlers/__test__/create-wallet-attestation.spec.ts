@@ -65,7 +65,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
       signCount: 0,
       isRevoked: false,
     }),
-  batchPatch: () => TE.left(new Error("not implemented")),
+  batchPatchWithReplaceOperation: () => TE.left(new Error("not implemented")),
   getAllByUserId: () => TE.left(new Error("not implemented")),
 };
 

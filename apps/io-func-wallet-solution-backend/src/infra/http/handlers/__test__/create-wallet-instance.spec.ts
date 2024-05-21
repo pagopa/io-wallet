@@ -31,7 +31,7 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     insert: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    batchPatch: () => TE.right(undefined),
+    batchPatchWithReplaceOperation: () => TE.right(undefined),
     getAllByUserId: () => TE.right([]),
   };
 
@@ -206,7 +206,8 @@ describe("CreateWalletInstanceHandler", () => {
       {
         insert: () => TE.left(new Error("failed on insert!")),
         get: () => TE.left(new Error("not implemented")),
-        batchPatch: () => TE.left(new Error("not implemented")),
+        batchPatchWithReplaceOperation: () =>
+          TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
@@ -242,7 +243,8 @@ describe("CreateWalletInstanceHandler", () => {
       {
         insert: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        batchPatch: () => TE.left(new Error("not implemented")),
+        batchPatchWithReplaceOperation: () =>
+          TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
       };
     const req = {
@@ -279,7 +281,8 @@ describe("CreateWalletInstanceHandler", () => {
       {
         insert: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        batchPatch: () => TE.left(new Error("failed on batchPatch!")),
+        batchPatchWithReplaceOperation: () =>
+          TE.left(new Error("failed on batchPatch!")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
