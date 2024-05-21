@@ -65,6 +65,8 @@ const walletInstanceRepository: WalletInstanceRepository = {
       signCount: 0,
       isRevoked: false,
     }),
+  batchPatchWithReplaceOperation: () => TE.left(new Error("not implemented")),
+  getAllByUserId: () => TE.left(new Error("not implemented")),
 };
 
 const data = Buffer.from(assertion, "base64");
