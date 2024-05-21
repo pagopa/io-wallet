@@ -71,8 +71,13 @@ export const revokeUserWalletInstancesExceptOne: (
   ({ walletInstanceRepository }) =>
     pipe(
       walletInstanceRepository.getAllByUserId(userId),
-      TE.map((walletInstances) => walletInstances.map((item) => item.id)),
-      TE.map((ids) => ids.filter((id) => id !== walletInstanceId)),
+      TE.map(
+        flow(
+          RA.filterMap((walletInstance) =>
+            walletInstance.id !== walletInstanceId ? O.some(walletInstance.id) : O.none
+          )
+        )
+      ),
       TE.chain((walletInstancesId) =>
         walletInstanceRepository.batchPatchWithReplaceOperation(
           walletInstancesId.map((id) => ({
