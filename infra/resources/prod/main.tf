@@ -5,6 +5,11 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "<= 3.104.0"
     }
+
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "<= 2.50.0"
+    }
   }
 
   backend "azurerm" {
@@ -36,6 +41,8 @@ module "key_vaults" {
 
   tenant_id = data.azurerm_client_config.current.tenant_id
 
+  key_vault_admin_ids = [data.azuread_group.io_admin.object_id]
+
   tags = local.tags
 }
 
@@ -49,6 +56,25 @@ module "networking" {
 
   # inferred from vnet-common with cidr 10.20.0.0/16
   cidr_subnet_func_wallet = "10.20.0.0/24"
+
+  tags = local.tags
+}
+
+module "cosmos" {
+  source = "../_modules/cosmos"
+
+  project             = local.project
+  location            = local.location
+  secondary_location  = local.secondary_location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  key_vault = {
+    id                 = module.key_vaults.key_vault_wallet.id
+    key_versionless_id = module.key_vaults.key_vault_cosmos_key.versionless_id
+  }
+
+  private_endpoint_subnet_id = data.azurerm_subnet.pep.id
+  private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
 
   tags = local.tags
 }
