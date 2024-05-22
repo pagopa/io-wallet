@@ -18,10 +18,3 @@ resource "azurerm_key_vault" "wallet" {
 
   tags = var.tags
 }
-
-resource "azurerm_management_lock" "this" {
-  name       = format("%s-lock", azurerm_key_vault.wallet.name)
-  scope      = azurerm_key_vault.wallet.id
-  lock_level = "CanNotDelete"
-  notes      = "this items can't be deleted in this subscription!"
-}
