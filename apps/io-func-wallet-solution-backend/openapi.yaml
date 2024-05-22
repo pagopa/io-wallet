@@ -30,10 +30,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  nonce:
-                    type: string
+                $ref: "#/components/schemas/NonceDetailView"
         "500":
           $ref: "#/components/responses/Unexpected"
 
@@ -152,6 +149,14 @@ components:
             $ref: "#/components/schemas/ProblemDetail"
 
   schemas:
+    NonceDetailView:
+      type: object
+      properties:
+        nonce:
+          type: string
+      required:
+        - nonce
+
     GetUserByFiscalCodeBody:
       type: object
       properties:
