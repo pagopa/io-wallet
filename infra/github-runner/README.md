@@ -1,4 +1,4 @@
-# IO Wallet - GitHub federated Managed Identities
+# IO Wallet - GitHub Self-Hosted runner
 
 <!-- markdownlint-disable -->
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
