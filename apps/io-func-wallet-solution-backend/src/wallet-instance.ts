@@ -1,6 +1,8 @@
 import * as t from "io-ts";
 
-import { pipe } from "fp-ts/function";
+import * as O from "fp-ts/Option";
+import { flow, pipe } from "fp-ts/function";
+import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 
@@ -24,6 +26,17 @@ export type WalletInstanceRepository = {
     userId: WalletInstance["userId"]
   ) => TE.TaskEither<Error, WalletInstance>;
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
+  batchPatchWithReplaceOperation: (
+    operations: Array<{
+      id: string;
+      path: string;
+      value: unknown;
+    }>,
+    userId: string
+  ) => TE.TaskEither<Error, void>;
+  getAllByUserId: (
+    userId: WalletInstance["userId"]
+  ) => TE.TaskEither<Error, WalletInstance[]>;
 };
 
 type WalletInstanceEnvironment = {
@@ -49,5 +62,34 @@ export const getValidWalletInstance: (
         walletInstance.isRevoked
           ? TE.left(new Error("The wallet instance has been revoked"))
           : TE.right(walletInstance)
+      )
+    );
+
+export const revokeUserWalletInstancesExceptOne: (
+  userId: WalletInstance["userId"],
+  walletInstanceId: WalletInstance["id"]
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
+  (userId, walletInstanceId) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      walletInstanceRepository.getAllByUserId(userId),
+      TE.map(
+        flow(
+          RA.filterMap((walletInstance) =>
+            walletInstance.id !== walletInstanceId
+              ? O.some(walletInstance.id)
+              : O.none
+          )
+        )
+      ),
+      TE.chain((walletInstancesId) =>
+        walletInstanceRepository.batchPatchWithReplaceOperation(
+          walletInstancesId.map((id) => ({
+            id,
+            path: "/isRevoked",
+            value: true,
+          })),
+          userId
+        )
       )
     );
