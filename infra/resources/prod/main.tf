@@ -73,15 +73,15 @@ module "function_apps" {
   location            = local.location
   resource_group_name = azurerm_resource_group.wallet.name
 
-  cidr_subnet_func_wallet    = "10.20.0.0/24"
-  private_endpoint_subnet_id = data.azurerm_subnet.pep.id
+  cidr_subnet_func_wallet              = "10.20.0.0/24"
+  private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
+  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu-common.name
   virtual_network = {
     resource_group_name = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
-
   cosmos_db = {
     endpoint = module.cosmos.cosmos_account_wallet.endpoint
     name     = module.cosmos.cosmos_account_wallet.name

@@ -50,3 +50,7 @@ variable "cosmos_db" {
     name     = string
   })
 }
+
+variable "private_dns_zone_resource_group_name" {
+  type = string
+}

@@ -2,6 +2,10 @@ data "azurerm_subscription" "current" {}
 
 data "azurerm_client_config" "current" {}
 
+data "azurerm_resource_group" "weu-common" {
+  name = "${local.project_legacy}-rg-common"
+}
+
 data "azurerm_virtual_network" "vnet_common_itn" {
   name                = "${local.project}-common-vnet-01"
   resource_group_name = "${local.project}-common-rg-01"
@@ -15,7 +19,7 @@ data "azurerm_subnet" "pep" {
 
 data "azurerm_private_dns_zone" "privatelink_documents" {
   name                = "privatelink.documents.azure.com"
-  resource_group_name = "${local.project_legacy}-rg-common"
+  resource_group_name = data.azurerm_resource_group.weu-common.name
 }
 
 data "azuread_group" "io_admin" {
@@ -24,5 +28,5 @@ data "azuread_group" "io_admin" {
 
 data "azurerm_application_insights" "common" {
   name                = "${local.project_legacy}-ai-common"
-  resource_group_name = "${local.project_legacy}-rg-common"
+  resource_group_name = data.azurerm_resource_group.weu-common.name
 }
