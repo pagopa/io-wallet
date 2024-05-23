@@ -66,7 +66,7 @@ export const validateIssuance = (
   // Check dates
   const now = new Date();
   const datesValid = x509Chain.every(
-    (c) => new Date(c.validFrom) < now && now < new Date(c.validTo)
+    (c) => new Date(c.validFrom) <= now && now <= new Date(c.validTo)
   );
   if (!datesValid) {
     throw new Error("[Android Attestation] Certificates expired");
