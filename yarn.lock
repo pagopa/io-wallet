@@ -4714,9 +4714,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"io-func-wallet-solution-backend@workspace:apps/io-func-wallet-solution-backend":
+"io-ts@npm:^2.2.20":
+  version: 2.2.21
+  resolution: "io-ts@npm:2.2.21"
+  peerDependencies:
+    fp-ts: ^2.5.0
+  checksum: c6ae5237e313f7428c874fa5667b3656adaa5ec29f7f34194ad8ea8894b525c89322a5b74ca560e7cd66f8334b0b48cae6c4dc517c662de72da86110140646d4
+  languageName: node
+  linkType: hard
+
+"io-wallet-solution-user-func@workspace:apps/io-wallet-solution-user-func":
   version: 0.0.0-use.local
-  resolution: "io-func-wallet-solution-backend@workspace:apps/io-func-wallet-solution-backend"
+  resolution: "io-wallet-solution-user-func@workspace:apps/io-wallet-solution-user-func"
   dependencies:
     "@azure/cosmos": ^4.0.0
     "@azure/functions": ^4.4.0
@@ -4743,15 +4752,6 @@ __metadata:
     vitest: ^1.5.0
   languageName: unknown
   linkType: soft
-
-"io-ts@npm:^2.2.20":
-  version: 2.2.21
-  resolution: "io-ts@npm:2.2.21"
-  peerDependencies:
-    fp-ts: ^2.5.0
-  checksum: c6ae5237e313f7428c874fa5667b3656adaa5ec29f7f34194ad8ea8894b525c89322a5b74ca560e7cd66f8334b0b48cae6c4dc517c662de72da86110140646d4
-  languageName: node
-  linkType: hard
 
 "io-wallet-workspace@workspace:.":
   version: 0.0.0-use.local
