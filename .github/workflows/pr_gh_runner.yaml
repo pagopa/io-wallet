@@ -1,0 +1,23 @@
+name: PR - GitHub Runner TF Validation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "infra/github-runner/**"
+      - ".github/workflows/**_gh_runner.yaml"
+
+jobs:
+  code_review_prod:
+    uses: pagopa/dx/.github/workflows/infra_plan.yaml@main
+    name: Code Review GitHub Runner
+    secrets: inherit
+    with:
+      environment: prod
+      base_path: infra/github-runner
