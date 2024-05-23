@@ -101,7 +101,7 @@ paths:
         "201":
           description: Wallet Attestation generated
           content:
-            application/entity-statement+jwt:
+            application/jwt:
               schema:
                 $ref: "#/components/schemas/WalletAttestationView"
         "422":

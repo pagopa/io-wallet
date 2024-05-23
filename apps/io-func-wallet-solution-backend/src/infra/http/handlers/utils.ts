@@ -9,9 +9,9 @@ export const successEntityStatementJwt = flow(
   H.withHeader("Content-Type", "application/entity-statement+jwt")
 );
 
-export const createdEntityStatementJwt = flow(
+export const createdJwt = flow(
   H.createdJson,
-  H.withHeader("Content-Type", "application/entity-statement+jwt")
+  H.withHeader("Content-Type", "application/jwt")
 );
 
 const requireUserId = (req: H.HttpRequest) =>
