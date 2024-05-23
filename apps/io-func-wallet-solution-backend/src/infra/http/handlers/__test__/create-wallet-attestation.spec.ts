@@ -127,7 +127,7 @@ describe("CreateWalletAttestationHandler", async () => {
       right: {
         statusCode: 201,
         headers: expect.objectContaining({
-          "Content-Type": "application/entity-statement+jwt",
+          "Content-Type": "application/jwt",
         }),
         body: expect.any(String),
       },

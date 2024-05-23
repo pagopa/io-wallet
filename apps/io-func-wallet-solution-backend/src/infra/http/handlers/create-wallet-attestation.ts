@@ -10,7 +10,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { logErrorAndReturnResponse } from "../utils";
-import { createdEntityStatementJwt, requireUser } from "./utils";
+import { createdJwt, requireUser } from "./utils";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
 import { consumeNonce } from "@/wallet-instance-request";
@@ -72,7 +72,7 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
         RTE.chainW(() => createWalletAttestation(walletAttestationRequest))
       )
     ),
-    RTE.map(createdEntityStatementJwt),
+    RTE.map(createdJwt),
     RTE.orElseW(logErrorAndReturnResponse)
   )
 );
