@@ -1,4 +1,4 @@
-name: PR GitHub Runner
+name: PR - GitHub Runner TF Validation
 
 on:
   workflow_dispatch:

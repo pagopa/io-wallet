@@ -1,4 +1,4 @@
-name: Release GitHub Runner
+name: Release - GitHub Runner TF Validation
 
 on:
   workflow_dispatch:
