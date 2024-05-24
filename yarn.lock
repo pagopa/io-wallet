@@ -4723,9 +4723,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"io-wallet-solution-user-func@workspace:apps/io-wallet-solution-user-func":
+"io-wallet-user-func@workspace:apps/io-wallet-user-func":
   version: 0.0.0-use.local
-  resolution: "io-wallet-solution-user-func@workspace:apps/io-wallet-solution-user-func"
+  resolution: "io-wallet-user-func@workspace:apps/io-wallet-user-func"
   dependencies:
     "@azure/cosmos": ^4.0.0
     "@azure/functions": ^4.4.0
