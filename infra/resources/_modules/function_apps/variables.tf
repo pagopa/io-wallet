@@ -28,11 +28,6 @@ variable "cidr_subnet_func_wallet" {
   description = "CIDR block for wallet function app subnet"
 }
 
-variable "application_insights_connection_string" {
-  type      = string
-  sensitive = true
-}
-
 variable "private_endpoint_subnet_id" {
   type = string
 }
@@ -44,11 +39,8 @@ variable "virtual_network" {
   })
 }
 
-variable "cosmos_db" {
-  type = object({
-    endpoint = string
-    name     = string
-  })
+variable "cosmos_db_endpoint" {
+  type = string
 }
 
 variable "private_dns_zone_resource_group_name" {

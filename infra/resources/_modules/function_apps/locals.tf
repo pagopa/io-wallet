@@ -14,8 +14,7 @@ locals {
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
 
       // CosmosDB connection
-      COSMOS_DB_URI  = var.cosmos_db.endpoint
-      COSMOS_DB_NAME = var.cosmos_db.name
+      COSMOS_DB_ENDPOINT = var.cosmos_db_endpoint
     }
   }
 }

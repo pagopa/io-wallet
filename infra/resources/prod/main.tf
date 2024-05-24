@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "<= 3.104.0"
+      version = "<= 3.105.0"
     }
 
     azuread = {
@@ -40,8 +40,6 @@ module "key_vaults" {
   resource_group_name = azurerm_resource_group.wallet.name
 
   tenant_id = data.azurerm_client_config.current.tenant_id
-
-  key_vault_admin_ids = [data.azuread_group.io_admin.object_id]
 
   tags = local.tags
 }
@@ -81,11 +79,28 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  application_insights_connection_string = data.azurerm_application_insights.common.connection_string
-  cosmos_db = {
-    endpoint = module.cosmos.cosmos_account_wallet.endpoint
-    name     = module.cosmos.cosmos_account_wallet.name
-  }
+  cosmos_db_endpoint = module.cosmos.cosmos_account_wallet.endpoint
 
   tags = local.tags
+}
+
+module "iam" {
+  source = "../_modules/iam"
+
+  cosmos_db = {
+    id                  = module.cosmos.cosmos_account_wallet.id
+    name                = module.cosmos.cosmos_account_wallet.name
+    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
+    database_names      = module.cosmos.cosmos_account_wallet.database_names
+  }
+
+  function_app = {
+    principal_id         = module.function_apps.function_app_user.principal_id
+    staging_principal_id = module.function_apps.function_app_user.staging_principal_id
+  }
+
+  key_vault = {
+    id        = module.key_vaults.key_vault_wallet.id
+    admin_ids = [data.azuread_group.io_admin.object_id]
+  }
 }
