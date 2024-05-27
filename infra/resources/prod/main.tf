@@ -71,7 +71,7 @@ module "function_apps" {
   location            = local.location
   resource_group_name = azurerm_resource_group.wallet.name
 
-  cidr_subnet_func_wallet              = "10.20.0.0/24"
+  cidr_subnet_user_func                = "10.20.0.0/24"
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu-common.name
   virtual_network = {
