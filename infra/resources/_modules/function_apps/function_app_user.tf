@@ -1,5 +1,4 @@
 module "function_app_user" {
-  # source = "../../../../../../devex/dx/infra/modules/azure_function_app"
   source = "github.com/pagopa/dx//infra/modules/azure_function_app?ref=main"
 
   environment = {
