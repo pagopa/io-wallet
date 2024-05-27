@@ -1,7 +1,7 @@
 resource "azurerm_role_assignment" "admins" {
-  for_each = var.key_vault_admin_ids
+  for_each = var.key_vault.admin_ids
 
   role_definition_name = "Key Vault Administrator"
-  scope                = azurerm_key_vault.wallet.id
+  scope                = var.key_vault.id
   principal_id         = each.value
 }
