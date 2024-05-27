@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "<= 3.104.0"
+      version = "<= 3.105.0"
     }
 
     azuread = {
@@ -41,22 +41,6 @@ module "key_vaults" {
 
   tenant_id = data.azurerm_client_config.current.tenant_id
 
-  key_vault_admin_ids = [data.azuread_group.io_admin.object_id]
-
-  tags = local.tags
-}
-
-module "networking" {
-  source = "../_modules/networking"
-
-  project              = local.project
-  location             = local.location
-  resource_group_name  = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
-  virtual_network_name = data.azurerm_virtual_network.vnet_common_itn.name
-
-  # inferred from vnet-common with cidr 10.20.0.0/16
-  cidr_subnet_func_wallet = "10.20.0.0/24"
-
   tags = local.tags
 }
 
@@ -77,4 +61,46 @@ module "cosmos" {
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
 
   tags = local.tags
+}
+
+module "function_apps" {
+  source = "../_modules/function_apps"
+
+  prefix              = local.prefix
+  env_short           = local.env_short
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  cidr_subnet_user_func                = "10.20.0.0/24"
+  private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
+  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu-common.name
+  virtual_network = {
+    resource_group_name = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
+    name                = data.azurerm_virtual_network.vnet_common_itn.name
+  }
+
+  cosmos_db_endpoint = module.cosmos.cosmos_account_wallet.endpoint
+
+  tags = local.tags
+}
+
+module "iam" {
+  source = "../_modules/iam"
+
+  cosmos_db = {
+    id                  = module.cosmos.cosmos_account_wallet.id
+    name                = module.cosmos.cosmos_account_wallet.name
+    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
+    database_names      = module.cosmos.cosmos_account_wallet.database_names
+  }
+
+  function_app = {
+    principal_id         = module.function_apps.function_app_user.principal_id
+    staging_principal_id = module.function_apps.function_app_user.staging_principal_id
+  }
+
+  key_vault = {
+    id        = module.key_vaults.key_vault_wallet.id
+    admin_ids = [data.azuread_group.io_admin.object_id]
+  }
 }

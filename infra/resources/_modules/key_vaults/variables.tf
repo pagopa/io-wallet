@@ -22,8 +22,3 @@ variable "tenant_id" {
   type        = string
   description = "Tenant Id"
 }
-
-variable "key_vault_admin_ids" {
-  type        = set(string)
-  description = "List of Entra groups who are administrator of Key Vaults"
-}
