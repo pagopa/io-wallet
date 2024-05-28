@@ -94,7 +94,7 @@ describe("CreateWalletAttestationHandler", async () => {
     .setExpirationTime("2h")
     .sign(josePrivateKey);
 
-  it("should return a 201 HTTP response on success", async () => {
+  it("should return a 200 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",
@@ -125,7 +125,7 @@ describe("CreateWalletAttestationHandler", async () => {
     expect(result).toEqual({
       _tag: "Right",
       right: {
-        statusCode: 201,
+        statusCode: 200,
         headers: expect.objectContaining({
           "Content-Type": "application/jwt",
         }),
