@@ -9,8 +9,8 @@ export const successEntityStatementJwt = flow(
   H.withHeader("Content-Type", "application/entity-statement+jwt")
 );
 
-export const createdJwt = flow(
-  H.createdJson,
+export const successJwt = flow(
+  H.success,
   H.withHeader("Content-Type", "application/jwt")
 );
 
