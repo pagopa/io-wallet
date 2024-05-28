@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.4
+
+### Patch Changes
+
+- 98feb5e: Updated OpenAPI
+
 ## 0.1.3
 
 ### Patch Changes
