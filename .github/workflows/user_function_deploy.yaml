@@ -20,4 +20,3 @@ jobs:
       function_app_name: io-p-itn-wallet-user-func-01
       health_check_path: "/health"
       use_staging_slot: false
-      use_private_agent: false
