@@ -37,17 +37,6 @@ jobs:
         with:
           version: yarn run version
           publish: yarn run release
-          commit: "ci(changesets): version packages"
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Release output
-        id: release
-        run: |
-          # intermediate variable necessary to avoid quotes around the array
-          # that prevented the fromJson function to work correctly
-          publishedPackages=${{toJSON(steps.changesets.outputs.publishedPackages)}}
-
-          echo 'published=${{steps.changesets.outputs.published}}' >> "$GITHUB_OUTPUT"
-          echo "publishedPackages=$publishedPackages" >> "$GITHUB_OUTPUT"
