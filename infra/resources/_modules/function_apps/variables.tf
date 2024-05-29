@@ -29,7 +29,8 @@ variable "cidr_subnet_user_func" {
 }
 
 variable "private_endpoint_subnet_id" {
-  type = string
+  type        = string
+  description = "Private Endpoints subnet Id"
 }
 
 variable "virtual_network" {
@@ -37,12 +38,20 @@ variable "virtual_network" {
     name                = string
     resource_group_name = string
   })
+  description = "Virtual network to create subnet in"
 }
 
 variable "cosmos_db_endpoint" {
-  type = string
+  type        = string
+  description = "Cosmos DB endpoint to use as application environment variable"
+}
+
+variable "key_vault_id" {
+  type        = string
+  description = "Id of the Key Vault where save secrets in"
 }
 
 variable "private_dns_zone_resource_group_name" {
-  type = string
+  type        = string
+  description = "Resource group name of the private DNS zone to use for private endpoints"
 }
