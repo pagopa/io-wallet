@@ -28,13 +28,12 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create Release Pull Request or Tag
         id: changesets
-        uses: changesets/action@aba318e9165b45b7948c60273e0b72fce0a64eb9 # v1.4.7
+        uses: changesets/action@v1
         with:
           version: yarn run version
           publish: yarn run release
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
