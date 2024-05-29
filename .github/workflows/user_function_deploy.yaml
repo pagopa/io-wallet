@@ -11,7 +11,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    uses: pagopa/dx/.github/workflows/function_app_deploy.yaml@DEVEX-122-implementare-una-pipeline-di-deploy-per-il-workspace-con-le-azure-function-2
+    uses: pagopa/dx/.github/workflows/function_app_deploy.yaml@main
     secrets: inherit
     with:
       workspace_name: io-wallet-user-func
@@ -20,3 +20,4 @@ jobs:
       function_app_name: io-p-itn-wallet-user-func-01
       health_check_path: "/health"
       use_staging_slot: false
+      use_private_agent: false
