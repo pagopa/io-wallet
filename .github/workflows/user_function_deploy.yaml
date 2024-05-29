@@ -2,11 +2,16 @@ name: Deploy Function App (user-func)
 
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/io-wallet-user-func/**"
 
 jobs:
   deploy:
     name: Deploy
-    uses: pagopa/dx/.github/workflows/function_app_deploy.yaml@f09aec9635f1b6f550dd90d2d2581d3e5239b409
+    uses: pagopa/dx/.github/workflows/function_app_deploy.yaml@DEVEX-122-implementare-una-pipeline-di-deploy-per-il-workspace-con-le-azure-function-2
     secrets: inherit
     with:
       workspace_name: io-wallet-user-func
@@ -14,3 +19,4 @@ jobs:
       resource_group_name: io-p-itn-wallet-rg-01
       function_app_name: io-p-itn-wallet-user-func-01
       health_check_path: "/health"
+      use_staging_slot: false
