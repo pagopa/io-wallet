@@ -8,9 +8,6 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    outputs:
-      published: ${{ steps.release.outputs.published }}
-      publishedPackages: ${{ steps.release.outputs.publishedPackages }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -31,12 +28,12 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Create Release Pull Request or Tag
+      - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@aba318e9165b45b7948c60273e0b72fce0a64eb9 # v1.4.7
         with:
           version: yarn run version
           publish: yarn run release
-          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
