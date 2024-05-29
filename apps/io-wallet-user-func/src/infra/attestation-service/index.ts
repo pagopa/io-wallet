@@ -5,10 +5,10 @@ import * as E from "fp-ts/Either";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
 import * as J from "fp-ts/Json";
-import { sequenceS } from "fp-ts/lib/Apply";
 
 import { ValidationError } from "@pagopa/handler-kit";
 import { Separated } from "fp-ts/lib/Separated";
+import { calculateJwkThumbprint } from "jose";
 import {
   AttestationService,
   ValidatedAttestation,
@@ -87,18 +87,18 @@ export class MobileAttestationService implements AttestationService {
     signCount,
   }: ValidateAssertionRequest) =>
     pipe(
-      sequenceS(TE.ApplicativeSeq)({
-        clientData: pipe(
+      TE.tryCatch(() => calculateJwkThumbprint(jwk, "sha256"), E.toError),
+      TE.chainEitherKW((jwk_thumbprint) =>
+        pipe(
           {
             challenge: nonce,
-            jwk,
+            jwk_thumbprint,
           },
           J.stringify,
-          E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
-          TE.fromEither
-        ),
-      }),
-      TE.chain(({ clientData }) =>
+          E.mapLeft(() => new ValidationError(["Unable to create clientData"]))
+        )
+      ),
+      TE.chainW((clientData) =>
         pipe(
           [
             validateiOSAssertion(
