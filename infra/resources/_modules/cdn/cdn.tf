@@ -25,20 +25,6 @@ resource "azurerm_cdn_endpoint" "this" {
     host_name = azurerm_storage_account.this.primary_blob_host
   }
 
-  # https://learn.microsoft.com/en-us/azure/cdn/cdn-standard-rules-engine-actions
-  global_delivery_rule {
-    modify_request_header_action {
-      action = "Overwrite"
-      name   = "Cache-Control"
-      value  = "no-store"
-    }
-    modify_response_header_action {
-      action = "Overwrite"
-      name   = "Cache-Control"
-      value  = "no-store"
-    }
-  }
-
   delivery_rule {
     name  = "EnforceHTTPS"
     order = 1
