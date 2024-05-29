@@ -23,6 +23,8 @@ terraform {
 provider "azurerm" {
   features {
   }
+
+  storage_use_azuread = true
 }
 
 resource "azurerm_resource_group" "wallet" {
@@ -84,6 +86,18 @@ module "function_apps" {
   tags = local.tags
 }
 
+module "cdn" {
+  source = "../_modules/cdn"
+
+  project             = local.project
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law.id
+
+  tags = local.tags
+}
+
 module "iam" {
   source = "../_modules/iam"
 
@@ -103,4 +117,6 @@ module "iam" {
     id        = module.key_vaults.key_vault_wallet.id
     admin_ids = [data.azuread_group.io_admin.object_id]
   }
+
+  cdn_storage_account_id = module.cdn.storage_account_cdn.id
 }

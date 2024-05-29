@@ -30,3 +30,8 @@ data "azurerm_application_insights" "common" {
   name                = "${local.project_legacy}-ai-common"
   resource_group_name = data.azurerm_resource_group.weu-common.name
 }
+
+data "azurerm_log_analytics_workspace" "law" {
+  name                = "${local.project_legacy}-law-common"
+  resource_group_name = data.azurerm_resource_group.weu-common.name
+}

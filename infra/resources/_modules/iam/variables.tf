@@ -24,3 +24,8 @@ variable "key_vault" {
 
   description = "KeyVault Id and list of Entra groups who are administrator of Key Vaults"
 }
+
+variable "cdn_storage_account_id" {
+  type        = string
+  description = "Storage Account Id used for CDN"
+}
