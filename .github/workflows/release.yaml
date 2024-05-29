@@ -11,94 +11,29 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    outputs:
-      published: ${{ steps.release.outputs.published }}
-      publishedPackages: ${{ steps.release.outputs.publishedPackages }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      # Corepack is an official tool by Node.js that manages package managers versions
+      - name: Setup yarn
+        run: corepack enable
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
-          node-version-file: ".node-version"
+          node-version: 18
           cache: "yarn"
-          cache-dependency-path: |
-            yarn.lock
-            package.json
-            apps/**/package.json
-            packages/**/package.json
-
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Create Release Pull Request or Tag
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: yarn run version
-          publish: yarn run release
-          commit: "ci(changesets): version packages"
-          createGithubReleases: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Release output
-        id: release
-        run: |
-          # intermediate variable necessary to avoid quotes around the array
-          # that prevented the fromJson function to work correctly
-          publishedPackages=${{toJSON(steps.changesets.outputs.publishedPackages)}}
-
-          echo 'published=${{steps.changesets.outputs.published}}' >> "$GITHUB_OUTPUT"
-          echo "publishedPackages=$publishedPackages" >> "$GITHUB_OUTPUT"
-
-  publish:
-    name: Publish
-    needs: [release]
-    if: needs.release.outputs.published == 'true'
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      matrix:
-        package: ${{ fromJson(needs.release.outputs.publishedPackages) }}
-    steps:
-      - name: Check internal packages
-        # they are not supposed to be published
-        if: ${{ startsWith(matrix.package.name, '@') }}
-        run: |
-          echo '::error title=Internal::Package ${{ matrix.package.name }} is not supposed to be published'
-          exit 1
-
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ".node-version"
-          cache: "yarn"
-          cache-dependency-path: |
-            yarn.lock
-            package.json
-            apps/**/package.json
-            packages/**/package.json
 
       - name: Install dependencies
         run: yarn
 
-      - name: Build
-        run: yarn build --filter ${{ matrix.package.name }}
-
-      - name: Package
-        run: yarn workspace ${{ matrix.package.name }} run build:package
-
-      - name: Create draft release
-        uses: softprops/action-gh-release@v1
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@aba318e9165b45b7948c60273e0b72fce0a64eb9 # v1.4.7
         with:
-          draft: true
-          files: apps/${{ matrix.package.name }}/${{ matrix.package.name }}-${{ matrix.package.version }}.zip
-          tag_name: ${{ matrix.package.name }}@${{ matrix.package.version }}
-          generate_release_notes: true
+          version: yarn run version
+          publish: yarn run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
