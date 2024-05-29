@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
 
       # Corepack is an official tool by Node.js that manages package managers versions
       - name: Setup yarn
@@ -28,12 +30,11 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Create Release Pull Request or Tag
+      - name: Create Release Pull Request
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@aba318e9165b45b7948c60273e0b72fce0a64eb9 # v1.4.7
         with:
           version: yarn run version
           publish: yarn run release
-          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
