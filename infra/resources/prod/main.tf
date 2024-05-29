@@ -82,6 +82,7 @@ module "function_apps" {
   }
 
   cosmos_db_endpoint = module.cosmos.cosmos_account_wallet.endpoint
+  key_vault_id       = module.key_vaults.key_vault_wallet.id
 
   tags = local.tags
 }

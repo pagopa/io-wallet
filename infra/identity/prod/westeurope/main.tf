@@ -43,7 +43,9 @@ module "federated_identities" {
           "Storage Blob Data Contributor"
         ]
         io-p-itn-wallet-rg-01 = [
-          "Key Vault Reader"
+          "Key Vault Reader",
+          "Key Vault Crypto User",
+          "Key Vault Secrets User",
         ]
       }
     }
@@ -58,7 +60,9 @@ module "federated_identities" {
           "Storage Blob Data Contributor"
         ]
         io-p-itn-wallet-rg-01 = [
-          "Key Vault Administrator"
+          "Key Vault Administrator",
+          "Key Vault Crypto Officer",
+          "Key Vault Secrets Officer",
         ]
       }
     }
