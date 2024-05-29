@@ -9,6 +9,7 @@ repos:
         args:
           - --args=--exclude-downloaded-modules
       - id: terraform_validate
+        exclude: '(\/_?modules\/.*)'
         args:
           - --init-args=-lockfile=readonly
           - --args=-json
