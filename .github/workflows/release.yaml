@@ -1,9 +1,6 @@
 name: Release
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -15,7 +12,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       # Corepack is an official tool by Node.js that manages package managers versions
       - name: Setup yarn
