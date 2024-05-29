@@ -10,9 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
@@ -26,7 +24,7 @@ jobs:
             packages/**/package.json
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
