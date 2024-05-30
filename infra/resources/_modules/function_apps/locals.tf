@@ -15,6 +15,7 @@ locals {
 
       // CosmosDB connection
       COSMOS_DB_ENDPOINT = var.cosmos_db_endpoint
+      # COSMOS_DB_DATABASE_NAME = var.cosmos_db_database_name
     }
   }
 }
