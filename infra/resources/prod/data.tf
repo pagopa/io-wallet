@@ -6,6 +6,11 @@ data "azurerm_resource_group" "weu-common" {
   name = "${local.project_legacy}-rg-common"
 }
 
+data "azurerm_key_vault" "weu-common" {
+  name                = "${local.project_legacy}-kv-common"
+  resource_group_name = data.azurerm_resource_group.weu-common.name
+}
+
 data "azurerm_virtual_network" "vnet_common_itn" {
   name                = "${local.project}-common-vnet-01"
   resource_group_name = "${local.project}-common-rg-01"
