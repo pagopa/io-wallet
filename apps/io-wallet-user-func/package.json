@@ -14,7 +14,7 @@
     "lint": "eslint \"src/**\"",
     "lint:fix": "eslint --fix \"src/**\"",
     "test": "vitest run",
-    "coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc",
     "start": "func start",
     "build:package": "npm-pack-zip --add-version --dst=$TURBO_BUNDLES_DIR"
