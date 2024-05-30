@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.6
+
+### Patch Changes
+
+- 45de669: Added route prefix
+
 ## 0.1.5
 
 ### Patch Changes
