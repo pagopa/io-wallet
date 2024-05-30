@@ -6,7 +6,7 @@ on:
     branches:
       - master
     paths:
-      - "apps/io-wallet-user-func/**"
+      - "apps/io-wallet-user-func/CHANGELOG.md"
 
 jobs:
   deploy:
