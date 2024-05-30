@@ -17,7 +17,16 @@ locals {
       autoscale_settings = {
         max_throughput = 2000
       }
-      default_ttl = 60
+      default_ttl = 300
+    },
+    # Each document represents an enabled user
+    {
+      name               = "users-whitelist"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 2000
+      }
+      default_ttl = null
     }
   ]
 }
