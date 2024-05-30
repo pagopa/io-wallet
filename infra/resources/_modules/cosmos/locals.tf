@@ -7,7 +7,8 @@ locals {
       partition_key_path = "/userId"
       autoscale_settings = {
         max_throughput = 2000
-      },
+      }
+      default_ttl = null
     },
     # Each document represents a nonce
     {
@@ -16,6 +17,7 @@ locals {
       autoscale_settings = {
         max_throughput = 2000
       }
+      default_ttl = 60
     }
   ]
 }
