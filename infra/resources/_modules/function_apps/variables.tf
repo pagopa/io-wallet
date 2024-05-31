@@ -62,6 +62,6 @@ variable "cosmos_db_key" {
 }
 
 variable "cosmos_database_names" {
-  type        = string
+  type        = list(string)
   description = "foo"
 }
