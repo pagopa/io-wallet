@@ -60,3 +60,8 @@ variable "cosmos_db_key" {
   type        = string
   description = "foo"
 }
+
+variable "cosmos_database_names" {
+  type        = string
+  description = "foo"
+}

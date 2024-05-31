@@ -81,9 +81,11 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_db_key      = module.cosmos.cosmos_account_wallet.primary_key
-  key_vault_id       = data.azurerm_key_vault.weu-common.id
+  cosmos_db_endpoint    = module.cosmos.cosmos_account_wallet.endpoint
+  cosmos_db_key         = module.cosmos.cosmos_account_wallet.primary_key
+  cosmos_database_names = module.cosmos.cosmos_account_wallet.database_names
+
+  key_vault_id = data.azurerm_key_vault.weu-common.id
 
   tags = local.tags
 }
