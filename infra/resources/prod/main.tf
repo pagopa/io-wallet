@@ -82,6 +82,7 @@ module "function_apps" {
   }
 
   cosmos_db_endpoint = module.cosmos.cosmos_account_wallet.endpoint
+  cosmos_db_key      = module.cosmos.cosmos_account_wallet.primary_key
   key_vault_id       = data.azurerm_key_vault.weu-common.id
 
   tags = local.tags
