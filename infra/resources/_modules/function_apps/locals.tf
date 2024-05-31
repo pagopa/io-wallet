@@ -14,7 +14,7 @@ locals {
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
 
       CosmosDbConnectionString = "AccountEndpoint=${var.cosmos_db_endpoint};AccountKey=${var.cosmos_db_key};"
-      CosmosDbDatabaseName     = var.database_names[0]
+      CosmosDbDatabaseName     = var.cosmos_database_names[0]
 
       FederationEntityBasePath         = "https://io-d-wallet-it.azurewebsites.net"
       FederationEntityOrganizationName = "PagoPa S.p.A."
