@@ -85,3 +85,19 @@ module "app_federated_identities" {
 
   tags = local.tags
 }
+
+resource "azurerm_key_vault_access_policy" "ci" {
+  key_vault_id = data.azurerm_key_vault.weu-common.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = module.federated_identities.federated_ci_identity.id
+
+  secret_permissions = ["Get", "List"]
+}
+
+resource "azurerm_key_vault_access_policy" "cd" {
+  key_vault_id = data.azurerm_key_vault.weu-common.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = module.federated_identities.federated_cd_identity.id
+
+  secret_permissions = ["Get", "List", "Set"]
+}
