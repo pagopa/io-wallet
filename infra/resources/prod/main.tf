@@ -71,6 +71,7 @@ module "function_apps" {
   prefix              = local.prefix
   env_short           = local.env_short
   location            = local.location
+  project             = local.project
   resource_group_name = azurerm_resource_group.wallet.name
 
   cidr_subnet_user_func                = "10.20.0.0/24"
