@@ -12,7 +12,7 @@ resource "azurerm_role_assignment" "func_app_user_staging_slot_to_cdn_storage_ac
   principal_id         = var.function_app.staging_principal_id
 }
 
-resource "azurerm_role_assignment" "cdn_contributors" {
+resource "azurerm_role_assignment" "cdn_blob_owners" {
   for_each = var.key_vault.admin_ids
 
   scope                = var.cdn_storage_account_id
