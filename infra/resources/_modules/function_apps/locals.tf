@@ -40,7 +40,7 @@ locals {
       },
       {
         for s in var.user_func.app_settings :
-        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.prefix}-${var.env_short}-${var.location}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
+        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.project}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
       }
     )
   }

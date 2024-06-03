@@ -6,7 +6,6 @@ locals {
   # it's the prefix of any resource name
   # it includes the choosen location
   project = "${local.prefix}-${local.env_short}-${local.location_short}"
-
   # some referenced resources are in a different location
   # for historical reasons
   # this project points to them (westeurope)

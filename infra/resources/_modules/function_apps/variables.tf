@@ -81,3 +81,8 @@ variable "user_func" {
   })
   description = "Configuration of the user-func"
 }
+
+variable "project" {
+  type        = string
+  description = "foo"
+}
