@@ -91,15 +91,7 @@ module "function_apps" {
 
   tags = local.tags
 
-  user_func = {
-    app_settings = [
-      # TODO
-      {
-        name                  = "PDV_TOKENIZER_API_KEY"
-        key_vault_secret_name = "PdvTokenizerApiKey"
-      }
-    ]
-  }
+  user_func = local.user_func
 }
 
 module "cdn" {
