@@ -23,7 +23,7 @@ jobs:
 
       # Note that the following step
       # never removes labels
-      - uses: actions/github-script@v6.4.0
+      - uses: actions/github-script@98814c53be79b1d30f795b907e553d8679345975 # v6.4.0
         id: set-result
         with:
           script: |
