@@ -119,7 +119,7 @@ module "iam" {
     admin_ids = [data.azuread_group.io_developers.object_id]
   }
 
-  cdn_storage = {
+  cdn_storage_account = {
     id        = module.cdn.storage_account_cdn.id
     admin_ids = [data.azuread_group.io_developers.object_id]
   }
