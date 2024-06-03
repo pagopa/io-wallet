@@ -8,6 +8,11 @@ variable "env_short" {
   description = "Short environment"
 }
 
+variable "project" {
+  type        = string
+  description = "IO prefix and short environment"
+}
+
 variable "location" {
   type        = string
   description = "Azure region"
@@ -64,4 +69,23 @@ variable "cosmos_db_key" {
 variable "cosmos_database_names" {
   type        = list(string)
   description = "foo"
+}
+
+variable "key_vault_wallet_id" {
+  type        = string
+  description = "foo"
+}
+
+variable "user_func" {
+  type = object({
+    autoscale_default = number
+    autoscale_minimum = number
+    autoscale_maximum = number
+    app_settings = list(object({
+      name                  = string
+      value                 = optional(string, "")
+      key_vault_secret_name = optional(string)
+    }))
+  })
+  description = "Configuration of the user-func"
 }

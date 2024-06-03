@@ -1,6 +1,6 @@
 locals {
   function_app_wallet = {
-    app_settings = {
+    app_settings = merge({
       FUNCTIONS_WORKER_RUNTIME       = "node"
       FUNCTIONS_WORKER_PROCESS_COUNT = 4
       NODE_ENV                       = "production"
@@ -37,7 +37,11 @@ locals {
 
       PdvTokenizerApiBaseURL = "https://api.uat.tokenizer.pdv.pagopa.it"
       PdvTokenizerTestUUID   = "c13b2aec-1597-4abd-a735-aacf2f935c93"
-      PdvTokenizerApiKey     = "KV"
-    }
+      },
+      {
+        for s in var.user_func.app_settings :
+        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.project}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
+      }
+    )
   }
 }
