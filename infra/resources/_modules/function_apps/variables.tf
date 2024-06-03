@@ -8,11 +8,6 @@ variable "env_short" {
   description = "Short environment"
 }
 
-variable "project" {
-  type        = string
-  description = "IO prefix and short environment"
-}
-
 variable "location" {
   type        = string
   description = "Azure region"
@@ -78,9 +73,6 @@ variable "key_vault_wallet_id" {
 
 variable "user_func" {
   type = object({
-    autoscale_default = number
-    autoscale_minimum = number
-    autoscale_maximum = number
     app_settings = list(object({
       name                  = string
       value                 = optional(string, "")

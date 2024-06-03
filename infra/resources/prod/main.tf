@@ -89,6 +89,16 @@ module "function_apps" {
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   tags = local.tags
+
+  user_func = {
+    app_settings = [
+      # TODO
+      {
+        name                  = "PDV_TOKENIZER_API_KEY"
+        key_vault_secret_name = "PdvTokenizerApiKey"
+      }
+    ]
+  }
 }
 
 module "cdn" {
