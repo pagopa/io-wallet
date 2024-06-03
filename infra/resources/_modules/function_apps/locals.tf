@@ -16,7 +16,7 @@ locals {
       CosmosDbConnectionString = "AccountEndpoint=${var.cosmos_db_endpoint};AccountKey=${var.cosmos_db_key};"
       CosmosDbDatabaseName     = var.cosmos_database_names[0]
 
-      FederationEntityBasePath         = "https://io-d-wallet-it.azurewebsites.net"
+      FederationEntityBasePath         = "https://wallet.io.pagopa.it"
       FederationEntityOrganizationName = "PagoPa S.p.A."
       FederationEntityHomepageUri      = "https://io.italia.it"
       FederationEntityPolicyUri        = "https://io.italia.it/privacy-policy/"
