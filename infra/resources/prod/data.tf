@@ -31,6 +31,10 @@ data "azuread_group" "io_developers" {
   display_name = format("%s-%s-adgroup-developers", local.prefix, local.env_short)
 }
 
+data "azuread_group" "io_admin" {
+  display_name = format("%s-%s-adgroup-admin", local.prefix, local.env_short)
+}
+
 data "azurerm_application_insights" "common" {
   name                = "${local.project_legacy}-ai-common"
   resource_group_name = data.azurerm_resource_group.weu-common.name
