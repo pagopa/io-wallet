@@ -8,6 +8,11 @@ variable "env_short" {
   description = "Short environment"
 }
 
+variable "project" {
+  type        = string
+  description = "IO prefix and short environment"
+}
+
 variable "location" {
   type        = string
   description = "Azure region"
@@ -48,7 +53,7 @@ variable "cosmos_db_endpoint" {
 
 variable "key_vault_id" {
   type        = string
-  description = "Id of the Key Vault where save secrets in"
+  description = "Id of the common Key Vault where save secrets in"
 }
 
 variable "private_dns_zone_resource_group_name" {
@@ -58,17 +63,17 @@ variable "private_dns_zone_resource_group_name" {
 
 variable "cosmos_db_key" {
   type        = string
-  description = "foo"
+  description = "Cosmos DB primary key"
 }
 
 variable "cosmos_database_names" {
   type        = list(string)
-  description = "foo"
+  description = "List of Cosmos DB database names"
 }
 
 variable "key_vault_wallet_id" {
   type        = string
-  description = "foo"
+  description = "Id of the wallet Key Vault where save secrets"
 }
 
 variable "user_func" {
@@ -82,7 +87,4 @@ variable "user_func" {
   description = "Configuration of the user-func"
 }
 
-variable "project" {
-  type        = string
-  description = "foo"
-}
+
