@@ -99,7 +99,9 @@ export const createWalletAttestation =
               x5c: [],
               trust_chain: trustChain,
             },
-            publicJwk.kid
+            publicJwk.kid,
+            "ES256",
+            "1h"
           )
         )
       )

@@ -5,21 +5,6 @@ info:
 security:
   - FunctionsKey: []
 paths:
-  /.well-known/openid-federation:
-    get:
-      operationId: getEntityConfiguration
-      summary: Returns entity configuration
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/entity-statement+jwt:
-              schema:
-                type: string
-                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        "500":
-          $ref: "#/components/responses/Unexpected"
-
   /nonce:
     get:
       operationId: getNonce
