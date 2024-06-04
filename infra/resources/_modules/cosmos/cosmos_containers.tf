@@ -13,4 +13,6 @@ module "wallet_cosmosdb_containers" {
   throughput         = lookup(each.value, "throughput", null)
 
   autoscale_settings = lookup(each.value, "autoscale_settings", null)
+
+  default_ttl = lookup(each.value, "default_ttl", null)
 }
