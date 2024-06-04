@@ -87,7 +87,7 @@ app.http("getUserByFiscalCode", {
 });
 
 app.timer("generateEntityConfiguration", {
-  schedule: "0 0 */12 * * *	",
+  schedule: "0 0 */12 * * *",
   handler: GenerateEntityConfigurationFunction({
     inputDecoder: t.unknown,
     federationEntityMetadata: config.federationEntity,
@@ -95,6 +95,6 @@ app.timer("generateEntityConfiguration", {
   }),
   return: output.storageBlob({
     path: `${config.azure.storage.containerName}/openid-federation`,
-    connection: "ENTITY_CONFIGURATION_STORAGE_CONNECTION_STRING",
+    connection: "ENTITY_CONFIGURATION_STORAGE_ACCOUNT_CONNECTION_STRING",
   }),
 });
