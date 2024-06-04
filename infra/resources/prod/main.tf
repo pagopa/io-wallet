@@ -71,6 +71,7 @@ module "function_apps" {
   prefix              = local.prefix
   env_short           = local.env_short
   location            = local.location
+  project             = local.project
   resource_group_name = azurerm_resource_group.wallet.name
 
   cidr_subnet_user_func                = "10.20.0.0/24"
@@ -81,10 +82,16 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint = module.cosmos.cosmos_account_wallet.endpoint
-  key_vault_id       = data.azurerm_key_vault.weu-common.id
+  cosmos_db_endpoint    = module.cosmos.cosmos_account_wallet.endpoint
+  cosmos_db_key         = module.cosmos.cosmos_account_wallet.primary_key
+  cosmos_database_names = module.cosmos.cosmos_account_wallet.database_names
+
+  key_vault_id        = data.azurerm_key_vault.weu-common.id
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   tags = local.tags
+
+  user_func = local.user_func
 }
 
 module "cdn" {

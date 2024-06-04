@@ -23,4 +23,21 @@ locals {
     ManagementTeam = "IO Wallet"
     Source         = "https://github.com/pagopa/io-wallet/blob/main/infra/resources/prod"
   }
+
+  user_func = {
+    app_settings = [
+      {
+        name                  = "GoogleAppCredentialsEncoded"
+        key_vault_secret_name = "GoogleAppCredentialsEncoded"
+      },
+      {
+        name                  = "PdvTokenizerApiKey"
+        key_vault_secret_name = "PdvTokenizerApiKey"
+      },
+      {
+        name                  = "WalletKeys"
+        key_vault_secret_name = "WalletKeys"
+      }
+    ]
+  }
 }
