@@ -28,6 +28,7 @@
     "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
     "PdvTokenizerApiBaseURL": "PDV_TOKENIZER_API_BASE_URL",
     "PdvTokenizerApiKey": "PDV_TOKENIZER_API_KEY",
-    "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID"
+    "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID",
+    "StorageAccountContainerName": "STORAGE_ACCOUNT_CONTAINER_NAME"
   }
 }
