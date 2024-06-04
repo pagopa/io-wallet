@@ -87,7 +87,7 @@ app.http("getUserByFiscalCode", {
 });
 
 app.timer("generateEntityConfiguration", {
-  schedule: "0 0 0 * * *",
+  schedule: "0 0 */12 * * *	",
   handler: GenerateEntityConfigurationFunction({
     inputDecoder: t.unknown,
     federationEntityMetadata: config.federationEntity,
