@@ -87,7 +87,7 @@ app.http("getUserByFiscalCode", {
 });
 
 app.timer("generateEntityConfiguration", {
-  schedule: "0 0 */12 * * *",
+  schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
   handler: GenerateEntityConfigurationFunction({
     inputDecoder: t.unknown,
     federationEntityMetadata: config.federationEntity,
