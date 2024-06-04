@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.8
+
+### Patch Changes
+
+- 5b0041c: Updated @pagopa/ts-commons
+
 ## 0.1.7
 
 ### Patch Changes
