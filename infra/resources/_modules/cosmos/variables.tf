@@ -22,13 +22,6 @@ variable "resource_group_name" {
   description = "Name of the resource group where resources will be created"
 }
 
-variable "key_vault" {
-  type = object({
-    id                 = string
-    key_versionless_id = string
-  })
-}
-
 variable "private_endpoint_subnet_id" {
   type = string
 }
