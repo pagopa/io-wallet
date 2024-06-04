@@ -59,6 +59,7 @@ const AzureConfiguration = t.type({
     connectionString: t.string,
     dbName: t.string,
   }),
+  storage: t.type({ containerName: t.string }),
 });
 
 type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
@@ -218,13 +219,25 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     cosmosDbConnectionString: readFromEnvironment("CosmosDbConnectionString"),
     cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
+    storageAccountContainerName: readFromEnvironment(
+      "StorageAccountContainerName"
+    ),
   }),
-  RE.map(({ cosmosDbConnectionString, cosmosDbDatabaseName }) => ({
-    cosmos: {
-      connectionString: cosmosDbConnectionString,
-      dbName: cosmosDbDatabaseName,
-    },
-  }))
+  RE.map(
+    ({
+      cosmosDbConnectionString,
+      cosmosDbDatabaseName,
+      storageAccountContainerName,
+    }) => ({
+      cosmos: {
+        connectionString: cosmosDbConnectionString,
+        dbName: cosmosDbDatabaseName,
+      },
+      storage: {
+        containerName: storageAccountContainerName,
+      },
+    })
+  )
 );
 
 const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<

@@ -1,11 +1,12 @@
-import { app } from "@azure/functions";
+import { app, output } from "@azure/functions";
 import { CosmosClient } from "@azure/cosmos";
+import * as t from "io-ts";
 
 import * as E from "fp-ts/Either";
 import { pipe, identity } from "fp-ts/function";
 
 import { getConfigFromEnvironment } from "./config";
-import { GetEntityConfigurationFunction } from "@/infra/azure/functions/get-entity-configuration";
+import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -69,16 +70,6 @@ app.http("createWalletInstance", {
   }),
 });
 
-app.http("getEntityConfiguration", {
-  methods: ["GET"],
-  authLevel: "anonymous",
-  route: ".well-known/openid-federation",
-  handler: GetEntityConfigurationFunction({
-    federationEntityMetadata: config.federationEntity,
-    signer,
-  }),
-});
-
 app.http("getNonce", {
   methods: ["GET"],
   authLevel: "function",
@@ -92,5 +83,18 @@ app.http("getUserByFiscalCode", {
   route: "users",
   handler: GetUserByFiscalCodeFunction({
     userRepository: pdvTokenizerClient,
+  }),
+});
+
+app.timer("generateEntityConfiguration", {
+  schedule: "*/5 * * * * *",
+  handler: GenerateEntityConfigurationFunction({
+    inputDecoder: t.any,
+    federationEntityMetadata: config.federationEntity,
+    signer,
+  }),
+  return: output.storageBlob({
+    path: `${config.azure.storage.containerName}/openid-federation`,
+    connection: "Storage",
   }),
 });
