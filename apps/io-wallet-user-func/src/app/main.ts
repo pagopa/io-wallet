@@ -94,7 +94,7 @@ app.timer("generateEntityConfiguration", {
     signer,
   }),
   return: output.storageBlob({
-    path: `${config.azure.storage.containerName}/openid-federation`,
-    connection: "ENTITY_CONFIGURATION_STORAGE_ACCOUNT_CONNECTION_STRING",
+    path: `${config.azure.storage.entityConfigurationContainerName}/openid-federation`,
+    connection: "EntityConfigurationStorageAccountConnectionString",
   }),
 });

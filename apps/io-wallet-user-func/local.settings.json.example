@@ -29,6 +29,7 @@
     "PdvTokenizerApiBaseURL": "PDV_TOKENIZER_API_BASE_URL",
     "PdvTokenizerApiKey": "PDV_TOKENIZER_API_KEY",
     "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID",
-    "StorageAccountContainerName": "STORAGE_ACCOUNT_CONTAINER_NAME"
+    "EntityConfigurationStorageAccountConnectionString": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT_CONNECTION_STRING",
+    "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME"
   }
 }

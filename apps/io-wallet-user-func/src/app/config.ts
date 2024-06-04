@@ -59,7 +59,7 @@ const AzureConfiguration = t.type({
     connectionString: t.string,
     dbName: t.string,
   }),
-  storage: t.type({ containerName: t.string }),
+  storage: t.type({ entityConfigurationContainerName: t.string }),
 });
 
 type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
@@ -219,22 +219,23 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     cosmosDbConnectionString: readFromEnvironment("CosmosDbConnectionString"),
     cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
-    storageAccountContainerName: readFromEnvironment(
-      "StorageAccountContainerName"
+    entityConfigurationStorageContainerName: readFromEnvironment(
+      "EntityConfigurationStorageContainerName"
     ),
   }),
   RE.map(
     ({
       cosmosDbConnectionString,
       cosmosDbDatabaseName,
-      storageAccountContainerName,
+      entityConfigurationStorageContainerName,
     }) => ({
       cosmos: {
         connectionString: cosmosDbConnectionString,
         dbName: cosmosDbDatabaseName,
       },
       storage: {
-        containerName: storageAccountContainerName,
+        entityConfigurationContainerName:
+          entityConfigurationStorageContainerName,
       },
     })
   )
