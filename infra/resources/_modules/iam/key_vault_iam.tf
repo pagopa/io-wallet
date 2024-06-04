@@ -1,4 +1,4 @@
-resource "azurerm_role_assignment" "admins" {
+resource "azurerm_role_assignment" "kv_admins" {
   for_each = var.key_vault.admin_ids
 
   role_definition_name = "Key Vault Administrator"

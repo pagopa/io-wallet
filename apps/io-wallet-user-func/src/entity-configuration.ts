@@ -116,7 +116,12 @@ export const getEntityConfiguration: RTE.ReaderTaskEither<
           },
         },
         EntityConfigurationToJwtModel.encode,
-        signer.createJwtAndSign({ typ: "entity-statement+jwt" }, publicJwk.kid)
+        signer.createJwtAndSign(
+          { typ: "entity-statement+jwt" },
+          publicJwk.kid,
+          "ES256",
+          "24h"
+        )
       )
     )
   );

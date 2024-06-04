@@ -63,6 +63,7 @@ module "federated_identities" {
           "Key Vault Administrator",
           "Key Vault Crypto Officer",
           "Key Vault Secrets Officer",
+          "Role Based Access Control Administrator",
         ]
       }
     }
