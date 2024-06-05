@@ -1,5 +1,6 @@
 import { app, output } from "@azure/functions";
 import { CosmosClient } from "@azure/cosmos";
+import { DefaultAzureCredential } from "@azure/identity";
 import * as t from "io-ts";
 
 import * as E from "fp-ts/Either";
@@ -28,7 +29,13 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
-const cosmosClient = new CosmosClient(config.azure.cosmos.connectionString);
+const credential = new DefaultAzureCredential();
+
+const cosmosClient = new CosmosClient({
+  endpoint: config.azure.cosmos.endpoint,
+  aadCredentials: credential,
+});
+
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const nonceRepository = new CosmosDbNonceRepository(database);
@@ -95,6 +102,6 @@ app.timer("generateEntityConfiguration", {
   }),
   return: output.storageBlob({
     path: `${config.azure.storage.entityConfigurationContainerName}/openid-federation`,
-    connection: "EntityConfigurationStorageAccountConnectionString",
+    connection: "EntityConfigurationStorageAccount",
   }),
 });
