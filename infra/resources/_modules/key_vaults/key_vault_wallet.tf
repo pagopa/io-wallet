@@ -3,7 +3,7 @@ resource "azurerm_key_vault" "wallet" {
   location            = var.location
   resource_group_name = var.resource_group_name
   tenant_id           = var.tenant_id
-  sku_name            = "premium"
+  sku_name            = "standard"
 
   enabled_for_disk_encryption   = true
   enable_rbac_authorization     = true

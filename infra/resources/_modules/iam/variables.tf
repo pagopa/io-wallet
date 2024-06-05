@@ -4,6 +4,7 @@ variable "cosmos_db" {
     name                = string
     resource_group_name = string
     database_names      = set(string)
+    admin_ids           = set(string)
   })
 }
 
