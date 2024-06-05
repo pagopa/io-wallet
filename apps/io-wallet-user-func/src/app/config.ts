@@ -225,7 +225,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
-      cosmosDbEnpoint,
+      cosmosDbEndpoint,
       cosmosDbDatabaseName,
       entityConfigurationStorageContainerName,
     }) => ({
