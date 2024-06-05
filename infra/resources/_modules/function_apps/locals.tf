@@ -13,8 +13,10 @@ locals {
       FETCH_KEEPALIVE_FREE_SOCKET_TIMEOUT = "30000"
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
 
-      CosmosDbConnectionString = "AccountEndpoint=${var.cosmos_db_endpoint};AccountKey=${var.cosmos_db_key};"
-      CosmosDbDatabaseName     = var.cosmos_database_names[0]
+      CosmosDbEndpoint     = var.cosmos_db_endpoint
+      CosmosDbDatabaseName = var.cosmos_database_names[0]
+
+      EntityConfigurationStorageAccount__serviceUri = "https://${var.storage_account_cdn_name}.blob.core.windows.net"
 
       FederationEntityBasePath         = "https://wallet.io.pagopa.it"
       FederationEntityOrganizationName = "PagoPa S.p.A."
