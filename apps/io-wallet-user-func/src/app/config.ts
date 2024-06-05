@@ -217,7 +217,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   AzureConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    cosmosDbEnpoint: readFromEnvironment("CosmosDbEndpoint"),
+    cosmosDbEndpoint: readFromEnvironment("CosmosDbEndpoint"),
     cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName"
