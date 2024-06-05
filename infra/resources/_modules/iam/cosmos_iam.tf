@@ -18,7 +18,7 @@ resource "azurerm_cosmosdb_sql_role_assignment" "func_app_user_staging_slot_to_c
   scope               = "${var.cosmos_db.id}/dbs/${each.value}"
 }
 
-resource "azurerm_role_assignment" "cosmos_admins" {
+resource "azurerm_role_assignment" "cosmos_contributors" {
   for_each = var.cosmos_db.admin_ids
 
   role_definition_name = "00000000-0000-0000-0000-000000000002"
