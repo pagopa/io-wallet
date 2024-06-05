@@ -54,11 +54,6 @@ module "cosmos" {
   secondary_location  = local.secondary_location
   resource_group_name = azurerm_resource_group.wallet.name
 
-  key_vault = {
-    id                 = module.key_vaults.key_vault_wallet.id
-    key_versionless_id = module.key_vaults.key_vault_cosmos_key.versionless_id
-  }
-
   private_endpoint_subnet_id = data.azurerm_subnet.pep.id
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
 

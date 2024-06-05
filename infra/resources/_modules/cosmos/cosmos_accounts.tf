@@ -4,14 +4,6 @@ resource "azurerm_cosmosdb_account" "wallet" {
   location            = var.location
   offer_type          = "Standard"
 
-  default_identity_type = join("=", ["UserAssignedIdentity", azurerm_user_assigned_identity.cosmos.id])
-  key_vault_key_id      = var.key_vault.key_versionless_id
-
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.cosmos.id]
-  }
-
   consistency_policy {
     consistency_level       = "Strong"
     max_interval_in_seconds = null
@@ -38,8 +30,4 @@ resource "azurerm_cosmosdb_account" "wallet" {
   }
 
   tags = var.tags
-
-  depends_on = [
-    azurerm_role_assignment.key_vault
-  ]
 }
