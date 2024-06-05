@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.9
+
+### Patch Changes
+
+- 53d30ed: updated
+
 ## 0.1.8
 
 ### Patch Changes
