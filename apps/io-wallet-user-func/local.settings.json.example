@@ -6,7 +6,7 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "NODE_ENV": "development",
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
-    "CosmosDbConnectionString": "COSMOS_DB_CONNECTION_STRING",
+    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
     "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME",
@@ -29,7 +29,7 @@
     "PdvTokenizerApiBaseURL": "PDV_TOKENIZER_API_BASE_URL",
     "PdvTokenizerApiKey": "PDV_TOKENIZER_API_KEY",
     "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID",
-    "EntityConfigurationStorageAccountConnectionString": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT_CONNECTION_STRING",
+    "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI"
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME"
   }
 }

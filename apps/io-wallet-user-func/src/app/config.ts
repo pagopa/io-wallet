@@ -56,7 +56,7 @@ export type AttestationServiceConfiguration = t.TypeOf<
 
 const AzureConfiguration = t.type({
   cosmos: t.type({
-    connectionString: t.string,
+    endpoint: t.string,
     dbName: t.string,
   }),
   storage: t.type({ entityConfigurationContainerName: t.string }),
@@ -217,7 +217,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   AzureConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    cosmosDbConnectionString: readFromEnvironment("CosmosDbConnectionString"),
+    cosmosDbEnpoint: readFromEnvironment("CosmosDbEndpoint"),
     cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName"
@@ -225,12 +225,12 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
-      cosmosDbConnectionString,
+      cosmosDbEnpoint,
       cosmosDbDatabaseName,
       entityConfigurationStorageContainerName,
     }) => ({
       cosmos: {
-        connectionString: cosmosDbConnectionString,
+        endpoint: cosmosDbEnpoint,
         dbName: cosmosDbDatabaseName,
       },
       storage: {
