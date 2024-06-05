@@ -111,6 +111,10 @@ module "iam" {
     name                = module.cosmos.cosmos_account_wallet.name
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
     database_names      = module.cosmos.cosmos_account_wallet.database_names
+    admin_ids = [
+      data.azuread_group.io_developers.object_id,
+      data.azuread_group.io_admin.object_id,
+    ]
   }
 
   function_app = {
