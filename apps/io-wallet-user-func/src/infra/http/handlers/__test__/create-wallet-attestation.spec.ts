@@ -1,6 +1,7 @@
 import { it, expect, describe, beforeAll, afterAll } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import * as O from "fp-ts/Option";
 import * as E from "fp-ts/Either";
 import * as jose from "jose";
 import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
@@ -24,7 +25,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode } from "cbor-x";
 
-const { challenge, assertion, hardwareKey, keyId, ephemeralKey } = iOSMockData;
+const { challenge, assertion, hardwareKey, keyId } = iOSMockData;
 
 beforeAll(() => {
   trustAnchorServerMock.listen(trustAnchorPort);
@@ -37,6 +38,11 @@ afterAll(() => {
 const nonceRepository: NonceRepository = {
   insert: () => TE.left(new Error("not implemented")),
   delete: () => TE.right(void 0),
+};
+
+const logger = {
+  log: () => () => {},
+  format: L.format.simple,
 };
 
 const attestationServiceConfiguration = {
@@ -58,13 +64,15 @@ const attestationServiceConfiguration = {
 const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
   get: () =>
-    TE.right({
-      id: "123" as NonEmptyString,
-      userId: "123" as NonEmptyString,
-      hardwareKey,
-      signCount: 0,
-      isRevoked: false,
-    }),
+    TE.right(
+      O.some({
+        id: "123" as NonEmptyString,
+        userId: "123" as NonEmptyString,
+        hardwareKey,
+        signCount: 0,
+        isRevoked: false,
+      })
+    ),
   batchPatchWithReplaceOperation: () => TE.left(new Error("not implemented")),
   getAllByUserId: () => TE.left(new Error("not implemented")),
 };
@@ -109,10 +117,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      logger: {
-        log: () => () => {},
-        format: L.format.simple,
-      },
+      logger,
       federationEntityMetadata,
       signer,
       nonceRepository,
@@ -142,5 +147,140 @@ describe("CreateWalletAttestationHandler", async () => {
         expect((decoded.sub || "").endsWith("/")).toBe(false);
       }
     }
+  });
+
+  it("should return a 422 HTTP response on invalid body", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: {
+        grant_type: "foo",
+        assertion: walletAttestationRequest,
+      },
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
+    };
+    const handler = CreateWalletAttestationHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      federationEntityMetadata,
+      signer,
+      nonceRepository,
+      attestationServiceConfiguration,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 422,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+      }),
+    });
+  });
+
+  it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
+    const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
+      insert: () => TE.left(new Error("not implemented")),
+      get: () =>
+        TE.right(
+          O.some({
+            id: "123" as NonEmptyString,
+            userId: "123" as NonEmptyString,
+            hardwareKey,
+            signCount: 0,
+            isRevoked: true,
+          })
+        ),
+      batchPatchWithReplaceOperation: () =>
+        TE.left(new Error("not implemented")),
+      getAllByUserId: () => TE.left(new Error("not implemented")),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: {
+        grant_type: GRANT_TYPE_KEY_ATTESTATION,
+        assertion: walletAttestationRequest,
+      },
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
+    };
+    const handler = CreateWalletAttestationHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      federationEntityMetadata,
+      signer,
+      nonceRepository,
+      attestationServiceConfiguration,
+      walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 403,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        body: {
+          title: "Forbidden",
+          status: 403,
+          detail: "The wallet instance has been revoked.",
+        },
+      }),
+    });
+  });
+
+  it("should return a 404 HTTP response when the wallet instance is not found", async () => {
+    const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
+      insert: () => TE.left(new Error("not implemented")),
+      get: () => TE.right(O.none),
+      batchPatchWithReplaceOperation: () =>
+        TE.left(new Error("not implemented")),
+      getAllByUserId: () => TE.left(new Error("not implemented")),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
+      body: {
+        grant_type: GRANT_TYPE_KEY_ATTESTATION,
+        assertion: walletAttestationRequest,
+      },
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
+    };
+    const handler = CreateWalletAttestationHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      federationEntityMetadata,
+      signer,
+      nonceRepository,
+      attestationServiceConfiguration,
+      walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 404,
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        body: {
+          title: "Not Found",
+          status: 404,
+          detail: "Wallet instance not found",
+        },
+      }),
+    });
   });
 });
