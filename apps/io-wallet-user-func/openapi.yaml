@@ -126,7 +126,7 @@ components:
 
   responses:
     Forbidden:
-      description: the server understands the request but refuses to authorize it
+      description: The server understands the request but refuses to authorize it
       content:
         application/json:
           schema:
