@@ -17,6 +17,7 @@ locals {
       CosmosDbDatabaseName = var.cosmos_database_names[0]
 
       EntityConfigurationStorageAccount__serviceUri = "https://${var.storage_account_cdn_name}.blob.core.windows.net"
+      EntityConfigurationStorageContainerName       = "test"
 
       FederationEntityBasePath         = "https://wallet.io.pagopa.it"
       FederationEntityOrganizationName = "PagoPa S.p.A."
