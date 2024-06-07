@@ -9,6 +9,14 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { User } from "./user";
 import { JwkPublicKey } from "./jwk";
+import { EntityNotFoundError } from "./infra/http/utils";
+
+class WalletInstanceRevoked extends Error {
+  name = "WalletInstanceRevoked";
+  constructor() {
+    super("The wallet instance has been revoked.");
+  }
+}
 
 export const WalletInstance = t.type({
   id: NonEmptyString,
@@ -24,7 +32,7 @@ export type WalletInstanceRepository = {
   get: (
     id: WalletInstance["id"],
     userId: WalletInstance["userId"]
-  ) => TE.TaskEither<Error, WalletInstance>;
+  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
   batchPatchWithReplaceOperation: (
     operations: Array<{
@@ -58,9 +66,14 @@ export const getValidWalletInstance: (
   ({ walletInstanceRepository }) =>
     pipe(
       walletInstanceRepository.get(id, userId),
+      TE.chain(
+        TE.fromOption(
+          () => new EntityNotFoundError("Wallet instance not found")
+        )
+      ),
       TE.chain((walletInstance) =>
         walletInstance.isRevoked
-          ? TE.left(new Error("The wallet instance has been revoked"))
+          ? TE.left(new WalletInstanceRevoked())
           : TE.right(walletInstance)
       )
     );

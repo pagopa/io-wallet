@@ -1,4 +1,5 @@
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
+import * as O from "fp-ts/Option";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
@@ -22,15 +23,20 @@ export class CosmosDbWalletInstanceRepository
         (error) => new Error(`Error getting wallet instance: ${error}`)
       ),
       TE.chain(({ resource }) =>
-        pipe(
-          resource,
-          WalletInstance.decode,
-          E.mapLeft(
-            () =>
-              new Error("error getting wallet instance: invalid result format")
-          ),
-          TE.fromEither
-        )
+        resource === undefined
+          ? TE.right(O.none)
+          : pipe(
+              resource,
+              WalletInstance.decode,
+              E.map(O.some),
+              E.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting wallet instance: invalid result format"
+                  )
+              ),
+              TE.fromEither
+            )
       )
     );
   }
