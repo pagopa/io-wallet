@@ -89,6 +89,12 @@ paths:
             application/jwt:
               schema:
                 $ref: "#/components/schemas/WalletAttestationView"
+        "403":
+          description: The wallet instance was revoked
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: The wallet instance was not found
+          $ref: "#/components/responses/NotFound"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -119,6 +125,20 @@ components:
       in: header
 
   responses:
+    Forbidden:
+      description: The server understands the request but refuses to authorize it
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+
     UnprocessableContent:
       description: Unprocessable Content
       content:

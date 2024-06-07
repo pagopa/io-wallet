@@ -5,6 +5,10 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 
 import { flow } from "fp-ts/function";
 
+export class EntityNotFoundError extends Error {
+  name = "EntityNotFoundError";
+}
+
 // Encode domain errors to http errors
 const toHttpError = (e: Error): Error => {
   if (e.name === "HttpError") {
@@ -13,14 +17,10 @@ const toHttpError = (e: Error): Error => {
   switch (e.name) {
     case "EntityNotFoundError":
       return new H.HttpNotFoundError(e.message);
-    case "ActionNotAllowedError":
-      return new H.HttpBadRequestError(e.message);
-    case "InvalidExpireDateError":
-      return new H.HttpBadRequestError(e.message);
-    case "TooManyRequestsError":
-      return new H.HttpTooManyRequestsError(e.message);
     case "HealthCheckError":
       return new H.HttpError(e.message);
+    case "WalletInstanceRevoked":
+      return new H.HttpForbiddenError(e.message);
   }
   return e;
 };
