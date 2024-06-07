@@ -24,7 +24,7 @@
   },
   "extensions": {
     "http": {
-      "routePrefix": "api/v1"
+      "routePrefix": "api/v1/wallet"
     },
     "tracing": {
       "traceInputsAndOutputs": false,
