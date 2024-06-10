@@ -34,7 +34,7 @@ export class PdvTokenizerClient
     this.#testUUID = testUUID;
   }
 
-  getUserByFiscalCode = (fiscalCode: FiscalCode) =>
+  getOrCreateUserByFiscalCode = (fiscalCode: FiscalCode) =>
     pipe(
       TE.tryCatch(
         async () => {
