@@ -39,11 +39,11 @@ export class PdvTokenizerClient
       TE.tryCatch(
         async () => {
           const result = await fetch(
-            new URL("/tokenizer/v1/tokens/search", this.#baseURL),
+            new URL("/tokenizer/v1/tokens", this.#baseURL),
             {
               ...this.#options,
               signal: AbortSignal.timeout(3000),
-              method: "POST",
+              method: "PUT",
               body: JSON.stringify({
                 pii: fiscalCode,
               }),
