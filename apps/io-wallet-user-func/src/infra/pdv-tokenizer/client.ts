@@ -38,6 +38,7 @@ export class PdvTokenizerClient
     pipe(
       TE.tryCatch(
         async () => {
+          this.setHeaders({ "Content-Type": "application/json" });
           const result = await fetch(
             new URL("/tokenizer/v1/tokens", this.#baseURL),
             {
@@ -117,5 +118,12 @@ export class PdvTokenizerClient
       signal: AbortSignal.timeout(3000),
       method: "GET",
     });
+  }
+
+  setHeaders(headers: object) {
+    this.#options.headers = {
+      ...this.#options.headers,
+      ...headers,
+    };
   }
 }
