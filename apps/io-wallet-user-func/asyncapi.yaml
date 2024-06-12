@@ -1,8 +1,18 @@
 asyncapi: 3.0.0
 info:
-  title: IO Wallet - Web Async API
+  title: IO Wallet - User Async API
   version: 0.1.0
 channels:
+  walletInstanceRevoked:
+    address: "on-wallet-instance-revoked"
+    messages:
+      walletInstanceRevokedMessage:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            id:
+              type: string
   walletInstanceCreated:
     address: "on-wallet-instance-created"
     messages:
@@ -26,23 +36,13 @@ channels:
                   type: string
                 crv:
                   type: string
-  walletInstanceRevoked:
-    address: "on-wallet-instance-revoked"
-    messages:
-      walletInstanceRevokedMessage:
-        contentType: application/json
-        payload:
-          type: object
-          properties:
-            id:
-              type: string
 
 operations:
-  createWalletInstance:
+  revokeWalletInstance:
     action: "receive"
     channel:
-      $ref: "#/channels/walletInstanceCreated"
-  setWalletInstanceStatus:
+      $ref: "#/channels/walletInstanceRevoked"
+  createWalletInstance:
     action: "send"
     channel:
-      $ref: "#/channels/walletInstanceRevoked"
+      $ref: "#/channels/walletInstanceCreated"

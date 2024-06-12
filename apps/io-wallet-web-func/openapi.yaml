@@ -4,8 +4,6 @@ info:
   title: IO Web Wallet Function API
   x-logo:
     url: https://io.italia.it/assets/img/io-logo-blue.svg
-  description: |
-    Documentation of the IO Web Wallet Function API here.
 security:
   - bearerAuth: []
 paths:
