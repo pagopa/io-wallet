@@ -1,0 +1,36 @@
+asyncapi: 3.0.0
+info:
+  title: web-func
+  version: 0.1.0
+  description: |
+    Documentation of the IO Web Wallet async API here.
+channels:
+  walletInstance:
+    address: "on-wallet-instance-created"
+    messages:
+      walletInstanceMessage:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            id:
+              type: string
+            userId:
+              type: string
+            hardwareKey:
+              type: object
+              properties:
+                kty:
+                  type: string
+                x:
+                  type: string
+                y:
+                  type: string
+                crv:
+                  type: string
+
+operations:
+  createWalletInstance:
+    action: "receive"
+    channel:
+      $ref: "#/channels/walletInstance"
