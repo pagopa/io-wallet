@@ -40,8 +40,6 @@ paths:
       description: |
         Revoke the Wallet Instance associated with the authenticated user. 
         If the Wallet Instance is already revoked, the operation succeed.
-        If the Wallet Instance cannot be revoked due to its current status, 
-        a conflict error is returned.
       operationId: setWalletInstanceStatus
       requestBody:
         content:
@@ -57,8 +55,6 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -87,13 +83,6 @@ components:
 
     NotFound:
       description: The specified resource was not found
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    Conflict:
-      description: There has been a conflict
       content:
         application/json:
           schema:
