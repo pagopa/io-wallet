@@ -8,7 +8,8 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
 describe("GetUserByFiscalCodeHandler", () => {
   const userRepository: UserRepository = {
-    getUserByFiscalCode: () => TE.right({ id: "pdv_id" as NonEmptyString }),
+    getOrCreateUserByFiscalCode: () =>
+      TE.right({ id: "pdv_id" as NonEmptyString }),
     getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
   };
 
@@ -73,7 +74,7 @@ describe("GetUserByFiscalCodeHandler", () => {
 
   it("should return a 500 HTTP response when getUserByFiscalCode returns error", async () => {
     const userRepositoryThatFailsOnGetUserByFiscalCode: UserRepository = {
-      getUserByFiscalCode: () =>
+      getOrCreateUserByFiscalCode: () =>
         TE.left(new Error("failed on getIdByFiscalCode!")),
       getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     };
