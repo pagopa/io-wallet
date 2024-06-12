@@ -82,7 +82,7 @@ components:
             $ref: "#/components/schemas/ProblemJson"
 
     NotFound:
-      description: The specified resource was not found
+      description: The specified wallet instance was not found
       content:
         application/json:
           schema:
