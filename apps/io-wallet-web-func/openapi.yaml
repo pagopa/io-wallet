@@ -106,20 +106,6 @@ components:
           schema:
             $ref: "#/components/schemas/ProblemJson"
 
-    BadGateway:
-      description: Bad Gateway
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    GatewayTimeout:
-      description: Gateway Timeout
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
     InternalServerError:
       description: Internal Server Error
       content:
