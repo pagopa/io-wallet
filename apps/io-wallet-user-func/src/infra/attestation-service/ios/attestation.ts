@@ -110,7 +110,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   );
   const publicKeyHash = createHash("sha256")
     .update(publicKey.toString("hex"), "hex") // Convert publicKey to hexadecimal string
-    .digest("base64");
+    .digest("base64url");
   if (publicKeyHash !== keyId) {
     throw new Error("[iOS Attestation] keyId does not match");
   }
@@ -148,7 +148,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const credentialIdLength = authData.subarray(53, 55).readInt16BE();
   const credentialId = authData.subarray(55, 55 + credentialIdLength);
 
-  if (credentialId.toString("base64") !== keyId) {
+  if (credentialId.toString("base64url") !== keyId) {
     throw new Error("[iOS Attestation] credentialId does not match");
   }
 
