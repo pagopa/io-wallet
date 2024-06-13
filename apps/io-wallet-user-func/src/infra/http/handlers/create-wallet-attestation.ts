@@ -9,7 +9,8 @@ import * as TE from "fp-ts/lib/TaskEither";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { logErrorAndReturnResponse } from "../utils";
+// import { logErrorAndReturnResponse } from "../utils";
+import { logErrorAndReturnResponse } from "@io-wallet/io-wallet/infra/http/utils";
 import { requireUser, successJwt } from "./utils";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";

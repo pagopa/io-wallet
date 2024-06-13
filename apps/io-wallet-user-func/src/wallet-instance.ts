@@ -7,9 +7,9 @@ import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { EntityNotFoundError } from "@io-wallet/io-wallet/infra/http/utils";
 import { User } from "./user";
 import { JwkPublicKey } from "./jwk";
-import { EntityNotFoundError } from "./infra/http/utils";
 
 class WalletInstanceRevoked extends Error {
   name = "WalletInstanceRevoked";

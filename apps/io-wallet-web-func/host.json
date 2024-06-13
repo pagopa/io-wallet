@@ -1,0 +1,34 @@
+{
+  "version": "2.0",
+  "logging": {
+    "logLevel": {
+      "default": "None",
+      "Function": "Error",
+      "Host.Aggregator": "Information",
+      "Host.Results": "Information",
+      "Microsoft": "Information",
+      "Worker": "Information"
+    },
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 5,
+        "includedTypes": "PageView;Trace;Dependency;Request",
+        "excludedTypes": "Exception;Event;CustomEvent"
+      }
+    }
+  },
+  "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[3.3.*, 4.0.0)"
+  },
+  "extensions": {
+    "http": {
+      "routePrefix": "api/v1/wallet"
+    },
+    "tracing": {
+      "traceInputsAndOutputs": false,
+      "traceReplayEvents": false
+    }
+  }
+}

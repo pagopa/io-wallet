@@ -1,6 +1,6 @@
 {
-  "name": "io-wallet-user-func",
-  "version": "0.1.10",
+  "name": "io-wallet-web-func",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -20,15 +20,7 @@
     "@io-wallet/io-wallet": "workspace:^",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
-    "@pagopa/ts-commons": "^13.1.1",
-    "@peculiar/asn1-android": "^2.3.10",
-    "asn1js": "^3.0.5",
-    "cbor-x": "^1.5.9",
-    "fp-ts": "^2.16.0",
-    "googleapis": "^134.0.0",
-    "io-ts": "^2.2.20",
-    "jose": "5.2.4",
-    "pkijs": "^3.0.16"
+    "io-ts": "^2.2.21"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",
