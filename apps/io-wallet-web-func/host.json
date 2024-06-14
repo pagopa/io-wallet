@@ -25,10 +25,6 @@
   "extensions": {
     "http": {
       "routePrefix": "api/v1/wallet"
-    },
-    "tracing": {
-      "traceInputsAndOutputs": false,
-      "traceReplayEvents": false
     }
   }
 }
