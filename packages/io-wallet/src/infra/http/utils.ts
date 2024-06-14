@@ -1,4 +1,3 @@
-// cambiare nome a questo file se voglio
 import * as H from "@pagopa/handler-kit";
 import { errorRTE } from "@pagopa/logger";
 

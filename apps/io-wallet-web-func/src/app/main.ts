@@ -31,5 +31,3 @@ app.http("healthCheck", {
   route: "health",
   handler: HealthFunction({ cosmosClient }),
 });
-
-// controlla che non ci siano dipendenze inutilizzate

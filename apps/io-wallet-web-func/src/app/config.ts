@@ -4,7 +4,6 @@ import * as RE from "fp-ts/lib/ReaderEither";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { readFromEnvironment } from "@io-wallet/io-wallet/infra/env";
 
-// ci sarà la coda
 const AzureConfiguration = t.type({
   cosmos: t.type({
     endpoint: t.string,
@@ -48,5 +47,3 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     azure,
   }))
 );
-
-// script build:package a che serve?
