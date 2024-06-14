@@ -1,13 +1,13 @@
-import * as t from "io-ts";
-import { pipe } from "fp-ts/lib/function";
-import * as RE from "fp-ts/lib/ReaderEither";
 import { sequenceS } from "fp-ts/lib/Apply";
+import * as RE from "fp-ts/lib/ReaderEither";
+import { pipe } from "fp-ts/lib/function";
+import * as t from "io-ts";
 import { readFromEnvironment } from "io-wallet-common";
 
 const AzureConfiguration = t.type({
   cosmos: t.type({
-    endpoint: t.string,
     dbName: t.string,
+    endpoint: t.string,
   }),
 });
 
@@ -25,15 +25,15 @@ const getAzureConfigFromEnvironment: RE.ReaderEither<
   AzureConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    cosmosDbEndpoint: readFromEnvironment("CosmosDbEndpoint"),
     cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
+    cosmosDbEndpoint: readFromEnvironment("CosmosDbEndpoint"),
   }),
-  RE.map(({ cosmosDbEndpoint, cosmosDbDatabaseName }) => ({
+  RE.map(({ cosmosDbDatabaseName, cosmosDbEndpoint }) => ({
     cosmos: {
-      endpoint: cosmosDbEndpoint,
       dbName: cosmosDbDatabaseName,
+      endpoint: cosmosDbEndpoint,
     },
-  }))
+  })),
 );
 
 export const getConfigFromEnvironment: RE.ReaderEither<
@@ -45,5 +45,5 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("azure", () => getAzureConfigFromEnvironment),
   RE.map(({ azure }) => ({
     azure,
-  }))
+  })),
 );

@@ -1,15 +1,15 @@
-import { app } from "@azure/functions";
-import { CosmosClient } from "@azure/cosmos";
-import { DefaultAzureCredential } from "@azure/identity";
-
-import * as E from "fp-ts/Either";
-import { pipe, identity } from "fp-ts/function";
-import { getConfigFromEnvironment } from "./config";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { CosmosClient } from "@azure/cosmos";
+import { app } from "@azure/functions";
+import { DefaultAzureCredential } from "@azure/identity";
+import * as E from "fp-ts/Either";
+import { identity, pipe } from "fp-ts/function";
+
+import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
-  E.getOrElseW(identity)
+  E.getOrElseW(identity),
 );
 
 if (configOrError instanceof Error) {
@@ -21,13 +21,13 @@ const config = configOrError;
 const credential = new DefaultAzureCredential();
 
 const cosmosClient = new CosmosClient({
-  endpoint: config.azure.cosmos.endpoint,
   aadCredentials: credential,
+  endpoint: config.azure.cosmos.endpoint,
 });
 
 app.http("healthCheck", {
-  methods: ["GET"],
   authLevel: "anonymous",
-  route: "health",
   handler: HealthFunction({ cosmosClient }),
+  methods: ["GET"],
+  route: "health",
 });

@@ -1,9 +1,7 @@
-import { it, expect, describe } from "vitest";
-
+import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-
-import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
+import { describe, expect, it } from "vitest";
 
 import { HealthHandler } from "../health";
 
@@ -19,52 +17,52 @@ describe("HealthHandler", () => {
 
   it("should return a 200 HTTP response on success", async () => {
     const handler = HealthHandler({
+      cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger: {
-        log: () => () => {},
         format: L.format.simple,
+        log: () => () => void 0,
       },
-      cosmosClient,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
-        statusCode: 200,
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
         body: {
           message: "it works!",
         },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
       },
     });
   });
 
   it("should return a 500 HTTP response when getCosmosHealth returns an error", async () => {
     const handler = HealthHandler({
+      cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger: {
-        log: () => () => {},
         format: L.format.simple,
+        log: () => () => void 0,
       },
-      cosmosClient: cosmosClientThatFails,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
-        statusCode: 500,
+        body: {
+          detail: "The function is not healthy. cosmos-db-error",
+          status: 500,
+          title: "Internal Server Error",
+        },
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        body: {
-          title: "Internal Server Error",
-          status: 500,
-          detail: "The function is not healthy. cosmos-db-error",
-        },
+        statusCode: 500,
       },
     });
   });

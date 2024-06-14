@@ -1,12 +1,12 @@
-import { pipe } from "fp-ts/function";
-import * as TE from "fp-ts/TaskEither";
-import * as RTE from "fp-ts/ReaderTaskEither";
 import { CosmosClient } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import * as TE from "fp-ts/TaskEither";
+import { pipe } from "fp-ts/function";
 import {
+  HealthCheckError,
   getCosmosHealth,
   logErrorAndReturnResponse,
-  HealthCheckError,
 } from "io-wallet-common";
 
 const getHealthCheck: RTE.ReaderTaskEither<
@@ -20,7 +20,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
     { cosmosClient },
     getCosmosHealth,
     TE.map(() => undefined),
-    TE.mapLeft(({ message }) => new HealthCheckError(message))
+    TE.mapLeft(({ message }) => new HealthCheckError(message)),
   );
 
 export const HealthHandler = H.of(() =>
@@ -30,6 +30,6 @@ export const HealthHandler = H.of(() =>
       message: "it works!",
     })),
     RTE.map(H.successJson),
-    RTE.orElseW(logErrorAndReturnResponse)
-  )
+    RTE.orElseW(logErrorAndReturnResponse),
+  ),
 );
