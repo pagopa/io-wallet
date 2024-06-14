@@ -1,13 +1,13 @@
-import * as http from "http";
-import { vi } from "vitest";
-import { flow } from "fp-ts/function";
-import * as E from "fp-ts/Either";
-import * as jose from "jose";
-import { UrlFromString } from "@pagopa/ts-commons/lib/url";
+import { FederationEntityMetadata } from "@/entity-configuration";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
+import * as E from "fp-ts/Either";
+import { flow } from "fp-ts/function";
+import * as http from "http";
+import * as jose from "jose";
+import { vi } from "vitest";
 
 import { jwks, privateEcKey } from "./keys";
-import { FederationEntityMetadata } from "@/entity-configuration";
 
 export const trustAnchorPort = 8123;
 
@@ -17,7 +17,6 @@ export const getEntityStatement = vi.fn().mockImplementation(async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   return await new jose.SignJWT({
     iss: `${trustAnchorBaseUrl}`,
-    sub: "https://wallet-provider.example.org",
     jwks: {
       keys: jwks,
     },
@@ -29,6 +28,7 @@ export const getEntityStatement = vi.fn().mockImplementation(async () => {
       },
     },
     source_endpoint: `${trustAnchorBaseUrl}/fetch`,
+    sub: "https://wallet-provider.example.org",
     trust_marks: [
       {
         id: `${trustAnchorBaseUrl}/entity/wallet_provider`,
@@ -38,9 +38,9 @@ export const getEntityStatement = vi.fn().mockImplementation(async () => {
     ],
   })
     .setProtectedHeader({
-      typ: "entity-statement+jwt",
       alg: "ES256",
       kid: privateEcKey.kid,
+      typ: "entity-statement+jwt",
     })
     .setIssuedAt()
     .setExpirationTime("2h")
@@ -52,8 +52,10 @@ export const getTrustAnchotEntityConfiguration = vi
   .mockImplementation(async () => {
     const josePrivateKey = await jose.importJWK(privateEcKey);
     return await new jose.SignJWT({
+      constraints: {
+        max_path_length: 1,
+      },
       iss: `${trustAnchorBaseUrl}`,
-      sub: `${trustAnchorBaseUrl}`,
       jwks: {
         keys: jwks,
       },
@@ -61,54 +63,51 @@ export const getTrustAnchotEntityConfiguration = vi
         federation_entity: {
           contacts: ["io-wallet@example.org"],
           federation_fetch_endpoint: `${trustAnchorBaseUrl}/fetch`,
+          federation_list_endpoint: `${trustAnchorBaseUrl}/list`,
           federation_resolve_endpoint: `${trustAnchorBaseUrl}/resolve`,
           federation_trust_mark_status_endpoint: `${trustAnchorBaseUrl}/trust_mark_status`,
           homepage_uri: `${trustAnchorBaseUrl}`,
           name: "Trust Anchor - Wallet interop lab",
-          federation_list_endpoint: `${trustAnchorBaseUrl}/list`,
         },
       },
-      constraints: {
-        max_path_length: 1,
-      },
+      sub: `${trustAnchorBaseUrl}`,
     })
       .setProtectedHeader({
-        typ: "entity-statement+jwt",
         alg: "ES256",
         kid: privateEcKey.kid,
+        typ: "entity-statement+jwt",
       })
       .setIssuedAt()
       .setExpirationTime("2h")
       .sign(josePrivateKey);
   });
 
-export const trustAnchorServerMock = http.createServer(async function (
-  req,
-  res
-) {
-  const { pathname } = new URL(req.url || "", `https://${req.headers.host}`);
-  res.setHeader("Content-Type", "application/entity-statement+jwt");
-  if (pathname.endsWith("/.well-known/openid-federation")) {
-    res.write(await getTrustAnchotEntityConfiguration());
-  } else if (pathname.endsWith("/fetch")) {
-    res.write(await getEntityStatement());
-  }
-  res.end();
-});
+export const trustAnchorServerMock = http.createServer(
+  async function (req, res) {
+    const { pathname } = new URL(req.url || "", `https://${req.headers.host}`);
+    res.setHeader("Content-Type", "application/entity-statement+jwt");
+    if (pathname.endsWith("/.well-known/openid-federation")) {
+      res.write(await getTrustAnchotEntityConfiguration());
+    } else if (pathname.endsWith("/fetch")) {
+      res.write(await getEntityStatement());
+    }
+    res.end();
+  },
+);
 
 export const url = flow(
   UrlFromString.decode,
   E.getOrElseW((_) => {
     throw new Error(`Failed to parse url ${_[0].value}`);
-  })
+  }),
 );
 
 export const federationEntityMetadata: FederationEntityMetadata = {
   basePath: url("https://wallet-provider.example.org"),
-  organizationName: "wallet provider" as NonEmptyString,
   homePageUri: url("https://wallet-provider.example.org/privacy_policy"),
+  logoUri: url("https://wallet-provider.example.org/logo.svg"),
+  organizationName: "wallet provider" as NonEmptyString,
   policyUri: url("https://wallet-provider.example.org/info_policy"),
   tosUri: url("https://wallet-provider.example.org/logo.svg"),
-  logoUri: url("https://wallet-provider.example.org/logo.svg"),
   trustAnchorUri: url(`http://localhost:${trustAnchorPort}`),
 };

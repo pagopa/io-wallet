@@ -1,20 +1,20 @@
-import { pipe, identity } from "fp-ts/function";
-import * as T from "fp-ts/Task";
-import * as TE from "fp-ts/TaskEither";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as RA from "fp-ts/ReadonlyArray";
-import { CosmosClient } from "@azure/cosmos";
-import * as O from "fp-ts/Option";
-import * as H from "@pagopa/handler-kit";
-import {
-  getCosmosHealth,
-  logErrorAndReturnResponse,
-  HealthCheckError,
-} from "io-wallet-common";
 import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
+import { CosmosClient } from "@azure/cosmos";
+import * as H from "@pagopa/handler-kit";
+import * as O from "fp-ts/Option";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import * as RA from "fp-ts/ReadonlyArray";
+import * as T from "fp-ts/Task";
+import * as TE from "fp-ts/TaskEither";
+import { identity, pipe } from "fp-ts/function";
+import {
+  HealthCheckError,
+  getCosmosHealth,
+  logErrorAndReturnResponse,
+} from "io-wallet-common";
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {
@@ -38,12 +38,12 @@ const getHealthCheck: RTE.ReaderTaskEither<
         O.fold(
           // return undefined in case errors array is empty
           () => TE.right(undefined),
-          () => TE.left(errors)
-        )
-      )
+          () => TE.left(errors),
+        ),
+      ),
     ),
     // It collects the errors, if any
-    TE.mapLeft((errors) => new HealthCheckError(errors.join(". ")))
+    TE.mapLeft((errors) => new HealthCheckError(errors.join(". "))),
   );
 
 export const HealthHandler = H.of(() =>
@@ -53,6 +53,6 @@ export const HealthHandler = H.of(() =>
       message: "it works!",
     })),
     RTE.map(H.successJson),
-    RTE.orElseW(logErrorAndReturnResponse)
-  )
+    RTE.orElseW(logErrorAndReturnResponse),
+  ),
 );

@@ -1,15 +1,14 @@
-import * as t from "io-ts";
-
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
-import { flow, pipe } from "fp-ts/function";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import * as RTE from "fp-ts/ReaderTaskEither";
-
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { flow, pipe } from "fp-ts/function";
+import * as t from "io-ts";
 import { EntityNotFoundError } from "io-wallet-common";
-import { User } from "./user";
+
 import { JwkPublicKey } from "./jwk";
+import { User } from "./user";
 
 class WalletInstanceRevoked extends Error {
   name = "WalletInstanceRevoked";
@@ -19,40 +18,40 @@ class WalletInstanceRevoked extends Error {
 }
 
 export const WalletInstance = t.type({
-  id: NonEmptyString,
-  userId: User.props.id,
   hardwareKey: JwkPublicKey,
-  signCount: t.number,
+  id: NonEmptyString,
   isRevoked: t.boolean,
+  signCount: t.number,
+  userId: User.props.id,
 });
 
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
-export type WalletInstanceRepository = {
-  get: (
-    id: WalletInstance["id"],
-    userId: WalletInstance["userId"]
-  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
+export interface WalletInstanceRepository {
   batchPatchWithReplaceOperation: (
-    operations: Array<{
+    operations: {
       id: string;
       path: string;
       value: unknown;
-    }>,
-    userId: string
+    }[],
+    userId: string,
   ) => TE.TaskEither<Error, void>;
+  get: (
+    id: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getAllByUserId: (
-    userId: WalletInstance["userId"]
+    userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, WalletInstance[]>;
-};
+  insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
+}
 
-type WalletInstanceEnvironment = {
+interface WalletInstanceEnvironment {
   walletInstanceRepository: WalletInstanceRepository;
-};
+}
 
 export const insertWalletInstance: (
-  walletInstance: WalletInstance
+  walletInstance: WalletInstance,
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (walletInstance) =>
   ({ walletInstanceRepository }) =>
@@ -60,7 +59,7 @@ export const insertWalletInstance: (
 
 export const getValidWalletInstance: (
   id: WalletInstance["id"],
-  userId: WalletInstance["userId"]
+  userId: WalletInstance["userId"],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
   (id, userId) =>
   ({ walletInstanceRepository }) =>
@@ -68,19 +67,19 @@ export const getValidWalletInstance: (
       walletInstanceRepository.get(id, userId),
       TE.chain(
         TE.fromOption(
-          () => new EntityNotFoundError("Wallet instance not found")
-        )
+          () => new EntityNotFoundError("Wallet instance not found"),
+        ),
       ),
       TE.chain((walletInstance) =>
         walletInstance.isRevoked
           ? TE.left(new WalletInstanceRevoked())
-          : TE.right(walletInstance)
-      )
+          : TE.right(walletInstance),
+      ),
     );
 
 export const revokeUserWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"]
+  walletInstanceId: WalletInstance["id"],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
@@ -91,9 +90,9 @@ export const revokeUserWalletInstancesExceptOne: (
           RA.filterMap((walletInstance) =>
             walletInstance.id !== walletInstanceId
               ? O.some(walletInstance.id)
-              : O.none
-          )
-        )
+              : O.none,
+          ),
+        ),
       ),
       TE.chain((walletInstancesId) =>
         walletInstanceRepository.batchPatchWithReplaceOperation(
@@ -102,7 +101,7 @@ export const revokeUserWalletInstancesExceptOne: (
             path: "/isRevoked",
             value: true,
           })),
-          userId
-        )
-      )
+          userId,
+        ),
+      ),
     );

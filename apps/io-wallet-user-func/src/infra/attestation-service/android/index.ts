@@ -1,16 +1,17 @@
+import { JwkPublicKey } from "@/jwk";
+import { validate } from "@/validation";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
-import * as S from "fp-ts/lib/string";
 import * as J from "fp-ts/Json";
+import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as S from "fp-ts/lib/string";
+
 import { ValidatedAttestation } from "..";
-import { verifyAttestation } from "./attestation";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
-import { validate } from "@/validation";
-import { JwkPublicKey } from "@/jwk";
+import { verifyAttestation } from "./attestation";
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -22,7 +23,7 @@ export const validateAndroidAttestation = (
   hardwareKeyTag: NonEmptyString,
   bundleIdentifier: string,
   googlePublicKey: string,
-  androidCrlUrl: string
+  androidCrlUrl: string,
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
     data.toString("utf-8"),
@@ -32,9 +33,11 @@ export const validateAndroidAttestation = (
         E.tryCatch(
           () => new X509Certificate(cert),
           () =>
-            new Error(`[Android Attestation] Unable to decode X509 certificate`)
-        )
-      )
+            new Error(
+              `[Android Attestation] Unable to decode X509 certificate`,
+            ),
+        ),
+      ),
     ),
     RA.sequence(E.Applicative),
     TE.fromEither,
@@ -43,24 +46,24 @@ export const validateAndroidAttestation = (
         TE.tryCatch(
           () =>
             verifyAttestation({
-              x509Chain,
-              googlePublicKey,
-              challenge: nonce,
-              bundleIdentifier,
               androidCrlUrl,
+              bundleIdentifier,
+              challenge: nonce,
+              googlePublicKey,
+              x509Chain,
             }),
-          E.toError
+          E.toError,
         ),
         TE.chainW(({ hardwareKey }) =>
           pipe(
             hardwareKey,
             validate(JwkPublicKey, "Invalid JWK Public Key"),
             E.map((hardwareKey) => ({ hardwareKey })),
-            TE.fromEither
-          )
-        )
-      )
-    )
+            TE.fromEither,
+          ),
+        ),
+      ),
+    ),
   );
 
 export const validateAndroidAssertion = (
@@ -72,19 +75,19 @@ export const validateAndroidAssertion = (
   androidPlayStoreCertificateHash: string,
   googleAppCredentialsEncoded: string,
   androidPlayIntegrityUrl: string,
-  allowDevelopmentEnvironment: boolean
+  allowDevelopmentEnvironment: boolean,
 ) =>
   pipe(
     E.tryCatch(
       () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
-      E.toError
+      E.toError,
     ),
     E.chain(J.parse),
     E.mapLeft(
       () =>
         new Error(
-          "[Android Assertion] Unable to parse Google App Credentials string"
-        )
+          "[Android Assertion] Unable to parse Google App Credentials string",
+        ),
     ),
     E.chainW(validate(GoogleAppCredentials, "Invalid Google App Credentials")),
     TE.fromEither,
@@ -92,17 +95,17 @@ export const validateAndroidAssertion = (
       TE.tryCatch(
         () =>
           verifyAssertion({
-            integrityAssertion,
-            hardwareSignature,
-            clientData,
-            hardwareKey,
-            bundleIdentifier,
-            androidPlayStoreCertificateHash,
-            googleAppCredentials,
-            androidPlayIntegrityUrl,
             allowDevelopmentEnvironment,
+            androidPlayIntegrityUrl,
+            androidPlayStoreCertificateHash,
+            bundleIdentifier,
+            clientData,
+            googleAppCredentials,
+            hardwareKey,
+            hardwareSignature,
+            integrityAssertion,
           }),
-        E.toError
-      )
-    )
+        E.toError,
+      ),
+    ),
   );

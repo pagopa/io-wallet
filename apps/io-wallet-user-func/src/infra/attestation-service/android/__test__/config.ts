@@ -13,10 +13,10 @@ const hardwareKey = {
 
 const ephemeralKey = {
   crv: "P-256",
+  kid: "vbeXJksM45xphtANnCiG6mCyuU4jfGNzopGuKvogg9c",
   kty: "EC",
   x: "4HNptI-xr2pjyRJKGMnz4WmdnQD_uJSq4R95Nj98b44",
   y: "LIZnSB39vFJhYgS3k7jXE4r3-CoGFQwZtPBIRqpNlrg",
-  kid: "vbeXJksM45xphtANnCiG6mCyuU4jfGNzopGuKvogg9c",
 };
 
 const integrityAssertion =
@@ -25,10 +25,10 @@ const integrityAssertion =
 const bundleIdentifier = "com.ioreactnativeintegrityexample";
 
 export const androidMockData = {
-  challenge,
   attestation,
-  integrityAssertion,
-  hardwareKey,
   bundleIdentifier,
+  challenge,
   ephemeralKey,
+  hardwareKey,
+  integrityAssertion,
 };

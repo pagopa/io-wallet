@@ -1,10 +1,10 @@
-import * as t from "io-ts";
-
-import { pipe } from "fp-ts/function";
+import * as H from "@pagopa/handler-kit";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
-import * as H from "@pagopa/handler-kit";
+import { pipe } from "fp-ts/function";
+import * as t from "io-ts";
+
 import { validate } from "./validation";
 
 export const ECKey = t.intersection([
@@ -50,12 +50,12 @@ export const RSAPrivateKey = t.intersection([
     d: t.string,
   }),
   t.partial({
-    p: t.string,
-    q: t.string,
-    u: t.string,
     dp: t.string,
     dq: t.string,
+    p: t.string,
+    q: t.string,
     qi: t.string,
+    u: t.string,
   }),
 ]);
 
@@ -72,7 +72,7 @@ export type JwkPublicKey = t.TypeOf<typeof JwkPublicKey>;
  */
 export const JwkPrivateKey = t.union(
   [RSAPrivateKey, ECPrivateKey],
-  "JwkPrivateKey"
+  "JwkPrivateKey",
 );
 export type JwkPrivateKey = t.TypeOf<typeof JwkPrivateKey>;
 
@@ -92,20 +92,20 @@ export const fromBase64ToJwks = (b64: string) =>
     E.tryCatch(() => Buffer.from(b64, "base64").toString(), E.toError),
     E.chain(J.parse),
     E.mapLeft(() => new Error("Unable to parse JWKs string")),
-    E.chainW(validate(t.array(Jwk), "Invalid JWKs"))
+    E.chainW(validate(t.array(Jwk), "Invalid JWKs")),
   );
 
 export const getKeyByKid = (kid: string) => (jwks: JwkPublicKey[]) =>
   pipe(
     jwks,
-    A.findFirst((key) => key.kid === kid)
+    A.findFirst((key) => key.kid === kid),
   );
 
 export const validateJwkKid: (
-  jwk: JwkPublicKey
+  jwk: JwkPublicKey,
 ) => E.Either<
   H.ValidationError,
-  Required<Pick<JwkPublicKey, "kid">> & JwkPublicKey
+  JwkPublicKey & Required<Pick<JwkPublicKey, "kid">>
 > = (jwk) =>
   pipe(
     jwk.kid,
@@ -113,5 +113,5 @@ export const validateJwkKid: (
     E.map((kid) => ({
       ...jwk,
       kid,
-    }))
+    })),
   );

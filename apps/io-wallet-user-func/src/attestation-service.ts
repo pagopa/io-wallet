@@ -1,44 +1,45 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { pipe } from "fp-ts/function";
-import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
-import { WalletInstanceRequest } from "./wallet-instance-request";
+import * as TE from "fp-ts/TaskEither";
+import { pipe } from "fp-ts/function";
+
 import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
-import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { JwkPublicKey } from "./jwk";
+import { WalletAttestationRequest } from "./wallet-attestation-request";
+import { WalletInstanceRequest } from "./wallet-instance-request";
 
 export enum OperatingSystem {
-  iOS = "Apple iOS",
   android = "Android",
+  iOS = "Apple iOS",
 }
 
-export type ValidatedAttestation = {
+export interface ValidatedAttestation {
   hardwareKey: JwkPublicKey;
-};
+}
 
-export type ValidateAssertionRequest = {
-  integrityAssertion: NonEmptyString;
+export interface ValidateAssertionRequest {
+  hardwareKey: JwkPublicKey;
   hardwareSignature: NonEmptyString;
-  nonce: NonEmptyString;
+  integrityAssertion: NonEmptyString;
   jwk: JwkPublicKey;
-  hardwareKey: JwkPublicKey;
+  nonce: NonEmptyString;
   signCount: number;
-};
+}
 
-export type AttestationService = {
+export interface AttestationService {
+  validateAssertion: (
+    request: ValidateAssertionRequest,
+  ) => TE.TaskEither<Error, void>;
   validateAttestation: (
     attestation: NonEmptyString,
     nonce: NonEmptyString,
-    hardwareKeyTag: NonEmptyString
+    hardwareKeyTag: NonEmptyString,
   ) => TE.TaskEither<Error, ValidatedAttestation>;
-  validateAssertion: (
-    request: ValidateAssertionRequest
-  ) => TE.TaskEither<Error, void>;
-};
+}
 
 export const validateAttestation: (
-  walletInstanceRequest: WalletInstanceRequest
+  walletInstanceRequest: WalletInstanceRequest,
 ) => RTE.ReaderTaskEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
@@ -52,14 +53,14 @@ export const validateAttestation: (
         attestationService.validateAttestation(
           walletInstanceRequest.keyAttestation,
           walletInstanceRequest.challenge,
-          walletInstanceRequest.hardwareKeyTag
-        )
+          walletInstanceRequest.hardwareKeyTag,
+        ),
     );
 
 export const validateAssertion: (
   walletAttestationRequest: WalletAttestationRequest,
   hardwareKey: JwkPublicKey,
-  signCount: number
+  signCount: number,
 ) => RTE.ReaderTaskEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
@@ -71,13 +72,13 @@ export const validateAssertion: (
       new MobileAttestationService(attestationServiceConfiguration),
       (attestationService) =>
         attestationService.validateAssertion({
-          integrityAssertion:
-            walletAttestationRequest.payload.integrity_assertion,
+          hardwareKey,
           hardwareSignature:
             walletAttestationRequest.payload.hardware_signature,
-          nonce: walletAttestationRequest.payload.challenge,
+          integrityAssertion:
+            walletAttestationRequest.payload.integrity_assertion,
           jwk: walletAttestationRequest.payload.cnf.jwk,
-          hardwareKey,
+          nonce: walletAttestationRequest.payload.challenge,
           signCount,
-        })
+        }),
     );

@@ -1,6 +1,6 @@
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as TE from "fp-ts/lib/TaskEither";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
 export const User = t.type({
@@ -9,21 +9,21 @@ export const User = t.type({
 
 export type User = t.TypeOf<typeof User>;
 
-export type UserRepository = {
-  getOrCreateUserByFiscalCode: (
-    fiscalCode: FiscalCode
-  ) => TE.TaskEither<Error, User>;
+export interface UserRepository {
   getFiscalCodeByUserId: (
-    id: string
+    id: string,
   ) => TE.TaskEither<Error, { fiscalCode: FiscalCode }>;
-};
+  getOrCreateUserByFiscalCode: (
+    fiscalCode: FiscalCode,
+  ) => TE.TaskEither<Error, User>;
+}
 
-type UserEnvironment = {
+interface UserEnvironment {
   userRepository: UserRepository;
-};
+}
 
 export const getUserByFiscalCode: (
-  fiscalCode: FiscalCode
+  fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<UserEnvironment, Error, User> =
   (fiscalCode) =>
   ({ userRepository }) =>
