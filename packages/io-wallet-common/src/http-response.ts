@@ -1,6 +1,5 @@
 import * as H from "@pagopa/handler-kit";
 import { errorRTE } from "@pagopa/logger";
-
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
@@ -32,25 +31,25 @@ const isHttpError = (e: Error): e is H.HttpError => e.name === "HttpError";
 export const toProblemJson = (e: Error): H.ProblemJson => {
   if (isValidationError(e)) {
     return {
-      type: "/problem/validation-error",
-      title: "Validation Error",
       detail: "Your request didn't validate",
       status: 422,
+      title: "Validation Error",
+      type: "/problem/validation-error",
       violations: e.violations,
     };
   }
 
   if (isHttpError(e)) {
     return {
-      title: e.title,
-      status: e.status,
       detail: e.message,
+      status: e.status,
+      title: e.title,
     };
   }
   return {
-    title: "Internal Server Error",
     detail: e.name,
     status: 500,
+    title: "Internal Server Error",
   };
 };
 
@@ -59,7 +58,7 @@ const toErrorResponse = flow(toHttpError, toProblemJson, H.problemJson);
 export const logErrorAndReturnResponse = flow(
   RTE.right<object, Error, Error>,
   RTE.chainFirst((error) =>
-    errorRTE("returning with an error response", { error })
+    errorRTE("returning with an error response", { error }),
   ),
-  RTE.map(toErrorResponse)
+  RTE.map(toErrorResponse),
 );
