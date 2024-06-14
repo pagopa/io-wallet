@@ -63,7 +63,7 @@ describe("HealthHandler", () => {
         body: {
           title: "Internal Server Error",
           status: 500,
-          detail: "The function is not healthy. cosmos-db-error", // su user-func è "The function is not healthy. Error: cosmos-db-error"
+          detail: "The function is not healthy. cosmos-db-error",
         },
       },
     });
