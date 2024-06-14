@@ -3,8 +3,7 @@ import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { CosmosClient } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
-import { getCosmosHealth } from "@io-wallet/io-wallet/infra/azure/cosmos/health-check";
-import { logErrorAndReturnResponse } from "@io-wallet/io-wallet/infra/http/utils";
+import { getCosmosHealth, logErrorAndReturnResponse } from "io-wallet-common";
 
 class HealthCheckError extends Error {
   name = "HealthCheckError";

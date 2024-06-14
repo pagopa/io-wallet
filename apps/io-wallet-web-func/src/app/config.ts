@@ -2,7 +2,7 @@ import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { readFromEnvironment } from "@io-wallet/io-wallet/infra/env";
+import { readFromEnvironment } from "io-wallet-common";
 
 const AzureConfiguration = t.type({
   cosmos: t.type({

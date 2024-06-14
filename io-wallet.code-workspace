@@ -13,7 +13,7 @@
     },
     {
       "path": "packages/io-wallet",
-      "name": "@io-wallet/io-wallet"
+      "name": "io-wallet-common"
     }
   ],
   "settings": {

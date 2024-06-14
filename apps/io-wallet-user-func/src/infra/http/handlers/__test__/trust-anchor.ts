@@ -6,8 +6,8 @@ import * as jose from "jose";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
-import { FederationEntityMetadata } from "../../../../entity-configuration";
 import { jwks, privateEcKey } from "./keys";
+import { FederationEntityMetadata } from "@/entity-configuration";
 
 export const trustAnchorPort = 8123;
 

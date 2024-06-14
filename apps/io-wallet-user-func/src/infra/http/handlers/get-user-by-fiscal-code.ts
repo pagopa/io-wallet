@@ -4,7 +4,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import { logErrorAndReturnResponse } from "@io-wallet/io-wallet/infra/http/utils";
+import { logErrorAndReturnResponse } from "io-wallet-common";
 import { getUserByFiscalCode } from "@/user";
 
 const FiscalCodeBody = t.type({

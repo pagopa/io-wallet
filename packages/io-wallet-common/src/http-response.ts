@@ -2,7 +2,6 @@ import * as H from "@pagopa/handler-kit";
 import { errorRTE } from "@pagopa/logger";
 
 import * as RTE from "fp-ts/ReaderTaskEither";
-
 import { flow } from "fp-ts/function";
 
 export class EntityNotFoundError extends Error {

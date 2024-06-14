@@ -17,7 +17,6 @@
     "@azure/cosmos": "^4.0.0",
     "@azure/functions": "^4.4.0",
     "@azure/identity": "^4.2.0",
-    "@io-wallet/io-wallet": "workspace:^",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^13.1.1",
@@ -27,6 +26,7 @@
     "fp-ts": "^2.16.0",
     "googleapis": "^134.0.0",
     "io-ts": "^2.2.20",
+    "io-wallet-common": "workspace:^",
     "jose": "5.2.4",
     "pkijs": "^3.0.16"
   },

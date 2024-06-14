@@ -6,8 +6,7 @@ import * as RA from "fp-ts/ReadonlyArray";
 import { CosmosClient } from "@azure/cosmos";
 import * as O from "fp-ts/Option";
 import * as H from "@pagopa/handler-kit";
-import { getCosmosHealth } from "@io-wallet/io-wallet/infra/azure/cosmos/health-check";
-import { logErrorAndReturnResponse } from "@io-wallet/io-wallet/infra/http/utils";
+import { getCosmosHealth, logErrorAndReturnResponse } from "io-wallet-common";
 import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,

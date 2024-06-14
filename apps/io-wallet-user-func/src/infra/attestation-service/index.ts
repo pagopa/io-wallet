@@ -9,17 +9,17 @@ import * as J from "fp-ts/Json";
 import { ValidationError } from "@pagopa/handler-kit";
 import { Separated } from "fp-ts/lib/Separated";
 import { calculateJwkThumbprint } from "jose";
-import {
-  AttestationService,
-  ValidatedAttestation,
-  ValidateAssertionRequest,
-} from "../../attestation-service";
-import { AttestationServiceConfiguration } from "../../app/config";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
 import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
+import {
+  AttestationService,
+  ValidatedAttestation,
+  ValidateAssertionRequest,
+} from "@/attestation-service";
+import { AttestationServiceConfiguration } from "@/app/config";
 
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

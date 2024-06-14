@@ -17,10 +17,10 @@
     "@azure/cosmos": "^4.0.0",
     "@azure/functions": "^4.4.0",
     "@azure/identity": "^4.2.0",
-    "@io-wallet/io-wallet": "workspace:^",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
-    "io-ts": "^2.2.21"
+    "io-ts": "^2.2.21",
+    "io-wallet-common": "workspace:^"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",

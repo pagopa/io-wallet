@@ -6,10 +6,10 @@ import * as J from "fp-ts/Json";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { ValidatedAttestation } from "../../attestation-service";
-import { validate } from "../../../validation";
+import { ValidatedAttestation } from "..";
 import { verifyAttestation } from "./attestation";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
+import { validate } from "@/validation";
 import { JwkPublicKey } from "@/jwk";
 
 export const base64ToPem = (b64cert: string) =>

@@ -17,12 +17,12 @@ import {
   EntityStatementPayload,
   TrustAnchor,
   TrustAnchorEntityConfigurationPayload,
-} from "../../trust-anchor";
-import { FederationEntityMetadata } from "../../entity-configuration";
-import { validate } from "../../validation";
-import { getKeyByKid } from "../../jwk";
-import { verifyJwtSignature } from "../../verifier";
-import { removeTrailingSlash } from "../../url";
+} from "@/trust-anchor";
+import { FederationEntityMetadata } from "@/entity-configuration";
+import { validate } from "@/validation";
+import { getKeyByKid } from "@/jwk";
+import { verifyJwtSignature } from "@/verifier";
+import { removeTrailingSlash } from "@/url";
 
 const oidFederation = "/.well-known/openid-federation";
 
