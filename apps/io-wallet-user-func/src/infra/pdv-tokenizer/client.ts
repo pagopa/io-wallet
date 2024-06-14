@@ -34,16 +34,20 @@ export class PdvTokenizerClient
     this.#testUUID = testUUID;
   }
 
-  getUserByFiscalCode = (fiscalCode: FiscalCode) =>
+  getOrCreateUserByFiscalCode = (fiscalCode: FiscalCode) =>
     pipe(
       TE.tryCatch(
         async () => {
+          const headers = {
+            ...this.#options.headers,
+            "Content-Type": "application/json",
+          };
           const result = await fetch(
-            new URL("/tokenizer/v1/tokens/search", this.#baseURL),
+            new URL("/tokenizer/v1/tokens", this.#baseURL),
             {
-              ...this.#options,
+              headers,
               signal: AbortSignal.timeout(3000),
-              method: "POST",
+              method: "PUT",
               body: JSON.stringify({
                 pii: fiscalCode,
               }),

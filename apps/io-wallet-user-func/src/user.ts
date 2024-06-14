@@ -10,7 +10,9 @@ export const User = t.type({
 export type User = t.TypeOf<typeof User>;
 
 export type UserRepository = {
-  getUserByFiscalCode: (fiscalCode: FiscalCode) => TE.TaskEither<Error, User>;
+  getOrCreateUserByFiscalCode: (
+    fiscalCode: FiscalCode
+  ) => TE.TaskEither<Error, User>;
   getFiscalCodeByUserId: (
     id: string
   ) => TE.TaskEither<Error, { fiscalCode: FiscalCode }>;
@@ -25,4 +27,4 @@ export const getUserByFiscalCode: (
 ) => RTE.ReaderTaskEither<UserEnvironment, Error, User> =
   (fiscalCode) =>
   ({ userRepository }) =>
-    userRepository.getUserByFiscalCode(fiscalCode);
+    userRepository.getOrCreateUserByFiscalCode(fiscalCode);
