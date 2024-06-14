@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsup-node",
+    "build:watch": "tsup-node --watch",
     "format": "prettier --write .",
     "lint": "eslint \"src/**\"",
     "lint:fix": "eslint --fix \"src/**\"",
