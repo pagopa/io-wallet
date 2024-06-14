@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc",
-    "start": "func start"
+    "start": "func start --port 7072"
   },
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
