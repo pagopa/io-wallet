@@ -16,13 +16,15 @@ const hardwareKey: JwkPublicKey = {
   y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
 };
 
+/* eslint-disable perfectionist/sort-objects */
 const ephemeralKey = {
   crv: "P-256",
-  kid: "vbeXJksM45xphtANnCiG6mCyuU4jfGNzopGuKvogg9c",
   kty: "EC",
   x: "4HNptI-xr2pjyRJKGMnz4WmdnQD_uJSq4R95Nj98b44",
   y: "LIZnSB39vFJhYgS3k7jXE4r3-CoGFQwZtPBIRqpNlrg",
+  kid: "vbeXJksM45xphtANnCiG6mCyuU4jfGNzopGuKvogg9c",
 };
+/* eslint-enable perfectionist/sort-objects */
 
 const assertion =
   "omlzaWduYXR1cmVYRzBFAiAqy9VNUCbjpk9JkkvbURxyRZN8gDYyTZjWH1UNZ7CDkAIhAI/9DpOi7fBeaTDNVDGYlG/2SuYKan/Fzt7a2RQhEDopcWF1dGhlbnRpY2F0b3JEYXRhWCWeDBnBGvrDhnvbN8megL4yLGEW8DZpXwCJQizAYkg3ykAAAAAB";

@@ -19,7 +19,7 @@ describe("iOSAssertionValidation", () => {
 
   const clientData = JSON.stringify({ challenge, jwk: ephemeralKey });
 
-  it("should return true", async () => {
+  it("should return true", () => {
     const result = verifyAssertion({
       bundleIdentifier,
       clientData,
@@ -30,6 +30,6 @@ describe("iOSAssertionValidation", () => {
       teamIdentifier,
     });
 
-    await expect(result).resolves.empty;
+    expect(result).resolves.empty;
   });
 });
