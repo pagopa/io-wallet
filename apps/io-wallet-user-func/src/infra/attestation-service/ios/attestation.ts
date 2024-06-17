@@ -1,7 +1,7 @@
-import { X509Certificate, createHash } from "crypto";
+import { createHash, X509Certificate } from "crypto";
 import * as asn1js from "asn1js";
-import * as jose from "jose";
 import * as pkijs from "pkijs";
+import * as jose from "jose";
 
 import { iOsAttestation } from ".";
 
@@ -11,28 +11,28 @@ const APPATTESTPROD = Buffer.concat([
   Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]),
 ]).toString("hex");
 
-export interface VerifyAttestationParams {
+export type VerifyAttestationParams = {
+  decodedAttestation: iOsAttestation;
+  challenge: string;
+  keyId: string;
+  bundleIdentifier: string;
+  teamIdentifier: string;
   allowDevelopmentEnvironment: boolean;
   appleRootCertificate: string;
-  bundleIdentifier: string;
-  challenge: string;
-  decodedAttestation: iOsAttestation;
-  keyId: string;
-  teamIdentifier: string;
-}
+};
 
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const {
+    decodedAttestation,
+    challenge,
+    keyId,
+    bundleIdentifier,
+    teamIdentifier,
     allowDevelopmentEnvironment,
     appleRootCertificate,
-    bundleIdentifier,
-    challenge,
-    decodedAttestation,
-    keyId,
-    teamIdentifier,
   } = params;
 
-  const { attStmt, authData } = decodedAttestation;
+  const { authData, attStmt } = decodedAttestation;
 
   // Convert X509 string to X509Certificate obj
   const rootCertificate = new X509Certificate(appleRootCertificate);

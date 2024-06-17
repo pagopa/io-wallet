@@ -1,11 +1,10 @@
-import { NonceRepository, generateNonce } from "@/nonce";
+import { it, expect, describe, vi } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import { GetNonceHandler } from "../get-nonce";
+import { NonceRepository, generateNonce } from "@/nonce";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it, vi } from "vitest";
-
-import { GetNonceHandler } from "../get-nonce";
 
 const mocks = vi.hoisted(() => ({
   generateNonce: vi.fn(),
@@ -23,19 +22,17 @@ vi.mock("@/nonce", async (importOriginal) => {
 
 describe("GetNonceHandler", () => {
   const nonceRepository: NonceRepository = {
-    delete: () => TE.left(new Error("not implemented")),
     insert: () => TE.right(undefined),
-  };
-
-  const logger = {
-    format: L.format.simple,
-    log: () => () => void 0,
+    delete: () => TE.left(new Error("not implemented")),
   };
 
   const handler = GetNonceHandler({
     input: H.request("https://api.test.it/"),
     inputDecoder: H.HttpRequest,
-    logger,
+    logger: {
+      log: () => () => {},
+      format: L.format.simple,
+    },
     nonceRepository,
   });
 
@@ -43,13 +40,13 @@ describe("GetNonceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
-        body: {
-          nonce: "nonce",
-        },
+        statusCode: 200,
         headers: expect.objectContaining({
           "Content-Type": "application/json",
         }),
-        statusCode: 200,
+        body: {
+          nonce: "nonce",
+        },
       },
     });
   });
@@ -59,34 +56,37 @@ describe("GetNonceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });
 
   it("should return a 500 HTTP response when insertNonce returns error", async () => {
     const nonceRepositoryThatFailsOnInsert: NonceRepository = {
-      delete: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("failed on insert!")),
+      delete: () => TE.left(new Error("not implemented")),
     };
 
     const handler = GetNonceHandler({
       input: H.request("https://api.test.it/"),
       inputDecoder: H.HttpRequest,
-      logger,
+      logger: {
+        log: () => () => {},
+        format: L.format.simple,
+      },
       nonceRepository: nonceRepositoryThatFailsOnInsert,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });

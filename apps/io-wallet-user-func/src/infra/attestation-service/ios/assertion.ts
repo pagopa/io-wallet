@@ -1,32 +1,31 @@
 import { createHash, createVerify } from "crypto";
 import { exportSPKI, importJWK } from "jose";
-
 import { iOsAssertion } from ".";
 import { JwkPublicKey } from "@/jwk";
 
-export interface VerifyAssertionParams {
-  bundleIdentifier: string;
-  clientData: string;
+export type VerifyAssertionParams = {
   decodedAssertion: iOsAssertion;
+  clientData: string;
+  bundleIdentifier: string;
+  teamIdentifier: string;
   hardwareKey: JwkPublicKey;
   signCount: number;
   skipSignatureValidation: boolean;
-  teamIdentifier: string;
-}
+};
 
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
-    bundleIdentifier,
-    clientData,
     decodedAssertion,
+    clientData,
     hardwareKey,
+    bundleIdentifier,
+    teamIdentifier,
     signCount,
     skipSignatureValidation,
-    teamIdentifier,
   } = params;
 
   // 1. The input buffer is already decoded so it is used directly here.
-  const { authenticatorData, signature } = decodedAssertion;
+  const { signature, authenticatorData } = decodedAssertion;
 
   // Convert JWK to PEM
   const joseHardwareKey = await importJWK(hardwareKey);

@@ -1,9 +1,8 @@
 import * as t from "io-ts";
 import * as E from "io-ts/lib/Encoder";
-
 import { JwkPublicKey } from "../jwk";
-import { removeTrailingSlash } from "../url";
 import { WalletAttestationPayload } from "../wallet-attestation";
+import { removeTrailingSlash } from "../url";
 
 const AlgValueSupported = t.type({
   alg_values_supported: t.array(t.string),
@@ -13,20 +12,20 @@ const AlgValueSupported = t.type({
  *is represented outside the code base
  */
 export const WalletAttestationJwtModel = t.type({
+  iss: t.string,
+  sub: t.string,
   attested_security_context: t.string,
-  authorization_endpoint: t.literal("eudiw"),
   cnf: t.type({
     jwk: JwkPublicKey,
   }),
-  iss: t.string,
-  presentation_definition_uri_supported: t.boolean,
-  request_object_signing_alg_values_supported: t.array(t.string),
+  authorization_endpoint: t.literal("eudiw"),
   response_types_supported: t.array(t.string),
-  sub: t.string,
   vp_formats_supported: t.type({
-    jwt_vc_json: AlgValueSupported,
     jwt_vp_json: AlgValueSupported,
+    jwt_vc_json: AlgValueSupported,
   }),
+  request_object_signing_alg_values_supported: t.array(t.string),
+  presentation_definition_uri_supported: t.boolean,
 });
 
 export type WalletAttestationJwtModel = t.TypeOf<
@@ -38,31 +37,31 @@ export const WalletAttestationToJwtModel: E.Encoder<
   WalletAttestationPayload
 > = {
   encode: ({
-    algValueSupported,
-    attested_security_context,
-    federationEntity,
     iss,
     sub,
-    walletInstancePublicKey,
-  }) => ({
+    federationEntity,
     attested_security_context,
-    authorization_endpoint: "eudiw",
+    walletInstancePublicKey,
+    algValueSupported,
+  }) => ({
+    iss: removeTrailingSlash(iss),
+    sub: removeTrailingSlash(sub),
+    homepage_uri: removeTrailingSlash(federationEntity.homepageUri.href),
+    attested_security_context,
     cnf: {
       jwk: walletInstancePublicKey,
     },
-    homepage_uri: removeTrailingSlash(federationEntity.homepageUri.href),
-    iss: removeTrailingSlash(iss),
-    presentation_definition_uri_supported: false,
-    request_object_signing_alg_values_supported: ["ES256"],
+    authorization_endpoint: "eudiw",
     response_types_supported: ["vp_token"],
-    sub: removeTrailingSlash(sub),
     vp_formats_supported: {
-      jwt_vc_json: {
-        alg_values_supported: algValueSupported,
-      },
       jwt_vp_json: {
         alg_values_supported: algValueSupported,
       },
+      jwt_vc_json: {
+        alg_values_supported: algValueSupported,
+      },
     },
+    request_object_signing_alg_values_supported: ["ES256"],
+    presentation_definition_uri_supported: false,
   }),
 };

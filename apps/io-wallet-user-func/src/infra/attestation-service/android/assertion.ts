@@ -1,53 +1,53 @@
 import { createHash, createVerify } from "crypto";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { google, playintegrity_v1 } from "googleapis";
 import * as t from "io-ts";
+import { google, playintegrity_v1 } from "googleapis";
 import { exportSPKI, importJWK } from "jose";
 import { JwkPublicKey } from "@/jwk";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
 export const GoogleAppCredentials = t.type({
-  auth_provider_x509_cert_url: NonEmptyString,
-  auth_uri: NonEmptyString,
+  type: NonEmptyString,
+  project_id: NonEmptyString,
+  private_key_id: NonEmptyString,
+  private_key: NonEmptyString,
   client_email: EmailString,
   client_id: NonEmptyString,
-  client_x509_cert_url: NonEmptyString,
-  private_key: NonEmptyString,
-  private_key_id: NonEmptyString,
-  project_id: NonEmptyString,
+  auth_uri: NonEmptyString,
   token_uri: NonEmptyString,
-  type: NonEmptyString,
+  auth_provider_x509_cert_url: NonEmptyString,
+  client_x509_cert_url: NonEmptyString,
   universe_domain: NonEmptyString,
 });
 
 export type GoogleAppCredentials = t.TypeOf<typeof GoogleAppCredentials>;
 
-export interface VerifyAssertionParams {
-  allowDevelopmentEnvironment: boolean;
-  androidPlayIntegrityUrl: string;
-  androidPlayStoreCertificateHash: string;
-  bundleIdentifier: string;
-  clientData: string;
-  googleAppCredentials: GoogleAppCredentials;
-  hardwareKey: JwkPublicKey;
-  hardwareSignature: string;
+export type VerifyAssertionParams = {
   integrityAssertion: NonEmptyString;
-}
+  hardwareSignature: string;
+  clientData: string;
+  hardwareKey: JwkPublicKey;
+  bundleIdentifier: string;
+  androidPlayStoreCertificateHash: string;
+  googleAppCredentials: GoogleAppCredentials;
+  androidPlayIntegrityUrl: string;
+  allowDevelopmentEnvironment: boolean;
+};
 
 export const playintegrity = google.playintegrity("v1");
 
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
-    allowDevelopmentEnvironment,
-    androidPlayIntegrityUrl,
-    androidPlayStoreCertificateHash,
-    bundleIdentifier,
-    clientData,
-    googleAppCredentials,
-    hardwareKey,
-    hardwareSignature,
     integrityAssertion,
+    hardwareSignature,
+    clientData,
+    hardwareKey,
+    bundleIdentifier,
+    androidPlayStoreCertificateHash,
+    googleAppCredentials,
+    androidPlayIntegrityUrl,
+    allowDevelopmentEnvironment,
   } = params;
 
   // First check whether the clientData has been signed correctly with the hardware key

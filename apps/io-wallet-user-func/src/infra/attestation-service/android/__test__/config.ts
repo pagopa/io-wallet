@@ -25,10 +25,10 @@ const integrityAssertion =
 const bundleIdentifier = "com.ioreactnativeintegrityexample";
 
 export const androidMockData = {
-  attestation,
-  bundleIdentifier,
   challenge,
-  ephemeralKey,
-  hardwareKey,
+  attestation,
   integrityAssertion,
+  hardwareKey,
+  bundleIdentifier,
+  ephemeralKey,
 };

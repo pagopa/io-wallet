@@ -1,4 +1,9 @@
-/* eslint-disable max-lines-per-function */
+import { it, expect, describe } from "vitest";
+import * as H from "@pagopa/handler-kit";
+import * as L from "@pagopa/logger";
+import * as TE from "fp-ts/TaskEither";
+
+import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 import {
   ANDROID_CRL_URL,
   ANDROID_PLAY_INTEGRITY_URL,
@@ -8,69 +13,63 @@ import {
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
-import * as H from "@pagopa/handler-kit";
-import * as L from "@pagopa/logger";
-import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it } from "vitest";
-
-import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 
 describe("CreateWalletInstanceHandler", () => {
-  const { attestation, challenge, keyId } = iOSMockData;
+  const { challenge, attestation, keyId } = iOSMockData;
 
   const walletInstanceRequest = {
     challenge,
-    hardware_key_tag: keyId,
     key_attestation: attestation,
+    hardware_key_tag: keyId,
   };
 
   const nonceRepository: NonceRepository = {
-    delete: () => TE.right(void 0),
     insert: () => TE.left(new Error("not implemented")),
+    delete: () => TE.right(void 0),
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
-    batchPatchWithReplaceOperation: () => TE.right(undefined),
-    get: () => TE.left(new Error("not implemented")),
-    getAllByUserId: () => TE.right([]),
     insert: () => TE.right(undefined),
+    get: () => TE.left(new Error("not implemented")),
+    batchPatchWithReplaceOperation: () => TE.right(undefined),
+    getAllByUserId: () => TE.right([]),
   };
 
   const logger = {
+    log: () => () => {},
     format: L.format.simple,
-    log: () => () => void 0,
   };
 
   const attestationServiceConfiguration = {
-    allowDevelopmentEnvironment: true,
-    androidBundleIdentifier:
-      "org.reactjs.native.example.IoReactNativeIntegrityExample",
-    androidCrlUrl: ANDROID_CRL_URL,
-    androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
-    androidPlayStoreCertificateHash: "",
-    appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-    googleAppCredentialsEncoded: "",
-    googlePublicKey: GOOGLE_PUBLIC_KEY,
     iOsBundleIdentifier:
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
     iOsTeamIdentifier: "M2X5YQ4BJ7",
+    androidBundleIdentifier:
+      "org.reactjs.native.example.IoReactNativeIntegrityExample",
+    androidPlayStoreCertificateHash: "",
+    appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
+    allowDevelopmentEnvironment: true,
+    googlePublicKey: GOOGLE_PUBLIC_KEY,
+    androidCrlUrl: ANDROID_CRL_URL,
+    androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
+    googleAppCredentialsEncoded: "",
     skipSignatureValidation: false,
   };
 
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: walletInstanceRequest,
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository,
     });
@@ -86,14 +85,14 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 400 HTTP response when header is missing", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
-      body: walletInstanceRequest,
       method: "POST",
+      body: walletInstanceRequest,
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository,
     });
@@ -101,10 +100,10 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 400,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 400,
       }),
     });
   });
@@ -112,17 +111,17 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 422 HTTP response when header is an empty string", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: walletInstanceRequest,
       headers: {
         "x-iowallet-user-id": "",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository,
     });
@@ -130,10 +129,10 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 422,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 422,
       }),
     });
   });
@@ -141,19 +140,19 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
         foo: "foo",
       },
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository,
     });
@@ -161,32 +160,32 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 422,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 422,
       }),
     });
   });
 
   it("should return a 500 HTTP response on validateChallenge error", async () => {
     const nonceRepositoryThatFailsOnDelete: NonceRepository = {
-      delete: () => TE.left(new Error("failed on delete!")),
       insert: () => TE.left(new Error("not implemented")),
+      delete: () => TE.left(new Error("failed on delete!")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: walletInstanceRequest,
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       walletInstanceRepository,
     });
@@ -194,10 +193,10 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });
@@ -205,25 +204,25 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 500 HTTP response on insertWalletInstance error", async () => {
     const walletInstanceRepositoryThatFailsOnInsert: WalletInstanceRepository =
       {
+        insert: () => TE.left(new Error("failed on insert!")),
+        get: () => TE.left(new Error("not implemented")),
         batchPatchWithReplaceOperation: () =>
           TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("failed on insert!")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: walletInstanceRequest,
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
@@ -231,10 +230,10 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });
@@ -242,25 +241,25 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 500 HTTP response on getAllByUserId error", async () => {
     const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
       {
+        insert: () => TE.left(new Error("not implemented")),
+        get: () => TE.left(new Error("not implemented")),
         batchPatchWithReplaceOperation: () =>
           TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
-        insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: walletInstanceRequest,
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetAllByUserId,
@@ -269,10 +268,10 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });
@@ -280,25 +279,25 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 500 HTTP response on batchPatchWithReplaceOperation error", async () => {
     const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
       {
+        insert: () => TE.left(new Error("not implemented")),
+        get: () => TE.left(new Error("not implemented")),
         batchPatchWithReplaceOperation: () =>
           TE.left(new Error("failed on batchPatch!")),
-        get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: walletInstanceRequest,
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      attestationServiceConfiguration,
       nonceRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
@@ -306,10 +305,10 @@ describe("CreateWalletInstanceHandler", () => {
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });

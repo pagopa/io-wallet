@@ -1,17 +1,17 @@
+import { it, expect, describe } from "vitest";
 import { decode } from "cbor-x";
-import { describe, expect, it } from "vitest";
 
-import { verifyAssertion } from "../assertion";
 import { iOSMockData } from "./config";
+import { verifyAssertion } from "../assertion";
 
 describe("iOSAssertionValidation", () => {
   const {
-    assertion,
-    bundleIdentifier,
     challenge,
-    ephemeralKey,
+    assertion,
     hardwareKey,
+    bundleIdentifier,
     teamIdentifier,
+    ephemeralKey,
   } = iOSMockData;
 
   const data = Buffer.from(assertion, "base64");
@@ -21,13 +21,13 @@ describe("iOSAssertionValidation", () => {
 
   it("should return true", async () => {
     const result = verifyAssertion({
-      bundleIdentifier,
-      clientData,
       decodedAssertion,
+      clientData,
       hardwareKey,
+      bundleIdentifier,
+      teamIdentifier,
       signCount: 0,
       skipSignatureValidation: false,
-      teamIdentifier,
     });
 
     await expect(result).resolves.empty;

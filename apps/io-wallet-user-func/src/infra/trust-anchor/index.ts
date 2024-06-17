@@ -1,3 +1,8 @@
+import { pipe, flow } from "fp-ts/function";
+import * as E from "fp-ts/lib/Either";
+import * as TE from "fp-ts/lib/TaskEither";
+import * as jose from "jose";
+
 import { agent } from "@pagopa/ts-commons";
 import {
   AbortableFetch,
@@ -5,22 +10,19 @@ import {
   toFetch,
 } from "@pagopa/ts-commons/lib/fetch";
 import { Millisecond } from "@pagopa/ts-commons/lib/units";
-import { flow, pipe } from "fp-ts/function";
+
 import { sequenceS } from "fp-ts/lib/Apply";
-import * as E from "fp-ts/lib/Either";
-import * as TE from "fp-ts/lib/TaskEither";
-import * as jose from "jose";
-import { verifyJwtSignature } from "@/verifier";
-import { validate } from "@/validation";
-import { removeTrailingSlash } from "@/url";
 import {
   EntityStatementHeader,
   EntityStatementPayload,
   TrustAnchor,
   TrustAnchorEntityConfigurationPayload,
-} from "@/trust-anchor";
-import { getKeyByKid } from "@/jwk";
-import { FederationEntityMetadata } from "@/entity-configuration";
+} from "../../trust-anchor";
+import { FederationEntityMetadata } from "../../entity-configuration";
+import { validate } from "../../validation";
+import { getKeyByKid } from "../../jwk";
+import { verifyJwtSignature } from "../../verifier";
+import { removeTrailingSlash } from "../../url";
 
 const oidFederation = "/.well-known/openid-federation";
 
@@ -69,8 +71,8 @@ export class EidasTrustAnchor implements TrustAnchor {
       },
       getRequest(this.fetchWithTimeout),
       TE.map((jwt) => ({
-        decoded: this.validateEntityStatementJwt(jwt),
         encoded: TE.right(jwt),
+        decoded: this.validateEntityStatementJwt(jwt),
       })),
       TE.chain(sequenceS(TE.ApplicativePar))
     );

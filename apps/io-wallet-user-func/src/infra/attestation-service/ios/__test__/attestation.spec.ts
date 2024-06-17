@@ -1,17 +1,17 @@
-import { APPLE_APP_ATTESTATION_ROOT_CA } from "@/app/config";
-import { decode } from "cbor-x";
-import { describe, expect, it } from "vitest";
-
+import { it, expect, describe } from "vitest";
 import { verifyAttestation } from "../attestation";
+import { decode } from "cbor-x";
+
 import { iOSMockData } from "./config";
+import { APPLE_APP_ATTESTATION_ROOT_CA } from "@/app/config";
 
 describe("iOSAttestationValidation", () => {
   const {
-    attestation,
-    bundleIdentifier,
     challenge,
-    hardwareKey,
+    attestation,
     keyId,
+    hardwareKey,
+    bundleIdentifier,
     teamIdentifier,
   } = iOSMockData;
 
@@ -20,13 +20,13 @@ describe("iOSAttestationValidation", () => {
 
   it("should return a validated attestation", async () => {
     const result = verifyAttestation({
+      decodedAttestation,
+      challenge,
+      keyId,
+      bundleIdentifier,
+      teamIdentifier,
       allowDevelopmentEnvironment: true,
       appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-      bundleIdentifier,
-      challenge,
-      decodedAttestation,
-      keyId,
-      teamIdentifier,
     });
     const expectedResult = {
       hardwareKey,
@@ -38,14 +38,14 @@ describe("iOSAttestationValidation", () => {
   it("should reject", async () => {
     await expect(
       verifyAttestation({
+        decodedAttestation,
+        challenge: "invalidChallenge",
+        keyId,
+        bundleIdentifier,
+        teamIdentifier,
         allowDevelopmentEnvironment: true,
         appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-        bundleIdentifier,
-        challenge: "invalidChallenge",
-        decodedAttestation,
-        keyId,
-        teamIdentifier,
-      }),
+      })
     ).rejects.toThrow();
   });
 });

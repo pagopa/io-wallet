@@ -1,4 +1,19 @@
-/* eslint-disable max-lines-per-function */
+import { it, expect, describe, beforeAll, afterAll } from "vitest";
+import * as H from "@pagopa/handler-kit";
+import * as L from "@pagopa/logger";
+import * as O from "fp-ts/Option";
+import * as E from "fp-ts/Either";
+import * as jose from "jose";
+import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
+import {
+  federationEntityMetadata,
+  trustAnchorPort,
+  trustAnchorServerMock,
+} from "./trust-anchor";
+import { privateEcKey, publicEcKey, signer } from "./keys";
+import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
+import { NonceRepository } from "@/nonce";
+import * as TE from "fp-ts/TaskEither";
 import {
   ANDROID_CRL_URL,
   ANDROID_PLAY_INTEGRITY_URL,
@@ -6,28 +21,11 @@ import {
   GOOGLE_PUBLIC_KEY,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
-import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
-import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
-import * as H from "@pagopa/handler-kit";
-import * as L from "@pagopa/logger";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode } from "cbor-x";
-import * as E from "fp-ts/Either";
-import * as O from "fp-ts/Option";
-import * as TE from "fp-ts/TaskEither";
-import * as jose from "jose";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
-import { privateEcKey, publicEcKey, signer } from "./keys";
-import {
-  federationEntityMetadata,
-  trustAnchorPort,
-  trustAnchorServerMock,
-} from "./trust-anchor";
-
-const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
+const { challenge, assertion, hardwareKey, keyId } = iOSMockData;
 
 beforeAll(() => {
   trustAnchorServerMock.listen(trustAnchorPort);
@@ -38,62 +36,62 @@ afterAll(() => {
 });
 
 const nonceRepository: NonceRepository = {
-  delete: () => TE.right(void 0),
   insert: () => TE.left(new Error("not implemented")),
+  delete: () => TE.right(void 0),
 };
 
 const logger = {
+  log: () => () => {},
   format: L.format.simple,
-  log: () => () => void 0,
 };
 
 const attestationServiceConfiguration = {
-  allowDevelopmentEnvironment: true,
-  androidBundleIdentifier:
-    "org.reactjs.native.example.IoReactNativeIntegrityExample",
-  androidCrlUrl: ANDROID_CRL_URL,
-  androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
-  androidPlayStoreCertificateHash: "",
-  appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-  googleAppCredentialsEncoded: "",
-  googlePublicKey: GOOGLE_PUBLIC_KEY,
   iOsBundleIdentifier:
     "org.reactjs.native.example.IoReactNativeIntegrityExample",
   iOsTeamIdentifier: "M2X5YQ4BJ7",
+  androidBundleIdentifier:
+    "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  androidPlayStoreCertificateHash: "",
+  appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
+  allowDevelopmentEnvironment: true,
+  googlePublicKey: GOOGLE_PUBLIC_KEY,
+  androidCrlUrl: ANDROID_CRL_URL,
+  androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
+  googleAppCredentialsEncoded: "",
   skipSignatureValidation: true,
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
-  batchPatchWithReplaceOperation: () => TE.left(new Error("not implemented")),
+  insert: () => TE.left(new Error("not implemented")),
   get: () =>
     TE.right(
       O.some({
-        hardwareKey,
         id: "123" as NonEmptyString,
-        isRevoked: false,
-        signCount: 0,
         userId: "123" as NonEmptyString,
-      }),
+        hardwareKey,
+        signCount: 0,
+        isRevoked: false,
+      })
     ),
+  batchPatchWithReplaceOperation: () => TE.left(new Error("not implemented")),
   getAllByUserId: () => TE.left(new Error("not implemented")),
-  insert: () => TE.left(new Error("not implemented")),
 };
 
 const data = Buffer.from(assertion, "base64");
-const { authenticatorData, signature } = decode(data);
+const { signature, authenticatorData } = decode(data);
 
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
+    iss: "demokey",
+    sub: "https://wallet-provider.example.org/",
     challenge,
+    hardware_signature: signature.toString("base64"),
+    integrity_assertion: authenticatorData.toString("base64"),
+    hardware_key_tag: keyId,
     cnf: {
       jwk: publicEcKey,
     },
-    hardware_key_tag: keyId,
-    hardware_signature: signature.toString("base64"),
-    integrity_assertion: authenticatorData.toString("base64"),
-    iss: "demokey",
-    sub: "https://wallet-provider.example.org/",
   })
     .setProtectedHeader({
       alg: "ES256",
@@ -107,23 +105,23 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
-        assertion: walletAttestationRequest,
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
+        assertion: walletAttestationRequest,
       },
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
-      federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      nonceRepository,
+      federationEntityMetadata,
       signer,
+      nonceRepository,
+      attestationServiceConfiguration,
       walletInstanceRepository,
     });
 
@@ -132,11 +130,11 @@ describe("CreateWalletAttestationHandler", async () => {
     expect(result).toEqual({
       _tag: "Right",
       right: {
-        body: expect.any(String),
+        statusCode: 200,
         headers: expect.objectContaining({
           "Content-Type": "application/jwt",
         }),
-        statusCode: 200,
+        body: expect.any(String),
       },
     });
 
@@ -154,134 +152,134 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
-        assertion: walletAttestationRequest,
         grant_type: "foo",
+        assertion: walletAttestationRequest,
       },
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
-      federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      nonceRepository,
+      federationEntityMetadata,
       signer,
+      nonceRepository,
+      attestationServiceConfiguration,
       walletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 422,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 422,
       }),
     });
   });
 
   it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
     const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
-      batchPatchWithReplaceOperation: () =>
-        TE.left(new Error("not implemented")),
+      insert: () => TE.left(new Error("not implemented")),
       get: () =>
         TE.right(
           O.some({
-            hardwareKey,
             id: "123" as NonEmptyString,
-            isRevoked: true,
-            signCount: 0,
             userId: "123" as NonEmptyString,
-          }),
+            hardwareKey,
+            signCount: 0,
+            isRevoked: true,
+          })
         ),
+      batchPatchWithReplaceOperation: () =>
+        TE.left(new Error("not implemented")),
       getAllByUserId: () => TE.left(new Error("not implemented")),
-      insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
-        assertion: walletAttestationRequest,
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
+        assertion: walletAttestationRequest,
       },
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
-      federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      nonceRepository,
+      federationEntityMetadata,
       signer,
+      nonceRepository,
+      attestationServiceConfiguration,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
-        body: {
-          detail: "The wallet instance has been revoked.",
-          status: 403,
-          title: "Forbidden",
-        },
+        statusCode: 403,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 403,
+        body: {
+          title: "Forbidden",
+          status: 403,
+          detail: "The wallet instance has been revoked.",
+        },
       }),
     });
   });
 
   it("should return a 404 HTTP response when the wallet instance is not found", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
+      insert: () => TE.left(new Error("not implemented")),
+      get: () => TE.right(O.none),
       batchPatchWithReplaceOperation: () =>
         TE.left(new Error("not implemented")),
-      get: () => TE.right(O.none),
       getAllByUserId: () => TE.left(new Error("not implemented")),
-      insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
-        assertion: walletAttestationRequest,
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
+        assertion: walletAttestationRequest,
       },
       headers: {
         "x-iowallet-user-id": "x-iowallet-user-id",
       },
-      method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
-      federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      nonceRepository,
+      federationEntityMetadata,
       signer,
+      nonceRepository,
+      attestationServiceConfiguration,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
-        body: {
-          detail: "Wallet instance not found",
-          status: 404,
-          title: "Not Found",
-        },
+        statusCode: 404,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 404,
+        body: {
+          title: "Not Found",
+          status: 404,
+          detail: "Wallet instance not found",
+        },
       }),
     });
   });

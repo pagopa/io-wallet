@@ -1,47 +1,44 @@
-import { UserRepository } from "@/user";
+import { it, expect, describe } from "vitest";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it } from "vitest";
-
 import { GetUserByFiscalCodeHandler } from "../get-user-by-fiscal-code";
+import { UserRepository } from "@/user";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
 describe("GetUserByFiscalCodeHandler", () => {
   const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     getOrCreateUserByFiscalCode: () =>
       TE.right({ id: "pdv_id" as NonEmptyString }),
-  };
-
-  const logger = {
-    format: L.format.simple,
-    log: () => () => void 0,
+    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
   };
 
   it("should return a 200 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
         fiscal_code: "GSPMTA98L25E625O",
       },
-      method: "POST",
     };
     const handler = GetUserByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      logger,
+      logger: {
+        log: () => () => {},
+        format: L.format.simple,
+      },
       userRepository,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
-        body: { id: "pdv_id" },
+        statusCode: 200,
         headers: expect.objectContaining({
           "Content-Type": "application/json",
         }),
-        statusCode: 200,
+        body: { id: "pdv_id" },
       },
     });
   });
@@ -49,56 +46,62 @@ describe("GetUserByFiscalCodeHandler", () => {
   it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
         foo: "GSPMTA98L25E625O",
       },
-      method: "POST",
     };
     const handler = GetUserByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      logger,
+      logger: {
+        log: () => () => {},
+        format: L.format.simple,
+      },
       userRepository,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 422,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 422,
       }),
     });
   });
 
   it("should return a 500 HTTP response when getUserByFiscalCode returns error", async () => {
     const userRepositoryThatFailsOnGetUserByFiscalCode: UserRepository = {
-      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
       getOrCreateUserByFiscalCode: () =>
         TE.left(new Error("failed on getIdByFiscalCode!")),
+      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      method: "POST",
       body: {
         fiscal_code: "GSPMTA98L25E625O",
       },
-      method: "POST",
     };
     const handler = GetUserByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      logger,
+      logger: {
+        log: () => () => {},
+        format: L.format.simple,
+      },
       userRepository: userRepositoryThatFailsOnGetUserByFiscalCode,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
+        statusCode: 500,
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
       }),
     });
   });

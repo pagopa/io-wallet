@@ -1,24 +1,26 @@
-import * as H from "@pagopa/handler-kit";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
-import * as E from "fp-ts/lib/Either";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common";
 
+import { pipe } from "fp-ts/function";
+
+import * as H from "@pagopa/handler-kit";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as E from "fp-ts/lib/Either";
+import * as TE from "fp-ts/lib/TaskEither";
+
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { sequenceS } from "fp-ts/lib/Apply";
+import { logErrorAndReturnResponse } from "../utils";
 import { requireUser, successJwt } from "./utils";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
-import { consumeNonce } from "@/wallet-instance-request";
-import { getValidWalletInstance } from "@/wallet-instance";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
+import { consumeNonce } from "@/wallet-instance-request";
 import { createWalletAttestation } from "@/wallet-attestation";
+import { getValidWalletInstance } from "@/wallet-instance";
 import { validateAssertion } from "@/attestation-service";
 
 const WalletAttestationRequestPayload = t.type({
-  assertion: NonEmptyString,
   grant_type: t.literal(GRANT_TYPE_KEY_ATTESTATION),
+  assertion: NonEmptyString,
 });
 
 type WalletAttestationRequestPayload = t.TypeOf<
@@ -40,7 +42,6 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
 export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(TE.ApplicativePar)({
-      user: pipe(req, requireUser, TE.fromEither),
       walletAttestationRequest: pipe(
         req,
         requireWalletAttestationRequest,
@@ -49,9 +50,10 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
           pipe(payload.assertion, verifyWalletAttestationRequest)
         )
       ),
+      user: pipe(req, requireUser, TE.fromEither),
     }),
     RTE.fromTaskEither,
-    RTE.chain(({ user, walletAttestationRequest }) =>
+    RTE.chain(({ walletAttestationRequest, user }) =>
       pipe(
         consumeNonce(walletAttestationRequest.payload.challenge),
         RTE.chainW(() =>

@@ -1,16 +1,15 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
+import { decode } from "cbor-x";
 import * as t from "io-ts";
-
-import { verifyAssertion } from "./assertion";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { sequenceS } from "fp-ts/lib/Apply";
+import { validate } from "../../../validation";
+import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";
-import { validate } from "@/validation";
+import { verifyAssertion } from "./assertion";
 import { JwkPublicKey } from "@/jwk";
-import { ValidatedAttestation } from "@/attestation-service";
 
 const buffer = new t.Type<Buffer, Buffer, unknown>(
   "buffer",
@@ -22,12 +21,12 @@ const buffer = new t.Type<Buffer, Buffer, unknown>(
 
 // iOS attestation type
 export const iOsAttestation = t.type({
+  fmt: t.literal("apple-appattest"),
   attStmt: t.type({
-    receipt: buffer,
     x5c: t.array(buffer),
+    receipt: buffer,
   }),
   authData: buffer,
-  fmt: t.literal("apple-appattest"),
 });
 
 export type iOsAttestation = t.TypeOf<typeof iOsAttestation>;
@@ -58,13 +57,13 @@ export const validateiOSAttestation = (
         TE.tryCatch(
           () =>
             verifyAttestation({
+              decodedAttestation,
+              challenge,
+              keyId,
+              bundleIdentifier,
+              teamIdentifier,
               allowDevelopmentEnvironment,
               appleRootCertificate,
-              bundleIdentifier,
-              challenge,
-              decodedAttestation,
-              keyId,
-              teamIdentifier,
             }),
           E.toError
         ),
@@ -82,8 +81,8 @@ export const validateiOSAttestation = (
 
 // iOS assertion type
 export const iOsAssertion = t.type({
-  authenticatorData: buffer,
   signature: buffer,
+  authenticatorData: buffer,
 });
 
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
@@ -117,13 +116,13 @@ export const validateiOSAssertion = (
       TE.tryCatch(
         () =>
           verifyAssertion({
-            bundleIdentifier,
-            clientData,
             decodedAssertion,
+            clientData,
+            bundleIdentifier,
+            teamIdentifier,
             hardwareKey,
             signCount,
             skipSignatureValidation,
-            teamIdentifier,
           }),
         E.toError
       )

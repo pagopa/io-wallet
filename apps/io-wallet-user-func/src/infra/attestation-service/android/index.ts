@@ -1,16 +1,15 @@
 import { X509Certificate } from "crypto";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
-import * as J from "fp-ts/Json";
 import * as TE from "fp-ts/TaskEither";
+import * as S from "fp-ts/lib/string";
+import * as J from "fp-ts/Json";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
-import * as S from "fp-ts/lib/string";
-
-import { ValidatedAttestation } from "..";
-import { GoogleAppCredentials, verifyAssertion } from "./assertion";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { ValidatedAttestation } from "../../attestation-service";
+import { validate } from "../../../validation";
 import { verifyAttestation } from "./attestation";
-import { validate } from "@/validation";
+import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 import { JwkPublicKey } from "@/jwk";
 
 export const base64ToPem = (b64cert: string) =>
@@ -44,11 +43,11 @@ export const validateAndroidAttestation = (
         TE.tryCatch(
           () =>
             verifyAttestation({
-              androidCrlUrl,
-              bundleIdentifier,
-              challenge: nonce,
-              googlePublicKey,
               x509Chain,
+              googlePublicKey,
+              challenge: nonce,
+              bundleIdentifier,
+              androidCrlUrl,
             }),
           E.toError
         ),
@@ -93,15 +92,15 @@ export const validateAndroidAssertion = (
       TE.tryCatch(
         () =>
           verifyAssertion({
-            allowDevelopmentEnvironment,
-            androidPlayIntegrityUrl,
-            androidPlayStoreCertificateHash,
-            bundleIdentifier,
-            clientData,
-            googleAppCredentials,
-            hardwareKey,
-            hardwareSignature,
             integrityAssertion,
+            hardwareSignature,
+            clientData,
+            hardwareKey,
+            bundleIdentifier,
+            androidPlayStoreCertificateHash,
+            googleAppCredentials,
+            androidPlayIntegrityUrl,
+            allowDevelopmentEnvironment,
           }),
         E.toError
       )

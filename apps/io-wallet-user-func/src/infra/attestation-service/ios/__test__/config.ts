@@ -28,12 +28,12 @@ const assertion =
   "omlzaWduYXR1cmVYRzBFAiAqy9VNUCbjpk9JkkvbURxyRZN8gDYyTZjWH1UNZ7CDkAIhAI/9DpOi7fBeaTDNVDGYlG/2SuYKan/Fzt7a2RQhEDopcWF1dGhlbnRpY2F0b3JEYXRhWCWeDBnBGvrDhnvbN8megL4yLGEW8DZpXwCJQizAYkg3ykAAAAAB";
 
 export const iOSMockData = {
-  assertion,
-  attestation,
-  bundleIdentifier,
   challenge,
-  ephemeralKey,
-  hardwareKey,
+  attestation,
+  assertion,
   keyId,
+  bundleIdentifier,
   teamIdentifier,
+  hardwareKey,
+  ephemeralKey,
 };

@@ -1,6 +1,6 @@
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
-import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
+import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -14,37 +14,6 @@ export class CosmosDbWalletInstanceRepository
 
   constructor(db: Database) {
     this.#container = db.container("wallet-instances");
-  }
-
-  batchPatchWithReplaceOperation(
-    operationsInput: Array<{
-      id: string;
-      path: string;
-      value: unknown;
-    }>,
-    userId: string
-  ) {
-    return TE.tryCatch(
-      async () => {
-        const operations: PatchOperationInput[] = operationsInput.map(
-          ({ id, path, value }) => ({
-            id,
-            operationType: "Patch",
-            resourceBody: {
-              operations: [
-                {
-                  op: "replace",
-                  path,
-                  value,
-                },
-              ],
-            },
-          })
-        );
-        await this.#container.items.batch(operations, userId);
-      },
-      (error) => new Error(`Error updating wallet instances: ${error}`)
-    );
   }
 
   get(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
@@ -72,19 +41,28 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
+  insert(walletInstance: WalletInstance) {
+    return TE.tryCatch(
+      async () => {
+        await this.#container.items.create(walletInstance);
+      },
+      (error) => new Error(`Error inserting wallet instance: ${error}`)
+    );
+  }
+
   getAllByUserId(userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(
         async () => {
           const { resources: items } = await this.#container.items
             .query({
+              query: "SELECT * FROM c WHERE c.userId = @partitionKey",
               parameters: [
                 {
                   name: "@partitionKey",
                   value: userId,
                 },
               ],
-              query: "SELECT * FROM c WHERE c.userId = @partitionKey",
             })
             .fetchAll();
           return items;
@@ -101,12 +79,34 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  insert(walletInstance: WalletInstance) {
+  batchPatchWithReplaceOperation(
+    operationsInput: Array<{
+      id: string;
+      path: string;
+      value: unknown;
+    }>,
+    userId: string
+  ) {
     return TE.tryCatch(
       async () => {
-        await this.#container.items.create(walletInstance);
+        const operations: PatchOperationInput[] = operationsInput.map(
+          ({ id, path, value }) => ({
+            operationType: "Patch",
+            id,
+            resourceBody: {
+              operations: [
+                {
+                  op: "replace",
+                  path,
+                  value,
+                },
+              ],
+            },
+          })
+        );
+        await this.#container.items.batch(operations, userId);
       },
-      (error) => new Error(`Error inserting wallet instance: ${error}`)
+      (error) => new Error(`Error updating wallet instances: ${error}`)
     );
   }
 }

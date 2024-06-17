@@ -1,25 +1,25 @@
-import { ValidationError } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { pipe, identity } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 import * as E from "fp-ts/Either";
-import * as J from "fp-ts/Json";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
-import * as TE from "fp-ts/TaskEither";
-import { identity, pipe } from "fp-ts/function";
+import * as J from "fp-ts/Json";
+
+import { ValidationError } from "@pagopa/handler-kit";
 import { Separated } from "fp-ts/lib/Separated";
 import { calculateJwkThumbprint } from "jose";
-
+import {
+  AttestationService,
+  ValidatedAttestation,
+  ValidateAssertionRequest,
+} from "../../attestation-service";
+import { AttestationServiceConfiguration } from "../../app/config";
+import { validateiOSAssertion, validateiOSAttestation } from "./ios";
 import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
-import { validateiOSAssertion, validateiOSAttestation } from "./ios";
-import {
-  AttestationService,
-  ValidateAssertionRequest,
-  ValidatedAttestation,
-} from "@/attestation-service";
-import { AttestationServiceConfiguration } from "@/app/config";
 
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,12 +36,54 @@ const getErrorsOrFirstValidValue = (
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
 
+  constructor(cnf: AttestationServiceConfiguration) {
+    this.#configuration = cnf;
+  }
+
+  validateAttestation = (
+    attestation: NonEmptyString,
+    nonce: NonEmptyString,
+    hardwareKeyTag: NonEmptyString
+  ): TE.TaskEither<Error, ValidatedAttestation> =>
+    pipe(
+      E.tryCatch(
+        () => Buffer.from(attestation, "base64"),
+        () => new Error(`Invalid attestation: ${attestation}`)
+      ),
+      TE.fromEither,
+      TE.chainW((data) =>
+        pipe(
+          [
+            validateiOSAttestation(
+              data,
+              nonce,
+              hardwareKeyTag,
+              this.#configuration.iOsBundleIdentifier,
+              this.#configuration.iOsTeamIdentifier,
+              this.#configuration.appleRootCertificate,
+              this.#configuration.allowDevelopmentEnvironment
+            ),
+            validateAndroidAttestation(
+              data,
+              nonce,
+              hardwareKeyTag,
+              this.#configuration.androidBundleIdentifier,
+              this.#configuration.googlePublicKey,
+              this.#configuration.androidCrlUrl
+            ),
+          ],
+          RA.wilt(T.ApplicativePar)(identity),
+          T.map(getErrorsOrFirstValidValue)
+        )
+      )
+    );
+
   validateAssertion = ({
-    hardwareKey,
-    hardwareSignature,
     integrityAssertion,
-    jwk,
+    hardwareSignature,
     nonce,
+    jwk,
+    hardwareKey,
     signCount,
   }: ValidateAssertionRequest) =>
     pipe(
@@ -86,47 +128,5 @@ export class MobileAttestationService implements AttestationService {
         )
       )
     );
-
-  validateAttestation = (
-    attestation: NonEmptyString,
-    nonce: NonEmptyString,
-    hardwareKeyTag: NonEmptyString
-  ): TE.TaskEither<Error, ValidatedAttestation> =>
-    pipe(
-      E.tryCatch(
-        () => Buffer.from(attestation, "base64"),
-        () => new Error(`Invalid attestation: ${attestation}`)
-      ),
-      TE.fromEither,
-      TE.chainW((data) =>
-        pipe(
-          [
-            validateiOSAttestation(
-              data,
-              nonce,
-              hardwareKeyTag,
-              this.#configuration.iOsBundleIdentifier,
-              this.#configuration.iOsTeamIdentifier,
-              this.#configuration.appleRootCertificate,
-              this.#configuration.allowDevelopmentEnvironment
-            ),
-            validateAndroidAttestation(
-              data,
-              nonce,
-              hardwareKeyTag,
-              this.#configuration.androidBundleIdentifier,
-              this.#configuration.googlePublicKey,
-              this.#configuration.androidCrlUrl
-            ),
-          ],
-          RA.wilt(T.ApplicativePar)(identity),
-          T.map(getErrorsOrFirstValidValue)
-        )
-      )
-    );
-
-  constructor(cnf: AttestationServiceConfiguration) {
-    this.#configuration = cnf;
-  }
 }
 export { ValidatedAttestation };

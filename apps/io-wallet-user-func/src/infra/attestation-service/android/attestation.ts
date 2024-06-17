@@ -1,22 +1,22 @@
 import { X509Certificate, createPublicKey } from "crypto";
+import { AsnConvert } from "@peculiar/asn1-schema";
+import * as jose from "jose";
+import * as asn1js from "asn1js";
+import * as pkijs from "pkijs";
 import {
   AttestationApplicationId,
   NonStandardKeyDescription,
 } from "@peculiar/asn1-android";
-import { AsnConvert } from "@peculiar/asn1-schema";
-import * as asn1js from "asn1js";
-import * as jose from "jose";
-import * as pkijs from "pkijs";
 
 /**
  * Simplified type definition for the Certificate Revocation List (CRL) object.
  */
-interface CRL {
+type CRL = {
   entries: Record<
     string,
-    { comment: string; expires: string; reason: string; status: string }
+    { status: string; expires: string; reason: string; comment: string }
   >;
-}
+};
 
 /**
  * Key attestation extension data schema OID
@@ -24,16 +24,16 @@ interface CRL {
  */
 const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 
-export interface VerifyAttestationParams {
-  androidCrlUrl: string;
-  bundleIdentifier: string;
-  challenge: string;
-  googlePublicKey: string;
+export type VerifyAttestationParams = {
   x509Chain: ReadonlyArray<X509Certificate>;
-}
+  googlePublicKey: string;
+  androidCrlUrl: string;
+  challenge: string;
+  bundleIdentifier: string;
+};
 
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
-  const { androidCrlUrl, googlePublicKey, x509Chain } = params;
+  const { x509Chain, googlePublicKey, androidCrlUrl } = params;
 
   if (x509Chain.length <= 0) {
     throw new Error("[Android Attestation] No certificates provided");
@@ -170,7 +170,7 @@ const validateExtension = (
   certWithExtension: X509Certificate,
   attestationParams: VerifyAttestationParams
 ) => {
-  const { bundleIdentifier, challenge } = attestationParams;
+  const { challenge, bundleIdentifier } = attestationParams;
 
   const extension = extractExtension(certWithExtension, KEY_OID);
   if (!extension) {

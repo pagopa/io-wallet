@@ -1,24 +1,29 @@
+import * as t from "io-ts";
+
+import { pipe } from "fp-ts/function";
+
 import * as H from "@pagopa/handler-kit";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as E from "fp-ts/lib/Either";
+
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
-import { pipe } from "fp-ts/function";
-import * as E from "fp-ts/lib/Either";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common";
+
+import { logErrorAndReturnResponse } from "../utils";
 
 import { requireUser } from "./utils";
-import { consumeNonce } from "@/wallet-instance-request";
 import {
   insertWalletInstance,
   revokeUserWalletInstancesExceptOne,
 } from "@/wallet-instance";
+import { consumeNonce } from "@/wallet-instance-request";
+
 import { validateAttestation } from "@/attestation-service";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
-  hardware_key_tag: NonEmptyString,
   key_attestation: NonEmptyString,
+  hardware_key_tag: NonEmptyString,
 });
 
 type WalletInstanceRequestPayload = t.TypeOf<
@@ -29,11 +34,11 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
     req.body,
     H.parse(WalletInstanceRequestPayload),
-    E.chain(({ challenge, hardware_key_tag, key_attestation }) =>
+    E.chain(({ challenge, key_attestation, hardware_key_tag }) =>
       sequenceS(E.Apply)({
         challenge: E.right(challenge),
-        hardwareKeyTag: E.right(hardware_key_tag),
         keyAttestation: E.right(key_attestation),
+        hardwareKeyTag: E.right(hardware_key_tag),
       })
     )
   );
@@ -41,21 +46,21 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
-      user: requireUser(req),
       walletInstanceRequest: requireWalletInstanceRequest(req),
+      user: requireUser(req),
     }),
     RTE.fromEither,
-    RTE.chain(({ user, walletInstanceRequest }) =>
+    RTE.chain(({ walletInstanceRequest, user }) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
         RTE.chainW(({ hardwareKey }) =>
           insertWalletInstance({
-            hardwareKey,
             id: walletInstanceRequest.hardwareKeyTag,
-            isRevoked: false,
-            signCount: 0,
             userId: user.id,
+            hardwareKey,
+            signCount: 0,
+            isRevoked: false,
           })
         ),
         RTE.chainW(() =>
