@@ -33,7 +33,7 @@ const getAzureConfigFromEnvironment: RE.ReaderEither<
       dbName: cosmosDbDatabaseName,
       endpoint: cosmosDbEndpoint,
     },
-  })),
+  }))
 );
 
 export const getConfigFromEnvironment: RE.ReaderEither<
@@ -45,5 +45,5 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("azure", () => getAzureConfigFromEnvironment),
   RE.map(({ azure }) => ({
     azure,
-  })),
+  }))
 );

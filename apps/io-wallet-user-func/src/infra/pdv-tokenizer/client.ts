@@ -1,5 +1,3 @@
-import { PdvTokenizerApiClientConfig } from "@/app/config";
-import { UserRepository } from "@/user";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
@@ -7,6 +5,8 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
 import { PdvTokenizerHealthCheck } from "./health-check";
+import { UserRepository } from "@/user";
+import { PdvTokenizerApiClientConfig } from "@/app/config";
 
 const Token = t.type({
   token: NonEmptyString,
@@ -33,7 +33,7 @@ export class PdvTokenizerClient
           }
           return result.json();
         },
-        (error) => new Error(`error getting fiscal code by user id: ${error}`),
+        (error) => new Error(`error getting fiscal code by user id: ${error}`)
       ),
       TE.chain(
         flow(
@@ -41,15 +41,15 @@ export class PdvTokenizerClient
           E.mapLeft(
             () =>
               new Error(
-                "error getting fiscal code id by user id: invalid result format from pdv",
-              ),
+                "error getting fiscal code id by user id: invalid result format from pdv"
+              )
           ),
-          TE.fromEither,
-        ),
+          TE.fromEither
+        )
       ),
       TE.map(({ pii }) => ({
         fiscalCode: pii,
-      })),
+      }))
     );
 
   getOrCreateUserByFiscalCode = (fiscalCode: FiscalCode) =>
@@ -69,14 +69,14 @@ export class PdvTokenizerClient
               headers,
               method: "PUT",
               signal: AbortSignal.timeout(3000),
-            },
+            }
           );
           if (!result.ok) {
             throw new Error(JSON.stringify(await result.json()));
           }
           return result.json();
         },
-        (error) => new Error(`error getting user id by fiscal code: ${error}`),
+        (error) => new Error(`error getting user id by fiscal code: ${error}`)
       ),
       TE.chain(
         flow(
@@ -84,13 +84,13 @@ export class PdvTokenizerClient
           E.mapLeft(
             () =>
               new Error(
-                "error getting user id by fiscal code: invalid result format from pdv",
-              ),
+                "error getting user id by fiscal code: invalid result format from pdv"
+              )
           ),
-          TE.fromEither,
-        ),
+          TE.fromEither
+        )
       ),
-      TE.map(({ token }) => ({ id: token })),
+      TE.map(({ token }) => ({ id: token }))
     );
 
   healthCheck = () =>
@@ -100,8 +100,8 @@ export class PdvTokenizerClient
           const result = await this.getFiscalCode(this.#testUUID);
           return result.status === 200;
         },
-        (error) => new Error(`error checking pdv tokenizer health: ${error}`),
-      ),
+        (error) => new Error(`error checking pdv tokenizer health: ${error}`)
+      )
     );
 
   constructor({ apiKey, baseURL, testUUID }: PdvTokenizerApiClientConfig) {

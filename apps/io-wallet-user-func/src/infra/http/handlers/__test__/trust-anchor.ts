@@ -1,13 +1,13 @@
-import { FederationEntityMetadata } from "@/entity-configuration";
+import * as http from "http";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as E from "fp-ts/Either";
 import { flow } from "fp-ts/function";
-import * as http from "http";
 import * as jose from "jose";
 import { vi } from "vitest";
 
 import { jwks, privateEcKey } from "./keys";
+import { FederationEntityMetadata } from "@/entity-configuration";
 
 export const trustAnchorPort = 8123;
 
@@ -82,24 +82,25 @@ export const getTrustAnchotEntityConfiguration = vi
       .sign(josePrivateKey);
   });
 
-export const trustAnchorServerMock = http.createServer(
-  async function (req, res) {
-    const { pathname } = new URL(req.url || "", `https://${req.headers.host}`);
-    res.setHeader("Content-Type", "application/entity-statement+jwt");
-    if (pathname.endsWith("/.well-known/openid-federation")) {
-      res.write(await getTrustAnchotEntityConfiguration());
-    } else if (pathname.endsWith("/fetch")) {
-      res.write(await getEntityStatement());
-    }
-    res.end();
-  },
-);
+export const trustAnchorServerMock = http.createServer(async function (
+  req,
+  res
+) {
+  const { pathname } = new URL(req.url || "", `https://${req.headers.host}`);
+  res.setHeader("Content-Type", "application/entity-statement+jwt");
+  if (pathname.endsWith("/.well-known/openid-federation")) {
+    res.write(await getTrustAnchotEntityConfiguration());
+  } else if (pathname.endsWith("/fetch")) {
+    res.write(await getEntityStatement());
+  }
+  res.end();
+});
 
 export const url = flow(
   UrlFromString.decode,
   E.getOrElseW((_) => {
     throw new Error(`Failed to parse url ${_[0].value}`);
-  }),
+  })
 );
 
 export const federationEntityMetadata: FederationEntityMetadata = {

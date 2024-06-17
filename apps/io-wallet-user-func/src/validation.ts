@@ -16,9 +16,9 @@ export class ValidationError extends Error {
 
 export const validate = <T>(
   schema: t.Decoder<unknown, T>,
-  message = ValidationError.defaultMessage,
+  message = ValidationError.defaultMessage
 ) =>
   flow(
     schema.decode,
-    E.mapLeft((errors) => new ValidationError(failure(errors), message)),
+    E.mapLeft((errors) => new ValidationError(failure(errors), message))
   );

@@ -14,18 +14,18 @@ export interface NonceEnvironment {
 
 export const generateNonce: IOE.IOEither<Error, string> = IOE.tryCatch(
   () => randomBytes(32).toString("hex"),
-  (error) => new Error(`Failed to generate nonce: ${error}`),
+  (error) => new Error(`Failed to generate nonce: ${error}`)
 );
 
 export const insertNonce: (
-  nonce: string,
+  nonce: string
 ) => RTE.ReaderTaskEither<NonceEnvironment, Error, void> =
   (nonce) =>
   ({ nonceRepository }) =>
     nonceRepository.insert(nonce);
 
 export const deleteNonce: (
-  nonce: string,
+  nonce: string
 ) => RTE.ReaderTaskEither<NonceEnvironment, Error, void> =
   (nonce) =>
   ({ nonceRepository }) =>

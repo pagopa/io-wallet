@@ -1,8 +1,8 @@
-import { JwkPublicKey } from "@/jwk";
 import { createHash, createVerify } from "crypto";
 import { exportSPKI, importJWK } from "jose";
 
 import { iOsAssertion } from ".";
+import { JwkPublicKey } from "@/jwk";
 
 export interface VerifyAssertionParams {
   bundleIdentifier: string;

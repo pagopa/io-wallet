@@ -1,15 +1,3 @@
-/* eslint-disable perfectionist/sort-classes */
-import { FederationEntityMetadata } from "@/entity-configuration";
-import { getKeyByKid } from "@/jwk";
-import {
-  EntityStatementHeader,
-  EntityStatementPayload,
-  TrustAnchor,
-  TrustAnchorEntityConfigurationPayload,
-} from "@/trust-anchor";
-import { removeTrailingSlash } from "@/url";
-import { validate } from "@/validation";
-import { verifyJwtSignature } from "@/verifier";
 import { agent } from "@pagopa/ts-commons";
 import {
   AbortableFetch,
@@ -22,6 +10,17 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
+import { verifyJwtSignature } from "@/verifier";
+import { validate } from "@/validation";
+import { removeTrailingSlash } from "@/url";
+import {
+  EntityStatementHeader,
+  EntityStatementPayload,
+  TrustAnchor,
+  TrustAnchorEntityConfigurationPayload,
+} from "@/trust-anchor";
+import { getKeyByKid } from "@/jwk";
+import { FederationEntityMetadata } from "@/entity-configuration";
 
 const oidFederation = "/.well-known/openid-federation";
 
@@ -31,7 +30,7 @@ export class EidasTrustAnchor implements TrustAnchor {
   httpApiFetch = agent.getHttpFetch(process.env);
   abortableFetch = AbortableFetch(this.httpApiFetch);
   fetchWithTimeout = toFetch(
-    setFetchTimeout(1000 as Millisecond, this.abortableFetch),
+    setFetchTimeout(1000 as Millisecond, this.abortableFetch)
   ) as unknown as typeof fetch;
 
   constructor(cnf: FederationEntityMetadata) {
@@ -47,10 +46,10 @@ export class EidasTrustAnchor implements TrustAnchor {
       TE.chainEitherKW(
         validate(
           TrustAnchorEntityConfigurationPayload,
-          "Invalid trust anchor entity configuration",
-        ),
+          "Invalid trust anchor entity configuration"
+        )
       ),
-      TE.map((metadata) => metadata.jwks.keys),
+      TE.map((metadata) => metadata.jwks.keys)
     );
 
   getEntityStatement = () =>
@@ -60,11 +59,11 @@ export class EidasTrustAnchor implements TrustAnchor {
         const fetchUrl = new URL("fetch", href);
         fetchUrl.searchParams.append(
           "sub",
-          removeTrailingSlash(this.#configuration.basePath.href),
+          removeTrailingSlash(this.#configuration.basePath.href)
         );
         fetchUrl.searchParams.append(
           "anchor",
-          removeTrailingSlash(this.#configuration.trustAnchorUri.href),
+          removeTrailingSlash(this.#configuration.trustAnchorUri.href)
         );
         return fetchUrl.href;
       },
@@ -73,7 +72,7 @@ export class EidasTrustAnchor implements TrustAnchor {
         decoded: this.validateEntityStatementJwt(jwt),
         encoded: TE.right(jwt),
       })),
-      TE.chain(sequenceS(TE.ApplicativePar)),
+      TE.chain(sequenceS(TE.ApplicativePar))
     );
 
   validateEntityStatementJwt = (jwt: string) =>
@@ -82,8 +81,8 @@ export class EidasTrustAnchor implements TrustAnchor {
       E.chainW(
         validate(
           EntityStatementHeader,
-          "Invalid trust anchor entity statement header",
-        ),
+          "Invalid trust anchor entity statement header"
+        )
       ),
       TE.fromEither,
       TE.chain((es) =>
@@ -92,19 +91,19 @@ export class EidasTrustAnchor implements TrustAnchor {
           TE.chain(
             flow(
               getKeyByKid(es.kid),
-              TE.fromOption(() => new Error("Kid not found")),
-            ),
-          ),
-        ),
+              TE.fromOption(() => new Error("Kid not found"))
+            )
+          )
+        )
       ),
       TE.chain(verifyJwtSignature(jwt)),
       TE.map((decoded) => decoded.payload),
       TE.chainEitherKW(
         validate(
           EntityStatementPayload,
-          "Invalid trust anchor entity statement payload",
-        ),
-      ),
+          "Invalid trust anchor entity statement payload"
+        )
+      )
     );
 }
 
@@ -115,7 +114,7 @@ const getRequest = (fetchFunction: typeof fetch) => (url: string) =>
       response.status === 200
         ? TE.tryCatch(() => response.text(), E.toError)
         : TE.left(
-            new Error(`Invalid response from trust anchor: ${response.status}`),
-          ),
-    ),
+            new Error(`Invalid response from trust anchor: ${response.status}`)
+          )
+    )
   );

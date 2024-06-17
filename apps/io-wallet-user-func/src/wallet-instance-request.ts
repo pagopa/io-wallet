@@ -15,6 +15,6 @@ export type WalletInstanceRequest = t.TypeOf<typeof WalletInstanceRequest>;
 
 // This function is used for nonce validation. Instead of checking if the nonce exists and then deleting it, we delete it directly to ensure an atomic operation.
 export const consumeNonce = (
-  challenge: WalletInstanceRequest["challenge"],
+  challenge: WalletInstanceRequest["challenge"]
 ): RTE.ReaderTaskEither<NonceEnvironment, Error, void> =>
   pipe(challenge, deleteNonce);

@@ -1,3 +1,10 @@
+import { CosmosClient } from "@azure/cosmos";
+import { app, output } from "@azure/functions";
+import { DefaultAzureCredential } from "@azure/identity";
+import * as E from "fp-ts/Either";
+import { identity, pipe } from "fp-ts/function";
+import * as t from "io-ts";
+import { getConfigFromEnvironment } from "./config";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -8,18 +15,10 @@ import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
-import { CosmosClient } from "@azure/cosmos";
-import { app, output } from "@azure/functions";
-import { DefaultAzureCredential } from "@azure/identity";
-import * as E from "fp-ts/Either";
-import { identity, pipe } from "fp-ts/function";
-import * as t from "io-ts";
-
-import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
-  E.getOrElseW(identity),
+  E.getOrElseW(identity)
 );
 
 if (configOrError instanceof Error) {

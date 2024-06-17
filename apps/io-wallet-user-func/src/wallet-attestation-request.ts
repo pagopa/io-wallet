@@ -44,7 +44,7 @@ export interface WalletAttestationRequest {
 
 // Verify and extract header and payload from Wallet Attestation Request
 export const verifyWalletAttestationRequest = (
-  attestationRequestJwt: string,
+  attestationRequestJwt: string
 ): TE.TaskEither<Error, WalletAttestationRequest> =>
   pipe(
     attestationRequestJwt,
@@ -57,16 +57,16 @@ export const verifyWalletAttestationRequest = (
           verifiedJwt.protectedHeader,
           validate(
             WalletAttestationRequestHeader,
-            "Invalid Wallet Attestation Request header",
-          ),
+            "Invalid Wallet Attestation Request header"
+          )
         ),
         payload: pipe(
           verifiedJwt.payload,
           validate(
             WalletAttestationRequestPayload,
-            "Invalid Wallet Attestation Request payload",
-          ),
+            "Invalid Wallet Attestation Request payload"
+          )
         ),
-      }),
-    ),
+      })
+    )
   );

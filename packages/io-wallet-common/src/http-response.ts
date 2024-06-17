@@ -58,7 +58,7 @@ const toErrorResponse = flow(toHttpError, toProblemJson, H.problemJson);
 export const logErrorAndReturnResponse = flow(
   RTE.right<object, Error, Error>,
   RTE.chainFirst((error) =>
-    errorRTE("returning with an error response", { error }),
+    errorRTE("returning with an error response", { error })
   ),
-  RTE.map(toErrorResponse),
+  RTE.map(toErrorResponse)
 );

@@ -29,19 +29,19 @@ export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
 export interface WalletInstanceRepository {
   batchPatchWithReplaceOperation: (
-    operations: {
+    operations: Array<{
       id: string;
       path: string;
       value: unknown;
-    }[],
-    userId: string,
+    }>,
+    userId: string
   ) => TE.TaskEither<Error, void>;
   get: (
     id: WalletInstance["id"],
-    userId: WalletInstance["userId"],
+    userId: WalletInstance["userId"]
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getAllByUserId: (
-    userId: WalletInstance["userId"],
+    userId: WalletInstance["userId"]
   ) => TE.TaskEither<Error, WalletInstance[]>;
   insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
 }
@@ -51,7 +51,7 @@ interface WalletInstanceEnvironment {
 }
 
 export const insertWalletInstance: (
-  walletInstance: WalletInstance,
+  walletInstance: WalletInstance
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (walletInstance) =>
   ({ walletInstanceRepository }) =>
@@ -59,7 +59,7 @@ export const insertWalletInstance: (
 
 export const getValidWalletInstance: (
   id: WalletInstance["id"],
-  userId: WalletInstance["userId"],
+  userId: WalletInstance["userId"]
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
   (id, userId) =>
   ({ walletInstanceRepository }) =>
@@ -67,19 +67,19 @@ export const getValidWalletInstance: (
       walletInstanceRepository.get(id, userId),
       TE.chain(
         TE.fromOption(
-          () => new EntityNotFoundError("Wallet instance not found"),
-        ),
+          () => new EntityNotFoundError("Wallet instance not found")
+        )
       ),
       TE.chain((walletInstance) =>
         walletInstance.isRevoked
           ? TE.left(new WalletInstanceRevoked())
-          : TE.right(walletInstance),
-      ),
+          : TE.right(walletInstance)
+      )
     );
 
 export const revokeUserWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"],
+  walletInstanceId: WalletInstance["id"]
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
@@ -90,9 +90,9 @@ export const revokeUserWalletInstancesExceptOne: (
           RA.filterMap((walletInstance) =>
             walletInstance.id !== walletInstanceId
               ? O.some(walletInstance.id)
-              : O.none,
-          ),
-        ),
+              : O.none
+          )
+        )
       ),
       TE.chain((walletInstancesId) =>
         walletInstanceRepository.batchPatchWithReplaceOperation(
@@ -101,7 +101,7 @@ export const revokeUserWalletInstancesExceptOne: (
             path: "/isRevoked",
             value: true,
           })),
-          userId,
-        ),
-      ),
+          userId
+        )
+      )
     );

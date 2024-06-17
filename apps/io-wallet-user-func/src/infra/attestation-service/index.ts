@@ -1,9 +1,3 @@
-import { AttestationServiceConfiguration } from "@/app/config";
-import {
-  AttestationService,
-  ValidateAssertionRequest,
-  ValidatedAttestation,
-} from "@/attestation-service";
 import { ValidationError } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
@@ -20,17 +14,23 @@ import {
   validateAndroidAttestation,
 } from "./android";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
+import {
+  AttestationService,
+  ValidateAssertionRequest,
+  ValidatedAttestation,
+} from "@/attestation-service";
+import { AttestationServiceConfiguration } from "@/app/config";
 
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validated: Separated<readonly Error[], readonly any[]>,
+  validated: Separated<ReadonlyArray<Error>, ReadonlyArray<any>>
 ) =>
   pipe(
     validated.right,
     RA.head,
     E.fromOption(
-      () => new ValidationError(validated.left.map((el) => el.message)),
-    ),
+      () => new ValidationError(validated.left.map((el) => el.message))
+    )
   );
 
 export class MobileAttestationService implements AttestationService {
@@ -53,8 +53,8 @@ export class MobileAttestationService implements AttestationService {
             jwk_thumbprint,
           },
           J.stringify,
-          E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
-        ),
+          E.mapLeft(() => new ValidationError(["Unable to create clientData"]))
+        )
       ),
       TE.chainW((clientData) =>
         pipe(
@@ -67,7 +67,7 @@ export class MobileAttestationService implements AttestationService {
               signCount,
               this.#configuration.iOsBundleIdentifier,
               this.#configuration.iOsTeamIdentifier,
-              this.#configuration.skipSignatureValidation,
+              this.#configuration.skipSignatureValidation
             ),
             validateAndroidAssertion(
               integrityAssertion,
@@ -78,24 +78,24 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.androidPlayStoreCertificateHash,
               this.#configuration.googleAppCredentialsEncoded,
               this.#configuration.androidPlayIntegrityUrl,
-              this.#configuration.allowDevelopmentEnvironment,
+              this.#configuration.allowDevelopmentEnvironment
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map(getErrorsOrFirstValidValue),
-        ),
-      ),
+          T.map(getErrorsOrFirstValidValue)
+        )
+      )
     );
 
   validateAttestation = (
     attestation: NonEmptyString,
     nonce: NonEmptyString,
-    hardwareKeyTag: NonEmptyString,
+    hardwareKeyTag: NonEmptyString
   ): TE.TaskEither<Error, ValidatedAttestation> =>
     pipe(
       E.tryCatch(
         () => Buffer.from(attestation, "base64"),
-        () => new Error(`Invalid attestation: ${attestation}`),
+        () => new Error(`Invalid attestation: ${attestation}`)
       ),
       TE.fromEither,
       TE.chainW((data) =>
@@ -108,7 +108,7 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.iOsBundleIdentifier,
               this.#configuration.iOsTeamIdentifier,
               this.#configuration.appleRootCertificate,
-              this.#configuration.allowDevelopmentEnvironment,
+              this.#configuration.allowDevelopmentEnvironment
             ),
             validateAndroidAttestation(
               data,
@@ -116,13 +116,13 @@ export class MobileAttestationService implements AttestationService {
               hardwareKeyTag,
               this.#configuration.androidBundleIdentifier,
               this.#configuration.googlePublicKey,
-              this.#configuration.androidCrlUrl,
+              this.#configuration.androidCrlUrl
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
-          T.map(getErrorsOrFirstValidValue),
-        ),
-      ),
+          T.map(getErrorsOrFirstValidValue)
+        )
+      )
     );
 
   constructor(cnf: AttestationServiceConfiguration) {

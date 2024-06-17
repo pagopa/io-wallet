@@ -78,7 +78,7 @@ export const getEntityConfiguration: RTE.ReaderTaskEither<
       jwks: signer.getPublicKeys(),
       publicJwk: pipe(
         signer.getFirstPublicKeyByKty("EC"),
-        E.chainW(validateJwkKid),
+        E.chainW(validateJwkKid)
       ),
       supportedSignAlgorithms: signer.getSupportedSignAlgorithms(),
     }),
@@ -106,7 +106,7 @@ export const getEntityConfiguration: RTE.ReaderTaskEither<
             jwks,
             tokenEndpoint: new URL(
               RELATIVE_TOKEN_ENDPOINT,
-              federationEntityMetadata.basePath.href,
+              federationEntityMetadata.basePath.href
             ).href,
             tokenEndpointAuthMethodsSupported: [
               TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
@@ -119,8 +119,8 @@ export const getEntityConfiguration: RTE.ReaderTaskEither<
           { typ: "entity-statement+jwt" },
           publicJwk.kid,
           "ES256",
-          "24h",
-        ),
-      ),
-    ),
+          "24h"
+        )
+      )
+    )
   );

@@ -11,7 +11,6 @@ const hardwareKey = {
   y: "w7r89bjsU_sPDOBe0vqbNBKYW95hO9URpkaglSltpWc",
 };
 
-/* eslint-disable perfectionist/sort-objects */
 const ephemeralKey = {
   crv: "P-256",
   kty: "EC",
@@ -19,7 +18,6 @@ const ephemeralKey = {
   y: "LIZnSB39vFJhYgS3k7jXE4r3-CoGFQwZtPBIRqpNlrg",
   kid: "vbeXJksM45xphtANnCiG6mCyuU4jfGNzopGuKvogg9c",
 };
-/* eslint-enable perfectionist/sort-objects */
 
 const integrityAssertion =
   "Cr0CARCnMGuc57T1faywYXiXp6Duu-F4ZFjB9xOehG0Bxowk74prPChIM-55FYD-dSOWWGgZNZsis0Nm5eHpLfnymXiuBrKXhrDJYX9vT4yu-v4si4lIzFMt4b-jwtmV164HiC-yYn66UBooy8HGv5bVut1Pb2NBZzJh_oCb7HPvywY8ahcQ8e0pajQjGosM-9MTa_yXaWycxppwVnxP6ONkgmaHltO5xWEJbDFwqJskpw8wvtm103BOCIB9f_Naa97ZECehKZrKxVVcW1kkRpk6ua5TaBPTJRxpryM3Sveaq3eWn8LECZez1ovQxUip3PQymDrQhYMekYhO8c77dlOiO49bf-CH9OHCYmnUB2YsjuP7--Na1rBqPHIl9O4unK5ytJJOVAuVwGjAbnWH7kV3QnbdVpUb6y5lxV9GcloaSQGnXnxlDg-DMH9tKlySbWl0jcOMCb6MPrDjPH0XwWrKN8rUSuliAVaojL-EUg2CQFLvw_vxDu0mZsvGQiTo1rygtHS7te-N9pM" as NonEmptyString;

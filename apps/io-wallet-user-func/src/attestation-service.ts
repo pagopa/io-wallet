@@ -29,17 +29,17 @@ export interface ValidateAssertionRequest {
 
 export interface AttestationService {
   validateAssertion: (
-    request: ValidateAssertionRequest,
+    request: ValidateAssertionRequest
   ) => TE.TaskEither<Error, void>;
   validateAttestation: (
     attestation: NonEmptyString,
     nonce: NonEmptyString,
-    hardwareKeyTag: NonEmptyString,
+    hardwareKeyTag: NonEmptyString
   ) => TE.TaskEither<Error, ValidatedAttestation>;
 }
 
 export const validateAttestation: (
-  walletInstanceRequest: WalletInstanceRequest,
+  walletInstanceRequest: WalletInstanceRequest
 ) => RTE.ReaderTaskEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
@@ -53,14 +53,14 @@ export const validateAttestation: (
         attestationService.validateAttestation(
           walletInstanceRequest.keyAttestation,
           walletInstanceRequest.challenge,
-          walletInstanceRequest.hardwareKeyTag,
-        ),
+          walletInstanceRequest.hardwareKeyTag
+        )
     );
 
 export const validateAssertion: (
   walletAttestationRequest: WalletAttestationRequest,
   hardwareKey: JwkPublicKey,
-  signCount: number,
+  signCount: number
 ) => RTE.ReaderTaskEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
@@ -80,5 +80,5 @@ export const validateAssertion: (
           jwk: walletAttestationRequest.payload.cnf.jwk,
           nonce: walletAttestationRequest.payload.challenge,
           signCount,
-        }),
+        })
     );

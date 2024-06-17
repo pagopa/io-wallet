@@ -1,6 +1,6 @@
-import { NonceRepository } from "@/nonce";
 import { Container, Database } from "@azure/cosmos";
 import * as TE from "fp-ts/lib/TaskEither";
+import { NonceRepository } from "@/nonce";
 
 export class CosmosDbNonceRepository implements NonceRepository {
   #container: Container;
@@ -25,7 +25,7 @@ export class CosmosDbNonceRepository implements NonceRepository {
         "code" in error &&
         error.code === 404
           ? new Error("Invalid nonce")
-          : new Error(`Error deleting nonce: ${error}`),
+          : new Error(`Error deleting nonce: ${error}`)
     );
   }
 
@@ -36,7 +36,7 @@ export class CosmosDbNonceRepository implements NonceRepository {
           id: nonce,
         });
       },
-      (error) => new Error(`Error inserting nonce: ${error}`),
+      (error) => new Error(`Error inserting nonce: ${error}`)
     );
   }
 }

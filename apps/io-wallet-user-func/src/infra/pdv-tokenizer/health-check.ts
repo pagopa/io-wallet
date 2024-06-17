@@ -16,8 +16,6 @@ export const getPdvTokenizerHealth: RTE.ReaderTaskEither<
   pipe(
     pdvTokenizerClient.healthCheck(),
     TE.flatMap((isHealth) =>
-      !isHealth
-        ? TE.left(new Error("pdv-tokenizer-error"))
-        : TE.right(isHealth),
-    ),
+      !isHealth ? TE.left(new Error("pdv-tokenizer-error")) : TE.right(isHealth)
+    )
   );

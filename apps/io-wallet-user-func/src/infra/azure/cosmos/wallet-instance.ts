@@ -1,11 +1,11 @@
-import { validate } from "@/validation";
-import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
+import { validate } from "@/validation";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
@@ -17,12 +17,12 @@ export class CosmosDbWalletInstanceRepository
   }
 
   batchPatchWithReplaceOperation(
-    operationsInput: {
+    operationsInput: Array<{
       id: string;
       path: string;
       value: unknown;
-    }[],
-    userId: string,
+    }>,
+    userId: string
   ) {
     return TE.tryCatch(
       async () => {
@@ -39,11 +39,11 @@ export class CosmosDbWalletInstanceRepository
                 },
               ],
             },
-          }),
+          })
         );
         await this.#container.items.batch(operations, userId);
       },
-      (error) => new Error(`Error updating wallet instances: ${error}`),
+      (error) => new Error(`Error updating wallet instances: ${error}`)
     );
   }
 
@@ -51,7 +51,7 @@ export class CosmosDbWalletInstanceRepository
     return pipe(
       TE.tryCatch(
         () => this.#container.item(id, userId).read(),
-        (error) => new Error(`Error getting wallet instance: ${error}`),
+        (error) => new Error(`Error getting wallet instance: ${error}`)
       ),
       TE.chain(({ resource }) =>
         resource === undefined
@@ -63,12 +63,12 @@ export class CosmosDbWalletInstanceRepository
               E.mapLeft(
                 () =>
                   new Error(
-                    "Error getting wallet instance: invalid result format",
-                  ),
+                    "Error getting wallet instance: invalid result format"
+                  )
               ),
-              TE.fromEither,
-            ),
-      ),
+              TE.fromEither
+            )
+      )
     );
   }
 
@@ -90,14 +90,14 @@ export class CosmosDbWalletInstanceRepository
           return items;
         },
         (error) =>
-          new Error(`Error getting wallet instances by user id: ${error}`),
+          new Error(`Error getting wallet instances by user id: ${error}`)
       ),
       TE.chainW(
         flow(
           validate(t.array(WalletInstance), "Invalid wallet instances"),
-          TE.fromEither,
-        ),
-      ),
+          TE.fromEither
+        )
+      )
     );
   }
 
@@ -106,7 +106,7 @@ export class CosmosDbWalletInstanceRepository
       async () => {
         await this.#container.items.create(walletInstance);
       },
-      (error) => new Error(`Error inserting wallet instance: ${error}`),
+      (error) => new Error(`Error inserting wallet instance: ${error}`)
     );
   }
 }

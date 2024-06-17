@@ -1,5 +1,5 @@
-import * as asn1js from "asn1js";
 import { X509Certificate, createHash } from "crypto";
+import * as asn1js from "asn1js";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
@@ -47,13 +47,13 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const certificates = attStmt.x5c.map((data) => new X509Certificate(data));
 
   const subCaCertificate = certificates.find((certificate) =>
-    certificate.issuer.includes("Apple App Attestation Root CA"),
+    certificate.issuer.includes("Apple App Attestation Root CA")
   );
 
   if (subCaCertificate !== undefined) {
     if (!subCaCertificate.verify(rootCertificate.publicKey)) {
       throw new Error(
-        "sub CA certificate is not signed by Apple App Attestation Root CA",
+        "sub CA certificate is not signed by Apple App Attestation Root CA"
       );
     }
   } else {
@@ -61,13 +61,13 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   }
 
   const clientCertificate = certificates.find((certificate) =>
-    certificate.issuer.includes("Apple App Attestation CA 1"),
+    certificate.issuer.includes("Apple App Attestation CA 1")
   );
 
   if (clientCertificate !== undefined) {
     if (!clientCertificate.verify(subCaCertificate.publicKey)) {
       throw new Error(
-        "client CA certificate is not signed by Apple App Attestation CA 1",
+        "client CA certificate is not signed by Apple App Attestation CA 1"
       );
     }
   } else {
@@ -93,12 +93,12 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const asn1 = asn1js.fromBER(clientCertificate.raw);
   const certificate = new pkijs.Certificate({ schema: asn1.result });
   const extension = certificate.extensions?.find(
-    (e: { extnID: string }) => e.extnID === "1.2.840.113635.100.8.2",
+    (e: { extnID: string }) => e.extnID === "1.2.840.113635.100.8.2"
   );
 
   const actualNonce = Buffer.from(
     extension?.parsedValue.valueBlock.value[0].valueBlock.value[0].valueBlock
-      .valueHex,
+      .valueHex
   ).toString("hex");
   if (actualNonce !== nonce) {
     throw new Error("[iOS Attestation] nonce does not match");
@@ -106,7 +106,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 
   // 5. Create the SHA256 hash of the public key in credCert, and verify that it matches the key identifier from your app
   const publicKey = Buffer.from(
-    certificate.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex,
+    certificate.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex
   );
   const publicKeyHash = createHash("sha256")
     .update(publicKey.toString("hex"), "hex") // Convert publicKey to hexadecimal string

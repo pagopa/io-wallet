@@ -1,9 +1,3 @@
-import { validateAttestation } from "@/attestation-service";
-import {
-  insertWalletInstance,
-  revokeUserWalletInstancesExceptOne,
-} from "@/wallet-instance";
-import { consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -14,6 +8,12 @@ import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common";
 
 import { requireUser } from "./utils";
+import { consumeNonce } from "@/wallet-instance-request";
+import {
+  insertWalletInstance,
+  revokeUserWalletInstancesExceptOne,
+} from "@/wallet-instance";
+import { validateAttestation } from "@/attestation-service";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -34,8 +34,8 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
         challenge: E.right(challenge),
         hardwareKeyTag: E.right(hardware_key_tag),
         keyAttestation: E.right(key_attestation),
-      }),
-    ),
+      })
+    )
   );
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
@@ -56,17 +56,17 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             isRevoked: false,
             signCount: 0,
             userId: user.id,
-          }),
+          })
         ),
         RTE.chainW(() =>
           revokeUserWalletInstancesExceptOne(
             user.id,
-            walletInstanceRequest.hardwareKeyTag,
-          ),
-        ),
-      ),
+            walletInstanceRequest.hardwareKeyTag
+          )
+        )
+      )
     ),
     RTE.map(() => H.empty),
-    RTE.orElseW(logErrorAndReturnResponse),
-  ),
+    RTE.orElseW(logErrorAndReturnResponse)
+  )
 );

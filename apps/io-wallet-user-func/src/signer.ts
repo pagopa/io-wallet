@@ -15,7 +15,7 @@ export interface Signer {
     header: JwtHeader,
     kid: string,
     alg?: string,
-    jwtDuration?: string,
+    jwtDuration?: string
   ) => (payload: jose.JWTPayload) => TE.TaskEither<Error, string>;
   getFirstPublicKeyByKty: (kty: Jwk["kty"]) => E.Either<Error, JwkPublicKey>;
   getPublicKeys: () => E.Either<Error, JwkPublicKey[]>;

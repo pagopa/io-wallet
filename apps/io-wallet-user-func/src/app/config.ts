@@ -93,7 +93,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("crypto", () => getCryptoConfigFromEnvironment),
   RE.bind(
     "attestationService",
-    () => getAttestationServiceConfigFromEnvironment,
+    () => getAttestationServiceConfigFromEnvironment
   ),
   RE.bind("azure", () => getAzureConfigFromEnvironment),
   RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
@@ -110,8 +110,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       crypto,
       federationEntity,
       pdvTokenizer,
-    }),
-  ),
+    })
+  )
 );
 
 const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
@@ -131,9 +131,9 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(
     validate(
       FederationEntityMetadata,
-      "Federation entity configuration is invalid",
-    ),
-  ),
+      "Federation entity configuration is invalid"
+    )
+  )
 );
 
 export const getCryptoConfigFromEnvironment: RE.ReaderEither<
@@ -144,17 +144,17 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     jwks: pipe(
       readFromEnvironment("WalletKeys"),
-      RE.chainEitherKW(fromBase64ToJwks),
+      RE.chainEitherKW(fromBase64ToJwks)
     ),
     jwtDefaultAlg: pipe(
       readFromEnvironment("JwtDefaultAlg"),
-      RE.orElse(() => RE.right("ES256")),
+      RE.orElse(() => RE.right("ES256"))
     ),
     jwtDefaultDuration: pipe(
       readFromEnvironment("JwtDefaultDuration"),
-      RE.orElse(() => RE.right("1h")),
+      RE.orElse(() => RE.right("1h"))
     ),
-  }),
+  })
 );
 
 export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
@@ -166,48 +166,48 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     allowDevelopmentEnvironment: pipe(
       readFromEnvironment("AllowDevelopmentEnvironment"),
       RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false)),
+      RE.orElse(() => RE.right(false))
     ),
     androidBundleIdentifier: pipe(
       readFromEnvironment("AndroidBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.app.io")),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
     ),
     androidCrlUrl: pipe(
       readFromEnvironment("AndroidCrlUrl"),
-      RE.orElse(() => RE.right(ANDROID_CRL_URL)),
+      RE.orElse(() => RE.right(ANDROID_CRL_URL))
     ),
     androidPlayIntegrityUrl: pipe(
       readFromEnvironment("AndroidPlayIntegrityUrl"),
-      RE.orElse(() => RE.right(ANDROID_PLAY_INTEGRITY_URL)),
+      RE.orElse(() => RE.right(ANDROID_PLAY_INTEGRITY_URL))
     ),
     androidPlayStoreCertificateHash: readFromEnvironment(
-      "AndroidPlayStoreCertificateHash",
+      "AndroidPlayStoreCertificateHash"
     ),
     appleRootCertificate: pipe(
       readFromEnvironment("AppleRootCertificate"),
-      RE.orElse(() => RE.right(APPLE_APP_ATTESTATION_ROOT_CA)),
+      RE.orElse(() => RE.right(APPLE_APP_ATTESTATION_ROOT_CA))
     ),
     googleAppCredentialsEncoded: readFromEnvironment(
-      "GoogleAppCredentialsEncoded",
+      "GoogleAppCredentialsEncoded"
     ),
     googlePublicKey: pipe(
       readFromEnvironment("GooglePublicKey"),
-      RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY)),
+      RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY))
     ),
     iOsBundleIdentifier: pipe(
       readFromEnvironment("IosBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.app.io")),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
     ),
     iOsTeamIdentifier: pipe(
       readFromEnvironment("IosTeamIdentifier"),
-      RE.orElse(() => RE.right("DSEVY6MV9G")),
+      RE.orElse(() => RE.right("DSEVY6MV9G"))
     ),
     skipSignatureValidation: pipe(
       readFromEnvironment("SkipSignatureValidation"),
       RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false)),
+      RE.orElse(() => RE.right(false))
     ),
-  }),
+  })
 );
 
 export const getAzureConfigFromEnvironment: RE.ReaderEither<
@@ -219,7 +219,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
     cosmosDbEndpoint: readFromEnvironment("CosmosDbEndpoint"),
     entityConfigurationStorageContainerName: readFromEnvironment(
-      "EntityConfigurationStorageContainerName",
+      "EntityConfigurationStorageContainerName"
     ),
   }),
   RE.map(
@@ -236,8 +236,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
         entityConfigurationContainerName:
           entityConfigurationStorageContainerName,
       },
-    }),
-  ),
+    })
+  )
 );
 
 const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
@@ -255,6 +255,6 @@ const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
       apiKey: pdvTokenizerApiKey,
       baseURL: pdvTokenizerApiBaseURL,
       testUUID: pdvTokenizerTestUUID,
-    }),
-  ),
+    })
+  )
 );

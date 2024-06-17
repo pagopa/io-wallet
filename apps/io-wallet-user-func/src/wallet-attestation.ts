@@ -36,7 +36,7 @@ const composeTrustChain = ({
   const walletProviderEntityStatement = pipe(
     new EidasTrustAnchor(federationEntityMetadata),
     (ta) => ta.getEntityStatement(),
-    TE.map(({ encoded }) => encoded),
+    TE.map(({ encoded }) => encoded)
   );
 
   const walletProviderEntityConfiguration = getEntityConfiguration({
@@ -47,15 +47,15 @@ const composeTrustChain = ({
   return pipe(
     sequenceT(TE.ApplicativePar)(
       walletProviderEntityConfiguration,
-      walletProviderEntityStatement,
-    ),
+      walletProviderEntityStatement
+    )
   );
 };
 
 // Build the JWT of the Wallet Attestation given a Wallet Attestation Request
 export const createWalletAttestation =
   (
-    attestationRequest: WalletAttestationRequest,
+    attestationRequest: WalletAttestationRequest
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({ federationEntityMetadata, signer }) =>
     pipe(
@@ -63,11 +63,11 @@ export const createWalletAttestation =
         publicJwk: pipe(
           signer.getFirstPublicKeyByKty("EC"),
           E.chainW(validateJwkKid),
-          TE.fromEither,
+          TE.fromEither
         ),
         supportedSignAlgorithms: pipe(
           signer.getSupportedSignAlgorithms(),
-          TE.fromEither,
+          TE.fromEither
         ),
         trustChain: composeTrustChain({ federationEntityMetadata, signer }),
       }),
@@ -77,7 +77,7 @@ export const createWalletAttestation =
             algValueSupported: supportedSignAlgorithms,
             attested_security_context: pipe(
               federationEntityMetadata.basePath,
-              getLoAUri(LoA.basic),
+              getLoAUri(LoA.basic)
             ),
             federationEntity: {
               homepageUri: federationEntityMetadata.homePageUri,
@@ -100,8 +100,8 @@ export const createWalletAttestation =
             },
             publicJwk.kid,
             "ES256",
-            "1h",
-          ),
-        ),
-      ),
+            "1h"
+          )
+        )
+      )
     );

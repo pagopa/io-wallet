@@ -22,8 +22,8 @@ export const verifyJwtSignature = (jwt: string) => (publicKey: JwkPublicKey) =>
   pipe(
     TE.tryCatch(() => jose.importJWK(publicKey), E.toError),
     TE.chain((joseKey) =>
-      TE.tryCatch(() => jose.jwtVerify(jwt, joseKey), E.toError),
-    ),
+      TE.tryCatch(() => jose.jwtVerify(jwt, joseKey), E.toError)
+    )
   );
 
 export const getPublicKeyFromCnf = (jwt: string) =>
@@ -33,8 +33,8 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     E.chainW(
       validate(
         WithJwkCnf,
-        "The jwt does not have the cnf attribute with the jwk public key.",
-      ),
+        "The jwt does not have the cnf attribute with the jwk public key."
+      )
     ),
-    E.map((payload) => payload.cnf.jwk),
+    E.map((payload) => payload.cnf.jwk)
   );

@@ -1,6 +1,3 @@
-import { ValidatedAttestation } from "@/attestation-service";
-import { JwkPublicKey } from "@/jwk";
-import { validate } from "@/validation";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
@@ -11,13 +8,16 @@ import * as t from "io-ts";
 
 import { verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";
+import { validate } from "@/validation";
+import { JwkPublicKey } from "@/jwk";
+import { ValidatedAttestation } from "@/attestation-service";
 
 const buffer = new t.Type<Buffer, Buffer, unknown>(
   "buffer",
   (input: unknown): input is Buffer => Buffer.isBuffer(input),
   (input, context) =>
     Buffer.isBuffer(input) ? t.success(input) : t.failure(input, context),
-  t.identity,
+  t.identity
 );
 
 // iOS attestation type
@@ -39,18 +39,18 @@ export const validateiOSAttestation = (
   bundleIdentifier: string,
   teamIdentifier: string,
   appleRootCertificate: string,
-  allowDevelopmentEnvironment: boolean,
+  allowDevelopmentEnvironment: boolean
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
     E.tryCatch(
       () => decode(data),
-      () => new Error(`[iOS Attestation] Unable to decode data`),
+      () => new Error(`[iOS Attestation] Unable to decode data`)
     ),
     E.chainW(
       validate(
         iOsAttestation,
-        "[iOS Attestation] attestation format is invalid",
-      ),
+        "[iOS Attestation] attestation format is invalid"
+      )
     ),
     TE.fromEither,
     TE.chain((decodedAttestation) =>
@@ -66,18 +66,18 @@ export const validateiOSAttestation = (
               keyId,
               teamIdentifier,
             }),
-          E.toError,
+          E.toError
         ),
         TE.chainW((result) =>
           pipe(
             result.hardwareKey,
             validate(JwkPublicKey, "Invalid JWK Public Key"),
             E.map((hardwareKey) => ({ ...result, hardwareKey })),
-            TE.fromEither,
-          ),
-        ),
-      ),
-    ),
+            TE.fromEither
+          )
+        )
+      )
+    )
   );
 
 // iOS assertion type
@@ -96,21 +96,21 @@ export const validateiOSAssertion = (
   signCount: number,
   bundleIdentifier: string,
   teamIdentifier: string,
-  skipSignatureValidation: boolean,
+  skipSignatureValidation: boolean
 ) =>
   pipe(
     sequenceS(E.Applicative)({
       authenticatorData: E.tryCatch(
         () => Buffer.from(integrityAssertion, "base64"),
-        E.toError,
+        E.toError
       ),
       signature: E.tryCatch(
         () => Buffer.from(hardwareSignature, "base64"),
-        E.toError,
+        E.toError
       ),
     }),
     E.chainW(
-      validate(iOsAssertion, "[iOS Assertion] assertion format is invalid"),
+      validate(iOsAssertion, "[iOS Assertion] assertion format is invalid")
     ),
     TE.fromEither,
     TE.chain((decodedAssertion) =>
@@ -125,7 +125,7 @@ export const validateiOSAssertion = (
             skipSignatureValidation,
             teamIdentifier,
           }),
-        E.toError,
-      ),
-    ),
+        E.toError
+      )
+    )
   );
