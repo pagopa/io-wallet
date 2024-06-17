@@ -1,14 +1,4 @@
-import { FederationEntityMetadata } from "@/entity-configuration";
-import { getKeyByKid } from "@/jwk";
-import {
-  EntityStatementHeader,
-  EntityStatementPayload,
-  TrustAnchor,
-  TrustAnchorEntityConfigurationPayload,
-} from "@/trust-anchor";
-import { removeTrailingSlash } from "@/url";
-import { validate } from "@/validation";
-import { verifyJwtSignature } from "@/verifier";
+/* eslint-disable perfectionist/sort-classes */
 import { agent } from "@pagopa/ts-commons";
 import {
   AbortableFetch,
@@ -22,15 +12,48 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
+import { FederationEntityMetadata } from "../../entity-configuration";
+import { getKeyByKid } from "../../jwk";
+import {
+  EntityStatementHeader,
+  EntityStatementPayload,
+  TrustAnchor,
+  TrustAnchorEntityConfigurationPayload,
+} from "../../trust-anchor";
+import { removeTrailingSlash } from "../../url";
+import { validate } from "../../validation";
+import { verifyJwtSignature } from "../../verifier";
+
 const oidFederation = "/.well-known/openid-federation";
 
 export class EidasTrustAnchor implements TrustAnchor {
   #configuration: FederationEntityMetadata;
 
+  httpApiFetch = agent.getHttpFetch(process.env);
   abortableFetch = AbortableFetch(this.httpApiFetch);
   fetchWithTimeout = toFetch(
     setFetchTimeout(1000 as Millisecond, this.abortableFetch),
   ) as unknown as typeof fetch;
+
+  constructor(cnf: FederationEntityMetadata) {
+    this.#configuration = cnf;
+  }
+
+  getPublicKeys = () =>
+    pipe(
+      new URL(oidFederation, this.#configuration.trustAnchorUri.href),
+      (metadataUrl) => removeTrailingSlash(metadataUrl.href),
+      getRequest(this.fetchWithTimeout),
+      TE.map((value) => jose.decodeJwt(value)),
+      TE.chainEitherKW(
+        validate(
+          TrustAnchorEntityConfigurationPayload,
+          "Invalid trust anchor entity configuration",
+        ),
+      ),
+      TE.map((metadata) => metadata.jwks.keys),
+    );
+
   getEntityStatement = () =>
     pipe(
       this.#configuration.trustAnchorUri.href,
@@ -53,23 +76,6 @@ export class EidasTrustAnchor implements TrustAnchor {
       })),
       TE.chain(sequenceS(TE.ApplicativePar)),
     );
-
-  getPublicKeys = () =>
-    pipe(
-      new URL(oidFederation, this.#configuration.trustAnchorUri.href),
-      (metadataUrl) => removeTrailingSlash(metadataUrl.href),
-      getRequest(this.fetchWithTimeout),
-      TE.map((value) => jose.decodeJwt(value)),
-      TE.chainEitherKW(
-        validate(
-          TrustAnchorEntityConfigurationPayload,
-          "Invalid trust anchor entity configuration",
-        ),
-      ),
-      TE.map((metadata) => metadata.jwks.keys),
-    );
-
-  httpApiFetch = agent.getHttpFetch(process.env);
 
   validateEntityStatementJwt = (jwt: string) =>
     pipe(
@@ -101,10 +107,6 @@ export class EidasTrustAnchor implements TrustAnchor {
         ),
       ),
     );
-
-  constructor(cnf: FederationEntityMetadata) {
-    this.#configuration = cnf;
-  }
 }
 
 const getRequest = (fetchFunction: typeof fetch) => (url: string) =>
