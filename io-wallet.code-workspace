@@ -12,7 +12,7 @@
       "name": "io-wallet-web-func"
     },
     {
-      "path": "packages/io-wallet",
+      "path": "packages/io-wallet-common",
       "name": "io-wallet-common"
     }
   ],
