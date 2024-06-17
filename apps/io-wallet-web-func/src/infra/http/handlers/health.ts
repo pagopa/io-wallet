@@ -20,7 +20,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
     { cosmosClient },
     getCosmosHealth,
     TE.map(constVoid),
-    TE.mapLeft(({ message }) => new HealthCheckError(message)),
+    TE.mapLeft(({ message }) => new HealthCheckError(`Error: ${message}`)),
   );
 
 export const HealthHandler = H.of(() =>
