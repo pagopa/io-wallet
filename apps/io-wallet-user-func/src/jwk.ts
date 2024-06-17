@@ -1,10 +1,10 @@
-import * as H from "@pagopa/handler-kit";
+import * as t from "io-ts";
+
+import { pipe } from "fp-ts/function";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
-import { pipe } from "fp-ts/function";
-import * as t from "io-ts";
-
+import * as H from "@pagopa/handler-kit";
 import { validate } from "./validation";
 
 export const ECKey = t.intersection([
@@ -50,12 +50,12 @@ export const RSAPrivateKey = t.intersection([
     d: t.string,
   }),
   t.partial({
-    dp: t.string,
-    dq: t.string,
     p: t.string,
     q: t.string,
-    qi: t.string,
     u: t.string,
+    dp: t.string,
+    dq: t.string,
+    qi: t.string,
   }),
 ]);
 
@@ -105,7 +105,7 @@ export const validateJwkKid: (
   jwk: JwkPublicKey
 ) => E.Either<
   H.ValidationError,
-  JwkPublicKey & Required<Pick<JwkPublicKey, "kid">>
+  Required<Pick<JwkPublicKey, "kid">> & JwkPublicKey
 > = (jwk) =>
   pipe(
     jwk.kid,

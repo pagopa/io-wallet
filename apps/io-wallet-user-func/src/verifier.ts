@@ -1,11 +1,12 @@
+import * as t from "io-ts";
+
 import * as E from "fp-ts/Either";
+import * as jose from "jose";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import * as t from "io-ts";
-import * as jose from "jose";
+import { validate } from "./validation";
 
 import { JwkPublicKey } from "./jwk";
-import { validate } from "./validation";
 
 const WithJwkCnf = t.type({
   cnf: t.type({

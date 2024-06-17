@@ -1,12 +1,13 @@
-import { sequenceS } from "fp-ts/lib/Apply";
-import * as RE from "fp-ts/lib/ReaderEither";
-import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
+import { pipe } from "fp-ts/lib/function";
+import * as RE from "fp-ts/lib/ReaderEither";
+import { sequenceS } from "fp-ts/lib/Apply";
+import { validate } from "../validation";
 import { FederationEntityMetadata } from "../entity-configuration";
+
 import { readFromEnvironment } from "../infra/env";
 import { Jwk, fromBase64ToJwks } from "../jwk";
-import { validate } from "../validation";
 
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
@@ -29,23 +30,23 @@ export const ANDROID_PLAY_INTEGRITY_URL =
 
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
-  jwtDefaultAlg: t.string,
   jwtDefaultDuration: t.string,
+  jwtDefaultAlg: t.string,
 });
 
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
-  allowDevelopmentEnvironment: t.boolean,
-  androidBundleIdentifier: t.string,
-  androidCrlUrl: t.string,
-  androidPlayIntegrityUrl: t.string,
-  androidPlayStoreCertificateHash: t.string,
-  appleRootCertificate: t.string,
-  googleAppCredentialsEncoded: t.string,
-  googlePublicKey: t.string,
   iOsBundleIdentifier: t.string,
   iOsTeamIdentifier: t.string,
+  androidBundleIdentifier: t.string,
+  androidPlayStoreCertificateHash: t.string,
+  appleRootCertificate: t.string,
+  googlePublicKey: t.string,
+  androidCrlUrl: t.string,
+  allowDevelopmentEnvironment: t.boolean,
+  googleAppCredentialsEncoded: t.string,
+  androidPlayIntegrityUrl: t.string,
   skipSignatureValidation: t.boolean,
 });
 
@@ -55,8 +56,8 @@ export type AttestationServiceConfiguration = t.TypeOf<
 
 const AzureConfiguration = t.type({
   cosmos: t.type({
-    dbName: t.string,
     endpoint: t.string,
+    dbName: t.string,
   }),
   storage: t.type({ entityConfigurationContainerName: t.string }),
 });
@@ -64,8 +65,8 @@ const AzureConfiguration = t.type({
 type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
 
 export const PdvTokenizerApiClientConfig = t.type({
-  apiKey: t.string,
   baseURL: t.string,
+  apiKey: t.string,
   testUUID: t.string,
 });
 
@@ -74,10 +75,10 @@ export type PdvTokenizerApiClientConfig = t.TypeOf<
 >;
 
 export const Config = t.type({
+  federationEntity: FederationEntityMetadata,
+  crypto: CryptoConfiguration,
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfiguration,
-  crypto: CryptoConfiguration,
-  federationEntity: FederationEntityMetadata,
   pdvTokenizer: PdvTokenizerApiClientConfig,
 });
 
@@ -99,16 +100,16 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
   RE.map(
     ({
+      federationEntity,
+      crypto,
       attestationService,
       azure,
-      crypto,
-      federationEntity,
       pdvTokenizer,
     }) => ({
+      federationEntity,
+      crypto,
       attestationService,
       azure,
-      crypto,
-      federationEntity,
       pdvTokenizer,
     })
   )
@@ -121,11 +122,11 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     basePath: readFromEnvironment("FederationEntityBasePath"),
-    homePageUri: readFromEnvironment("FederationEntityHomepageUri"),
-    logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
+    homePageUri: readFromEnvironment("FederationEntityHomepageUri"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
+    logoUri: readFromEnvironment("FederationEntityLogoUri"),
     trustAnchorUri: readFromEnvironment("FederationEntityTrustAnchorUri"),
   }),
   RE.chainEitherKW(
@@ -146,13 +147,13 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("WalletKeys"),
       RE.chainEitherKW(fromBase64ToJwks)
     ),
-    jwtDefaultAlg: pipe(
-      readFromEnvironment("JwtDefaultAlg"),
-      RE.orElse(() => RE.right("ES256"))
-    ),
     jwtDefaultDuration: pipe(
       readFromEnvironment("JwtDefaultDuration"),
       RE.orElse(() => RE.right("1h"))
+    ),
+    jwtDefaultAlg: pipe(
+      readFromEnvironment("JwtDefaultAlg"),
+      RE.orElse(() => RE.right("ES256"))
     ),
   })
 );
@@ -163,10 +164,21 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   AttestationServiceConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    allowDevelopmentEnvironment: pipe(
-      readFromEnvironment("AllowDevelopmentEnvironment"),
-      RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false))
+    iOsBundleIdentifier: pipe(
+      readFromEnvironment("IosBundleIdentifier"),
+      RE.orElse(() => RE.right("it.pagopa.app.io"))
+    ),
+    iOsTeamIdentifier: pipe(
+      readFromEnvironment("IosTeamIdentifier"),
+      RE.orElse(() => RE.right("DSEVY6MV9G"))
+    ),
+    appleRootCertificate: pipe(
+      readFromEnvironment("AppleRootCertificate"),
+      RE.orElse(() => RE.right(APPLE_APP_ATTESTATION_ROOT_CA))
+    ),
+    googlePublicKey: pipe(
+      readFromEnvironment("GooglePublicKey"),
+      RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY))
     ),
     androidBundleIdentifier: pipe(
       readFromEnvironment("AndroidBundleIdentifier"),
@@ -176,31 +188,20 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("AndroidCrlUrl"),
       RE.orElse(() => RE.right(ANDROID_CRL_URL))
     ),
+    allowDevelopmentEnvironment: pipe(
+      readFromEnvironment("AllowDevelopmentEnvironment"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false))
+    ),
+    googleAppCredentialsEncoded: readFromEnvironment(
+      "GoogleAppCredentialsEncoded"
+    ),
     androidPlayIntegrityUrl: pipe(
       readFromEnvironment("AndroidPlayIntegrityUrl"),
       RE.orElse(() => RE.right(ANDROID_PLAY_INTEGRITY_URL))
     ),
     androidPlayStoreCertificateHash: readFromEnvironment(
       "AndroidPlayStoreCertificateHash"
-    ),
-    appleRootCertificate: pipe(
-      readFromEnvironment("AppleRootCertificate"),
-      RE.orElse(() => RE.right(APPLE_APP_ATTESTATION_ROOT_CA))
-    ),
-    googleAppCredentialsEncoded: readFromEnvironment(
-      "GoogleAppCredentialsEncoded"
-    ),
-    googlePublicKey: pipe(
-      readFromEnvironment("GooglePublicKey"),
-      RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY))
-    ),
-    iOsBundleIdentifier: pipe(
-      readFromEnvironment("IosBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.app.io"))
-    ),
-    iOsTeamIdentifier: pipe(
-      readFromEnvironment("IosTeamIdentifier"),
-      RE.orElse(() => RE.right("DSEVY6MV9G"))
     ),
     skipSignatureValidation: pipe(
       readFromEnvironment("SkipSignatureValidation"),
@@ -216,21 +217,21 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   AzureConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
     cosmosDbEndpoint: readFromEnvironment("CosmosDbEndpoint"),
+    cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName"
     ),
   }),
   RE.map(
     ({
-      cosmosDbDatabaseName,
       cosmosDbEndpoint,
+      cosmosDbDatabaseName,
       entityConfigurationStorageContainerName,
     }) => ({
       cosmos: {
-        dbName: cosmosDbDatabaseName,
         endpoint: cosmosDbEndpoint,
+        dbName: cosmosDbDatabaseName,
       },
       storage: {
         entityConfigurationContainerName:
@@ -252,8 +253,8 @@ const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({ pdvTokenizerApiBaseURL, pdvTokenizerApiKey, pdvTokenizerTestUUID }) => ({
-      apiKey: pdvTokenizerApiKey,
       baseURL: pdvTokenizerApiBaseURL,
+      apiKey: pdvTokenizerApiKey,
       testUUID: pdvTokenizerTestUUID,
     })
   )

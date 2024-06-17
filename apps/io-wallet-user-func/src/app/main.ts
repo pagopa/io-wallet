@@ -1,20 +1,22 @@
-import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
+import { CosmosClient } from "@azure/cosmos";
 import { DefaultAzureCredential } from "@azure/identity";
-import * as E from "fp-ts/Either";
-import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+
+import * as E from "fp-ts/Either";
+import { pipe, identity } from "fp-ts/function";
+
 import { getConfigFromEnvironment } from "./config";
-import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
-import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
-import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
-import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
-import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
-import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
+import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
+import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
+import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
+import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
+import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -30,8 +32,8 @@ const config = configOrError;
 const credential = new DefaultAzureCredential();
 
 const cosmosClient = new CosmosClient({
-  aadCredentials: credential,
   endpoint: config.azure.cosmos.endpoint,
+  aadCredentials: credential,
 });
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
@@ -45,61 +47,61 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
 app.http("healthCheck", {
-  authLevel: "anonymous",
-  handler: HealthFunction({ cosmosClient, pdvTokenizerClient }),
   methods: ["GET"],
+  authLevel: "anonymous",
   route: "health",
+  handler: HealthFunction({ cosmosClient, pdvTokenizerClient }),
 });
 
 app.http("createWalletAttestation", {
-  authLevel: "function",
-  handler: CreateWalletAttestationFunction({
-    attestationServiceConfiguration: config.attestationService,
-    federationEntityMetadata: config.federationEntity,
-    nonceRepository,
-    signer,
-    walletInstanceRepository,
-  }),
   methods: ["POST"],
+  authLevel: "function",
   route: "token",
+  handler: CreateWalletAttestationFunction({
+    federationEntityMetadata: config.federationEntity,
+    signer,
+    nonceRepository,
+    walletInstanceRepository,
+    attestationServiceConfiguration: config.attestationService,
+  }),
 });
 
 app.http("createWalletInstance", {
+  methods: ["POST"],
   authLevel: "function",
+  route: "wallet-instances",
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
     walletInstanceRepository,
   }),
-  methods: ["POST"],
-  route: "wallet-instances",
 });
 
 app.http("getNonce", {
-  authLevel: "function",
-  handler: GetNonceFunction({ nonceRepository }),
   methods: ["GET"],
+  authLevel: "function",
   route: "nonce",
+  handler: GetNonceFunction({ nonceRepository }),
 });
 
 app.http("getUserByFiscalCode", {
+  methods: ["POST"],
   authLevel: "function",
+  route: "users",
   handler: GetUserByFiscalCodeFunction({
     userRepository: pdvTokenizerClient,
   }),
-  methods: ["POST"],
-  route: "users",
 });
 
 app.timer("generateEntityConfiguration", {
+  schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
   handler: GenerateEntityConfigurationFunction({
-    federationEntityMetadata: config.federationEntity,
     inputDecoder: t.unknown,
+    federationEntityMetadata: config.federationEntity,
     signer,
   }),
   return: output.storageBlob({
-    connection: "EntityConfigurationStorageAccount",
     path: `${config.azure.storage.entityConfigurationContainerName}/openid-federation`,
+    connection: "EntityConfigurationStorageAccount",
   }),
-  schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });

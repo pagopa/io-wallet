@@ -1,28 +1,29 @@
-import * as E from "fp-ts/Either";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/function";
-import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 
-import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
+import * as E from "fp-ts/Either";
+import * as TE from "fp-ts/TaskEither";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import { pipe } from "fp-ts/function";
+import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
+
 import {
   EntityConfigurationEnvironment,
   FederationEntity,
   getEntityConfiguration,
 } from "./entity-configuration";
-import { EidasTrustAnchor } from "./infra/trust-anchor";
-import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
+import { JwkPublicKey, validateJwkKid } from "./jwk";
+import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
+import { EidasTrustAnchor } from "./infra/trust-anchor";
 
 export const WalletAttestationPayload = t.type({
-  algValueSupported: t.array(t.string),
-  attested_security_context: t.string,
-  federationEntity: FederationEntity,
   iss: t.string,
   sub: t.string,
+  federationEntity: FederationEntity,
+  attested_security_context: t.string,
   walletInstancePublicKey: JwkPublicKey,
+  algValueSupported: t.array(t.string),
 });
 
 export type WalletAttestationPayload = t.TypeOf<
@@ -74,29 +75,29 @@ export const createWalletAttestation =
       TE.chain(({ publicJwk, supportedSignAlgorithms, trustChain }) =>
         pipe(
           {
-            algValueSupported: supportedSignAlgorithms,
+            iss: federationEntityMetadata.basePath.href,
+            sub: attestationRequest.header.kid,
+            federationEntity: {
+              organizationName: federationEntityMetadata.organizationName,
+              homepageUri: federationEntityMetadata.homePageUri,
+              policyUri: federationEntityMetadata.policyUri,
+              tosUri: federationEntityMetadata.tosUri,
+              logoUri: federationEntityMetadata.logoUri,
+              trustAnchorUri: federationEntityMetadata.trustAnchorUri,
+            },
             attested_security_context: pipe(
               federationEntityMetadata.basePath,
               getLoAUri(LoA.basic)
             ),
-            federationEntity: {
-              homepageUri: federationEntityMetadata.homePageUri,
-              logoUri: federationEntityMetadata.logoUri,
-              organizationName: federationEntityMetadata.organizationName,
-              policyUri: federationEntityMetadata.policyUri,
-              tosUri: federationEntityMetadata.tosUri,
-              trustAnchorUri: federationEntityMetadata.trustAnchorUri,
-            },
-            iss: federationEntityMetadata.basePath.href,
-            sub: attestationRequest.header.kid,
             walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
+            algValueSupported: supportedSignAlgorithms,
           },
           WalletAttestationToJwtModel.encode,
           signer.createJwtAndSign(
             {
-              trust_chain: trustChain,
               typ: "wallet-attestation+jwt",
               x5c: [],
+              trust_chain: trustChain,
             },
             publicJwk.kid,
             "ES256",

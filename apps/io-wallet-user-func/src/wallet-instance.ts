@@ -1,14 +1,15 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as t from "io-ts";
+
 import * as O from "fp-ts/Option";
-import * as RTE from "fp-ts/ReaderTaskEither";
+import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
-import * as t from "io-ts";
-import { EntityNotFoundError } from "io-wallet-common";
+import * as RTE from "fp-ts/ReaderTaskEither";
 
-import { JwkPublicKey } from "./jwk";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { User } from "./user";
+import { JwkPublicKey } from "./jwk";
+import { EntityNotFoundError } from "io-wallet-common";
 
 class WalletInstanceRevoked extends Error {
   name = "WalletInstanceRevoked";
@@ -18,16 +19,21 @@ class WalletInstanceRevoked extends Error {
 }
 
 export const WalletInstance = t.type({
-  hardwareKey: JwkPublicKey,
   id: NonEmptyString,
-  isRevoked: t.boolean,
-  signCount: t.number,
   userId: User.props.id,
+  hardwareKey: JwkPublicKey,
+  signCount: t.number,
+  isRevoked: t.boolean,
 });
 
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
-export interface WalletInstanceRepository {
+export type WalletInstanceRepository = {
+  get: (
+    id: WalletInstance["id"],
+    userId: WalletInstance["userId"]
+  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
   batchPatchWithReplaceOperation: (
     operations: Array<{
       id: string;
@@ -36,19 +42,14 @@ export interface WalletInstanceRepository {
     }>,
     userId: string
   ) => TE.TaskEither<Error, void>;
-  get: (
-    id: WalletInstance["id"],
-    userId: WalletInstance["userId"]
-  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getAllByUserId: (
     userId: WalletInstance["userId"]
   ) => TE.TaskEither<Error, WalletInstance[]>;
-  insert: (walletInstance: WalletInstance) => TE.TaskEither<Error, void>;
-}
+};
 
-interface WalletInstanceEnvironment {
+type WalletInstanceEnvironment = {
   walletInstanceRepository: WalletInstanceRepository;
-}
+};
 
 export const insertWalletInstance: (
   walletInstance: WalletInstance

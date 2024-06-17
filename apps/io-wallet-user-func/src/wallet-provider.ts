@@ -1,12 +1,11 @@
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
-
 import { removeTrailingSlash } from "./url";
 
 // Level of Agreement
 export enum LoA {
   basic = "LoA/basic",
-  hight = "LoA/hight",
   medium = "LoA/medium",
+  hight = "LoA/hight",
 }
 
 export const getLoAUri = (level: LoA) => (basePath: UrlFromString) =>
