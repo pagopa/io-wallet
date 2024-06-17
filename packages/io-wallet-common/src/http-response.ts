@@ -28,7 +28,7 @@ const isValidationError = (e: Error): e is H.ValidationError =>
 
 const isHttpError = (e: Error): e is H.HttpError => e.name === "HttpError";
 
-export const toProblemJson = (e: Error): H.ProblemJson => {
+const toProblemJson = (e: Error): H.ProblemJson => {
   if (isValidationError(e)) {
     return {
       detail: "Your request didn't validate",
