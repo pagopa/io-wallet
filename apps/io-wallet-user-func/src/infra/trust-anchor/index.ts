@@ -1,4 +1,15 @@
 /* eslint-disable perfectionist/sort-classes */
+import { FederationEntityMetadata } from "@/entity-configuration";
+import { getKeyByKid } from "@/jwk";
+import {
+  EntityStatementHeader,
+  EntityStatementPayload,
+  TrustAnchor,
+  TrustAnchorEntityConfigurationPayload,
+} from "@/trust-anchor";
+import { removeTrailingSlash } from "@/url";
+import { validate } from "@/validation";
+import { verifyJwtSignature } from "@/verifier";
 import { agent } from "@pagopa/ts-commons";
 import {
   AbortableFetch,
@@ -11,18 +22,6 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
-
-import { FederationEntityMetadata } from "../../entity-configuration";
-import { getKeyByKid } from "../../jwk";
-import {
-  EntityStatementHeader,
-  EntityStatementPayload,
-  TrustAnchor,
-  TrustAnchorEntityConfigurationPayload,
-} from "../../trust-anchor";
-import { removeTrailingSlash } from "../../url";
-import { validate } from "../../validation";
-import { verifyJwtSignature } from "../../verifier";
 
 const oidFederation = "/.well-known/openid-federation";
 
