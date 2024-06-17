@@ -39,3 +39,4 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     ),
     E.map((payload) => payload.cnf.jwk)
   );
+  
