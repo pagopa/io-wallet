@@ -1,42 +1,41 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-
+import * as TE from "fp-ts/TaskEither";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import { WalletInstanceRequest } from "./wallet-instance-request";
 import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
-import { JwkPublicKey } from "./jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
-import { WalletInstanceRequest } from "./wallet-instance-request";
+import { JwkPublicKey } from "./jwk";
 
 export enum OperatingSystem {
-  android = "Android",
   iOS = "Apple iOS",
+  android = "Android",
 }
 
-export interface ValidatedAttestation {
+export type ValidatedAttestation = {
   hardwareKey: JwkPublicKey;
-}
+};
 
-export interface ValidateAssertionRequest {
-  hardwareKey: JwkPublicKey;
-  hardwareSignature: NonEmptyString;
+export type ValidateAssertionRequest = {
   integrityAssertion: NonEmptyString;
-  jwk: JwkPublicKey;
+  hardwareSignature: NonEmptyString;
   nonce: NonEmptyString;
+  jwk: JwkPublicKey;
+  hardwareKey: JwkPublicKey;
   signCount: number;
-}
+};
 
-export interface AttestationService {
-  validateAssertion: (
-    request: ValidateAssertionRequest
-  ) => TE.TaskEither<Error, void>;
+export type AttestationService = {
   validateAttestation: (
     attestation: NonEmptyString,
     nonce: NonEmptyString,
     hardwareKeyTag: NonEmptyString
   ) => TE.TaskEither<Error, ValidatedAttestation>;
-}
+  validateAssertion: (
+    request: ValidateAssertionRequest
+  ) => TE.TaskEither<Error, void>;
+};
 
 export const validateAttestation: (
   walletInstanceRequest: WalletInstanceRequest
@@ -72,13 +71,13 @@ export const validateAssertion: (
       new MobileAttestationService(attestationServiceConfiguration),
       (attestationService) =>
         attestationService.validateAssertion({
-          hardwareKey,
-          hardwareSignature:
-            walletAttestationRequest.payload.hardware_signature,
           integrityAssertion:
             walletAttestationRequest.payload.integrity_assertion,
-          jwk: walletAttestationRequest.payload.cnf.jwk,
+          hardwareSignature:
+            walletAttestationRequest.payload.hardware_signature,
           nonce: walletAttestationRequest.payload.challenge,
+          jwk: walletAttestationRequest.payload.cnf.jwk,
+          hardwareKey,
           signCount,
         })
     );
