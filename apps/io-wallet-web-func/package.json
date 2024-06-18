@@ -19,16 +19,16 @@
     "@azure/identity": "^4.2.0",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
+    "@pagopa/ts-commons": "^13.1.1",
     "io-ts": "^2.2.21",
     "io-wallet-common": "workspace:^"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^3.0.0",
-    "@rushstack/eslint-patch": "^1.2.0",
+    "@pagopa/eslint-config": "^4.0.1",
     "@vitest/coverage-c8": "^0.33.0",
     "azure-functions-core-tools": "^4.0.5611",
-    "eslint": "^8.28.0",
-    "prettier": "2.7.1",
+    "eslint": "8.57.0",
+    "prettier": "3.2.5",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5",
     "vitest": "^1.5.0"

@@ -7,9 +7,8 @@ import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { JwkPublicKey } from "./jwk";
+import { validate, JwkPublicKey } from "io-wallet-common";
 import { getPublicKeyFromCnf, verifyJwtSignature } from "./verifier";
-import { validate } from "./validation";
 
 export const WalletAttestationRequestHeader = t.type({
   alg: t.string,

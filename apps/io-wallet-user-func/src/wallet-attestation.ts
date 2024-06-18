@@ -6,6 +6,7 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 
+import { JwkPublicKey, validateJwkKid } from "io-wallet-common";
 import {
   EntityConfigurationEnvironment,
   FederationEntity,
@@ -13,7 +14,6 @@ import {
 } from "./entity-configuration";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
-import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
 import { EidasTrustAnchor } from "./infra/trust-anchor";
 

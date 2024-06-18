@@ -12,17 +12,16 @@ import {
 import { Millisecond } from "@pagopa/ts-commons/lib/units";
 
 import { sequenceS } from "fp-ts/lib/Apply";
+import { getKeyByKid, validate } from "io-wallet-common";
 import {
   EntityStatementHeader,
   EntityStatementPayload,
   TrustAnchor,
   TrustAnchorEntityConfigurationPayload,
-} from "../../trust-anchor";
-import { FederationEntityMetadata } from "../../entity-configuration";
-import { validate } from "../../validation";
-import { getKeyByKid } from "../../jwk";
-import { verifyJwtSignature } from "../../verifier";
-import { removeTrailingSlash } from "../../url";
+} from "@/trust-anchor";
+import { FederationEntityMetadata } from "@/entity-configuration";
+import { verifyJwtSignature } from "@/verifier";
+import { removeTrailingSlash } from "@/url";
 
 const oidFederation = "/.well-known/openid-federation";
 

@@ -4,9 +4,8 @@ import * as E from "fp-ts/Either";
 import * as jose from "jose";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import { validate } from "./validation";
 
-import { JwkPublicKey } from "./jwk";
+import { JwkPublicKey, validate } from "io-wallet-common";
 
 const WithJwkCnf = t.type({
   cnf: t.type({

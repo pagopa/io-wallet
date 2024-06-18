@@ -5,11 +5,10 @@ import { decode } from "cbor-x";
 import * as t from "io-ts";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { validate } from "../../../validation";
+import { JwkPublicKey, validate } from "io-wallet-common";
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";
 import { verifyAssertion } from "./assertion";
-import { JwkPublicKey } from "@/jwk";
 
 const buffer = new t.Type<Buffer, Buffer, unknown>(
   "buffer",

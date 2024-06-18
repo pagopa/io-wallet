@@ -7,9 +7,8 @@ import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
+import { ECKey, Jwk, RSAKey, validate } from "io-wallet-common";
 import { JwtHeader, Signer } from "../../signer";
-import { ECKey, Jwk, RSAKey } from "../../jwk";
-import { validate } from "../../validation";
 import { CryptoConfiguration } from "../../app/config";
 
 const supportedSignAlgorithms = [

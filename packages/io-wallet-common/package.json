@@ -17,7 +17,9 @@
     "@azure/cosmos": "^4.0.0",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/logger": "^1.0.1",
-    "fp-ts": "^2.16.6"
+    "@pagopa/ts-commons": "^13.1.1",
+    "fp-ts": "^2.16.6",
+    "io-ts": "^2.2.21"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^3.0.0",

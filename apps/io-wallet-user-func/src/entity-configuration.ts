@@ -8,6 +8,7 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 
+import { JwkPublicKey, validateJwkKid } from "io-wallet-common";
 import {
   GRANT_TYPE_KEY_ATTESTATION,
   LoA,
@@ -15,7 +16,6 @@ import {
   TOKEN_ENDPOINT_AUTH_METHOD_SUPPORTED,
   getLoAUri,
 } from "./wallet-provider";
-import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { Signer } from "./signer";
 import { EntityConfigurationToJwtModel } from "./encoders/entity-configuration";
 

@@ -2,7 +2,7 @@ import { flow, pipe } from "fp-ts/function";
 import { lookup } from "fp-ts/Record";
 import * as E from "fp-ts/lib/Either";
 import * as H from "@pagopa/handler-kit";
-import { User } from "@/user";
+import { User } from "io-wallet-common";
 
 export const successEntityStatementJwt = flow(
   H.success,

@@ -4,8 +4,8 @@ import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { validate } from "io-wallet-common";
 import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
-import { validate } from "@/validation";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
