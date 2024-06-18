@@ -6,19 +6,15 @@ import * as RA from "fp-ts/ReadonlyArray";
 import { CosmosClient } from "@azure/cosmos";
 import * as O from "fp-ts/Option";
 import * as H from "@pagopa/handler-kit";
-import { logErrorAndReturnResponse } from "../utils";
+import {
+  HealthCheckError,
+  getCosmosHealth,
+  logErrorAndReturnResponse,
+} from "io-wallet-common";
 import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
-import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
-
-class HealthCheckError extends Error {
-  name = "HealthCheckError";
-  constructor(cause?: string) {
-    super(`The function is not healthy. ${cause}`);
-  }
-}
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {

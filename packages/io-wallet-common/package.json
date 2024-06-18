@@ -1,0 +1,32 @@
+{
+  "name": "io-wallet-common",
+  "version": "0.0.1",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "typecheck": "tsc",
+    "format": "prettier --write .",
+    "lint": "eslint \"src/**\"",
+    "lint:fix": "eslint --fix \"src/**\"",
+    "build": "tsup-node"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "@pagopa/handler-kit": "^1.1.0",
+    "@pagopa/logger": "^1.0.1",
+    "fp-ts": "^2.16.6"
+  },
+  "devDependencies": {
+    "@pagopa/eslint-config": "^3.0.0",
+    "@rushstack/eslint-patch": "^1.2.0",
+    "@vitest/coverage-c8": "^0.33.0",
+    "eslint": "^8.28.0",
+    "prettier": "2.7.1",
+    "tsup": "^8.1.0",
+    "typescript": "^4.8.4",
+    "vitest": "^1.2.2"
+  }
+}

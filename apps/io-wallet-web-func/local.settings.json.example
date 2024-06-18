@@ -1,0 +1,11 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "NODE_ENV": "development",
+    "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
+    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
+    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
+  }
+}

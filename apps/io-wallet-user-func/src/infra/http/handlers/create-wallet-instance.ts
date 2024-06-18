@@ -9,7 +9,7 @@ import * as E from "fp-ts/lib/Either";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 
-import { logErrorAndReturnResponse } from "../utils";
+import { logErrorAndReturnResponse } from "io-wallet-common";
 
 import { requireUser } from "./utils";
 import {
