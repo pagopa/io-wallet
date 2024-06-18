@@ -4,7 +4,8 @@ import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { readFromEnvironment } from "io-wallet-common";
-import { Jwk, fromBase64ToJwks, validate } from "io-wallet-common";
+import { Jwk, fromBase64ToJwks } from "io-wallet-common";
+import { parse } from "@pagopa/handler-kit";
 import { FederationEntityMetadata } from "../entity-configuration";
 
 const booleanFromString = (input: string) =>
@@ -128,7 +129,7 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
     trustAnchorUri: readFromEnvironment("FederationEntityTrustAnchorUri"),
   }),
   RE.chainEitherKW(
-    validate(
+    parse(
       FederationEntityMetadata,
       "Federation entity configuration is invalid"
     )

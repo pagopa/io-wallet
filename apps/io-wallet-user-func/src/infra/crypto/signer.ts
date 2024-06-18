@@ -7,7 +7,8 @@ import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
-import { ECKey, Jwk, RSAKey, validate } from "io-wallet-common";
+import { ECKey, Jwk, RSAKey } from "io-wallet-common";
+import { parse } from "@pagopa/handler-kit";
 import { JwtHeader, Signer } from "../../signer";
 import { CryptoConfiguration } from "../../app/config";
 
@@ -34,7 +35,7 @@ export class CryptoSigner implements Signer {
   getPublicKeys = () =>
     pipe(
       this.#configuration.jwks,
-      validate(
+      parse(
         t.array(t.union([t.exact(ECKey), t.exact(RSAKey)])),
         "JWKs appears to not be a public key array"
       )

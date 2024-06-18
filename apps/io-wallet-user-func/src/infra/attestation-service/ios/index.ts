@@ -5,7 +5,8 @@ import { decode } from "cbor-x";
 import * as t from "io-ts";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { JwkPublicKey, validate } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common";
+import { parse } from "@pagopa/handler-kit";
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";
 import { verifyAssertion } from "./assertion";
@@ -45,10 +46,7 @@ export const validateiOSAttestation = (
       () => new Error(`[iOS Attestation] Unable to decode data`)
     ),
     E.chainW(
-      validate(
-        iOsAttestation,
-        "[iOS Attestation] attestation format is invalid"
-      )
+      parse(iOsAttestation, "[iOS Attestation] attestation format is invalid")
     ),
     TE.fromEither,
     TE.chain((decodedAttestation) =>
@@ -69,7 +67,7 @@ export const validateiOSAttestation = (
         TE.chainW((result) =>
           pipe(
             result.hardwareKey,
-            validate(JwkPublicKey, "Invalid JWK Public Key"),
+            parse(JwkPublicKey, "Invalid JWK Public Key"),
             E.map((hardwareKey) => ({ ...result, hardwareKey })),
             TE.fromEither
           )
@@ -108,7 +106,7 @@ export const validateiOSAssertion = (
       ),
     }),
     E.chainW(
-      validate(iOsAssertion, "[iOS Assertion] assertion format is invalid")
+      parse(iOsAssertion, "[iOS Assertion] assertion format is invalid")
     ),
     TE.fromEither,
     TE.chain((decodedAssertion) =>

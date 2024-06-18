@@ -1,9 +1,9 @@
 import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 import { Container, Database } from "@azure/cosmos";
+import { parse } from "@pagopa/handler-kit";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { validate } from "io-wallet-common";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
@@ -36,7 +36,7 @@ export class CosmosDbWalletInstanceRepository
       ),
       TE.chainW(
         flow(
-          validate(t.array(WalletInstance), "Invalid wallet instances"),
+          parse(t.array(WalletInstance), "Invalid wallet instances"),
           TE.fromEither,
         ),
       ),

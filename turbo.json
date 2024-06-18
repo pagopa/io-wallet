@@ -18,6 +18,11 @@
       "outputs": [],
       "dependsOn": ["^build"]
     },
+    "lint:fix": {
+      "inputs": ["src/**/*.ts"],
+      "outputs": [],
+      "dependsOn": ["^build"]
+    },
     "test": {
       "inputs": ["src/**/*.spec.ts"],
       "outputs": [],

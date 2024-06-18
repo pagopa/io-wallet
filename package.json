@@ -4,7 +4,8 @@
   "scripts": {
     "test": "turbo run test --no-daemon",
     "format": "turbo run format --no-daemon",
-    "lint": "turbo run lint --no-daemon --",
+    "lint": "turbo run lint --no-daemon",
+    "lint:fix": "turbo run lint:fix --no-daemon",
     "build": "turbo run build --no-daemon",
     "code-review": "turbo run typecheck lint test",
     "version": "changeset version",

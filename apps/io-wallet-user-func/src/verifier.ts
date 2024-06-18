@@ -5,7 +5,9 @@ import * as jose from "jose";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 
-import { JwkPublicKey, validate } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common";
+
+import { parse } from "@pagopa/handler-kit";
 
 const WithJwkCnf = t.type({
   cnf: t.type({
@@ -31,7 +33,7 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     jwt,
     decodeJwt,
     E.chainW(
-      validate(
+      parse(
         WithJwkCnf,
         "The jwt does not have the cnf attribute with the jwk public key."
       )
