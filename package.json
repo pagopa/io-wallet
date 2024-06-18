@@ -1,19 +1,18 @@
 {
-  "name": "io-wallet-workspace",
+  "name": "io-wallet",
   "private": true,
   "scripts": {
     "test": "turbo run test --no-daemon",
     "format": "turbo run format --no-daemon",
     "lint": "turbo run lint --no-daemon --",
     "build": "turbo run build --no-daemon",
-    "build:package": "TURBO_BUNDLES_DIR=$(pwd)/bundles && turbo run build:package --no-daemon",
-    "generate": "turbo run generate --no-daemon",
     "code-review": "turbo run typecheck lint test",
     "version": "changeset version",
     "release": "changeset tag"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

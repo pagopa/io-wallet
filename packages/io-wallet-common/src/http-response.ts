@@ -1,8 +1,6 @@
 import * as H from "@pagopa/handler-kit";
 import { errorRTE } from "@pagopa/logger";
-
 import * as RTE from "fp-ts/ReaderTaskEither";
-
 import { flow } from "fp-ts/function";
 
 export class EntityNotFoundError extends Error {
@@ -30,32 +28,32 @@ const isValidationError = (e: Error): e is H.ValidationError =>
 
 const isHttpError = (e: Error): e is H.HttpError => e.name === "HttpError";
 
-export const toProblemJson = (e: Error): H.ProblemJson => {
+const toProblemJson = (e: Error): H.ProblemJson => {
   if (isValidationError(e)) {
     return {
-      type: "/problem/validation-error",
-      title: "Validation Error",
       detail: "Your request didn't validate",
       status: 422,
+      title: "Validation Error",
+      type: "/problem/validation-error",
       violations: e.violations,
     };
   }
 
   if (isHttpError(e)) {
     return {
-      title: e.title,
-      status: e.status,
       detail: e.message,
+      status: e.status,
+      title: e.title,
     };
   }
   return {
-    title: "Internal Server Error",
     detail: e.name,
     status: 500,
+    title: "Internal Server Error",
   };
 };
 
-export const toErrorResponse = flow(toHttpError, toProblemJson, H.problemJson);
+const toErrorResponse = flow(toHttpError, toProblemJson, H.problemJson);
 
 export const logErrorAndReturnResponse = flow(
   RTE.right<object, Error, Error>,

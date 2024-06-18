@@ -1,16 +1,11 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turbo.build/schema.v1.json",
   "pipeline": {
     "build": {
       "inputs": ["src/**/*.ts"],
       "outputs": ["dist/**"],
+      "outputMode": "errors-only",
       "dependsOn": ["^build"]
-    },
-    "build:package": {
-      "outputs": [],
-      "dependsOn": ["^build"],
-      "outputMode": "full",
-      "cache": false
     },
     "typecheck": {
       "inputs": ["src/**/*.ts"],
@@ -24,7 +19,7 @@
       "dependsOn": ["^build"]
     },
     "test": {
-      "inputs": ["src/**/*.spec.ts", "src/**/*.test.ts"],
+      "inputs": ["src/**/*.spec.ts"],
       "outputs": [],
       "outputMode": "errors-only",
       "dependsOn": ["^build"]

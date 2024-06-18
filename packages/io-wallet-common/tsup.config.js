@@ -1,10 +1,10 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["./src/app/main.ts"],
+  entry: ["./src/index.ts"],
   splitting: false,
   sourcemap: true,
+  dts: true,
   clean: true,
-  minify: false,
   target: "node20",
 });
