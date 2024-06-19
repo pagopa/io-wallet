@@ -5,7 +5,7 @@ import { decode } from "cbor-x";
 import * as t from "io-ts";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAttestation } from "./attestation";

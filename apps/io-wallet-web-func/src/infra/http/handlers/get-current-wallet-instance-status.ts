@@ -3,7 +3,7 @@ import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
-import { logErrorAndReturnResponse } from "io-wallet-common";
+import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 
 export const GetCurrentWalletInstanceStatusHandler = H.of(() =>
   pipe(

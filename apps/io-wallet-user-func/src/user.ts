@@ -1,7 +1,7 @@
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import { User } from "io-wallet-common";
+import { User } from "io-wallet-common/user";
 
 export type UserRepository = {
   getOrCreateUserByFiscalCode: (

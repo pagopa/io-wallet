@@ -9,6 +9,6 @@
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
-    "noEmit": true
+    "noEmit": false
   }
 }

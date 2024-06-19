@@ -12,7 +12,7 @@ import {
 import { Millisecond } from "@pagopa/ts-commons/lib/units";
 
 import { sequenceS } from "fp-ts/lib/Apply";
-import { getKeyByKid } from "io-wallet-common";
+import { getKeyByKid } from "io-wallet-common/jwk";
 import { parse } from "@pagopa/handler-kit";
 import {
   EntityStatementHeader,

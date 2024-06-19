@@ -3,8 +3,8 @@ import * as t from "io-ts";
 import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { readFromEnvironment } from "io-wallet-common";
-import { Jwk, fromBase64ToJwks } from "io-wallet-common";
+import { readFromEnvironment } from "io-wallet-common/env";
+import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { FederationEntityMetadata } from "../entity-configuration";
 

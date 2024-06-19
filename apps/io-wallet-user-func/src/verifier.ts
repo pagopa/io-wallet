@@ -5,7 +5,7 @@ import * as jose from "jose";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { parse } from "@pagopa/handler-kit";
 

@@ -4,7 +4,8 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { JwkPublicKey, User } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
+import { User } from "io-wallet-common/user";
 
 const WalletInstanceValid = t.type({
   createdAt: IsoDateFromString,

@@ -5,7 +5,7 @@ import {
   JwkPublicKey,
   fromBase64ToJwks,
   validateJwkKid,
-} from "io-wallet-common";
+} from "io-wallet-common/jwk";
 
 const publicRsaKey = {
   kty: "RSA",

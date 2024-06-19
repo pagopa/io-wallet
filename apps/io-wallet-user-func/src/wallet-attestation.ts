@@ -6,7 +6,7 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 
-import { JwkPublicKey, validateJwkKid } from "io-wallet-common";
+import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 import {
   EntityConfigurationEnvironment,
   FederationEntity,

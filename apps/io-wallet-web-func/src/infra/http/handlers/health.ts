@@ -4,10 +4,10 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { constVoid, pipe } from "fp-ts/function";
 import {
-  HealthCheckError,
   getCosmosHealth,
-  logErrorAndReturnResponse,
-} from "io-wallet-common";
+  HealthCheckError,
+} from "io-wallet-common/cosmos-health-check";
+import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {
