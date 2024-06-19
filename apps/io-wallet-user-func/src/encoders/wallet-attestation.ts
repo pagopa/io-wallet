@@ -1,6 +1,6 @@
 import * as t from "io-ts";
 import * as E from "io-ts/lib/Encoder";
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { WalletAttestationPayload } from "../wallet-attestation";
 import { removeTrailingSlash } from "../url";
 

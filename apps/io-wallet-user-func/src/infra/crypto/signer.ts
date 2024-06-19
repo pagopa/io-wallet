@@ -7,7 +7,7 @@ import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
-import { ECKey, Jwk, RSAKey } from "io-wallet-common";
+import { ECKey, Jwk, RSAKey } from "io-wallet-common/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { JwtHeader, Signer } from "../../signer";
 import { CryptoConfiguration } from "../../app/config";

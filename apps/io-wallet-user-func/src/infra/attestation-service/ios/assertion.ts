@@ -1,6 +1,6 @@
 import { createHash, createVerify } from "crypto";
 import { exportSPKI, importJWK } from "jose";
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { iOsAssertion } from ".";
 
 export type VerifyAssertionParams = {

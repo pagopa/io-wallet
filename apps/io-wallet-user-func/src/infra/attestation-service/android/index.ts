@@ -6,7 +6,7 @@ import * as J from "fp-ts/Json";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { ValidatedAttestation } from "../../attestation-service";
 import { verifyAttestation } from "./attestation";

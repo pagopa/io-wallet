@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 import * as TE from "fp-ts/TaskEither";
 
-import { JwkPublicKey, JwksMetadata } from "io-wallet-common";
+import { JwkPublicKey, JwksMetadata } from "io-wallet-common/jwk";
 
 export const TrustAnchorEntityConfigurationPayload = t.type({
   iss: t.string,

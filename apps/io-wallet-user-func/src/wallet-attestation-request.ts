@@ -7,7 +7,7 @@ import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { getPublicKeyFromCnf, verifyJwtSignature } from "./verifier";
 

@@ -4,8 +4,8 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { constVoid, pipe } from "fp-ts/function";
 import {
-  getCosmosHealth,
   HealthCheckError,
+  getCosmosHealth,
 } from "io-wallet-common/cosmos-health-check";
 import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 

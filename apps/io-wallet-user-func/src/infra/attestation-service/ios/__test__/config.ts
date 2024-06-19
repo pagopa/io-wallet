@@ -1,4 +1,4 @@
-import { JwkPublicKey } from "io-wallet-common";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 
 const challenge = "586e95ef-43a0-43f6-982d-0aeab3611bd9";
 const attestation =

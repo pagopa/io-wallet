@@ -8,7 +8,7 @@ import {
 import { generateKeyPairSync, createSign, createHash } from "crypto";
 import { exportJWK } from "jose";
 import { playintegrity_v1 } from "googleapis";
-import { ECKey } from "io-wallet-common";
+import { ECKey } from "io-wallet-common/jwk";
 
 describe("AndroidAssertionValidation", async () => {
   const { challenge, bundleIdentifier, ephemeralKey } = androidMockData;
