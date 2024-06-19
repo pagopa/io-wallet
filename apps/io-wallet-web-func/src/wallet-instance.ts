@@ -1,9 +1,11 @@
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { EntityNotFoundError } from "io-wallet-common/http-response";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { User } from "io-wallet-common/user";
 
@@ -38,12 +40,9 @@ export const WalletInstance = t.union([
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
 export interface WalletInstanceRepository {
-  // getAllByUserId: (
-  //   userId: WalletInstance["userId"]
-  // ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   getAllByUserId: (
     userId: WalletInstance["userId"],
-  ) => TE.TaskEither<Error, WalletInstance[]>;
+  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
 }
 
 interface WalletInstanceEnvironment {
@@ -57,6 +56,11 @@ export const getCurrentWalletInstance: (
   ({ walletInstanceRepository }) =>
     pipe(
       walletInstanceRepository.getAllByUserId(userId),
+      TE.chain(
+        TE.fromOption(
+          () => new EntityNotFoundError("Wallet instance not found"),
+        ),
+      ),
       TE.map((walletInstances) =>
         walletInstances.reduce(
           (previous, current) =>

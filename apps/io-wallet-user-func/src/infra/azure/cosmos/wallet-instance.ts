@@ -4,7 +4,6 @@ import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { parse } from "@pagopa/handler-kit";
 import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 
 export class CosmosDbWalletInstanceRepository
@@ -72,7 +71,11 @@ export class CosmosDbWalletInstanceRepository
       ),
       TE.chainW(
         flow(
-          parse(t.array(WalletInstance), "Invalid wallet instances"),
+          t.array(WalletInstance).decode,
+          E.mapLeft(
+            () =>
+              new Error("Error getting wallet instances: invalid result format")
+          ),
           TE.fromEither
         )
       )

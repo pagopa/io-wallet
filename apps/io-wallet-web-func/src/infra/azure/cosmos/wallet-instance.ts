@@ -1,8 +1,8 @@
 import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 import { Container, Database } from "@azure/cosmos";
-import { parse } from "@pagopa/handler-kit";
+import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
 export class CosmosDbWalletInstanceRepository
@@ -34,11 +34,21 @@ export class CosmosDbWalletInstanceRepository
         (error) =>
           new Error(`Error getting wallet instances by user id: ${error}`),
       ),
-      TE.chainW(
-        flow(
-          parse(t.array(WalletInstance), "Invalid wallet instances"),
-          TE.fromEither,
-        ),
+      TE.chain((walletInstances) =>
+        !walletInstances.length
+          ? TE.right(O.none)
+          : pipe(
+              walletInstances,
+              t.array(WalletInstance).decode,
+              TE.fromEither,
+              TE.map(O.some),
+              TE.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting wallet instances: invalid result format",
+                  ),
+              ),
+            ),
       ),
     );
   }

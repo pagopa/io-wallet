@@ -2,19 +2,13 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentWalletInstanceStatusHandler } from "../get-current-wallet-instance-status";
 
 describe("GetCurrentWalletInstanceStatusHandler", () => {
-  const hardwareKey = {
-    crv: "P-256",
-    kty: "EC",
-    x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
-    y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
-  } as const;
-
   const logger = {
     format: L.format.simple,
     log: () => () => void 0,
@@ -22,26 +16,39 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
   const walletInstanceRepository: WalletInstanceRepository = {
     getAllByUserId: () =>
-      TE.right([
-        {
-          createdAt: new Date(),
-          hardwareKey,
-          id: "123" as NonEmptyString,
-          isRevoked: false,
-          signCount: 0,
-          userId: "123" as NonEmptyString,
-        },
-      ]),
+      TE.right(
+        O.some([
+          {
+            createdAt: new Date(),
+            hardwareKey: {
+              crv: "P-256",
+              kty: "EC",
+              x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
+              y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
+            },
+            id: "123" as NonEmptyString,
+            isRevoked: false,
+            signCount: 0,
+            userId: "123" as NonEmptyString,
+          },
+        ]),
+      ),
   };
 
-  const handler = GetCurrentWalletInstanceStatusHandler({
-    input: H.request("https://api.test.it/"),
-    inputDecoder: H.HttpRequest,
-    logger,
-    walletInstanceRepository,
-  });
-
   it("should return a 200 HTTP response on success", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      headers: {
+        authorization: "authorization",
+      },
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository,
+    });
+
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
@@ -54,6 +61,111 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
         }),
         statusCode: 200,
       },
+    });
+  });
+
+  it("should return a 400 HTTP response when authorization header is missing", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 400,
+      }),
+    });
+  });
+
+  it("should return a 404 HTTP response when no wallet instances is found", async () => {
+    const walletInstanceRepository: WalletInstanceRepository = {
+      getAllByUserId: () => TE.right(O.none),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      headers: {
+        authorization: "authorization",
+      },
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 404,
+      }),
+    });
+  });
+
+  it("should return a 422 HTTP response when authorization header is an empty string", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      headers: {
+        authorization: "",
+      },
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 422,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response on getAllByUserId error", async () => {
+    const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
+      {
+        getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
+      };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      headers: {
+        authorization: "authorization",
+      },
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository:
+        walletInstanceRepositoryThatFailsOnGetAllByUserId,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
     });
   });
 });

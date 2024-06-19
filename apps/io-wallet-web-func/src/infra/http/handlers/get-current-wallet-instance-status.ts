@@ -1,20 +1,45 @@
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { lookup } from "fp-ts/Record";
+import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
+import { User } from "io-wallet-common/user";
 
-export const GetCurrentWalletInstanceStatusHandler = H.of(() =>
+// TODO: SIW-1266. Now in the `authorization` header there is the pdv tokenizer id, later there will be the authentication token
+// Move the code to a more central part
+const requireAuthorizationHeader = (req: H.HttpRequest) =>
   pipe(
-    // this is a fake UUID
-    "f61f9cc6-e1b8-4040-89ac-46418780c6a9" as NonEmptyString,
-    getCurrentWalletInstance,
-    RTE.map((walletInstance) => ({
-      id: walletInstance.id,
-      is_revoked: walletInstance.isRevoked,
-    })),
-    RTE.map(H.successJson),
-    RTE.orElseW(logErrorAndReturnResponse),
-  ),
+    req.headers,
+    lookup("authorization"),
+    E.fromOption(
+      () => new H.HttpBadRequestError("Missing authorization in header"),
+    ),
+    E.chainW(
+      H.parse(User.props.id, "The content of authorization is not a valid id"),
+    ),
+  );
+
+const requireUser: (
+  req: H.HttpRequest,
+) => E.Either<H.HttpBadRequestError | H.ValidationError, User> = flow(
+  requireAuthorizationHeader,
+  E.map((id) => ({ id })),
+);
+
+export const GetCurrentWalletInstanceStatusHandler = H.of(
+  (req: H.HttpRequest) =>
+    pipe(
+      req,
+      requireUser,
+      RTE.fromEither,
+      RTE.chain(({ id }) => getCurrentWalletInstance(id)),
+      RTE.map((walletInstance) => ({
+        id: walletInstance.id,
+        is_revoked: walletInstance.isRevoked,
+      })),
+      RTE.map(H.successJson),
+      RTE.orElseW(logErrorAndReturnResponse),
+    ),
 );
