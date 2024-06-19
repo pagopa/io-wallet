@@ -40,6 +40,9 @@ export const WalletInstance = t.union([
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
 export interface WalletInstanceRepository {
+  getLastByUserId: (
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
@@ -55,17 +58,10 @@ export const getCurrentWalletInstance: (
   (userId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.getAllByUserId(userId),
+      walletInstanceRepository.getLastByUserId(userId),
       TE.chain(
         TE.fromOption(
           () => new EntityNotFoundError("Wallet instance not found"),
-        ),
-      ),
-      TE.map((walletInstances) =>
-        walletInstances.reduce(
-          (previous, current) =>
-            previous.createdAt > current.createdAt ? previous : current,
-          walletInstances[0],
         ),
       ),
     );

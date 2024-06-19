@@ -15,23 +15,22 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
-    getAllByUserId: () =>
+    getAllByUserId: () => TE.left(new Error("not implemented")),
+    getLastByUserId: () =>
       TE.right(
-        O.some([
-          {
-            createdAt: new Date(),
-            hardwareKey: {
-              crv: "P-256",
-              kty: "EC",
-              x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
-              y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
-            },
-            id: "123" as NonEmptyString,
-            isRevoked: false,
-            signCount: 0,
-            userId: "123" as NonEmptyString,
+        O.some({
+          createdAt: new Date(),
+          hardwareKey: {
+            crv: "P-256",
+            kty: "EC",
+            x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
+            y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
           },
-        ]),
+          id: "123" as NonEmptyString,
+          isRevoked: false,
+          signCount: 0,
+          userId: "123" as NonEmptyString,
+        }),
       ),
   };
 
@@ -88,7 +87,8 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
   it("should return a 404 HTTP response when no wallet instances is found", async () => {
     const walletInstanceRepository: WalletInstanceRepository = {
-      getAllByUserId: () => TE.right(O.none),
+      getLastByUserId: () => TE.right(O.none),
+      getAllByUserId: () => TE.left(new Error("not implemented")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -139,10 +139,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on getAllByUserId error", async () => {
-    const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
+  it("should return a 500 HTTP response on getLastByUserId error", async () => {
+    const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
       {
-        getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
+        getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -155,7 +156,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       walletInstanceRepository:
-        walletInstanceRepositoryThatFailsOnGetAllByUserId,
+        walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
 
     await expect(handler()).resolves.toEqual({
