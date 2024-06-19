@@ -69,11 +69,3 @@ export const getCurrentWalletInstance: (
         ),
       ),
     );
-// pipe(
-//   walletInstanceRepository.getAllByUserId(userId),
-// TE.chain(
-//   TE.fromOption(
-//     () => new EntityNotFoundError("There are no wallet instances")
-//   )
-// )
-// );
