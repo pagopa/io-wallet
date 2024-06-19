@@ -40,12 +40,12 @@ export const WalletInstance = t.union([
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
 export interface WalletInstanceRepository {
-  getLastByUserId: (
-    userId: WalletInstance["userId"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
+  getLastByUserId: (
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
 }
 
 interface WalletInstanceEnvironment {

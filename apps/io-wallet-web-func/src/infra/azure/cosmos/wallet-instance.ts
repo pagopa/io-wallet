@@ -14,6 +14,45 @@ export class CosmosDbWalletInstanceRepository
     this.#container = db.container("wallet-instances");
   }
 
+  getAllByUserId(userId: WalletInstance["userId"]) {
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          const { resources: items } = await this.#container.items
+            .query({
+              parameters: [
+                {
+                  name: "@partitionKey",
+                  value: userId,
+                },
+              ],
+              query: "SELECT * FROM c WHERE c.userId = @partitionKey",
+            })
+            .fetchAll();
+          return items;
+        },
+        (error) =>
+          new Error(`Error getting wallet instances by user id: ${error}`),
+      ),
+      TE.chain((walletInstances) =>
+        !walletInstances.length
+          ? TE.right(O.none)
+          : pipe(
+              walletInstances,
+              t.array(WalletInstance).decode,
+              TE.fromEither,
+              TE.map(O.some),
+              TE.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting wallet instances: invalid result format",
+                  ),
+              ),
+            ),
+      ),
+    );
+  }
+
   getLastByUserId(userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(
@@ -47,45 +86,6 @@ export class CosmosDbWalletInstanceRepository
                 () =>
                   new Error(
                     "Error getting last wallet instance: invalid result format",
-                  ),
-              ),
-            ),
-      ),
-    );
-  }
-
-  getAllByUserId(userId: WalletInstance["userId"]) {
-    return pipe(
-      TE.tryCatch(
-        async () => {
-          const { resources: items } = await this.#container.items
-            .query({
-              parameters: [
-                {
-                  name: "@partitionKey",
-                  value: userId,
-                },
-              ],
-              query: "SELECT * FROM c WHERE c.userId = @partitionKey",
-            })
-            .fetchAll();
-          return items;
-        },
-        (error) =>
-          new Error(`Error getting wallet instances by user id: ${error}`),
-      ),
-      TE.chain((walletInstances) =>
-        !walletInstances.length
-          ? TE.right(O.none)
-          : pipe(
-              walletInstances,
-              t.array(WalletInstance).decode,
-              TE.fromEither,
-              TE.map(O.some),
-              TE.mapLeft(
-                () =>
-                  new Error(
-                    "Error getting wallet instances: invalid result format",
                   ),
               ),
             ),
