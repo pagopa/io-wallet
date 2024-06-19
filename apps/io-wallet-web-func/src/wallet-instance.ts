@@ -9,28 +9,28 @@ import { EntityNotFoundError } from "io-wallet-common/http-response";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { User } from "io-wallet-common/user";
 
-const WalletInstanceValid = t.type({
+const WalletInstanceBase = t.type({
   createdAt: IsoDateFromString,
   hardwareKey: JwkPublicKey,
   id: NonEmptyString,
-  isRevoked: t.literal(false),
   signCount: t.number,
   userId: User.props.id,
 });
 
-type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
+const WalletInstanceValid = t.intersection([
+  WalletInstanceBase,
+  t.type({
+    isRevoked: t.literal(false),
+  }),
+]);
 
-const WalletInstanceRevoked = t.type({
-  createdAt: IsoDateFromString,
-  hardwareKey: JwkPublicKey,
-  id: NonEmptyString,
-  isRevoked: t.literal(true),
-  revokedAt: IsoDateFromString,
-  signCount: t.number,
-  userId: User.props.id,
-});
-
-type WalletInstanceRevoked = t.TypeOf<typeof WalletInstanceRevoked>;
+const WalletInstanceRevoked = t.intersection([
+  WalletInstanceBase,
+  t.type({
+    isRevoked: t.literal(true),
+    revokedAt: IsoDateFromString,
+  }),
+]);
 
 export const WalletInstance = t.union([
   WalletInstanceValid,
