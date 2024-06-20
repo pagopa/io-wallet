@@ -4,7 +4,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/function";
 import { CryptoSigner } from "../signer";
 import * as jose from "jose";
-import { ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "@/jwk";
+import { ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "io-wallet-common/jwk";
 
 const publicRsaKey = {
   kty: "RSA",

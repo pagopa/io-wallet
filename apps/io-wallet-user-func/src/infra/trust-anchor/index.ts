@@ -12,17 +12,17 @@ import {
 import { Millisecond } from "@pagopa/ts-commons/lib/units";
 
 import { sequenceS } from "fp-ts/lib/Apply";
+import { getKeyByKid } from "io-wallet-common/jwk";
+import { parse } from "@pagopa/handler-kit";
 import {
   EntityStatementHeader,
   EntityStatementPayload,
   TrustAnchor,
   TrustAnchorEntityConfigurationPayload,
-} from "../../trust-anchor";
-import { FederationEntityMetadata } from "../../entity-configuration";
-import { validate } from "../../validation";
-import { getKeyByKid } from "../../jwk";
-import { verifyJwtSignature } from "../../verifier";
-import { removeTrailingSlash } from "../../url";
+} from "@/trust-anchor";
+import { FederationEntityMetadata } from "@/entity-configuration";
+import { verifyJwtSignature } from "@/verifier";
+import { removeTrailingSlash } from "@/url";
 
 const oidFederation = "/.well-known/openid-federation";
 
@@ -46,7 +46,7 @@ export class EidasTrustAnchor implements TrustAnchor {
       getRequest(this.fetchWithTimeout),
       TE.map((value) => jose.decodeJwt(value)),
       TE.chainEitherKW(
-        validate(
+        parse(
           TrustAnchorEntityConfigurationPayload,
           "Invalid trust anchor entity configuration"
         )
@@ -81,7 +81,7 @@ export class EidasTrustAnchor implements TrustAnchor {
     pipe(
       E.tryCatch(() => jose.decodeProtectedHeader(jwt), E.toError),
       E.chainW(
-        validate(
+        parse(
           EntityStatementHeader,
           "Invalid trust anchor entity statement header"
         )
@@ -101,7 +101,7 @@ export class EidasTrustAnchor implements TrustAnchor {
       TE.chain(verifyJwtSignature(jwt)),
       TE.map((decoded) => decoded.payload),
       TE.chainEitherKW(
-        validate(
+        parse(
           EntityStatementPayload,
           "Invalid trust anchor entity statement payload"
         )

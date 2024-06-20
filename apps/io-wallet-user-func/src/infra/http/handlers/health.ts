@@ -9,8 +9,8 @@ import * as H from "@pagopa/handler-kit";
 import {
   HealthCheckError,
   getCosmosHealth,
-  logErrorAndReturnResponse,
-} from "io-wallet-common";
+} from "io-wallet-common/cosmos-health-check";
+import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,

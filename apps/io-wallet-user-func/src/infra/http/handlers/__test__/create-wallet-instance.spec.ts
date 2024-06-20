@@ -82,7 +82,7 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 400 HTTP response when header is missing", async () => {
+  it("should return a 400 HTTP response when x-iowallet-user-id header is missing", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",
@@ -108,7 +108,7 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 422 HTTP response when header is an empty string", async () => {
+  it("should return a 422 HTTP response when x-iowallet-user-id header is an empty string", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       method: "POST",

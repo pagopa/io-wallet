@@ -2,11 +2,11 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
-import { JwkPublicKey } from "./jwk";
 
 export enum OperatingSystem {
   iOS = "Apple iOS",
