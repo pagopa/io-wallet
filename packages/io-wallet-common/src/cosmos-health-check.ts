@@ -18,7 +18,7 @@ export const getCosmosHealth: RTE.ReaderTaskEither<
   pipe(
     TE.tryCatch(
       () => cosmosClient.getDatabaseAccount(),
-      () => new Error("cosmos-db-error")
+      () => new Error("cosmos-db-error"),
     ),
-    TE.map(() => true)
+    TE.map(() => true),
   );
