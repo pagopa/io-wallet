@@ -6,11 +6,11 @@ import * as J from "fp-ts/Json";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { JwkPublicKey } from "io-wallet-common/jwk";
+import { parse } from "@pagopa/handler-kit";
 import { ValidatedAttestation } from "../../attestation-service";
-import { validate } from "../../../validation";
 import { verifyAttestation } from "./attestation";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
-import { JwkPublicKey } from "@/jwk";
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -54,7 +54,7 @@ export const validateAndroidAttestation = (
         TE.chainW(({ hardwareKey }) =>
           pipe(
             hardwareKey,
-            validate(JwkPublicKey, "Invalid JWK Public Key"),
+            parse(JwkPublicKey, "Invalid JWK Public Key"),
             E.map((hardwareKey) => ({ hardwareKey })),
             TE.fromEither
           )
@@ -86,7 +86,7 @@ export const validateAndroidAssertion = (
           "[Android Assertion] Unable to parse Google App Credentials string"
         )
     ),
-    E.chainW(validate(GoogleAppCredentials, "Invalid Google App Credentials")),
+    E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
     TE.fromEither,
     TE.chain((googleAppCredentials) =>
       TE.tryCatch(

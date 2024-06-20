@@ -5,7 +5,6 @@ import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
 import * as H from "@pagopa/handler-kit";
-import { validate } from "./validation";
 
 export const ECKey = t.intersection([
   t.type({
@@ -92,7 +91,7 @@ export const fromBase64ToJwks = (b64: string) =>
     E.tryCatch(() => Buffer.from(b64, "base64").toString(), E.toError),
     E.chain(J.parse),
     E.mapLeft(() => new Error("Unable to parse JWKs string")),
-    E.chainW(validate(t.array(Jwk), "Invalid JWKs"))
+    E.chainW(H.parse(t.array(Jwk), "Invalid JWKs"))
   );
 
 export const getKeyByKid = (kid: string) => (jwks: JwkPublicKey[]) =>
@@ -109,7 +108,7 @@ export const validateJwkKid: (
 > = (jwk) =>
   pipe(
     jwk.kid,
-    validate(t.string, "JWK Public Key kid is undefined"),
+    H.parse(t.string, "JWK Public Key kid is undefined"),
     E.map((kid) => ({
       ...jwk,
       kid,

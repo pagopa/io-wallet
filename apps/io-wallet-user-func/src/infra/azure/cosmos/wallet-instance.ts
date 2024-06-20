@@ -5,7 +5,6 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
-import { validate } from "@/validation";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
@@ -72,7 +71,11 @@ export class CosmosDbWalletInstanceRepository
       ),
       TE.chainW(
         flow(
-          validate(t.array(WalletInstance), "Invalid wallet instances"),
+          t.array(WalletInstance).decode,
+          E.mapLeft(
+            () =>
+              new Error("Error getting wallet instances: invalid result format")
+          ),
           TE.fromEither
         )
       )

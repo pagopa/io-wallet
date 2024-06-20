@@ -7,9 +7,9 @@ import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { JwkPublicKey } from "./jwk";
+import { JwkPublicKey } from "io-wallet-common/jwk";
+import { parse } from "@pagopa/handler-kit";
 import { getPublicKeyFromCnf, verifyJwtSignature } from "./verifier";
-import { validate } from "./validation";
 
 export const WalletAttestationRequestHeader = t.type({
   alg: t.string,
@@ -57,14 +57,14 @@ export const verifyWalletAttestationRequest = (
       sequenceS(E.Apply)({
         payload: pipe(
           verifiedJwt.payload,
-          validate(
+          parse(
             WalletAttestationRequestPayload,
             "Invalid Wallet Attestation Request payload"
           )
         ),
         header: pipe(
           verifiedJwt.protectedHeader,
-          validate(
+          parse(
             WalletAttestationRequestHeader,
             "Invalid Wallet Attestation Request header"
           )

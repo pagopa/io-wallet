@@ -1,3 +1,6 @@
+import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
+import { HealthFunction } from "@/infra/azure/functions/health";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -5,11 +8,10 @@ import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 
 import { getConfigFromEnvironment } from "./config";
-import { HealthFunction } from "@/infra/azure/functions/health";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
-  E.getOrElseW(identity)
+  E.getOrElseW(identity),
 );
 
 if (configOrError instanceof Error) {
@@ -25,9 +27,20 @@ const cosmosClient = new CosmosClient({
   endpoint: config.azure.cosmos.endpoint,
 });
 
+const database = cosmosClient.database(config.azure.cosmos.dbName);
+
+const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({ cosmosClient }),
   methods: ["GET"],
   route: "health",
+});
+
+app.http("getCurrentWalletInstanceStatus", {
+  authLevel: "function",
+  handler: GetCurrentWalletInstanceStatusFunction({ walletInstanceRepository }),
+  methods: ["GET"],
+  route: "wallet-instances/current/status",
 });
