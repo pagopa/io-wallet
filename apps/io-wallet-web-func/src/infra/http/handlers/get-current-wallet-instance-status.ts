@@ -1,3 +1,4 @@
+import { WalletInstanceToStatus } from "@/encoders/wallet-instance";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { lookup } from "fp-ts/Record";
@@ -35,10 +36,7 @@ export const GetCurrentWalletInstanceStatusHandler = H.of(
       requireUser,
       RTE.fromEither,
       RTE.chain(({ id }) => getCurrentWalletInstance(id)),
-      RTE.map((walletInstance) => ({
-        id: walletInstance.id,
-        is_revoked: walletInstance.isRevoked,
-      })),
+      RTE.map(WalletInstanceToStatus.encode),
       RTE.map(H.successJson),
       RTE.orElseW(logErrorAndReturnResponse),
     ),
