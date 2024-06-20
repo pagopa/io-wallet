@@ -32,11 +32,10 @@
     "io-ts": "^2.2.21"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^3.0.0",
-    "@rushstack/eslint-patch": "^1.2.0",
+    "@pagopa/eslint-config": "^4.0.1",
     "@vitest/coverage-c8": "^0.33.0",
-    "eslint": "^8.28.0",
-    "prettier": "2.7.1",
+    "eslint": "8.57.0",
+    "prettier": "3.2.5",
     "typescript": "^4.8.4",
     "vitest": "^1.2.2"
   }

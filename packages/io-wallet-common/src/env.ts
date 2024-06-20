@@ -10,6 +10,6 @@ export const readFromEnvironment =
       lookup(variableName),
       O.chain(O.fromNullable),
       E.fromOption(
-        () => new Error(`unable to find "${variableName}" in node environment`)
-      )
+        () => new Error(`unable to find "${variableName}" in node environment`),
+      ),
     );

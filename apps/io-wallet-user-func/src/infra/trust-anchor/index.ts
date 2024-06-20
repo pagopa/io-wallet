@@ -1,8 +1,14 @@
-import { pipe, flow } from "fp-ts/function";
-import * as E from "fp-ts/lib/Either";
-import * as TE from "fp-ts/lib/TaskEither";
-import * as jose from "jose";
-
+/* eslint-disable perfectionist/sort-classes */
+import { FederationEntityMetadata } from "@/entity-configuration";
+import {
+  EntityStatementHeader,
+  EntityStatementPayload,
+  TrustAnchor,
+  TrustAnchorEntityConfigurationPayload,
+} from "@/trust-anchor";
+import { removeTrailingSlash } from "@/url";
+import { verifyJwtSignature } from "@/verifier";
+import { parse } from "@pagopa/handler-kit";
 import { agent } from "@pagopa/ts-commons";
 import {
   AbortableFetch,
@@ -10,19 +16,12 @@ import {
   toFetch,
 } from "@pagopa/ts-commons/lib/fetch";
 import { Millisecond } from "@pagopa/ts-commons/lib/units";
-
+import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
+import * as E from "fp-ts/lib/Either";
+import * as TE from "fp-ts/lib/TaskEither";
 import { getKeyByKid } from "io-wallet-common/jwk";
-import { parse } from "@pagopa/handler-kit";
-import {
-  EntityStatementHeader,
-  EntityStatementPayload,
-  TrustAnchor,
-  TrustAnchorEntityConfigurationPayload,
-} from "@/trust-anchor";
-import { FederationEntityMetadata } from "@/entity-configuration";
-import { verifyJwtSignature } from "@/verifier";
-import { removeTrailingSlash } from "@/url";
+import * as jose from "jose";
 
 const oidFederation = "/.well-known/openid-federation";
 
@@ -32,7 +31,7 @@ export class EidasTrustAnchor implements TrustAnchor {
   httpApiFetch = agent.getHttpFetch(process.env);
   abortableFetch = AbortableFetch(this.httpApiFetch);
   fetchWithTimeout = toFetch(
-    setFetchTimeout(1000 as Millisecond, this.abortableFetch)
+    setFetchTimeout(1000 as Millisecond, this.abortableFetch),
   ) as unknown as typeof fetch;
 
   constructor(cnf: FederationEntityMetadata) {
@@ -48,10 +47,10 @@ export class EidasTrustAnchor implements TrustAnchor {
       TE.chainEitherKW(
         parse(
           TrustAnchorEntityConfigurationPayload,
-          "Invalid trust anchor entity configuration"
-        )
+          "Invalid trust anchor entity configuration",
+        ),
       ),
-      TE.map((metadata) => metadata.jwks.keys)
+      TE.map((metadata) => metadata.jwks.keys),
     );
 
   getEntityStatement = () =>
@@ -61,20 +60,20 @@ export class EidasTrustAnchor implements TrustAnchor {
         const fetchUrl = new URL("fetch", href);
         fetchUrl.searchParams.append(
           "sub",
-          removeTrailingSlash(this.#configuration.basePath.href)
+          removeTrailingSlash(this.#configuration.basePath.href),
         );
         fetchUrl.searchParams.append(
           "anchor",
-          removeTrailingSlash(this.#configuration.trustAnchorUri.href)
+          removeTrailingSlash(this.#configuration.trustAnchorUri.href),
         );
         return fetchUrl.href;
       },
       getRequest(this.fetchWithTimeout),
       TE.map((jwt) => ({
-        encoded: TE.right(jwt),
         decoded: this.validateEntityStatementJwt(jwt),
+        encoded: TE.right(jwt),
       })),
-      TE.chain(sequenceS(TE.ApplicativePar))
+      TE.chain(sequenceS(TE.ApplicativePar)),
     );
 
   validateEntityStatementJwt = (jwt: string) =>
@@ -83,8 +82,8 @@ export class EidasTrustAnchor implements TrustAnchor {
       E.chainW(
         parse(
           EntityStatementHeader,
-          "Invalid trust anchor entity statement header"
-        )
+          "Invalid trust anchor entity statement header",
+        ),
       ),
       TE.fromEither,
       TE.chain((es) =>
@@ -93,19 +92,19 @@ export class EidasTrustAnchor implements TrustAnchor {
           TE.chain(
             flow(
               getKeyByKid(es.kid),
-              TE.fromOption(() => new Error("Kid not found"))
-            )
-          )
-        )
+              TE.fromOption(() => new Error("Kid not found")),
+            ),
+          ),
+        ),
       ),
       TE.chain(verifyJwtSignature(jwt)),
       TE.map((decoded) => decoded.payload),
       TE.chainEitherKW(
         parse(
           EntityStatementPayload,
-          "Invalid trust anchor entity statement payload"
-        )
-      )
+          "Invalid trust anchor entity statement payload",
+        ),
+      ),
     );
 }
 
@@ -116,7 +115,7 @@ const getRequest = (fetchFunction: typeof fetch) => (url: string) =>
       response.status === 200
         ? TE.tryCatch(() => response.text(), E.toError)
         : TE.left(
-            new Error(`Invalid response from trust anchor: ${response.status}`)
-          )
-    )
+            new Error(`Invalid response from trust anchor: ${response.status}`),
+          ),
+    ),
   );

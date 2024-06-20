@@ -1,60 +1,60 @@
-import { createHash, createVerify } from "crypto";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as t from "io-ts";
+import { createHash, createVerify } from "crypto";
 import { google, playintegrity_v1 } from "googleapis";
-import { exportSPKI, importJWK } from "jose";
+import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
+import { exportSPKI, importJWK } from "jose";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
 export const GoogleAppCredentials = t.type({
-  type: NonEmptyString,
-  project_id: NonEmptyString,
-  private_key_id: NonEmptyString,
-  private_key: NonEmptyString,
+  auth_provider_x509_cert_url: NonEmptyString,
+  auth_uri: NonEmptyString,
   client_email: EmailString,
   client_id: NonEmptyString,
-  auth_uri: NonEmptyString,
-  token_uri: NonEmptyString,
-  auth_provider_x509_cert_url: NonEmptyString,
   client_x509_cert_url: NonEmptyString,
+  private_key: NonEmptyString,
+  private_key_id: NonEmptyString,
+  project_id: NonEmptyString,
+  token_uri: NonEmptyString,
+  type: NonEmptyString,
   universe_domain: NonEmptyString,
 });
 
 export type GoogleAppCredentials = t.TypeOf<typeof GoogleAppCredentials>;
 
-export type VerifyAssertionParams = {
-  integrityAssertion: NonEmptyString;
-  hardwareSignature: string;
-  clientData: string;
-  hardwareKey: JwkPublicKey;
-  bundleIdentifier: string;
-  androidPlayStoreCertificateHash: string;
-  googleAppCredentials: GoogleAppCredentials;
-  androidPlayIntegrityUrl: string;
+export interface VerifyAssertionParams {
   allowDevelopmentEnvironment: boolean;
-};
+  androidPlayIntegrityUrl: string;
+  androidPlayStoreCertificateHash: string;
+  bundleIdentifier: string;
+  clientData: string;
+  googleAppCredentials: GoogleAppCredentials;
+  hardwareKey: JwkPublicKey;
+  hardwareSignature: string;
+  integrityAssertion: NonEmptyString;
+}
 
 export const playintegrity = google.playintegrity("v1");
 
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
-    integrityAssertion,
-    hardwareSignature,
-    clientData,
-    hardwareKey,
-    bundleIdentifier,
-    androidPlayStoreCertificateHash,
-    googleAppCredentials,
-    androidPlayIntegrityUrl,
     allowDevelopmentEnvironment,
+    androidPlayIntegrityUrl,
+    androidPlayStoreCertificateHash,
+    bundleIdentifier,
+    clientData,
+    googleAppCredentials,
+    hardwareKey,
+    hardwareSignature,
+    integrityAssertion,
   } = params;
 
   // First check whether the clientData has been signed correctly with the hardware key
   const signatureValidated = validateAssertionSignature(
     hardwareKey,
     clientData,
-    hardwareSignature
+    hardwareSignature,
   );
 
   if (!signatureValidated) {
@@ -66,7 +66,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     googleAppCredentials.client_email,
     undefined,
     googleAppCredentials.private_key,
-    [androidPlayIntegrityUrl]
+    [androidPlayIntegrityUrl],
   );
 
   google.options({ auth: jwtClient });
@@ -81,7 +81,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
 
   if (!tokenPayloadExternal) {
     throw new Error(
-      "[Android Assertion] Invalid token payload from Play Integrity API response"
+      "[Android Assertion] Invalid token payload from Play Integrity API response",
     );
   }
 
@@ -90,12 +90,12 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     bundleIdentifier,
     clientData,
     allowDevelopmentEnvironment,
-    androidPlayStoreCertificateHash
+    androidPlayStoreCertificateHash,
   );
 
   if (!responseValidated) {
     throw new Error(
-      "[Android Assertion] Integrity Response did not pass validation"
+      "[Android Assertion] Integrity Response did not pass validation",
     );
   }
 };
@@ -103,7 +103,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
 export const validateAssertionSignature = async (
   hardwareKey: JwkPublicKey,
   clientData: string,
-  hardwareSignature: string
+  hardwareSignature: string,
 ) => {
   const joseHardwareKey = await importJWK(hardwareKey);
   if (!("type" in joseHardwareKey)) {
@@ -123,7 +123,7 @@ export const validateIntegrityResponse = (
   bundleIdentifier: string,
   clientData: string,
   allowDevelopmentEnvironment: boolean,
-  androidPlayStoreCertificateHash: string
+  androidPlayStoreCertificateHash: string,
 ) => {
   /**
    * 1. You must first check that the values in the requestDetails field match those of the original
@@ -139,7 +139,7 @@ export const validateIntegrityResponse = (
 
   if (requestDetails.requestPackageName !== bundleIdentifier) {
     throw new Error(
-      `The bundle identifier ${requestDetails.requestPackageName} does not match ${bundleIdentifier}.`
+      `The bundle identifier ${requestDetails.requestPackageName} does not match ${bundleIdentifier}.`,
     );
   }
 
@@ -147,7 +147,7 @@ export const validateIntegrityResponse = (
 
   if (requestDetails.requestHash !== clientDataHash) {
     throw new Error(
-      `The client data hash ${requestDetails.requestHash} does not match ${clientDataHash}.`
+      `The client data hash ${requestDetails.requestHash} does not match ${clientDataHash}.`,
     );
   }
 
@@ -177,13 +177,13 @@ export const validateIntegrityResponse = (
     appIntegrity.appRecognitionVerdict !== "PLAY_RECOGNIZED"
   ) {
     throw new Error(
-      `The app does not match the versions distributed by Google Play.`
+      `The app does not match the versions distributed by Google Play.`,
     );
   }
 
   if (appIntegrity.packageName !== bundleIdentifier) {
     throw new Error(
-      `The package name ${appIntegrity.packageName} does not match ${bundleIdentifier}.`
+      `The package name ${appIntegrity.packageName} does not match ${bundleIdentifier}.`,
     );
   }
 
@@ -197,7 +197,7 @@ export const validateIntegrityResponse = (
     certificateSha256Digest.indexOf(androidPlayStoreCertificateHash) === -1
   ) {
     throw new Error(
-      `The app certificate does not match the versions distributed by Google Play.`
+      `The app certificate does not match the versions distributed by Google Play.`,
     );
   }
 
@@ -234,7 +234,7 @@ export const validateIntegrityResponse = (
     accountDetails.appLicensingVerdict !== "LICENSED"
   ) {
     throw new Error(
-      `[Android Assertion] The user doesn't have an app entitlement.`
+      `[Android Assertion] The user doesn't have an app entitlement.`,
     );
   }
 
