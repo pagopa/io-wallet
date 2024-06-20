@@ -30,7 +30,7 @@ describe("CreateWalletInstanceHandler", () => {
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
-    batchPatchWithReplaceOperation: () => TE.right(undefined),
+    batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
     getAllByUserId: () => TE.right([]),
     insert: () => TE.right(undefined),
@@ -205,8 +205,7 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 500 HTTP response on insertWalletInstance error", async () => {
     const walletInstanceRepositoryThatFailsOnInsert: WalletInstanceRepository =
       {
-        batchPatchWithReplaceOperation: () =>
-          TE.left(new Error("not implemented")),
+        batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
@@ -242,8 +241,7 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 500 HTTP response on getAllByUserId error", async () => {
     const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
       {
-        batchPatchWithReplaceOperation: () =>
-          TE.left(new Error("not implemented")),
+        batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
         insert: () => TE.left(new Error("not implemented")),
@@ -277,11 +275,10 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on batchPatchWithReplaceOperation error", async () => {
+  it("should return a 500 HTTP response on batchPatch error", async () => {
     const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
       {
-        batchPatchWithReplaceOperation: () =>
-          TE.left(new Error("failed on batchPatch!")),
+        batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),

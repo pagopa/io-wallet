@@ -51,6 +51,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
         RTE.chainW(({ hardwareKey }) =>
           insertWalletInstance({
+            createdAt: new Date(), // side effect
             hardwareKey,
             id: walletInstanceRequest.hardwareKeyTag,
             isRevoked: false,
