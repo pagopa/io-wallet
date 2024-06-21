@@ -11,6 +11,7 @@ import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { QueueServiceClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -45,6 +46,15 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
+const queueServiceClient = new QueueServiceClient(
+  `https://ioditnwallet.queue.core.windows.net`,
+  credential,
+);
+
+const onWalletInstanceCreatedQueueClient = queueServiceClient.getQueueClient(
+  "on-wallet-instance-created",
+);
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({ cosmosClient, pdvTokenizerClient }),
@@ -70,6 +80,7 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
+    queueClient: onWalletInstanceCreatedQueueClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],

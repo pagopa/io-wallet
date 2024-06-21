@@ -17,6 +17,7 @@
     "@azure/cosmos": "^4.0.0",
     "@azure/functions": "^4.4.0",
     "@azure/identity": "^4.3.0",
+    "@azure/storage-queue": "^12.22.0",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^13.1.1",
