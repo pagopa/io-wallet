@@ -26,8 +26,26 @@ resource "azurerm_cdn_endpoint" "this" {
   }
 
   delivery_rule {
-    name  = "EnforceHTTPS"
+    name  = "WellKnownRewrite"
     order = 1
+
+    request_uri_condition {
+      operator = "BeginsWith"
+      match_values = [
+        "https://${local.cdn_hostname}/.well-known/"
+      ]
+    }
+
+    url_rewrite_action {
+      source_pattern          = "/.well-known/"
+      destination             = "/well-known/"
+      preserve_unmatched_path = true
+    }
+  }
+
+  delivery_rule {
+    name  = "EnforceHTTPS"
+    order = 2
 
     request_scheme_condition {
       operator     = "Equal"
