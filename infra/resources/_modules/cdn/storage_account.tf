@@ -22,3 +22,11 @@ resource "azurerm_storage_account" "this" {
 
   tags = var.tags
 }
+
+resource "azurerm_storage_container" "well_known" {
+  name                 = "well-known"
+  storage_account_name = azurerm_storage_account.this.name
+
+  # tfsec:ignore:azure-storage-no-public-access
+  container_access_type = "container"
+}
