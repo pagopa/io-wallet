@@ -69,7 +69,6 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 walletInstanceRequest.hardwareKeyTag,
               ),
             ),
-            // enqueue si prende tutto?
             RTE.chainW(() => enqueue(walletInstance)),
           ),
         ),
