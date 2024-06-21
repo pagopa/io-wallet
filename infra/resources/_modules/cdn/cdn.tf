@@ -32,13 +32,13 @@ resource "azurerm_cdn_endpoint" "this" {
     request_uri_condition {
       operator = "BeginsWith"
       match_values = [
-        "https://wallet.io.pagopa.it/.well-known/"
+        "https://${local.dns_name}.${local.cdn_dns_zone_name}/.well-known/"
       ]
     }
 
     url_rewrite_action {
       source_pattern          = "/.well-known/"
-      destination             = "/assets/"
+      destination             = "/well-known/"
       preserve_unmatched_path = true
     }
   }
