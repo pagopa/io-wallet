@@ -8,6 +8,7 @@ import {
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as TE from "fp-ts/TaskEither";
@@ -57,6 +58,14 @@ describe("CreateWalletInstanceHandler", () => {
     skipSignatureValidation: false,
   };
 
+  const queueClient = {
+    sendMessage: () =>
+      Promise.resolve({
+        errorCode: undefined,
+        messageId: "messageId",
+      } as QueueSendMessageResponse),
+  } as unknown as QueueClient;
+
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -72,6 +81,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository,
     });
 
@@ -95,6 +105,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository,
     });
 
@@ -124,6 +135,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository,
     });
 
@@ -155,6 +167,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository,
     });
 
@@ -188,6 +201,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
+      queueClient,
       walletInstanceRepository,
     });
 
@@ -224,6 +238,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -260,6 +275,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetAllByUserId,
     });
@@ -297,7 +313,46 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response on send message on error while sending the message to the queue", async () => {
+    const queueClientThatFailsOnSendMessage = {
+      sendMessage: () =>
+        Promise.resolve({
+          errorCode: "errorCode",
+          messageId: "messageId",
+        } as QueueSendMessageResponse),
+    } as unknown as QueueClient;
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      headers: {
+        "x-iowallet-user-id": "x-iowallet-user-id",
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationServiceConfiguration,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient: queueClientThatFailsOnSendMessage,
+      walletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({

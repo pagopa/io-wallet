@@ -16,7 +16,6 @@ class StorageQueueError extends Error {
 
 const toBase64 = flow(Buffer.from, (b) => b.toString("base64"));
 
-// vedere il fatto che torna l'id
 const sendMessage =
   (
     message: string,
