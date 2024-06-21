@@ -57,7 +57,11 @@ const onWalletInstanceCreatedQueueClient = queueServiceClient.getQueueClient(
 
 app.http("healthCheck", {
   authLevel: "anonymous",
-  handler: HealthFunction({ cosmosClient, pdvTokenizerClient }),
+  handler: HealthFunction({
+    cosmosClient,
+    pdvTokenizerClient,
+    queueClient: onWalletInstanceCreatedQueueClient,
+  }),
   methods: ["GET"],
   route: "health",
 });
