@@ -47,7 +47,7 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
 const queueServiceClient = new QueueServiceClient(
-  `https://ioditnwallet.queue.core.windows.net`,
+  config.azure.storage.walletInstances.queueServiceUrl,
   credential,
 );
 
@@ -111,7 +111,7 @@ app.timer("generateEntityConfiguration", {
   }),
   return: output.storageBlob({
     connection: "EntityConfigurationStorageAccount",
-    path: `${config.azure.storage.entityConfigurationContainerName}/openid-federation`,
+    path: `${config.azure.storage.entityConfiguration.containerName}/openid-federation`,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
