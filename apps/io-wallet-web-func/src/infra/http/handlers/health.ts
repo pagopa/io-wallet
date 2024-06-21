@@ -6,7 +6,7 @@ import { constVoid, pipe } from "fp-ts/function";
 import {
   HealthCheckError,
   getCosmosHealth,
-} from "io-wallet-common/cosmos-health-check";
+} from "io-wallet-common/azure-health-check";
 import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 
 const getHealthCheck: RTE.ReaderTaskEither<
