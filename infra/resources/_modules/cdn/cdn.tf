@@ -26,8 +26,26 @@ resource "azurerm_cdn_endpoint" "this" {
   }
 
   delivery_rule {
-    name  = "EnforceHTTPS"
+    name  = "WellKnownRewrite"
     order = 1
+
+    request_uri_condition {
+      operator = "BeginsWith"
+      match_values = [
+        "https://wallet.io.pagopa.it/.well-known/"
+      ]
+    }
+
+    url_rewrite_action {
+      source_pattern          = "/.well-known/"
+      destination             = "/assets/"
+      preserve_unmatched_path = true
+    }
+  }
+
+  delivery_rule {
+    name  = "EnforceHTTPS"
+    order = 2
 
     request_scheme_condition {
       operator     = "Equal"
