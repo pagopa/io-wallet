@@ -32,7 +32,7 @@ resource "azurerm_cdn_endpoint" "this" {
     request_uri_condition {
       operator = "BeginsWith"
       match_values = [
-        "https://${local.dns_name}.${local.cdn_dns_zone_name}/.well-known/"
+        "https://${local.cdn_hostname}/.well-known/"
       ]
     }
 
