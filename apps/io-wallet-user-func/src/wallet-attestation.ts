@@ -17,8 +17,8 @@ import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
 
 export const WalletAttestationPayload = t.type({
+  aal: t.string,
   algValueSupported: t.array(t.string),
-  attested_security_context: t.string,
   federationEntity: FederationEntity,
   iss: t.string,
   sub: t.string,
@@ -74,11 +74,8 @@ export const createWalletAttestation =
       TE.chain(({ publicJwk, supportedSignAlgorithms, trustChain }) =>
         pipe(
           {
+            aal: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
             algValueSupported: supportedSignAlgorithms,
-            attested_security_context: pipe(
-              federationEntityMetadata.basePath,
-              getLoAUri(LoA.basic),
-            ),
             federationEntity: {
               homepageUri: federationEntityMetadata.homePageUri,
               logoUri: federationEntityMetadata.logoUri,
@@ -96,7 +93,6 @@ export const createWalletAttestation =
             {
               trust_chain: trustChain,
               typ: "wallet-attestation+jwt",
-              x5c: [],
             },
             publicJwk.kid,
             "ES256",
