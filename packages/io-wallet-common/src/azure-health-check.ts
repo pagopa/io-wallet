@@ -37,6 +37,6 @@ export const getStorageQueueHealth: RTE.ReaderTaskEither<
       () => new Error("storage-queue-error"),
     ),
     TE.chain((exists) =>
-      exists ? TE.right(true) : TE.left(new Error("storage-queue-error")),
+      exists ? TE.right(true) : TE.left(new Error("storage-queue-not-found")),
     ),
   );
