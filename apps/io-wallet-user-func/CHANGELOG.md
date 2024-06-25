@@ -1,5 +1,13 @@
 # io-func-wallet-solution-backend
 
+## 0.1.13
+
+### Patch Changes
+
+- df39918: Patch
+- Updated dependencies [df39918]
+  - io-wallet-common@0.0.2
+
 ## 0.1.12
 
 ### Patch Changes
