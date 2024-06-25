@@ -1,5 +1,5 @@
 import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
-import { Container, Database } from "@azure/cosmos";
+import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
@@ -12,6 +12,34 @@ export class CosmosDbWalletInstanceRepository
 
   constructor(db: Database) {
     this.#container = db.container("wallet-instances");
+  }
+
+  batchPatch(
+    operationsInput: {
+      id: string;
+      operations: {
+        op: "add" | "incr" | "remove" | "replace" | "set";
+        path: string;
+        value: unknown;
+      }[];
+    }[],
+    userId: string,
+  ) {
+    return TE.tryCatch(
+      async () => {
+        const operations: PatchOperationInput[] = operationsInput.map(
+          ({ id, operations }) => ({
+            id,
+            operationType: "Patch",
+            resourceBody: {
+              operations,
+            },
+          }),
+        );
+        await this.#container.items.batch(operations, userId);
+      },
+      (error) => new Error(`Error updating wallet instances: ${error}`),
+    );
   }
 
   getAllByUserId(userId: WalletInstance["userId"]) {
@@ -90,6 +118,15 @@ export class CosmosDbWalletInstanceRepository
               ),
             ),
       ),
+    );
+  }
+
+  insert(walletInstance: WalletInstance) {
+    return TE.tryCatch(
+      async () => {
+        await this.#container.items.create(walletInstance);
+      },
+      (error) => new Error(`Error inserting wallet instance: ${error}`),
     );
   }
 }
