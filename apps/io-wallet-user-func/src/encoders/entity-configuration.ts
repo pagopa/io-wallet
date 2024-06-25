@@ -20,7 +20,7 @@ export const EntityConfigurationJwtModel = t.type({
       tos_uri: t.string,
     }),
     wallet_provider: t.type({
-      attested_security_context_values_supported: t.array(t.string),
+      aal_values_supported: t.array(t.string),
       grant_types_supported: t.array(t.string),
       jwks: t.type({
         keys: t.array(JwkPublicKey),
@@ -57,8 +57,7 @@ export const EntityConfigurationToJwtModel: E.Encoder<
         tos_uri: removeTrailingSlash(federationEntity.tosUri.href),
       },
       wallet_provider: {
-        attested_security_context_values_supported:
-          walletProviderMetadata.ascValues,
+        aal_values_supported: walletProviderMetadata.ascValues,
         grant_types_supported: walletProviderMetadata.grantTypesSupported,
         jwks: {
           keys: walletProviderMetadata.jwks,
