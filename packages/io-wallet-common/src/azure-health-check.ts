@@ -1,4 +1,5 @@
 import { CosmosClient } from "@azure/cosmos";
+import { QueueClient } from "@azure/storage-queue";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -21,4 +22,21 @@ export const getCosmosHealth: RTE.ReaderTaskEither<
       () => new Error("cosmos-db-error"),
     ),
     TE.map(() => true),
+  );
+
+export const getStorageQueueHealth: RTE.ReaderTaskEither<
+  {
+    queueClient: QueueClient;
+  },
+  Error,
+  true
+> = ({ queueClient }) =>
+  pipe(
+    TE.tryCatch(
+      () => queueClient.exists(),
+      () => new Error("storage-queue-error"),
+    ),
+    TE.chain((exists) =>
+      exists ? TE.right(true) : TE.left(new Error("storage-queue-not-found")),
+    ),
   );

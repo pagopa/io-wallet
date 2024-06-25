@@ -11,6 +11,7 @@ import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { QueueServiceClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -45,9 +46,22 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
+const queueServiceClient = new QueueServiceClient(
+  config.azure.storage.walletInstances.queueServiceUrl,
+  credential,
+);
+
+const onWalletInstanceCreatedQueueClient = queueServiceClient.getQueueClient(
+  "on-wallet-instance-created",
+);
+
 app.http("healthCheck", {
   authLevel: "anonymous",
-  handler: HealthFunction({ cosmosClient, pdvTokenizerClient }),
+  handler: HealthFunction({
+    cosmosClient,
+    pdvTokenizerClient,
+    queueClient: onWalletInstanceCreatedQueueClient,
+  }),
   methods: ["GET"],
   route: "health",
 });
@@ -70,6 +84,7 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
+    queueClient: onWalletInstanceCreatedQueueClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -100,7 +115,7 @@ app.timer("generateEntityConfiguration", {
   }),
   return: output.storageBlob({
     connection: "EntityConfigurationStorageAccount",
-    path: `${config.azure.storage.entityConfigurationContainerName}/openid-federation`,
+    path: `${config.azure.storage.entityConfiguration.containerName}/openid-federation`,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });

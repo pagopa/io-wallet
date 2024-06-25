@@ -3,6 +3,7 @@ import {
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
 import { CosmosClient } from "@azure/cosmos";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -13,22 +14,25 @@ import { identity, pipe } from "fp-ts/function";
 import {
   HealthCheckError,
   getCosmosHealth,
-} from "io-wallet-common/cosmos-health-check";
+  getStorageQueueHealth,
+} from "io-wallet-common/azure-health-check";
 import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
     pdvTokenizerClient: PdvTokenizerHealthCheck;
+    queueClient: QueueClient;
   },
   Error,
   void
-> = ({ cosmosClient, pdvTokenizerClient }) =>
+> = ({ cosmosClient, pdvTokenizerClient, queueClient }) =>
   // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
+      pipe({ queueClient }, getStorageQueueHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ left: errors }) =>

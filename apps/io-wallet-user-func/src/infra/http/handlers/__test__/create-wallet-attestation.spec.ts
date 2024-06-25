@@ -64,10 +64,11 @@ const attestationServiceConfiguration = {
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
-  batchPatchWithReplaceOperation: () => TE.left(new Error("not implemented")),
+  batchPatch: () => TE.left(new Error("not implemented")),
   get: () =>
     TE.right(
       O.some({
+        createdAt: new Date(),
         hardwareKey,
         id: "123" as NonEmptyString,
         isRevoked: false,
@@ -187,14 +188,15 @@ describe("CreateWalletAttestationHandler", async () => {
 
   it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
     const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
-      batchPatchWithReplaceOperation: () =>
-        TE.left(new Error("not implemented")),
+      batchPatch: () => TE.left(new Error("not implemented")),
       get: () =>
         TE.right(
           O.some({
+            createdAt: new Date(),
             hardwareKey,
             id: "123" as NonEmptyString,
             isRevoked: true,
+            revokedAt: new Date(),
             signCount: 0,
             userId: "123" as NonEmptyString,
           }),
@@ -242,8 +244,7 @@ describe("CreateWalletAttestationHandler", async () => {
 
   it("should return a 404 HTTP response when the wallet instance is not found", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
-      batchPatchWithReplaceOperation: () =>
-        TE.left(new Error("not implemented")),
+      batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
       getAllByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
