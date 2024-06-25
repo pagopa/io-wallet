@@ -88,43 +88,32 @@ export const insertWalletInstance: (
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
 
-const getAllByUserId: (
+const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
-) => RTE.ReaderTaskEither<
-  WalletInstanceEnvironment,
-  Error,
-  O.Option<WalletInstance[]>
-> =
-  (userId) =>
-  ({ walletInstanceRepository }) =>
-    walletInstanceRepository.getAllByUserId(userId);
-
-const revokeWalletInstance: (
-  userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"],
+  walletInstancesId: readonly WalletInstance["id"][],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
-  (userId, walletInstanceId) =>
+  (userId, walletInstancesId) =>
   ({ walletInstanceRepository }) =>
-    walletInstanceRepository.batchPatch(
-      [
-        {
-          id: walletInstanceId,
-          operations: [
-            {
-              op: "replace",
-              path: "/isRevoked",
-              value: true,
-            },
-            {
-              op: "add",
-              path: "/revokedAt",
-              value: new Date(),
-            },
-          ],
-        },
-      ],
-      userId,
-    );
+    walletInstancesId.length
+      ? walletInstanceRepository.batchPatch(
+          walletInstancesId.map((walletInstanceId) => ({
+            id: walletInstanceId,
+            operations: [
+              {
+                op: "replace",
+                path: "/isRevoked",
+                value: true,
+              },
+              {
+                op: "add",
+                path: "/revokedAt",
+                value: new Date(),
+              },
+            ],
+          })),
+          userId,
+        )
+      : TE.right(void 0);
 
 const getUserWalletInstancesIdExceptOne: (
   userId: WalletInstance["userId"],
@@ -133,38 +122,24 @@ const getUserWalletInstancesIdExceptOne: (
   WalletInstanceEnvironment,
   Error,
   readonly WalletInstance["id"][]
-> = (userId, walletInstanceId) =>
-  pipe(
-    getAllByUserId(userId),
-    RTE.map(
-      O.fold(
-        () => [],
-        flow(
-          RA.filterMap((walletInstance) =>
-            walletInstance.id !== walletInstanceId
-              ? O.some(walletInstance.id)
-              : O.none,
+> =
+  (userId, walletInstanceId) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      walletInstanceRepository.getAllByUserId(userId),
+      TE.map(
+        O.fold(
+          () => [],
+          flow(
+            RA.filterMap((walletInstance) =>
+              walletInstance.id !== walletInstanceId
+                ? O.some(walletInstance.id)
+                : O.none,
+            ),
           ),
         ),
       ),
-    ),
-  );
-
-const revokeUserWalletInstances: (
-  userId: WalletInstance["userId"],
-  walletInstancesId: readonly WalletInstance["id"][],
-) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
-  userId,
-  walletInstancesId,
-) =>
-  walletInstancesId.length
-    ? pipe(
-        RA.sequence(RTE.ApplicativePar)(
-          walletInstancesId.map((id) => revokeWalletInstance(id, userId)),
-        ),
-        RTE.map(() => void 0),
-      )
-    : RTE.right(void 0);
+    );
 
 export const revokeUserWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
