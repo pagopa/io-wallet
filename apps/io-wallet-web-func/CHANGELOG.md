@@ -1,5 +1,11 @@
 # io-wallet-web-func
 
+## 0.0.3
+
+### Patch Changes
+
+- feeea6f: Patch
+
 ## 0.0.2
 
 ### Patch Changes
