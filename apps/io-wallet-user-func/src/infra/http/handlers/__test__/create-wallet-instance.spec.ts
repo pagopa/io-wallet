@@ -11,6 +11,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
@@ -33,7 +34,7 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getAllByUserId: () => TE.right([]),
+    getAllByUserId: () => TE.right(O.some([])),
     insert: () => TE.right(undefined),
   };
 

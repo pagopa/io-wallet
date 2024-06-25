@@ -7,5 +7,6 @@
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
     "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
+    "StorageAccount__queueServiceUri": "STORAGE_ACCOUNT__QUEUE_SERVICE_URI"
   }
 }

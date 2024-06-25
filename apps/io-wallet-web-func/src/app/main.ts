@@ -1,6 +1,8 @@
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { WalletInstanceValid } from "@/wallet-instance";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -43,4 +45,13 @@ app.http("getCurrentWalletInstanceStatus", {
   handler: GetCurrentWalletInstanceStatusFunction({ walletInstanceRepository }),
   methods: ["GET"],
   route: "wallet-instances/current/status",
+});
+
+app.storageQueue("createWalletInstance", {
+  connection: "StorageAccount",
+  handler: CreateWalletInstanceFunction({
+    inputDecoder: WalletInstanceValid,
+    walletInstanceRepository,
+  }),
+  queueName: "on-wallet-instance-created",
 });

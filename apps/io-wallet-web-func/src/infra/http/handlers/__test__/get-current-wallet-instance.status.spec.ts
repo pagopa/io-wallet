@@ -15,6 +15,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
+    batchPatch: () => TE.left(new Error("not implemented")),
     getAllByUserId: () => TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
@@ -32,6 +33,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
           userId: "123" as NonEmptyString,
         }),
       ),
+    insert: () => TE.left(new Error("not implemented")),
   };
 
   it("should return a 200 HTTP response on success", async () => {
@@ -87,8 +89,10 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
   it("should return a 404 HTTP response when no wallet instances is found", async () => {
     const walletInstanceRepository: WalletInstanceRepository = {
+      batchPatch: () => TE.left(new Error("not implemented")),
       getAllByUserId: () => TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.right(O.none),
+      insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -142,8 +146,10 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   it("should return a 500 HTTP response on getLastByUserId error", async () => {
     const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
       {
+        batchPatch: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
+        insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
