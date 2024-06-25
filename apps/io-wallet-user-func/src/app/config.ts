@@ -58,7 +58,12 @@ const AzureConfiguration = t.type({
     dbName: t.string,
     endpoint: t.string,
   }),
-  storage: t.type({ entityConfigurationContainerName: t.string }),
+  storage: t.type({
+    entityConfiguration: t.type({ containerName: t.string }),
+    walletInstances: t.type({
+      queueServiceUrl: t.string,
+    }),
+  }),
 });
 
 type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
@@ -221,20 +226,28 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
+    walletInstancesStorageQueueServiceUrl: readFromEnvironment(
+      "WalletInstancesStorageQueueServiceUrl",
+    ),
   }),
   RE.map(
     ({
       cosmosDbDatabaseName,
       cosmosDbEndpoint,
       entityConfigurationStorageContainerName,
+      walletInstancesStorageQueueServiceUrl,
     }) => ({
       cosmos: {
         dbName: cosmosDbDatabaseName,
         endpoint: cosmosDbEndpoint,
       },
       storage: {
-        entityConfigurationContainerName:
-          entityConfigurationStorageContainerName,
+        entityConfiguration: {
+          containerName: entityConfigurationStorageContainerName,
+        },
+        walletInstances: {
+          queueServiceUrl: walletInstancesStorageQueueServiceUrl,
+        },
       },
     }),
   ),

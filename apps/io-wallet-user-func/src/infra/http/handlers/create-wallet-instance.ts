@@ -12,6 +12,7 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
+import { enqueue } from "io-wallet-common/storage-queue";
 
 import { requireUser } from "./utils";
 
@@ -49,19 +50,26 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
-        RTE.chainW(({ hardwareKey }) =>
-          insertWalletInstance({
+        RTE.bind("walletInstance", ({ hardwareKey }) =>
+          RTE.right({
+            createdAt: new Date(),
             hardwareKey,
             id: walletInstanceRequest.hardwareKeyTag,
-            isRevoked: false,
+            isRevoked: false as const,
             signCount: 0,
             userId: user.id,
           }),
         ),
-        RTE.chainW(() =>
-          revokeUserWalletInstancesExceptOne(
-            user.id,
-            walletInstanceRequest.hardwareKeyTag,
+        RTE.chainW(({ walletInstance }) =>
+          pipe(
+            insertWalletInstance(walletInstance),
+            RTE.chainW(() =>
+              revokeUserWalletInstancesExceptOne(
+                user.id,
+                walletInstanceRequest.hardwareKeyTag,
+              ),
+            ),
+            RTE.chainW(() => enqueue(walletInstance)),
           ),
         ),
       ),
