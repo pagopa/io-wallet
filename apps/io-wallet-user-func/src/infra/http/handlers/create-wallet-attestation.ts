@@ -12,8 +12,8 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 
+import { logErrorAndReturnResponse } from "../response";
 import { requireUser, successJwt } from "./utils";
 
 const WalletAttestationRequestPayload = t.type({

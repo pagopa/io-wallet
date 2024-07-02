@@ -2,10 +2,10 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
+import { JwkPublicKey } from "./jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 

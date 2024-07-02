@@ -1,3 +1,9 @@
+import { AttestationServiceConfiguration } from "@/app/config";
+import {
+  AttestationService,
+  ValidateAssertionRequest,
+  ValidatedAttestation,
+} from "@/attestation-service";
 import { ValidationError } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
@@ -9,12 +15,6 @@ import { identity, pipe } from "fp-ts/function";
 import { Separated } from "fp-ts/lib/Separated";
 import { calculateJwkThumbprint } from "jose";
 
-import { AttestationServiceConfiguration } from "../../app/config";
-import {
-  AttestationService,
-  ValidateAssertionRequest,
-  ValidatedAttestation,
-} from "../../attestation-service";
 import {
   validateAndroidAssertion,
   validateAndroidAttestation,

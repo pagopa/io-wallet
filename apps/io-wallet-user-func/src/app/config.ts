@@ -1,10 +1,10 @@
+import { readFromEnvironment } from "@/infra/env";
+import { Jwk, fromBase64ToJwks } from "@/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
-import { readFromEnvironment } from "io-wallet-common/env";
-import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
 
@@ -60,9 +60,6 @@ const AzureConfiguration = t.type({
   }),
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
-    walletInstances: t.type({
-      queueServiceUrl: t.string,
-    }),
   }),
 });
 
@@ -226,16 +223,12 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
-    walletInstancesStorageQueueServiceUrl: readFromEnvironment(
-      "WalletInstancesStorageQueueServiceUrl",
-    ),
   }),
   RE.map(
     ({
       cosmosDbDatabaseName,
       cosmosDbEndpoint,
       entityConfigurationStorageContainerName,
-      walletInstancesStorageQueueServiceUrl,
     }) => ({
       cosmos: {
         dbName: cosmosDbDatabaseName,
@@ -244,9 +237,6 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       storage: {
         entityConfiguration: {
           containerName: entityConfigurationStorageContainerName,
-        },
-        walletInstances: {
-          queueServiceUrl: walletInstancesStorageQueueServiceUrl,
         },
       },
     }),
