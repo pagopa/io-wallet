@@ -30,7 +30,6 @@
     "PdvTokenizerApiKey": "PDV_TOKENIZER_API_KEY",
     "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID",
     "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI",
-    "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
-    "WalletInstancesStorageQueueServiceUrl: "WALLET_INSTANCES_STORAGE_QUEUE_SERVICE_URL"
+    "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME"
   }
 }

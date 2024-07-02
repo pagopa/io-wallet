@@ -107,6 +107,46 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
+  getLastByUserId(userId: WalletInstance["userId"]) {
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          const { resources: items } = await this.#container.items
+            .query({
+              parameters: [
+                {
+                  name: "@partitionKey",
+                  value: userId,
+                },
+              ],
+              query:
+                "SELECT TOP 1 * FROM c WHERE c.userId = @partitionKey ORDER BY c.createdAt DESC",
+            })
+            .fetchAll();
+          return items;
+        },
+        (error) =>
+          new Error(`Error getting wallet instances by user id: ${error}`),
+      ),
+      TE.chain((walletInstances) =>
+        !walletInstances.length
+          ? TE.right(O.none)
+          : pipe(
+              walletInstances,
+              t.array(WalletInstance).decode,
+              TE.fromEither,
+              TE.map((walletInstances) => O.some(walletInstances[0])),
+              TE.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting last wallet instance: invalid result format",
+                  ),
+              ),
+            ),
+      ),
+    );
+  }
+
   insert(walletInstance: WalletInstance) {
     return TE.tryCatch(
       async () => {

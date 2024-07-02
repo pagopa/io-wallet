@@ -3,7 +3,7 @@ import {
   JwkPublicKey,
   fromBase64ToJwks,
   validateJwkKid,
-} from "io-wallet-common/jwk";
+} from "@/jwk";
 import { describe, expect, it } from "vitest";
 
 const publicRsaKey = {

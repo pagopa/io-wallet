@@ -3,15 +3,16 @@ import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-in
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
+import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
-import { QueueServiceClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -46,21 +47,11 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const queueServiceClient = new QueueServiceClient(
-  config.azure.storage.walletInstances.queueServiceUrl,
-  credential,
-);
-
-const onWalletInstanceCreatedQueueClient = queueServiceClient.getQueueClient(
-  "on-wallet-instance-created",
-);
-
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
     pdvTokenizerClient,
-    queueClient: onWalletInstanceCreatedQueueClient,
   }),
   methods: ["GET"],
   route: "health",
@@ -84,7 +75,6 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
-    queueClient: onWalletInstanceCreatedQueueClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -118,4 +108,24 @@ app.timer("generateEntityConfiguration", {
     path: `${config.azure.storage.entityConfiguration.containerName}/openid-federation`,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
+});
+
+app.http("getCurrentWalletInstanceStatus", {
+  authLevel: "function",
+  handler: GetCurrentWalletInstanceStatusFunction({
+    userRepository: pdvTokenizerClient,
+    walletInstanceRepository,
+  }),
+  methods: ["GET"],
+  route: "wallet-instances/current/status",
+});
+
+app.http("setWalletInstanceStatus", {
+  authLevel: "function",
+  handler: SetWalletInstanceStatusFunction({
+    userRepository: pdvTokenizerClient,
+    walletInstanceRepository,
+  }),
+  methods: ["PUT"],
+  route: "wallet-instances/{id}/status",
 });

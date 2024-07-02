@@ -11,9 +11,8 @@ import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
-import { enqueue } from "io-wallet-common/storage-queue";
 
+import { logErrorAndReturnResponse } from "../response";
 import { requireUser } from "./utils";
 
 const WalletInstanceRequestPayload = t.type({
@@ -69,7 +68,6 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 walletInstanceRequest.hardwareKeyTag,
               ),
             ),
-            RTE.chainW(() => enqueue(walletInstance)),
           ),
         ),
       ),

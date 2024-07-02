@@ -1,5 +1,5 @@
 import { CryptoSigner } from "@/infra/crypto/signer";
-import { ECKey, ECPrivateKey } from "io-wallet-common/jwk";
+import { ECKey, ECPrivateKey } from "@/jwk";
 
 export const publicEcKey = {
   crv: "P-256",

@@ -1,3 +1,4 @@
+import { JwkPublicKey } from "@/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode } from "cbor-x";
@@ -6,7 +7,6 @@ import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
-import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { ValidatedAttestation } from "../../../attestation-service";
 import { verifyAssertion } from "./assertion";

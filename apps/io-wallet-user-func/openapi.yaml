@@ -17,7 +17,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/NonceDetailView"
         "500":
-          $ref: "#/components/responses/Unexpected"
+          $ref: "#/components/responses/InternalServerError"
 
   /users:
     post:
@@ -39,7 +39,7 @@ paths:
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
-          $ref: "#/components/responses/Unexpected"
+          $ref: "#/components/responses/InternalServerError"
 
   /wallet-instances:
     post:
@@ -63,7 +63,7 @@ paths:
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
-          $ref: "#/components/responses/Unexpected"
+          $ref: "#/components/responses/InternalServerError"
 
   /token:
     description: This is a token endpoint (as defined in RFC 7523 section 4)
@@ -98,7 +98,58 @@ paths:
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
-          $ref: "#/components/responses/Unexpected"
+          $ref: "#/components/responses/InternalServerError"
+
+  /wallet-instances/current/status:
+    get:
+      summary: Retrieve the current Wallet Instance status
+      description: Retrieve the current Wallet Instance status
+      operationId: getCurrentWalletInstanceStatus
+      responses:
+        "200":
+          description: Wallet Instance status successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletData"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /wallet-instances/{id}/status:
+    put:
+      summary: Revoke a Wallet Instance
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: |
+        Revoke the Wallet Instance associated with the authenticated user. 
+        If the Wallet Instance is already revoked, the operation succeed.
+      operationId: setWalletInstanceStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetWalletInstanceStatusData"
+      responses:
+        "204":
+          description: Wallet Instance status successfully set
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /health:
     get:
@@ -115,7 +166,7 @@ paths:
                   message:
                     type: string
         "500":
-          $ref: "#/components/responses/Unexpected"
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   securitySchemes:
@@ -130,30 +181,61 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProblemDetail"
+            $ref: "#/components/schemas/ProblemJson"
+
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
 
     NotFound:
       description: The specified resource was not found
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProblemDetail"
+            $ref: "#/components/schemas/ProblemJson"
 
     UnprocessableContent:
       description: Unprocessable Content
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProblemDetail"
+            $ref: "#/components/schemas/ProblemJson"
 
-    Unexpected:
-      description: Unexpected error
+    InternalServerError:
+      description: Internal Server Error
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProblemDetail"
+            $ref: "#/components/schemas/ProblemJson"
 
   schemas:
+    SetWalletInstanceStatusData:
+      type: string
+      enum: ["REVOKED"]
+
+    WalletData:
+      description: |-
+        Describes the status of the wallet.
+      type: object
+      properties:
+        id:
+          type: string
+        is_revoked:
+          type: boolean
+      required:
+        - id
+        - is_revoked
+
     NonceDetailView:
       type: object
       properties:
@@ -215,7 +297,7 @@ components:
       required:
         - id
 
-    ProblemDetail:
+    ProblemJson:
       type: object
       properties:
         type:
