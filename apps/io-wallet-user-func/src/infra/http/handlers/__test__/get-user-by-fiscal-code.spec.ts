@@ -1,4 +1,8 @@
-import { UserRepository } from "@/user";
+import {
+  SubscriptionStateEnum,
+  UserRepository,
+  UserTrialSubscriptionRepository,
+} from "@/user";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -13,6 +17,17 @@ describe("GetUserByFiscalCodeHandler", () => {
     getOrCreateUserByFiscalCode: () =>
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
+
+  // test di quando questa va in errore
+  const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+    getUserSubscriptionDetail: () =>
+      TE.right({
+        state: SubscriptionStateEnum["ACTIVE"],
+      }),
+  };
+
+  // TODO
+  const trialSystemFeatureFlag = "true";
 
   const logger = {
     format: L.format.simple,
@@ -31,7 +46,9 @@ describe("GetUserByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -58,7 +75,9 @@ describe("GetUserByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -89,7 +108,9 @@ describe("GetUserByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository: userRepositoryThatFailsOnGetUserByFiscalCode,
+      userTrialSubscriptionRepository,
     });
 
     await expect(handler()).resolves.toEqual({

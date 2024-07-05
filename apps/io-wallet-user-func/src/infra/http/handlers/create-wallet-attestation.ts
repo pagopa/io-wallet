@@ -39,8 +39,8 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
 
 export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(TE.ApplicativePar)({
-      user: pipe(req, requireUser, TE.fromEither),
+    sequenceS(RTE.ApplicativePar)({
+      user: pipe(req, requireUser),
       walletAttestationRequest: pipe(
         req,
         requireWalletAttestationRequest,
@@ -48,10 +48,10 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
         TE.chain((payload) =>
           pipe(payload.assertion, verifyWalletAttestationRequest),
         ),
+        RTE.fromTaskEither,
       ),
     }),
-    RTE.fromTaskEither,
-    RTE.chain(({ user, walletAttestationRequest }) =>
+    RTE.chainW(({ user, walletAttestationRequest }) =>
       pipe(
         consumeNonce(walletAttestationRequest.payload.challenge),
         RTE.chainW(() =>

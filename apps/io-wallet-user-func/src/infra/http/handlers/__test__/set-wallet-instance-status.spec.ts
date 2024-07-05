@@ -1,5 +1,10 @@
 /* eslint-disable max-lines-per-function */
-import { UserRepository } from "@/user";
+import { JwtValidate } from "@/jwt-validator";
+import {
+  SubscriptionStateEnum,
+  UserRepository,
+  UserTrialSubscriptionRepository,
+} from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -24,6 +29,22 @@ describe("SetWalletInstanceStatusHandler", () => {
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
 
+  const hslValidate: JwtValidate = () =>
+    TE.right({
+      fiscal_number: "AAACCC94D55H501P",
+    });
+
+  // test di quando questa va in errore
+  const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+    getUserSubscriptionDetail: () =>
+      TE.right({
+        state: SubscriptionStateEnum["ACTIVE"],
+      }),
+  };
+
+  // TODO
+  const trialSystemFeatureFlag = "true";
+
   const logger = {
     format: L.format.simple,
     log: () => () => void 0,
@@ -34,8 +55,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       ...H.request("https://wallet-provider.example.org/"),
       body: "REVOKED",
       headers: {
-        authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXNjYWxfbnVtYmVyIjoiQUFBQkJCOTRENTVINTAxUCIsImlhdCI6MTcxOTkyMzkwOSwiZXhwIjoxNzE5OTI3NTA5fQ.TvNm1IBz0PCXxZXBcNvXWvpeX1tJANNciaaEpW-kuTk",
+        authorization: "Bearer xxx",
       },
       method: "PUT",
       path: {
@@ -43,10 +63,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -68,10 +91,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -99,10 +125,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -130,10 +159,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -149,12 +181,16 @@ describe("SetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 422 HTTP response when token does not contain `fiscal_number`", async () => {
+    const hslValidate: JwtValidate = () =>
+      TE.right({
+        foo: "AAACCC94D55H501P",
+      });
+
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: "REVOKED",
       headers: {
-        authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJBQUFCQkI5NEQ1NUg1MDFQIiwiaWF0IjoxNzE5OTI0ODQ4LCJleHAiOjE3MTk5Mjg0NDh9.r1vTZCa6emHK84-IT56QAb4p6-hOmI5R7v5Qdc8oyv8",
+        authorization: "Bearer xxx",
       },
       method: "PUT",
       path: {
@@ -162,10 +198,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -185,7 +224,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       ...H.request("https://wallet-provider.example.org"),
       body: "revoked",
       headers: {
-        authorization: "authorization",
+        authorization: "Bearer xxx",
       },
       method: "PUT",
       path: {
@@ -193,10 +232,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -230,10 +272,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository: userRepositoryThatFailsOnGetUser,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -270,10 +315,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      hslValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      trialSystemFeatureFlag,
       userRepository,
+      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
@@ -287,4 +335,81 @@ describe("SetWalletInstanceStatusHandler", () => {
       }),
     });
   });
+
+  it("should return a 500 HTTP response on hslValidate error", async () => {
+    const hslValidateThatFails: JwtValidate = () =>
+      TE.left(new Error("failed on jwtValidationAndDecode!"));
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org/"),
+      body: "REVOKED",
+      headers: {
+        authorization: "Bearer xxx",
+      },
+      method: "PUT",
+      path: {
+        id: "foo",
+      },
+    };
+    const handler = SetWalletInstanceStatusHandler({
+      hslValidate: hslValidateThatFails,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      trialSystemFeatureFlag,
+      userRepository,
+      userTrialSubscriptionRepository,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  // it("should return a 500 HTTP response on jwtValidationAndDecode error", async () => {
+  //   const hslJwtValidationThatFailsOnHslIntrospect: HslJwtValidation = {
+  //     introspectHslJwtValidation: () =>
+  //       TE.left(new Error("failed on introspectHslJwtValidation!")),
+  //     jwtValidationAndDecode: () =>
+  //       TE.right({
+  //         fiscal_number: "AAACCC94D55H501P",
+  //       }),
+  //   };
+  //   const req = {
+  //     ...H.request("https://wallet-provider.example.org/"),
+  //     body: "REVOKED",
+  //     headers: {
+  //       authorization: "Bearer xxx",
+  //     },
+  //     method: "PUT",
+  //     path: {
+  //       id: "foo",
+  //     },
+  //   };
+  //   const handler = SetWalletInstanceStatusHandler({
+  //     hslJwtValidation: hslJwtValidationThatFailsOnHslIntrospect,
+  //     input: req,
+  //     inputDecoder: H.HttpRequest,
+  //     logger,
+  //     userRepository,
+  //     walletInstanceRepository,
+  //   });
+
+  //   await expect(handler()).resolves.toEqual({
+  //     _tag: "Right",
+  //     right: expect.objectContaining({
+  //       headers: expect.objectContaining({
+  //         "Content-Type": "application/problem+json",
+  //       }),
+  //       statusCode: 500,
+  //     }),
+  //   });
+  // });
 });

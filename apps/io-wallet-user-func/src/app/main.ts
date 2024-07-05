@@ -9,7 +9,9 @@ import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { validate } from "@/infra/jwt-validator";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
+import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -34,6 +36,9 @@ const credential = new DefaultAzureCredential();
 
 const cosmosClient = new CosmosClient({
   aadCredentials: credential,
+  connectionPolicy: {
+    requestTimeout: 3000, // TODO: check this timeout
+  },
   endpoint: config.azure.cosmos.endpoint,
 });
 
@@ -47,11 +52,18 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
+const hslValidate = validate(config.hubSpidLogin);
+
+const trialSystemClient = new TrialSystemClient(config.trialSystem);
+
+const trialSystemFeatureFlag = config.trialSystem.featureFlag;
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
     pdvTokenizerClient,
+    trialSystemClient, // ff
   }),
   methods: ["GET"],
   route: "health",
@@ -64,6 +76,8 @@ app.http("createWalletAttestation", {
     federationEntityMetadata: config.federationEntity,
     nonceRepository,
     signer,
+    trialSystemFeatureFlag, // in client?
+    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -75,6 +89,8 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
+    trialSystemFeatureFlag,
+    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -91,7 +107,9 @@ app.http("getNonce", {
 app.http("getUserByFiscalCode", {
   authLevel: "function",
   handler: GetUserByFiscalCodeFunction({
+    trialSystemFeatureFlag,
     userRepository: pdvTokenizerClient,
+    userTrialSubscriptionRepository: trialSystemClient,
   }),
   methods: ["POST"],
   route: "users",
@@ -113,7 +131,10 @@ app.timer("generateEntityConfiguration", {
 app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceStatusFunction({
+    hslValidate,
+    trialSystemFeatureFlag,
     userRepository: pdvTokenizerClient,
+    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["GET"],
@@ -123,7 +144,10 @@ app.http("getCurrentWalletInstanceStatus", {
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
   handler: SetWalletInstanceStatusFunction({
+    hslValidate,
+    trialSystemFeatureFlag,
     userRepository: pdvTokenizerClient,
+    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["PUT"],

@@ -40,12 +40,15 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(E.Apply)({
+    sequenceS(RTE.ApplyPar)({
       user: requireUser(req),
-      walletInstanceRequest: requireWalletInstanceRequest(req),
+      walletInstanceRequest: pipe(
+        req,
+        requireWalletInstanceRequest,
+        RTE.fromEither,
+      ),
     }),
-    RTE.fromEither,
-    RTE.chain(({ user, walletInstanceRequest }) =>
+    RTE.chainW(({ user, walletInstanceRequest }) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),

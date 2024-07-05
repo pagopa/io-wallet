@@ -1,6 +1,8 @@
 import { readFromEnvironment } from "@/infra/env";
 import { Jwk, fromBase64ToJwks } from "@/jwk";
 import { parse } from "@pagopa/handler-kit";
+import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -75,12 +77,33 @@ export type PdvTokenizerApiClientConfig = t.TypeOf<
   typeof PdvTokenizerApiClientConfig
 >;
 
+const HubSpidLoginConfig = t.type({
+  clientBaseUrl: NonEmptyString,
+  jwtIssuer: NonEmptyString,
+  jwtPubKey: NonEmptyString,
+});
+
+export type HubSpidLoginConfig = t.TypeOf<typeof HubSpidLoginConfig>;
+
+const TrialSystemApiClientConfig = t.type({
+  apiKey: t.string,
+  baseURL: t.string,
+  featureFlag: t.string,
+  trialId: t.string,
+});
+
+export type TrialSystemApiClientConfig = t.TypeOf<
+  typeof TrialSystemApiClientConfig
+>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfiguration,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
+  hubSpidLogin: HubSpidLoginConfig,
   pdvTokenizer: PdvTokenizerApiClientConfig,
+  trialSystem: TrialSystemApiClientConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -99,19 +122,25 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   ),
   RE.bind("azure", () => getAzureConfigFromEnvironment),
   RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
+  RE.bind("hubSpidLogin", () => getHubSpidLoginConfigFromEnvironment),
+  RE.bind("trialSystem", () => getTrialSystemConfigFromEnvironment),
   RE.map(
     ({
       attestationService,
       azure,
       crypto,
       federationEntity,
+      hubSpidLogin,
       pdvTokenizer,
+      trialSystem,
     }) => ({
       attestationService,
       azure,
       crypto,
       federationEntity,
+      hubSpidLogin,
       pdvTokenizer,
+      trialSystem,
     }),
   ),
 );
@@ -258,6 +287,62 @@ const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
       apiKey: pdvTokenizerApiKey,
       baseURL: pdvTokenizerApiBaseURL,
       testUUID: pdvTokenizerTestUUID,
+    }),
+  ),
+);
+
+const getHubSpidLoginConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  HubSpidLoginConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    hubSpidLoginClientBaseUrl: readFromEnvironment("HubSpidLoginClientBaseUrl"),
+    hubSpidLoginJwtIssuer: readFromEnvironment("HubSpidLoginJwtIssuer"),
+    hubSpidLoginJwtPubKey: readFromEnvironment("HubSpidLoginJwtPubKey"),
+  }),
+  RE.map(
+    ({
+      hubSpidLoginClientBaseUrl,
+      hubSpidLoginJwtIssuer,
+      hubSpidLoginJwtPubKey,
+    }) => ({
+      clientBaseUrl: hubSpidLoginClientBaseUrl,
+      jwtIssuer: hubSpidLoginJwtIssuer,
+      jwtPubKey: hubSpidLoginJwtPubKey,
+    }),
+  ),
+  RE.chainW((result) =>
+    pipe(
+      HubSpidLoginConfig.decode(result),
+      RE.fromEither,
+      RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
+    ),
+  ),
+);
+
+const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  TrialSystemApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    trialSystemApiBaseURL: readFromEnvironment("TrialSystemApiBaseURL"),
+    trialSystemApiKey: readFromEnvironment("TrialSystemApiKey"),
+    trialSystemFeatureFlag: readFromEnvironment("TrialSystemFeatureFlag"),
+    trialSystemTrialId: readFromEnvironment("TrialSystemTrialId"),
+  }),
+  RE.map(
+    ({
+      trialSystemApiBaseURL,
+      trialSystemApiKey,
+      trialSystemFeatureFlag,
+      trialSystemTrialId,
+    }) => ({
+      apiKey: trialSystemApiKey,
+      baseURL: trialSystemApiBaseURL,
+      featureFlag: trialSystemFeatureFlag,
+      trialId: trialSystemTrialId,
     }),
   ),
 );

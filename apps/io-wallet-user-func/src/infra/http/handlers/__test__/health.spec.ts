@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
+import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -19,13 +20,18 @@ describe("HealthHandler", () => {
     getDatabaseAccount: () => Promise.reject(new Error("foo")),
   } as CosmosClient;
 
-  const pdvTokenizerClient = {
+  const pdvTokenizerClient: PdvTokenizerHealthCheck = {
     healthCheck: () => TE.right(true),
-  } as PdvTokenizerHealthCheck;
+  };
 
-  const pdvTokenizerClientThatFails = {
+  const pdvTokenizerClientThatFails: PdvTokenizerHealthCheck = {
     healthCheck: () => TE.left(new Error("pdv-tokenizer-error")),
-  } as PdvTokenizerHealthCheck;
+  };
+
+  // test di quando questa va in errore
+  const trialSystemClient: TrialSystemHealthCheck = {
+    healthCheck: () => TE.right(true),
+  };
 
   const logger = {
     format: L.format.simple,
@@ -39,6 +45,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient,
+      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -62,6 +69,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient,
+      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -87,6 +95,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
+      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -112,6 +121,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
+      trialSystemClient,
     });
 
     const result = await handler();

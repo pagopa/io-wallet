@@ -7,6 +7,20 @@ export class EntityNotFoundError extends Error {
   name = "EntityNotFoundError";
 }
 
+// posizione
+export class UnauthorizedError extends Error {
+  name = "UnauthorizedError";
+  constructor() {
+    super("You are not authorized to perform this operation");
+  }
+}
+
+// non mi piace il HttpUnauthorizedError che è in handler-kit
+export class HttpUnauthorizedError extends H.HttpError {
+  status = 401 as const;
+  title = "Unauthorized";
+}
+
 // Encode domain errors to http errors
 const toHttpError = (e: Error): Error => {
   if (e.name === "HttpError") {
@@ -19,6 +33,8 @@ const toHttpError = (e: Error): Error => {
       return new H.HttpError(e.message);
     case "WalletInstanceRevoked":
       return new H.HttpForbiddenError(e.message);
+    case "UnauthorizedError":
+      return new HttpUnauthorizedError(e.message);
   }
   return e;
 };

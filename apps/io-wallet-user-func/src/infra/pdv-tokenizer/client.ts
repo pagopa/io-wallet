@@ -109,8 +109,8 @@ export class PdvTokenizerClient
     this.#options = {
       headers: {
         Accept: "application/json, text/plain",
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
+        // "Content-Type": "application/json", // TODO
+        "x-api-key": apiKey, // autenticazione health check
       },
     };
     this.#testUUID = testUUID;

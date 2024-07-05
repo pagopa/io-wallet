@@ -3,6 +3,10 @@ import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
+import {
+  TrialSystemHealthCheck,
+  getTrialSystemHealth,
+} from "@/infra/trial-system/health-check";
 import { CosmosClient } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
 import * as O from "fp-ts/Option";
@@ -25,15 +29,17 @@ const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
     pdvTokenizerClient: PdvTokenizerHealthCheck;
+    trialSystemClient: TrialSystemHealthCheck;
   },
   Error,
   void
-> = ({ cosmosClient, pdvTokenizerClient }) =>
+> = ({ cosmosClient, pdvTokenizerClient, trialSystemClient }) =>
   // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
+      pipe({ trialSystemClient }, getTrialSystemHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ left: errors }) =>

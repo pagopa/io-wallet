@@ -9,7 +9,7 @@ import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
 import { logErrorAndReturnResponse } from "../response";
-import { requireUser } from "./token-auth";
+import { foo } from "./token-auth";
 
 const requireWalletInstanceId: (
   req: H.HttpRequest,
@@ -34,7 +34,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
       body: pipe(req, requireSetWalletInstanceStatusBody, RTE.fromEither),
-      userId: pipe(req, requireUser),
+      userId: pipe(req, foo),
       walletInstanceId: pipe(req, requireWalletInstanceId, RTE.fromEither),
     }),
     RTE.chainFirstW(({ userId, walletInstanceId }) =>

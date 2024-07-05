@@ -1,8 +1,16 @@
-import { User } from "@/user";
+import { Config } from "@/app/config";
+import {
+  User,
+  UserTrialSubscriptionEnvironment,
+  checkUserSubscription,
+} from "@/user";
 import * as H from "@pagopa/handler-kit";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import { lookup } from "fp-ts/Record";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
+
+import { UnauthorizedError } from "../response";
 
 export const successEntityStatementJwt = flow(
   H.success,
@@ -29,9 +37,20 @@ const requireUserId = (req: H.HttpRequest) =>
     ),
   );
 
-export const requireUser: (
-  req: H.HttpRequest,
-) => E.Either<H.HttpBadRequestError | H.ValidationError, User> = flow(
+export const requireUser: (req: H.HttpRequest) => RTE.ReaderTaskEither<
+  {
+    trialSystemFeatureFlag: Config["trialSystem"]["featureFlag"]; // mettere un tipo da esportare in user?
+  } & UserTrialSubscriptionEnvironment,
+  Error | H.HttpBadRequestError | H.ValidationError | UnauthorizedError, // TODO
+  User
+> = flow(
   requireUserId,
   E.map((id) => ({ id })),
+  RTE.fromEither,
+  RTE.chainFirstW(
+    flow(
+      checkUserSubscription,
+      RTE.mapLeft(() => new UnauthorizedError()),
+    ),
+  ),
 );
