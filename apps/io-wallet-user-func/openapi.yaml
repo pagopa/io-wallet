@@ -2,13 +2,15 @@ openapi: 3.0.3
 info:
   title: IO Wallet - User API
   version: 1.0.0
-security:
-  - FunctionsKey: []
+servers:
+  - url: https://io-p-itn-wallet-user-func-01.azurewebsites.net/api/v1/wallet
 paths:
   /nonce:
     get:
       operationId: getNonce
       summary: Returns a randomly generated nonce
+      security:
+        - FunctionsKey: []
       responses:
         "200":
           description: Nonce successfully generated
@@ -23,6 +25,8 @@ paths:
     post:
       operationId: getUserByFiscalCode
       summary: Returns the user given the fiscal code
+      security:
+        - FunctionsKey: []
       requestBody:
         required: true
         content:
@@ -45,6 +49,8 @@ paths:
     post:
       operationId: createWalletInstance
       summary: Create a wallet instance
+      security:
+        - FunctionsKey: []
       parameters:
         - in: header
           name: x-iowallet-user-id
@@ -70,6 +76,8 @@ paths:
     post:
       operationId: createWalletAttestation
       summary: Create and return a Wallet Attestation
+      security:
+        - FunctionsKey: []
       parameters:
         - in: header
           name: x-iowallet-user-id
@@ -103,8 +111,10 @@ paths:
   /wallet-instances/current/status:
     get:
       summary: Retrieve the current Wallet Instance status
-      description: Retrieve the current Wallet Instance status
       operationId: getCurrentWalletInstanceStatus
+      security:
+        - FunctionsKey: []
+          BearerAuth: []
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -122,6 +132,10 @@ paths:
   /wallet-instances/{id}/status:
     put:
       summary: Revoke a Wallet Instance
+      operationId: setWalletInstanceStatus
+      security:
+        - FunctionsKey: []
+          BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -131,7 +145,6 @@ paths:
       description: |
         Revoke the Wallet Instance associated with the authenticated user. 
         If the Wallet Instance is already revoked, the operation succeed.
-      operationId: setWalletInstanceStatus
       requestBody:
         content:
           application/json:
@@ -174,6 +187,10 @@ components:
       type: apiKey
       name: X-Functions-Key
       in: header
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   responses:
     Forbidden:
