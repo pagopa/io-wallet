@@ -255,8 +255,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       ...H.request("https://wallet-provider.example.org"),
       body: "REVOKED",
       headers: {
-        authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXNjYWxfbnVtYmVyIjoiQUFBQkJCOTRENTVINTAxUCIsImlhdCI6MTcxOTkyMzkwOSwiZXhwIjoxNzE5OTI3NTA5fQ.TvNm1IBz0PCXxZXBcNvXWvpeX1tJANNciaaEpW-kuTk",
+        authorization: "Bearer xxx",
       },
       method: "PUT",
       path: {
@@ -297,8 +296,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       ...H.request("https://wallet-provider.example.org"),
       body: "REVOKED",
       headers: {
-        authorization:
-          "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXNjYWxfbnVtYmVyIjoiQUFBQkJCOTRENTVINTAxUCIsImlhdCI6MTcxOTkyMzkwOSwiZXhwIjoxNzE5OTI3NTA5fQ.TvNm1IBz0PCXxZXBcNvXWvpeX1tJANNciaaEpW-kuTk",
+        authorization: "Bearer xxx",
       },
       method: "PUT",
       path: {
