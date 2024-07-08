@@ -10,7 +10,7 @@ import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
-import { requireUserFromToken } from "./token-validator";
+import { requireUserFromToken } from "./jwt-validator";
 import { requireUserFromHeader } from "./user-id-header-validator";
 
 export const requireWhitelistedUserFromHeader: (

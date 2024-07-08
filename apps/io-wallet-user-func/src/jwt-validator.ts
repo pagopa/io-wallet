@@ -27,7 +27,7 @@ interface ExchangeJwtEnvironment {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const exchangeJwtValidate1: (
+const exchangeJwtValidate: (
   token: NonEmptyString,
 ) => RTE.ReaderTaskEither<ExchangeJwtEnvironment, Error, jwt.JwtPayload> =
   (token) =>
