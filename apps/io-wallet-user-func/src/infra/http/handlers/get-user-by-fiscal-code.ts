@@ -1,3 +1,4 @@
+import { UnauthorizedError } from "@/error";
 import { ensureUserInWhitelist, getUserByFiscalCode } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -6,7 +7,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
-import { UnauthorizedError, logErrorAndReturnResponse } from "../error";
+import { logErrorAndReturnResponse } from "../error";
 
 const FiscalCodeBody = t.type({
   fiscal_code: FiscalCode,

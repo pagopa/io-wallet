@@ -19,5 +19,3 @@ export const requireUserFromHeader = (req: H.HttpRequest) =>
     ),
     E.map((id) => ({ id })),
   );
-
-// qui la sperimentazione non entra

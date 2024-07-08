@@ -3,19 +3,6 @@ import { errorRTE } from "@pagopa/logger";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
-export class EntityNotFoundError extends Error {
-  name = "EntityNotFoundError";
-}
-
-// posizione
-export class UnauthorizedError extends Error {
-  name = "UnauthorizedError";
-  constructor() {
-    super("You are not authorized to perform this operation");
-  }
-}
-
-// non mi piace il HttpUnauthorizedError che è in handler-kit
 export class HttpUnauthorizedError extends H.HttpError {
   status = 401 as const;
   title = "Unauthorized";

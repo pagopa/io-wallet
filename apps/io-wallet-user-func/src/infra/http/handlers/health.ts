@@ -1,3 +1,4 @@
+import { HealthCheckError } from "@/error";
 import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
 import {
   PdvTokenizerHealthCheck,
@@ -17,13 +18,6 @@ import * as TE from "fp-ts/TaskEither";
 import { identity, pipe } from "fp-ts/function";
 
 import { logErrorAndReturnResponse } from "../error";
-
-class HealthCheckError extends Error {
-  name = "HealthCheckError";
-  constructor(cause?: string) {
-    super(`The function is not healthy. ${cause}`);
-  }
-}
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {

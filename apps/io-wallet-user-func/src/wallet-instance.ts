@@ -7,7 +7,7 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
-import { EntityNotFoundError } from "./infra/http/error";
+import { EntityNotFoundError } from "./error";
 import { JwkPublicKey } from "./jwk";
 import { User } from "./user";
 

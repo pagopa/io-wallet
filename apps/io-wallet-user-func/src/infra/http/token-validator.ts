@@ -13,7 +13,6 @@ import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import * as jwt from "jsonwebtoken";
 
-// nomi e nome file
 const AuthBearer = PatternString("^Bearer [a-zA-Z0-9-_].+");
 type AuthBearer = t.TypeOf<typeof AuthBearer>;
 
@@ -61,5 +60,3 @@ export const requireUserFromToken: (
     RTE.chainW(flow(requireFiscalCode, RTE.fromEither)),
     RTE.chainW(getUserByFiscalCode),
   );
-
-// qui la sperimentazione non entra

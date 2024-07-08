@@ -1,3 +1,4 @@
+import { UnauthorizedError } from "@/error";
 import { HslJwtEnvironment } from "@/jwt-validator";
 import {
   User,
@@ -9,9 +10,8 @@ import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
-import { UnauthorizedError } from "./error";
-import { requireUserFromToken } from "./token-auth";
-import { requireUserFromHeader } from "./user-header";
+import { requireUserFromToken } from "./token-validator";
+import { requireUserFromHeader } from "./user-id-header-validator";
 
 export const requireWhitelistedUserFromHeader: (
   req: H.HttpRequest,
