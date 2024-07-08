@@ -22,6 +22,8 @@ const toHttpError = (e: Error): Error => {
       return new H.HttpForbiddenError(e.message);
     case "UnauthorizedError":
       return new HttpUnauthorizedError(e.message);
+    case "ForbiddenError":
+      return new H.HttpForbiddenError(e.message);
   }
   return e;
 };

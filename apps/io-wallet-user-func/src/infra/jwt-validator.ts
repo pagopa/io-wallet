@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { HubSpidLoginConfig } from "@/app/config";
+import { UnauthorizedError } from "@/error";
 import { ExchangeJwtValidate, HslJwtValidate } from "@/jwt-validator";
 import { getValidateJWT } from "@pagopa/ts-commons/lib/jwt_with_key_rotation";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -50,9 +51,10 @@ const hslIntrospection: (
           TE.fromEither,
         ),
       ),
-      TE.chain(
-        (response) =>
-          response.active ? TE.right(undefined) : TE.left(new Error("")), // deve tornare 403
+      TE.chain((response) =>
+        response.active
+          ? TE.right(undefined)
+          : TE.left(new UnauthorizedError()),
       ),
     );
 
@@ -68,6 +70,7 @@ export const hslValidate: ({
       validateAndDecode(jwtIssuer, jwtPubKey),
       // TODO: make the call to hub spid login service
       // TE.chainFirst(() => pipe(token, hslIntrospection(clientBaseUrl))),
+      TE.mapLeft(() => new UnauthorizedError()),
     );
 
 const exchangeValidate: ({

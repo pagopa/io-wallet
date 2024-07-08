@@ -9,6 +9,13 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class ForbiddenError extends Error {
+  name = "ForbiddenError";
+  constructor() {
+    super("Access to this resource is forbidden");
+  }
+}
+
 export class HealthCheckError extends Error {
   name = "HealthCheckError";
   constructor(cause?: string) {

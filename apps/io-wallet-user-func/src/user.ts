@@ -5,6 +5,8 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
+import { ForbiddenError } from "./error";
+
 export const User = t.type({
   id: NonEmptyString,
 });
@@ -77,7 +79,7 @@ export const ensureUserInWhitelist: ({
   id,
 }: User) => RTE.ReaderTaskEither<
   UserTrialSubscriptionEnvironment,
-  Error,
+  ForbiddenError,
   void
 > = ({ id }) =>
   pipe(
@@ -86,4 +88,5 @@ export const ensureUserInWhitelist: ({
     RTE.chain((isActive) =>
       isActive ? RTE.right(undefined) : RTE.left(new Error()),
     ),
+    RTE.mapLeft(() => new ForbiddenError()),
   );

@@ -1,4 +1,3 @@
-import { UnauthorizedError } from "@/error";
 import { HslJwtEnvironment } from "@/jwt-validator";
 import {
   User,
@@ -18,12 +17,7 @@ export const requireWhitelistedUserFromHeader: (
 ) => RTE.ReaderTaskEither<UserTrialSubscriptionEnvironment, Error, User> = flow(
   requireUserFromHeader,
   RTE.fromEither,
-  RTE.chainFirstW(
-    flow(
-      ensureUserInWhitelist,
-      RTE.mapLeft(() => new UnauthorizedError()),
-    ),
-  ),
+  RTE.chainFirstW(ensureUserInWhitelist),
 );
 
 export const requireWhitelistedUserFromToken: (
@@ -32,12 +26,4 @@ export const requireWhitelistedUserFromToken: (
   HslJwtEnvironment & UserEnvironment & UserTrialSubscriptionEnvironment,
   Error,
   User
-> = flow(
-  requireUserFromToken,
-  RTE.chainFirstW(
-    flow(
-      ensureUserInWhitelist,
-      RTE.mapLeft(() => new UnauthorizedError()),
-    ),
-  ),
-);
+> = flow(requireUserFromToken, RTE.chainFirstW(ensureUserInWhitelist));
