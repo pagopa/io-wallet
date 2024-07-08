@@ -67,7 +67,7 @@ export const hslValidate: ({
       token,
       validateAndDecode(jwtIssuer, jwtPubKey),
       // TODO: make the call to hub spid login service
-      // TE.chain(() => hslIntrospection(clientBaseUrl)(token)),
+      // TE.chainFirst(() => pipe(token, hslIntrospection(clientBaseUrl))),
     );
 
 const exchangeValidate: ({
