@@ -169,7 +169,7 @@ paths:
   /health:
     get:
       operationId: healthCheck
-      summary: Used to check if the function is active
+      summary: Used to check if the function is healthy
       responses:
         "200":
           description: The function is health

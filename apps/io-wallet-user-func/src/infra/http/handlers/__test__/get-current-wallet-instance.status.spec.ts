@@ -1,4 +1,5 @@
 /* eslint-disable max-lines-per-function */
+import { UnauthorizedError } from "@/error";
 import { HslJwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
@@ -55,7 +56,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       fiscal_number: "AAACCC94D55H501P",
     });
 
-  // test di quando questa va in errore
   const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
     featureFlag: "true",
     getUserSubscriptionDetail: () =>
@@ -225,6 +225,83 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
+  it("should return a 401 HTTP response on hsl jwt forbidden error", async () => {
+    const hslJwtValidateThatFails: HslJwtValidate = () =>
+      TE.left(new UnauthorizedError());
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: "REVOKED",
+      headers: {
+        authorization: "Bearer xxx",
+      },
+      method: "PUT",
+      path: {
+        id: "foo",
+      },
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      hslJwtValidate: hslJwtValidateThatFails,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      userRepository,
+      userTrialSubscriptionRepository,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 401,
+      }),
+    });
+  });
+
+  it("should return a 403 HTTP response on inactive user subscription", async () => {
+    const userTrialSubscriptionRepositoryUnsubscribed: UserTrialSubscriptionRepository =
+      {
+        featureFlag: "true",
+        getUserSubscriptionDetail: () =>
+          TE.right({
+            state: SubscriptionStateEnum["UNSUBSCRIBED"],
+          }),
+      };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: "REVOKED",
+      headers: {
+        authorization: "Bearer xxx",
+      },
+      method: "PUT",
+      path: {
+        id: "foo",
+      },
+    };
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      hslJwtValidate,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      userRepository,
+      userTrialSubscriptionRepository:
+        userTrialSubscriptionRepositoryUnsubscribed,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 403,
+      }),
+    });
+  });
+
   it("should return a 404 HTTP response when no wallet instances is found", async () => {
     const walletInstanceRepository: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
@@ -297,7 +374,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on hslValidate error", async () => {
+  it("should return a 500 HTTP response on hslJwtValidate error", async () => {
     const hslValidateThatFails: HslJwtValidate = () =>
       TE.left(new Error("failed on jwtValidationAndDecode!"));
 
@@ -327,39 +404,4 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       }),
     });
   });
-
-  // it("should return a 500 HTTP response on jwtValidationAndDecode error", async () => {
-  //   const hslJwtValidationThatFailsOnHslIntrospect: HslJwtValidation = {
-  //     introspectHslJwtValidation: () =>
-  //       TE.left(new Error("failed on introspectHslJwtValidation!")),
-  //     jwtValidationAndDecode: () =>
-  //       TE.right({
-  //         fiscal_number: "AAACCC94D55H501P",
-  //       }),
-  //   };
-  //   const req = {
-  //     ...H.request("https://wallet-provider.example.org"),
-  //     headers: {
-  //       authorization: "Bearer xxx",
-  //     },
-  //   };
-  //   const handler = GetCurrentWalletInstanceStatusHandler({
-  //     hslJwtValidation: hslJwtValidationThatFailsOnHslIntrospect,
-  //     input: req,
-  //     inputDecoder: H.HttpRequest,
-  //     logger,
-  //     userRepository,
-  //     walletInstanceRepository,
-  //   });
-
-  //   await expect(handler()).resolves.toEqual({
-  //     _tag: "Right",
-  //     right: expect.objectContaining({
-  //       headers: expect.objectContaining({
-  //         "Content-Type": "application/problem+json",
-  //       }),
-  //       statusCode: 500,
-  //     }),
-  //   });
-  // });
 });
