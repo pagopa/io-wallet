@@ -1,4 +1,4 @@
-import { HslJwtEnvironment, jwtValidate } from "@/jwt-validator";
+import { HslJwtEnvironment, hslJwtValidate } from "@/jwt-validator";
 import { User, UserEnvironment, getUserByFiscalCode } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import {
@@ -56,7 +56,7 @@ export const requireUserFromToken: (
     requireAuthorizationHeader,
     E.chainW(requireBearerToken),
     RTE.fromEither,
-    RTE.chain(jwtValidate),
+    RTE.chain(hslJwtValidate),
     RTE.chainW(flow(requireFiscalCode, RTE.fromEither)),
     RTE.chainW(getUserByFiscalCode),
   );

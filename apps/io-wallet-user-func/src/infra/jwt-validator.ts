@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { HubSpidLoginConfig } from "@/app/config";
-import { JwtValidate } from "@/jwt-validator";
+import { ExchangeJwtValidate, HslJwtValidate } from "@/jwt-validator";
 import { getValidateJWT } from "@pagopa/ts-commons/lib/jwt_with_key_rotation";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -9,10 +9,6 @@ import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import * as jwt from "jsonwebtoken";
 
-// /infra?
-
-// jwt-validator/hsl.ts ex
-// questa è una funzione comune sia a jwt che a exchange
 const validateAndDecode: (
   issuer: NonEmptyString,
   pubKey: NonEmptyString,
@@ -20,12 +16,11 @@ const validateAndDecode: (
   (issuer, pubKey) => (token) =>
     pipe(token, getValidateJWT(issuer, pubKey));
 
-// nome
 const IntrospectSuccessResponse = t.type({
   active: t.boolean,
 });
 
-const introspection: (
+const hslIntrospection: (
   clientBaseUrl: NonEmptyString,
 ) => (token: NonEmptyString) => TE.TaskEither<Error, void> =
   (clientBaseUrl) => (token) =>
@@ -61,26 +56,25 @@ const introspection: (
       ),
     );
 
-export const validate: ({
+export const hslValidate: ({
   clientBaseUrl,
   jwtIssuer,
   jwtPubKey,
-}: HubSpidLoginConfig) => JwtValidate =
+}: HubSpidLoginConfig) => HslJwtValidate =
   ({ clientBaseUrl, jwtIssuer, jwtPubKey }) =>
   (token) =>
     pipe(
       token,
       validateAndDecode(jwtIssuer, jwtPubKey),
-      // add comment
-      // TE.chain(() => introspection(clientBaseUrl)(token)),
+      // TODO: make the call to hub spid login service
+      // TE.chain(() => hslIntrospection(clientBaseUrl)(token)),
     );
 
-// jwt-validator/exchange.ts ex
-// export const exchangeValidate: ({
-//   clientBaseUrl,
-//   jwtIssuer,
-//   jwtPubKey,
-// }: HubSpidLoginConfig) => ExchangeJwtValidate =
-//   ({ jwtIssuer, jwtPubKey }) =>
-//   (token) =>
-//     pipe(token, validateAndDecode(jwtIssuer, jwtPubKey));
+const exchangeValidate: ({
+  clientBaseUrl,
+  jwtIssuer,
+  jwtPubKey,
+}: HubSpidLoginConfig) => ExchangeJwtValidate =
+  ({ jwtIssuer, jwtPubKey }) =>
+  (token) =>
+    pipe(token, validateAndDecode(jwtIssuer, jwtPubKey));

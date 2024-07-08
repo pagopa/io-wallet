@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import { JwtValidate } from "@/jwt-validator";
+import { HslJwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
   UserRepository,
@@ -29,7 +29,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
 
-  const hslValidate: JwtValidate = () =>
+  const hslJwtValidate: HslJwtValidate = () =>
     TE.right({
       fiscal_number: "AAACCC94D55H501P",
     });
@@ -61,7 +61,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -88,7 +88,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -121,7 +121,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -154,7 +154,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -175,7 +175,7 @@ describe("SetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 422 HTTP response when token does not contain `fiscal_number`", async () => {
-    const hslValidate: JwtValidate = () =>
+    const hslJwtValidate: HslJwtValidate = () =>
       TE.right({
         foo: "AAACCC94D55H501P",
       });
@@ -192,7 +192,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -225,7 +225,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -264,7 +264,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -306,7 +306,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate,
+      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -327,7 +327,7 @@ describe("SetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 500 HTTP response on hslValidate error", async () => {
-    const hslValidateThatFails: JwtValidate = () =>
+    const hslValidateThatFails: HslJwtValidate = () =>
       TE.left(new Error("failed on jwtValidationAndDecode!"));
 
     const req = {
@@ -342,7 +342,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
-      hslValidate: hslValidateThatFails,
+      hslJwtValidate: hslValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

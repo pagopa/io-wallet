@@ -9,7 +9,7 @@ import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
-import { validate } from "@/infra/jwt-validator";
+import { hslValidate } from "@/infra/jwt-validator";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
 import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
@@ -52,7 +52,7 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const hslValidate = validate(config.hubSpidLogin);
+const hslJwtValidate = hslValidate(config.hubSpidLogin);
 
 const trialSystemClient = new TrialSystemClient(config.trialSystem);
 
@@ -126,7 +126,7 @@ app.timer("generateEntityConfiguration", {
 app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceStatusFunction({
-    hslValidate,
+    hslJwtValidate,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
@@ -138,7 +138,7 @@ app.http("getCurrentWalletInstanceStatus", {
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
   handler: SetWalletInstanceStatusFunction({
-    hslValidate,
+    hslJwtValidate,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
