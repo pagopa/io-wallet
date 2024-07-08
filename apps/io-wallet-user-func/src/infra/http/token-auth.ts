@@ -1,12 +1,5 @@
-import { Config } from "@/app/config";
 import { HslJwtEnvironment, jwtValidate } from "@/jwt-validator";
-import {
-  User,
-  UserEnvironment,
-  UserTrialSubscriptionEnvironment,
-  checkUserSubscription,
-  getUserByFiscalCode,
-} from "@/user";
+import { User, UserEnvironment, getUserByFiscalCode } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import {
   FiscalCode,
@@ -20,9 +13,7 @@ import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import * as jwt from "jsonwebtoken";
 
-import { UnauthorizedError } from "../response";
-
-// nome e nome file
+// nomi e nome file
 const AuthBearer = PatternString("^Bearer [a-zA-Z0-9-_].+");
 type AuthBearer = t.TypeOf<typeof AuthBearer>;
 
@@ -59,26 +50,16 @@ const requireFiscalCode: (
   E.map(({ fiscal_number }) => fiscal_number),
 );
 
-// si chiamava requireUser
-export const foo: (req: H.HttpRequest) => RTE.ReaderTaskEither<
-  {
-    trialSystemFeatureFlag: Config["trialSystem"]["featureFlag"];
-  } & HslJwtEnvironment &
-    UserEnvironment &
-    UserTrialSubscriptionEnvironment,
-  Error,
-  User
-> = flow(
-  requireAuthorizationHeader,
-  E.chainW(requireBearerToken),
-  RTE.fromEither,
-  RTE.chain(jwtValidate),
-  RTE.chainW(flow(requireFiscalCode, RTE.fromEither)),
-  RTE.chainW(getUserByFiscalCode),
-  RTE.chainFirstW(
-    flow(
-      checkUserSubscription,
-      RTE.mapLeft(() => new UnauthorizedError()),
-    ),
-  ),
-);
+export const requireUserFromToken: (
+  req: H.HttpRequest,
+) => RTE.ReaderTaskEither<HslJwtEnvironment & UserEnvironment, Error, User> =
+  flow(
+    requireAuthorizationHeader,
+    E.chainW(requireBearerToken),
+    RTE.fromEither,
+    RTE.chain(jwtValidate),
+    RTE.chainW(flow(requireFiscalCode, RTE.fromEither)),
+    RTE.chainW(getUserByFiscalCode),
+  );
+
+// qui la sperimentazione non entra

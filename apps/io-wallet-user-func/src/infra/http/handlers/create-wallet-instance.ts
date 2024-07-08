@@ -12,8 +12,8 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
 
-import { logErrorAndReturnResponse } from "../response";
-import { requireUser } from "./utils";
+import { logErrorAndReturnResponse } from "../error";
+import { requireWhitelistedUserFromHeader } from "../whitelisted-user";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -41,7 +41,7 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
-      user: requireUser(req),
+      user: pipe(req, requireWhitelistedUserFromHeader),
       walletInstanceRequest: pipe(
         req,
         requireWalletInstanceRequest,

@@ -30,6 +30,7 @@ describe("HealthHandler", () => {
 
   // test di quando questa va in errore
   const trialSystemClient: TrialSystemHealthCheck = {
+    featureFlag: "true",
     healthCheck: () => TE.right(true),
   };
 

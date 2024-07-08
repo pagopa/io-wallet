@@ -1,4 +1,4 @@
-import { checkUserSubscription, getUserByFiscalCode } from "@/user";
+import { ensureUserInWhitelist, getUserByFiscalCode } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -6,7 +6,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
-import { UnauthorizedError, logErrorAndReturnResponse } from "../response";
+import { UnauthorizedError, logErrorAndReturnResponse } from "../error";
 
 const FiscalCodeBody = t.type({
   fiscal_code: FiscalCode,
@@ -24,11 +24,10 @@ export const GetUserByFiscalCodeHandler = H.of((req: H.HttpRequest) =>
     req,
     requireFiscalCode,
     RTE.fromEither,
-    // in requireFiscalCode?
     RTE.chain(getUserByFiscalCode),
     RTE.chainFirstW(
       flow(
-        checkUserSubscription,
+        ensureUserInWhitelist,
         RTE.mapLeft(() => new UnauthorizedError()),
       ),
     ),

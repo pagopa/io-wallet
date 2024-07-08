@@ -8,8 +8,8 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
-import { logErrorAndReturnResponse } from "../response";
-import { foo } from "./token-auth";
+import { logErrorAndReturnResponse } from "../error";
+import { requireWhitelistedUserFromToken } from "../whitelisted-user";
 
 const requireWalletInstanceId: (
   req: H.HttpRequest,
@@ -34,7 +34,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
       body: pipe(req, requireSetWalletInstanceStatusBody, RTE.fromEither),
-      userId: pipe(req, foo),
+      userId: pipe(req, requireWhitelistedUserFromToken),
       walletInstanceId: pipe(req, requireWalletInstanceId, RTE.fromEither),
     }),
     RTE.chainFirstW(({ userId, walletInstanceId }) =>

@@ -45,14 +45,12 @@ const nonceRepository: NonceRepository = {
 
 // test di quando questa va in errore
 const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+  featureFlag: "true",
   getUserSubscriptionDetail: () =>
     TE.right({
       state: SubscriptionStateEnum["ACTIVE"],
     }),
 };
-
-// TODO
-const trialSystemFeatureFlag = "true";
 
 const logger = {
   format: L.format.simple,
@@ -138,7 +136,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -187,7 +184,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -241,7 +237,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
@@ -289,7 +284,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });

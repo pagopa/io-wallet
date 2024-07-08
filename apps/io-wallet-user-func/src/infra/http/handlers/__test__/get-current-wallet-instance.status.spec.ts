@@ -57,14 +57,12 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
   // test di quando questa va in errore
   const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+    featureFlag: "true",
     getUserSubscriptionDetail: () =>
       TE.right({
         state: SubscriptionStateEnum["ACTIVE"],
       }),
   };
-
-  // TODO
-  const trialSystemFeatureFlag = "true";
 
   it("should return a 200 HTTP response on success", async () => {
     const req = {
@@ -78,7 +76,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
@@ -108,7 +105,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
@@ -142,7 +138,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
@@ -176,7 +171,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
@@ -215,7 +209,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
@@ -251,7 +244,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
@@ -288,7 +280,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository:
@@ -321,7 +312,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,

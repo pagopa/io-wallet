@@ -16,7 +16,7 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { identity, pipe } from "fp-ts/function";
 
-import { logErrorAndReturnResponse } from "../response";
+import { logErrorAndReturnResponse } from "../error";
 
 class HealthCheckError extends Error {
   name = "HealthCheckError";

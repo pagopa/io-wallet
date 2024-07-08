@@ -11,6 +11,7 @@ export class TrialSystemClient
   #apiKey: string;
   #baseURL: string;
   #trialId: string;
+  featureFlag: string;
 
   getUserSubscriptionDetail = (userId: NonEmptyString) =>
     TE.tryCatch(
@@ -51,9 +52,15 @@ export class TrialSystemClient
       (error) => new Error(`error checking trial system health: ${error}`),
     );
 
-  constructor({ apiKey, baseURL, trialId }: TrialSystemApiClientConfig) {
+  constructor({
+    apiKey,
+    baseURL,
+    featureFlag,
+    trialId,
+  }: TrialSystemApiClientConfig) {
     this.#apiKey = apiKey;
     this.#baseURL = baseURL;
     this.#trialId = trialId;
+    this.featureFlag = featureFlag;
   }
 }

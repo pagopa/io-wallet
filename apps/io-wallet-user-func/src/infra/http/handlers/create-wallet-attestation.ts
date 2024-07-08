@@ -13,8 +13,9 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
-import { logErrorAndReturnResponse } from "../response";
-import { requireUser, successJwt } from "./utils";
+import { logErrorAndReturnResponse } from "../error";
+import { successJwt } from "../response";
+import { requireWhitelistedUserFromHeader } from "../whitelisted-user";
 
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,
@@ -40,7 +41,7 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
 export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplicativePar)({
-      user: pipe(req, requireUser),
+      user: pipe(req, requireWhitelistedUserFromHeader),
       walletAttestationRequest: pipe(
         req,
         requireWalletAttestationRequest,

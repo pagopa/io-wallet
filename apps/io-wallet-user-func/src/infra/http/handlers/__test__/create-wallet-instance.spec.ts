@@ -41,14 +41,12 @@ describe("CreateWalletInstanceHandler", () => {
 
   // test di quando questa va in errore
   const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+    featureFlag: "true",
     getUserSubscriptionDetail: () =>
       TE.right({
         state: SubscriptionStateEnum["ACTIVE"],
       }),
   };
-
-  // TODO
-  const trialSystemFeatureFlag = "true";
 
   const logger = {
     format: L.format.simple,
@@ -86,7 +84,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -111,7 +108,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -142,7 +138,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -175,7 +170,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -210,7 +204,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -249,7 +242,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
@@ -288,7 +280,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetAllByUserId,
@@ -328,7 +319,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      trialSystemFeatureFlag,
       userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });

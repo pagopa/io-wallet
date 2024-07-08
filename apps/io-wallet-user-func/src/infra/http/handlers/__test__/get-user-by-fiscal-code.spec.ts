@@ -20,14 +20,12 @@ describe("GetUserByFiscalCodeHandler", () => {
 
   // test di quando questa va in errore
   const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+    featureFlag: "true",
     getUserSubscriptionDetail: () =>
       TE.right({
         state: SubscriptionStateEnum["ACTIVE"],
       }),
   };
-
-  // TODO
-  const trialSystemFeatureFlag = "true";
 
   const logger = {
     format: L.format.simple,
@@ -46,7 +44,6 @@ describe("GetUserByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
     });
@@ -75,7 +72,6 @@ describe("GetUserByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository,
       userTrialSubscriptionRepository,
     });
@@ -108,7 +104,6 @@ describe("GetUserByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      trialSystemFeatureFlag,
       userRepository: userRepositoryThatFailsOnGetUserByFiscalCode,
       userTrialSubscriptionRepository,
     });

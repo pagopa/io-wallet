@@ -56,14 +56,12 @@ const hslValidate = validate(config.hubSpidLogin);
 
 const trialSystemClient = new TrialSystemClient(config.trialSystem);
 
-const trialSystemFeatureFlag = config.trialSystem.featureFlag;
-
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
     pdvTokenizerClient,
-    trialSystemClient, // ff
+    trialSystemClient,
   }),
   methods: ["GET"],
   route: "health",
@@ -76,7 +74,6 @@ app.http("createWalletAttestation", {
     federationEntityMetadata: config.federationEntity,
     nonceRepository,
     signer,
-    trialSystemFeatureFlag, // in client?
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
@@ -89,7 +86,6 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
-    trialSystemFeatureFlag,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
@@ -107,7 +103,6 @@ app.http("getNonce", {
 app.http("getUserByFiscalCode", {
   authLevel: "function",
   handler: GetUserByFiscalCodeFunction({
-    trialSystemFeatureFlag,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
   }),
@@ -132,7 +127,6 @@ app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceStatusFunction({
     hslValidate,
-    trialSystemFeatureFlag,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
@@ -145,7 +139,6 @@ app.http("setWalletInstanceStatus", {
   authLevel: "function",
   handler: SetWalletInstanceStatusFunction({
     hslValidate,
-    trialSystemFeatureFlag,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
