@@ -68,7 +68,7 @@ export const hslValidate: ({
     pipe(
       token,
       validateAndDecode(jwtIssuer, jwtPubKey),
-      // TODO: make the call to hub spid login service
+      // TODO [SIW-1327]: make the call to hub spid login service
       // TE.chainFirst(() => pipe(token, hslIntrospection(clientBaseUrl))),
       TE.mapLeft(() => new UnauthorizedError()),
     );
