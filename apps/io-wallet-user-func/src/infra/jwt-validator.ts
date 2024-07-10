@@ -32,7 +32,7 @@ const hslIntrospection: (
             token,
           }),
           method: "POST",
-          signal: AbortSignal.timeout(3000),
+          signal: AbortSignal.timeout(3000), // TODO [SIW-1332]: make this timeout configurable through env vars
         });
         if (!result.ok) {
           throw new Error(JSON.stringify(await result.json()));
