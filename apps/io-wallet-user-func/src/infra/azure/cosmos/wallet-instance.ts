@@ -2,8 +2,9 @@ import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
+import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
 export class CosmosDbWalletInstanceRepository
@@ -88,21 +89,27 @@ export class CosmosDbWalletInstanceRepository
         (error) =>
           new Error(`Error getting wallet instances by user id: ${error}`),
       ),
-      TE.chain((walletInstances) =>
-        !walletInstances.length
-          ? TE.right(O.none)
-          : pipe(
-              walletInstances,
-              t.array(WalletInstance).decode,
-              TE.fromEither,
-              TE.map(O.some),
-              TE.mapLeft(
-                () =>
-                  new Error(
-                    "Error getting wallet instances: invalid result format",
-                  ),
+      TE.chain((items) =>
+        pipe(
+          items,
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            () =>
+              pipe(
+                items,
+                t.array(WalletInstance).decode,
+                E.map(O.some),
+                E.mapLeft(
+                  () =>
+                    new Error(
+                      "Error getting wallet instances: invalid result format",
+                    ),
+                ),
+                TE.fromEither,
               ),
-            ),
+          ),
+        ),
       ),
     );
   }
@@ -128,21 +135,24 @@ export class CosmosDbWalletInstanceRepository
         (error) =>
           new Error(`Error getting wallet instances by user id: ${error}`),
       ),
-      TE.chain((walletInstances) =>
-        !walletInstances.length
-          ? TE.right(O.none)
-          : pipe(
-              walletInstances,
-              t.array(WalletInstance).decode,
-              TE.fromEither,
-              TE.map((walletInstances) => O.some(walletInstances[0])),
-              TE.mapLeft(
+      TE.chain(
+        flow(
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            flow(
+              WalletInstance.decode,
+              E.map(O.some),
+              E.mapLeft(
                 () =>
                   new Error(
                     "Error getting last wallet instance: invalid result format",
                   ),
               ),
+              TE.fromEither,
             ),
+          ),
+        ),
       ),
     );
   }
