@@ -198,6 +198,7 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     googlePublicKey: pipe(
       readFromEnvironment("GooglePublicKey"),
       RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY)),
+      RE.map((publicKey) => publicKey.replace(/\\n/g, "\n")),
     ),
     iOsBundleIdentifier: pipe(
       readFromEnvironment("IosBundleIdentifier"),
