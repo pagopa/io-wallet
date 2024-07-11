@@ -13,7 +13,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
 
 import { logErrorAndReturnResponse } from "../error";
-import { requireWhitelistedUserFromHeader } from "../whitelisted-user";
+import { requireUserFromHeader } from "../user-id-header-validator";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -41,7 +41,7 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
-      user: pipe(req, requireWhitelistedUserFromHeader),
+      user: pipe(req, requireUserFromHeader, RTE.fromEither),
       walletInstanceRequest: pipe(
         req,
         requireWalletInstanceRequest,

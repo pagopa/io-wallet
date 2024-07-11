@@ -1,4 +1,4 @@
-import { ensureUserInWhitelist, getUserByFiscalCode } from "@/user";
+import { getUserByFiscalCode } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -25,7 +25,6 @@ export const GetUserByFiscalCodeHandler = H.of((req: H.HttpRequest) =>
     requireFiscalCode,
     RTE.fromEither,
     RTE.chain(getUserByFiscalCode),
-    RTE.chainFirstW(ensureUserInWhitelist),
     RTE.map(H.successJson),
     RTE.orElseW(logErrorAndReturnResponse),
   ),

@@ -7,7 +7,6 @@ import {
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
-import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
@@ -41,15 +40,6 @@ afterAll(() => {
 const nonceRepository: NonceRepository = {
   delete: () => TE.right(void 0),
   insert: () => TE.left(new Error("not implemented")),
-};
-
-// test di quando questa va in errore
-const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
-  featureFlag: "true",
-  getUserSubscriptionDetail: () =>
-    TE.right({
-      state: SubscriptionStateEnum["ACTIVE"],
-    }),
 };
 
 const logger = {
@@ -136,7 +126,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -184,7 +173,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -237,7 +225,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -284,7 +271,6 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
-      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 

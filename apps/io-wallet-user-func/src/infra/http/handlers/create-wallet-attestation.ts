@@ -15,7 +15,7 @@ import * as t from "io-ts";
 
 import { logErrorAndReturnResponse } from "../error";
 import { successJwt } from "../response";
-import { requireWhitelistedUserFromHeader } from "../whitelisted-user";
+import { requireUserFromHeader } from "../user-id-header-validator";
 
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,
@@ -41,7 +41,7 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
 export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplicativePar)({
-      user: pipe(req, requireWhitelistedUserFromHeader),
+      user: pipe(req, requireUserFromHeader, RTE.fromEither),
       walletAttestationRequest: pipe(
         req,
         requireWalletAttestationRequest,
