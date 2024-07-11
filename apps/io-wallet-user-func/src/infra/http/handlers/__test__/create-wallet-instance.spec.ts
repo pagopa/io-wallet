@@ -7,7 +7,6 @@ import {
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
-import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -37,15 +36,6 @@ describe("CreateWalletInstanceHandler", () => {
     getAllByUserId: () => TE.right(O.some([])),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     insert: () => TE.right(undefined),
-  };
-
-  // test di quando questa va in errore
-  const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
-    featureFlag: "true",
-    getUserSubscriptionDetail: () =>
-      TE.right({
-        state: SubscriptionStateEnum["ACTIVE"],
-      }),
   };
 
   const logger = {
@@ -84,7 +74,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -108,7 +97,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -138,7 +126,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -170,7 +157,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -204,7 +190,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -242,7 +227,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -280,7 +264,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetAllByUserId,
     });
@@ -319,7 +302,6 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 

@@ -74,7 +74,6 @@ app.http("createWalletAttestation", {
     federationEntityMetadata: config.federationEntity,
     nonceRepository,
     signer,
-    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -86,7 +85,6 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
-    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -104,7 +102,6 @@ app.http("getUserByFiscalCode", {
   authLevel: "function",
   handler: GetUserByFiscalCodeFunction({
     userRepository: pdvTokenizerClient,
-    userTrialSubscriptionRepository: trialSystemClient,
   }),
   methods: ["POST"],
   route: "users",
