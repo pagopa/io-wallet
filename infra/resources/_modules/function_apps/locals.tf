@@ -38,6 +38,14 @@ locals {
 
       PdvTokenizerApiBaseURL = "https://api.uat.tokenizer.pdv.pagopa.it"
       PdvTokenizerTestUUID   = "c13b2aec-1597-4abd-a735-aacf2f935c93"
+
+      HubSpidLoginJwtPubKey     = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4MvZBc1HXql1OvFXftKphdWZBjTVsGaZg/aDabkvHOitIZad+MRWWpPK+uXEdv4M7Hc5QZEZp8+hDHKTvtNIdXLtmjEH+SWwXh7ZeMoQrj/TN6eI506L39lGcFsSZfmTYrAZppSQ338IhbZ7cuKIOF7AN09G8Uzv2E1LgWHd3+E3FWIihJrHEBRiPf90dXUB8C4t2dBdN1nmyGYbvRwlTiGe3ZBiC+DMWZB1YdQNaJpocw/J+0DO6pIJbcZ+GHfgmZW8nq8+Agtm9aQcOTj1+a22tpkMC6C5MiZ1PDnstwBzfzJv6urNFMS+p5vVQjBm11Ppjg9CWvWqcm9AI/maAwIDAQAB\n-----END PUBLIC KEY-----",
+      HubSpidLoginJwtIssuer     = "api-web.io.pagopa.it/ioweb/auth"
+      HubSpidLoginClientBaseUrl = "https://io-p-weu-ioweb-spid-login.azurewebsites.net"
+
+      TrialSystemApiBaseURL  = "https://ts-p-itn-subscription-fn-01.azurewebsites.net"
+      TrialSystemTrialId     = "01J2E5JA8QGYCFZRZGYQ33PXKN"
+      TrialSystemFeatureFlag = true
       },
       {
         for s in var.user_func.app_settings :
