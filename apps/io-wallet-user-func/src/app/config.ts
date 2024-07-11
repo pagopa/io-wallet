@@ -201,7 +201,7 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     ),
     androidBundleIdentifier: pipe(
       readFromEnvironment("AndroidBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.app.io")),
+      RE.orElse(() => RE.right("it.pagopa.io.app")),
     ),
     androidCrlUrl: pipe(
       readFromEnvironment("AndroidCrlUrl"),
