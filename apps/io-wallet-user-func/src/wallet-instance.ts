@@ -6,9 +6,10 @@ import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { EntityNotFoundError } from "io-wallet-common/http-response";
-import { JwkPublicKey } from "io-wallet-common/jwk";
-import { User } from "io-wallet-common/user";
+
+import { EntityNotFoundError } from "./error";
+import { JwkPublicKey } from "./jwk";
+import { User } from "./user";
 
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
@@ -32,7 +33,7 @@ const WalletInstanceValid = t.intersection([
   }),
 ]);
 
-type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
+export type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
 
 const WalletInstanceRevoked = t.intersection([
   WalletInstanceBase,
@@ -68,12 +69,29 @@ export interface WalletInstanceRepository {
   getAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
+  getLastByUserId: (
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
 interface WalletInstanceEnvironment {
   walletInstanceRepository: WalletInstanceRepository;
 }
+
+export const getCurrentWalletInstance: (
+  userId: WalletInstance["userId"],
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
+  (userId) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      walletInstanceRepository.getLastByUserId(userId),
+      TE.chain(
+        TE.fromOption(
+          () => new EntityNotFoundError("Wallet instance not found"),
+        ),
+      ),
+    );
 
 export const insertWalletInstance: (
   walletInstance: WalletInstanceValid,
@@ -106,7 +124,7 @@ export const getValidWalletInstance: (
       ),
     );
 
-const revokeUserWalletInstances: (
+export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =

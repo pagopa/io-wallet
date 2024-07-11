@@ -1,9 +1,14 @@
+import { HealthCheckError } from "@/error";
+import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
 import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
+import {
+  TrialSystemHealthCheck,
+  getTrialSystemHealth,
+} from "@/infra/trial-system/health-check";
 import { CosmosClient } from "@azure/cosmos";
-import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -11,28 +16,24 @@ import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { identity, pipe } from "fp-ts/function";
-import {
-  HealthCheckError,
-  getCosmosHealth,
-  getStorageQueueHealth,
-} from "io-wallet-common/azure-health-check";
-import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
+
+import { logErrorAndReturnResponse } from "../error";
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
     pdvTokenizerClient: PdvTokenizerHealthCheck;
-    queueClient: QueueClient;
+    trialSystemClient: TrialSystemHealthCheck;
   },
   Error,
   void
-> = ({ cosmosClient, pdvTokenizerClient, queueClient }) =>
+> = ({ cosmosClient, pdvTokenizerClient, trialSystemClient }) =>
   // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
-      pipe({ queueClient }, getStorageQueueHealth),
+      pipe({ trialSystemClient }, getTrialSystemHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ left: errors }) =>

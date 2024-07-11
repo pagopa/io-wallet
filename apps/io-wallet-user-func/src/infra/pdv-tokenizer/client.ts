@@ -109,7 +109,6 @@ export class PdvTokenizerClient
     this.#options = {
       headers: {
         Accept: "application/json, text/plain",
-        "Content-Type": "application/json",
         "x-api-key": apiKey,
       },
     };

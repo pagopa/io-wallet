@@ -1,3 +1,4 @@
+import { JwkPublicKey } from "@/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
@@ -7,7 +8,6 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as S from "fp-ts/lib/string";
-import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { ValidatedAttestation } from "../../attestation-service";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";

@@ -2,7 +2,8 @@ import { generateNonce, insertNonce } from "@/nonce";
 import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
-import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
+
+import { logErrorAndReturnResponse } from "../error";
 
 export const GetNonceHandler = H.of(() =>
   pipe(

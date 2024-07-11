@@ -11,10 +11,9 @@ import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
-import { enqueue } from "io-wallet-common/storage-queue";
 
-import { requireUser } from "./utils";
+import { logErrorAndReturnResponse } from "../error";
+import { requireWhitelistedUserFromHeader } from "../whitelisted-user";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -41,12 +40,15 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(E.Apply)({
-      user: requireUser(req),
-      walletInstanceRequest: requireWalletInstanceRequest(req),
+    sequenceS(RTE.ApplyPar)({
+      user: pipe(req, requireWhitelistedUserFromHeader),
+      walletInstanceRequest: pipe(
+        req,
+        requireWalletInstanceRequest,
+        RTE.fromEither,
+      ),
     }),
-    RTE.fromEither,
-    RTE.chain(({ user, walletInstanceRequest }) =>
+    RTE.chainW(({ user, walletInstanceRequest }) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
@@ -69,7 +71,6 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 walletInstanceRequest.hardwareKeyTag,
               ),
             ),
-            RTE.chainW(() => enqueue(walletInstance)),
           ),
         ),
       ),

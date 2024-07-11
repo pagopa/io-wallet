@@ -3,8 +3,9 @@ import { errorRTE } from "@pagopa/logger";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
-export class EntityNotFoundError extends Error {
-  name = "EntityNotFoundError";
+export class HttpUnauthorizedError extends H.HttpError {
+  status = 401 as const;
+  title = "Unauthorized";
 }
 
 // Encode domain errors to http errors
@@ -18,6 +19,10 @@ const toHttpError = (e: Error): Error => {
     case "HealthCheckError":
       return new H.HttpError(e.message);
     case "WalletInstanceRevoked":
+      return new H.HttpForbiddenError(e.message);
+    case "UnauthorizedError":
+      return new HttpUnauthorizedError(e.message);
+    case "ForbiddenError":
       return new H.HttpForbiddenError(e.message);
   }
   return e;
