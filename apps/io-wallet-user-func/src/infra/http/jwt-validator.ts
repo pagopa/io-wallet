@@ -1,5 +1,4 @@
 import { HslJwtEnvironment, hslJwtValidate } from "@/jwt-validator";
-import { User, UserEnvironment, getUserByFiscalCode } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import {
   FiscalCode,
@@ -49,14 +48,12 @@ const requireFiscalCode: (
   E.map(({ fiscal_number }) => fiscal_number),
 );
 
-export const requireUserFromToken: (
+export const requireFiscalCodeFromToken: (
   req: H.HttpRequest,
-) => RTE.ReaderTaskEither<HslJwtEnvironment & UserEnvironment, Error, User> =
-  flow(
-    requireAuthorizationHeader,
-    E.chainW(requireBearerToken),
-    RTE.fromEither,
-    RTE.chain(hslJwtValidate),
-    RTE.chainW(flow(requireFiscalCode, RTE.fromEither)),
-    RTE.chainW(getUserByFiscalCode),
-  );
+) => RTE.ReaderTaskEither<HslJwtEnvironment, Error, FiscalCode> = flow(
+  requireAuthorizationHeader,
+  E.chainW(requireBearerToken),
+  RTE.fromEither,
+  RTE.chain(hslJwtValidate),
+  RTE.chainW(flow(requireFiscalCode, RTE.fromEither)),
+);
