@@ -2,7 +2,7 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { enumType } from "@pagopa/ts-commons/lib/types";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
 import { ForbiddenError } from "./error";
@@ -52,7 +52,7 @@ export type SubscriptionState = t.TypeOf<typeof SubscriptionState>;
 export interface UserTrialSubscriptionRepository {
   featureFlag: string;
   getUserSubscriptionDetail: (
-    userId: NonEmptyString,
+    fiscalCode: FiscalCode,
   ) => TE.TaskEither<Error, SubscriptionState>;
 }
 
@@ -61,32 +61,30 @@ export interface UserTrialSubscriptionEnvironment {
 }
 
 const isUserSubscriptionActive: (
-  userId: NonEmptyString,
+  fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<UserTrialSubscriptionEnvironment, Error, boolean> =
-  (userId) =>
+  (fiscalCode) =>
   ({
     userTrialSubscriptionRepository: { featureFlag, getUserSubscriptionDetail },
   }) =>
     featureFlag === "true"
       ? pipe(
-          userId,
+          fiscalCode,
           getUserSubscriptionDetail,
           TE.map(({ state }) => state === "ACTIVE"),
         )
       : TE.right(true);
 
-export const ensureUserInWhitelist: ({
-  id,
-}: User) => RTE.ReaderTaskEither<
+export const ensureUserInWhitelist: (
+  fiscalCode: FiscalCode,
+) => RTE.ReaderTaskEither<
   UserTrialSubscriptionEnvironment,
   ForbiddenError,
   void
-> = ({ id }) =>
-  pipe(
-    id,
-    isUserSubscriptionActive,
-    RTE.chain((isActive) =>
-      isActive ? RTE.right(undefined) : RTE.left(new Error()),
-    ),
-    RTE.mapLeft(() => new ForbiddenError()),
-  );
+> = flow(
+  isUserSubscriptionActive,
+  RTE.chain((isActive) =>
+    isActive ? RTE.right(undefined) : RTE.left(new Error()),
+  ),
+  RTE.mapLeft(() => new ForbiddenError()),
+);

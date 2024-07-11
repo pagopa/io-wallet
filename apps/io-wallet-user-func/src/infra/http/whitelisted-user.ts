@@ -4,12 +4,13 @@ import {
   UserEnvironment,
   UserTrialSubscriptionEnvironment,
   ensureUserInWhitelist,
+  getUserByFiscalCode,
 } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
-import { requireUserFromToken } from "./jwt-validator";
+import { requireFiscalCodeFromToken } from "./jwt-validator";
 
 export const requireWhitelistedUserFromToken: (
   req: H.HttpRequest,
@@ -17,4 +18,8 @@ export const requireWhitelistedUserFromToken: (
   HslJwtEnvironment & UserEnvironment & UserTrialSubscriptionEnvironment,
   Error,
   User
-> = flow(requireUserFromToken, RTE.chainFirstW(ensureUserInWhitelist));
+> = flow(
+  requireFiscalCodeFromToken,
+  RTE.chainFirstW(ensureUserInWhitelist),
+  RTE.chainW(getUserByFiscalCode),
+);

@@ -1,6 +1,6 @@
 import { TrialSystemApiClientConfig } from "@/app/config";
 import { UserTrialSubscriptionRepository } from "@/user";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 
 import { TrialSystemHealthCheck } from "./health-check";
@@ -13,12 +13,12 @@ export class TrialSystemClient
   #trialId: string;
   featureFlag: string;
 
-  getUserSubscriptionDetail = (userId: NonEmptyString) =>
+  getUserSubscriptionDetail = (fiscalCode: FiscalCode) =>
     TE.tryCatch(
       async () => {
         const result = await fetch(
           new URL(
-            `/trials/${this.#trialId}/subscriptions/${userId}`,
+            `/trials/${this.#trialId}/subscriptions/${fiscalCode}`,
             this.#baseURL,
           ),
           {
