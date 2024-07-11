@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.15
+
+### Patch Changes
+
+- e5ca821: Updated
+
 ## 0.1.14
 
 ### Patch Changes
