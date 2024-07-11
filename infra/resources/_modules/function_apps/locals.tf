@@ -28,7 +28,7 @@ locals {
       FederationEntityTrustAnchorUri   = "https://demo.federation.eudi.wallet.developers.italia.it"
       IosBundleIdentifier              = "it.pagopa.app.io"
       IosTeamIdentifier                = "M2X5YQ4BJ7"
-      AndroidBundleIdentifier          = "it.pagopa.app.io"
+      AndroidBundleIdentifier          = "it.pagopa.io.app"
       AndroidCrlUrl                    = "https://android.googleapis.com/attestation/status"
       AndroidPlayIntegrityUrl          = "https://www.googleapis.com/auth/playintegrity"
       AndroidPlayStoreCertificateHash  = "feT-Pqrgg__NiwcDAehlAtPx6tHdZqwUK618VEdVT4I"
