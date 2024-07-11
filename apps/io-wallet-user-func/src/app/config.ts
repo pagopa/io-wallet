@@ -191,6 +191,7 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     appleRootCertificate: pipe(
       readFromEnvironment("AppleRootCertificate"),
       RE.orElse(() => RE.right(APPLE_APP_ATTESTATION_ROOT_CA)),
+      RE.map((rootCa) => rootCa.replace(/\\n/g, "\n")),
     ),
     googleAppCredentialsEncoded: readFromEnvironment(
       "GoogleAppCredentialsEncoded",
