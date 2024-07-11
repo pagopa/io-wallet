@@ -44,7 +44,7 @@ locals {
       HubSpidLoginClientBaseUrl = "https://io-p-weu-ioweb-spid-login.azurewebsites.net"
 
       TrialSystemApiBaseURL  = "https://ts-p-itn-subscription-fn-01.azurewebsites.net"
-      TrialSystemTrialId     = "01J2E5JA8QGYCFZRZGYQ33PXKN"
+      TrialSystemTrialId     = "01J2GN4TA8FB6DPTAX3T3YD6M1"
       TrialSystemFeatureFlag = true
       },
       {
