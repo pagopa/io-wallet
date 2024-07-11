@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.16
+
+### Patch Changes
+
+- dee02e1: Fixed Android bundle identifier
+
 ## 0.1.15
 
 ### Patch Changes
