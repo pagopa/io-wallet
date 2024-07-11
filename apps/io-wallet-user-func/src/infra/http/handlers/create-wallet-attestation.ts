@@ -12,9 +12,10 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common/http-response";
 
-import { requireUser, successJwt } from "./utils";
+import { logErrorAndReturnResponse } from "../error";
+import { successJwt } from "../response";
+import { requireWhitelistedUserFromHeader } from "../whitelisted-user";
 
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,
@@ -39,8 +40,8 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
 
 export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(TE.ApplicativePar)({
-      user: pipe(req, requireUser, TE.fromEither),
+    sequenceS(RTE.ApplicativePar)({
+      user: pipe(req, requireWhitelistedUserFromHeader),
       walletAttestationRequest: pipe(
         req,
         requireWalletAttestationRequest,
@@ -48,10 +49,10 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
         TE.chain((payload) =>
           pipe(payload.assertion, verifyWalletAttestationRequest),
         ),
+        RTE.fromTaskEither,
       ),
     }),
-    RTE.fromTaskEither,
-    RTE.chain(({ user, walletAttestationRequest }) =>
+    RTE.chainW(({ user, walletAttestationRequest }) =>
       pipe(
         consumeNonce(walletAttestationRequest.payload.challenge),
         RTE.chainW(() =>

@@ -1,5 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 import { FederationEntityMetadata } from "@/entity-configuration";
+import { getKeyByKid } from "@/jwk";
 import {
   EntityStatementHeader,
   EntityStatementPayload,
@@ -20,7 +21,6 @@ import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
-import { getKeyByKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
 const oidFederation = "/.well-known/openid-federation";

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
+import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
-import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as E from "fp-ts/Either";
@@ -20,21 +20,19 @@ describe("HealthHandler", () => {
     getDatabaseAccount: () => Promise.reject(new Error("foo")),
   } as CosmosClient;
 
-  const pdvTokenizerClient = {
+  const pdvTokenizerClient: PdvTokenizerHealthCheck = {
     healthCheck: () => TE.right(true),
-  } as PdvTokenizerHealthCheck;
+  };
 
-  const pdvTokenizerClientThatFails = {
+  const pdvTokenizerClientThatFails: PdvTokenizerHealthCheck = {
     healthCheck: () => TE.left(new Error("pdv-tokenizer-error")),
-  } as PdvTokenizerHealthCheck;
+  };
 
-  const queueClient = {
-    exists: () => Promise.resolve(true),
-  } as QueueClient;
-
-  const queueClientThatFails = {
-    exists: () => Promise.reject(new Error("foo")),
-  } as QueueClient;
+  // test di quando questa va in errore
+  const trialSystemClient: TrialSystemHealthCheck = {
+    featureFlag: "true",
+    healthCheck: () => TE.right(true),
+  };
 
   const logger = {
     format: L.format.simple,
@@ -48,7 +46,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient,
-      queueClient,
+      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -72,7 +70,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient,
-      queueClient,
+      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -98,7 +96,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
-      queueClient,
+      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -124,7 +122,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
-      queueClient,
+      trialSystemClient,
     });
 
     const result = await handler();
@@ -149,69 +147,6 @@ describe("HealthHandler", () => {
       expect(body).toEqual(
         expect.objectContaining({
           detail: expect.stringContaining("pdv-tokenizer-error"),
-        }),
-      );
-    }
-  });
-
-  it("should return a 500 HTTP response when getStorageQueueHealth returns an error", async () => {
-    const handler = HealthHandler({
-      cosmosClient,
-      input: H.request("https://wallet-provider.example.org"),
-      inputDecoder: H.HttpRequest,
-      logger,
-      pdvTokenizerClient,
-      queueClient: queueClientThatFails,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: {
-        body: {
-          detail: "The function is not healthy. Error: storage-queue-error",
-          status: 500,
-          title: "Internal Server Error",
-        },
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      },
-    });
-  });
-
-  it("should return a 500 HTTP response when getCosmosHealth and getStorageQueueHealth return an error", async () => {
-    const handler = HealthHandler({
-      cosmosClient: cosmosClientThatFails,
-      input: H.request("https://wallet-provider.example.org"),
-      inputDecoder: H.HttpRequest,
-      logger,
-      pdvTokenizerClient,
-      queueClient: queueClientThatFails,
-    });
-
-    const result = await handler();
-
-    expect.assertions(3);
-    expect(result).toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      }),
-    });
-    if (E.isRight(result)) {
-      const body = result.right.body;
-      expect(body).toEqual({
-        detail: expect.stringContaining("cosmos-db-error"),
-        status: 500,
-        title: "Internal Server Error",
-      });
-      expect(body).toEqual(
-        expect.objectContaining({
-          detail: expect.stringContaining("storage-queue-error"),
         }),
       );
     }

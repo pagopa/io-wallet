@@ -6,9 +6,9 @@ import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
-import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 
 import { EntityConfigurationToJwtModel } from "./encoders/entity-configuration";
+import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { Signer } from "./signer";
 import {
   GRANT_TYPE_KEY_ATTESTATION,

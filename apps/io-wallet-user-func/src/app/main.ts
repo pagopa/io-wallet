@@ -3,15 +3,18 @@ import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-in
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
+import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { hslValidate } from "@/infra/jwt-validator";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
+import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
-import { QueueServiceClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -33,6 +36,9 @@ const credential = new DefaultAzureCredential();
 
 const cosmosClient = new CosmosClient({
   aadCredentials: credential,
+  connectionPolicy: {
+    requestTimeout: 3000, // TODO [SIW-1331]: check this timeout
+  },
   endpoint: config.azure.cosmos.endpoint,
 });
 
@@ -46,21 +52,16 @@ const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const queueServiceClient = new QueueServiceClient(
-  config.azure.storage.walletInstances.queueServiceUrl,
-  credential,
-);
+const hslJwtValidate = hslValidate(config.hubSpidLogin);
 
-const onWalletInstanceCreatedQueueClient = queueServiceClient.getQueueClient(
-  "on-wallet-instance-created",
-);
+const trialSystemClient = new TrialSystemClient(config.trialSystem);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
     pdvTokenizerClient,
-    queueClient: onWalletInstanceCreatedQueueClient,
+    trialSystemClient,
   }),
   methods: ["GET"],
   route: "health",
@@ -73,6 +74,7 @@ app.http("createWalletAttestation", {
     federationEntityMetadata: config.federationEntity,
     nonceRepository,
     signer,
+    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -84,7 +86,7 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
-    queueClient: onWalletInstanceCreatedQueueClient,
+    userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -102,6 +104,7 @@ app.http("getUserByFiscalCode", {
   authLevel: "function",
   handler: GetUserByFiscalCodeFunction({
     userRepository: pdvTokenizerClient,
+    userTrialSubscriptionRepository: trialSystemClient,
   }),
   methods: ["POST"],
   route: "users",
@@ -118,4 +121,28 @@ app.timer("generateEntityConfiguration", {
     path: `${config.azure.storage.entityConfiguration.containerName}/openid-federation`,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
+});
+
+app.http("getCurrentWalletInstanceStatus", {
+  authLevel: "function",
+  handler: GetCurrentWalletInstanceStatusFunction({
+    hslJwtValidate,
+    userRepository: pdvTokenizerClient,
+    userTrialSubscriptionRepository: trialSystemClient,
+    walletInstanceRepository,
+  }),
+  methods: ["GET"],
+  route: "wallet-instances/current/status",
+});
+
+app.http("setWalletInstanceStatus", {
+  authLevel: "function",
+  handler: SetWalletInstanceStatusFunction({
+    hslJwtValidate,
+    userRepository: pdvTokenizerClient,
+    userTrialSubscriptionRepository: trialSystemClient,
+    walletInstanceRepository,
+  }),
+  methods: ["PUT"],
+  route: "wallet-instances/{id}/status",
 });

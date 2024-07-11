@@ -7,6 +7,7 @@ import {
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
+import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
@@ -40,6 +41,15 @@ afterAll(() => {
 const nonceRepository: NonceRepository = {
   delete: () => TE.right(void 0),
   insert: () => TE.left(new Error("not implemented")),
+};
+
+// test di quando questa va in errore
+const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
+  featureFlag: "true",
+  getUserSubscriptionDetail: () =>
+    TE.right({
+      state: SubscriptionStateEnum["ACTIVE"],
+    }),
 };
 
 const logger = {
@@ -77,6 +87,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
       }),
     ),
   getAllByUserId: () => TE.left(new Error("not implemented")),
+  getLastByUserId: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
 };
 
@@ -125,6 +136,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -172,6 +184,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -202,6 +215,7 @@ describe("CreateWalletAttestationHandler", async () => {
           }),
         ),
       getAllByUserId: () => TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
@@ -223,6 +237,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -247,6 +262,7 @@ describe("CreateWalletAttestationHandler", async () => {
       batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
       getAllByUserId: () => TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
@@ -268,6 +284,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
