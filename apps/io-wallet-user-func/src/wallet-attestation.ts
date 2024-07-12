@@ -2,16 +2,14 @@ import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
+import { sequenceS } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 
 import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
 import {
   EntityConfigurationEnvironment,
   FederationEntity,
-  getEntityConfiguration,
 } from "./entity-configuration";
-import { EidasTrustAnchor } from "./infra/trust-anchor";
 import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
@@ -28,29 +26,6 @@ export const WalletAttestationPayload = t.type({
 export type WalletAttestationPayload = t.TypeOf<
   typeof WalletAttestationPayload
 >;
-
-const composeTrustChain = ({
-  federationEntityMetadata,
-  signer,
-}: EntityConfigurationEnvironment) => {
-  const walletProviderEntityStatement = pipe(
-    new EidasTrustAnchor(federationEntityMetadata),
-    (ta) => ta.getEntityStatement(),
-    TE.map(({ encoded }) => encoded),
-  );
-
-  const walletProviderEntityConfiguration = getEntityConfiguration({
-    federationEntityMetadata,
-    signer,
-  });
-
-  return pipe(
-    sequenceT(TE.ApplicativePar)(
-      walletProviderEntityConfiguration,
-      walletProviderEntityStatement,
-    ),
-  );
-};
 
 // Build the JWT of the Wallet Attestation given a Wallet Attestation Request
 export const createWalletAttestation =
@@ -69,9 +44,8 @@ export const createWalletAttestation =
           signer.getSupportedSignAlgorithms(),
           TE.fromEither,
         ),
-        trustChain: composeTrustChain({ federationEntityMetadata, signer }),
       }),
-      TE.chain(({ publicJwk, supportedSignAlgorithms, trustChain }) =>
+      TE.chain(({ publicJwk, supportedSignAlgorithms }) =>
         pipe(
           {
             aal: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
@@ -82,7 +56,6 @@ export const createWalletAttestation =
               organizationName: federationEntityMetadata.organizationName,
               policyUri: federationEntityMetadata.policyUri,
               tosUri: federationEntityMetadata.tosUri,
-              trustAnchorUri: federationEntityMetadata.trustAnchorUri,
             },
             iss: federationEntityMetadata.basePath.href,
             sub: attestationRequest.header.kid,
@@ -91,7 +64,6 @@ export const createWalletAttestation =
           WalletAttestationToJwtModel.encode,
           signer.createJwtAndSign(
             {
-              trust_chain: trustChain,
               typ: "wallet-attestation+jwt",
             },
             publicJwk.kid,

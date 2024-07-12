@@ -26,7 +26,6 @@ export const FederationEntityMetadata = t.type({
   organizationName: NonEmptyString,
   policyUri: UrlFromString,
   tosUri: UrlFromString,
-  trustAnchorUri: UrlFromString,
 });
 
 export type FederationEntityMetadata = t.TypeOf<
@@ -44,7 +43,6 @@ export const FederationEntity = t.type({
   organizationName: t.string,
   policyUri: UrlFromString,
   tosUri: UrlFromString,
-  trustAnchorUri: UrlFromString,
 });
 
 const WalletProviderMetadataPayload = t.type({
@@ -92,7 +90,6 @@ export const getEntityConfiguration: RTE.ReaderTaskEither<
             organizationName: federationEntityMetadata.organizationName,
             policyUri: federationEntityMetadata.policyUri,
             tosUri: federationEntityMetadata.tosUri,
-            trustAnchorUri: federationEntityMetadata.trustAnchorUri,
           },
           iss: federationEntityMetadata.basePath,
           sub: federationEntityMetadata.basePath,

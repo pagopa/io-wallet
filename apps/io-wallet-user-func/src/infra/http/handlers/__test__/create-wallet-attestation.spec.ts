@@ -17,25 +17,13 @@ import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as jose from "jose";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
 import { privateEcKey, publicEcKey, signer } from "./keys";
-import {
-  federationEntityMetadata,
-  trustAnchorPort,
-  trustAnchorServerMock,
-} from "./trust-anchor";
+import { federationEntityMetadata } from "./trust-anchor";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
-
-beforeAll(() => {
-  trustAnchorServerMock.listen(trustAnchorPort);
-});
-
-afterAll(() => {
-  trustAnchorServerMock.close();
-});
 
 const nonceRepository: NonceRepository = {
   delete: () => TE.right(void 0),
