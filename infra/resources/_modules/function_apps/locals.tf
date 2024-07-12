@@ -25,7 +25,6 @@ locals {
       FederationEntityPolicyUri        = "https://io.italia.it/privacy-policy/"
       FederationEntityTosUri           = "https://io.italia.it/privacy-policy/"
       FederationEntityLogoUri          = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
-      FederationEntityTrustAnchorUri   = "https://demo.federation.eudi.wallet.developers.italia.it"
       IosBundleIdentifier              = "it.pagopa.app.io"
       IosTeamIdentifier                = "M2X5YQ4BJ7"
       AndroidBundleIdentifier          = "it.pagopa.io.app"

@@ -157,7 +157,6 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
-    trustAnchorUri: readFromEnvironment("FederationEntityTrustAnchorUri"),
   }),
   RE.chainEitherKW(
     parse(
