@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.21
+
+### Patch Changes
+
+- 548406a: Removed TrustAnchor
+
 ## 0.1.20
 
 ### Patch Changes
