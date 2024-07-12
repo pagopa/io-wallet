@@ -37,7 +37,11 @@ locals {
       {
         name                  = "WalletKeys"
         key_vault_secret_name = "WalletKeys"
-      }
+      },
+      {
+        name                  = "TrialSystemApiKey"
+        key_vault_secret_name = "TrialSystemApiKey"
+      },
     ]
   }
 }

@@ -301,7 +301,10 @@ const getHubSpidLoginConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     hubSpidLoginClientBaseUrl: readFromEnvironment("HubSpidLoginClientBaseUrl"),
     hubSpidLoginJwtIssuer: readFromEnvironment("HubSpidLoginJwtIssuer"),
-    hubSpidLoginJwtPubKey: readFromEnvironment("HubSpidLoginJwtPubKey"),
+    hubSpidLoginJwtPubKey: pipe(
+      readFromEnvironment("HubSpidLoginJwtPubKey"),
+      RE.map((publicKey) => publicKey.replace(/\\n/g, "\n")),
+    ),
   }),
   RE.map(
     ({
