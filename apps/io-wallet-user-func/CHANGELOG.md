@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.20
+
+### Patch Changes
+
+- c453b00: Fixed getHttpsFetch
+
 ## 0.1.19
 
 ### Patch Changes
