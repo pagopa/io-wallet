@@ -18,12 +18,12 @@ export class TrialSystemClient
       async () => {
         const result = await fetch(
           new URL(
-            `/trials/${this.#trialId}/subscriptions/${fiscalCode}`,
+            `/manage/api/v1/trials/${this.#trialId}/subscriptions/${fiscalCode}`,
             this.#baseURL,
           ),
           {
             headers: {
-              "x-functions-key": this.#apiKey,
+              "Ocp-Apim-Subscription-Key": this.#apiKey,
             },
             method: "GET",
             signal: AbortSignal.timeout(3000),

@@ -43,7 +43,7 @@ locals {
       HubSpidLoginJwtIssuer     = "api-web.io.pagopa.it/ioweb/auth"
       HubSpidLoginClientBaseUrl = "https://io-p-weu-ioweb-spid-login.azurewebsites.net"
 
-      TrialSystemApiBaseURL  = "https://ts-p-itn-subscription-fn-01.azurewebsites.net"
+      TrialSystemApiBaseURL  = "https://api.trial.pagopa.it"
       TrialSystemTrialId     = "01J2GN4TA8FB6DPTAX3T3YD6M1"
       TrialSystemFeatureFlag = true
       },
