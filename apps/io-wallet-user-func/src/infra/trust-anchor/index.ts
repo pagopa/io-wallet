@@ -28,8 +28,8 @@ const oidFederation = "/.well-known/openid-federation";
 export class EidasTrustAnchor implements TrustAnchor {
   #configuration: FederationEntityMetadata;
 
-  httpApiFetch = agent.getHttpFetch(process.env);
-  abortableFetch = AbortableFetch(this.httpApiFetch);
+  httpsApiFetch = agent.getHttpsFetch(process.env);
+  abortableFetch = AbortableFetch(this.httpsApiFetch);
   fetchWithTimeout = toFetch(
     setFetchTimeout(1000 as Millisecond, this.abortableFetch),
   ) as unknown as typeof fetch;
