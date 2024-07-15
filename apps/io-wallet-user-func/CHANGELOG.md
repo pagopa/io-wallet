@@ -1,5 +1,12 @@
 # io-func-wallet-solution-backend
 
+## 0.1.22
+
+### Patch Changes
+
+- 29b2dad: Patch
+- 29b2dad: Update function name
+
 ## 0.1.21
 
 ### Patch Changes
