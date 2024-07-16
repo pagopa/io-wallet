@@ -10,6 +10,7 @@ export class TrialSystemClient
 {
   #apiKey: string;
   #baseURL: string;
+  #options: RequestInit;
   #trialId: string;
   featureFlag: string;
 
@@ -21,13 +22,7 @@ export class TrialSystemClient
             `/manage/api/v1/trials/${this.#trialId}/subscriptions/${fiscalCode}`,
             this.#baseURL,
           ),
-          {
-            headers: {
-              "Ocp-Apim-Subscription-Key": this.#apiKey,
-            },
-            method: "GET",
-            signal: AbortSignal.timeout(3000),
-          },
+          { ...this.#options, signal: AbortSignal.timeout(3000) },
         );
         if (!result.ok) {
           throw new Error(JSON.stringify(await result.json()));
@@ -43,10 +38,10 @@ export class TrialSystemClient
   healthCheck = () =>
     TE.tryCatch(
       async () => {
-        const result = await fetch(new URL("/info", this.#baseURL), {
-          method: "GET",
-          signal: AbortSignal.timeout(3000),
-        });
+        const result = await fetch(
+          new URL(`/manage/api/v1/trials/${this.#trialId}`, this.#baseURL),
+          { ...this.#options, signal: AbortSignal.timeout(3000) },
+        );
         return result.status === 200;
       },
       (error) => new Error(`error checking trial system health: ${error}`),
@@ -62,5 +57,11 @@ export class TrialSystemClient
     this.#baseURL = baseURL;
     this.#trialId = trialId;
     this.featureFlag = featureFlag;
+    this.#options = {
+      headers: {
+        "Ocp-Apim-Subscription-Key": this.#apiKey,
+      },
+      method: "GET",
+    };
   }
 }
