@@ -1,4 +1,8 @@
-import { ANDROID_CRL_URL, GOOGLE_PUBLIC_KEY } from "@/app/config";
+import {
+  ANDROID_CRL_URL,
+  GOOGLE_PUBLIC_KEY,
+  decodeBase64String,
+} from "@/app/config";
 import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 
@@ -21,7 +25,7 @@ describe("AndroidAttestationValidation", () => {
       androidCrlUrl: ANDROID_CRL_URL,
       bundleIdentifier: "com.ioreactnativeintegrityexample",
       challenge: "randomvalue",
-      googlePublicKey: GOOGLE_PUBLIC_KEY,
+      googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
       x509Chain,
     });
     const expectedResult = {
