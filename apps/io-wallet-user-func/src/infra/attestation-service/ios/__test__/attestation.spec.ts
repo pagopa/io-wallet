@@ -1,4 +1,7 @@
-import { APPLE_APP_ATTESTATION_ROOT_CA } from "@/app/config";
+import {
+  APPLE_APP_ATTESTATION_ROOT_CA,
+  decodeBase64String,
+} from "@/app/config";
 import { decode } from "cbor-x";
 import { describe, expect, it } from "vitest";
 
@@ -21,7 +24,7 @@ describe("iOSAttestationValidation", () => {
   it("should return a validated attestation", async () => {
     const result = verifyAttestation({
       allowDevelopmentEnvironment: true,
-      appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
+      appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
       bundleIdentifier,
       challenge,
       decodedAttestation,
