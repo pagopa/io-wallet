@@ -4,6 +4,7 @@ import {
   ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
+  decodeBase64String,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -47,12 +48,12 @@ describe("CreateWalletInstanceHandler", () => {
     allowDevelopmentEnvironment: true,
     androidBundleIdentifier:
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
-    androidCrlUrl: ANDROID_CRL_URL,
-    androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
+    androidCrlUrl: decodeBase64String(ANDROID_CRL_URL),
+    androidPlayIntegrityUrl: decodeBase64String(ANDROID_PLAY_INTEGRITY_URL),
     androidPlayStoreCertificateHash: "",
-    appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
+    appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
     googleAppCredentialsEncoded: "",
-    googlePublicKey: GOOGLE_PUBLIC_KEY,
+    googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
     iOsBundleIdentifier:
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
     iOsTeamIdentifier: "M2X5YQ4BJ7",
