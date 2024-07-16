@@ -10,8 +10,8 @@ export class TrialSystemClient
 {
   #apiKey: string;
   #baseURL: string;
-  #trialId: string;
   #options: RequestInit;
+  #trialId: string;
   featureFlag: string;
 
   getUserSubscriptionDetail = (fiscalCode: FiscalCode) =>
