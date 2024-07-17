@@ -132,3 +132,16 @@ module "iam" {
 
   cdn_storage_account_id = module.cdn.storage_account_cdn.id
 }
+
+module "apim" {
+  source = "../_modules/apim"
+
+  project_legacy             = local.project_legacy
+  apim_name                  = local.apim.name
+  resource_group_name = local.apim.resource_group_name
+  product_id = local.apim.products.io_web.product_id
+
+  user_function_hostname =  module.function_apps.function_app_user.default_site_hostname
+
+  tags = local.tags
+}

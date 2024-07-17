@@ -1,0 +1,97 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "IO Wallet - User API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/wallet-instances/current/status": {
+      "get": {
+        "summary": "Retrieve the current Wallet Instance status",
+        "operationId": "getCurrentWalletInstanceStatus",
+        "security": [
+          {
+            "FunctionsKey": [],
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Wallet Instance status successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletData"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/wallet-instances/{id}/status": {
+      "put": {
+        "summary": "Revoke a Wallet Instance",
+        "operationId": "setWalletInstanceStatus",
+        "security": [
+          {
+            "FunctionsKey": [],
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Revoke the Wallet Instance associated with the authenticated user. \nIf the Wallet Instance is already revoked, the operation succeed.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetWalletInstanceStatusData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Wallet Instance status successfully set"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    }
+  }
+}

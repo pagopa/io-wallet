@@ -1,4 +1,6 @@
 locals {
+  project_legacy = "${var.prefix}-${var.env_short}"
+
   function_app_wallet = {
     app_settings = merge({
       FUNCTIONS_WORKER_RUNTIME       = "node"
