@@ -5,6 +5,6 @@ output "function_app_user" {
     resource_group_name   = module.function_app_user.function_app.resource_group_name
     principal_id          = module.function_app_user.function_app.function_app.principal_id
     staging_principal_id  = module.function_app_user.function_app.function_app.slot.principal_id
-    default_site_hostname = module.function_app_user.function_app.default_site_hostname
+    default_hostname = module.function_app_user.function_app.default_hostname
   }
 }
