@@ -41,15 +41,15 @@ export const CryptoConfiguration = t.type({
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
+  AndroidBundleIdentifiers: t.array(t.string),
+  IosBundleIdentifiers: t.array(t.string),
   allowDevelopmentEnvironment: t.boolean,
-  androidBundleIdentifier: t.string,
   androidCrlUrl: t.string,
   androidPlayIntegrityUrl: t.string,
   androidPlayStoreCertificateHash: t.string,
   appleRootCertificate: t.string,
   googleAppCredentialsEncoded: t.string,
   googlePublicKey: t.string,
-  iOsBundleIdentifier: t.string,
   iOsTeamIdentifier: t.string,
   skipSignatureValidation: t.boolean,
 });
@@ -196,14 +196,20 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   AttestationServiceConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
+    AndroidBundleIdentifiers: pipe(
+      readFromEnvironment("AndroidBundleIdentifiers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right(["it.pagopa.io.app"])),
+    ),
+    IosBundleIdentifiers: pipe(
+      readFromEnvironment("IosBundleIdentifiers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right(["it.pagopa.app.io"])),
+    ),
     allowDevelopmentEnvironment: pipe(
       readFromEnvironment("AllowDevelopmentEnvironment"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
-    ),
-    androidBundleIdentifier: pipe(
-      readFromEnvironment("AndroidBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.io.app")),
     ),
     androidCrlUrl: pipe(
       readFromEnvironment("AndroidCrlUrl"),
@@ -228,10 +234,6 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("GooglePublicKey"),
       RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY)),
       RE.map(decodeBase64String),
-    ),
-    iOsBundleIdentifier: pipe(
-      readFromEnvironment("IosBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.app.io")),
     ),
     iOsTeamIdentifier: pipe(
       readFromEnvironment("IosTeamIdentifier"),

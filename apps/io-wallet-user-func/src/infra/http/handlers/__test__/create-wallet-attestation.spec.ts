@@ -36,17 +36,19 @@ const logger = {
 };
 
 const attestationServiceConfiguration = {
-  allowDevelopmentEnvironment: true,
-  androidBundleIdentifier:
+  AndroidBundleIdentifiers: [
     "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  ],
+  IosBundleIdentifiers: [
+    "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  ],
+  allowDevelopmentEnvironment: true,
   androidCrlUrl: ANDROID_CRL_URL,
   androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
   androidPlayStoreCertificateHash: "",
   appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
   googleAppCredentialsEncoded: "",
   googlePublicKey: GOOGLE_PUBLIC_KEY,
-  iOsBundleIdentifier:
-    "org.reactjs.native.example.IoReactNativeIntegrityExample",
   iOsTeamIdentifier: "M2X5YQ4BJ7",
   skipSignatureValidation: true,
 };

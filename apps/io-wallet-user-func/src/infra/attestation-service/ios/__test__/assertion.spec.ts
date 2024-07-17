@@ -7,7 +7,7 @@ import { iOSMockData } from "./config";
 describe("iOSAssertionValidation", () => {
   const {
     assertion,
-    bundleIdentifier,
+    bundleIdentifiers,
     challenge,
     ephemeralKey,
     hardwareKey,
@@ -21,7 +21,7 @@ describe("iOSAssertionValidation", () => {
 
   it("should return true", async () => {
     const result = verifyAssertion({
-      bundleIdentifier,
+      bundleIdentifiers,
       clientData,
       decodedAssertion,
       hardwareKey,

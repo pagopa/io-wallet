@@ -23,7 +23,7 @@ describe("AndroidAttestationValidation", () => {
   it("should return a validated attestation", async () => {
     const result = verifyAttestation({
       androidCrlUrl: ANDROID_CRL_URL,
-      bundleIdentifier: "com.ioreactnativeintegrityexample",
+      bundleIdentifiers: ["com.ioreactnativeintegrityexample"],
       challenge: "randomvalue",
       googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
       x509Chain,

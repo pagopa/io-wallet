@@ -36,7 +36,7 @@ export const validateiOSAttestation = (
   data: Buffer,
   challenge: NonEmptyString,
   keyId: string,
-  bundleIdentifier: string,
+  bundleIdentifiers: string[],
   teamIdentifier: string,
   appleRootCertificate: string,
   allowDevelopmentEnvironment: boolean,
@@ -57,7 +57,7 @@ export const validateiOSAttestation = (
             verifyAttestation({
               allowDevelopmentEnvironment,
               appleRootCertificate,
-              bundleIdentifier,
+              bundleIdentifiers,
               challenge,
               decodedAttestation,
               keyId,
@@ -91,7 +91,7 @@ export const validateiOSAssertion = (
   clientData: string,
   hardwareKey: JwkPublicKey,
   signCount: number,
-  bundleIdentifier: string,
+  bundleIdentifiers: string[],
   teamIdentifier: string,
   skipSignatureValidation: boolean,
 ) =>
@@ -114,7 +114,7 @@ export const validateiOSAssertion = (
       TE.tryCatch(
         () =>
           verifyAssertion({
-            bundleIdentifier,
+            bundleIdentifiers,
             clientData,
             decodedAssertion,
             hardwareKey,

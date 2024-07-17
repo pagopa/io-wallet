@@ -45,17 +45,19 @@ describe("CreateWalletInstanceHandler", () => {
   };
 
   const attestationServiceConfiguration = {
-    allowDevelopmentEnvironment: true,
-    androidBundleIdentifier:
+    AndroidBundleIdentifiers: [
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
+    ],
+    IosBundleIdentifiers: [
+      "org.reactjs.native.example.IoReactNativeIntegrityExample",
+    ],
+    allowDevelopmentEnvironment: true,
     androidCrlUrl: decodeBase64String(ANDROID_CRL_URL),
     androidPlayIntegrityUrl: decodeBase64String(ANDROID_PLAY_INTEGRITY_URL),
     androidPlayStoreCertificateHash: "",
     appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
     googleAppCredentialsEncoded: "",
     googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
-    iOsBundleIdentifier:
-      "org.reactjs.native.example.IoReactNativeIntegrityExample",
     iOsTeamIdentifier: "M2X5YQ4BJ7",
     skipSignatureValidation: false,
   };
