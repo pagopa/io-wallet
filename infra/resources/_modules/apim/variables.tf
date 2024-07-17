@@ -4,7 +4,7 @@ variable "product_id" {
 }
 
 variable "project_legacy" {
-  type        = string
+  type = string
 }
 
 variable "tags" {

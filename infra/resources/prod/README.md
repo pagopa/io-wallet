@@ -20,6 +20,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_apim"></a> [apim](#module\_apim) | ../_modules/apim | n/a |
 | <a name="module_cdn"></a> [cdn](#module\_cdn) | ../_modules/cdn | n/a |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | ../_modules/cosmos | n/a |
 | <a name="module_function_apps"></a> [function\_apps](#module\_function\_apps) | ../_modules/function_apps | n/a |

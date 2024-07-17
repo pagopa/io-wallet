@@ -16,7 +16,7 @@ locals {
   secondary_location = "germanywestcentral"
 
   apim = {
-    name             = "${local.project_legacy}-apim-v2-api"
+    name                = "${local.project_legacy}-apim-v2-api"
     resource_group_name = "${local.project_legacy}-rg-internal"
     products = {
       io_web = {
