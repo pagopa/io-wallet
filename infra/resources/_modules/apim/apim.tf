@@ -4,7 +4,7 @@ module "apim_v2_wallet_api" {
   name                  = format("%s-ioweb-wallet", var.project_legacy)
   api_management_name   = var.apim_name
   resource_group_name   = var.resource_group_name
-  product_ids           = [local.io_web.product_id]
+  product_ids           = [var.product_id]
   subscription_required = false
 
   service_url = format("https://%s", var.user_function_hostname)
