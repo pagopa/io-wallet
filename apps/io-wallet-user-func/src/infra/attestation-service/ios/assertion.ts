@@ -5,7 +5,7 @@ import { exportSPKI, importJWK } from "jose";
 import { iOsAssertion } from ".";
 
 export interface VerifyAssertionParams {
-  bundleIdentifier: string;
+  bundleIdentifiers: string[];
   clientData: string;
   decodedAssertion: iOsAssertion;
   hardwareKey: JwkPublicKey;
@@ -16,7 +16,7 @@ export interface VerifyAssertionParams {
 
 export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const {
-    bundleIdentifier,
+    bundleIdentifiers,
     clientData,
     decodedAssertion,
     hardwareKey,
@@ -57,12 +57,18 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   }
 
   // 5. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
-  const appIdHash = createHash("sha256")
-    .update(`${teamIdentifier}.${bundleIdentifier}`)
-    .digest("base64");
-  const rpiIdHash = authenticatorData.subarray(0, 32).toString("base64");
 
-  if (appIdHash !== rpiIdHash) {
+  const bundleIdentifiersCheck = bundleIdentifiers.filter(
+    (bundleIdentifier) => {
+      const appIdHash = createHash("sha256")
+        .update(`${teamIdentifier}.${bundleIdentifier}`)
+        .digest("base64");
+      const rpiIdHash = authenticatorData.subarray(0, 32).toString("base64");
+      return appIdHash === rpiIdHash;
+    },
+  );
+
+  if (bundleIdentifiersCheck.length === 0) {
     throw new Error("[iOS Assertion] appId does not match");
   }
 

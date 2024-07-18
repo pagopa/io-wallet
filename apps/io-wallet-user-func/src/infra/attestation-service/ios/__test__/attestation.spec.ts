@@ -11,7 +11,7 @@ import { iOSMockData } from "./config";
 describe("iOSAttestationValidation", () => {
   const {
     attestation,
-    bundleIdentifier,
+    bundleIdentifiers,
     challenge,
     hardwareKey,
     keyId,
@@ -25,7 +25,7 @@ describe("iOSAttestationValidation", () => {
     const result = verifyAttestation({
       allowDevelopmentEnvironment: true,
       appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
-      bundleIdentifier,
+      bundleIdentifiers,
       challenge,
       decodedAttestation,
       keyId,
@@ -43,7 +43,7 @@ describe("iOSAttestationValidation", () => {
       verifyAttestation({
         allowDevelopmentEnvironment: true,
         appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-        bundleIdentifier,
+        bundleIdentifiers,
         challenge: "invalidChallenge",
         decodedAttestation,
         keyId,

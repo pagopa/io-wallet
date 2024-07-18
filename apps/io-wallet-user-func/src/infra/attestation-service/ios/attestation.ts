@@ -14,7 +14,7 @@ const APPATTESTPROD = Buffer.concat([
 export interface VerifyAttestationParams {
   allowDevelopmentEnvironment: boolean;
   appleRootCertificate: string;
-  bundleIdentifier: string;
+  bundleIdentifiers: string[];
   challenge: string;
   decodedAttestation: iOsAttestation;
   keyId: string;
@@ -25,7 +25,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const {
     allowDevelopmentEnvironment,
     appleRootCertificate,
-    bundleIdentifier,
+    bundleIdentifiers,
     challenge,
     decodedAttestation,
     keyId,
@@ -116,12 +116,17 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   }
 
   // 6. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
-  const appIdHash = createHash("sha256")
-    .update(`${teamIdentifier}.${bundleIdentifier}`)
-    .digest("base64");
-  const rpiIdHash = authData.subarray(0, 32).toString("base64");
+  const bundleIdentifiersCheck = bundleIdentifiers.filter(
+    (bundleIdentifier) => {
+      const appIdHash = createHash("sha256")
+        .update(`${teamIdentifier}.${bundleIdentifier}`)
+        .digest("base64");
+      const rpiIdHash = authData.subarray(0, 32).toString("base64");
+      return appIdHash === rpiIdHash;
+    },
+  );
 
-  if (appIdHash !== rpiIdHash) {
+  if (bundleIdentifiersCheck.length === 0) {
     throw new Error("[iOS Attestation] appId does not match");
   }
 
