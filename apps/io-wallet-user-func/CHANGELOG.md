@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.24
+
+### Patch Changes
+
+- 3829cab: patch
+
 ## 0.1.23
 
 ### Patch Changes
