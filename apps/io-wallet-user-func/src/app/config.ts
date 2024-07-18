@@ -41,9 +41,8 @@ export const CryptoConfiguration = t.type({
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
-  AndroidBundleIdentifiers: t.array(t.string),
-  IosBundleIdentifiers: t.array(t.string),
   allowDevelopmentEnvironment: t.boolean,
+  androidBundleIdentifiers: t.array(t.string),
   androidCrlUrl: t.string,
   androidPlayIntegrityUrl: t.string,
   androidPlayStoreCertificateHash: t.string,
@@ -51,6 +50,7 @@ export const AttestationServiceConfiguration = t.type({
   googleAppCredentialsEncoded: t.string,
   googlePublicKey: t.string,
   iOsTeamIdentifier: t.string,
+  iosBundleIdentifiers: t.array(t.string),
   skipSignatureValidation: t.boolean,
 });
 
@@ -196,20 +196,15 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   AttestationServiceConfiguration
 > = pipe(
   sequenceS(RE.Apply)({
-    AndroidBundleIdentifiers: pipe(
-      readFromEnvironment("AndroidBundleIdentifiers"),
-      RE.map((identifiers) => identifiers.split(",")),
-      RE.orElse(() => RE.right(["it.pagopa.io.app"])),
-    ),
-    IosBundleIdentifiers: pipe(
-      readFromEnvironment("IosBundleIdentifiers"),
-      RE.map((identifiers) => identifiers.split(",")),
-      RE.orElse(() => RE.right(["it.pagopa.app.io"])),
-    ),
     allowDevelopmentEnvironment: pipe(
       readFromEnvironment("AllowDevelopmentEnvironment"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
+    ),
+    androidBundleIdentifiers: pipe(
+      readFromEnvironment("AndroidBundleIdentifiers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right(["it.pagopa.io.app"])),
     ),
     androidCrlUrl: pipe(
       readFromEnvironment("AndroidCrlUrl"),
@@ -238,6 +233,11 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     iOsTeamIdentifier: pipe(
       readFromEnvironment("IosTeamIdentifier"),
       RE.orElse(() => RE.right("DSEVY6MV9G")),
+    ),
+    iosBundleIdentifiers: pipe(
+      readFromEnvironment("IosBundleIdentifiers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right(["it.pagopa.app.io"])),
     ),
     skipSignatureValidation: pipe(
       readFromEnvironment("SkipSignatureValidation"),

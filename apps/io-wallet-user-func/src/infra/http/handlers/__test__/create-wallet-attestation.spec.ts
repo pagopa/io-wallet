@@ -36,13 +36,10 @@ const logger = {
 };
 
 const attestationServiceConfiguration = {
-  AndroidBundleIdentifiers: [
-    "org.reactjs.native.example.IoReactNativeIntegrityExample",
-  ],
-  IosBundleIdentifiers: [
-    "org.reactjs.native.example.IoReactNativeIntegrityExample",
-  ],
   allowDevelopmentEnvironment: true,
+  androidBundleIdentifiers: [
+    "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  ],
   androidCrlUrl: ANDROID_CRL_URL,
   androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
   androidPlayStoreCertificateHash: "",
@@ -50,6 +47,9 @@ const attestationServiceConfiguration = {
   googleAppCredentialsEncoded: "",
   googlePublicKey: GOOGLE_PUBLIC_KEY,
   iOsTeamIdentifier: "M2X5YQ4BJ7",
+  iosBundleIdentifiers: [
+    "org.reactjs.native.example.IoReactNativeIntegrityExample",
+  ],
   skipSignatureValidation: true,
 };
 
