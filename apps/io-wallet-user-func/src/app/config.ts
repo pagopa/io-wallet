@@ -99,12 +99,23 @@ export type TrialSystemApiClientConfig = t.TypeOf<
   typeof TrialSystemApiClientConfig
 >;
 
+const IPZSApiClientConfig = t.type({
+  baseURL: t.string,
+  clientCertificate: t.string,
+  clientPrivateKey: t.string,
+  rootCACertificate: t.string,
+  walletProviderEntity: t.string,
+});
+
+export type IPZSApiClientConfig = t.TypeOf<typeof IPZSApiClientConfig>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfiguration,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   hubSpidLogin: HubSpidLoginConfig,
+  ipzs: IPZSApiClientConfig,
   pdvTokenizer: PdvTokenizerApiClientConfig,
   trialSystem: TrialSystemApiClientConfig,
 });
@@ -127,6 +138,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
   RE.bind("hubSpidLogin", () => getHubSpidLoginConfigFromEnvironment),
   RE.bind("trialSystem", () => getTrialSystemConfigFromEnvironment),
+  RE.bind("ipzs", () => getIpzsConfigFromEnvironment),
   RE.map(
     ({
       attestationService,
@@ -134,6 +146,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       crypto,
       federationEntity,
       hubSpidLogin,
+      ipzs,
       pdvTokenizer,
       trialSystem,
     }) => ({
@@ -142,6 +155,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       crypto,
       federationEntity,
       hubSpidLogin,
+      ipzs,
       pdvTokenizer,
       trialSystem,
     }),
@@ -350,6 +364,44 @@ const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
       baseURL: trialSystemApiBaseURL,
       featureFlag: trialSystemFeatureFlag,
       trialId: trialSystemTrialId,
+    }),
+  ),
+);
+
+const getIpzsConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  IPZSApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    ipzApiClientCertificate: pipe(
+      readFromEnvironment("IpzsApiClientCertificate"),
+      RE.map(decodeBase64String),
+    ),
+    ipzApiClientPrivateKey: pipe(
+      readFromEnvironment("IpzsApiClientPrivateKey"),
+      RE.map(decodeBase64String),
+    ),
+    ipzsApiBaseURL: readFromEnvironment("IpzsApiBaseURL"),
+    ipzsApiRootCACertificate: pipe(
+      readFromEnvironment("IpzsApiRootCACertificate"),
+      RE.map(decodeBase64String),
+    ),
+    walletProviderEntity: readFromEnvironment("WalletProviderEntity"),
+  }),
+  RE.map(
+    ({
+      ipzApiClientCertificate,
+      ipzApiClientPrivateKey,
+      ipzsApiBaseURL,
+      ipzsApiRootCACertificate,
+      walletProviderEntity,
+    }) => ({
+      baseURL: ipzsApiBaseURL,
+      clientCertificate: ipzApiClientCertificate,
+      clientPrivateKey: ipzApiClientPrivateKey,
+      rootCACertificate: ipzsApiRootCACertificate,
+      walletProviderEntity,
     }),
   ),
 );

@@ -36,6 +36,11 @@
     "TrialSystemApiBaseURL": "TRIAL_SYSTEM_API_BASE_URL",
     "TrialSystemApiKey": "TRIAL_SYSTEM_API_KEY",
     "TrialSystemTrialId": "TRIAL_SYSTEM_TRIAL_ID",
-    "TrialSystemFeatureFlag": "TRIAL_SYSTEM_FEATURE_FLAG"
+    "TrialSystemFeatureFlag": "TRIAL_SYSTEM_FEATURE_FLAG",
+    "IpzsApiBaseURL": "IPZS_API_BASE_URL",
+    "WalletProviderEntity": "WALLET_PROVIDER_ENTITY",
+    "IpzsApiClientCertificate": "IPZS_API_CLIENT_CERTIFICATE",
+    "IpzsApiClientPrivateKey": "IPZS_API_CLIENT_PRIVATE_KEY",
+    "IpzsApiRootCACertificate": "IPZS_API_ROOT_CA_CERTIFICATE"
   }
 }

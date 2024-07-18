@@ -1,3 +1,5 @@
+import { revokeAllCredentials } from "@/infra/ipzs/client";
+import { getFiscalCodeByUserId } from "@/user";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -37,6 +39,15 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
       userId: pipe(req, requireWhitelistedUserFromToken),
       walletInstanceId: pipe(req, requireWalletInstanceId, RTE.fromEither),
     }),
+    // invoke IPZS services to revoke all credentials for that user
+    RTE.chainFirstW(({ userId: { id } }) =>
+      pipe(
+        getFiscalCodeByUserId(id),
+        RTE.map(({ fiscalCode }) => fiscalCode),
+        RTE.chainW(revokeAllCredentials),
+      ),
+    ),
+    // access our database to revoke the wallet instance
     RTE.chainFirstW(({ userId, walletInstanceId }) =>
       revokeUserWalletInstances(userId.id, [walletInstanceId]),
     ),

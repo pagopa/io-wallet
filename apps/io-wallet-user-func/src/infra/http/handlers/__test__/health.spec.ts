@@ -1,4 +1,5 @@
 /* eslint-disable max-lines-per-function */
+import { IpzsApiClient } from "@/infra/ipzs/client";
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
 import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
@@ -28,10 +29,24 @@ describe("HealthHandler", () => {
     healthCheck: () => TE.left(new Error("pdv-tokenizer-error")),
   };
 
-  // test di quando questa va in errore
   const trialSystemClient: TrialSystemHealthCheck = {
     featureFlag: "true",
     healthCheck: () => TE.right(true),
+  };
+
+  const trialSystemClientThatFails: TrialSystemHealthCheck = {
+    featureFlag: "true",
+    healthCheck: () => TE.left(new Error("trial-system-error")),
+  };
+
+  const ipzsClient: IpzsApiClient = {
+    healthCheck: () => TE.right(true),
+    revokeAllCredentials: () => TE.left(new Error("not implemented!")),
+  };
+
+  const ipzsClientThatFails: IpzsApiClient = {
+    healthCheck: () => TE.left(new Error("ipzs-error")),
+    revokeAllCredentials: () => TE.left(new Error("not implemented!")),
   };
 
   const logger = {
@@ -44,6 +59,7 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
+      ipzsClient,
       logger,
       pdvTokenizerClient,
       trialSystemClient,
@@ -68,6 +84,7 @@ describe("HealthHandler", () => {
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
+      ipzsClient,
       logger,
       pdvTokenizerClient,
       trialSystemClient,
@@ -94,6 +111,7 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
+      ipzsClient,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
       trialSystemClient,
@@ -120,6 +138,7 @@ describe("HealthHandler", () => {
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
+      ipzsClient,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
       trialSystemClient,
@@ -150,5 +169,59 @@ describe("HealthHandler", () => {
         }),
       );
     }
+  });
+
+  it("should return a 500 HTTP response when getTrialSystemHealth returns an error", async () => {
+    const handler = HealthHandler({
+      cosmosClient,
+      input: H.request("https://wallet-provider.example.org"),
+      inputDecoder: H.HttpRequest,
+      ipzsClient,
+      logger,
+      pdvTokenizerClient,
+      trialSystemClient: trialSystemClientThatFails,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          detail: "The function is not healthy. Error: trial-system-error",
+          status: 500,
+          title: "Internal Server Error",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      },
+    });
+  });
+
+  it("should return a 500 HTTP response when getIpzsHealth returns an error", async () => {
+    const handler = HealthHandler({
+      cosmosClient,
+      input: H.request("https://wallet-provider.example.org"),
+      inputDecoder: H.HttpRequest,
+      ipzsClient: ipzsClientThatFails,
+      logger,
+      pdvTokenizerClient,
+      trialSystemClient,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          detail: "The function is not healthy. Error: ipzs-error",
+          status: 500,
+          title: "Internal Server Error",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      },
+    });
   });
 });
