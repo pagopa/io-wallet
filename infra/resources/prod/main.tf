@@ -136,12 +136,19 @@ module "iam" {
 module "apim" {
   source = "../_modules/apim"
 
-  project_legacy      = local.project_legacy
-  apim_name           = local.apim.name
-  resource_group_name = local.apim.resource_group_name
-  product_id          = local.apim.products.io_web.product_id
+  project_legacy = local.project_legacy
+  apim = {
+    name                = local.apim.name
+    resource_group_name = local.apim.resource_group_name
+  }
 
-  user_function_hostname = module.function_apps.function_app_user.default_hostname
+  user_function = {
+    function_hostname = module.function_apps.function_app_user.default_hostname
+  }
+
+  key_vault_id = data.azurerm_key_vault.weu-common.id
+
+  product_id = local.apim.products.io_web.product_id
 
   tags = local.tags
 }

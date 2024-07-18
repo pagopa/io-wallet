@@ -12,17 +12,22 @@ variable "tags" {
   description = "Resource tags"
 }
 
-variable "apim_name" {
-  type        = string
-  description = "Name of the APIM instance"
+variable "apim" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  description = "APIM configuration variables"
 }
 
-variable "resource_group_name" {
-  type        = string
-  description = "Name of the resource group where resources will be created"
+variable "user_function" {
+  type = object({
+    function_hostname = string
+  })
+  description = "APIM configuration variables"
 }
 
-variable "user_function_hostname" {
+variable "key_vault_id" {
   type        = string
-  description = "User function hostname"
+  description = "Key Vault ID"
 }
