@@ -25,7 +25,7 @@ module "function_app_user" {
   app_settings      = local.function_app_wallet.app_settings
   slot_app_settings = local.function_app_wallet.app_settings
 
-  tier = "test"
+  tier = "premium"
 
   tags = var.tags
 }
