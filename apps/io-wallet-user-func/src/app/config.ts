@@ -42,15 +42,15 @@ export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
   allowDevelopmentEnvironment: t.boolean,
-  androidBundleIdentifier: t.string,
+  androidBundleIdentifiers: t.array(t.string),
   androidCrlUrl: t.string,
   androidPlayIntegrityUrl: t.string,
   androidPlayStoreCertificateHash: t.string,
   appleRootCertificate: t.string,
   googleAppCredentialsEncoded: t.string,
   googlePublicKey: t.string,
-  iOsBundleIdentifier: t.string,
   iOsTeamIdentifier: t.string,
+  iosBundleIdentifiers: t.array(t.string),
   skipSignatureValidation: t.boolean,
 });
 
@@ -201,9 +201,10 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
     ),
-    androidBundleIdentifier: pipe(
-      readFromEnvironment("AndroidBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.io.app")),
+    androidBundleIdentifiers: pipe(
+      readFromEnvironment("AndroidBundleIdentifiers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right(["it.pagopa.io.app"])),
     ),
     androidCrlUrl: pipe(
       readFromEnvironment("AndroidCrlUrl"),
@@ -229,13 +230,14 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY)),
       RE.map(decodeBase64String),
     ),
-    iOsBundleIdentifier: pipe(
-      readFromEnvironment("IosBundleIdentifier"),
-      RE.orElse(() => RE.right("it.pagopa.app.io")),
-    ),
     iOsTeamIdentifier: pipe(
       readFromEnvironment("IosTeamIdentifier"),
       RE.orElse(() => RE.right("DSEVY6MV9G")),
+    ),
+    iosBundleIdentifiers: pipe(
+      readFromEnvironment("IosBundleIdentifiers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right(["it.pagopa.app.io"])),
     ),
     skipSignatureValidation: pipe(
       readFromEnvironment("SkipSignatureValidation"),

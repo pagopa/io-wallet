@@ -27,7 +27,7 @@ export interface VerifyAssertionParams {
   allowDevelopmentEnvironment: boolean;
   androidPlayIntegrityUrl: string;
   androidPlayStoreCertificateHash: string;
-  bundleIdentifier: string;
+  bundleIdentifiers: string[];
   clientData: string;
   googleAppCredentials: GoogleAppCredentials;
   hardwareKey: JwkPublicKey;
@@ -42,7 +42,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     allowDevelopmentEnvironment,
     androidPlayIntegrityUrl,
     androidPlayStoreCertificateHash,
-    bundleIdentifier,
+    bundleIdentifiers,
     clientData,
     googleAppCredentials,
     hardwareKey,
@@ -70,16 +70,28 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   google.options({ auth: jwtClient });
-  const result = await playintegrity.v1.decodeIntegrityToken({
-    packageName: bundleIdentifier,
-    requestBody: {
-      integrityToken: integrityAssertion,
-    },
-  });
 
-  const tokenPayloadExternal = result.data.tokenPayloadExternal;
+  let bundleIdentifier;
+  let tokenPayloadExternal;
 
-  if (!tokenPayloadExternal) {
+  for (const packageName of bundleIdentifiers) {
+    const result = await playintegrity.v1.decodeIntegrityToken({
+      packageName,
+      requestBody: {
+        integrityToken: integrityAssertion,
+      },
+    });
+
+    const token = result.data.tokenPayloadExternal;
+
+    if (token) {
+      bundleIdentifier = packageName;
+      tokenPayloadExternal = token;
+      break;
+    }
+  }
+
+  if (!tokenPayloadExternal || !bundleIdentifier) {
     throw new Error(
       "[Android Assertion] Invalid token payload from Play Integrity API response",
     );

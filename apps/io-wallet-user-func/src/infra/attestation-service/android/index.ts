@@ -21,7 +21,7 @@ export const validateAndroidAttestation = (
   data: Buffer,
   nonce: NonEmptyString,
   hardwareKeyTag: NonEmptyString,
-  bundleIdentifier: string,
+  bundleIdentifiers: string[],
   googlePublicKey: string,
   androidCrlUrl: string,
 ): TE.TaskEither<Error, ValidatedAttestation> =>
@@ -47,7 +47,7 @@ export const validateAndroidAttestation = (
           () =>
             verifyAttestation({
               androidCrlUrl,
-              bundleIdentifier,
+              bundleIdentifiers,
               challenge: nonce,
               googlePublicKey,
               x509Chain,
@@ -71,7 +71,7 @@ export const validateAndroidAssertion = (
   hardwareSignature: NonEmptyString,
   clientData: string,
   hardwareKey: JwkPublicKey,
-  bundleIdentifier: string,
+  bundleIdentifiers: string[],
   androidPlayStoreCertificateHash: string,
   googleAppCredentialsEncoded: string,
   androidPlayIntegrityUrl: string,
@@ -98,7 +98,7 @@ export const validateAndroidAssertion = (
             allowDevelopmentEnvironment,
             androidPlayIntegrityUrl,
             androidPlayStoreCertificateHash,
-            bundleIdentifier,
+            bundleIdentifiers,
             clientData,
             googleAppCredentials,
             hardwareKey,

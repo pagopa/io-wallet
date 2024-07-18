@@ -26,7 +26,7 @@ const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 
 export interface VerifyAttestationParams {
   androidCrlUrl: string;
-  bundleIdentifier: string;
+  bundleIdentifiers: string[];
   challenge: string;
   googlePublicKey: string;
   x509Chain: readonly X509Certificate[];
@@ -170,7 +170,7 @@ const validateExtension = (
   certWithExtension: X509Certificate,
   attestationParams: VerifyAttestationParams,
 ) => {
-  const { bundleIdentifier, challenge } = attestationParams;
+  const { bundleIdentifiers, challenge } = attestationParams;
 
   const extension = extractExtension(certWithExtension, KEY_OID);
   if (!extension) {
@@ -251,9 +251,13 @@ const validateExtension = (
     packageInfo.packageName as unknown as ArrayBuffer,
   ).toString("utf-8");
 
-  if (packageName !== bundleIdentifier) {
+  const bundleIdentifiersCheck = bundleIdentifiers.filter(
+    (bundleIdentifier) => packageName === bundleIdentifier,
+  );
+
+  if (bundleIdentifiersCheck.length === 0) {
     throw new Error(
-      `[Android Attestation] The bundle identifier ${packageName} does not match ${bundleIdentifier}.`,
+      `[Android Attestation] The bundle identifier ${packageName} does not match any of ${bundleIdentifiers}.`,
     );
   }
 
