@@ -10,7 +10,8 @@ on:
       - reopened
       - ready_for_review
     paths:
-      - "infra/resources/**"
+      - "infra/resources/prod/**"
+      - "infra/resources/_modules/**"
       - ".github/workflows/pr_infra.yaml"
       - ".github/workflows/release_infra.yaml"
 
