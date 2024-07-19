@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { UnauthorizedError } from "@/error";
-import { IpzsApiClient } from "@/infra/ipzs/client";
+import { CredentialsNotFound, IpzsApiClient } from "@/infra/ipzs/client";
 import { HslJwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
@@ -454,6 +454,44 @@ describe("SetWalletInstanceStatusHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 404 HTTP response when revokeAllCredentials returns 404", async () => {
+    const ipzsClientWithCredentialsNotFound: IpzsApiClient = {
+      healthCheck: () => TE.left(new Error("not implemented")),
+      revokeAllCredentials: () => TE.left(new CredentialsNotFound()),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: "REVOKED",
+      headers: {
+        authorization: "Bearer xxx",
+      },
+      method: "PUT",
+      path: {
+        id: "foo",
+      },
+    };
+    const handler = SetWalletInstanceStatusHandler({
+      hslJwtValidate,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      ipzsClient: ipzsClientWithCredentialsNotFound,
+      logger,
+      userRepository,
+      userTrialSubscriptionRepository,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 404,
       }),
     });
   });

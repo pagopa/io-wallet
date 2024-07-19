@@ -5,6 +5,13 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { Agent, RequestInit, fetch } from "undici";
 
+export class CredentialsNotFound extends Error {
+  name = "CredentialsNotFound";
+  constructor() {
+    super("No credentials found or credentials are already revoked.");
+  }
+}
+
 export interface IpzsApiClient {
   healthCheck: () => TE.TaskEither<Error, boolean>;
   revokeAllCredentials: (fiscalCode: FiscalCode) => TE.TaskEither<Error, void>;
@@ -66,16 +73,17 @@ export class IpzsClient implements IpzsApiClient {
             signal: AbortSignal.timeout(3000),
             ...this.#init,
           });
-          // if (result.status === 404) {
-          //   throw new Error(
-          //     "no credentials found or all credentials are already revoked",
-          //   );
-          // }
+          if (result.status === 404) {
+            throw new CredentialsNotFound();
+          }
           if (!result.ok) {
             throw new Error(JSON.stringify(await result.json()));
           }
         },
-        (error) => new Error(`error revoking all user credentials: ${error}`),
+        (error) =>
+          error instanceof CredentialsNotFound
+            ? error
+            : new Error(`error revoking all user credentials: ${error}`),
       ),
     );
 
