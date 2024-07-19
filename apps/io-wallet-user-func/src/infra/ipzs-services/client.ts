@@ -19,18 +19,18 @@ export interface IpzsApiClient {
 
 export const revokeAllCredentials: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<{ ipzsClient: IpzsApiClient }, Error, void> =
+) => RTE.ReaderTaskEither<{ ipzsServicesClient: IpzsApiClient }, Error, void> =
   (fiscalCode) =>
-  ({ ipzsClient }) =>
-    ipzsClient.revokeAllCredentials(fiscalCode);
+  ({ ipzsServicesClient }) =>
+    ipzsServicesClient.revokeAllCredentials(fiscalCode);
 
-export const getIpzsHealth: RTE.ReaderTaskEither<
+export const getIpzsServicesHealth: RTE.ReaderTaskEither<
   {
-    ipzsClient: IpzsApiClient;
+    ipzsServicesClient: IpzsApiClient;
   },
   Error,
   true
-> = ({ ipzsClient: { healthCheck } }) =>
+> = ({ ipzsServicesClient: { healthCheck } }) =>
   pipe(
     healthCheck(),
     TE.flatMap((isHealth) =>
@@ -38,7 +38,7 @@ export const getIpzsHealth: RTE.ReaderTaskEither<
     ),
   );
 
-export class IpzsClient implements IpzsApiClient {
+export class IpzsServicesClient implements IpzsApiClient {
   #baseURL: string;
   #init: RequestInit;
   #walletProviderEntity: string;

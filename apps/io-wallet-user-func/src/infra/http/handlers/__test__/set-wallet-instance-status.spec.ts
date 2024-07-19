@@ -1,6 +1,9 @@
 /* eslint-disable max-lines-per-function */
 import { UnauthorizedError } from "@/error";
-import { CredentialsNotFound, IpzsApiClient } from "@/infra/ipzs/client";
+import {
+  CredentialsNotFound,
+  IpzsApiClient,
+} from "@/infra/ipzs-services/client";
 import { HslJwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
@@ -47,7 +50,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       }),
   };
 
-  const ipzsClient: IpzsApiClient = {
+  const ipzsServicesClient: IpzsApiClient = {
     healthCheck: () => TE.right(true),
     revokeAllCredentials: () => TE.right(undefined),
   };
@@ -73,7 +76,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -101,7 +104,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -135,7 +138,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -169,7 +172,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -208,7 +211,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -242,7 +245,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -278,7 +281,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate: hslJwtValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -320,7 +323,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository:
@@ -361,7 +364,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository: userTrialSubscriptionRepositoryThatFails,
@@ -400,7 +403,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository: userRepositoryThatFailsOnGetUser,
       userTrialSubscriptionRepository,
@@ -440,7 +443,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository: userRepositoryThatFailsOnGetFiscalCode,
       userTrialSubscriptionRepository,
@@ -459,7 +462,7 @@ describe("SetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 404 HTTP response when revokeAllCredentials returns 404", async () => {
-    const ipzsClientWithCredentialsNotFound: IpzsApiClient = {
+    const ipzsServicesClientWithCredentialsNotFound: IpzsApiClient = {
       healthCheck: () => TE.left(new Error("not implemented")),
       revokeAllCredentials: () => TE.left(new CredentialsNotFound()),
     };
@@ -478,7 +481,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient: ipzsClientWithCredentialsNotFound,
+      ipzsServicesClient: ipzsServicesClientWithCredentialsNotFound,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -497,7 +500,7 @@ describe("SetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 500 HTTP response on revokeAllCredentials error", async () => {
-    const ipzsClientThatFailsOnRevoke: IpzsApiClient = {
+    const ipzsServicesClientThatFailsOnRevoke: IpzsApiClient = {
       healthCheck: () => TE.left(new Error("not implemented")),
       revokeAllCredentials: () =>
         TE.left(new Error("failed on revokeAllCredentials!")),
@@ -517,7 +520,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient: ipzsClientThatFailsOnRevoke,
+      ipzsServicesClient: ipzsServicesClientThatFailsOnRevoke,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -559,7 +562,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -596,7 +599,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       hslJwtValidate: hslJwtValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,

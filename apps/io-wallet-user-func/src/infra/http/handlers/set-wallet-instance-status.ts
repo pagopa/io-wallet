@@ -1,4 +1,4 @@
-import { revokeAllCredentials } from "@/infra/ipzs/client";
+import { revokeAllCredentials } from "@/infra/ipzs-services/client";
 import { getFiscalCodeByUserId } from "@/user";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";

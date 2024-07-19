@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import { IpzsApiClient } from "@/infra/ipzs/client";
+import { IpzsApiClient } from "@/infra/ipzs-services/client";
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
 import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
@@ -39,12 +39,12 @@ describe("HealthHandler", () => {
     healthCheck: () => TE.left(new Error("trial-system-error")),
   };
 
-  const ipzsClient: IpzsApiClient = {
+  const ipzsServicesClient: IpzsApiClient = {
     healthCheck: () => TE.right(true),
     revokeAllCredentials: () => TE.left(new Error("not implemented!")),
   };
 
-  const ipzsClientThatFails: IpzsApiClient = {
+  const ipzsServicesClientThatFails: IpzsApiClient = {
     healthCheck: () => TE.left(new Error("ipzs-error")),
     revokeAllCredentials: () => TE.left(new Error("not implemented!")),
   };
@@ -59,7 +59,7 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       pdvTokenizerClient,
       trialSystemClient,
@@ -84,7 +84,7 @@ describe("HealthHandler", () => {
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       pdvTokenizerClient,
       trialSystemClient,
@@ -111,7 +111,7 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
       trialSystemClient,
@@ -138,7 +138,7 @@ describe("HealthHandler", () => {
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
       trialSystemClient,
@@ -176,7 +176,7 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsClient,
+      ipzsServicesClient,
       logger,
       pdvTokenizerClient,
       trialSystemClient: trialSystemClientThatFails,
@@ -203,7 +203,7 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsClient: ipzsClientThatFails,
+      ipzsServicesClient: ipzsServicesClientThatFails,
       logger,
       pdvTokenizerClient,
       trialSystemClient,
