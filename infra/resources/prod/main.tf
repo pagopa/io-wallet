@@ -136,6 +136,8 @@ module "iam" {
 module "apim" {
   source = "../_modules/apim"
 
+  revision = "v1"
+
   project_legacy = local.project_legacy
   apim = {
     name                = local.apim.name

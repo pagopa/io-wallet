@@ -31,3 +31,9 @@ variable "key_vault_id" {
   type        = string
   description = "Key Vault ID"
 }
+
+variable "revision" {
+  type        = string
+  description = "Revision"
+  default     = "v1"
+}

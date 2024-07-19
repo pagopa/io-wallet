@@ -1,4 +1,4 @@
-module "apim_v2_wallet_api" {
+module "apim_v2_web_wallet_api" {
   source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
 
   name                  = format("%s-ioweb-wallet", var.project_legacy)
@@ -11,7 +11,7 @@ module "apim_v2_wallet_api" {
 
   description  = "Wallet APIs"
   display_name = "IO Web - Wallet"
-  path         = "ioweb/wallet/api/v1"
+  path         = "ioweb/wallet/api/${var.revision}"
   protocols    = ["https"]
 
   content_format = "openapi"
