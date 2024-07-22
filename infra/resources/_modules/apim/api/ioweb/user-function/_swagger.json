@@ -11,7 +11,6 @@
         "operationId": "getCurrentWalletInstanceStatus",
         "security": [
           {
-            "FunctionsKey": [],
             "BearerAuth": []
           }
         ],
@@ -47,7 +46,6 @@
         "operationId": "setWalletInstanceStatus",
         "security": [
           {
-            "FunctionsKey": [],
             "BearerAuth": []
           }
         ],
