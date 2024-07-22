@@ -1,9 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import { CredentialRepository } from "@/credential";
 import { UnauthorizedError } from "@/error";
-import {
-  CredentialsNotFound,
-  IpzsApiClient,
-} from "@/infra/ipzs-services/client";
 import { HslJwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
@@ -50,8 +47,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       }),
   };
 
-  const ipzsServicesClient: IpzsApiClient = {
-    healthCheck: () => TE.right(true),
+  const ipzsServicesClient: CredentialRepository = {
     revokeAllCredentials: () => TE.right(undefined),
   };
 
@@ -73,10 +69,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -101,10 +97,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -135,10 +131,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -169,10 +165,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -208,10 +204,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -242,10 +238,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -278,10 +274,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate: hslJwtValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -320,10 +316,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository:
@@ -361,10 +357,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository: userTrialSubscriptionRepositoryThatFails,
@@ -400,10 +396,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository: userRepositoryThatFailsOnGetUser,
       userTrialSubscriptionRepository,
@@ -421,87 +417,8 @@ describe("SetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on getFiscalCodeByUserId error", async () => {
-    const userRepositoryThatFailsOnGetFiscalCode: UserRepository = {
-      getFiscalCodeByUserId: () =>
-        TE.left(new Error("failed on getFiscalCodeByUserId!")),
-      getOrCreateUserByFiscalCode: () =>
-        TE.right({ id: "pdv_id" as NonEmptyString }),
-    };
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "Bearer xxx",
-      },
-      method: "PUT",
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = SetWalletInstanceStatusHandler({
-      hslJwtValidate,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
-      logger,
-      userRepository: userRepositoryThatFailsOnGetFiscalCode,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      }),
-    });
-  });
-
-  it("should return a 404 HTTP response when revokeAllCredentials returns 404", async () => {
-    const ipzsServicesClientWithCredentialsNotFound: IpzsApiClient = {
-      healthCheck: () => TE.left(new Error("not implemented")),
-      revokeAllCredentials: () => TE.left(new CredentialsNotFound()),
-    };
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "Bearer xxx",
-      },
-      method: "PUT",
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = SetWalletInstanceStatusHandler({
-      hslJwtValidate,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      ipzsServicesClient: ipzsServicesClientWithCredentialsNotFound,
-      logger,
-      userRepository,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 404,
-      }),
-    });
-  });
-
   it("should return a 500 HTTP response on revokeAllCredentials error", async () => {
-    const ipzsServicesClientThatFailsOnRevoke: IpzsApiClient = {
-      healthCheck: () => TE.left(new Error("not implemented")),
+    const ipzsServicesClientThatFailsOnRevoke: CredentialRepository = {
       revokeAllCredentials: () =>
         TE.left(new Error("failed on revokeAllCredentials!")),
     };
@@ -517,10 +434,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClientThatFailsOnRevoke,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient: ipzsServicesClientThatFailsOnRevoke,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -559,10 +476,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -596,10 +513,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       },
     };
     const handler = SetWalletInstanceStatusHandler({
+      credentialRepository: ipzsServicesClient,
       hslJwtValidate: hslJwtValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       userRepository,
       userTrialSubscriptionRepository,

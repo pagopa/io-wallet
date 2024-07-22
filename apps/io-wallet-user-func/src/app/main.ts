@@ -139,8 +139,8 @@ app.http("getCurrentWalletInstanceStatus", {
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
   handler: SetWalletInstanceStatusFunction({
+    credentialRepository: ipzsServicesClient,
     hslJwtValidate,
-    ipzsServicesClient,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,

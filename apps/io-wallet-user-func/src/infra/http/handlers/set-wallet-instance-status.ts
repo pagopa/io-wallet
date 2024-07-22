@@ -1,5 +1,5 @@
-import { revokeAllCredentials } from "@/infra/ipzs-services/client";
-import { getFiscalCodeByUserId } from "@/user";
+import { revokeAllCredentials } from "@/credential";
+import { getUserByFiscalCode } from "@/user";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -11,7 +11,7 @@ import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
 import { logErrorAndReturnResponse } from "../error";
-import { requireWhitelistedUserFromToken } from "../whitelisted-user";
+import { requireWhitelistedFiscalCodeFromToken } from "../whitelisted-user";
 
 const requireWalletInstanceId: (
   req: H.HttpRequest,
@@ -36,20 +36,19 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
       body: pipe(req, requireSetWalletInstanceStatusBody, RTE.fromEither),
-      userId: pipe(req, requireWhitelistedUserFromToken),
+      fiscalCode: pipe(req, requireWhitelistedFiscalCodeFromToken),
       walletInstanceId: pipe(req, requireWalletInstanceId, RTE.fromEither),
     }),
     // invoke IPZS services to revoke all credentials for that user
-    RTE.chainFirstW(({ userId: { id } }) =>
-      pipe(
-        getFiscalCodeByUserId(id),
-        RTE.map(({ fiscalCode }) => fiscalCode),
-        RTE.chainW(revokeAllCredentials),
-      ),
-    ),
+    RTE.chainFirstW(({ fiscalCode }) => revokeAllCredentials(fiscalCode)),
     // access our database to revoke the wallet instance
-    RTE.chainFirstW(({ userId, walletInstanceId }) =>
-      revokeUserWalletInstances(userId.id, [walletInstanceId]),
+    RTE.chainW(({ fiscalCode, walletInstanceId }) =>
+      pipe(
+        getUserByFiscalCode(fiscalCode),
+        RTE.chainW(({ id }) =>
+          revokeUserWalletInstances(id, [walletInstanceId]),
+        ),
+      ),
     ),
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse),

@@ -1,44 +1,15 @@
 import { IPZSApiClientConfig } from "@/app/config";
+import { CredentialRepository } from "@/credential";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { Agent, RequestInit, fetch } from "undici";
 
-export class CredentialsNotFound extends Error {
-  name = "CredentialsNotFound";
-  constructor() {
-    super("No credentials found or credentials are already revoked.");
-  }
-}
+import { IpzsServicesHealthCheck } from "./health-check";
 
-export interface IpzsApiClient {
-  healthCheck: () => TE.TaskEither<Error, boolean>;
-  revokeAllCredentials: (fiscalCode: FiscalCode) => TE.TaskEither<Error, void>;
-}
-
-export const revokeAllCredentials: (
-  fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<{ ipzsServicesClient: IpzsApiClient }, Error, void> =
-  (fiscalCode) =>
-  ({ ipzsServicesClient }) =>
-    ipzsServicesClient.revokeAllCredentials(fiscalCode);
-
-export const getIpzsServicesHealth: RTE.ReaderTaskEither<
-  {
-    ipzsServicesClient: IpzsApiClient;
-  },
-  Error,
-  true
-> = ({ ipzsServicesClient: { healthCheck } }) =>
-  pipe(
-    healthCheck(),
-    TE.flatMap((isHealth) =>
-      !isHealth ? TE.left(new Error("ipzs-error")) : TE.right(isHealth),
-    ),
-  );
-
-export class IpzsServicesClient implements IpzsApiClient {
+export class IpzsServicesClient
+  implements CredentialRepository, IpzsServicesHealthCheck
+{
   #baseURL: string;
   #init: RequestInit;
   #walletProviderEntity: string;
@@ -66,24 +37,24 @@ export class IpzsServicesClient implements IpzsApiClient {
         async () => {
           const result = await fetch(new URL("/revokeAll", this.#baseURL), {
             body: JSON.stringify({
-              unique_id: fiscalCode,
+              unique_id: `TINIT-${fiscalCode}`,
               wallet_provider: this.#walletProviderEntity,
             }),
             method: "POST",
             signal: AbortSignal.timeout(3000),
             ...this.#init,
           });
+
           if (result.status === 404) {
-            throw new CredentialsNotFound();
+            // if the credentials have already been revoked the status is 404 but our endpoint is idempotent
+            // add log
+            return undefined;
           }
           if (!result.ok) {
             throw new Error(JSON.stringify(await result.json()));
           }
         },
-        (error) =>
-          error instanceof CredentialsNotFound
-            ? error
-            : new Error(`error revoking all user credentials: ${error}`),
+        (error) => new Error(`error revoking all user credentials: ${error}`),
       ),
     );
 

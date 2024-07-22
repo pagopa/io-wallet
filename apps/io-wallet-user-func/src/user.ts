@@ -33,13 +33,6 @@ export const getUserByFiscalCode: (
   ({ userRepository }) =>
     userRepository.getOrCreateUserByFiscalCode(fiscalCode);
 
-export const getFiscalCodeByUserId: (
-  id: NonEmptyString,
-) => RTE.ReaderTaskEither<UserEnvironment, Error, { fiscalCode: FiscalCode }> =
-  (id) =>
-  ({ userRepository }) =>
-    userRepository.getFiscalCodeByUserId(id);
-
 export enum SubscriptionStateEnum {
   "ACTIVE" = "ACTIVE",
   "DISABLED" = "DISABLED",

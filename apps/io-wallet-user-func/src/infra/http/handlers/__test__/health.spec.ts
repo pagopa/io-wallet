@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import { IpzsApiClient } from "@/infra/ipzs-services/client";
+import { IpzsServicesHealthCheck } from "@/infra/ipzs-services/health-check";
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
 import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
@@ -39,14 +39,12 @@ describe("HealthHandler", () => {
     healthCheck: () => TE.left(new Error("trial-system-error")),
   };
 
-  const ipzsServicesClient: IpzsApiClient = {
+  const ipzsServicesClient: IpzsServicesHealthCheck = {
     healthCheck: () => TE.right(true),
-    revokeAllCredentials: () => TE.left(new Error("not implemented!")),
   };
 
-  const ipzsServicesClientThatFails: IpzsApiClient = {
+  const ipzsServicesClientThatFails: IpzsServicesHealthCheck = {
     healthCheck: () => TE.left(new Error("ipzs-error")),
-    revokeAllCredentials: () => TE.left(new Error("not implemented!")),
   };
 
   const logger = {

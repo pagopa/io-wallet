@@ -1,9 +1,9 @@
 import { HealthCheckError } from "@/error";
 import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
 import {
-  IpzsApiClient,
+  IpzsServicesHealthCheck,
   getIpzsServicesHealth,
-} from "@/infra/ipzs-services/client";
+} from "@/infra/ipzs-services/health-check";
 import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,
@@ -26,7 +26,7 @@ import { logErrorAndReturnResponse } from "../error";
 const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
-    ipzsServicesClient: IpzsApiClient;
+    ipzsServicesClient: IpzsServicesHealthCheck;
     pdvTokenizerClient: PdvTokenizerHealthCheck;
     trialSystemClient: TrialSystemHealthCheck;
   },
