@@ -7,7 +7,7 @@ module "apim_v2_web_wallet_api" {
   product_ids           = [var.product_id]
   subscription_required = false
 
-  service_url = format("https://%s", var.user_function.function_hostname)
+  service_url = format("https://%s/api/v1/wallet", var.user_function.function_hostname)
 
   description  = "Wallet APIs"
   display_name = "IO Web - Wallet"
