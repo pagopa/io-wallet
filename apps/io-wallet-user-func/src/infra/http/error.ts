@@ -24,8 +24,6 @@ const toHttpError = (e: Error): Error => {
       return new HttpUnauthorizedError(e.message);
     case "ForbiddenError":
       return new H.HttpForbiddenError(e.message);
-    case "CredentialsNotFound":
-      return new H.HttpNotFoundError(e.message);
   }
   return e;
 };
