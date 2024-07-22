@@ -1,0 +1,11 @@
+<policies>
+  <inbound>
+      <base />
+      <set-header name="x-functions-key" exists-action="override">
+          <value>{{io-wallet-user-func-key}}</value>
+      </set-header>
+  </inbound>
+  <outbound>
+      <base />
+  </outbound>
+</policies>
