@@ -13,7 +13,7 @@ resource "azurerm_role_assignment" "func_app_user_to_kv_secrets" {
 }
 
 resource "azurerm_role_assignment" "func_app_user_staging_slot_to_kv_secrets" {
-  for_each = var.function_app.staging_principal_id == null ? [] : toset([])
+  count = var.function_app.staging_principal_id != null ? 1 : 0
 
   role_definition_name = "Key Vault Secrets User"
   scope                = var.key_vault.id
