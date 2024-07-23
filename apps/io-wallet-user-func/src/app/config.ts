@@ -99,7 +99,7 @@ export type TrialSystemApiClientConfig = t.TypeOf<
   typeof TrialSystemApiClientConfig
 >;
 
-const IPZSApiClientConfig = t.type({
+const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
   clientCertificate: t.string,
   clientPrivateKey: t.string,
@@ -107,7 +107,9 @@ const IPZSApiClientConfig = t.type({
   walletProviderEntity: t.string,
 });
 
-export type IPZSApiClientConfig = t.TypeOf<typeof IPZSApiClientConfig>;
+export type PidIssuerApiClientConfig = t.TypeOf<
+  typeof PidIssuerApiClientConfig
+>;
 
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
@@ -115,8 +117,8 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   hubSpidLogin: HubSpidLoginConfig,
-  ipzs: IPZSApiClientConfig,
   pdvTokenizer: PdvTokenizerApiClientConfig,
+  pidIssuer: PidIssuerApiClientConfig,
   trialSystem: TrialSystemApiClientConfig,
 });
 
@@ -138,7 +140,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
   RE.bind("hubSpidLogin", () => getHubSpidLoginConfigFromEnvironment),
   RE.bind("trialSystem", () => getTrialSystemConfigFromEnvironment),
-  RE.bind("ipzs", () => getIpzsConfigFromEnvironment),
+  RE.bind("pidIssuer", () => getPidIssuerConfigFromEnvironment),
   RE.map(
     ({
       attestationService,
@@ -146,8 +148,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       crypto,
       federationEntity,
       hubSpidLogin,
-      ipzs,
       pdvTokenizer,
+      pidIssuer,
       trialSystem,
     }) => ({
       attestationService,
@@ -155,8 +157,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       crypto,
       federationEntity,
       hubSpidLogin,
-      ipzs,
       pdvTokenizer,
+      pidIssuer,
       trialSystem,
     }),
   ),
@@ -368,23 +370,23 @@ const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
-const getIpzsConfigFromEnvironment: RE.ReaderEither<
+const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  IPZSApiClientConfig
+  PidIssuerApiClientConfig
 > = pipe(
   sequenceS(RE.Apply)({
     ipzApiClientCertificate: pipe(
-      readFromEnvironment("IpzsApiClientCertificate"),
+      readFromEnvironment("PidIssuerApiClientCertificate"),
       RE.map(decodeBase64String),
     ),
     ipzApiClientPrivateKey: pipe(
-      readFromEnvironment("IpzsApiClientPrivateKey"),
+      readFromEnvironment("PidIssuerApiClientPrivateKey"),
       RE.map(decodeBase64String),
     ),
-    ipzsApiBaseURL: readFromEnvironment("IpzsApiBaseURL"),
-    ipzsApiRootCACertificate: pipe(
-      readFromEnvironment("IpzsApiRootCACertificate"),
+    pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
+    pidIssuerApiRootCACertificate: pipe(
+      readFromEnvironment("PidIssuerApiRootCACertificate"),
       RE.map(decodeBase64String),
     ),
     walletProviderEntity: readFromEnvironment("WalletProviderEntity"),
@@ -393,14 +395,14 @@ const getIpzsConfigFromEnvironment: RE.ReaderEither<
     ({
       ipzApiClientCertificate,
       ipzApiClientPrivateKey,
-      ipzsApiBaseURL,
-      ipzsApiRootCACertificate,
+      pidIssuerApiBaseURL,
+      pidIssuerApiRootCACertificate,
       walletProviderEntity,
     }) => ({
-      baseURL: ipzsApiBaseURL,
+      baseURL: pidIssuerApiBaseURL,
       clientCertificate: ipzApiClientCertificate,
       clientPrivateKey: ipzApiClientPrivateKey,
-      rootCACertificate: ipzsApiRootCACertificate,
+      rootCACertificate: pidIssuerApiRootCACertificate,
       walletProviderEntity,
     }),
   ),

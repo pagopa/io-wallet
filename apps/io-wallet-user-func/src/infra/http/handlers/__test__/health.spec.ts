@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
-import { IpzsServicesHealthCheck } from "@/infra/ipzs-services/health-check";
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
+import { PidIssuerHealthCheck } from "@/infra/pid-issuer/health-check";
 import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
@@ -39,12 +39,12 @@ describe("HealthHandler", () => {
     healthCheck: () => TE.left(new Error("trial-system-error")),
   };
 
-  const ipzsServicesClient: IpzsServicesHealthCheck = {
+  const pidIssuerClient: PidIssuerHealthCheck = {
     healthCheck: () => TE.right(true),
   };
 
-  const ipzsServicesClientThatFails: IpzsServicesHealthCheck = {
-    healthCheck: () => TE.left(new Error("ipzs-error")),
+  const pidIssuerClientThatFails: PidIssuerHealthCheck = {
+    healthCheck: () => TE.left(new Error("pid-issuer-error")),
   };
 
   const logger = {
@@ -57,9 +57,9 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       pdvTokenizerClient,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -82,9 +82,9 @@ describe("HealthHandler", () => {
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       pdvTokenizerClient,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -109,9 +109,9 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -136,9 +136,9 @@ describe("HealthHandler", () => {
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -174,9 +174,9 @@ describe("HealthHandler", () => {
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient,
       logger,
       pdvTokenizerClient,
+      pidIssuerClient,
       trialSystemClient: trialSystemClientThatFails,
     });
 
@@ -196,14 +196,14 @@ describe("HealthHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getIpzsHealth returns an error", async () => {
+  it("should return a 500 HTTP response when getPidIssuerHealth returns an error", async () => {
     const handler = HealthHandler({
       cosmosClient,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
-      ipzsServicesClient: ipzsServicesClientThatFails,
       logger,
       pdvTokenizerClient,
+      pidIssuerClient: pidIssuerClientThatFails,
       trialSystemClient,
     });
 
@@ -211,7 +211,7 @@ describe("HealthHandler", () => {
       _tag: "Right",
       right: {
         body: {
-          detail: "The function is not healthy. Error: ipzs-error",
+          detail: "The function is not healthy. Error: pid-issuer-error",
           status: 500,
           title: "Internal Server Error",
         },

@@ -9,9 +9,9 @@ import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
-import { IpzsServicesClient } from "@/infra/ipzs-services/client";
 import { hslValidate } from "@/infra/jwt-validator";
 import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
+import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -57,14 +57,14 @@ const hslJwtValidate = hslValidate(config.hubSpidLogin);
 
 const trialSystemClient = new TrialSystemClient(config.trialSystem);
 
-const ipzsServicesClient = new IpzsServicesClient(config.ipzs);
+const pidIssuerClient = new PidIssuerClient(config.pidIssuer);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
-    ipzsServicesClient,
     pdvTokenizerClient,
+    pidIssuerClient,
     trialSystemClient,
   }),
   methods: ["GET"],
@@ -139,7 +139,7 @@ app.http("getCurrentWalletInstanceStatus", {
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
   handler: SetWalletInstanceStatusFunction({
-    credentialRepository: ipzsServicesClient,
+    credentialRepository: pidIssuerClient,
     hslJwtValidate,
     userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,

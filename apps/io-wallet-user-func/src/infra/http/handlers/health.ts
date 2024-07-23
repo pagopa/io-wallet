@@ -1,13 +1,13 @@
 import { HealthCheckError } from "@/error";
 import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
 import {
-  IpzsServicesHealthCheck,
-  getIpzsServicesHealth,
-} from "@/infra/ipzs-services/health-check";
-import {
   PdvTokenizerHealthCheck,
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
+import {
+  PidIssuerHealthCheck,
+  getPidIssuerHealth,
+} from "@/infra/pid-issuer/health-check";
 import {
   TrialSystemHealthCheck,
   getTrialSystemHealth,
@@ -26,16 +26,16 @@ import { logErrorAndReturnResponse } from "../error";
 const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
-    ipzsServicesClient: IpzsServicesHealthCheck;
     pdvTokenizerClient: PdvTokenizerHealthCheck;
+    pidIssuerClient: PidIssuerHealthCheck;
     trialSystemClient: TrialSystemHealthCheck;
   },
   Error,
   void
 > = ({
   cosmosClient,
-  ipzsServicesClient,
   pdvTokenizerClient,
+  pidIssuerClient,
   trialSystemClient,
 }) =>
   // It runs multiple health checks in parallel
@@ -44,7 +44,7 @@ const getHealthCheck: RTE.ReaderTaskEither<
       pipe({ cosmosClient }, getCosmosHealth),
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
       pipe({ trialSystemClient }, getTrialSystemHealth),
-      pipe({ ipzsServicesClient }, getIpzsServicesHealth),
+      pipe({ pidIssuerClient }, getPidIssuerHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ left: errors }) =>

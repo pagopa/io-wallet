@@ -1,14 +1,14 @@
-import { IPZSApiClientConfig } from "@/app/config";
+import { PidIssuerApiClientConfig } from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { Agent, RequestInit, fetch } from "undici";
 
-import { IpzsServicesHealthCheck } from "./health-check";
+import { PidIssuerHealthCheck } from "./health-check";
 
-export class IpzsServicesClient
-  implements CredentialRepository, IpzsServicesHealthCheck
+export class PidIssuerClient
+  implements CredentialRepository, PidIssuerHealthCheck
 {
   #baseURL: string;
   #init: RequestInit;
@@ -28,7 +28,7 @@ export class IpzsServicesClient
         });
         return result.status === 404;
       },
-      (error) => new Error(`error checking IPZS services health: ${error}`),
+      (error) => new Error(`error checking PID issuer health: ${error}`),
     );
 
   revokeAllCredentials = (fiscalCode: FiscalCode) =>
@@ -64,7 +64,7 @@ export class IpzsServicesClient
     clientPrivateKey,
     rootCACertificate,
     walletProviderEntity,
-  }: IPZSApiClientConfig) {
+  }: PidIssuerApiClientConfig) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = walletProviderEntity;
     this.#init = {

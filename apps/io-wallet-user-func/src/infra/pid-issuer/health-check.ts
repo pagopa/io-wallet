@@ -2,20 +2,20 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 
-export interface IpzsServicesHealthCheck {
+export interface PidIssuerHealthCheck {
   healthCheck: () => TE.TaskEither<Error, boolean>;
 }
 
-export const getIpzsServicesHealth: RTE.ReaderTaskEither<
+export const getPidIssuerHealth: RTE.ReaderTaskEither<
   {
-    ipzsServicesClient: IpzsServicesHealthCheck;
+    pidIssuerClient: PidIssuerHealthCheck;
   },
   Error,
   true
-> = ({ ipzsServicesClient: { healthCheck } }) =>
+> = ({ pidIssuerClient: { healthCheck } }) =>
   pipe(
     healthCheck(),
     TE.flatMap((isHealth) =>
-      !isHealth ? TE.left(new Error("ipzs-error")) : TE.right(isHealth),
+      !isHealth ? TE.left(new Error("pid-issuer-error")) : TE.right(isHealth),
     ),
   );

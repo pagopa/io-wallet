@@ -43,8 +43,8 @@ locals {
         key_vault_secret_name = "TrialSystemApiKey"
       },
       {
-        name                  = "IpzsApiClientPrivateKey"
-        key_vault_secret_name = "IpzsApiClientPrivateKey"
+        name                  = "PidIssuerApiClientPrivateKey"
+        key_vault_secret_name = "PidIssuerApiClientPrivateKey"
       }
     ]
   }

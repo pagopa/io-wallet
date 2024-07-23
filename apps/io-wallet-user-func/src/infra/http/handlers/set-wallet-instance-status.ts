@@ -39,7 +39,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
       fiscalCode: pipe(req, requireWhitelistedFiscalCodeFromToken),
       walletInstanceId: pipe(req, requireWalletInstanceId, RTE.fromEither),
     }),
-    // invoke IPZS services to revoke all credentials for that user
+    // invoke PID issuer services to revoke all credentials for that user
     RTE.chainFirstW(({ fiscalCode }) => revokeAllCredentials(fiscalCode)),
     // access our database to revoke the wallet instance
     RTE.chainW(({ fiscalCode, walletInstanceId }) =>
