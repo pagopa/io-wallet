@@ -4,6 +4,20 @@
       <set-header name="x-functions-key" exists-action="override">
           <value>{{io-wallet-user-func-key}}</value>
       </set-header>
+      <cors>
+        <allowed-origins>
+            <origin>https://ioapp.it/</origin>
+        </allowed-origins>
+        <allowed-methods preflight-result-max-age="300">
+            <method>OPTIONS</method>
+            <method>GET</method>
+            <method>PUT</method>
+        </allowed-methods>
+        <allowed-headers>
+            <header>Content-Type</header>
+            <header>Authorization</header>
+        </allowed-headers>
+      </cors>
   </inbound>
   <outbound>
       <base />
