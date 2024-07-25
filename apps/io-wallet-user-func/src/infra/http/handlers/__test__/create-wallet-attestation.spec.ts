@@ -124,9 +124,11 @@ describe("CreateWalletAttestationHandler", async () => {
     expect(result).toEqual({
       _tag: "Right",
       right: {
-        body: expect.any(String),
+        body: expect.objectContaining({
+          wallet_attestation: expect.any(String),
+        }),
         headers: expect.objectContaining({
-          "Content-Type": "application/jwt",
+          "Content-Type": "application/json",
         }),
         statusCode: 200,
       },
@@ -135,8 +137,9 @@ describe("CreateWalletAttestationHandler", async () => {
     // check trailing slashes are removed
     if (E.isRight(result)) {
       const body = result.right.body;
-      if (typeof body === "string") {
-        const decoded = jose.decodeJwt(body);
+      const walletAttestation = body.wallet_attestation;
+      if (typeof walletAttestation === "string") {
+        const decoded = jose.decodeJwt(walletAttestation);
         expect((decoded.iss || "").endsWith("/")).toBe(false);
         expect((decoded.sub || "").endsWith("/")).toBe(false);
       }
