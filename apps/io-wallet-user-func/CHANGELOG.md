@@ -1,5 +1,11 @@
 # io-func-wallet-solution-backend
 
+## 0.1.25
+
+### Patch Changes
+
+- bf23989: Changed content-type to application/json from token endpoint
+
 ## 0.1.24
 
 ### Patch Changes
