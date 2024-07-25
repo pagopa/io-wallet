@@ -94,7 +94,7 @@ paths:
         "200":
           description: Wallet Attestation generated
           content:
-            application/jwt:
+            application/json:
               schema:
                 $ref: "#/components/schemas/WalletAttestationView"
         "403":
@@ -145,7 +145,7 @@ paths:
           schema:
             type: string
       description: |
-        Revoke the Wallet Instance associated with the authenticated user. 
+        Revoke the Wallet Instance associated with the authenticated user.
         If the Wallet Instance is already revoked, the operation succeed.
       requestBody:
         content:
@@ -264,7 +264,14 @@ components:
         - nonce
 
     WalletAttestationView:
-      type: string
+      type: object
+      properties:
+        wallet_attestation:
+          type: string
+          minLength: 1
+          format: binary
+      required:
+        - wallet_attestation
 
     GetUserByFiscalCodeBody:
       type: object

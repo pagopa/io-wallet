@@ -14,7 +14,6 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
 import { logErrorAndReturnResponse } from "../error";
-import { successJwt } from "../response";
 import { requireUserFromHeader } from "../user-id-header-validator";
 
 const WalletAttestationRequestPayload = t.type({
@@ -71,7 +70,8 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
         RTE.chainW(() => createWalletAttestation(walletAttestationRequest)),
       ),
     ),
-    RTE.map(successJwt),
+    RTE.map((wallet_attestation) => ({ wallet_attestation })),
+    RTE.map(H.successJson),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );
