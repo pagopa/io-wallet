@@ -1,7 +1,6 @@
 import { Config, PidIssuerApiClientConfig } from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { Agent, RequestInit, fetch } from "undici";
