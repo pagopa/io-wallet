@@ -5,6 +5,10 @@ import {
   getPdvTokenizerHealth,
 } from "@/infra/pdv-tokenizer/health-check";
 import {
+  PidIssuerHealthCheck,
+  getPidIssuerHealth,
+} from "@/infra/pid-issuer/health-check";
+import {
   TrialSystemHealthCheck,
   getTrialSystemHealth,
 } from "@/infra/trial-system/health-check";
@@ -23,17 +27,24 @@ const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
     pdvTokenizerClient: PdvTokenizerHealthCheck;
+    pidIssuerClient: PidIssuerHealthCheck;
     trialSystemClient: TrialSystemHealthCheck;
   },
   Error,
   void
-> = ({ cosmosClient, pdvTokenizerClient, trialSystemClient }) =>
+> = ({
+  cosmosClient,
+  pdvTokenizerClient,
+  pidIssuerClient,
+  trialSystemClient,
+}) =>
   // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
       pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
       pipe({ trialSystemClient }, getTrialSystemHealth),
+      pipe({ pidIssuerClient }, getPidIssuerHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ left: errors }) =>

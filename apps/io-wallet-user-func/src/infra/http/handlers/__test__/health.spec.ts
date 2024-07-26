@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
+import { PidIssuerHealthCheck } from "@/infra/pid-issuer/health-check";
 import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
@@ -28,10 +29,22 @@ describe("HealthHandler", () => {
     healthCheck: () => TE.left(new Error("pdv-tokenizer-error")),
   };
 
-  // test di quando questa va in errore
   const trialSystemClient: TrialSystemHealthCheck = {
     featureFlag: "true",
     healthCheck: () => TE.right(true),
+  };
+
+  const trialSystemClientThatFails: TrialSystemHealthCheck = {
+    featureFlag: "true",
+    healthCheck: () => TE.left(new Error("trial-system-error")),
+  };
+
+  const pidIssuerClient: PidIssuerHealthCheck = {
+    healthCheck: () => TE.right(true),
+  };
+
+  const pidIssuerClientThatFails: PidIssuerHealthCheck = {
+    healthCheck: () => TE.left(new Error("pid-issuer-error")),
   };
 
   const logger = {
@@ -46,6 +59,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -70,6 +84,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -96,6 +111,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -122,6 +138,7 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pdvTokenizerClient: pdvTokenizerClientThatFails,
+      pidIssuerClient,
       trialSystemClient,
     });
 
@@ -150,5 +167,59 @@ describe("HealthHandler", () => {
         }),
       );
     }
+  });
+
+  it("should return a 500 HTTP response when getTrialSystemHealth returns an error", async () => {
+    const handler = HealthHandler({
+      cosmosClient,
+      input: H.request("https://wallet-provider.example.org"),
+      inputDecoder: H.HttpRequest,
+      logger,
+      pdvTokenizerClient,
+      pidIssuerClient,
+      trialSystemClient: trialSystemClientThatFails,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          detail: "The function is not healthy. Error: trial-system-error",
+          status: 500,
+          title: "Internal Server Error",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      },
+    });
+  });
+
+  it("should return a 500 HTTP response when getPidIssuerHealth returns an error", async () => {
+    const handler = HealthHandler({
+      cosmosClient,
+      input: H.request("https://wallet-provider.example.org"),
+      inputDecoder: H.HttpRequest,
+      logger,
+      pdvTokenizerClient,
+      pidIssuerClient: pidIssuerClientThatFails,
+      trialSystemClient,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          detail: "The function is not healthy. Error: pid-issuer-error",
+          status: 500,
+          title: "Internal Server Error",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      },
+    });
   });
 });

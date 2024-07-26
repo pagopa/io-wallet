@@ -28,7 +28,8 @@
     "io-ts": "^2.2.20",
     "jose": "5.2.4",
     "jsonwebtoken": "^9.0.2",
-    "pkijs": "^3.0.16"
+    "pkijs": "^3.0.16",
+    "undici": "^6.19.2"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",
