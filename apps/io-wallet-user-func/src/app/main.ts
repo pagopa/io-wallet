@@ -59,7 +59,7 @@ const trialSystemClient = new TrialSystemClient(config.trialSystem);
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.federationEntity.basePath,
+  config.federationEntity.basePath.href,
 );
 
 app.http("healthCheck", {
