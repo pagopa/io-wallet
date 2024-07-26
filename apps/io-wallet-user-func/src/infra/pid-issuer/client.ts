@@ -38,6 +38,7 @@ export class PidIssuerClient
         async () => {
           const result = await fetch(new URL("/revokeAll", this.#baseURL), {
             body: JSON.stringify({
+              // TINIT is the CF international format: TIN (Tax Identification Number) and IT (Italy). It is required by the endpoint
               unique_id: `TINIT-${fiscalCode}`,
               wallet_provider: this.#walletProviderEntity,
             }),
@@ -48,7 +49,7 @@ export class PidIssuerClient
 
           if (result.status === 404) {
             // if the credentials have already been revoked the status is 404 but our endpoint is idempotent
-            // add log
+            // TODO: SIW-1402 add log
             return undefined;
           }
           if (!result.ok) {
