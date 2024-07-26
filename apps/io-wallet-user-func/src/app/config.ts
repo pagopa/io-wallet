@@ -376,15 +376,15 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   PidIssuerApiClientConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    ipzApiClientCertificate: pipe(
+    pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
+    pidIssuerApiClientCertificate: pipe(
       readFromEnvironment("PidIssuerApiClientCertificate"),
       RE.map(decodeBase64String),
     ),
-    ipzApiClientPrivateKey: pipe(
+    pidIssuerApiClientPrivateKey: pipe(
       readFromEnvironment("PidIssuerApiClientPrivateKey"),
       RE.map(decodeBase64String),
     ),
-    pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
     pidIssuerApiRootCACertificate: pipe(
       readFromEnvironment("PidIssuerApiRootCACertificate"),
       RE.map(decodeBase64String),
@@ -393,15 +393,15 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
-      ipzApiClientCertificate,
-      ipzApiClientPrivateKey,
       pidIssuerApiBaseURL,
+      pidIssuerApiClientCertificate,
+      pidIssuerApiClientPrivateKey,
       pidIssuerApiRootCACertificate,
       walletProviderEntity,
     }) => ({
       baseURL: pidIssuerApiBaseURL,
-      clientCertificate: ipzApiClientCertificate,
-      clientPrivateKey: ipzApiClientPrivateKey,
+      clientCertificate: pidIssuerApiClientCertificate,
+      clientPrivateKey: pidIssuerApiClientPrivateKey,
       rootCACertificate: pidIssuerApiRootCACertificate,
       walletProviderEntity,
     }),
