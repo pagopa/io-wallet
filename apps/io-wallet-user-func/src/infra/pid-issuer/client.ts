@@ -1,6 +1,7 @@
-import { PidIssuerApiClientConfig } from "@/app/config";
+import { Config, PidIssuerApiClientConfig } from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { Agent, RequestInit, fetch } from "undici";
@@ -12,7 +13,7 @@ export class PidIssuerClient
 {
   #baseURL: string;
   #init: RequestInit;
-  #walletProviderEntity: string;
+  #walletProviderEntity: UrlFromString;
 
   healthCheck = () =>
     TE.tryCatch(
@@ -58,15 +59,17 @@ export class PidIssuerClient
       ),
     );
 
-  constructor({
-    baseURL,
-    clientCertificate,
-    clientPrivateKey,
-    rootCACertificate,
-    walletProviderEntity,
-  }: PidIssuerApiClientConfig) {
+  constructor(
+    {
+      baseURL,
+      clientCertificate,
+      clientPrivateKey,
+      rootCACertificate,
+    }: PidIssuerApiClientConfig,
+    basePath: Config["federationEntity"]["basePath"],
+  ) {
     this.#baseURL = baseURL;
-    this.#walletProviderEntity = walletProviderEntity;
+    this.#walletProviderEntity = basePath;
     this.#init = {
       dispatcher: new Agent({
         connect: {

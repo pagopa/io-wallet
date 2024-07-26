@@ -104,7 +104,6 @@ const PidIssuerApiClientConfig = t.type({
   clientCertificate: t.string,
   clientPrivateKey: t.string,
   rootCACertificate: t.string,
-  walletProviderEntity: t.string,
 });
 
 export type PidIssuerApiClientConfig = t.TypeOf<
@@ -389,7 +388,6 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("PidIssuerApiRootCACertificate"),
       RE.map(decodeBase64String),
     ),
-    walletProviderEntity: readFromEnvironment("WalletProviderEntity"),
   }),
   RE.map(
     ({
@@ -397,13 +395,11 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       pidIssuerApiClientCertificate,
       pidIssuerApiClientPrivateKey,
       pidIssuerApiRootCACertificate,
-      walletProviderEntity,
     }) => ({
       baseURL: pidIssuerApiBaseURL,
       clientCertificate: pidIssuerApiClientCertificate,
       clientPrivateKey: pidIssuerApiClientPrivateKey,
       rootCACertificate: pidIssuerApiRootCACertificate,
-      walletProviderEntity,
     }),
   ),
 );

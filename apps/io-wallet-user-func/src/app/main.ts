@@ -57,7 +57,10 @@ const hslJwtValidate = hslValidate(config.hubSpidLogin);
 
 const trialSystemClient = new TrialSystemClient(config.trialSystem);
 
-const pidIssuerClient = new PidIssuerClient(config.pidIssuer);
+const pidIssuerClient = new PidIssuerClient(
+  config.pidIssuer,
+  config.federationEntity.basePath,
+);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
