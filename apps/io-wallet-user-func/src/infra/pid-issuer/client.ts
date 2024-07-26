@@ -48,7 +48,9 @@ export class PidIssuerClient
           });
 
           if (result.status === 404) {
-            // if the credentials have already been revoked the status is 404 but our endpoint is idempotent
+            // the endpoint returns 404 if the credentials have already been revoked or do not exist
+            // the credentials already revoked => the error is suppressed because our endpoint is idempotent
+            // the credentials do not exist => the error is suppressed because our endpoint returns 204 when attempting to revoke non-existent credentials
             // TODO: SIW-1402 add log
             return undefined;
           }
