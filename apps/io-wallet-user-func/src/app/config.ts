@@ -99,6 +99,17 @@ export type TrialSystemApiClientConfig = t.TypeOf<
   typeof TrialSystemApiClientConfig
 >;
 
+const PidIssuerApiClientConfig = t.type({
+  baseURL: t.string,
+  clientCertificate: t.string,
+  clientPrivateKey: t.string,
+  rootCACertificate: t.string,
+});
+
+export type PidIssuerApiClientConfig = t.TypeOf<
+  typeof PidIssuerApiClientConfig
+>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfiguration,
@@ -106,6 +117,7 @@ export const Config = t.type({
   federationEntity: FederationEntityMetadata,
   hubSpidLogin: HubSpidLoginConfig,
   pdvTokenizer: PdvTokenizerApiClientConfig,
+  pidIssuer: PidIssuerApiClientConfig,
   trialSystem: TrialSystemApiClientConfig,
 });
 
@@ -127,6 +139,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
   RE.bind("hubSpidLogin", () => getHubSpidLoginConfigFromEnvironment),
   RE.bind("trialSystem", () => getTrialSystemConfigFromEnvironment),
+  RE.bind("pidIssuer", () => getPidIssuerConfigFromEnvironment),
   RE.map(
     ({
       attestationService,
@@ -135,6 +148,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       federationEntity,
       hubSpidLogin,
       pdvTokenizer,
+      pidIssuer,
       trialSystem,
     }) => ({
       attestationService,
@@ -143,6 +157,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       federationEntity,
       hubSpidLogin,
       pdvTokenizer,
+      pidIssuer,
       trialSystem,
     }),
   ),
@@ -352,6 +367,41 @@ const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
       baseURL: trialSystemApiBaseURL,
       featureFlag: trialSystemFeatureFlag,
       trialId: trialSystemTrialId,
+    }),
+  ),
+);
+
+const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  PidIssuerApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
+    pidIssuerApiClientCertificate: pipe(
+      readFromEnvironment("PidIssuerApiClientCertificate"),
+      RE.map(decodeBase64String),
+    ),
+    pidIssuerApiClientPrivateKey: pipe(
+      readFromEnvironment("PidIssuerApiClientPrivateKey"),
+      RE.map(decodeBase64String),
+    ),
+    pidIssuerApiRootCACertificate: pipe(
+      readFromEnvironment("PidIssuerApiRootCACertificate"),
+      RE.map(decodeBase64String),
+    ),
+  }),
+  RE.map(
+    ({
+      pidIssuerApiBaseURL,
+      pidIssuerApiClientCertificate,
+      pidIssuerApiClientPrivateKey,
+      pidIssuerApiRootCACertificate,
+    }) => ({
+      baseURL: pidIssuerApiBaseURL,
+      clientCertificate: pidIssuerApiClientCertificate,
+      clientPrivateKey: pidIssuerApiClientPrivateKey,
+      rootCACertificate: pidIssuerApiRootCACertificate,
     }),
   ),
 );

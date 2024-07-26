@@ -7,10 +7,19 @@ import {
   getUserByFiscalCode,
 } from "@/user";
 import * as H from "@pagopa/handler-kit";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
 import { requireFiscalCodeFromToken } from "./jwt-validator";
+
+export const requireWhitelistedFiscalCodeFromToken: (
+  req: H.HttpRequest,
+) => RTE.ReaderTaskEither<
+  HslJwtEnvironment & UserTrialSubscriptionEnvironment,
+  Error,
+  FiscalCode
+> = flow(requireFiscalCodeFromToken, RTE.chainFirstW(ensureUserInWhitelist));
 
 export const requireWhitelistedUserFromToken: (
   req: H.HttpRequest,
@@ -19,7 +28,6 @@ export const requireWhitelistedUserFromToken: (
   Error,
   User
 > = flow(
-  requireFiscalCodeFromToken,
-  RTE.chainFirstW(ensureUserInWhitelist),
+  requireWhitelistedFiscalCodeFromToken,
   RTE.chainW(getUserByFiscalCode),
 );

@@ -36,6 +36,10 @@
     "TrialSystemApiBaseURL": "TRIAL_SYSTEM_API_BASE_URL",
     "TrialSystemApiKey": "TRIAL_SYSTEM_API_KEY",
     "TrialSystemTrialId": "TRIAL_SYSTEM_TRIAL_ID",
-    "TrialSystemFeatureFlag": "TRIAL_SYSTEM_FEATURE_FLAG"
+    "TrialSystemFeatureFlag": "TRIAL_SYSTEM_FEATURE_FLAG",
+    "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
+    "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
+    "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
+    "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE"
   }
 }

@@ -15,7 +15,7 @@ export type User = t.TypeOf<typeof User>;
 
 export interface UserRepository {
   getFiscalCodeByUserId: (
-    id: string,
+    id: NonEmptyString,
   ) => TE.TaskEither<Error, { fiscalCode: FiscalCode }>;
   getOrCreateUserByFiscalCode: (
     fiscalCode: FiscalCode,
