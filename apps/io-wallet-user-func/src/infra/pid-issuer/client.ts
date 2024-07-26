@@ -13,7 +13,7 @@ export class PidIssuerClient
 {
   #baseURL: string;
   #init: RequestInit;
-  #walletProviderEntity: UrlFromString;
+  #walletProviderEntity: string;
 
   healthCheck = () =>
     TE.tryCatch(
@@ -24,7 +24,7 @@ export class PidIssuerClient
             wallet_provider: this.#walletProviderEntity,
           }),
           method: "POST",
-          signal: AbortSignal.timeout(3000),
+          signal: AbortSignal.timeout(10000),
           ...this.#init,
         });
         return result.status === 404;
@@ -43,7 +43,7 @@ export class PidIssuerClient
               wallet_provider: this.#walletProviderEntity,
             }),
             method: "POST",
-            signal: AbortSignal.timeout(3000),
+            signal: AbortSignal.timeout(10000),
             ...this.#init,
           });
 
@@ -69,7 +69,7 @@ export class PidIssuerClient
       clientPrivateKey,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
-    basePath: Config["federationEntity"]["basePath"],
+    basePath: Config["federationEntity"]["basePath"]["href"],
   ) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = basePath;
