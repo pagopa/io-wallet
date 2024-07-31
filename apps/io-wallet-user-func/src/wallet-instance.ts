@@ -151,42 +151,40 @@ export const revokeUserWalletInstances: (
         )
       : TE.right(void 0);
 
-const getUserWalletInstancesIdExceptOne: (
+const getValidUserWalletInstances: (
   userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"],
 ) => RTE.ReaderTaskEither<
   WalletInstanceEnvironment,
   Error,
-  readonly WalletInstance["id"][]
+  readonly WalletInstanceValid["id"][]
 > =
-  (userId, walletInstanceId) =>
+  (userId) =>
   ({ walletInstanceRepository }) =>
     pipe(
       walletInstanceRepository.getAllByUserId(userId),
+      TE.chain(
+        TE.fromOption(
+          () => new EntityNotFoundError("Wallet instance not found"),
+        ),
+      ),
       TE.map(
-        O.fold(
-          () => [],
-          flow(
-            RA.filterMap((walletInstance) =>
-              walletInstance.id !== walletInstanceId
-                ? O.some(walletInstance.id)
-                : O.none,
-            ),
+        flow(
+          RA.filterMap((walletInstance) =>
+            walletInstance.isRevoked === false
+              ? O.some(walletInstance.id)
+              : O.none,
           ),
         ),
       ),
     );
 
-export const revokeUserWalletInstancesExceptOne: (
+export const revokeValidUserWalletInstances: (
   userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"],
-) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
-  userId,
-  walletInstanceId,
-) =>
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (userId) =>
   pipe(
-    getUserWalletInstancesIdExceptOne(userId, walletInstanceId),
-    RTE.chain((walletInstancesId) =>
-      revokeUserWalletInstances(userId, walletInstancesId),
+    userId,
+    getValidUserWalletInstances,
+    RTE.chain((validWalletInstances) =>
+      revokeUserWalletInstances(userId, validWalletInstances),
     ),
   );
