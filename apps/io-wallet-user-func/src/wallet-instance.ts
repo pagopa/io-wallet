@@ -151,13 +151,13 @@ export const revokeUserWalletInstances: (
         )
       : TE.right(void 0);
 
-const getUserWalletInstancesIdExceptOne: (
+const getUserValidWalletInstancesIdExceptOne: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
 ) => RTE.ReaderTaskEither<
   WalletInstanceEnvironment,
   Error,
-  readonly WalletInstance["id"][]
+  readonly WalletInstanceValid["id"][]
 > =
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
@@ -168,7 +168,8 @@ const getUserWalletInstancesIdExceptOne: (
           () => [],
           flow(
             RA.filterMap((walletInstance) =>
-              walletInstance.id !== walletInstanceId
+              walletInstance.id !== walletInstanceId &&
+              walletInstance.isRevoked === false
                 ? O.some(walletInstance.id)
                 : O.none,
             ),
@@ -177,7 +178,7 @@ const getUserWalletInstancesIdExceptOne: (
       ),
     );
 
-export const revokeUserWalletInstancesExceptOne: (
+export const revokeUserValidWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
@@ -185,8 +186,8 @@ export const revokeUserWalletInstancesExceptOne: (
   walletInstanceId,
 ) =>
   pipe(
-    getUserWalletInstancesIdExceptOne(userId, walletInstanceId),
-    RTE.chain((walletInstancesId) =>
-      revokeUserWalletInstances(userId, walletInstancesId),
+    getUserValidWalletInstancesIdExceptOne(userId, walletInstanceId),
+    RTE.chain((validWalletInstances) =>
+      revokeUserWalletInstances(userId, validWalletInstances),
     ),
   );

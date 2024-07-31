@@ -1,7 +1,7 @@
 import { validateAttestation } from "@/attestation-service";
 import {
   insertWalletInstance,
-  revokeUserWalletInstancesExceptOne,
+  revokeUserValidWalletInstancesExceptOne,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
@@ -66,7 +66,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
           pipe(
             insertWalletInstance(walletInstance),
             RTE.chainW(() =>
-              revokeUserWalletInstancesExceptOne(
+              revokeUserValidWalletInstancesExceptOne(
                 user.id,
                 walletInstanceRequest.hardwareKeyTag,
               ),
