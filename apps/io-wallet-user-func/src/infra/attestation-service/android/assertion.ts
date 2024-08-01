@@ -73,6 +73,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
 
   let bundleIdentifier;
   let tokenPayloadExternal;
+  let responseValidated;
 
   for (const packageName of bundleIdentifiers) {
     const result = await playintegrity.v1.decodeIntegrityToken({
@@ -87,7 +88,21 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     if (token) {
       bundleIdentifier = packageName;
       tokenPayloadExternal = token;
-      break;
+
+      try {
+        responseValidated = validateIntegrityResponse(
+          tokenPayloadExternal,
+          bundleIdentifier,
+          clientData,
+          allowDevelopmentEnvironment,
+          androidPlayStoreCertificateHash,
+        );
+        break;
+      } catch (e) {
+        /* If it fails I continue the for loop anyway to try other bundleIdentifiers.
+         * The check is still done at the end on the value of responseValidated
+         */
+      }
     }
   }
 
@@ -96,14 +111,6 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
       "[Android Assertion] Invalid token payload from Play Integrity API response",
     );
   }
-
-  const responseValidated = validateIntegrityResponse(
-    tokenPayloadExternal,
-    bundleIdentifier,
-    clientData,
-    allowDevelopmentEnvironment,
-    androidPlayStoreCertificateHash,
-  );
 
   if (!responseValidated) {
     throw new Error(

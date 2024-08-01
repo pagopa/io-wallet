@@ -8,10 +8,31 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as S from "fp-ts/lib/string";
+import * as t from "io-ts";
 
 import { ValidatedAttestation } from "../../attestation-service";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";
+
+export const AndroidDeviceDetails = t.intersection([
+  t.type({
+    attestationSecurityLevel: t.number,
+    attestationVersion: t.number,
+    keymasterSecurityLevel: t.number,
+    keymasterVersion: t.number,
+    platform: t.literal("android"),
+  }),
+  t.partial({
+    bootPatchLevel: t.string,
+    deviceLocked: t.boolean,
+    osPatchLevel: t.number,
+    osVersion: t.number,
+    vendorPatchLevel: t.string,
+    verifiedBootState: t.number,
+  }),
+]);
+
+export type AndroidDeviceDetails = t.TypeOf<typeof AndroidDeviceDetails>;
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -54,11 +75,11 @@ export const validateAndroidAttestation = (
             }),
           E.toError,
         ),
-        TE.chainW(({ hardwareKey }) =>
+        TE.chainW(({ deviceDetails, hardwareKey }) =>
           pipe(
             hardwareKey,
             parse(JwkPublicKey, "Invalid JWK Public Key"),
-            E.map((hardwareKey) => ({ hardwareKey })),
+            E.map((hardwareKey) => ({ deviceDetails, hardwareKey })),
             TE.fromEither,
           ),
         ),

@@ -3,7 +3,7 @@ import { X509Certificate, createHash } from "crypto";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
-import { iOsAttestation } from ".";
+import { IosDeviceDetails, iOsAttestation } from ".";
 
 const APPATTESTDEVELOP = Buffer.from("appattestdevelop").toString("hex");
 const APPATTESTPROD = Buffer.concat([
@@ -31,6 +31,10 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
     keyId,
     teamIdentifier,
   } = params;
+
+  const deviceDetails: IosDeviceDetails = {
+    platform: "ios",
+  };
 
   const { attStmt, authData } = decodedAttestation;
 
@@ -160,6 +164,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const hardwareKey = await jose.exportJWK(clientCertificate.publicKey);
 
   return {
+    deviceDetails,
     hardwareKey,
   };
 };

@@ -29,6 +29,19 @@ describe("AndroidAttestationValidation", () => {
       x509Chain,
     });
     const expectedResult = {
+      deviceDetails: {
+        attestationSecurityLevel: 2,
+        attestationVersion: 4,
+        bootPatchLevel: "20230805",
+        deviceLocked: true,
+        keymasterSecurityLevel: 2,
+        keymasterVersion: 41,
+        osPatchLevel: 202308,
+        osVersion: 130000,
+        platform: "android",
+        vendorPatchLevel: "20230805",
+        verifiedBootState: 0,
+      },
       hardwareKey,
     };
 
