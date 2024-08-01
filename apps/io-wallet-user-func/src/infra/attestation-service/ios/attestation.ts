@@ -4,6 +4,7 @@ import * as jose from "jose";
 import * as pkijs from "pkijs";
 
 import { IosDeviceDetails, iOsAttestation } from ".";
+import { IosAttestationError } from "../errors";
 
 const APPATTESTDEVELOP = Buffer.from("appattestdevelop").toString("hex");
 const APPATTESTPROD = Buffer.concat([
@@ -41,7 +42,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   // Convert X509 string to X509Certificate obj
   const rootCertificate = new X509Certificate(appleRootCertificate);
   if (!rootCertificate) {
-    throw new Error("[iOS Attestation] Invalid Apple root certificate");
+    throw new IosAttestationError("Invalid Apple root certificate");
   }
 
   // https://developer.apple.com/documentation/devicecheck/validating_apps_that_connect_to_your_server
@@ -61,7 +62,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
       );
     }
   } else {
-    throw new Error("[iOS Attestation] no sub CA certificate found");
+    throw new IosAttestationError("no sub CA certificate found");
   }
 
   const clientCertificate = certificates.find((certificate) =>
@@ -75,7 +76,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
       );
     }
   } else {
-    throw new Error("[iOS Attestation] no client CA certificate found");
+    throw new IosAttestationError("no client CA certificate found");
   }
 
   // 2. Create clientDataHash as the SHA256 hash of the one-time challenge your server sends to your
@@ -105,7 +106,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
       .valueHex,
   ).toString("hex");
   if (actualNonce !== nonce) {
-    throw new Error("[iOS Attestation] nonce does not match");
+    throw new IosAttestationError("nonce does not match");
   }
 
   // 5. Create the SHA256 hash of the public key in credCert, and verify that it matches the key identifier from your app
@@ -116,7 +117,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
     .update(publicKey.toString("hex"), "hex") // Convert publicKey to hexadecimal string
     .digest("base64url");
   if (publicKeyHash !== keyId) {
-    throw new Error("[iOS Attestation] keyId does not match");
+    throw new IosAttestationError("keyId does not match");
   }
 
   // 6. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
@@ -131,14 +132,14 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   );
 
   if (bundleIdentifiersCheck.length === 0) {
-    throw new Error("[iOS Attestation] appId does not match");
+    throw new IosAttestationError("appId does not match");
   }
 
   // 7. Verify that the authenticator data’s counter field equals 0.
   const signCount = authData.subarray(33, 37).readInt32BE();
 
   if (signCount !== 0) {
-    throw new Error("[iOS Attestation] signCount is not 0");
+    throw new IosAttestationError("signCount is not 0");
   }
 
   // 8. Verify that the authenticator data’s aaguid field is either appattestdevelop if operating in the development
@@ -146,11 +147,11 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const aaguid = authData.subarray(37, 53).toString("hex");
 
   if (aaguid !== APPATTESTDEVELOP && aaguid !== APPATTESTPROD) {
-    throw new Error("[iOS Attestation] aaguid is not valid");
+    throw new IosAttestationError("aaguid is not valid");
   }
 
   if (aaguid === APPATTESTDEVELOP && !allowDevelopmentEnvironment) {
-    throw new Error("[iOS Attestation] development environment is not allowed");
+    throw new IosAttestationError("development environment is not allowed");
   }
 
   // 9. Verify that the authenticator data’s credentialId field is the same as the key identifier.
@@ -158,7 +159,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const credentialId = authData.subarray(55, 55 + credentialIdLength);
 
   if (credentialId.toString("base64url") !== keyId) {
-    throw new Error("[iOS Attestation] credentialId does not match");
+    throw new IosAttestationError("credentialId does not match");
   }
 
   const hardwareKey = await jose.exportJWK(clientCertificate.publicKey);

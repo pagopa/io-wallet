@@ -11,8 +11,9 @@ import * as S from "fp-ts/lib/string";
 import * as t from "io-ts";
 
 import { ValidatedAttestation } from "../../attestation-service";
+import { AndroidAttestationError } from "../errors";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
-import { AndroidAttestationError, verifyAttestation } from "./attestation";
+import { verifyAttestation } from "./attestation";
 
 export const AndroidDeviceDetails = t.intersection([
   t.type({

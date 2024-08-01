@@ -5,6 +5,8 @@ import { google, playintegrity_v1 } from "googleapis";
 import * as t from "io-ts";
 import { exportSPKI, importJWK } from "jose";
 
+import { AndroidAssertionError } from "../errors";
+
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
 export const GoogleAppCredentials = t.type({
@@ -58,7 +60,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   if (!signatureValidated) {
-    throw new Error("[Android Assertion] Invalid hardware signature");
+    throw new AndroidAssertionError("Invalid hardware signature");
   }
 
   // Then verify the integrity token
@@ -126,7 +128,7 @@ export const validateAssertionSignature = async (
 ) => {
   const joseHardwareKey = await importJWK(hardwareKey);
   if (!("type" in joseHardwareKey)) {
-    throw new Error("[Android Assertion] Invalid Hardware Key format");
+    throw new AndroidAssertionError("Invalid Hardware Key format");
   }
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
 
@@ -153,7 +155,7 @@ export const validateIntegrityResponse = (
   const requestDetails = integrityResponse.requestDetails;
 
   if (!requestDetails) {
-    throw new Error("[Android Assertion] Invalid requestDetails");
+    throw new AndroidAssertionError("Invalid requestDetails");
   }
 
   if (requestDetails.requestPackageName !== bundleIdentifier) {
@@ -171,14 +173,14 @@ export const validateIntegrityResponse = (
   }
 
   if (!requestDetails.timestampMillis) {
-    throw new Error("[Android Assertion] Invalid timestamp");
+    throw new AndroidAssertionError("Invalid timestamp");
   }
 
   const tsMills = parseInt(requestDetails.timestampMillis, 10);
   const tsMillsDiff = new Date().getTime() - new Date(tsMills).getTime();
 
   if (tsMillsDiff > ALLOWED_WINDOW_MILLIS) {
-    throw new Error("[Android Assertion] It's been too long since the request");
+    throw new AndroidAssertionError("It's been too long since the request");
   }
 
   /**
@@ -237,7 +239,7 @@ export const validateIntegrityResponse = (
   }
 
   if (deviceRecognitionVerdict.indexOf("MEETS_DEVICE_INTEGRITY") === -1) {
-    throw new Error("[Android Assertion] Device no meets integrity check");
+    throw new AndroidAssertionError("Device no meets integrity check");
   }
 
   /**

@@ -9,17 +9,7 @@ import * as jose from "jose";
 import * as pkijs from "pkijs";
 
 import { AndroidDeviceDetails } from ".";
-
-export class AndroidAttestationError extends Error {
-  name = "AndroidAttestationError";
-  constructor(message: string, deviceDetails?: AndroidDeviceDetails) {
-    super(
-      deviceDetails
-        ? `[Android Attestation Error] ${message} - Device details: ${JSON.stringify(deviceDetails)}`
-        : `[Android Attestation Error] ${message}`,
-    );
-  }
-}
+import { AndroidAttestationError } from "../errors";
 
 /**
  * Simplified type definition for the Certificate Revocation List (CRL) object.
