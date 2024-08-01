@@ -32,6 +32,9 @@ describe("iOSAttestationValidation", () => {
       teamIdentifier,
     });
     const expectedResult = {
+      deviceDetails: {
+        platform: "ios",
+      },
       hardwareKey,
     };
 

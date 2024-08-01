@@ -52,9 +52,10 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() => validateAttestation(walletInstanceRequest)),
-        RTE.bind("walletInstance", ({ hardwareKey }) =>
+        RTE.bind("walletInstance", ({ deviceDetails, hardwareKey }) =>
           RTE.right({
             createdAt: new Date(),
+            deviceDetails,
             hardwareKey,
             id: walletInstanceRequest.hardwareKeyTag,
             isRevoked: false as const,
