@@ -41,6 +41,7 @@ describe("AndroidAttestationValidation", () => {
         platform: "android",
         vendorPatchLevel: "20230805",
         verifiedBootState: 0,
+        x509Chain: x509Chain.map((el) => el.toString()),
       },
       hardwareKey,
     };
