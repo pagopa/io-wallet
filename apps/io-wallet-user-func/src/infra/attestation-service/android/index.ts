@@ -29,6 +29,7 @@ export const AndroidDeviceDetails = t.intersection([
     osVersion: t.number,
     vendorPatchLevel: t.string,
     verifiedBootState: t.number,
+    x509Chain: t.array(t.string),
   }),
 ]);
 

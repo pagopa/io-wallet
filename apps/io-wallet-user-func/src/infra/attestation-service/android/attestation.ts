@@ -56,7 +56,10 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   await validateRevocation(x509Chain, androidCrlUrl);
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
-  const deviceDetails = validateExtension(certWithExtension, params);
+  const deviceDetails = {
+    ...validateExtension(certWithExtension, params),
+    x509Chain: x509Chain.map((x509) => x509.toString()),
+  };
 
   const hardwareKey = await jose.exportJWK(certWithExtension.publicKey);
 
