@@ -10,7 +10,7 @@ import * as pkijs from "pkijs";
 
 import { AndroidDeviceDetails } from ".";
 
-class AndroidAttestationError extends Error {
+export class AndroidAttestationError extends Error {
   name = "AndroidAttestationError";
   constructor(message: string, deviceDetails?: AndroidDeviceDetails) {
     super(

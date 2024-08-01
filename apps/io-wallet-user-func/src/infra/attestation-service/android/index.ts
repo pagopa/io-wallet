@@ -12,7 +12,7 @@ import * as t from "io-ts";
 
 import { ValidatedAttestation } from "../../attestation-service";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
-import { verifyAttestation } from "./attestation";
+import { AndroidAttestationError, verifyAttestation } from "./attestation";
 
 export const AndroidDeviceDetails = t.intersection([
   t.type({
@@ -55,9 +55,7 @@ export const validateAndroidAttestation = (
         E.tryCatch(
           () => new X509Certificate(cert),
           () =>
-            new Error(
-              `[Android Attestation] Unable to decode X509 certificate`,
-            ),
+            new AndroidAttestationError(`Unable to decode X509 certificate`),
         ),
       ),
     ),
