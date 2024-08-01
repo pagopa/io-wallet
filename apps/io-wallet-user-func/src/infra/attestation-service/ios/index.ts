@@ -20,6 +20,11 @@ const buffer = new t.Type<Buffer, Buffer, unknown>(
   t.identity,
 );
 
+export const IosDeviceDetails = t.type({
+  platform: t.literal("ios"),
+});
+export type IosDeviceDetails = t.TypeOf<typeof IosDeviceDetails>;
+
 // iOS attestation type
 export const iOsAttestation = t.type({
   attStmt: t.type({

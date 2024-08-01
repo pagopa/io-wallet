@@ -3,6 +3,7 @@ import { createHash, createVerify } from "crypto";
 import { exportSPKI, importJWK } from "jose";
 
 import { iOsAssertion } from ".";
+import { IosAssertionError } from "../errors";
 
 export interface VerifyAssertionParams {
   bundleIdentifiers: string[];
@@ -32,7 +33,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const joseHardwareKey = await importJWK(hardwareKey);
 
   if (!("type" in joseHardwareKey)) {
-    throw new Error("[iOS Assertion] Invalid Hardware Key format");
+    throw new IosAssertionError("Invalid Hardware Key format");
   }
 
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
@@ -53,7 +54,7 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     !skipSignatureValidation &&
     !verifier.verify(publicHardwareKeyPem, signature)
   ) {
-    throw new Error("[iOS Assertion] invalid signature");
+    throw new IosAssertionError("invalid signature");
   }
 
   // 5. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
@@ -69,12 +70,12 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   if (bundleIdentifiersCheck.length === 0) {
-    throw new Error("[iOS Assertion] appId does not match");
+    throw new IosAssertionError("appId does not match");
   }
 
   // 6. Verify that the authenticator data’s counter field is larger than the stored signCount.
   const nextSignCount = authenticatorData.subarray(33, 37).readInt32BE();
   if (nextSignCount <= signCount) {
-    throw new Error("[iOS Assertion] invalid signCount");
+    throw new IosAssertionError("invalid signCount");
   }
 };

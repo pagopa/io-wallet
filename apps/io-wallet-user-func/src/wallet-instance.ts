@@ -7,10 +7,10 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
+import { DeviceDetails } from "./attestation-service";
 import { EntityNotFoundError } from "./error";
 import { JwkPublicKey } from "./jwk";
 import { User } from "./user";
-
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
   constructor() {
@@ -18,13 +18,18 @@ class RevokedWalletInstance extends Error {
   }
 }
 
-const WalletInstanceBase = t.type({
-  createdAt: IsoDateFromString,
-  hardwareKey: JwkPublicKey,
-  id: NonEmptyString,
-  signCount: t.number,
-  userId: User.props.id,
-});
+const WalletInstanceBase = t.intersection([
+  t.type({
+    createdAt: IsoDateFromString,
+    hardwareKey: JwkPublicKey,
+    id: NonEmptyString,
+    signCount: t.number,
+    userId: User.props.id,
+  }),
+  t.partial({
+    deviceDetails: DeviceDetails,
+  }),
+]);
 
 const WalletInstanceValid = t.intersection([
   WalletInstanceBase,
