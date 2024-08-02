@@ -11,6 +11,7 @@ import { DeviceDetails } from "./attestation-service";
 import { EntityNotFoundError } from "./error";
 import { JwkPublicKey } from "./jwk";
 import { User } from "./user";
+
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
   constructor() {

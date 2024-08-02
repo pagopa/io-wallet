@@ -24,6 +24,8 @@ const toHttpError = (e: Error): Error => {
       return new HttpUnauthorizedError(e.message);
     case "ForbiddenError":
       return new H.HttpForbiddenError(e.message);
+    case "IntegrityCheckError":
+      return new H.HttpUnprocessableEntityError(e.message);
   }
   return e;
 };
