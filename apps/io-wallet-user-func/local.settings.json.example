@@ -40,6 +40,7 @@
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
     "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
-    "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE"
+    "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE",
+    "PidIssuerHealthCheckEnabled": PID_ISSUER_HEALTH_CHECK_ENABLED
   }
 }
