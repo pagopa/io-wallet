@@ -21,6 +21,13 @@ import {
 } from "./android";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
 
+class IntegrityCheckError extends Error {
+  name = "IntegrityCheckError";
+  constructor(msg: string[]) {
+    super(msg.join(". "));
+  }
+}
+
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validated: Separated<readonly Error[], readonly any[]>,
@@ -29,7 +36,7 @@ const getErrorsOrFirstValidValue = (
     validated.right,
     RA.head,
     E.fromOption(
-      () => new ValidationError(validated.left.map((el) => el.message)),
+      () => new IntegrityCheckError(validated.left.map((el) => el.message)),
     ),
   );
 
