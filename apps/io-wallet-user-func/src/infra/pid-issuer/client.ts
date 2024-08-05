@@ -11,25 +11,28 @@ export class PidIssuerClient
   implements CredentialRepository, PidIssuerHealthCheck
 {
   #baseURL: string;
+  #healthCheckEnabled: boolean;
   #init: RequestInit;
   #walletProviderEntity: string;
 
   healthCheck = () =>
-    TE.tryCatch(
-      async () => {
-        const result = await fetch(new URL(`/revokeAll`, this.#baseURL), {
-          body: JSON.stringify({
-            unique_id: "foo",
-            wallet_provider: this.#walletProviderEntity,
-          }),
-          method: "POST",
-          signal: AbortSignal.timeout(10000),
-          ...this.#init,
-        });
-        return result.status === 404;
-      },
-      (error) => new Error(`error checking PID issuer health: ${error}`),
-    );
+    this.#healthCheckEnabled
+      ? TE.tryCatch(
+          async () => {
+            const result = await fetch(new URL(`/revokeAll`, this.#baseURL), {
+              body: JSON.stringify({
+                unique_id: "foo",
+                wallet_provider: this.#walletProviderEntity,
+              }),
+              method: "POST",
+              signal: AbortSignal.timeout(10000),
+              ...this.#init,
+            });
+            return result.status === 404;
+          },
+          (error) => new Error(`error checking PID issuer health: ${error}`),
+        )
+      : TE.of(true);
 
   revokeAllCredentials = (fiscalCode: FiscalCode) =>
     pipe(
@@ -66,12 +69,14 @@ export class PidIssuerClient
       baseURL,
       clientCertificate,
       clientPrivateKey,
+      healthCheckEnabled,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
     basePath: Config["federationEntity"]["basePath"]["href"],
   ) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = basePath;
+    this.#healthCheckEnabled = healthCheckEnabled;
     this.#init = {
       dispatcher: new Agent({
         connect: {

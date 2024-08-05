@@ -103,6 +103,7 @@ const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
   clientCertificate: t.string,
   clientPrivateKey: t.string,
+  healthCheckEnabled: t.boolean,
   rootCACertificate: t.string,
 });
 
@@ -390,6 +391,11 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("PidIssuerApiRootCACertificate"),
       RE.map(decodeBase64String),
     ),
+    pidIssuerHealthCheckEnabled: pipe(
+      readFromEnvironment("PidIssuerHealthCheckEnabled"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
+    ),
   }),
   RE.map(
     ({
@@ -397,10 +403,12 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       pidIssuerApiClientCertificate,
       pidIssuerApiClientPrivateKey,
       pidIssuerApiRootCACertificate,
+      pidIssuerHealthCheckEnabled,
     }) => ({
       baseURL: pidIssuerApiBaseURL,
       clientCertificate: pidIssuerApiClientCertificate,
       clientPrivateKey: pidIssuerApiClientPrivateKey,
+      healthCheckEnabled: pidIssuerHealthCheckEnabled,
       rootCACertificate: pidIssuerApiRootCACertificate,
     }),
   ),
