@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.1.2
+
+### Patch Changes
+
+- 0d20ef2: Added pid issuer health check toggler
+
 ## 1.1.1
 
 ### Patch Changes
