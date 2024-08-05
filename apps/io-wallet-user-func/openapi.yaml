@@ -66,6 +66,8 @@ paths:
       responses:
         "204":
           description: Wallet instance successfully created
+        "409":
+          $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -103,6 +105,8 @@ paths:
         "404":
           description: The wallet instance was not found
           $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -218,6 +222,13 @@ components:
 
     NotFound:
       description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
+
+    Conflict:
+      description: There has been a conflict
       content:
         application/json:
           schema:

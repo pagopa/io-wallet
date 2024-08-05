@@ -24,8 +24,9 @@ const toHttpError = (e: Error): Error => {
       return new HttpUnauthorizedError(e.message);
     case "ForbiddenError":
       return new H.HttpForbiddenError(e.message);
+    // TODO SIW-1482
     case "IntegrityCheckError":
-      return new H.HttpUnprocessableEntityError(e.message);
+      return new H.HttpConflictError(e.message);
   }
   return e;
 };
