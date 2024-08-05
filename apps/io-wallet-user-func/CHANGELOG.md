@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.1.1
+
+### Patch Changes
+
+- 0a9dc42: Fix error attestation and assertion
+
 ## 1.1.0
 
 ### Minor Changes
