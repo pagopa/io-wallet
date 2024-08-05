@@ -86,6 +86,8 @@ module "function_apps" {
   key_vault_id        = data.azurerm_key_vault.weu-common.id
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
+  application_insights_connection_string = data.azurerm_application_insights.common.connection_string
+
   tags = local.tags
 
   user_func = local.user_func

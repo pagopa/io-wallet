@@ -93,3 +93,11 @@ variable "user_func" {
   })
   description = "Configuration of the user-func"
 }
+
+variable "application_insights_connection_string" {
+  type        = string
+  description = "Application Insights instrumentation key"
+  default     = null
+
+  sensitive = true
+}
