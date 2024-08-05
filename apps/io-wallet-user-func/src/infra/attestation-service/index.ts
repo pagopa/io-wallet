@@ -24,7 +24,7 @@ import { validateiOSAssertion, validateiOSAttestation } from "./ios";
 class IntegrityCheckError extends Error {
   name = "IntegrityCheckError";
   constructor(msg: string[]) {
-    super(msg.join(". "));
+    super(msg.join(" | "));
   }
 }
 
