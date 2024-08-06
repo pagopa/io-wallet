@@ -25,8 +25,6 @@ module "function_app_user" {
   app_settings      = local.function_app_wallet.app_settings
   slot_app_settings = local.function_app_wallet.app_settings
   sticky_app_setting_names = [
-    "APPINSIGHTS_INSTRUMENTATIONKEY",
-    "SLOT_TASK_HUBNAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING ",
     "APPINSIGHTS_PROFILERFEATURE_VERSION",
     "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
