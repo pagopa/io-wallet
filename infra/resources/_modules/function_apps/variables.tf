@@ -101,9 +101,3 @@ variable "application_insights_connection_string" {
 
   sensitive = true
 }
-
-variable "enable_autoscaling" {
-  type        = bool
-  description = "Enable autoscaling"
-  default     = false
-}
