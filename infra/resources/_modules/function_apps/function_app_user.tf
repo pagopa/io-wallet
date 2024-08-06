@@ -24,7 +24,7 @@ module "function_app_user" {
 
   app_settings      = local.function_app_wallet.app_settings
   slot_app_settings = local.function_app_wallet.app_settings
-  sticky_app_setting_names       = [
+  sticky_app_setting_names = [
     "APPINSIGHTS_INSTRUMENTATIONKEY",
     "SLOT_TASK_HUBNAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING ",
@@ -51,7 +51,7 @@ module "function_app_user" {
 
 module "function_app_user_autoscaler" {
   count = var.enable_autoscaling ? 1 : 0
-  
+
   source = "github.com/pagopa/dx//infra/modules/azure_app_service_plan_autoscaler?ref=main"
 
   resource_group_name = var.resource_group_name
