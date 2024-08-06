@@ -24,21 +24,6 @@ module "function_app_user" {
 
   app_settings      = local.function_app_wallet.app_settings
   slot_app_settings = local.function_app_wallet.app_settings
-  sticky_app_setting_names = [
-    "APPLICATIONINSIGHTS_CONNECTION_STRING ",
-    "APPINSIGHTS_PROFILERFEATURE_VERSION",
-    "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
-    "ApplicationInsightsAgent_EXTENSION_VERSION",
-    "XDT_MicrosoftApplicationInsights_BaseExtensions",
-    "DiagnosticServices_EXTENSION_VERSION",
-    "InstrumentationEngine_EXTENSION_VERSION",
-    "SnapshotDebugger_EXTENSION_VERSION",
-    "XDT_MicrosoftApplicationInsights_Mode",
-    "XDT_MicrosoftApplicationInsights_PreemptSdk",
-    "APPLICATIONINSIGHTS_CONFIGURATION_CONTENT",
-    "XDT_MicrosoftApplicationInsightsJava",
-    "XDT_MicrosoftApplicationInsights_NodeJS",
-  ]
 
   application_insights_connection_string = var.application_insights_connection_string
 
