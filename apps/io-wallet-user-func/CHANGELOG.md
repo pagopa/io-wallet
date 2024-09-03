@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.1.3
+
+### Patch Changes
+
+- a164214: Removed trailing slash in the body passed to pid issuer API
+
 ## 1.1.2
 
 ### Patch Changes
