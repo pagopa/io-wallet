@@ -17,4 +17,6 @@ jobs:
       workspace_name: io-wallet-user-func
       environment: app-prod
       resource_group_name: io-p-itn-wallet-rg-01
-      web_app_name: io-p-itn-wallet-user-func-01
+      function_app_name: io-p-itn-wallet-user-func-01
+      health_check_path: "/api/v1/wallet/health"
+      use_staging_slot: true
