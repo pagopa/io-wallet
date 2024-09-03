@@ -1,5 +1,6 @@
 import { Config, PidIssuerApiClientConfig } from "@/app/config";
 import { CredentialRepository } from "@/credential";
+import { removeTrailingSlash } from "@/url";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
@@ -75,7 +76,7 @@ export class PidIssuerClient
     basePath: Config["federationEntity"]["basePath"]["href"],
   ) {
     this.#baseURL = baseURL;
-    this.#walletProviderEntity = basePath;
+    this.#walletProviderEntity = removeTrailingSlash(basePath);
     this.#healthCheckEnabled = healthCheckEnabled;
     this.#init = {
       dispatcher: new Agent({
