@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.1.4
+
+### Patch Changes
+
+- 5ed07a0: Add io-web magic link jwt validation
+
 ## 1.1.3
 
 ### Patch Changes
