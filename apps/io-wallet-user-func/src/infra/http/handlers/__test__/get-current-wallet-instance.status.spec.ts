@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { UnauthorizedError } from "@/error";
-import { HslJwtValidate } from "@/jwt-validator";
+import { JwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
   UserRepository,
@@ -51,7 +51,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
 
-  const hslJwtValidate: HslJwtValidate = () =>
+  const jwtValidate: JwtValidate = () =>
     TE.right({
       fiscal_number: "AAACCC94D55H501P",
     });
@@ -72,9 +72,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -101,9 +101,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       ...H.request("https://wallet-provider.example.org"),
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -134,9 +134,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -167,9 +167,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -188,7 +188,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 422 HTTP response when token does not contain `fiscal_number`", async () => {
-    const hslJwtValidate: HslJwtValidate = () =>
+    const jwtValidate: JwtValidate = () =>
       TE.right({
         foo: "AAACCC94D55H501P",
       });
@@ -205,9 +205,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -225,8 +225,8 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 401 HTTP response on hsl jwt forbidden error", async () => {
-    const hslJwtValidateThatFails: HslJwtValidate = () =>
+  it("should return a 401 HTTP response on jwt forbidden error", async () => {
+    const jwtValidateThatFails: JwtValidate = () =>
       TE.left(new UnauthorizedError());
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -240,9 +240,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate: hslJwtValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate: jwtValidateThatFails,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -281,9 +281,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository:
@@ -317,9 +317,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -353,9 +353,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate,
       logger,
       userRepository,
       userTrialSubscriptionRepository,
@@ -374,8 +374,8 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on hslJwtValidate error", async () => {
-    const hslValidateThatFails: HslJwtValidate = () =>
+  it("should return a 500 HTTP response on jwtValidate error", async () => {
+    const jwtValidateThatFails: JwtValidate = () =>
       TE.left(new Error("failed on jwtValidationAndDecode!"));
 
     const req = {
@@ -385,9 +385,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       },
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
-      hslJwtValidate: hslValidateThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtValidate: jwtValidateThatFails,
       logger,
       userRepository,
       userTrialSubscriptionRepository,

@@ -1,4 +1,4 @@
-import { HslJwtEnvironment } from "@/jwt-validator";
+import { JwtEnvironment } from "@/jwt-validator";
 import {
   User,
   UserEnvironment,
@@ -16,7 +16,7 @@ import { requireFiscalCodeFromToken } from "./jwt-validator";
 export const requireWhitelistedFiscalCodeFromToken: (
   req: H.HttpRequest,
 ) => RTE.ReaderTaskEither<
-  HslJwtEnvironment & UserTrialSubscriptionEnvironment,
+  JwtEnvironment & UserTrialSubscriptionEnvironment,
   Error,
   FiscalCode
 > = flow(requireFiscalCodeFromToken, RTE.chainFirstW(ensureUserInWhitelist));
@@ -24,7 +24,7 @@ export const requireWhitelistedFiscalCodeFromToken: (
 export const requireWhitelistedUserFromToken: (
   req: H.HttpRequest,
 ) => RTE.ReaderTaskEither<
-  HslJwtEnvironment & UserEnvironment & UserTrialSubscriptionEnvironment,
+  JwtEnvironment & UserEnvironment & UserTrialSubscriptionEnvironment,
   Error,
   User
 > = flow(

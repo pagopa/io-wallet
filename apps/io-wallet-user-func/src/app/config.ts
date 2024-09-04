@@ -80,13 +80,19 @@ export type PdvTokenizerApiClientConfig = t.TypeOf<
   typeof PdvTokenizerApiClientConfig
 >;
 
-const HubSpidLoginConfig = t.type({
-  clientBaseUrl: NonEmptyString,
-  jwtIssuer: NonEmptyString,
-  jwtPubKey: NonEmptyString,
+const JwtValidatorConfig = t.type({
+  exchange: t.type({
+    jwtIssuer: NonEmptyString,
+    jwtPubKey: NonEmptyString,
+  }),
+  hubSpidLogin: t.type({
+    clientBaseUrl: NonEmptyString,
+    jwtIssuer: NonEmptyString,
+    jwtPubKey: NonEmptyString,
+  }),
 });
 
-export type HubSpidLoginConfig = t.TypeOf<typeof HubSpidLoginConfig>;
+export type JwtValidatorConfig = t.TypeOf<typeof JwtValidatorConfig>;
 
 const TrialSystemApiClientConfig = t.type({
   apiKey: t.string,
@@ -116,53 +122,13 @@ export const Config = t.type({
   azure: AzureConfiguration,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
-  hubSpidLogin: HubSpidLoginConfig,
+  jwtValidator: JwtValidatorConfig,
   pdvTokenizer: PdvTokenizerApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   trialSystem: TrialSystemApiClientConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
-
-export const getConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  Config
-> = pipe(
-  RE.Do,
-  RE.bind("federationEntity", () => getFederationEntityConfigFromEnvironment),
-  RE.bind("crypto", () => getCryptoConfigFromEnvironment),
-  RE.bind(
-    "attestationService",
-    () => getAttestationServiceConfigFromEnvironment,
-  ),
-  RE.bind("azure", () => getAzureConfigFromEnvironment),
-  RE.bind("pdvTokenizer", () => getPdvTokenizerConfigFromEnvironment),
-  RE.bind("hubSpidLogin", () => getHubSpidLoginConfigFromEnvironment),
-  RE.bind("trialSystem", () => getTrialSystemConfigFromEnvironment),
-  RE.bind("pidIssuer", () => getPidIssuerConfigFromEnvironment),
-  RE.map(
-    ({
-      attestationService,
-      azure,
-      crypto,
-      federationEntity,
-      hubSpidLogin,
-      pdvTokenizer,
-      pidIssuer,
-      trialSystem,
-    }) => ({
-      attestationService,
-      azure,
-      crypto,
-      federationEntity,
-      hubSpidLogin,
-      pdvTokenizer,
-      pidIssuer,
-      trialSystem,
-    }),
-  ),
-);
 
 const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -313,12 +279,17 @@ const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
-const getHubSpidLoginConfigFromEnvironment: RE.ReaderEither<
+const getJwtValidatorConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  HubSpidLoginConfig
+  JwtValidatorConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    exchangeJwtIssuer: readFromEnvironment("ExchangeJwtIssuer"),
+    exchangeJwtPubKey: pipe(
+      readFromEnvironment("ExchangeJwtPubKey"),
+      RE.map(decodeBase64String),
+    ),
     hubSpidLoginClientBaseUrl: readFromEnvironment("HubSpidLoginClientBaseUrl"),
     hubSpidLoginJwtIssuer: readFromEnvironment("HubSpidLoginJwtIssuer"),
     hubSpidLoginJwtPubKey: pipe(
@@ -328,18 +299,26 @@ const getHubSpidLoginConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
+      exchangeJwtIssuer,
+      exchangeJwtPubKey,
       hubSpidLoginClientBaseUrl,
       hubSpidLoginJwtIssuer,
       hubSpidLoginJwtPubKey,
     }) => ({
-      clientBaseUrl: hubSpidLoginClientBaseUrl,
-      jwtIssuer: hubSpidLoginJwtIssuer,
-      jwtPubKey: hubSpidLoginJwtPubKey,
+      exchange: {
+        jwtIssuer: exchangeJwtIssuer,
+        jwtPubKey: exchangeJwtPubKey,
+      },
+      hubSpidLogin: {
+        clientBaseUrl: hubSpidLoginClientBaseUrl,
+        jwtIssuer: hubSpidLoginJwtIssuer,
+        jwtPubKey: hubSpidLoginJwtPubKey,
+      },
     }),
   ),
   RE.chainW((result) =>
     pipe(
-      HubSpidLoginConfig.decode(result),
+      JwtValidatorConfig.decode(result),
       RE.fromEither,
       RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
     ),
@@ -412,4 +391,21 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       rootCACertificate: pidIssuerApiRootCACertificate,
     }),
   ),
+);
+
+export const getConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  Config
+> = pipe(
+  sequenceS(RE.Apply)({
+    attestationService: getAttestationServiceConfigFromEnvironment,
+    azure: getAzureConfigFromEnvironment,
+    crypto: getCryptoConfigFromEnvironment,
+    federationEntity: getFederationEntityConfigFromEnvironment,
+    jwtValidator: getJwtValidatorConfigFromEnvironment,
+    pdvTokenizer: getPdvTokenizerConfigFromEnvironment,
+    pidIssuer: getPidIssuerConfigFromEnvironment,
+    trialSystem: getTrialSystemConfigFromEnvironment,
+  }),
 );
