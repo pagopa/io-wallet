@@ -33,6 +33,8 @@
     "HubSpidLoginJwtPubKey": "HUB_SPID_LOGIN_JWT_PUB_KEY",
     "HubSpidLoginJwtIssuer": "HUB_SPID_LOGIN_JWT_ISSUER",
     "HubSpidLoginClientBaseUrl": "HUB_SPID_LOGIN_CLIENT_BASE_URL",
+    "ExchangeJwtIssuer": "EXCHANGE_JWT_ISSUER",
+    "ExchangeJwtPubKey": "EXCHANGE_JWT_PUB_KEY",
     "TrialSystemApiBaseURL": "TRIAL_SYSTEM_API_BASE_URL",
     "TrialSystemApiKey": "TRIAL_SYSTEM_API_KEY",
     "TrialSystemTrialId": "TRIAL_SYSTEM_TRIAL_ID",
