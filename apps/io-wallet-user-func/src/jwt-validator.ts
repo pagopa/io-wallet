@@ -3,33 +3,17 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jwt from "jsonwebtoken";
 
-export type HslJwtValidate = (
+export type JwtValidate = (
   token: NonEmptyString,
 ) => TE.TaskEither<Error, jwt.JwtPayload>;
 
-export interface HslJwtEnvironment {
-  hslJwtValidate: HslJwtValidate;
+export interface JwtEnvironment {
+  jwtValidate: JwtValidate;
 }
 
-export const hslJwtValidate: (
+export const jwtValidate: (
   token: NonEmptyString,
-) => RTE.ReaderTaskEither<HslJwtEnvironment, Error, jwt.JwtPayload> =
+) => RTE.ReaderTaskEither<JwtEnvironment, Error, jwt.JwtPayload> =
   (token) =>
-  ({ hslJwtValidate }) =>
-    hslJwtValidate(token);
-
-export type ExchangeJwtValidate = (
-  token: NonEmptyString,
-) => TE.TaskEither<Error, jwt.JwtPayload>;
-
-interface ExchangeJwtEnvironment {
-  exchangeJwtValidate: ExchangeJwtValidate;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const exchangeJwtValidate: (
-  token: NonEmptyString,
-) => RTE.ReaderTaskEither<ExchangeJwtEnvironment, Error, jwt.JwtPayload> =
-  (token) =>
-  ({ exchangeJwtValidate }) =>
-    exchangeJwtValidate(token);
+  ({ jwtValidate }) =>
+    jwtValidate(token);

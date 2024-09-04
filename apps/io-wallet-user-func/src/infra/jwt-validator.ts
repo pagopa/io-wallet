@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { HubSpidLoginConfig } from "@/app/config";
+import { JwtValidatorConfig } from "@/app/config";
 import { UnauthorizedError } from "@/error";
-import { ExchangeJwtValidate, HslJwtValidate } from "@/jwt-validator";
+import { JwtValidate } from "@/jwt-validator";
 import { getValidateJWT } from "@pagopa/ts-commons/lib/jwt_with_key_rotation";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -58,11 +58,11 @@ const hslIntrospection: (
       ),
     );
 
-export const hslValidate: ({
+const hslJwtValidate: ({
   clientBaseUrl,
   jwtIssuer,
   jwtPubKey,
-}: HubSpidLoginConfig) => HslJwtValidate =
+}: JwtValidatorConfig["hubSpidLogin"]) => JwtValidate =
   ({ clientBaseUrl, jwtIssuer, jwtPubKey }) =>
   (token) =>
     pipe(
@@ -70,14 +70,25 @@ export const hslValidate: ({
       validateAndDecode(jwtIssuer, jwtPubKey),
       // TODO [SIW-1327]: make the call to hub spid login service
       // TE.chainFirst(() => pipe(token, hslIntrospection(clientBaseUrl))),
-      TE.mapLeft(() => new UnauthorizedError()),
     );
 
-const exchangeValidate: ({
-  clientBaseUrl,
+const exchangeJwtValidate: ({
   jwtIssuer,
   jwtPubKey,
-}: HubSpidLoginConfig) => ExchangeJwtValidate =
+}: JwtValidatorConfig["exchange"]) => JwtValidate =
   ({ jwtIssuer, jwtPubKey }) =>
   (token) =>
     pipe(token, validateAndDecode(jwtIssuer, jwtPubKey));
+
+export const jwtValidate: ({
+  exchange,
+  hubSpidLogin,
+}: JwtValidatorConfig) => JwtValidate =
+  ({ exchange, hubSpidLogin }) =>
+  (token) =>
+    pipe(
+      token,
+      hslJwtValidate(hubSpidLogin),
+      TE.orElse(() => pipe(token, exchangeJwtValidate(exchange))),
+      TE.mapLeft(() => new UnauthorizedError()),
+    );
