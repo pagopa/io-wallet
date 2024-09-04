@@ -80,6 +80,10 @@ const exchangeJwtValidate: ({
   (token) =>
     pipe(token, validateAndDecode(jwtIssuer, jwtPubKey));
 
+// there are two types of tokens
+// one issued by the hub SPID login when the user logs in directly (validated with hslJwtValidate)
+// and another issued when the user enters via a magic link (validated with exchangeJwtValidate)
+// this function returns 'Right' if at least one of these validations returns 'Right'.
 export const jwtValidate: ({
   exchange,
   hubSpidLogin,
