@@ -2,7 +2,6 @@
   "name": "io-wallet-support-func",
   "version": "0.0.1",
   "private": true,
-  "packageManager": "yarn@3.6.3",
   "scripts": {
     "build": "tsup-node",
     "build:watch": "tsup-node --watch",
