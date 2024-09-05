@@ -65,6 +65,8 @@ export type RSAPrivateKey = t.TypeOf<typeof RSAPrivateKey>;
 export const JwkPublicKey = t.union([RSAKey, ECKey], "JwkPublicKey");
 export type JwkPublicKey = t.TypeOf<typeof JwkPublicKey>;
 
+// da qui in giù non servono
+
 /**
  * The Private Key JWK type. It could be either an ECPrivateKey or an RSAPrivateKey.
  */

@@ -12,7 +12,8 @@
     "release": "changeset tag"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "devDependencies": {
     "@changesets/cli": "^2.27.1",

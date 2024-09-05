@@ -4,13 +4,13 @@ import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
+import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 
 import { WalletAttestationToJwtModel } from "./encoders/wallet-attestation";
 import {
   EntityConfigurationEnvironment,
   FederationEntity,
 } from "./entity-configuration";
-import { JwkPublicKey, validateJwkKid } from "./jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
 

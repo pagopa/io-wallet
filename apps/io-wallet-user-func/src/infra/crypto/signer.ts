@@ -1,4 +1,3 @@
-import { ECKey, Jwk, RSAKey } from "@/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { flow, pipe } from "fp-ts/function";
 import * as A from "fp-ts/lib/Array";
@@ -6,6 +5,7 @@ import * as E from "fp-ts/lib/Either";
 import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
+import { ECKey, Jwk, RSAKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
 import { CryptoConfiguration } from "../../app/config";

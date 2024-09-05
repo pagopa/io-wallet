@@ -1,5 +1,5 @@
-import { JwkPublicKey } from "@/jwk";
 import { createHash, createVerify } from "crypto";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
 
 import { iOsAssertion } from ".";

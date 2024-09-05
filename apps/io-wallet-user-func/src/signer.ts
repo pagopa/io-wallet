@@ -1,8 +1,7 @@
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
+import { Jwk, JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
-
-import { Jwk, JwkPublicKey } from "./jwk";
 
 export interface JwtHeader {
   trust_chain?: string[];

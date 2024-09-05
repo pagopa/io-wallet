@@ -4,8 +4,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
-
-import { ForbiddenError } from "./error";
+import { ForbiddenError } from "io-wallet-common/error";
 
 export const User = t.type({
   id: NonEmptyString,

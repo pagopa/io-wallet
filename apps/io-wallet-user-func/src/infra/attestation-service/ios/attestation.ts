@@ -1,9 +1,10 @@
 import * as asn1js from "asn1js";
 import { X509Certificate, createHash } from "crypto";
+import { IosDeviceDetails } from "io-wallet-common/device-details";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
-import { IosDeviceDetails, iOsAttestation } from ".";
+import { iOsAttestation } from ".";
 import { IosAttestationError } from "../errors";
 
 const APPATTESTDEVELOP = Buffer.from("appattestdevelop").toString("hex");

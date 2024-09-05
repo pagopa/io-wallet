@@ -1,4 +1,4 @@
-import { AndroidDeviceDetails } from "./android";
+import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 
 export class AndroidAttestationError extends Error {
   name = "AndroidAttestationError";
