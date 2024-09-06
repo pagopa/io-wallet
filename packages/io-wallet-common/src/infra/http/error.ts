@@ -8,6 +8,7 @@ class HttpUnauthorizedError extends H.HttpError {
   title = "Unauthorized";
 }
 
+// Encode domain errors to http errors
 const toHttpError = (e: Error): Error => {
   if (e.name === "HttpError") {
     return e;
