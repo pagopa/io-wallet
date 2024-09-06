@@ -7,7 +7,7 @@ module "function_app_support" {
     env_short       = var.env_short
     location        = "italynorth"
     domain          = "wallet"
-    app_name        = "support"
+    app_name        = "supp"
     instance_number = "01"
   }
 
