@@ -105,17 +105,23 @@ components:
 
   schemas:
     WalletData:
-      description: |-
-        Describes the status of the wallet.
+      description: Current wallet information
       type: object
       properties:
         id:
           type: string
         is_revoked:
           type: boolean
+        created_at:
+          $ref: "#/components/schemas/Timestamp"
+        revoked_at:
+          $ref: "#/components/schemas/Timestamp"
+        device_details:
+          $ref: "#/components/schemas/DeviceDetails"
       required:
         - id
         - is_revoked
+        - created_at
 
     ProblemJson:
       type: object
@@ -172,3 +178,43 @@ components:
           $ref: "#/components/schemas/FiscalCode"
       required:
         - fiscal_code
+
+    Timestamp:
+      type: string
+      format: UTCISODateFromString
+      description: A date-time field in ISO-8601 format and UTC timezone.
+      x-import: "@pagopa/ts-commons/lib/dates"
+      example: "2018-10-13T00:00:00.000Z"
+
+    DeviceDetails:
+      type: object
+      description: User device information
+      properties:
+        platform:
+          type: string
+        attestationSecurityLevel:
+          type: number
+        attestationVersion:
+          type: number
+        keymasterSecurityLevel:
+          type: number
+        keymasterVersion:
+          type: number
+        bootPatchLevel:
+          type: string
+        deviceLocked:
+          type: boolean
+        osPatchLevel:
+          type: number
+        osVersion:
+          type: number
+        vendorPatchLevel:
+          type: string
+        verifiedBootState:
+          type: number
+        x509Chain:
+          type: array
+          items:
+            type: string
+      required:
+        - platform
