@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ES2023", "DOM"],
+    "lib": ["ES2023"],
     "module": "commonjs",
     "target": "ES2021",
     "moduleResolution": "node",
