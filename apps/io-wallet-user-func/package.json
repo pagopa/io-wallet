@@ -43,5 +43,8 @@
     "typescript": "^5.4.5",
     "vitest": "^1.5.0"
   },
-  "main": "dist/main.js"
+  "main": "dist/main.js",
+  "files": [
+    "host.json"
+  ]
 }
