@@ -1,12 +1,9 @@
+import { HealthHandler } from "@/infra/http/handlers/health";
 import { app } from "@azure/functions";
-
-async function healthHandler() {
-  return { status: 204 };
-}
 
 app.http("healthCheck", {
   authLevel: "anonymous",
-  handler: healthHandler,
+  handler: HealthHandler,
   methods: ["GET"],
   route: "health",
 });
