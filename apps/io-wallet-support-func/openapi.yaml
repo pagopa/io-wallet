@@ -5,10 +5,10 @@ info:
 servers:
   - url: https://io-p-itn-wallet-support-func-01.azurewebsites.net/api/v1/wallet
 paths:
-  /wallet-instances/current/status:
+  /wallet-instances/current:
     post:
-      summary: Retrieve the current Wallet Instance status given a fiscal code
-      operationId: getCurrentWalletInstanceStatusByFiscalCode
+      summary: Retrieve the current Wallet Instance information given a fiscal code
+      operationId: getCurrentWalletInstanceByFiscalCode
       security:
         - FunctionsKey: []
       requestBody:
@@ -16,14 +16,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GetCurrentWalletInstanceStatusByFiscalCodeBody"
+              $ref: "#/components/schemas/GetCurrentWalletInstanceByFiscalCodeBody"
       responses:
         "200":
-          description: Wallet Instance status successfully retrieved
+          description: Wallet Instance successfully retrieved
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WalletData"
+                $ref: "#/components/schemas/WalletInstanceData"
         "404":
           $ref: "#/components/responses/NotFound"
         "500":
@@ -104,8 +104,8 @@ components:
             $ref: "#/components/schemas/ProblemJson"
 
   schemas:
-    WalletData:
-      description: Current wallet information
+    WalletInstanceData:
+      description: Current wallet instance information
       type: object
       properties:
         id:
@@ -171,7 +171,7 @@ components:
       x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
 
-    GetCurrentWalletInstanceStatusByFiscalCodeBody:
+    GetCurrentWalletInstanceByFiscalCodeBody:
       type: object
       properties:
         fiscal_code:
