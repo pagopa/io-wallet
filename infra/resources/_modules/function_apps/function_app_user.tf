@@ -22,8 +22,8 @@ module "function_app_user" {
     resource_group_name = var.virtual_network.resource_group_name
   }
 
-  app_settings      = local.function_app_wallet.app_settings
-  slot_app_settings = local.function_app_wallet.app_settings
+  app_settings      = local.function_app_user.app_settings
+  slot_app_settings = local.function_app_user.app_settings
 
   application_insights_connection_string = var.application_insights_connection_string
 

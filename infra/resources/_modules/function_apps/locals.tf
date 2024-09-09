@@ -1,5 +1,5 @@
 locals {
-  function_app_wallet = {
+  function_app_user = {
     app_settings = merge({
       FUNCTIONS_WORKER_RUNTIME       = "node"
       FUNCTIONS_WORKER_PROCESS_COUNT = 4
