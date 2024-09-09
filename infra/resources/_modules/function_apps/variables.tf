@@ -28,7 +28,7 @@ variable "resource_group_name" {
   description = "Name of the resource group where resources will be created"
 }
 
-variable "cidr_subnet_user_func" {
+variable "cidr_subnet_func" {
   type        = string
   description = "CIDR block for wallet function app subnet"
 }

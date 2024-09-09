@@ -15,7 +15,7 @@ module "function_app_support" {
   health_check_path   = "/api/v1/wallet/health"
   node_version        = 20
 
-  subnet_cidr                          = var.cidr_subnet_user_func
+  subnet_cidr                          = var.cidr_subnet_func
   subnet_pep_id                        = var.private_endpoint_subnet_id
   private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
   virtual_network = {
@@ -32,3 +32,5 @@ module "function_app_support" {
 
   tags = var.tags
 }
+
+
