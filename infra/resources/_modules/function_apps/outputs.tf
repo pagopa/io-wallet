@@ -8,3 +8,9 @@ output "function_app_user" {
     default_hostname     = module.function_app_user.function_app.function_app.default_hostname
   }
 }
+
+output "function_app_support" {
+  value = {
+    name = module.function_app_support.function_app.function_app.name
+  }
+}
