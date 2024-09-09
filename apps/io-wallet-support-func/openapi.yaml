@@ -186,12 +186,12 @@ components:
       x-import: "@pagopa/ts-commons/lib/dates"
       example: "2018-10-13T00:00:00.000Z"
 
-    DeviceDetails:
+    AndroidDeviceDetails:
       type: object
-      description: User device information
       properties:
         platform:
           type: string
+          enum: ["android"]
         attestationSecurityLevel:
           type: number
         attestationVersion:
@@ -218,3 +218,23 @@ components:
             type: string
       required:
         - platform
+        - attestationSecurityLevel
+        - attestationVersion
+        - keymasterSecurityLevel
+        - keymasterVersion
+
+    IosDeviceDetails:
+      type: object
+      properties:
+        platform:
+          type: string
+          enum: ["ios"]
+      required:
+        - platform
+
+    DeviceDetails:
+      type: object
+      description: User device information
+      oneOf:
+        - $ref: "#/components/schemas/AndroidDeviceDetails"
+        - $ref: "#/components/schemas/IosDeviceDetails"
