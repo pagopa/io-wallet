@@ -1,5 +1,4 @@
 import { revokeAllCredentials } from "@/credential";
-import { getUserByFiscalCode } from "@/user";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -10,6 +9,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { getUserByFiscalCode } from "io-wallet-common/user";
 
 import { requireWhitelistedFiscalCodeFromToken } from "../whitelisted-user";
 

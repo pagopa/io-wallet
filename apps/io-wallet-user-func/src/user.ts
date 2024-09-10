@@ -1,36 +1,10 @@
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { enumType } from "@pagopa/ts-commons/lib/types";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { ForbiddenError } from "io-wallet-common/error";
-
-export const User = t.type({
-  id: NonEmptyString,
-});
-
-export type User = t.TypeOf<typeof User>;
-
-export interface UserRepository {
-  getFiscalCodeByUserId: (
-    id: NonEmptyString,
-  ) => TE.TaskEither<Error, { fiscalCode: FiscalCode }>;
-  getOrCreateUserByFiscalCode: (
-    fiscalCode: FiscalCode,
-  ) => TE.TaskEither<Error, User>;
-}
-
-export interface UserEnvironment {
-  userRepository: UserRepository;
-}
-
-export const getUserByFiscalCode: (
-  fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<UserEnvironment, Error, User> =
-  (fiscalCode) =>
-  ({ userRepository }) =>
-    userRepository.getOrCreateUserByFiscalCode(fiscalCode);
 
 export enum SubscriptionStateEnum {
   "ACTIVE" = "ACTIVE",

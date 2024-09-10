@@ -23,6 +23,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.1.1",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/logger": "^1.0.1",
     "@pagopa/ts-commons": "^13.1.1",

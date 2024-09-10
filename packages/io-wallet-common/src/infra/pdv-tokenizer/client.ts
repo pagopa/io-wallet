@@ -1,11 +1,11 @@
+import { UserRepository } from "@/user";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { PdvTokenizerApiClientConfig } from "io-wallet-common/infra/pdv-tokenizer/config";
-import { UserRepository } from "io-wallet-common/user";
 
+import { PdvTokenizerApiClientConfig } from "./config";
 import { PdvTokenizerHealthCheck } from "./health-check";
 
 const Token = t.type({
