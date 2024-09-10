@@ -1,5 +1,3 @@
-import { readFromEnvironment } from "@/infra/env";
-import { Jwk, fromBase64ToJwks } from "@/jwk";
 import { parse } from "@pagopa/handler-kit";
 import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -7,6 +5,8 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
+import { readFromEnvironment } from "io-wallet-common/infra/env";
+import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
 

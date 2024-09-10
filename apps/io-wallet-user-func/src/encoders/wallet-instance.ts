@@ -1,6 +1,6 @@
-import { WalletInstance } from "@/wallet-instance";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
+import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 const WalletInstanceStatus = t.type({
   id: NonEmptyString,

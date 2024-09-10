@@ -3,7 +3,7 @@ import { errorRTE } from "@pagopa/logger";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
 
-export class HttpUnauthorizedError extends H.HttpError {
+class HttpUnauthorizedError extends H.HttpError {
   status = 401 as const;
   title = "Unauthorized";
 }

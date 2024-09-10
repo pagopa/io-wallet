@@ -5,10 +5,10 @@ import {
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
 import { X509Certificate, createPublicKey } from "crypto";
+import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
-import { AndroidDeviceDetails } from ".";
 import { AndroidAttestationError } from "../errors";
 
 /**

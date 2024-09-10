@@ -1,4 +1,3 @@
-import { HealthCheckError } from "@/error";
 import { getCosmosHealth } from "@/infra/azure/cosmos/health-check";
 import {
   PdvTokenizerHealthCheck,
@@ -20,8 +19,8 @@ import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { identity, pipe } from "fp-ts/function";
-
-import { logErrorAndReturnResponse } from "../error";
+import { HealthCheckError } from "io-wallet-common/error";
+import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {

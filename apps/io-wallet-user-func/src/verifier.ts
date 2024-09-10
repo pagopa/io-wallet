@@ -3,9 +3,8 @@ import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
-
-import { JwkPublicKey } from "./jwk";
 
 const WithJwkCnf = t.type({
   cnf: t.type({
@@ -15,7 +14,7 @@ const WithJwkCnf = t.type({
 
 type WithJwkCnf = t.TypeOf<typeof WithJwkCnf>;
 
-export const decodeJwt = (jwt: string) =>
+const decodeJwt = (jwt: string) =>
   E.tryCatch(() => jose.decodeJwt(jwt), E.toError);
 
 export const verifyJwtSignature = (jwt: string) => (publicKey: JwkPublicKey) =>

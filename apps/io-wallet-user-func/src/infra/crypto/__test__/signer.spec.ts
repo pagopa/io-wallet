@@ -1,7 +1,7 @@
-import { ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "@/jwk";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
+import { ECPrivateKey, Jwk, RSAKey, RSAPrivateKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 

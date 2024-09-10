@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { JwtValidatorConfig } from "@/app/config";
-import { UnauthorizedError } from "@/error";
 import { JwtValidate } from "@/jwt-validator";
 import { getValidateJWT } from "@pagopa/ts-commons/lib/jwt_with_key_rotation";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -8,6 +7,7 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
+import { UnauthorizedError } from "io-wallet-common/error";
 import * as jwt from "jsonwebtoken";
 
 const validateAndDecode: (

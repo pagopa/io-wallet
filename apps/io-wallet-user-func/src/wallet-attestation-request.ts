@@ -5,8 +5,8 @@ import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { JwkPublicKey } from "./jwk";
 import { getPublicKeyFromCnf, verifyJwtSignature } from "./verifier";
 
 export const WalletAttestationRequestHeader = t.type({
