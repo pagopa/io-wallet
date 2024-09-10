@@ -3875,6 +3875,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "io-wallet-common@workspace:packages/io-wallet-common"
   dependencies:
+    "@azure/cosmos": "npm:^4.1.1"
     "@pagopa/eslint-config": "npm:^4.0.1"
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@pagopa/logger": "npm:^1.0.1"
@@ -3892,8 +3893,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "io-wallet-support-func@workspace:apps/io-wallet-support-func"
   dependencies:
+    "@azure/cosmos": "npm:^4.1.1"
     "@azure/functions": "npm:^4.5.1"
+    "@azure/identity": "npm:^4.4.1"
     "@pagopa/eslint-config": "npm:^4.0.1"
+    "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
     "@vitest/coverage-c8": "npm:^0.33.0"
     azure-functions-core-tools: "npm:^4.0.5907"
     eslint: "npm:8.57.0"

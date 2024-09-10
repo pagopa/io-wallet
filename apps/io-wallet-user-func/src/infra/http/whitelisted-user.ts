@@ -1,15 +1,17 @@
 import { JwtEnvironment } from "@/jwt-validator";
 import {
-  User,
-  UserEnvironment,
   UserTrialSubscriptionEnvironment,
   ensureUserInWhitelist,
-  getUserByFiscalCode,
 } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
+import {
+  User,
+  UserEnvironment,
+  getUserByFiscalCode,
+} from "io-wallet-common/user";
 
 import { requireFiscalCodeFromToken } from "./jwt-validator";
 

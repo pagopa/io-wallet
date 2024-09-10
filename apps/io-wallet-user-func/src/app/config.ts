@@ -5,7 +5,15 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
+import {
+  AzureCosmosConfig,
+  getAzureCosmosConfigFromEnvironment,
+} from "io-wallet-common/infra/azure/cosmos/config";
 import { readFromEnvironment } from "io-wallet-common/infra/env";
+import {
+  PdvTokenizerApiClientConfig,
+  getPdvTokenizerConfigFromEnvironment,
+} from "io-wallet-common/infra/pdv-tokenizer/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
@@ -58,27 +66,14 @@ export type AttestationServiceConfiguration = t.TypeOf<
   typeof AttestationServiceConfiguration
 >;
 
-const AzureConfiguration = t.type({
-  cosmos: t.type({
-    dbName: t.string,
-    endpoint: t.string,
-  }),
+const AzureConfig = t.type({
+  cosmos: AzureCosmosConfig,
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
   }),
 });
 
-type AzureConfiguration = t.TypeOf<typeof AzureConfiguration>;
-
-export const PdvTokenizerApiClientConfig = t.type({
-  apiKey: t.string,
-  baseURL: t.string,
-  testUUID: t.string,
-});
-
-export type PdvTokenizerApiClientConfig = t.TypeOf<
-  typeof PdvTokenizerApiClientConfig
->;
+type AzureConfig = t.TypeOf<typeof AzureConfig>;
 
 const JwtValidatorConfig = t.type({
   exchange: t.type({
@@ -119,7 +114,7 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
-  azure: AzureConfiguration,
+  azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   jwtValidator: JwtValidatorConfig,
@@ -232,51 +227,22 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
 export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  AzureConfiguration
+  AzureConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    cosmosDbDatabaseName: readFromEnvironment("CosmosDbDatabaseName"),
-    cosmosDbEndpoint: readFromEnvironment("CosmosDbEndpoint"),
+    cosmos: getAzureCosmosConfigFromEnvironment,
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
   }),
-  RE.map(
-    ({
-      cosmosDbDatabaseName,
-      cosmosDbEndpoint,
-      entityConfigurationStorageContainerName,
-    }) => ({
-      cosmos: {
-        dbName: cosmosDbDatabaseName,
-        endpoint: cosmosDbEndpoint,
+  RE.map(({ cosmos, entityConfigurationStorageContainerName }) => ({
+    cosmos,
+    storage: {
+      entityConfiguration: {
+        containerName: entityConfigurationStorageContainerName,
       },
-      storage: {
-        entityConfiguration: {
-          containerName: entityConfigurationStorageContainerName,
-        },
-      },
-    }),
-  ),
-);
-
-const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  PdvTokenizerApiClientConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    pdvTokenizerApiBaseURL: readFromEnvironment("PdvTokenizerApiBaseURL"),
-    pdvTokenizerApiKey: readFromEnvironment("PdvTokenizerApiKey"),
-    pdvTokenizerTestUUID: readFromEnvironment("PdvTokenizerTestUUID"),
-  }),
-  RE.map(
-    ({ pdvTokenizerApiBaseURL, pdvTokenizerApiKey, pdvTokenizerTestUUID }) => ({
-      apiKey: pdvTokenizerApiKey,
-      baseURL: pdvTokenizerApiBaseURL,
-      testUUID: pdvTokenizerTestUUID,
-    }),
-  ),
+    },
+  })),
 );
 
 const getJwtValidatorConfigFromEnvironment: RE.ReaderEither<
