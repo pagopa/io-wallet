@@ -1,16 +1,13 @@
-import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
-import * as t from "io-ts";
-
-import { DeviceDetails } from "./attestation-service";
-import { EntityNotFoundError } from "./error";
-import { JwkPublicKey } from "./jwk";
-import { User } from "./user";
+import { EntityNotFoundError } from "io-wallet-common/error";
+import {
+  WalletInstance,
+  WalletInstanceValid,
+} from "io-wallet-common/wallet-instance";
 
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
@@ -18,43 +15,6 @@ class RevokedWalletInstance extends Error {
     super("The wallet instance has been revoked.");
   }
 }
-
-const WalletInstanceBase = t.intersection([
-  t.type({
-    createdAt: IsoDateFromString,
-    hardwareKey: JwkPublicKey,
-    id: NonEmptyString,
-    signCount: t.number,
-    userId: User.props.id,
-  }),
-  t.partial({
-    deviceDetails: DeviceDetails,
-  }),
-]);
-
-const WalletInstanceValid = t.intersection([
-  WalletInstanceBase,
-  t.type({
-    isRevoked: t.literal(false),
-  }),
-]);
-
-export type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
-
-const WalletInstanceRevoked = t.intersection([
-  WalletInstanceBase,
-  t.type({
-    isRevoked: t.literal(true),
-    revokedAt: IsoDateFromString,
-  }),
-]);
-
-export const WalletInstance = t.union([
-  WalletInstanceValid,
-  WalletInstanceRevoked,
-]);
-
-export type WalletInstance = t.TypeOf<typeof WalletInstance>;
 
 export interface WalletInstanceRepository {
   batchPatch: (

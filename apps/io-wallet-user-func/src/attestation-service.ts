@@ -2,13 +2,11 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
-import * as t from "io-ts";
+import { DeviceDetails } from "io-wallet-common/device-details";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
-import { AndroidDeviceDetails } from "./infra/attestation-service/android";
-import { IosDeviceDetails } from "./infra/attestation-service/ios";
-import { JwkPublicKey } from "./jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 
@@ -16,9 +14,6 @@ export enum OperatingSystem {
   android = "Android",
   iOS = "Apple iOS",
 }
-
-export const DeviceDetails = t.union([AndroidDeviceDetails, IosDeviceDetails]);
-export type DeviceDetails = t.TypeOf<typeof DeviceDetails>;
 
 export interface ValidatedAttestation {
   deviceDetails: DeviceDetails;

@@ -1,4 +1,4 @@
-import { WalletInstance, WalletInstanceRepository } from "@/wallet-instance";
+import { WalletInstanceRepository } from "@/wallet-instance";
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
@@ -6,6 +6,7 @@ import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository

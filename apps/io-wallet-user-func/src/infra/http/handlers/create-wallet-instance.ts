@@ -11,8 +11,8 @@ import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
+import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import { logErrorAndReturnResponse } from "../error";
 import { requireUserFromHeader } from "../user-id-header-validator";
 
 const WalletInstanceRequestPayload = t.type({

@@ -1,7 +1,7 @@
-import { ECKey } from "@/jwk";
 import { createHash, createSign, generateKeyPairSync } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import { playintegrity_v1 } from "googleapis";
+import { ECKey } from "io-wallet-common/jwk";
 import { exportJWK } from "jose";
 import { describe, expect, it } from "vitest";
 

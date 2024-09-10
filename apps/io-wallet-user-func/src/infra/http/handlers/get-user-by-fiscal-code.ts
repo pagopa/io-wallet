@@ -5,8 +5,7 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
-
-import { logErrorAndReturnResponse } from "../error";
+import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 const FiscalCodeBody = t.type({
   fiscal_code: FiscalCode,

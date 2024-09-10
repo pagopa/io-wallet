@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { UnauthorizedError } from "@/error";
 import { JwtValidate } from "@/jwt-validator";
 import {
   SubscriptionStateEnum,
@@ -12,6 +11,7 @@ import * as L from "@pagopa/logger";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import { UnauthorizedError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentWalletInstanceStatusHandler } from "../get-current-wallet-instance-status";
