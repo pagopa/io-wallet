@@ -1,17 +1,14 @@
 /* eslint-disable max-lines-per-function */
 import { CredentialRepository } from "@/credential";
 import { JwtValidate } from "@/jwt-validator";
-import {
-  SubscriptionStateEnum,
-  UserRepository,
-  UserTrialSubscriptionRepository,
-} from "@/user";
+import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/TaskEither";
 import { UnauthorizedError } from "io-wallet-common/error";
+import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";

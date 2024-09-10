@@ -14,7 +14,10 @@
     "start": "func start --port 7072"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.1.1",
     "@azure/functions": "^4.5.1",
+    "@azure/identity": "^4.4.1",
+    "@pagopa/handler-kit-azure-func": "^2.0.7",
     "io-wallet-common": "workspace:^"
   },
   "devDependencies": {

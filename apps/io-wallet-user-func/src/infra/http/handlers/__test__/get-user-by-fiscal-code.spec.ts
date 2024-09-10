@@ -1,8 +1,8 @@
-import { UserRepository } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/TaskEither";
+import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { GetUserByFiscalCodeHandler } from "../get-user-by-fiscal-code";

@@ -1,8 +1,8 @@
-import { User } from "@/user";
 import * as H from "@pagopa/handler-kit";
 import { lookup } from "fp-ts/Record";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
+import { User } from "io-wallet-common/user";
 
 export const requireUserFromHeader = (req: H.HttpRequest) =>
   pipe(
