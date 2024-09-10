@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 1.1.5
+
+### Patch Changes
+
+- c86eea3: Added io-wallet-support-func and io-wallet-common packages. Consequently refactored io-wallet-user-func
+- Updated dependencies [c86eea3]
+  - io-wallet-common@1.0.0
+
 ## 1.1.4
 
 ### Patch Changes
