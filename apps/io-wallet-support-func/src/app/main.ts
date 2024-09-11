@@ -1,3 +1,5 @@
+import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/functions/get-current-wallet-instance-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
@@ -29,6 +31,10 @@ const cosmosClient = new CosmosClient({
   endpoint: config.azure.cosmos.endpoint,
 });
 
+const database = cosmosClient.database(config.azure.cosmos.dbName);
+
+const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
+
 const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
 
 app.http("healthCheck", {
@@ -39,4 +45,14 @@ app.http("healthCheck", {
   }),
   methods: ["GET"],
   route: "health",
+});
+
+app.http("getCurrentWalletInstanceByFiscalCode", {
+  authLevel: "function",
+  handler: GetCurrentWalletInstanceByFiscalCodeFunction({
+    userRepository: pdvTokenizerClient,
+    walletInstanceRepository,
+  }),
+  methods: ["POST"],
+  route: "wallet-instances/current/status",
 });
