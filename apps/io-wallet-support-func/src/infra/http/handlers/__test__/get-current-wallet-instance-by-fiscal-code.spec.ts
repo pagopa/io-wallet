@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -63,9 +64,9 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       _tag: "Right",
       right: {
         body: {
+          created_at: mockDate,
           id: "123",
           is_revoked: false,
-          created_at: mockDate,
         },
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -107,9 +108,9 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       _tag: "Right",
       right: {
         body: {
+          created_at: mockDate,
           id: "123",
           is_revoked: true,
-          created_at: mockDate,
           revoked_at: mockDate,
         },
         headers: expect.objectContaining({
@@ -126,6 +127,9 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
         TE.right(
           O.some({
             createdAt: mockDate,
+            deviceDetails: {
+              platform: "ios",
+            },
             hardwareKey: {
               crv: "P-256",
               kty: "EC",
@@ -137,9 +141,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             revokedAt: mockDate,
             signCount: 0,
             userId: "123" as NonEmptyString,
-            deviceDetails: {
-              platform: "ios",
-            },
           }),
         ),
     };
@@ -155,13 +156,13 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       _tag: "Right",
       right: {
         body: {
-          id: "123",
-          is_revoked: true,
           created_at: mockDate,
-          revoked_at: mockDate,
           device_details: {
             platform: "ios",
           },
+          id: "123",
+          is_revoked: true,
+          revoked_at: mockDate,
         },
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -177,6 +178,13 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
         TE.right(
           O.some({
             createdAt: mockDate,
+            deviceDetails: {
+              attestationSecurityLevel: 0,
+              attestationVersion: 0,
+              keymasterSecurityLevel: 0,
+              keymasterVersion: 0,
+              platform: "android",
+            },
             hardwareKey: {
               crv: "P-256",
               kty: "EC",
@@ -188,13 +196,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             revokedAt: mockDate,
             signCount: 0,
             userId: "123" as NonEmptyString,
-            deviceDetails: {
-              platform: "android",
-              attestationSecurityLevel: 0,
-              attestationVersion: 0,
-              keymasterSecurityLevel: 0,
-              keymasterVersion: 0,
-            },
           }),
         ),
     };
@@ -210,13 +211,13 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       _tag: "Right",
       right: {
         body: {
-          id: "123",
-          is_revoked: true,
           created_at: mockDate,
-          revoked_at: mockDate,
           device_details: {
             platform: "android",
           },
+          id: "123",
+          is_revoked: true,
+          revoked_at: mockDate,
         },
         headers: expect.objectContaining({
           "Content-Type": "application/json",
