@@ -1,8 +1,30 @@
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
-import { DeviceDetails } from "io-wallet-common/device-details";
+import {
+  AndroidDeviceDetails,
+  IosDeviceDetails,
+} from "io-wallet-common/device-details";
 import { WalletInstance } from "io-wallet-common/wallet-instance";
+
+const androidDevicePlatform = AndroidDeviceDetails.types[0].props.platform;
+
+const androidDeviceOptionalFields = AndroidDeviceDetails.types[1].props;
+
+const DeviceDetails = t.union([
+  IosDeviceDetails,
+  t.intersection([
+    t.type({
+      platform: androidDevicePlatform,
+    }),
+    t.partial({
+      os_patch_level: androidDeviceOptionalFields.osPatchLevel,
+      os_version: androidDeviceOptionalFields.osVersion,
+    }),
+  ]),
+]);
+
+type DeviceDetails = t.TypeOf<typeof DeviceDetails>;
 
 const WalletInstanceApiModel = t.intersection([
   t.type({
@@ -28,18 +50,21 @@ export const WalletInstanceToApiModel: t.Encoder<
     id,
     isRevoked,
     ...additionalFields
-  }) => {
-    const baseFields = {
-      created_at: createdAt,
-      device_details: deviceDetails,
-      id,
-      is_revoked: isRevoked,
-    };
-    return "revokedAt" in additionalFields
-      ? {
-          ...baseFields,
-          revoked_at: additionalFields.revokedAt,
-        }
-      : baseFields;
-  },
+  }) => ({
+    created_at: createdAt,
+    id,
+    is_revoked: isRevoked,
+    ...("revokedAt" in additionalFields && {
+      revoked_at: additionalFields.revokedAt,
+    }),
+    ...(deviceDetails && {
+      device_details: {
+        platform: deviceDetails.platform,
+        ...(deviceDetails.platform === "android" && {
+          os_patch_level: deviceDetails.osPatchLevel,
+          os_version: deviceDetails.osVersion,
+        }),
+      },
+    }),
+  }),
 };

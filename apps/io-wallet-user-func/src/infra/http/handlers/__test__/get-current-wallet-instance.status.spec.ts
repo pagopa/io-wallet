@@ -125,7 +125,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         authorization: "",
       },
-      method: "PUT",
       path: {
         id: "foo",
       },
@@ -158,7 +157,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         authorization: "Bearer ",
       },
-      method: "PUT",
       path: {
         id: "foo",
       },
@@ -196,7 +194,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         authorization: "Bearer xxx",
       },
-      method: "PUT",
       path: {
         id: "foo",
       },
@@ -231,7 +228,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         authorization: "Bearer xxx",
       },
-      method: "PUT",
       path: {
         id: "foo",
       },
@@ -272,7 +268,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         authorization: "Bearer xxx",
       },
-      method: "PUT",
       path: {
         id: "foo",
       },
