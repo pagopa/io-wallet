@@ -1,5 +1,11 @@
 # io-wallet-support-func
 
+## 1.2.0
+
+### Minor Changes
+
+- bdf1332: Added getCurrentWalletInstanceByFiscalCode in support function
+
 ## 1.1.0
 
 ### Minor Changes
