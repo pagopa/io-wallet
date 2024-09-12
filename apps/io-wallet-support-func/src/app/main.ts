@@ -54,5 +54,5 @@ app.http("getCurrentWalletInstanceByFiscalCode", {
     walletInstanceRepository,
   }),
   methods: ["POST"],
-  route: "wallet-instances/current/status",
+  route: "wallet-instances/current",
 });
