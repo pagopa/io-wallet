@@ -309,7 +309,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       getOrCreateUserByFiscalCode: () =>
         TE.left(new Error("failed on getOrCreateUserByFiscalCode!")),
     };
-
     const handler = GetCurrentWalletInstanceByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
@@ -334,7 +333,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       {
         getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
       };
-
     const handler = GetCurrentWalletInstanceByFiscalCodeHandler({
       input: req,
       inputDecoder: H.HttpRequest,
