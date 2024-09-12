@@ -26,6 +26,8 @@ paths:
                 $ref: "#/components/schemas/WalletInstanceData"
         "404":
           $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -54,36 +56,8 @@ components:
       in: header
 
   responses:
-    Forbidden:
-      description: The server understands the request but refuses to authorize it
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    BadRequest:
-      description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
     NotFound:
       description: The specified resource was not found
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    Conflict:
-      description: There has been a conflict
       content:
         application/json:
           schema:
@@ -192,36 +166,12 @@ components:
         platform:
           type: string
           enum: ["android"]
-        attestationSecurityLevel:
+        os_patch_level:
           type: number
-        attestationVersion:
+        os_version:
           type: number
-        keymasterSecurityLevel:
-          type: number
-        keymasterVersion:
-          type: number
-        bootPatchLevel:
-          type: string
-        deviceLocked:
-          type: boolean
-        osPatchLevel:
-          type: number
-        osVersion:
-          type: number
-        vendorPatchLevel:
-          type: string
-        verifiedBootState:
-          type: number
-        x509Chain:
-          type: array
-          items:
-            type: string
       required:
         - platform
-        - attestationSecurityLevel
-        - attestationVersion
-        - keymasterSecurityLevel
-        - keymasterVersion
 
     IosDeviceDetails:
       type: object

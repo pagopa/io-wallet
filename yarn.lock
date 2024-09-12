@@ -3898,6 +3898,7 @@ __metadata:
     "@azure/identity": "npm:^4.4.1"
     "@pagopa/eslint-config": "npm:^4.0.1"
     "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
+    "@pagopa/ts-commons": "npm:^13.1.1"
     "@vitest/coverage-c8": "npm:^0.33.0"
     azure-functions-core-tools: "npm:^4.0.5907"
     eslint: "npm:8.57.0"
