@@ -1,4 +1,5 @@
-module "function_app_user" {
+
+module "function_app_support" {
   source = "github.com/pagopa/dx//infra/modules/azure_function_app?ref=main"
 
   environment = {
@@ -6,7 +7,7 @@ module "function_app_user" {
     env_short       = var.env_short
     location        = "italynorth"
     domain          = "wallet"
-    app_name        = "user"
+    app_name        = "supp"
     instance_number = "01"
   }
 
@@ -14,7 +15,7 @@ module "function_app_user" {
   health_check_path   = "/api/v1/wallet/health"
   node_version        = 20
 
-  subnet_cidr                          = var.cidr_subnet_user_func
+  subnet_cidr                          = var.cidr_subnet_support_func
   subnet_pep_id                        = var.private_endpoint_subnet_id
   private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
   virtual_network = {
@@ -22,8 +23,8 @@ module "function_app_user" {
     resource_group_name = var.virtual_network.resource_group_name
   }
 
-  app_settings      = local.function_app_user.app_settings
-  slot_app_settings = local.function_app_user.app_settings
+  app_settings      = local.function_app_support.app_settings
+  slot_app_settings = local.function_app_support.app_settings
 
   application_insights_connection_string = var.application_insights_connection_string
 
@@ -32,13 +33,13 @@ module "function_app_user" {
   tags = var.tags
 }
 
-module "function_app_user_autoscaler" {
+module "function_app_support_autoscaler" {
   source = "github.com/pagopa/dx//infra/modules/azure_app_service_plan_autoscaler?ref=main"
 
   resource_group_name = var.resource_group_name
 
   target_service = {
-    function_app_name = module.function_app_user.function_app.function_app.name
+    function_app_name = module.function_app_support.function_app.function_app.name
   }
 
   scheduler = {
