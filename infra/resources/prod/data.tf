@@ -44,3 +44,8 @@ data "azurerm_log_analytics_workspace" "law" {
   name                = "${local.project_legacy}-law-common"
   resource_group_name = data.azurerm_resource_group.weu-common.name
 }
+
+data "azurerm_nat_gateway" "nat" {
+  name                = "${local.project}-ng-01"
+  resource_group_name = "${local.project}-common-rg-01"
+}

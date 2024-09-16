@@ -30,7 +30,7 @@ variable "resource_group_name" {
 
 variable "cidr_subnet_user_func" {
   type        = string
-  description = "CIDR block for wallet function app subnet"
+  description = "CIDR block for user function app subnet"
 }
 
 variable "private_endpoint_subnet_id" {
@@ -100,4 +100,14 @@ variable "application_insights_connection_string" {
   default     = null
 
   sensitive = true
+}
+
+variable "cidr_subnet_support_func" {
+  type        = string
+  description = "CIDR block for support function app subnet"
+}
+
+variable "nat_gateway_id_support_func" {
+  type        = string
+  description = "NAT gateway id for support func subnet"
 }
