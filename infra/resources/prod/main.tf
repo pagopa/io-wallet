@@ -92,6 +92,8 @@ module "function_apps" {
   tags = local.tags
 
   user_func = local.user_func
+
+  nat_gateway_id_support_func = data.azurerm_nat_gateway.nat.id
 }
 
 module "cdn" {
