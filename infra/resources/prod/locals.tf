@@ -58,4 +58,13 @@ locals {
       }
     ]
   }
+
+  support_func = {
+    app_settings = [
+      {
+        name                  = "PdvTokenizerApiKey"
+        key_vault_secret_name = "PdvTokenizerApiKey"
+      }
+    ]
+  }
 }

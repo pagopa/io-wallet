@@ -76,6 +76,17 @@ locals {
       FETCH_KEEPALIVE_MAX_FREE_SOCKETS    = "10"
       FETCH_KEEPALIVE_FREE_SOCKET_TIMEOUT = "30000"
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
-    })
+
+      CosmosDbEndpoint     = var.cosmos_db_endpoint
+      CosmosDbDatabaseName = var.cosmos_database_names[0]
+
+      PdvTokenizerApiBaseURL = "https://api.uat.tokenizer.pdv.pagopa.it"
+      PdvTokenizerTestUUID   = "c13b2aec-1597-4abd-a735-aacf2f935c93"
+      },
+      {
+        for s in var.support_func.app_settings :
+        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.project}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
+      }
+    )
   }
 }
