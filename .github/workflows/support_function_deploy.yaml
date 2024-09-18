@@ -1,0 +1,20 @@
+name: Deploy Function App (support-func)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/io-wallet-support-func/CHANGELOG.md"
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: pagopa/dx/.github/workflows/web_app_deploy.yaml@main
+    secrets: inherit
+    with:
+      workspace_name: io-wallet-support-func
+      environment: app-prod
+      resource_group_name: io-p-itn-wallet-rg-01
+      web_app_name: io-p-itn-wallet-supp-func-01
