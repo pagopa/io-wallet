@@ -78,9 +78,9 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint    = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_db_key         = module.cosmos.cosmos_account_wallet.primary_key
-  cosmos_database_names = module.cosmos.cosmos_account_wallet.database_names
+  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
+  cosmos_db_key        = module.cosmos.cosmos_account_wallet.primary_key
+  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
@@ -117,7 +117,7 @@ module "iam" {
     id                  = module.cosmos.cosmos_account_wallet.id
     name                = module.cosmos.cosmos_account_wallet.name
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
-    database_names      = module.cosmos.cosmos_account_wallet.database_names
+    database_name       = module.cosmos.cosmos_account_wallet.database_name
     admin_ids = [
       data.azuread_group.io_developers.object_id,
       data.azuread_group.io_admin.object_id,
@@ -136,14 +136,20 @@ module "iam" {
   }
 
   key_vault = {
-    id = module.key_vaults.key_vault_wallet.id
+    id                  = module.key_vaults.key_vault_wallet.id
+    name                = module.key_vaults.key_vault_wallet.name
+    resource_group_name = module.key_vaults.key_vault_wallet.resource_group_name
     admin_ids = [
       data.azuread_group.io_developers.object_id,
       data.azuread_group.io_admin.object_id,
     ]
   }
 
-  cdn_storage_account_id = module.cdn.storage_account_cdn.id
+  cdn_storage_account = {
+    id                  = module.cdn.storage_account_cdn.id
+    name                = module.cdn.storage_account_cdn.name
+    resource_group_name = module.cdn.storage_account_cdn.resource_group_name
+  }
 }
 
 module "apim" {

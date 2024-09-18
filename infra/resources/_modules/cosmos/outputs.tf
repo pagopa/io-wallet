@@ -4,7 +4,7 @@ output "cosmos_account_wallet" {
     name                = azurerm_cosmosdb_account.wallet.name
     resource_group_name = azurerm_cosmosdb_account.wallet.resource_group_name
     endpoint            = azurerm_cosmosdb_account.wallet.endpoint
-    database_names      = [azurerm_cosmosdb_sql_database.db.name]
+    database_name       = azurerm_cosmosdb_sql_database.db.name
     primary_key         = azurerm_cosmosdb_account.wallet.primary_key
   }
 }
