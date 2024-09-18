@@ -10,8 +10,14 @@ variable "cosmos_db" {
 
 variable "function_app" {
   type = object({
-    principal_id         = string
-    staging_principal_id = string
+    user_func = object({
+      principal_id         = string
+      staging_principal_id = string
+    })
+    support_func = object({
+      principal_id         = string
+      staging_principal_id = string
+    })
   })
 
   description = "Function App system assigned identities"
