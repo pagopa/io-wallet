@@ -72,6 +72,8 @@ locals {
       FETCH_KEEPALIVE_FREE_SOCKET_TIMEOUT = "30000"
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
 
+      WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
+      WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
       },
       local.function_apps.common_app_settings,
       {
