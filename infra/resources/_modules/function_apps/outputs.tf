@@ -11,6 +11,8 @@ output "function_app_user" {
 
 output "function_app_support" {
   value = {
-    name = module.function_app_support.function_app.function_app.name
+    name                 = module.function_app_support.function_app.function_app.name
+    principal_id         = module.function_app_support.function_app.function_app.principal_id
+    staging_principal_id = module.function_app_support.function_app.function_app.slot.principal_id
   }
 }
