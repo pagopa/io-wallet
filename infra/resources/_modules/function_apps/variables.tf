@@ -66,9 +66,9 @@ variable "cosmos_db_key" {
   description = "Cosmos DB primary key"
 }
 
-variable "cosmos_database_names" {
-  type        = list(string)
-  description = "List of Cosmos DB database names"
+variable "cosmos_database_name" {
+  type        = string
+  description = "Wallet Cosmos DB database name"
 }
 
 variable "key_vault_wallet_id" {
