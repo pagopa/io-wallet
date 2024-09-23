@@ -50,7 +50,7 @@ module "apim_v2_wallet_support_api" {
   service_url = format("https://%s/api/v1/wallet", var.function_apps.support_function.function_hostname)
 
 
-  description  = "Wallet APIs"
+  description  = "API for Wallet Support Assistance"
   display_name = "IO Wallet - Support"
   path         = "api/v1/wallet/support"
   protocols    = ["https"]
