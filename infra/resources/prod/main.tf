@@ -163,11 +163,17 @@ module "apim" {
     resource_group_name = local.apim.resource_group_name
   }
 
-  user_function = {
-    function_hostname = module.function_apps.function_app_user.default_hostname
+  function_apps = {
+    user_function = {
+      function_hostname = module.function_apps.function_app_user.default_hostname
+    }
+    support_function = {
+      function_hostname = module.function_apps.function_app_support.default_hostname
+    }
   }
 
-  key_vault_id = data.azurerm_key_vault.weu-common.id
+  key_vault_id        = data.azurerm_key_vault.weu-common.id
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   product_id = local.apim.products.io_web.product_id
 

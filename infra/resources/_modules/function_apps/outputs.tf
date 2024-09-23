@@ -14,5 +14,7 @@ output "function_app_support" {
     name                 = module.function_app_support.function_app.function_app.name
     principal_id         = module.function_app_support.function_app.function_app.principal_id
     staging_principal_id = module.function_app_support.function_app.function_app.slot.principal_id
+    resource_group_name  = module.function_app_support.function_app.resource_group_name
+    default_hostname     = module.function_app_support.function_app.function_app.default_hostname
   }
 }
