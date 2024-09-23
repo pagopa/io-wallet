@@ -51,32 +51,6 @@
           }
         }
       }
-    },
-    "/health": {
-      "get": {
-        "operationId": "healthCheck",
-        "summary": "Used to check if the function is healthy",
-        "responses": {
-          "200": {
-            "description": "The function is health",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
     }
   },
   "components": {
