@@ -5,10 +5,3 @@ resource "azurerm_key_vault_secret" "func_user_default_key" {
   key_vault_id = var.key_vault_id
   content_type = "token"
 }
-
-resource "azurerm_key_vault_secret" "func_support_default_key" {
-  name         = "io-wallet-support-func-key"
-  value        = data.azurerm_function_app_host_keys.support_func.default_function_key
-  key_vault_id = var.key_vault_wallet_id
-  content_type = "token"
-}

@@ -76,6 +76,7 @@ variable "key_vault_wallet_id" {
   description = "Id of the wallet Key Vault where save secrets"
 }
 
+
 variable "storage_account_cdn_name" {
   type        = string
   description = "Name of the CDN storage account"
