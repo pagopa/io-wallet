@@ -7,4 +7,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  coverage: {
+    include: ["src/**/*.ts"],
+  },
 });
