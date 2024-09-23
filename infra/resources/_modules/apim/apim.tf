@@ -45,7 +45,7 @@ module "apim_v2_wallet_support_api" {
   api_management_name   = var.apim.name
   resource_group_name   = var.apim.resource_group_name
   product_ids           = [module.apim_v2_wallet_support_product.product_id]
-  subscription_required = false
+  subscription_required = true
 
   service_url = format("https://%s/api/v1/wallet", var.function_apps.support_function.function_hostname)
 
