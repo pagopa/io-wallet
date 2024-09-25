@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.1.8
+
+### Patch Changes
+
+- 261a3d9: Increase error details
+
 ## 1.1.7
 
 ### Patch Changes
