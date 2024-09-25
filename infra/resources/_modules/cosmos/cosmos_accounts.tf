@@ -4,6 +4,8 @@ resource "azurerm_cosmosdb_account" "wallet" {
   location            = var.location
   offer_type          = "Standard"
 
+  automatic_failover_enabled = true
+
   consistency_policy {
     consistency_level       = "Strong"
     max_interval_in_seconds = null

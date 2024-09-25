@@ -25,10 +25,10 @@ variable "function_app" {
 
 variable "key_vault" {
   type = object({
-    id        = string
-    name = string
+    id                  = string
+    name                = string
     resource_group_name = string
-    admin_ids = set(string)
+    admin_ids           = set(string)
   })
 
   description = "KeyVault Id and list of Entra groups who are administrator of Key Vaults"
