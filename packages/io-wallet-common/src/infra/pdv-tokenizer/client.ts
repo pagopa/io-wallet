@@ -21,6 +21,7 @@ export class PdvTokenizerClient
 {
   #baseURL: string;
   #options: RequestInit;
+  #requestTimeout: number;
   #testUUID: string;
 
   getFiscalCodeByUserId = (id: string) =>
@@ -68,7 +69,7 @@ export class PdvTokenizerClient
               }),
               headers,
               method: "PUT",
-              signal: AbortSignal.timeout(3000),
+              signal: AbortSignal.timeout(this.#requestTimeout),
             },
           );
           if (!result.ok) {
@@ -104,7 +105,12 @@ export class PdvTokenizerClient
       ),
     );
 
-  constructor({ apiKey, baseURL, testUUID }: PdvTokenizerApiClientConfig) {
+  constructor({
+    apiKey,
+    baseURL,
+    requestTimeout,
+    testUUID,
+  }: PdvTokenizerApiClientConfig) {
     this.#baseURL = baseURL;
     this.#options = {
       headers: {
@@ -112,6 +118,7 @@ export class PdvTokenizerClient
         "x-api-key": apiKey,
       },
     };
+    this.#requestTimeout = requestTimeout;
     this.#testUUID = testUUID;
   }
 
@@ -119,7 +126,7 @@ export class PdvTokenizerClient
     return fetch(new URL(`/tokenizer/v1/tokens/${id}/pii`, this.#baseURL), {
       ...this.#options,
       method: "GET",
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(this.#requestTimeout),
     });
   }
 }

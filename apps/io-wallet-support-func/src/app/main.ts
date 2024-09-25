@@ -26,7 +26,7 @@ const credential = new DefaultAzureCredential();
 const cosmosClient = new CosmosClient({
   aadCredentials: credential,
   connectionPolicy: {
-    requestTimeout: 3000, // TODO [SIW-1331]: check this timeout
+    requestTimeout: config.azure.cosmos.requestTimeout,
   },
   endpoint: config.azure.cosmos.endpoint,
 });

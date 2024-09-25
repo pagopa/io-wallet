@@ -46,6 +46,7 @@ const attestationServiceConfiguration = {
   appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
   googleAppCredentialsEncoded: "",
   googlePublicKey: GOOGLE_PUBLIC_KEY,
+  httpRequestTimeout: 0,
   iOsTeamIdentifier: "M2X5YQ4BJ7",
   iosBundleIdentifiers: [
     "org.reactjs.native.example.IoReactNativeIntegrityExample",

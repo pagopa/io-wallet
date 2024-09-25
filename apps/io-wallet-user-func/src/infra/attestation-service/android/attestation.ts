@@ -32,18 +32,20 @@ export interface VerifyAttestationParams {
   bundleIdentifiers: string[];
   challenge: string;
   googlePublicKey: string;
+  httpRequestTimeout: number;
   x509Chain: readonly X509Certificate[];
 }
 
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
-  const { androidCrlUrl, googlePublicKey, x509Chain } = params;
+  const { androidCrlUrl, googlePublicKey, httpRequestTimeout, x509Chain } =
+    params;
 
   if (x509Chain.length <= 0) {
     throw new AndroidAttestationError("No certificates provided");
   }
 
   validateIssuance(x509Chain, googlePublicKey);
-  await validateRevocation(x509Chain, androidCrlUrl);
+  await validateRevocation(x509Chain, androidCrlUrl, httpRequestTimeout);
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
   const deviceDetails = {
@@ -114,8 +116,12 @@ export const validateIssuance = (
 export const validateRevocation = async (
   x509Chain: readonly X509Certificate[],
   androidCrlUrl: string,
+  httpRequestTimeout: number,
 ) => {
-  const res = await fetch(androidCrlUrl, { method: "GET" });
+  const res = await fetch(androidCrlUrl, {
+    method: "GET",
+    signal: AbortSignal.timeout(httpRequestTimeout),
+  });
   if (!res.ok) {
     throw new AndroidAttestationError("Failed to fetch CRL");
   }
