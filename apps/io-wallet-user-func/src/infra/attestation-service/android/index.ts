@@ -34,7 +34,10 @@ export const validateAndroidAttestation = (
         E.tryCatch(
           () => new X509Certificate(cert),
           () =>
-            new AndroidAttestationError(`Unable to decode X509 certificate`),
+            new AndroidAttestationError(
+              `Unable to decode X509 certificate`,
+              {},
+            ),
         ),
       ),
     ),
