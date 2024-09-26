@@ -398,28 +398,20 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   RE.map(
     ({
       attestationService,
-      azure,
-      crypto,
-      federationEntity,
       httpRequestTimeout,
-      jwtValidator,
       pdvTokenizer,
-      pidIssuer,
       trialSystem,
+      ...remainingConfigs
     }) => ({
+      ...remainingConfigs,
       attestationService: {
         ...attestationService,
         httpRequestTimeout,
       },
-      azure,
-      crypto,
-      federationEntity,
-      jwtValidator,
       pdvTokenizer: {
         ...pdvTokenizer,
         requestTimeout: httpRequestTimeout,
       },
-      pidIssuer,
       trialSystem: {
         ...trialSystem,
         requestTimeout: httpRequestTimeout,
