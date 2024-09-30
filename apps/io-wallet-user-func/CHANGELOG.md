@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 1.1.9
+
+### Patch Changes
+
+- 78e84ea: Added CosmosClient and fetch timeout as environment variables
+- Updated dependencies [78e84ea]
+  - io-wallet-common@1.0.2
+
 ## 1.1.8
 
 ### Patch Changes

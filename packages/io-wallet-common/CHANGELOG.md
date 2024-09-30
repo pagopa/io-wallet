@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.0.2
+
+### Patch Changes
+
+- 78e84ea: Added CosmosClient and fetch timeout as environment variables
+
 ## 1.0.1
 
 ### Patch Changes
