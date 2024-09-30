@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { PdvTokenizerHealthCheck } from "@/infra/pdv-tokenizer/health-check";
 import { PidIssuerHealthCheck } from "@/infra/pid-issuer/health-check";
 import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
@@ -7,6 +6,7 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
+import { PdvTokenizerHealthCheck } from "io-wallet-common/infra/pdv-tokenizer/health-check";
 import { describe, expect, it } from "vitest";
 
 import { HealthHandler } from "../health";

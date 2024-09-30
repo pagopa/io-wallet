@@ -6,6 +6,7 @@ import {
   AzureCosmosConfig,
   getAzureCosmosConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/cosmos/config";
+import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
 import {
   PdvTokenizerApiClientConfig,
   getPdvTokenizerConfigFromEnvironment,
@@ -26,13 +27,20 @@ export const getConfigFromEnvironment: RE.ReaderEither<
   pipe(
     sequenceS(RE.Apply)({
       cosmos: getAzureCosmosConfigFromEnvironment,
+      httpRequestTimeout: pipe(
+        getHttpRequestConfigFromEnvironment,
+        RE.map(({ timeout }) => timeout),
+      ),
       pdvTokenizer: getPdvTokenizerConfigFromEnvironment,
     }),
-    RE.map(({ cosmos, pdvTokenizer }) => ({
+    RE.map(({ cosmos, httpRequestTimeout, pdvTokenizer }) => ({
       azure: {
         cosmos,
       },
-      pdvTokenizer,
+      pdvTokenizer: {
+        ...pdvTokenizer,
+        requestTimeout: httpRequestTimeout,
+      },
     })),
   ),
 );

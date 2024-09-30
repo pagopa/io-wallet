@@ -1,15 +1,17 @@
 import { parse } from "@pagopa/handler-kit";
+import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import {
   AzureCosmosConfig,
   getAzureCosmosConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/cosmos/config";
 import { readFromEnvironment } from "io-wallet-common/infra/env";
+import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
 import {
   PdvTokenizerApiClientConfig,
   getPdvTokenizerConfigFromEnvironment,
@@ -57,6 +59,7 @@ export const AttestationServiceConfiguration = t.type({
   appleRootCertificate: t.string,
   googleAppCredentialsEncoded: t.string,
   googlePublicKey: t.string,
+  httpRequestTimeout: NumberFromString,
   iOsTeamIdentifier: t.string,
   iosBundleIdentifiers: t.array(t.string),
   skipSignatureValidation: t.boolean,
@@ -93,6 +96,7 @@ const TrialSystemApiClientConfig = t.type({
   apiKey: t.string,
   baseURL: t.string,
   featureFlag: t.string,
+  requestTimeout: NumberFromString,
   trialId: t.string,
 });
 
@@ -105,6 +109,7 @@ const PidIssuerApiClientConfig = t.type({
   clientCertificate: t.string,
   clientPrivateKey: t.string,
   healthCheckEnabled: t.boolean,
+  requestTimeout: NumberFromString,
   rootCACertificate: t.string,
 });
 
@@ -170,7 +175,7 @@ export const getCryptoConfigFromEnvironment: RE.ReaderEither<
 export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  AttestationServiceConfiguration
+  Omit<AttestationServiceConfiguration, "httpRequestTimeout">
 > = pipe(
   sequenceS(RE.Apply)({
     allowDevelopmentEnvironment: pipe(
@@ -282,9 +287,9 @@ const getJwtValidatorConfigFromEnvironment: RE.ReaderEither<
       },
     }),
   ),
-  RE.chainW((result) =>
-    pipe(
-      JwtValidatorConfig.decode(result),
+  RE.chainW(
+    flow(
+      JwtValidatorConfig.decode,
       RE.fromEither,
       RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
     ),
@@ -294,7 +299,7 @@ const getJwtValidatorConfigFromEnvironment: RE.ReaderEither<
 const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  TrialSystemApiClientConfig
+  Omit<TrialSystemApiClientConfig, "requestTimeout">
 > = pipe(
   sequenceS(RE.Apply)({
     trialSystemApiBaseURL: readFromEnvironment("TrialSystemApiBaseURL"),
@@ -332,6 +337,16 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("PidIssuerApiClientPrivateKey"),
       RE.map(decodeBase64String),
     ),
+    pidIssuerApiRequestTimeout: pipe(
+      readFromEnvironment("PidIssuerApiRequestTimeout"),
+      RE.chainW(
+        flow(
+          NumberFromString.decode,
+          RE.fromEither,
+          RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
+        ),
+      ),
+    ),
     pidIssuerApiRootCACertificate: pipe(
       readFromEnvironment("PidIssuerApiRootCACertificate"),
       RE.map(decodeBase64String),
@@ -347,6 +362,7 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       pidIssuerApiBaseURL,
       pidIssuerApiClientCertificate,
       pidIssuerApiClientPrivateKey,
+      pidIssuerApiRequestTimeout,
       pidIssuerApiRootCACertificate,
       pidIssuerHealthCheckEnabled,
     }) => ({
@@ -354,6 +370,7 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
       clientCertificate: pidIssuerApiClientCertificate,
       clientPrivateKey: pidIssuerApiClientPrivateKey,
       healthCheckEnabled: pidIssuerHealthCheckEnabled,
+      requestTimeout: pidIssuerApiRequestTimeout,
       rootCACertificate: pidIssuerApiRootCACertificate,
     }),
   ),
@@ -369,9 +386,36 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     azure: getAzureConfigFromEnvironment,
     crypto: getCryptoConfigFromEnvironment,
     federationEntity: getFederationEntityConfigFromEnvironment,
+    httpRequestTimeout: pipe(
+      getHttpRequestConfigFromEnvironment,
+      RE.map(({ timeout }) => timeout),
+    ),
     jwtValidator: getJwtValidatorConfigFromEnvironment,
     pdvTokenizer: getPdvTokenizerConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     trialSystem: getTrialSystemConfigFromEnvironment,
   }),
+  RE.map(
+    ({
+      attestationService,
+      httpRequestTimeout,
+      pdvTokenizer,
+      trialSystem,
+      ...remainingConfigs
+    }) => ({
+      ...remainingConfigs,
+      attestationService: {
+        ...attestationService,
+        httpRequestTimeout,
+      },
+      pdvTokenizer: {
+        ...pdvTokenizer,
+        requestTimeout: httpRequestTimeout,
+      },
+      trialSystem: {
+        ...trialSystem,
+        requestTimeout: httpRequestTimeout,
+      },
+    }),
+  ),
 );

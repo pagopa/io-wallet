@@ -14,6 +14,7 @@ export class PidIssuerClient
   #baseURL: string;
   #healthCheckEnabled: boolean;
   #init: RequestInit;
+  #requestTimeout: number;
   #walletProviderEntity: string;
 
   healthCheck = () =>
@@ -26,7 +27,7 @@ export class PidIssuerClient
                 wallet_provider: this.#walletProviderEntity,
               }),
               method: "POST",
-              signal: AbortSignal.timeout(10000),
+              signal: AbortSignal.timeout(this.#requestTimeout),
               ...this.#init,
             });
             return result.status === 404;
@@ -46,7 +47,7 @@ export class PidIssuerClient
               wallet_provider: this.#walletProviderEntity,
             }),
             method: "POST",
-            signal: AbortSignal.timeout(10000),
+            signal: AbortSignal.timeout(this.#requestTimeout),
             ...this.#init,
           });
 
@@ -71,6 +72,7 @@ export class PidIssuerClient
       clientCertificate,
       clientPrivateKey,
       healthCheckEnabled,
+      requestTimeout,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
     basePath: Config["federationEntity"]["basePath"]["href"],
@@ -91,5 +93,6 @@ export class PidIssuerClient
         "Content-Type": "application/json",
       },
     };
+    this.#requestTimeout = requestTimeout;
   }
 }

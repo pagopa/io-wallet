@@ -1,3 +1,4 @@
+import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -8,6 +9,7 @@ import { readFromEnvironment } from "../env";
 export const PdvTokenizerApiClientConfig = t.type({
   apiKey: t.string,
   baseURL: t.string,
+  requestTimeout: NumberFromString,
   testUUID: t.string,
 });
 
@@ -18,7 +20,7 @@ export type PdvTokenizerApiClientConfig = t.TypeOf<
 export const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  PdvTokenizerApiClientConfig
+  Omit<PdvTokenizerApiClientConfig, "requestTimeout">
 > = pipe(
   sequenceS(RE.Apply)({
     pdvTokenizerApiBaseURL: readFromEnvironment("PdvTokenizerApiBaseURL"),

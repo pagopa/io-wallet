@@ -79,7 +79,6 @@ module "function_apps" {
   }
 
   cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_db_key        = module.cosmos.cosmos_account_wallet.primary_key
   cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name

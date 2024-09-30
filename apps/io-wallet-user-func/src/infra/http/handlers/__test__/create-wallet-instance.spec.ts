@@ -55,6 +55,7 @@ describe("CreateWalletInstanceHandler", () => {
     appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
     googleAppCredentialsEncoded: "",
     googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
+    httpRequestTimeout: 0,
     iOsTeamIdentifier: "M2X5YQ4BJ7",
     iosBundleIdentifiers: [
       "org.reactjs.native.example.IoReactNativeIntegrityExample",

@@ -10,7 +10,6 @@ import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { jwtValidate } from "@/infra/jwt-validator";
-import { PdvTokenizerClient } from "@/infra/pdv-tokenizer/client";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
@@ -19,6 +18,7 @@ import { DefaultAzureCredential } from "@azure/identity";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { PdvTokenizerClient } from "io-wallet-common/infra/pdv-tokenizer/client";
 
 import { getConfigFromEnvironment } from "./config";
 
@@ -38,7 +38,7 @@ const credential = new DefaultAzureCredential();
 const cosmosClient = new CosmosClient({
   aadCredentials: credential,
   connectionPolicy: {
-    requestTimeout: 3000, // TODO [SIW-1331]: check this timeout
+    requestTimeout: config.azure.cosmos.requestTimeout,
   },
   endpoint: config.azure.cosmos.endpoint,
 });

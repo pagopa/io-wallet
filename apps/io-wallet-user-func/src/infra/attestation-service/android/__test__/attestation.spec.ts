@@ -26,6 +26,7 @@ describe("AndroidAttestationValidation", () => {
       bundleIdentifiers: ["com.ioreactnativeintegrityexample"],
       challenge: "randomvalue",
       googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
+      httpRequestTimeout: 1000,
       x509Chain,
     });
     const expectedResult = {

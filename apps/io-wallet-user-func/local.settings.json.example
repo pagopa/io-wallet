@@ -8,6 +8,7 @@
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
     "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
+    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
     "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
     "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME",
     "FederationEntityHomepageUri": "FEDERATION_ENTITY_HOMEPAGE_URI",
@@ -43,6 +44,8 @@
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
     "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
     "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE",
-    "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED"
+    "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED",
+    "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
+    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT"
   }
 }

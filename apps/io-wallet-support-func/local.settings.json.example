@@ -4,8 +4,10 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
+    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
     "PdvTokenizerApiBaseURL": "PDV_TOKENIZER_API_BASE_URL",
     "PdvTokenizerApiKey": "PDV_TOKENIZER_API_KEY",
-    "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID"
+    "PdvTokenizerTestUUID": "PDV_TOKENIZER_TEST_UUID",
+    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT"
   }
 }
