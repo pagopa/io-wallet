@@ -85,11 +85,15 @@ locals {
 
   function_apps = {
     common_app_settings = {
-      CosmosDbEndpoint     = var.cosmos_db_endpoint
-      CosmosDbDatabaseName = var.cosmos_database_name
+      CosmosDbEndpoint       = var.cosmos_db_endpoint
+      CosmosDbDatabaseName   = var.cosmos_database_name
+      CosmosDbRequestTimeout = "5000"
 
-      PdvTokenizerApiBaseURL = "https://api.uat.tokenizer.pdv.pagopa.it"
-      PdvTokenizerTestUUID   = "c13b2aec-1597-4abd-a735-aacf2f935c93"
+      PdvTokenizerApiBaseURL     = "https://api.uat.tokenizer.pdv.pagopa.it"
+      PdvTokenizerTestUUID       = "c13b2aec-1597-4abd-a735-aacf2f935c93"
+      PidIssuerApiRequestTimeout = "10000"
+
+      HttpRequestTimeout = "5000"
     }
   }
 }

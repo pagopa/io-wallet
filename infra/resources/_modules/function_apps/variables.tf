@@ -61,11 +61,6 @@ variable "private_dns_zone_resource_group_name" {
   description = "Resource group name of the private DNS zone to use for private endpoints"
 }
 
-variable "cosmos_db_key" {
-  type        = string
-  description = "Cosmos DB primary key"
-}
-
 variable "cosmos_database_name" {
   type        = string
   description = "Wallet Cosmos DB database name"

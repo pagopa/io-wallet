@@ -11,6 +11,7 @@ export class TrialSystemClient
   #apiKey: string;
   #baseURL: string;
   #options: RequestInit;
+  #requestTimeout: number;
   #trialId: string;
   featureFlag: string;
 
@@ -22,7 +23,10 @@ export class TrialSystemClient
             `/manage/api/v1/trials/${this.#trialId}/subscriptions/${fiscalCode}`,
             this.#baseURL,
           ),
-          { ...this.#options, signal: AbortSignal.timeout(3000) },
+          {
+            ...this.#options,
+            signal: AbortSignal.timeout(this.#requestTimeout),
+          },
         );
         if (!result.ok) {
           throw new Error(JSON.stringify(await result.json()));
@@ -40,7 +44,10 @@ export class TrialSystemClient
       async () => {
         const result = await fetch(
           new URL(`/manage/api/v1/trials/${this.#trialId}`, this.#baseURL),
-          { ...this.#options, signal: AbortSignal.timeout(3000) },
+          {
+            ...this.#options,
+            signal: AbortSignal.timeout(this.#requestTimeout),
+          },
         );
         return result.status === 200;
       },
@@ -51,6 +58,7 @@ export class TrialSystemClient
     apiKey,
     baseURL,
     featureFlag,
+    requestTimeout,
     trialId,
   }: TrialSystemApiClientConfig) {
     this.#apiKey = apiKey;
@@ -63,5 +71,6 @@ export class TrialSystemClient
       },
       method: "GET",
     };
+    this.#requestTimeout = requestTimeout;
   }
 }
