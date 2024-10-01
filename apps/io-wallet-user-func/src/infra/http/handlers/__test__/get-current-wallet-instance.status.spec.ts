@@ -43,7 +43,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   };
 
   const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     getOrCreateUserByFiscalCode: () =>
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };

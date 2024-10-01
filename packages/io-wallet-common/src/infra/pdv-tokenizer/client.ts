@@ -1,10 +1,12 @@
-import { UserRepository } from "@/user";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
+import * as CircuitBreaker from "opossum";
 
+import { ServiceUnavailableError } from "../../error";
+import { UserRepository } from "../../user";
 import { PdvTokenizerApiClientConfig } from "./config";
 import { PdvTokenizerHealthCheck } from "./health-check";
 
@@ -12,72 +14,60 @@ const Token = t.type({
   token: NonEmptyString,
 });
 
-const Pii = t.type({
-  pii: FiscalCode,
-});
-
 export class PdvTokenizerClient
   implements UserRepository, PdvTokenizerHealthCheck
 {
   #baseURL: string;
+  #circuitBreaker: CircuitBreaker<[fiscalCode: FiscalCode], unknown>;
   #options: RequestInit;
   #requestTimeout: number;
   #testUUID: string;
 
-  getFiscalCodeByUserId = (id: string) =>
-    pipe(
-      TE.tryCatch(
-        async () => {
-          const result = await this.getFiscalCode(id);
-          if (!result.ok) {
-            throw new Error(JSON.stringify(await result.json()));
-          }
-          return result.json();
-        },
-        (error) => new Error(`error getting fiscal code by user id: ${error}`),
-      ),
-      TE.chain(
-        flow(
-          Pii.decode,
-          E.mapLeft(
-            () =>
-              new Error(
-                "error getting fiscal code id by user id: invalid result format from pdv",
-              ),
-          ),
-          TE.fromEither,
-        ),
-      ),
-      TE.map(({ pii }) => ({
-        fiscalCode: pii,
-      })),
-    );
+  private createCircuitBreaker: (
+    errorThresholdPercentage: number,
+    resetTimeout: number,
+  ) => CircuitBreaker<[FiscalCode], unknown> = (
+    errorThresholdPercentage,
+    resetTimeout,
+  ) =>
+    new CircuitBreaker(this.fetchTokenByFiscalCode, {
+      errorThresholdPercentage,
+      resetTimeout,
+    });
+
+  // The method is used by the Circuit Breaker to limit calls in case of repeated errors or service interruptions
+  private fetchTokenByFiscalCode = async (fiscalCode: FiscalCode) => {
+    const result = await fetch(new URL("/tokenizer/v1/tokens", this.#baseURL), {
+      body: JSON.stringify({ pii: fiscalCode }),
+      headers: {
+        ...this.#options.headers,
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      signal: AbortSignal.timeout(this.#requestTimeout),
+    });
+
+    if (!result.ok) {
+      throw new Error(JSON.stringify(await result.json()));
+    }
+
+    return result.json();
+  };
 
   getOrCreateUserByFiscalCode = (fiscalCode: FiscalCode) =>
     pipe(
       TE.tryCatch(
-        async () => {
-          const headers = {
-            ...this.#options.headers,
-            "Content-Type": "application/json",
-          };
-          const result = await fetch(
-            new URL("/tokenizer/v1/tokens", this.#baseURL),
-            {
-              body: JSON.stringify({
-                pii: fiscalCode,
-              }),
-              headers,
-              method: "PUT",
-              signal: AbortSignal.timeout(this.#requestTimeout),
-            },
-          );
-          if (!result.ok) {
-            throw new Error(JSON.stringify(await result.json()));
+        async () => this.#circuitBreaker.fire(fiscalCode),
+        (error) => {
+          if (
+            error instanceof Error &&
+            (error.name === "TimeoutError" ||
+              error.message === "Breaker is open")
+          ) {
+            return new ServiceUnavailableError(error.message);
           }
-          return result.json();
+          return new Error(`error getting user id by fiscal code: ${error}`);
         },
-        (error) => new Error(`error getting user id by fiscal code: ${error}`),
       ),
       TE.chain(
         flow(
@@ -98,7 +88,17 @@ export class PdvTokenizerClient
     pipe(
       TE.tryCatch(
         async () => {
-          const result = await this.getFiscalCode(this.#testUUID);
+          const result = await fetch(
+            new URL(
+              `/tokenizer/v1/tokens/${this.#testUUID}/pii`,
+              this.#baseURL,
+            ),
+            {
+              ...this.#options,
+              method: "GET",
+              signal: AbortSignal.timeout(this.#requestTimeout),
+            },
+          );
           return result.status === 200;
         },
         (error) => new Error(`error checking pdv tokenizer health: ${error}`),
@@ -108,6 +108,8 @@ export class PdvTokenizerClient
   constructor({
     apiKey,
     baseURL,
+    circuitBreakerErrorThreshold,
+    circuitBreakerResetTimeout,
     requestTimeout,
     testUUID,
   }: PdvTokenizerApiClientConfig) {
@@ -120,13 +122,9 @@ export class PdvTokenizerClient
     };
     this.#requestTimeout = requestTimeout;
     this.#testUUID = testUUID;
-  }
-
-  private async getFiscalCode(id: string) {
-    return fetch(new URL(`/tokenizer/v1/tokens/${id}/pii`, this.#baseURL), {
-      ...this.#options,
-      method: "GET",
-      signal: AbortSignal.timeout(this.#requestTimeout),
-    });
+    this.#circuitBreaker = this.createCircuitBreaker(
+      circuitBreakerErrorThreshold,
+      circuitBreakerResetTimeout,
+    );
   }
 }

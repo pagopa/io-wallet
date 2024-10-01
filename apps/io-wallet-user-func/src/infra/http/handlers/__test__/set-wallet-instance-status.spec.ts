@@ -5,7 +5,7 @@ import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/TaskEither";
 import { UnauthorizedError } from "io-wallet-common/error";
 import { UserRepository } from "io-wallet-common/user";
@@ -23,10 +23,6 @@ describe("SetWalletInstanceStatusHandler", () => {
   };
 
   const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () =>
-      TE.right({
-        fiscalCode: "AAAPPP94D55H501P" as FiscalCode,
-      }),
     getOrCreateUserByFiscalCode: () =>
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
@@ -377,7 +373,6 @@ describe("SetWalletInstanceStatusHandler", () => {
 
   it("should return a 500 HTTP response on getOrCreateUserByFiscalCode error", async () => {
     const userRepositoryThatFailsOnGetUser: UserRepository = {
-      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
       getOrCreateUserByFiscalCode: () =>
         TE.left(new Error("failed on getOrCreateUserByFiscalCode!")),
     };
