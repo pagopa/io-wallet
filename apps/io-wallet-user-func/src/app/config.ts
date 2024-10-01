@@ -11,6 +11,7 @@ import {
   getAzureCosmosConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/cosmos/config";
 import { readFromEnvironment } from "io-wallet-common/infra/env";
+import { stringToNumberDecoderRE } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
 import {
   PdvTokenizerApiClientConfig,
@@ -339,13 +340,7 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
     ),
     pidIssuerApiRequestTimeout: pipe(
       readFromEnvironment("PidIssuerApiRequestTimeout"),
-      RE.chainW(
-        flow(
-          NumberFromString.decode,
-          RE.fromEither,
-          RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
-        ),
-      ),
+      RE.chainW(stringToNumberDecoderRE),
     ),
     pidIssuerApiRootCACertificate: pipe(
       readFromEnvironment("PidIssuerApiRootCACertificate"),

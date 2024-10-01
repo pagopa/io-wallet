@@ -1585,6 +1585,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/opossum@npm:^8.1.8":
+  version: 8.1.8
+  resolution: "@types/opossum@npm:8.1.8"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10c0/f500712f7f91f007757aa76764fae50d7b1486d44cb2ffa446db6b7eb861203438d1e4738fee28e7d016844abb2deb06ed07fc59ad58a9ad149b25c2d1e6ae54
+  languageName: node
+  linkType: hard
+
 "@types/parse-multipart@npm:^1.0.0":
   version: 1.0.2
   resolution: "@types/parse-multipart@npm:1.0.2"
@@ -3972,9 +3981,11 @@ __metadata:
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@pagopa/logger": "npm:^1.0.1"
     "@pagopa/ts-commons": "npm:^13.1.1"
+    "@types/opossum": "npm:^8.1.8"
     eslint: "npm:8.57.0"
     fp-ts: "npm:^2.16.0"
     io-ts: "npm:^2.2.20"
+    opossum: "npm:^8.1.4"
     prettier: "npm:3.2.5"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.0"
@@ -5011,6 +5022,13 @@ __metadata:
     is-docker: "npm:^2.1.1"
     is-wsl: "npm:^2.2.0"
   checksum: 10c0/bb6b3a58401dacdb0aad14360626faf3fb7fba4b77816b373495988b724fb48941cad80c1b65d62bb31a17609b2cd91c41a181602caea597ca80dfbcc27e84c9
+  languageName: node
+  linkType: hard
+
+"opossum@npm:^8.1.4":
+  version: 8.1.4
+  resolution: "opossum@npm:8.1.4"
+  checksum: 10c0/d5e80503e2cf5ab3739741229b32cb614d7e8d7a53deb3391a8a751b5247f4b6dd1cd8e5922556f345ea5aab435926d1cb2b0676a33051c9af02f61263214dfe
   languageName: node
   linkType: hard
 

@@ -9,7 +9,6 @@ import { GetUserByFiscalCodeHandler } from "../get-user-by-fiscal-code";
 
 describe("GetUserByFiscalCodeHandler", () => {
   const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     getOrCreateUserByFiscalCode: () =>
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
@@ -74,7 +73,6 @@ describe("GetUserByFiscalCodeHandler", () => {
 
   it("should return a 500 HTTP response when getUserByFiscalCode returns error", async () => {
     const userRepositoryThatFailsOnGetUserByFiscalCode: UserRepository = {
-      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
       getOrCreateUserByFiscalCode: () =>
         TE.left(new Error("failed on getIdByFiscalCode!")),
     };

@@ -27,6 +27,8 @@ const toHttpError = (e: Error): Error => {
     // TODO SIW-1482
     case "IntegrityCheckError":
       return new H.HttpConflictError(e.message);
+    case "ServiceUnavailable":
+      return new H.HttpServiceUnavailableError(e.message);
   }
   return e;
 };

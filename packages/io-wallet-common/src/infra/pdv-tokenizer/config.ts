@@ -4,11 +4,13 @@ import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
-import { readFromEnvironment } from "../env";
+import { readFromEnvironment, stringToNumberDecoderRE } from "../env";
 
 export const PdvTokenizerApiClientConfig = t.type({
   apiKey: t.string,
   baseURL: t.string,
+  circuitBreakerErrorThreshold: NumberFromString,
+  circuitBreakerResetTimeout: NumberFromString,
   requestTimeout: NumberFromString,
   testUUID: t.string,
 });
@@ -23,15 +25,18 @@ export const getPdvTokenizerConfigFromEnvironment: RE.ReaderEither<
   Omit<PdvTokenizerApiClientConfig, "requestTimeout">
 > = pipe(
   sequenceS(RE.Apply)({
-    pdvTokenizerApiBaseURL: readFromEnvironment("PdvTokenizerApiBaseURL"),
-    pdvTokenizerApiKey: readFromEnvironment("PdvTokenizerApiKey"),
-    pdvTokenizerTestUUID: readFromEnvironment("PdvTokenizerTestUUID"),
+    apiKey: readFromEnvironment("PdvTokenizerApiKey"),
+    baseURL: readFromEnvironment("PdvTokenizerApiBaseURL"),
+    circuitBreakerErrorThreshold: pipe(
+      readFromEnvironment("PdvTokenizerCircuitBreakerErrorThreshold"),
+      RE.chainW(stringToNumberDecoderRE),
+      RE.orElse(() => RE.right(50)),
+    ),
+    circuitBreakerResetTimeout: pipe(
+      readFromEnvironment("PdvTokenizerCircuitBreakerResetTimeout"),
+      RE.chainW(stringToNumberDecoderRE),
+      RE.orElse(() => RE.right(5000)),
+    ),
+    testUUID: readFromEnvironment("PdvTokenizerTestUUID"),
   }),
-  RE.map(
-    ({ pdvTokenizerApiBaseURL, pdvTokenizerApiKey, pdvTokenizerTestUUID }) => ({
-      apiKey: pdvTokenizerApiKey,
-      baseURL: pdvTokenizerApiBaseURL,
-      testUUID: pdvTokenizerTestUUID,
-    }),
-  ),
 );

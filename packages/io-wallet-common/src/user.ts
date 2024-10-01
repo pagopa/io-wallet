@@ -10,9 +10,6 @@ export const User = t.type({
 export type User = t.TypeOf<typeof User>;
 
 export interface UserRepository {
-  getFiscalCodeByUserId: (
-    id: NonEmptyString,
-  ) => TE.TaskEither<Error, { fiscalCode: FiscalCode }>;
   getOrCreateUserByFiscalCode: (
     fiscalCode: FiscalCode,
   ) => TE.TaskEither<Error, User>;

@@ -1,10 +1,11 @@
+import { describe, expect, it } from "vitest";
+
 import {
   JwkPrivateKey,
   JwkPublicKey,
   fromBase64ToJwks,
   validateJwkKid,
-} from "@/jwk";
-import { describe, expect, it } from "vitest";
+} from "../jwk";
 
 const publicRsaKey = {
   e: "AQAB",

@@ -22,3 +22,10 @@ export class HealthCheckError extends Error {
     super(`The function is not healthy. ${cause}`);
   }
 }
+
+export class ServiceUnavailableError extends Error {
+  name = "ServiceUnavailable";
+  constructor(cause?: string) {
+    super(`Service Unavailable. Please try again later. ${cause}`);
+  }
+}

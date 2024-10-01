@@ -36,7 +36,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
   };
 
   const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
     getOrCreateUserByFiscalCode: () =>
       TE.right({ id: "pdv_id" as NonEmptyString }),
   };
@@ -306,7 +305,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
 
   it("should return a 500 HTTP response on pdv tokenizer error", async () => {
     const pdvTokenizerClientThatFails: UserRepository = {
-      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
       getOrCreateUserByFiscalCode: () =>
         TE.left(new Error("failed on getOrCreateUserByFiscalCode!")),
     };
