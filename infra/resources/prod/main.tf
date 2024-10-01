@@ -46,6 +46,19 @@ module "key_vaults" {
   tags = local.tags
 }
 
+module "monitoring" {
+  source = "../_modules/monitoring"
+
+  project             = local.project
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  notification_email    = data.azurerm_key_vault_secret.notification_email.value
+  notification_slack    = data.azurerm_key_vault_secret.notification_slack.value
+  notification_opsgenie = data.azurerm_key_vault_secret.notification_opsgenie.value
+
+  tags = local.tags
+}
+
 module "cosmos" {
   source = "../_modules/cosmos"
 
@@ -72,7 +85,7 @@ module "function_apps" {
   cidr_subnet_user_func                = "10.20.0.0/24"
   cidr_subnet_support_func             = "10.20.13.0/24"
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
-  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu-common.name
+  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
   virtual_network = {
     resource_group_name = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
     name                = data.azurerm_virtual_network.vnet_common_itn.name
@@ -83,7 +96,7 @@ module "function_apps" {
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
-  key_vault_id        = data.azurerm_key_vault.weu-common.id
+  key_vault_id        = data.azurerm_key_vault.weu_common.id
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
@@ -171,7 +184,7 @@ module "apim" {
     }
   }
 
-  key_vault_id        = data.azurerm_key_vault.weu-common.id
+  key_vault_id        = data.azurerm_key_vault.weu_common.id
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   product_id = local.apim.products.io_web.product_id

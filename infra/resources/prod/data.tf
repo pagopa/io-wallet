@@ -2,13 +2,22 @@ data "azurerm_subscription" "current" {}
 
 data "azurerm_client_config" "current" {}
 
-data "azurerm_resource_group" "weu-common" {
+data "azurerm_resource_group" "weu_common" {
   name = "${local.project_legacy}-rg-common"
 }
 
-data "azurerm_key_vault" "weu-common" {
+data "azurerm_resource_group" "weu_sec" {
+  name = "${local.project_legacy}-sec-rg"
+}
+
+data "azurerm_key_vault" "weu" {
+  name                = "${local.project_legacy}-kv"
+  resource_group_name = data.azurerm_resource_group.weu_sec.name
+}
+
+data "azurerm_key_vault" "weu_common" {
   name                = "${local.project_legacy}-kv-common"
-  resource_group_name = data.azurerm_resource_group.weu-common.name
+  resource_group_name = data.azurerm_resource_group.weu_common.name
 }
 
 data "azurerm_virtual_network" "vnet_common_itn" {
@@ -24,7 +33,7 @@ data "azurerm_subnet" "pep" {
 
 data "azurerm_private_dns_zone" "privatelink_documents" {
   name                = "privatelink.documents.azure.com"
-  resource_group_name = data.azurerm_resource_group.weu-common.name
+  resource_group_name = data.azurerm_resource_group.weu_common.name
 }
 
 data "azuread_group" "io_developers" {
@@ -37,15 +46,29 @@ data "azuread_group" "io_admin" {
 
 data "azurerm_application_insights" "common" {
   name                = "${local.project_legacy}-ai-common"
-  resource_group_name = data.azurerm_resource_group.weu-common.name
+  resource_group_name = data.azurerm_resource_group.weu_common.name
 }
 
 data "azurerm_log_analytics_workspace" "law" {
   name                = "${local.project_legacy}-law-common"
-  resource_group_name = data.azurerm_resource_group.weu-common.name
+  resource_group_name = data.azurerm_resource_group.weu_common.name
 }
 
 data "azurerm_nat_gateway" "nat" {
   name                = "${local.project}-ng-01"
   resource_group_name = "${local.project}-common-rg-01"
+}
+data "azurerm_key_vault_secret" "notification_slack" {
+  name         = "alert-error-notification-slack"
+  key_vault_id = data.azurerm_key_vault.weu.id
+}
+
+data "azurerm_key_vault_secret" "notification_opsgenie" {
+  name         = "alert-error-notification-opsgenie"
+  key_vault_id = data.azurerm_key_vault.weu.id
+}
+
+data "azurerm_key_vault_secret" "notification_email" {
+  name         = "alert-error-notification-email"
+  key_vault_id = data.azurerm_key_vault.weu.id
 }
