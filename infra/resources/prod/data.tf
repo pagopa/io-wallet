@@ -59,3 +59,8 @@ data "azurerm_key_vault_secret" "notification_email" {
   name         = "email-wallet"
   key_vault_id = module.key_vaults.key_vault_wallet.id
 }
+
+data "azurerm_monitor_action_group" "io" {
+  name                = "ioperror"
+  resource_group_name = data.azurerm_resource_group.weu_common.name
+}

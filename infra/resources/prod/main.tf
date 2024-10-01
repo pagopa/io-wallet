@@ -69,6 +69,9 @@ module "cosmos" {
   private_endpoint_subnet_id = data.azurerm_subnet.pep.id
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
 
+  action_group_wallet_id = module.monitoring.action_group_wallet.id
+  action_group_io_id     = data.azurerm_monitor_action_group.io.id
+
   tags = local.tags
 }
 
