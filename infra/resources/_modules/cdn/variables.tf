@@ -22,3 +22,13 @@ variable "log_analytics_workspace_id" {
   type        = string
   description = "Log Analytics Workspace id"
 }
+
+variable "action_group_wallet_id" {
+  type        = string
+  description = "Id of the Action Group owned by the Wallet team"
+}
+
+variable "action_group_io_id" {
+  type        = string
+  description = "Id of the Action Group shared among all IO teams"
+}

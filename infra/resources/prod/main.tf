@@ -121,6 +121,9 @@ module "cdn" {
 
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law.id
 
+  action_group_wallet_id = module.monitoring.action_group_wallet.id
+  action_group_io_id     = data.azurerm_monitor_action_group.io.id
+
   tags = local.tags
 }
 

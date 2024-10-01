@@ -19,5 +19,13 @@ resource "azurerm_monitor_metric_alert" "storage_account_low_availability" {
     skip_metric_validation = false
   }
 
+  action {
+    action_group_id = var.action_group_wallet_id
+  }
+
+  action {
+    action_group_id = var.action_group_io_id
+  }
+
   tags = var.tags
 }
