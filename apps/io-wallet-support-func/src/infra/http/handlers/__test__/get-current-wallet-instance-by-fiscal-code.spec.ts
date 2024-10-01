@@ -9,6 +9,7 @@ import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentWalletInstanceByFiscalCodeHandler } from "../get-current-wallet-instance-by-fiscal-code";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 
 describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
   const logger = {
@@ -348,6 +349,32 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 503 HTTP response on cosmos db timeout error", async () => {
+    const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
+      {
+        getLastByUserId: () =>
+          TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),
+      };
+    const handler = GetCurrentWalletInstanceByFiscalCodeHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      userRepository,
+      walletInstanceRepository:
+        walletInstanceRepositoryThatFailsOnGetLastByUserId,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 503,
       }),
     });
   });
