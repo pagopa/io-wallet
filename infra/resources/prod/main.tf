@@ -103,13 +103,16 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  tags = local.tags
-
   user_func = local.user_func
 
   support_func = local.support_func
 
   nat_gateway_id_support_func = data.azurerm_nat_gateway.nat.id
+
+  action_group_wallet_id = module.monitoring.action_group_wallet.id
+  action_group_io_id     = data.azurerm_monitor_action_group.io.id
+
+  tags = local.tags
 }
 
 module "cdn" {
