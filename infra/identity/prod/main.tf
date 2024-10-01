@@ -88,7 +88,7 @@ module "app_federated_identities" {
 }
 
 resource "azurerm_key_vault_access_policy" "ci" {
-  key_vault_id = data.azurerm_key_vault.weu-common.id
+  key_vault_id = data.azurerm_key_vault.weu_common.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = module.federated_identities.federated_ci_identity.id
 
@@ -96,7 +96,7 @@ resource "azurerm_key_vault_access_policy" "ci" {
 }
 
 resource "azurerm_key_vault_access_policy" "cd" {
-  key_vault_id = data.azurerm_key_vault.weu-common.id
+  key_vault_id = data.azurerm_key_vault.weu_common.id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = module.federated_identities.federated_cd_identity.id
 
