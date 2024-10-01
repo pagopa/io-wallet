@@ -115,3 +115,13 @@ variable "nat_gateway_id_support_func" {
   type        = string
   description = "NAT gateway id for support func subnet"
 }
+
+variable "action_group_wallet_id" {
+  type        = string
+  description = "Id of the Action Group owned by the Wallet team"
+}
+
+variable "action_group_io_id" {
+  type        = string
+  description = "Id of the Action Group shared among all IO teams"
+}
