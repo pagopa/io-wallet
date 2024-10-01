@@ -17,11 +17,5 @@ resource "azurerm_monitor_action_group" "wallet" {
     use_common_alert_schema = true
   }
 
-  webhook_receiver {
-    name                    = "opsgenie"
-    service_uri             = var.notification_opsgenie
-    use_common_alert_schema = true
-  }
-
   tags = var.tags
 }

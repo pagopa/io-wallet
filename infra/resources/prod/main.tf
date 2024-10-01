@@ -52,9 +52,8 @@ module "monitoring" {
   project             = local.project
   resource_group_name = azurerm_resource_group.wallet.name
 
-  notification_email    = data.azurerm_key_vault_secret.notification_email.value
-  notification_slack    = data.azurerm_key_vault_secret.notification_slack.value
-  notification_opsgenie = data.azurerm_key_vault_secret.notification_opsgenie.value
+  notification_email = data.azurerm_key_vault_secret.notification_email.value
+  notification_slack = data.azurerm_key_vault_secret.notification_slack.value
 
   tags = local.tags
 }

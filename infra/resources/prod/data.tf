@@ -58,17 +58,13 @@ data "azurerm_nat_gateway" "nat" {
   name                = "${local.project}-ng-01"
   resource_group_name = "${local.project}-common-rg-01"
 }
-data "azurerm_key_vault_secret" "notification_slack" {
-  name         = "alert-error-notification-slack"
-  key_vault_id = data.azurerm_key_vault.weu.id
-}
 
-data "azurerm_key_vault_secret" "notification_opsgenie" {
-  name         = "alert-error-notification-opsgenie"
-  key_vault_id = data.azurerm_key_vault.weu.id
+data "azurerm_key_vault_secret" "notification_slack" {
+  name         = "slack-wallet-channel-email"
+  key_vault_id = module.key_vaults.key_vault_wallet.id
 }
 
 data "azurerm_key_vault_secret" "notification_email" {
-  name         = "alert-error-notification-email"
-  key_vault_id = data.azurerm_key_vault.weu.id
+  name         = "email-wallet"
+  key_vault_id = module.key_vaults.key_vault_wallet.id
 }

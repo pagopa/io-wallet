@@ -22,8 +22,3 @@ variable "notification_slack" {
   type    = string
   default = "Slack channel id to use for the action group"
 }
-
-variable "notification_opsgenie" {
-  type    = string
-  default = "OpsGenie channel id to use for the action group"
-}
