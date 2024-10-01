@@ -29,3 +29,13 @@ variable "private_endpoint_subnet_id" {
 variable "private_link_documents_id" {
   type = string
 }
+
+variable "action_group_wallet_id" {
+  type        = string
+  description = "Id of the Action Group owned by the Wallet team"
+}
+
+variable "action_group_io_id" {
+  type        = string
+  description = "Id of the Action Group shared among all IO teams"
+}
