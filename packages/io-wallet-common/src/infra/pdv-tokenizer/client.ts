@@ -58,16 +58,11 @@ export class PdvTokenizerClient
     pipe(
       TE.tryCatch(
         async () => this.#circuitBreaker.fire(fiscalCode),
-        (error) => {
-          if (
-            error instanceof Error &&
-            (error.name === "TimeoutError" ||
-              error.message === "Breaker is open")
-          ) {
-            return new ServiceUnavailableError(error.message);
-          }
-          return new Error(`error getting user id by fiscal code: ${error}`);
-        },
+        (error) =>
+          error instanceof Error &&
+          (error.name === "TimeoutError" || error.message === "Breaker is open")
+            ? new ServiceUnavailableError(error.message)
+            : new Error(`error getting user id by fiscal code: ${error}`),
       ),
       TE.chain(
         flow(
