@@ -6,6 +6,7 @@ import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 export class CosmosDbWalletInstanceRepository
@@ -41,7 +42,10 @@ export class CosmosDbWalletInstanceRepository
         );
         await this.#container.items.batch(operations, userId);
       },
-      (error) => new Error(`Error updating wallet instances: ${error}`),
+      (error) =>
+        error instanceof Error && error.name === "TimeoutError"
+          ? new ServiceUnavailableError(error.message)
+          : new Error(`Error updating wallet instances: ${error}`),
     );
   }
 
@@ -49,7 +53,10 @@ export class CosmosDbWalletInstanceRepository
     return pipe(
       TE.tryCatch(
         () => this.#container.item(id, userId).read(),
-        (error) => new Error(`Error getting wallet instance: ${error}`),
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(error.message)
+            : new Error(`Error getting wallet instance: ${error}`),
       ),
       TE.chain(({ resource }) =>
         resource === undefined
@@ -88,7 +95,9 @@ export class CosmosDbWalletInstanceRepository
           return items;
         },
         (error) =>
-          new Error(`Error getting wallet instances by user id: ${error}`),
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(error.message)
+            : new Error(`Error getting wallet instances by user id: ${error}`),
       ),
       TE.chain((items) =>
         pipe(
@@ -134,7 +143,9 @@ export class CosmosDbWalletInstanceRepository
           return items;
         },
         (error) =>
-          new Error(`Error getting wallet instances by user id: ${error}`),
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(error.message)
+            : new Error(`Error getting wallet instances by user id: ${error}`),
       ),
       TE.chain(
         flow(
@@ -163,7 +174,10 @@ export class CosmosDbWalletInstanceRepository
       async () => {
         await this.#container.items.create(walletInstance);
       },
-      (error) => new Error(`Error inserting wallet instance: ${error}`),
+      (error) =>
+        error instanceof Error && error.name === "TimeoutError"
+          ? new ServiceUnavailableError(error.message)
+          : new Error(`Error inserting wallet instance: ${error}`),
     );
   }
 }

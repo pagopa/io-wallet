@@ -1,6 +1,8 @@
 import { NonceRepository } from "@/nonce";
 import { Container, Database } from "@azure/cosmos";
+import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/lib/TaskEither";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 
 export class CosmosDbNonceRepository implements NonceRepository {
   #container: Container;
@@ -15,17 +17,26 @@ export class CosmosDbNonceRepository implements NonceRepository {
   Therefore, if the nonce does not exist, we will receive a 404 and thus the nonce will not be valid
   */
   delete(nonce: string) {
-    return TE.tryCatch(
-      async () => {
-        await this.#container.item(nonce, nonce).delete();
-      },
-      (error) =>
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        error.code === 404
-          ? new Error("Invalid nonce")
-          : new Error(`Error deleting nonce: ${error}`),
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          await this.#container.item(nonce, nonce).delete();
+        },
+        (error) => {
+          if (error instanceof Error && error.name === "TimeoutError") {
+            return new ServiceUnavailableError(error.message);
+          }
+          if (
+            typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            error.code === 404
+          ) {
+            return new Error("Invalid nonce");
+          }
+          return new Error(`Error deleting nonce: ${error}`);
+        },
+      ),
     );
   }
 
@@ -36,7 +47,10 @@ export class CosmosDbNonceRepository implements NonceRepository {
           id: nonce,
         });
       },
-      (error) => new Error(`Error inserting nonce: ${error}`),
+      (error) =>
+        error instanceof Error && error.name === "TimeoutError"
+          ? new ServiceUnavailableError(error.message)
+          : new Error(`Error inserting nonce: ${error}`),
     );
   }
 }
