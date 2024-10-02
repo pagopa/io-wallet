@@ -1,7 +1,7 @@
 import { NonceRepository } from "@/nonce";
 import { Container, Database } from "@azure/cosmos";
-import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/lib/TaskEither";
+import { pipe } from "fp-ts/lib/function";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 
 export class CosmosDbNonceRepository implements NonceRepository {

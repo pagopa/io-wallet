@@ -6,11 +6,11 @@ import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { SetCurrentWalletInstanceStatusHandler } from "../set-current-wallet-instance-status";
-import { ServiceUnavailableError } from "io-wallet-common/error";
 
 describe("SetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
