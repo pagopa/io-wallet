@@ -61,7 +61,7 @@ module "function_app_user_02" {
 
   application_insights_connection_string = var.application_insights_connection_string
 
-  tier = "l"
+  tier = "xl"
 
   tags = var.tags
 }
