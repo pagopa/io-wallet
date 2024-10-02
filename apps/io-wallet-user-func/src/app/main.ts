@@ -7,6 +7,7 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { jwtValidate } from "@/infra/jwt-validator";
@@ -150,4 +151,15 @@ app.http("setWalletInstanceStatus", {
   }),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
+});
+
+app.http("setCurrentWalletInstanceStatus", {
+  authLevel: "function",
+  handler: SetCurrentWalletInstanceStatusFunction({
+    credentialRepository: pidIssuerClient,
+    userRepository: pdvTokenizerClient,
+    walletInstanceRepository,
+  }),
+  methods: ["PUT"],
+  route: "wallet-instances/current/status",
 });

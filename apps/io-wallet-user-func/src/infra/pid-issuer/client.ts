@@ -4,6 +4,7 @@ import { removeTrailingSlash } from "@/url";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 import { Agent, RequestInit, fetch } from "undici";
 
 import { PidIssuerHealthCheck } from "./health-check";
@@ -62,7 +63,10 @@ export class PidIssuerClient
             throw new Error(JSON.stringify(await result.json()));
           }
         },
-        (error) => new Error(`error revoking all user credentials: ${error}`),
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(error.message)
+            : new Error(`error revoking all user credentials: ${error}`),
       ),
     );
 

@@ -1,10 +1,11 @@
-import { UserRepository } from "@/user";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
+import { ServiceUnavailableError } from "../../error";
+import { UserRepository } from "../../user";
 import { PdvTokenizerApiClientConfig } from "./config";
 import { PdvTokenizerHealthCheck } from "./health-check";
 
@@ -77,7 +78,10 @@ export class PdvTokenizerClient
           }
           return result.json();
         },
-        (error) => new Error(`error getting user id by fiscal code: ${error}`),
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(error.message)
+            : new Error(`error getting user id by fiscal code: ${error}`),
       ),
       TE.chain(
         flow(
