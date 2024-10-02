@@ -1,5 +1,16 @@
 # io-wallet-user-func
 
+## 1.2.0
+
+### Minor Changes
+
+- 9c920d2: Added setCurrentWalletInstanceStatus function in user-func and added 503 response status code
+
+### Patch Changes
+
+- Updated dependencies [9c920d2]
+  - io-wallet-common@1.0.3
+
 ## 1.1.9
 
 ### Patch Changes
