@@ -9,6 +9,7 @@ import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { IoLoadTestClient } from "@/infra/io-load-test/client";
 import { jwtValidate } from "@/infra/jwt-validator";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { TrialSystemClient } from "@/infra/trial-system/client";
@@ -62,6 +63,11 @@ const pidIssuerClient = new PidIssuerClient(
   config.federationEntity.basePath.href,
 );
 
+const ioLoadTestClient = new IoLoadTestClient(
+  config.loadTest,
+  pdvTokenizerClient,
+);
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
@@ -79,6 +85,7 @@ app.http("createWalletAttestation", {
   handler: CreateWalletAttestationFunction({
     attestationServiceConfiguration: config.attestationService,
     federationEntityMetadata: config.federationEntity,
+    loadTestClient: ioLoadTestClient,
     nonceRepository,
     signer,
     walletInstanceRepository,
@@ -91,6 +98,7 @@ app.http("createWalletInstance", {
   authLevel: "function",
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
+    loadTestClient: ioLoadTestClient,
     nonceRepository,
     walletInstanceRepository,
   }),

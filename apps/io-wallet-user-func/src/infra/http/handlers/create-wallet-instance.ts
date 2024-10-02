@@ -1,4 +1,5 @@
 import { validateAttestation } from "@/attestation-service";
+import { isTestUser, validateTestAttestation } from "@/load-test";
 import {
   insertWalletInstance,
   revokeUserValidWalletInstancesExceptOne,
@@ -51,7 +52,12 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     RTE.chainW(({ user, walletInstanceRequest }) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
-        RTE.chainW(() => validateAttestation(walletInstanceRequest)),
+        RTE.chainW(() => isTestUser(user)),
+        RTE.chainW((isTest) =>
+          isTest
+            ? validateTestAttestation(walletInstanceRequest, user)
+            : validateAttestation(walletInstanceRequest),
+        ),
         RTE.bind("walletInstance", ({ deviceDetails, hardwareKey }) =>
           RTE.right({
             createdAt: new Date(),

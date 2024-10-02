@@ -7,12 +7,15 @@ import {
   decodeBase64String,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { LoadTestClient } from "@/load-test";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import * as E from "fp-ts/lib/Either";
+import { User } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
@@ -29,6 +32,13 @@ describe("CreateWalletInstanceHandler", () => {
   const nonceRepository: NonceRepository = {
     delete: () => TE.right(void 0),
     insert: () => TE.left(new Error("not implemented")),
+  };
+
+  const loadTestClient: LoadTestClient = {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    isTestUser: function (user: User): E.Either<Error, boolean> {
+      return E.right(false);
+    },
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
@@ -76,6 +86,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository,
@@ -99,6 +110,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository,
@@ -128,6 +140,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository,
@@ -159,6 +172,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository,
@@ -192,6 +206,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       walletInstanceRepository,
@@ -229,6 +244,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
@@ -266,6 +282,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository:
@@ -304,6 +321,7 @@ describe("CreateWalletInstanceHandler", () => {
       attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,

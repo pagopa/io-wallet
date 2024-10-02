@@ -1,4 +1,13 @@
 locals {
+
+  // TODO: SIW-1701 To replace with a common module
+  test_users_fast_login_load_test = concat([
+    for i in range(0, 1000) : format("LVTEST00A00A%03dX", i)
+    ], [
+    for i in range(0, 1000) : format("LVTEST00A00B%03dX", i)
+  ])
+
+
   function_app_user = {
     app_settings = merge({
       FUNCTIONS_WORKER_RUNTIME       = "node"
@@ -49,6 +58,10 @@ locals {
 
       WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
       WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
+
+      TestUsersFiscalCodeForLoadTest = join(",",
+          flatten([local.test_users_fast_login_load_test])
+        )
       },
       local.function_apps.common_app_settings,
       {
