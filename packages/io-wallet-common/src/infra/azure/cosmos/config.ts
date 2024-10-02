@@ -1,11 +1,10 @@
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
-import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
-import { flow, pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
-import { readFromEnvironment } from "../../env";
+import { readFromEnvironment, stringToNumberDecoderRE } from "../../env";
 
 export const AzureCosmosConfig = t.type({
   dbName: t.string,
@@ -25,13 +24,7 @@ export const getAzureCosmosConfigFromEnvironment: RE.ReaderEither<
     endpoint: readFromEnvironment("CosmosDbEndpoint"),
     requestTimeout: pipe(
       readFromEnvironment("CosmosDbRequestTimeout"),
-      RE.chainW(
-        flow(
-          NumberFromString.decode,
-          RE.fromEither,
-          RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
-        ),
-      ),
+      RE.chainW(stringToNumberDecoderRE),
     ),
   }),
 );
