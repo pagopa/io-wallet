@@ -53,7 +53,7 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       E.map(({ fiscal_code }) => fiscal_code),
       RTE.fromEither,
       // invoke PID issuer services to revoke all credentials for that user
-      RTE.chainFirst(revokeAllCredentials),
+      RTE.chainFirst(revokeAllCredentials), // TODO: SIW-1708 analysis on asynchronous call
       // revoke the wallet instance in the database
       RTE.chainW(revokeCurrentUserWalletInstance),
       RTE.map(() => H.empty),
