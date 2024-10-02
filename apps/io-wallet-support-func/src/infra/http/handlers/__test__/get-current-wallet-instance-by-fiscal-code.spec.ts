@@ -5,6 +5,7 @@ import * as L from "@pagopa/logger";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
@@ -350,6 +351,32 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 503 HTTP response on cosmos db timeout error", async () => {
+    const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
+      {
+        getLastByUserId: () =>
+          TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),
+      };
+    const handler = GetCurrentWalletInstanceByFiscalCodeHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      userRepository,
+      walletInstanceRepository:
+        walletInstanceRepositoryThatFailsOnGetLastByUserId,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 503,
       }),
     });
   });
