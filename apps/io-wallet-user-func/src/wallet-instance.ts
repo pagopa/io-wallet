@@ -41,7 +41,7 @@ export interface WalletInstanceRepository {
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
-interface WalletInstanceEnvironment {
+export interface WalletInstanceEnvironment {
   walletInstanceRepository: WalletInstanceRepository;
 }
 

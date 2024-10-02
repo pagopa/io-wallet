@@ -9,9 +9,6 @@
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
-    "noEmit": false,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "noEmit": false
   }
 }
