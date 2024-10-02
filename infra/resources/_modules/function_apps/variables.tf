@@ -116,9 +116,9 @@ variable "cidr_subnet_support_func" {
   description = "CIDR block for support function app subnet"
 }
 
-variable "nat_gateway_id_support_func" {
+variable "nat_gateway_id" {
   type        = string
-  description = "NAT gateway id for support func subnet"
+  description = "NAT gateway Id"
 }
 
 variable "action_group_wallet_id" {
