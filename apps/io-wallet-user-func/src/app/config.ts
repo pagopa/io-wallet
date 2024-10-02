@@ -1,7 +1,7 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { flow, pipe } from "fp-ts/lib/function";
@@ -117,12 +117,19 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const LoadTestConfig = t.type({
+  testUsersFiscalCode: t.array(FiscalCode),
+});
+
+export type LoadTestConfig = t.TypeOf<typeof LoadTestConfig>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   jwtValidator: JwtValidatorConfig,
+  loadTest: LoadTestConfig,
   pdvTokenizer: PdvTokenizerApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   trialSystem: TrialSystemApiClientConfig,
@@ -322,6 +329,29 @@ const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
+const getLoadTestConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  LoadTestConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    testUsersFiscalCode: pipe(
+      readFromEnvironment("TestUsersFiscalCodeForLoadTest"),
+      RE.map((testUsers) => testUsers.split(",")),
+      RE.chainW(
+        flow(
+          t.array(FiscalCode).decode,
+          RE.fromEither,
+          RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
+        ),
+      ),
+    ),
+  }),
+  RE.map(({ testUsersFiscalCode }) => ({
+    testUsersFiscalCode,
+  })),
+);
+
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -391,6 +421,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     jwtValidator: getJwtValidatorConfigFromEnvironment,
+    loadTest: getLoadTestConfigFromEnvironment,
     pdvTokenizer: getPdvTokenizerConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     trialSystem: getTrialSystemConfigFromEnvironment,

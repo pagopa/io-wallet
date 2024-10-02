@@ -6,6 +6,7 @@ import {
   GOOGLE_PUBLIC_KEY,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { LoadTestClient } from "@/load-test";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
@@ -16,6 +17,7 @@ import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import { User } from "io-wallet-common/user";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
@@ -75,6 +77,13 @@ const walletInstanceRepository: WalletInstanceRepository = {
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
+const loadTestClient: LoadTestClient = {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isTestUser: function (user: User): E.Either<Error, boolean> {
+    return E.right(false);
+  },
+};
+
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
@@ -114,6 +123,7 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       signer,
@@ -164,6 +174,7 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       signer,
@@ -216,6 +227,7 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       signer,
@@ -262,6 +274,7 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
+      loadTestClient,
       logger,
       nonceRepository,
       signer,
