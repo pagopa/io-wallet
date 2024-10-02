@@ -33,6 +33,11 @@ variable "cidr_subnet_user_func" {
   description = "CIDR block for user function app subnet"
 }
 
+variable "cidr_subnet_user_func_02" {
+  type        = string
+  description = "CIDR block for user function app subnet 02"
+}
+
 variable "private_endpoint_subnet_id" {
   type        = string
   description = "Private Endpoints subnet Id"
