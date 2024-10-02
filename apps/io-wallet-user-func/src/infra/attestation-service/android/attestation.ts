@@ -33,6 +33,7 @@ export interface VerifyAttestationParams {
   challenge: string;
   googlePublicKey: string;
   httpRequestTimeout: number;
+  skipChainValidation: boolean;
   x509Chain: readonly X509Certificate[];
 }
 
@@ -46,7 +47,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
     });
   }
 
-  validateIssuance(x509Chain, googlePublicKey);
+  validateIssuance(x509Chain, googlePublicKey, params.skipChainValidation);
   await validateRevocation(x509Chain, androidCrlUrl, httpRequestTimeout);
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
@@ -73,6 +74,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   googlePublicKey: string,
+  skipChainValidation: boolean,
 ) => {
   // Check dates
   const now = new Date();
@@ -93,7 +95,7 @@ export const validateIssuance = (
         if (
           !subject ||
           !issuer ||
-          subject.checkIssued(issuer) === false ||
+          (!skipChainValidation && subject.checkIssued(issuer) === false) ||
           subject.verify(issuer.publicKey) === false
         ) {
           throw new AndroidAttestationError("Certificate chain is invalid", {
