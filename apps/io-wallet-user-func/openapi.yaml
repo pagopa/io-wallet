@@ -23,32 +23,6 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
-  /users:
-    post:
-      operationId: getUserByFiscalCode
-      summary: Returns the user given the fiscal code
-      security:
-        - FunctionsKey: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetUserByFiscalCodeBody"
-      responses:
-        "200":
-          description: User successfully retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDetailView"
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-
   /wallet-instances:
     post:
       operationId: createWalletInstance
@@ -325,14 +299,6 @@ components:
       required:
         - wallet_attestation
 
-    GetUserByFiscalCodeBody:
-      type: object
-      properties:
-        fiscal_code:
-          $ref: "#/components/schemas/FiscalCode"
-      required:
-        - fiscal_code
-
     CreateWalletInstanceBody:
       type: object
       properties:
@@ -372,14 +338,6 @@ components:
         - grant_type
         - assertion
         - fiscal_code
-
-    UserDetailView:
-      type: object
-      properties:
-        id:
-          $ref: "#/components/schemas/Id"
-      required:
-        - id
 
     ProblemJson:
       type: object
@@ -428,8 +386,3 @@ components:
       format: FiscalCode
       x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
-
-    Id:
-      type: string
-      description: UUID
-      example: 32928ece-6ca0-488c-9a6a-eb8ee66ab69a
