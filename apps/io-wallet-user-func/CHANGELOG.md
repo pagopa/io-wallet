@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.2.1
+
+### Patch Changes
+
+- 00d2603: Add SkipChainValidation
+
 ## 1.2.0
 
 ### Minor Changes
