@@ -38,8 +38,13 @@ export interface VerifyAttestationParams {
 }
 
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
-  const { androidCrlUrl, googlePublicKey, httpRequestTimeout, x509Chain } =
-    params;
+  const {
+    androidCrlUrl,
+    googlePublicKey,
+    httpRequestTimeout,
+    skipChainValidation,
+    x509Chain,
+  } = params;
 
   if (x509Chain.length <= 0) {
     throw new AndroidAttestationError("No certificates provided", {
@@ -47,7 +52,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
     });
   }
 
-  validateIssuance(x509Chain, googlePublicKey, params.skipChainValidation);
+  validateIssuance(x509Chain, googlePublicKey, skipChainValidation);
   await validateRevocation(x509Chain, androidCrlUrl, httpRequestTimeout);
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
