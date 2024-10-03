@@ -47,6 +47,8 @@
     "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED",
     "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
     "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
-    "TestUsersFiscalCodeForLoadTest": "FISCAL_CODE_OF_TEST_USERS_SEPARATED_BY_COMMA"
+    "TestUsersFiscalCodeForLoadTest": "FISCAL_CODE_OF_TEST_USERS_SEPARATED_BY_COMMA",
+    "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
+    "SkipChainValidation": "SKIP_CHAIN_VALIDATION"
   }
 }
