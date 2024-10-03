@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.2.2
+
+### Patch Changes
+
+- 8b6d769: Fix attestation bug and remove SkipChainValidation
+
 ## 1.2.1
 
 ### Patch Changes
