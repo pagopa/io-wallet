@@ -60,6 +60,7 @@ describe("CreateWalletInstanceHandler", () => {
     iosBundleIdentifiers: [
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
     ],
+    skipChainValidation: false,
     skipSignatureValidation: false,
   };
 
