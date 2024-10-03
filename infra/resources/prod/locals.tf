@@ -41,10 +41,6 @@ locals {
         key_vault_secret_name = "GoogleAppCredentialsEncoded"
       },
       {
-        name                  = "PdvTokenizerApiKey"
-        key_vault_secret_name = "PdvTokenizerApiKey"
-      },
-      {
         name                  = "WalletKeys"
         key_vault_secret_name = "WalletKeys"
       },
@@ -55,15 +51,6 @@ locals {
       {
         name                  = "PidIssuerApiClientPrivateKey"
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
-      }
-    ]
-  }
-
-  support_func = {
-    app_settings = [
-      {
-        name                  = "PdvTokenizerApiKey"
-        key_vault_secret_name = "PdvTokenizerApiKey"
       }
     ]
   }
