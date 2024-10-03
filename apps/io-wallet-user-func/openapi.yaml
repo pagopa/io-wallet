@@ -20,6 +20,8 @@ paths:
                 $ref: "#/components/schemas/NonceDetailView"
         "500":
           $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /users:
     post:
@@ -44,6 +46,8 @@ paths:
           $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances:
     post:
@@ -72,6 +76,8 @@ paths:
           $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /token:
     description: This is a token endpoint (as defined in RFC 7523 section 4)
@@ -111,6 +117,8 @@ paths:
           $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/current/status:
     get:
@@ -134,6 +142,30 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+    put:
+      summary: Revoke current Wallet Instance
+      operationId: setCurrentWalletInstanceStatus
+      security:
+        - FunctionsKey: []
+      description: |
+        Revoke the current Wallet Instance.
+        If the Wallet Instance is already revoked, the operation will succeed.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetWalletInstanceStatusWithFiscalCodeData"
+      responses:
+        "204":
+          description: Wallet Instance status successfully set
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/{id}/status:
     put:
@@ -150,7 +182,7 @@ paths:
             type: string
       description: |
         Revoke the Wallet Instance associated with the authenticated user.
-        If the Wallet Instance is already revoked, the operation succeed.
+        If the Wallet Instance is already revoked, the operation will succeed.
       requestBody:
         content:
           application/json:
@@ -169,6 +201,8 @@ paths:
           $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /health:
     get:
@@ -248,10 +282,29 @@ components:
           schema:
             $ref: "#/components/schemas/ProblemJson"
 
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
+
   schemas:
     SetWalletInstanceStatusData:
       type: string
       enum: ["REVOKED"]
+
+    SetWalletInstanceStatusWithFiscalCodeData:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["REVOKED"]
+        fiscal_code:
+          $ref: "#/components/schemas/FiscalCode"
+      required:
+        - status
+        - fiscal_code
 
     WalletData:
       description: |-

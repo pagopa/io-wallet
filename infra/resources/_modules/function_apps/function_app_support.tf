@@ -28,7 +28,7 @@ module "function_app_support" {
 
   application_insights_connection_string = var.application_insights_connection_string
 
-  tier = "premium"
+  tier = "l"
 
   tags = var.tags
 }
