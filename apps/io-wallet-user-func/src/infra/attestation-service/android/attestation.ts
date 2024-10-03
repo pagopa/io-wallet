@@ -33,18 +33,12 @@ export interface VerifyAttestationParams {
   challenge: string;
   googlePublicKey: string;
   httpRequestTimeout: number;
-  skipChainValidation: boolean;
   x509Chain: readonly X509Certificate[];
 }
 
 export const verifyAttestation = async (params: VerifyAttestationParams) => {
-  const {
-    androidCrlUrl,
-    googlePublicKey,
-    httpRequestTimeout,
-    skipChainValidation,
-    x509Chain,
-  } = params;
+  const { androidCrlUrl, googlePublicKey, httpRequestTimeout, x509Chain } =
+    params;
 
   if (x509Chain.length <= 0) {
     throw new AndroidAttestationError("No certificates provided", {
@@ -52,7 +46,7 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
     });
   }
 
-  validateIssuance(x509Chain, googlePublicKey, skipChainValidation);
+  validateIssuance(x509Chain, googlePublicKey);
   await validateRevocation(x509Chain, androidCrlUrl, httpRequestTimeout);
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
@@ -79,7 +73,6 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   googlePublicKey: string,
-  skipChainValidation: boolean,
 ) => {
   // Check dates
   const now = new Date();
@@ -94,15 +87,10 @@ export const validateIssuance = (
 
   // Check that each certificate, except for the last, is issued by the subsequent one.
   if (x509Chain.length >= 2) {
-    x509Chain.forEach((subject, index) => {
+    x509Chain.forEach((cert, index) => {
       if (index < x509Chain.length - 1) {
-        const issuer = x509Chain[index + 1];
-        if (
-          !subject ||
-          !issuer ||
-          (!skipChainValidation && subject.checkIssued(issuer) === false) ||
-          subject.verify(issuer.publicKey) === false
-        ) {
+        const parent = x509Chain[index + 1];
+        if (!cert || !parent || cert.verify(parent.publicKey) === false) {
           throw new AndroidAttestationError("Certificate chain is invalid", {
             x509Chain,
           });

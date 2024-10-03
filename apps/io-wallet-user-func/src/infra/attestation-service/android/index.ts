@@ -26,7 +26,6 @@ export const validateAndroidAttestation = (
   googlePublicKey: string,
   androidCrlUrl: string,
   httpRequestTimeout: number,
-  skipChainValidation: boolean,
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
     data.toString("utf-8"),
@@ -55,7 +54,6 @@ export const validateAndroidAttestation = (
               challenge: nonce,
               googlePublicKey,
               httpRequestTimeout,
-              skipChainValidation,
               x509Chain,
             }),
           E.toError,
