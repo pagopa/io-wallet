@@ -1,4 +1,3 @@
-import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
@@ -8,7 +7,7 @@ import { ValidatedAttestation } from "./attestation-service";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 
 export interface LoadTestClient {
-  isTestUser: (user: User) => E.Either<Error, boolean>;
+  isTestUser: (user: User) => boolean;
 }
 
 export const isTestUser: (user: User) => RTE.ReaderTaskEither<
@@ -20,7 +19,7 @@ export const isTestUser: (user: User) => RTE.ReaderTaskEither<
 > =
   (user) =>
   ({ loadTestClient }) =>
-    pipe(user, loadTestClient.isTestUser, TE.fromEither);
+    pipe(user, loadTestClient.isTestUser, TE.of);
 
 export const validateTestAttestation: (
   walletInstanceRequest: WalletInstanceRequest,
