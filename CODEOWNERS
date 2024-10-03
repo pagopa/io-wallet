@@ -6,3 +6,4 @@
 /infra/ @pagopa/engineering-team-cloud-eng
 /.github/ @pagopa/engineering-team-cloud-eng
 /.terraform-version @pagopa/engineering-team-cloud-eng
+/.pre-commit-config.yaml @pagopa/engineering-team-cloud-eng
