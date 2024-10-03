@@ -102,10 +102,8 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };
@@ -154,9 +152,6 @@ describe("CreateWalletAttestationHandler", async () => {
         assertion: walletAttestationRequest,
         grant_type: "foo",
       },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
@@ -204,10 +199,8 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };
@@ -250,10 +243,8 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };

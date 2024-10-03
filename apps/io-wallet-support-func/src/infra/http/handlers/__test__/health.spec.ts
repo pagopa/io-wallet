@@ -1,8 +1,6 @@
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
 import { HealthHandler } from "../health";
