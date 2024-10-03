@@ -65,6 +65,7 @@ export const AttestationServiceConfiguration = t.type({
   httpRequestTimeout: NumberFromString,
   iOsTeamIdentifier: t.string,
   iosBundleIdentifiers: t.array(t.string),
+  skipChainValidation: t.boolean,
   skipSignatureValidation: t.boolean,
 });
 
@@ -223,6 +224,11 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("IosBundleIdentifiers"),
       RE.map((identifiers) => identifiers.split(",")),
       RE.orElse(() => RE.right(["it.pagopa.app.io"])),
+    ),
+    skipChainValidation: pipe(
+      readFromEnvironment("SkipChainValidation"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
     ),
     skipSignatureValidation: pipe(
       readFromEnvironment("SkipSignatureValidation"),

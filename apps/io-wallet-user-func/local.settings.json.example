@@ -46,6 +46,8 @@
     "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE",
     "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED",
     "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
-    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT"
+    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
+    "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
+    "SkipChainValidation": "SKIP_CHAIN_VALIDATION",
   }
 }
