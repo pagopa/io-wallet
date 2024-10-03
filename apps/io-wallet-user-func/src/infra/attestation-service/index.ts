@@ -125,7 +125,6 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.googlePublicKey,
               this.#configuration.androidCrlUrl,
               this.#configuration.httpRequestTimeout,
-              this.#configuration.skipChainValidation,
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
