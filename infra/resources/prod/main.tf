@@ -150,6 +150,10 @@ module "iam" {
       principal_id         = module.function_apps.function_app_user.principal_id
       staging_principal_id = module.function_apps.function_app_user.staging_principal_id
     }
+    user_func_02 = {
+      principal_id         = module.function_apps.function_app_user_02.principal_id
+      staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
+    }
     support_func = {
       principal_id         = module.function_apps.function_app_support.principal_id
       staging_principal_id = module.function_apps.function_app_support.staging_principal_id
