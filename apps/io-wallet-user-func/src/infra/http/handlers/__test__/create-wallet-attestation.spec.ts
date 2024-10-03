@@ -79,8 +79,8 @@ const { authenticatorData, signature } = decode(data);
 
 const loadTestClient: LoadTestClient = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  isTestUser: function (user: User): E.Either<Error, boolean> {
-    return E.right(false);
+  isTestUser: function (user: User): boolean {
+    return false;
   },
 };
 

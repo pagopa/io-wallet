@@ -14,7 +14,6 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import * as E from "fp-ts/lib/Either";
 import { User } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
@@ -36,8 +35,8 @@ describe("CreateWalletInstanceHandler", () => {
 
   const loadTestClient: LoadTestClient = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    isTestUser: function (user: User): E.Either<Error, boolean> {
-      return E.right(false);
+    isTestUser: function (user: User): boolean {
+      return false;
     },
   };
 
