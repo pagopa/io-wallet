@@ -1,10 +1,9 @@
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 
 import { DeviceDetails } from "./device-details";
 import { JwkPublicKey } from "./jwk";
-import { User } from "./user";
 
 const WalletInstanceBase = t.intersection([
   t.type({
@@ -12,7 +11,7 @@ const WalletInstanceBase = t.intersection([
     hardwareKey: JwkPublicKey,
     id: NonEmptyString,
     signCount: t.number,
-    userId: User.props.id,
+    userId: FiscalCode,
   }),
   t.partial({
     deviceDetails: DeviceDetails,

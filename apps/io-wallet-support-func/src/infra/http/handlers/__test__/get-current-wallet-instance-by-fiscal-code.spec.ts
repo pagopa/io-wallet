@@ -2,11 +2,10 @@
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentWalletInstanceByFiscalCodeHandler } from "../get-current-wallet-instance-by-fiscal-code";
@@ -31,15 +30,9 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
           id: "123" as NonEmptyString,
           isRevoked: false,
           signCount: 0,
-          userId: "123" as NonEmptyString,
+          userId: "AAACCCZ55H501P" as FiscalCode,
         }),
       ),
-  };
-
-  const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
-    getOrCreateUserByFiscalCode: () =>
-      TE.right({ id: "pdv_id" as NonEmptyString }),
   };
 
   const req = {
@@ -57,7 +50,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -93,7 +85,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             isRevoked: true,
             revokedAt: mockDate,
             signCount: 0,
-            userId: "123" as NonEmptyString,
+            userId: "AAACCCZ55H501P" as FiscalCode,
           }),
         ),
     };
@@ -101,7 +93,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -141,7 +132,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             isRevoked: true,
             revokedAt: mockDate,
             signCount: 0,
-            userId: "123" as NonEmptyString,
+            userId: "AAACCCZ55H501P" as FiscalCode,
           }),
         ),
     };
@@ -149,7 +140,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -196,7 +186,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             isRevoked: true,
             revokedAt: mockDate,
             signCount: 0,
-            userId: "123" as NonEmptyString,
+            userId: "AAACCCZ55H501P" as FiscalCode,
           }),
         ),
     };
@@ -204,7 +194,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -236,7 +225,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -263,7 +251,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -290,7 +277,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -305,31 +291,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on pdv tokenizer error", async () => {
-    const pdvTokenizerClientThatFails: UserRepository = {
-      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
-      getOrCreateUserByFiscalCode: () =>
-        TE.left(new Error("failed on getOrCreateUserByFiscalCode!")),
-    };
-    const handler = GetCurrentWalletInstanceByFiscalCodeHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      userRepository: pdvTokenizerClientThatFails,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      }),
-    });
-  });
-
   it("should return a 500 HTTP response on cosmos db error", async () => {
     const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
       {
@@ -339,7 +300,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
@@ -365,7 +325,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });

@@ -13,8 +13,6 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import { requireUserFromHeader } from "../user-id-header-validator";
-
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
   hardware_key_tag: NonEmptyString,

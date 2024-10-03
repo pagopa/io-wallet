@@ -15,10 +15,6 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
-import {
-  PdvTokenizerApiClientConfig,
-  getPdvTokenizerConfigFromEnvironment,
-} from "io-wallet-common/infra/pdv-tokenizer/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
@@ -126,7 +122,6 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   jwtValidator: JwtValidatorConfig,
-  pdvTokenizer: PdvTokenizerApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   trialSystem: TrialSystemApiClientConfig,
 });
@@ -388,7 +383,6 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     jwtValidator: getJwtValidatorConfigFromEnvironment,
-    pdvTokenizer: getPdvTokenizerConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     trialSystem: getTrialSystemConfigFromEnvironment,
   }),
@@ -396,7 +390,6 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     ({
       attestationService,
       httpRequestTimeout,
-      pdvTokenizer,
       trialSystem,
       ...remainingConfigs
     }) => ({
@@ -404,10 +397,6 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       attestationService: {
         ...attestationService,
         httpRequestTimeout,
-      },
-      pdvTokenizer: {
-        ...pdvTokenizer,
-        requestTimeout: httpRequestTimeout,
       },
       trialSystem: {
         ...trialSystem,

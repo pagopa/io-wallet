@@ -14,8 +14,6 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import { requireUserFromHeader } from "../user-id-header-validator";
-
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,
   grant_type: t.literal(GRANT_TYPE_KEY_ATTESTATION),

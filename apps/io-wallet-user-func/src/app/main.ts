@@ -5,7 +5,6 @@ import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wal
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
-import { GetUserByFiscalCodeFunction } from "@/infra/azure/functions/get-user-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
@@ -19,7 +18,6 @@ import { DefaultAzureCredential } from "@azure/identity";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { PdvTokenizerClient } from "io-wallet-common/infra/pdv-tokenizer/client";
 
 import { getConfigFromEnvironment } from "./config";
 
@@ -50,8 +48,6 @@ const nonceRepository = new CosmosDbNonceRepository(database);
 
 const signer = new CryptoSigner(config.crypto);
 
-const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
-
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
 const tokenValidate = jwtValidate(config.jwtValidator);
@@ -67,7 +63,6 @@ app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
-    pdvTokenizerClient,
     pidIssuerClient,
     trialSystemClient,
   }),
@@ -106,15 +101,6 @@ app.http("getNonce", {
   route: "nonce",
 });
 
-app.http("getUserByFiscalCode", {
-  authLevel: "function",
-  handler: GetUserByFiscalCodeFunction({
-    userRepository: pdvTokenizerClient,
-  }),
-  methods: ["POST"],
-  route: "users",
-});
-
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
     federationEntityMetadata: config.federationEntity,
@@ -132,7 +118,6 @@ app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceStatusFunction({
     jwtValidate: tokenValidate,
-    userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
@@ -145,7 +130,6 @@ app.http("setWalletInstanceStatus", {
   handler: SetWalletInstanceStatusFunction({
     credentialRepository: pidIssuerClient,
     jwtValidate: tokenValidate,
-    userRepository: pdvTokenizerClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
@@ -157,7 +141,6 @@ app.http("setCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: SetCurrentWalletInstanceStatusFunction({
     credentialRepository: pidIssuerClient,
-    userRepository: pdvTokenizerClient,
     walletInstanceRepository,
   }),
   methods: ["PUT"],

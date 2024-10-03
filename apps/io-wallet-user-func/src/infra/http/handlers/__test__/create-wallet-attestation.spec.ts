@@ -11,7 +11,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
@@ -64,7 +64,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
         id: "123" as NonEmptyString,
         isRevoked: false,
         signCount: 0,
-        userId: "123" as NonEmptyString,
+        userId: "AAA" as FiscalCode,
       }),
     ),
   getAllByUserId: () => TE.left(new Error("not implemented")),
@@ -193,7 +193,7 @@ describe("CreateWalletAttestationHandler", async () => {
             isRevoked: true,
             revokedAt: new Date(),
             signCount: 0,
-            userId: "123" as NonEmptyString,
+            userId: "AAA" as FiscalCode,
           }),
         ),
       getAllByUserId: () => TE.left(new Error("not implemented")),
