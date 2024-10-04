@@ -87,15 +87,10 @@ export const validateIssuance = (
 
   // Check that each certificate, except for the last, is issued by the subsequent one.
   if (x509Chain.length >= 2) {
-    x509Chain.forEach((subject, index) => {
+    x509Chain.forEach((cert, index) => {
       if (index < x509Chain.length - 1) {
-        const issuer = x509Chain[index + 1];
-        if (
-          !subject ||
-          !issuer ||
-          subject.checkIssued(issuer) === false ||
-          subject.verify(issuer.publicKey) === false
-        ) {
+        const parent = x509Chain[index + 1];
+        if (!cert || !parent || cert.verify(parent.publicKey) === false) {
           throw new AndroidAttestationError("Certificate chain is invalid", {
             x509Chain,
           });

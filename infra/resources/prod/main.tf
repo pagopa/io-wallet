@@ -85,6 +85,7 @@ module "function_apps" {
   resource_group_name = azurerm_resource_group.wallet.name
 
   cidr_subnet_user_func                = "10.20.0.0/24"
+  cidr_subnet_user_func_02             = "10.20.19.0/24"
   cidr_subnet_support_func             = "10.20.13.0/24"
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
@@ -105,7 +106,7 @@ module "function_apps" {
 
   user_func = local.user_func
 
-  nat_gateway_id_support_func = data.azurerm_nat_gateway.nat.id
+  nat_gateway_id = data.azurerm_nat_gateway.nat.id
 
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
