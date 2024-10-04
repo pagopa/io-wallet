@@ -54,6 +54,8 @@ const attestationServiceConfiguration = {
   skipSignatureValidation: true,
 };
 
+const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
+
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
   get: () =>
@@ -64,7 +66,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
         id: "123" as NonEmptyString,
         isRevoked: false,
         signCount: 0,
-        userId: "AAA" as FiscalCode,
+        userId: mockFiscalCode,
       }),
     ),
   getAllByUserId: () => TE.left(new Error("not implemented")),
@@ -188,7 +190,7 @@ describe("CreateWalletAttestationHandler", async () => {
             isRevoked: true,
             revokedAt: new Date(),
             signCount: 0,
-            userId: "AAA" as FiscalCode,
+            userId: mockFiscalCode,
           }),
         ),
       getAllByUserId: () => TE.left(new Error("not implemented")),
