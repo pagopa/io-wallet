@@ -43,7 +43,6 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     req,
     requireWalletInstanceRequest,
     RTE.fromEither,
-    RTE.map((x) => x),
     RTE.chainW((walletInstanceRequest) =>
       pipe(
         consumeNonce(walletInstanceRequest.challenge),
