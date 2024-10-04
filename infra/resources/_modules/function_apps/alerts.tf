@@ -1,7 +1,7 @@
 resource "azurerm_monitor_metric_alert" "function_app_user_response_time" {
-  name                = "[${module.function_app_user.function_app.function_app.name}] Slow Response Time"
+  name                = "[${module.function_app_user_02.function_app.function_app.name}] Slow Response Time"
   resource_group_name = var.resource_group_name
-  scopes              = [module.function_app_user.function_app.function_app.id]
+  scopes              = [module.function_app_user_02.function_app.function_app.id]
   description         = "Slow responses from the Function App. Beware: deployments may slow it down for some minutes. Always check in application insight."
   severity            = 1
   frequency           = "PT5M"

@@ -84,7 +84,6 @@ module "function_apps" {
   project             = local.project
   resource_group_name = azurerm_resource_group.wallet.name
 
-  cidr_subnet_user_func                = "10.20.0.0/24"
   cidr_subnet_user_func_02             = "10.20.19.0/24"
   cidr_subnet_support_func             = "10.20.13.0/24"
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
@@ -144,10 +143,6 @@ module "iam" {
   }
 
   function_app = {
-    user_func = {
-      principal_id         = module.function_apps.function_app_user.principal_id
-      staging_principal_id = module.function_apps.function_app_user.staging_principal_id
-    }
     user_func_02 = {
       principal_id         = module.function_apps.function_app_user_02.principal_id
       staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
