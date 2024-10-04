@@ -105,8 +105,6 @@ module "function_apps" {
 
   user_func = local.user_func
 
-  support_func = local.support_func
-
   nat_gateway_id_support_func = data.azurerm_nat_gateway.nat.id
 
   action_group_wallet_id = module.monitoring.action_group_wallet.id
