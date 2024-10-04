@@ -6,7 +6,6 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
-import { PdvTokenizerHealthCheck } from "io-wallet-common/infra/pdv-tokenizer/health-check";
 import { describe, expect, it } from "vitest";
 
 import { HealthHandler } from "../health";
@@ -20,14 +19,6 @@ describe("HealthHandler", () => {
   const cosmosClientThatFails = {
     getDatabaseAccount: () => Promise.reject(new Error("foo")),
   } as CosmosClient;
-
-  const pdvTokenizerClient: PdvTokenizerHealthCheck = {
-    healthCheck: () => TE.right(true),
-  };
-
-  const pdvTokenizerClientThatFails: PdvTokenizerHealthCheck = {
-    healthCheck: () => TE.left(new Error("pdv-tokenizer-error")),
-  };
 
   const trialSystemClient: TrialSystemHealthCheck = {
     featureFlag: "true",
@@ -58,7 +49,6 @@ describe("HealthHandler", () => {
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger,
-      pdvTokenizerClient,
       pidIssuerClient,
       trialSystemClient,
     });
@@ -83,7 +73,6 @@ describe("HealthHandler", () => {
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger,
-      pdvTokenizerClient,
       pidIssuerClient,
       trialSystemClient,
     });
@@ -104,42 +93,14 @@ describe("HealthHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getPdvTokenizerHealth returns an error", async () => {
-    const handler = HealthHandler({
-      cosmosClient,
-      input: H.request("https://wallet-provider.example.org"),
-      inputDecoder: H.HttpRequest,
-      logger,
-      pdvTokenizerClient: pdvTokenizerClientThatFails,
-      pidIssuerClient,
-      trialSystemClient,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: {
-        body: {
-          detail: "The function is not healthy. Error: pdv-tokenizer-error",
-          status: 500,
-          title: "Internal Server Error",
-        },
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      },
-    });
-  });
-
-  it("should return a 500 HTTP response when getCosmosHealth and getPdvTokenizerHealth return an error", async () => {
+  it("should return a 500 HTTP response when getCosmosHealth and getTrialSystemHealth return an error", async () => {
     const handler = HealthHandler({
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger,
-      pdvTokenizerClient: pdvTokenizerClientThatFails,
       pidIssuerClient,
-      trialSystemClient,
+      trialSystemClient: trialSystemClientThatFails,
     });
 
     const result = await handler();
@@ -163,7 +124,7 @@ describe("HealthHandler", () => {
       });
       expect(body).toEqual(
         expect.objectContaining({
-          detail: expect.stringContaining("pdv-tokenizer-error"),
+          detail: expect.stringContaining("trial-system-error"),
         }),
       );
     }
@@ -175,7 +136,6 @@ describe("HealthHandler", () => {
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger,
-      pdvTokenizerClient,
       pidIssuerClient,
       trialSystemClient: trialSystemClientThatFails,
     });
@@ -202,7 +162,6 @@ describe("HealthHandler", () => {
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger,
-      pdvTokenizerClient,
       pidIssuerClient: pidIssuerClientThatFails,
       trialSystemClient,
     });

@@ -6,7 +6,6 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { getUserByFiscalCode } from "io-wallet-common/user";
 
 import { WalletInstanceToApiModel } from "../encoders/wallet-instance";
 
@@ -27,8 +26,7 @@ export const GetCurrentWalletInstanceByFiscalCodeHandler = H.of(
       req,
       requireFiscalCode,
       RTE.fromEither,
-      RTE.chain(getUserByFiscalCode),
-      RTE.chainW(({ id }) => getCurrentWalletInstance(id)),
+      RTE.chain(getCurrentWalletInstance),
       RTE.map(WalletInstanceToApiModel.encode),
       RTE.map(H.successJson),
       RTE.orElseW(logErrorAndReturnResponse),

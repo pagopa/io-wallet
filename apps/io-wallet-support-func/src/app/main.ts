@@ -6,7 +6,6 @@ import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
-import { PdvTokenizerClient } from "io-wallet-common/infra/pdv-tokenizer/client";
 
 import { getConfigFromEnvironment } from "./config";
 
@@ -35,13 +34,10 @@ const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const pdvTokenizerClient = new PdvTokenizerClient(config.pdvTokenizer);
-
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
-    pdvTokenizerClient,
   }),
   methods: ["GET"],
   route: "health",
@@ -50,7 +46,6 @@ app.http("healthCheck", {
 app.http("getCurrentWalletInstanceByFiscalCode", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceByFiscalCodeFunction({
-    userRepository: pdvTokenizerClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],

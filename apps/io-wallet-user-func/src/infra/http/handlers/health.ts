@@ -17,31 +17,20 @@ import { identity, pipe } from "fp-ts/function";
 import { HealthCheckError } from "io-wallet-common/error";
 import { getCosmosHealth } from "io-wallet-common/infra/azure/cosmos/health-check";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import {
-  PdvTokenizerHealthCheck,
-  getPdvTokenizerHealth,
-} from "io-wallet-common/infra/pdv-tokenizer/health-check";
 
 const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
-    pdvTokenizerClient: PdvTokenizerHealthCheck;
     pidIssuerClient: PidIssuerHealthCheck;
     trialSystemClient: TrialSystemHealthCheck;
   },
   Error,
   void
-> = ({
-  cosmosClient,
-  pdvTokenizerClient,
-  pidIssuerClient,
-  trialSystemClient,
-}) =>
+> = ({ cosmosClient, pidIssuerClient, trialSystemClient }) =>
   // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
-      pipe({ pdvTokenizerClient }, getPdvTokenizerHealth),
       pipe({ trialSystemClient }, getTrialSystemHealth),
       pipe({ pidIssuerClient }, getPidIssuerHealth),
     ],

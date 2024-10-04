@@ -4,11 +4,10 @@ import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { UnauthorizedError } from "io-wallet-common/error";
-import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentWalletInstanceStatusHandler } from "../get-current-wallet-instance-status";
@@ -36,16 +35,10 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
           id: "123" as NonEmptyString,
           isRevoked: false,
           signCount: 0,
-          userId: "123" as NonEmptyString,
+          userId: "AAA" as FiscalCode,
         }),
       ),
     insert: () => TE.left(new Error("not implemented")),
-  };
-
-  const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
-    getOrCreateUserByFiscalCode: () =>
-      TE.right({ id: "pdv_id" as NonEmptyString }),
   };
 
   const jwtValidate: JwtValidate = () =>
@@ -73,7 +66,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -102,7 +94,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -134,7 +125,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -166,7 +156,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -203,7 +192,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -237,7 +225,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate: jwtValidateThatFails,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -277,7 +264,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository:
         userTrialSubscriptionRepositoryUnsubscribed,
       walletInstanceRepository,
@@ -313,7 +299,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -349,7 +334,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
@@ -381,7 +365,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate: jwtValidateThatFails,
       logger,
-      userRepository,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });

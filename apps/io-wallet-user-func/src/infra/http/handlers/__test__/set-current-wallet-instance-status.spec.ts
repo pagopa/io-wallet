@@ -7,7 +7,6 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { UserRepository } from "io-wallet-common/user";
 import { describe, expect, it } from "vitest";
 
 import { SetCurrentWalletInstanceStatusHandler } from "../set-current-wallet-instance-status";
@@ -30,19 +29,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
           id: "123" as NonEmptyString,
           isRevoked: false,
           signCount: 0,
-          userId: "123" as NonEmptyString,
+          userId: "AAA" as FiscalCode,
         }),
       ),
     insert: () => TE.left(new Error("not implemented")),
-  };
-
-  const userRepository: UserRepository = {
-    getFiscalCodeByUserId: () =>
-      TE.right({
-        fiscalCode: "AAAPPP94D55H501P" as FiscalCode,
-      }),
-    getOrCreateUserByFiscalCode: () =>
-      TE.right({ id: "pdv_id" as NonEmptyString }),
   };
 
   const pidIssuerClient: CredentialRepository = {
@@ -69,7 +59,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -95,7 +84,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository,
     });
 
@@ -120,33 +108,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      }),
-    });
-  });
-
-  it("should return a 500 HTTP response on getOrCreateUserByFiscalCode error", async () => {
-    const userRepositoryThatFailsOnGetUser: UserRepository = {
-      getFiscalCodeByUserId: () => TE.left(new Error("not implemented")),
-      getOrCreateUserByFiscalCode: () =>
-        TE.left(new Error("failed on getOrCreateUserByFiscalCode!")),
-    };
-    const handler = SetCurrentWalletInstanceStatusHandler({
-      credentialRepository: pidIssuerClient,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      userRepository: userRepositoryThatFailsOnGetUser,
       walletInstanceRepository,
     });
 
@@ -175,7 +136,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
@@ -205,7 +165,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      userRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
