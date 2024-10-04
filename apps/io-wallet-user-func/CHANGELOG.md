@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 1.2.3
+
+### Patch Changes
+
+- 795121e: Removed PDV service
+- Updated dependencies [795121e]
+  - io-wallet-common@1.0.4
+
 ## 1.2.2
 
 ### Patch Changes

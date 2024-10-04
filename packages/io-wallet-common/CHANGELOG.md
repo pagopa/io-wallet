@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.0.4
+
+### Patch Changes
+
+- 795121e: Removed PDV service
+
 ## 1.0.3
 
 ### Patch Changes
