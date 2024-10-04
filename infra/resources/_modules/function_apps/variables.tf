@@ -28,11 +28,6 @@ variable "resource_group_name" {
   description = "Name of the resource group where resources will be created"
 }
 
-variable "cidr_subnet_user_func" {
-  type        = string
-  description = "CIDR block for user function app subnet"
-}
-
 variable "cidr_subnet_user_func_02" {
   type        = string
   description = "CIDR block for user function app subnet 02"
