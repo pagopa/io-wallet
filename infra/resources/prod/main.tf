@@ -184,7 +184,7 @@ module "apim" {
 
   function_apps = {
     user_function = {
-      function_hostname = module.function_apps.function_app_user_2.default_hostname
+      function_hostname = module.function_apps.function_app_user.default_hostname
     }
     support_function = {
       function_hostname = module.function_apps.function_app_support.default_hostname
