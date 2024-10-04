@@ -32,33 +32,6 @@ module "function_app_user_02" {
   tags = var.tags
 }
 
-module "function_app_user_autoscaler" {
-  source = "github.com/pagopa/dx//infra/modules/azure_app_service_plan_autoscaler?ref=main"
-
-  resource_group_name = var.resource_group_name
-
-  target_service = {
-    function_app_name = module.function_app_user_02.function_app.function_app.name
-  }
-
-  scheduler = {
-    maximum = 30
-    normal_load = {
-      default = 5
-      minimum = 3
-    }
-  }
-
-  scale_metrics = {
-    cpu = {
-      upper_threshold = 50
-      increase_by     = 2
-    }
-  }
-
-  tags = var.tags
-}
-
 module "function_app_user_autoscaler_02" {
   source = "github.com/pagopa/dx//infra/modules/azure_app_service_plan_autoscaler?ref=main"
 

@@ -10,10 +10,6 @@ variable "cosmos_db" {
 
 variable "function_app" {
   type = object({
-    user_func = object({
-      principal_id         = string
-      staging_principal_id = string
-    })
     user_func_02 = object({
       principal_id         = string
       staging_principal_id = string
