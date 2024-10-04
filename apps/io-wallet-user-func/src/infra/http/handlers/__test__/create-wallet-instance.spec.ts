@@ -22,6 +22,7 @@ describe("CreateWalletInstanceHandler", () => {
 
   const walletInstanceRequest = {
     challenge,
+    fiscal_code: "AAACCC94E17H501P",
     hardware_key_tag: keyId,
     key_attestation: attestation,
   };
@@ -67,9 +68,6 @@ describe("CreateWalletInstanceHandler", () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -89,69 +87,11 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 400 HTTP response when x-iowallet-user-id header is missing", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: walletInstanceRequest,
-      method: "POST",
-    };
-    const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 400,
-      }),
-    });
-  });
-
-  it("should return a 422 HTTP response when x-iowallet-user-id header is an empty string", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: walletInstanceRequest,
-      headers: {
-        "x-iowallet-user-id": "",
-      },
-      method: "POST",
-    };
-    const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 422,
-      }),
-    });
-  });
-
   it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         foo: "foo",
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };
@@ -183,9 +123,6 @@ describe("CreateWalletInstanceHandler", () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -220,9 +157,6 @@ describe("CreateWalletInstanceHandler", () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -257,9 +191,6 @@ describe("CreateWalletInstanceHandler", () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -295,9 +226,6 @@ describe("CreateWalletInstanceHandler", () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({

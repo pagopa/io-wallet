@@ -9,7 +9,6 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { getUserByFiscalCode } from "io-wallet-common/user";
 
 import { requireWhitelistedFiscalCodeFromToken } from "../whitelisted-user";
 
@@ -43,12 +42,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
     RTE.chainFirstW(({ fiscalCode }) => revokeAllCredentials(fiscalCode)),
     // access our database to revoke the wallet instance
     RTE.chainW(({ fiscalCode, walletInstanceId }) =>
-      pipe(
-        getUserByFiscalCode(fiscalCode),
-        RTE.chainW(({ id }) =>
-          revokeUserWalletInstances(id, [walletInstanceId]),
-        ),
-      ),
+      revokeUserWalletInstances(fiscalCode, [walletInstanceId]),
     ),
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse),

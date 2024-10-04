@@ -75,11 +75,7 @@ locals {
       WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
       WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
       },
-      local.function_apps.common_app_settings,
-      {
-        for s in var.support_func.app_settings :
-        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.project}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
-      }
+      local.function_apps.common_app_settings
     )
   }
 
@@ -89,8 +85,6 @@ locals {
       CosmosDbDatabaseName   = var.cosmos_database_name
       CosmosDbRequestTimeout = "5000"
 
-      PdvTokenizerApiBaseURL     = "https://api.uat.tokenizer.pdv.pagopa.it"
-      PdvTokenizerTestUUID       = "c13b2aec-1597-4abd-a735-aacf2f935c93"
       PidIssuerApiRequestTimeout = "10000"
 
       HttpRequestTimeout = "5000"

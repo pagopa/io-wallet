@@ -11,7 +11,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
@@ -54,6 +54,8 @@ const attestationServiceConfiguration = {
   skipSignatureValidation: true,
 };
 
+const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
+
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
   get: () =>
@@ -64,7 +66,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
         id: "123" as NonEmptyString,
         isRevoked: false,
         signCount: 0,
-        userId: "123" as NonEmptyString,
+        userId: mockFiscalCode,
       }),
     ),
   getAllByUserId: () => TE.left(new Error("not implemented")),
@@ -102,10 +104,8 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };
@@ -154,9 +154,6 @@ describe("CreateWalletAttestationHandler", async () => {
         assertion: walletAttestationRequest,
         grant_type: "foo",
       },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
-      },
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
@@ -193,7 +190,7 @@ describe("CreateWalletAttestationHandler", async () => {
             isRevoked: true,
             revokedAt: new Date(),
             signCount: 0,
-            userId: "123" as NonEmptyString,
+            userId: mockFiscalCode,
           }),
         ),
       getAllByUserId: () => TE.left(new Error("not implemented")),
@@ -204,10 +201,8 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };
@@ -250,10 +245,8 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
-      },
-      headers: {
-        "x-iowallet-user-id": "x-iowallet-user-id",
       },
       method: "POST",
     };
