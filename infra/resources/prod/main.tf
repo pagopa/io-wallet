@@ -144,10 +144,6 @@ module "iam" {
   }
 
   function_app = {
-    user_func = {
-      principal_id         = module.function_apps.function_app_user.principal_id
-      staging_principal_id = module.function_apps.function_app_user.staging_principal_id
-    }
     user_func_02 = {
       principal_id         = module.function_apps.function_app_user_02.principal_id
       staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
@@ -188,7 +184,7 @@ module "apim" {
 
   function_apps = {
     user_function = {
-      function_hostname = module.function_apps.function_app_user.default_hostname
+      function_hostname = module.function_apps.function_app_user_2.default_hostname
     }
     support_function = {
       function_hostname = module.function_apps.function_app_support.default_hostname
