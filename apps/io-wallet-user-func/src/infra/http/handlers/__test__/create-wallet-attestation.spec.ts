@@ -25,6 +25,8 @@ import { federationEntityMetadata } from "./trust-anchor";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
+const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
+
 const nonceRepository: NonceRepository = {
   delete: () => TE.right(void 0),
   insert: () => TE.left(new Error("not implemented")),
@@ -36,7 +38,7 @@ const logger = {
 };
 
 const attestationServiceConfiguration = {
-  allowDevelopmentEnvironment: true,
+  allowedDeveloperUsers: [mockFiscalCode],
   androidBundleIdentifiers: [
     "org.reactjs.native.example.IoReactNativeIntegrityExample",
   ],
@@ -53,8 +55,6 @@ const attestationServiceConfiguration = {
   ],
   skipSignatureValidation: true,
 };
-
-const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
