@@ -61,3 +61,7 @@ export const ensureUserInWhitelist: (
   ),
   RTE.mapLeft(() => new ForbiddenError()),
 );
+
+// Load testing users have a dummy fiscal code that starts with: LVTEST00A00
+export const isLoadTestUser = (fiscalCode: FiscalCode) =>
+  fiscalCode.startsWith("LVTEST00A00");
