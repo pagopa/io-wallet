@@ -70,6 +70,9 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
               ),
         ),
         RTE.chainW(() => createWalletAttestation(assertion)),
+        RTE.map((attestation) =>
+          isLoadTestUser(fiscalCode) ? "" : attestation,
+        ),
       ),
     ),
     RTE.map((wallet_attestation) => ({ wallet_attestation })),
