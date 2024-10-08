@@ -69,10 +69,9 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
                 fiscalCode,
               ),
         ),
-        RTE.chainW(() =>
-          isLoadTestUser(fiscalCode)
-            ? RTE.right("")
-            : createWalletAttestation(assertion),
+        RTE.chainW(() => createWalletAttestation(assertion)),
+        RTE.map((attestation) =>
+          isLoadTestUser(fiscalCode) ? "" : attestation,
         ),
       ),
     ),
