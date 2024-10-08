@@ -4,6 +4,7 @@ import {
   ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
+  HARDWARE_PUBLIC_TEST_JWK,
   decodeBase64String,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
@@ -59,6 +60,7 @@ describe("CreateWalletInstanceHandler", () => {
     appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
     googleAppCredentialsEncoded: "",
     googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
+    hardwarePublicTestJwk: decodeBase64String(HARDWARE_PUBLIC_TEST_JWK),
     httpRequestTimeout: 0,
     iOsTeamIdentifier: "M2X5YQ4BJ7",
     iosBundleIdentifiers: [
