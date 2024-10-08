@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.2.6
+
+### Patch Changes
+
+- 7da8056: Increase security on test wallet attestation
+
 ## 1.2.5
 
 ### Patch Changes
