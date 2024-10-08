@@ -11,18 +11,21 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 
+const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
+
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
   const walletInstanceRequest = {
     challenge,
-    fiscal_code: "AAACCC94E17H501P",
+    fiscal_code: mockFiscalCode,
     hardware_key_tag: keyId,
     key_attestation: attestation,
   };
@@ -46,7 +49,7 @@ describe("CreateWalletInstanceHandler", () => {
   };
 
   const attestationServiceConfiguration = {
-    allowDevelopmentEnvironment: true,
+    allowedDeveloperUsers: [mockFiscalCode],
     androidBundleIdentifiers: [
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
     ],

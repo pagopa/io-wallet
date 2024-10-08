@@ -1,4 +1,4 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -7,6 +7,7 @@ import { NonceEnvironment, deleteNonce } from "./nonce";
 
 const WalletInstanceRequest = t.type({
   challenge: NonEmptyString,
+  fiscalCode: FiscalCode,
   hardwareKeyTag: NonEmptyString,
   keyAttestation: NonEmptyString,
 });
