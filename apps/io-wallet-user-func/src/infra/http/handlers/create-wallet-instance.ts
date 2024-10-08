@@ -14,8 +14,8 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
+import * as RE from "fp-ts/lib/ReaderEither";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { JwkPublicKey } from "io-wallet-common/jwk";
@@ -55,7 +55,11 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
         consumeNonce(walletInstanceRequest.challenge),
         RTE.chainW(() =>
           isLoadTestUser(walletInstanceRequest.fiscalCode)
-            ? skipAttestationValidation(walletInstanceRequest)
+            ? pipe(
+                walletInstanceRequest,
+                skipAttestationValidation,
+                RTE.fromReaderEither,
+              )
             : validateAttestation(walletInstanceRequest),
         ),
         RTE.bind("walletInstance", ({ deviceDetails, hardwareKey }) =>
@@ -89,7 +93,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
 
 const skipAttestationValidation: (
   walletInstanceRequest: WalletInstanceRequest,
-) => RTE.ReaderTaskEither<
+) => RE.ReaderEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
   ValidatedAttestation
@@ -103,8 +107,7 @@ const skipAttestationValidation: (
       ),
       JwkPublicKey.decode,
       E.mapLeft(() => new Error("Invalid test hardware public key")),
-      TE.fromEither,
-      TE.map((hardwareKey) => ({
+      E.map((hardwareKey) => ({
         createdAt: new Date(),
         deviceDetails: {
           platform: "ios",
