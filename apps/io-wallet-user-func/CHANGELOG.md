@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.2.5
+
+### Patch Changes
+
+- 940b7cc: Fix bug
+
 ## 1.2.4
 
 ### Patch Changes
