@@ -66,6 +66,7 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
                 assertion,
                 walletInstance.hardwareKey,
                 walletInstance.signCount,
+                fiscalCode,
               ),
         ),
         RTE.chainW(() => createWalletAttestation(assertion)),

@@ -1,4 +1,4 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
@@ -27,6 +27,7 @@ export interface ValidateAssertionRequest {
   jwk: JwkPublicKey;
   nonce: NonEmptyString;
   signCount: number;
+  user: FiscalCode;
 }
 
 export interface AttestationService {
@@ -37,6 +38,7 @@ export interface AttestationService {
     attestation: NonEmptyString,
     nonce: NonEmptyString,
     hardwareKeyTag: NonEmptyString,
+    user: FiscalCode,
   ) => TE.TaskEither<Error, ValidatedAttestation>;
 }
 
@@ -56,6 +58,7 @@ export const validateAttestation: (
           walletInstanceRequest.keyAttestation,
           walletInstanceRequest.challenge,
           walletInstanceRequest.hardwareKeyTag,
+          walletInstanceRequest.fiscalCode,
         ),
     );
 
@@ -63,12 +66,13 @@ export const validateAssertion: (
   walletAttestationRequest: WalletAttestationRequest,
   hardwareKey: JwkPublicKey,
   signCount: number,
+  user: FiscalCode,
 ) => RTE.ReaderTaskEither<
   { attestationServiceConfiguration: AttestationServiceConfiguration },
   Error,
   void
 > =
-  (walletAttestationRequest, hardwareKey, signCount) =>
+  (walletAttestationRequest, hardwareKey, signCount, user) =>
   ({ attestationServiceConfiguration }) =>
     pipe(
       new MobileAttestationService(attestationServiceConfiguration),
@@ -82,5 +86,6 @@ export const validateAssertion: (
           jwk: walletAttestationRequest.payload.cnf.jwk,
           nonce: walletAttestationRequest.payload.challenge,
           signCount,
+          user,
         }),
     );
