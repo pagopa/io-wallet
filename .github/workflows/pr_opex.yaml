@@ -16,6 +16,7 @@ on:
       - "apps/io-wallet-user-func/openapi.yaml"
       - ".github/workflows/pr_opex.yaml"
       - ".github/workflows/release_opex.yaml"
+  push:
 
 concurrency:
   group: ${{ github.workflow }}
