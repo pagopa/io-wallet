@@ -4,7 +4,7 @@ import {
   ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
-  HARDWARE_PUBLIC_TEST_JWK,
+  HARDWARE_PUBLIC_TEST_KEY,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -49,7 +49,7 @@ const attestationServiceConfiguration = {
   appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
   googleAppCredentialsEncoded: "",
   googlePublicKey: GOOGLE_PUBLIC_KEY,
-  hardwarePublicTestJwk: HARDWARE_PUBLIC_TEST_JWK,
+  hardwarePublicTestKey: HARDWARE_PUBLIC_TEST_KEY,
   httpRequestTimeout: 0,
   iOsTeamIdentifier: "M2X5YQ4BJ7",
   iosBundleIdentifiers: [
