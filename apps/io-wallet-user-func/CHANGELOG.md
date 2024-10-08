@@ -1,5 +1,12 @@
 # io-wallet-user-func
 
+## 1.2.4
+
+### Patch Changes
+
+- a905214: Add allowedDeveloperUsers
+- 9b858ab: Add load test integration
+
 ## 1.2.3
 
 ### Patch Changes
