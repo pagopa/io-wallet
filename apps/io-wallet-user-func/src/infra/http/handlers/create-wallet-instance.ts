@@ -12,7 +12,7 @@ import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
-import { flow, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -97,17 +97,13 @@ const skipAttestationValidation: (
   (walletInstanceRequest) =>
   ({ attestationServiceConfiguration }) =>
     pipe(
-      TE.tryCatch(
+      E.tryCatch(
         () => JSON.parse(attestationServiceConfiguration.hardwarePublicTestJwk),
         E.toError,
       ),
-      TE.chain(
-        flow(
-          JwkPublicKey.decode,
-          E.mapLeft(() => new Error("Invalid test hardware public key")),
-          TE.fromEither,
-        ),
-      ),
+      JwkPublicKey.decode,
+      E.mapLeft(() => new Error("Invalid test hardware public key")),
+      TE.fromEither,
       TE.map((hardwareKey) => ({
         createdAt: new Date(),
         deviceDetails: {
