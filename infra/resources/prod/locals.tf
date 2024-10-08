@@ -51,6 +51,10 @@ locals {
       {
         name                  = "PidIssuerApiClientPrivateKey"
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
+      },
+      {
+        name                  = "AllowedDeveloperUsers"
+        key_vault_secret_name = "AllowedDeveloperUsers"
       }
     ]
   }

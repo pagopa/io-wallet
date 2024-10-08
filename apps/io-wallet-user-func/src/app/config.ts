@@ -50,7 +50,7 @@ export const CryptoConfiguration = t.type({
 export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
-  allowDevelopmentEnvironment: t.boolean,
+  allowedDeveloperUsers: t.array(t.string),
   androidBundleIdentifiers: t.array(t.string),
   androidCrlUrl: t.string,
   androidPlayIntegrityUrl: t.string,
@@ -176,10 +176,12 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   Omit<AttestationServiceConfiguration, "httpRequestTimeout">
 > = pipe(
   sequenceS(RE.Apply)({
-    allowDevelopmentEnvironment: pipe(
-      readFromEnvironment("AllowDevelopmentEnvironment"),
-      RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false)),
+    allowedDeveloperUsers: pipe(
+      readFromEnvironment("AllowedDeveloperUsers"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(
+        (): RE.ReaderEither<NodeJS.ProcessEnv, Error, string[]> => RE.right([]),
+      ),
     ),
     androidBundleIdentifiers: pipe(
       readFromEnvironment("AndroidBundleIdentifiers"),
