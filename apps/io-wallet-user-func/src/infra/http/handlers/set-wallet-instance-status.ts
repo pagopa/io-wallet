@@ -61,7 +61,6 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
         ),
       ),
     ),
-
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
