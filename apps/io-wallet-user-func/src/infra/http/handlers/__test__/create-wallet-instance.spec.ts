@@ -11,6 +11,7 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
@@ -64,6 +65,10 @@ describe("CreateWalletInstanceHandler", () => {
     skipSignatureValidation: false,
   };
 
+  const telemetryClient: appInsights.TelemetryClient = {
+    trackException: () => void 0,
+  } as unknown as appInsights.TelemetryClient;
+
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -76,6 +81,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -101,6 +107,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -131,6 +138,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -165,6 +173,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -199,6 +208,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetAllByUserId,
     });
@@ -234,6 +244,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 

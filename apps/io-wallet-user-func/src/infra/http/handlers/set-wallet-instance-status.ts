@@ -8,6 +8,7 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
+import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { requireWhitelistedFiscalCodeFromToken } from "../whitelisted-user";
@@ -33,17 +34,34 @@ const requireSetWalletInstanceStatusBody: (
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(RTE.ApplyPar)({
-      body: pipe(req, requireSetWalletInstanceStatusBody, RTE.fromEither),
-      fiscalCode: pipe(req, requireWhitelistedFiscalCodeFromToken),
-      walletInstanceId: pipe(req, requireWalletInstanceId, RTE.fromEither),
-    }),
-    // invoke PID issuer services to revoke all credentials for that user
-    RTE.chainFirstW(({ fiscalCode }) => revokeAllCredentials(fiscalCode)),
-    // access our database to revoke the wallet instance
-    RTE.chainW(({ fiscalCode, walletInstanceId }) =>
-      revokeUserWalletInstances(fiscalCode, [walletInstanceId]),
+    req,
+    requireWhitelistedFiscalCodeFromToken,
+    RTE.chainW((fiscalCode) =>
+      pipe(
+        sequenceS(E.Apply)({
+          body: pipe(req, requireSetWalletInstanceStatusBody),
+          walletInstanceId: pipe(req, requireWalletInstanceId),
+        }),
+        RTE.fromEither,
+        // invoke PID issuer services to revoke all credentials for that user
+        RTE.chainFirstW(() => revokeAllCredentials(fiscalCode)),
+        // access our database to revoke the wallet instance
+        RTE.chainW(({ walletInstanceId }) =>
+          revokeUserWalletInstances(fiscalCode, [walletInstanceId]),
+        ),
+        RTE.orElseFirstW((error) =>
+          pipe(
+            sendTelemetryException(error, {
+              fiscalCode,
+              pathParameter: req.path,
+              payload: req.body,
+            }),
+            RTE.fromReader,
+          ),
+        ),
+      ),
     ),
+
     RTE.map(() => H.empty),
     RTE.orElseW(logErrorAndReturnResponse),
   ),

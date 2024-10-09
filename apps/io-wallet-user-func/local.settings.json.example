@@ -44,6 +44,7 @@
     "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED",
     "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
     "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
-    "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION"
+    "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING"
   }
 }

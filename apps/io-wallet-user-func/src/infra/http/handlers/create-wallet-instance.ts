@@ -1,4 +1,5 @@
 import { validateAttestation } from "@/attestation-service";
+import { logException } from "@/telemetry";
 import {
   insertWalletInstance,
   revokeUserValidWalletInstancesExceptOne,
@@ -72,6 +73,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       ),
     ),
     RTE.map(() => H.empty),
+    RTE.orElseFirstW((error) => logException(error, req.body)),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );

@@ -1,4 +1,5 @@
 import { revokeAllCredentials } from "@/credential";
+import { logException } from "@/telemetry";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import {
   WalletInstanceEnvironment,
@@ -52,6 +53,7 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       // revoke the wallet instance in the database
       RTE.chainW(revokeCurrentUserWalletInstance),
       RTE.map(() => H.empty),
+      RTE.orElseFirstW((error) => logException(error, req.body)),
       RTE.orElseW(logErrorAndReturnResponse),
     ),
 );

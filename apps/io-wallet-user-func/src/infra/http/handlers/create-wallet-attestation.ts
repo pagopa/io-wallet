@@ -1,4 +1,5 @@
 import { validateAssertion } from "@/attestation-service";
+import { logException } from "@/telemetry";
 import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
 import { getValidWalletInstance } from "@/wallet-instance";
@@ -70,6 +71,7 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
     ),
     RTE.map((wallet_attestation) => ({ wallet_attestation })),
     RTE.map(H.successJson),
+    RTE.orElseFirstW((error) => logException(error, req.body)),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );

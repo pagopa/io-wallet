@@ -19,6 +19,7 @@
     "@azure/identity": "^4.4.1",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^13.1.1",
+    "applicationinsights": "^3.3.0",
     "io-wallet-common": "workspace:^"
   },
   "devDependencies": {
