@@ -1,0 +1,145 @@
+name: PR - Opex Dashboard
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+    branches:
+      - master
+    paths:
+      - "apps/io-wallet-user-func/.opex/**"
+      - "apps/io-wallet-user-func/openapi.yaml"
+      - ".github/workflows/pr_opex.yaml"
+      - ".github/workflows/release_opex.yaml"
+
+concurrency:
+  group: wallet-opex
+  cancel-in-progress: false
+
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_USE_OIDC: true
+  DOCKER_IMAGE_TAG: sha256:04d8ead53c772d23b094c2a395292dc159e6f2905e1b13b5f828f31eac6eb27f
+  TEMPLATE_DIR: azure-dashboard
+  APP_NAME: io-wallet-user-func
+  API_NAME: management
+
+jobs:
+  tf_plan:
+    runs-on: ubuntu-22.04
+    name: Terraform Plan
+    environment: opex-prod-ci
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+
+    steps:
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        name: Checkout
+
+      - name: Azure Login
+        uses: azure/login@v2 # v2.0.0
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Set Terraform Version
+        id: set-terraform-version
+        run: |
+          set -eu
+          terraform_version=$(cat .terraform-version)
+          printf "terraform_version=$terraform_version" >> "$GITHUB_OUTPUT"
+
+      - name: Create Terraform Environment for Opex
+        shell: bash
+        run: |
+          docker run \
+            --workdir /github/workspace --rm \
+            -v $(pwd):"/github/workspace" \
+            ghcr.io/pagopa/opex-dashboard-azure-action@${{ env.DOCKER_IMAGE_TAG }} ${{ env.TEMPLATE_DIR }} apps/${{ env.APP_NAME }}/.opex/${{ env.API_NAME }}/env/prod/config.yaml
+
+      - name: Copy Environments
+        shell: bash
+        id: opex_copy
+        run: |
+          cp -R apps/${{ env.APP_NAME }}/.opex/${{ env.API_NAME }}/env ./${{ env.TEMPLATE_DIR }}
+
+      - name: Setup Terraform
+        id: terraform_setup
+        uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36 # v3.0.0
+        with:
+          terraform_version: ${{ steps.set-terraform-version.outputs.terraform_version }}
+
+      - name: Terraform Plan
+        shell: bash
+        id: plan
+        working-directory: ${{ env.TEMPLATE_DIR }}
+        run: |
+          bash ./terraform.sh plan prod -no-color 2>&1 | grep -v "hidden-link:"  | tee plan_output.txt
+
+          OUTPUT=$(grep -Ev "Refreshing state|state lock|Reading|Read" plan_output.txt | tail -c 60000)
+
+          printf "%s" "$OUTPUT" > plan_output_multiline.txt
+
+          if grep -q "::error::Terraform exited with code" plan_output.txt; then
+            echo "failed"
+            exit 1
+          fi
+
+      - name: Post Plan on PR
+        id: comment
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        if: always() && github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('${{ env.TEMPLATE_DIR }}/plan_output_multiline.txt', 'utf8');
+            const status = '${{ steps.plan.outcome }}'
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes(`Terraform Plan ('Opex')`)
+            })
+            const commentBody = `#### 📖 Terraform Plan ('${{ env.TEMPLATE_DIR }}') - ${status}
+            <details>
+            <summary>Terraform Plan</summary>
+
+            \`\`\`hcl
+            ${output}
+            \`\`\`
+
+            </details>
+            `;
+            if (botComment) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id
+              })
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody,
+              issue_number: context.issue.number
+            })
+
+      - name: Check Terraform Plan Result
+        if: always() && steps.plan.outcome != 'success'
+        run: |
+          exit 1
