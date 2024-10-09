@@ -1,4 +1,5 @@
 import { validateAssertion } from "@/attestation-service";
+import { isLoadTestUser } from "@/user";
 import { logException } from "@/telemetry";
 import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
@@ -60,13 +61,19 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
           ),
         ),
         RTE.chainW((walletInstance) =>
-          validateAssertion(
-            assertion,
-            walletInstance.hardwareKey,
-            walletInstance.signCount,
-          ),
+          isLoadTestUser(fiscalCode)
+            ? RTE.right(undefined)
+            : validateAssertion(
+                assertion,
+                walletInstance.hardwareKey,
+                walletInstance.signCount,
+                fiscalCode,
+              ),
         ),
         RTE.chainW(() => createWalletAttestation(assertion)),
+        RTE.map((attestation) =>
+          isLoadTestUser(fiscalCode) ? "" : attestation,
+        ),
       ),
     ),
     RTE.map((wallet_attestation) => ({ wallet_attestation })),

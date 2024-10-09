@@ -4,6 +4,7 @@ import {
   ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
+  HARDWARE_PUBLIC_TEST_KEY,
   decodeBase64String,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
@@ -11,6 +12,7 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
@@ -18,12 +20,14 @@ import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 
+const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
+
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
   const walletInstanceRequest = {
     challenge,
-    fiscal_code: "AAACCC94E17H501P",
+    fiscal_code: mockFiscalCode,
     hardware_key_tag: keyId,
     key_attestation: attestation,
   };
@@ -47,7 +51,7 @@ describe("CreateWalletInstanceHandler", () => {
   };
 
   const attestationServiceConfiguration = {
-    allowDevelopmentEnvironment: true,
+    allowedDeveloperUsers: [mockFiscalCode],
     androidBundleIdentifiers: [
       "org.reactjs.native.example.IoReactNativeIntegrityExample",
     ],
@@ -57,6 +61,7 @@ describe("CreateWalletInstanceHandler", () => {
     appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
     googleAppCredentialsEncoded: "",
     googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
+    hardwarePublicTestKey: decodeBase64String(HARDWARE_PUBLIC_TEST_KEY),
     httpRequestTimeout: 0,
     iOsTeamIdentifier: "M2X5YQ4BJ7",
     iosBundleIdentifiers: [

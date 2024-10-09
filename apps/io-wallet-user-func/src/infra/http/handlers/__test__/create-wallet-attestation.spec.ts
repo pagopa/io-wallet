@@ -4,6 +4,7 @@ import {
   ANDROID_PLAY_INTEGRITY_URL,
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
+  HARDWARE_PUBLIC_TEST_KEY,
 } from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -26,6 +27,8 @@ import { federationEntityMetadata } from "./trust-anchor";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
+const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
+
 const nonceRepository: NonceRepository = {
   delete: () => TE.right(void 0),
   insert: () => TE.left(new Error("not implemented")),
@@ -37,7 +40,7 @@ const logger = {
 };
 
 const attestationServiceConfiguration = {
-  allowDevelopmentEnvironment: true,
+  allowedDeveloperUsers: [mockFiscalCode],
   androidBundleIdentifiers: [
     "org.reactjs.native.example.IoReactNativeIntegrityExample",
   ],
@@ -47,6 +50,7 @@ const attestationServiceConfiguration = {
   appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
   googleAppCredentialsEncoded: "",
   googlePublicKey: GOOGLE_PUBLIC_KEY,
+  hardwarePublicTestKey: HARDWARE_PUBLIC_TEST_KEY,
   httpRequestTimeout: 0,
   iOsTeamIdentifier: "M2X5YQ4BJ7",
   iosBundleIdentifiers: [
@@ -54,8 +58,6 @@ const attestationServiceConfiguration = {
   ],
   skipSignatureValidation: true,
 };
-
-const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),

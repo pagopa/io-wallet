@@ -5,9 +5,10 @@ import {
   ValidatedAttestation,
 } from "@/attestation-service";
 import { ValidationError } from "@pagopa/handler-kit";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
+import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
@@ -43,6 +44,13 @@ const getErrorsOrFirstValidValue = (
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
 
+  allowDevelopmentEnvironmentForUser = (user: FiscalCode) =>
+    pipe(
+      this.#configuration.allowedDeveloperUsers,
+      RA.findFirst((allowedUser) => allowedUser === user),
+      O.isSome,
+    );
+
   validateAssertion = ({
     hardwareKey,
     hardwareSignature,
@@ -50,6 +58,7 @@ export class MobileAttestationService implements AttestationService {
     jwk,
     nonce,
     signCount,
+    user,
   }: ValidateAssertionRequest) =>
     pipe(
       TE.tryCatch(() => calculateJwkThumbprint(jwk, "sha256"), E.toError),
@@ -85,7 +94,7 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.androidPlayStoreCertificateHash,
               this.#configuration.googleAppCredentialsEncoded,
               this.#configuration.androidPlayIntegrityUrl,
-              this.#configuration.allowDevelopmentEnvironment,
+              this.allowDevelopmentEnvironmentForUser(user),
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),
@@ -98,6 +107,7 @@ export class MobileAttestationService implements AttestationService {
     attestation: NonEmptyString,
     nonce: NonEmptyString,
     hardwareKeyTag: NonEmptyString,
+    user: FiscalCode,
   ): TE.TaskEither<Error, ValidatedAttestation> =>
     pipe(
       E.tryCatch(
@@ -115,7 +125,7 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.iosBundleIdentifiers,
               this.#configuration.iOsTeamIdentifier,
               this.#configuration.appleRootCertificate,
-              this.#configuration.allowDevelopmentEnvironment,
+              this.allowDevelopmentEnvironmentForUser(user),
             ),
             validateAndroidAttestation(
               data,
