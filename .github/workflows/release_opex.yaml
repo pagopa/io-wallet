@@ -4,8 +4,12 @@ on:
   workflow_dispatch:
 
   push:
-    # branches:
-    #   - main
+    branches:
+      - main
+    paths:
+      - "apps/io-wallet-user-func/.opex/**"
+      - "apps/io-wallet-user-func/openapi.yaml"
+      - ".github/workflows/release_opex.yaml"
 
 concurrency:
   group: wallet-opex
