@@ -36,7 +36,7 @@ jobs:
     name: Terraform Plan
     environment: opex-prod-ci
     permissions:
-      pull-requests: read
+      pull-requests: write
       id-token: write
       contents: read
     env:
