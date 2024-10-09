@@ -10,7 +10,7 @@ on:
       - synchronize
       - reopened
     branches:
-      - main
+      - master
     paths:
       - "apps/io-wallet-user-func/.opex/**"
       - "apps/io-wallet-user-func/openapi.yaml"
