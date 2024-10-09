@@ -16,7 +16,7 @@ const getFiscalCode: (input: unknown) => FiscalCode | undefined = (body) =>
 
 // it sends an exception to the Application Insights logs
 // if the fiscal code is available, it is sent along with the request data
-export const logException = (error: Error, payload: unknown) =>
+export const sendExceptionToAppInsights = (error: Error, payload: unknown) =>
   pipe(
     payload,
     getFiscalCode,
