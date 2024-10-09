@@ -19,7 +19,7 @@ on:
   push:
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: wallet-opex
   cancel-in-progress: false
 
 env:
@@ -62,19 +62,8 @@ jobs:
           terraform_version=$(cat .terraform-version)
           printf "terraform_version=$terraform_version" >> "$GITHUB_OUTPUT"
 
-      # - uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36 # v3.0.0
-      #   name: Setup Terraform
-      #   with:
-      #     terraform_version: ${{ steps.set-terraform-version.outputs.terraform_version }}
-
-      # - name: Terraform Init
-      #   working-directory: ${{ steps.directory.outputs.dir }}
-      #   run: |
-      #     terraform init
-
-      - name: Plan Opex Dashbaord
+      - name: Create Terraform Environment for Opex
         shell: bash
-        id: opex_docker
         run: |
           docker run \
             --workdir /github/workspace --rm \
@@ -98,8 +87,47 @@ jobs:
         id: terraform_plan
         working-directory: ${{ env.TEMPLATE_DIR }}
         run: |
-          bash ./terraform.sh plan prod
+          bash ./terraform.sh plan prod -no-color | tee plan_output.txt
+          OUTPUT="$(cat plan_output.txt | grep -v "Refreshing state" | tail -c 60000)"
+          echo "$OUTPUT" > plan_output_multiline.txt
 
-          # bash ./terraform.sh plan prod -no-color | tee plan_output.txt
-          # OUTPUT="$(cat plan_output.txt | grep -v "Refreshing state" | tail -c 60000)"
-          # echo "$OUTPUT" > plan_output_multiline.txt
+      - name: Post Plan on PR
+        id: terraform_plan_comment
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('${{ env.TEMPLATE_DIR }}/plan_output_multiline.txt', 'utf8');
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('Terraform Plan')
+            })
+            const commentBody = `#### Terraform Plan 📖
+            <details>
+            <summary>Terraform Plan for '${{ env.API_NAME }}'</summary>
+
+            \`\`\`hcl
+            ${output}
+            \`\`\`
+            </details>
+            `;
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody,
+                comment_id: botComment.id
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody,
+                issue_number: context.issue.number
+              })
+            }
