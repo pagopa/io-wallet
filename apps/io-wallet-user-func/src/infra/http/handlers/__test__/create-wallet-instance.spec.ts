@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import {
   ANDROID_CRL_URL,
   ANDROID_PLAY_INTEGRITY_URL,
@@ -13,7 +15,6 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";

@@ -1,11 +1,12 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import { JwtValidate } from "@/jwt-validator";
 import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { UnauthorizedError } from "io-wallet-common/error";

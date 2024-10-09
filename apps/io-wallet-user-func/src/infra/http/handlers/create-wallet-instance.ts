@@ -3,8 +3,8 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
-import { isLoadTestUser } from "@/user";
 import { logException } from "@/telemetry";
+import { isLoadTestUser } from "@/user";
 import {
   insertWalletInstance,
   revokeUserValidWalletInstancesExceptOne,

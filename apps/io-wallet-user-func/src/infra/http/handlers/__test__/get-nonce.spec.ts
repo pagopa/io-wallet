@@ -1,7 +1,8 @@
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import { NonceRepository, generateNonce } from "@/nonce";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import * as appInsights from "applicationinsights";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";

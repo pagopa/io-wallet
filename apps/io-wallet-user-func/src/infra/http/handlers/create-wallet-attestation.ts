@@ -1,6 +1,6 @@
 import { validateAssertion } from "@/attestation-service";
-import { isLoadTestUser } from "@/user";
 import { logException } from "@/telemetry";
+import { isLoadTestUser } from "@/user";
 import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
 import { getValidWalletInstance } from "@/wallet-instance";
