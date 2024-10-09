@@ -123,7 +123,8 @@ module "opex_federated_identities" {
         ],
         terraform-state-rg = [
           "Storage Blob Data Reader",
-          "Reader and Data Access"
+          "Reader and Data Access",
+          "PagoPA IaC Reader",
         ]
       }
     }
