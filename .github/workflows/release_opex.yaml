@@ -1,0 +1,55 @@
+name: Release - Opex Dashboard
+
+on:
+  workflow_dispatch:
+
+  push:
+    # branches:
+    #   - main
+
+concurrency:
+  group: wallet-opex
+  cancel-in-progress: false
+
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_USE_OIDC: true
+  DOCKER_IMAGE_TAG: sha256:04d8ead53c772d23b094c2a395292dc159e6f2905e1b13b5f828f31eac6eb27f
+  TEMPLATE_DIR: azure-dashboard
+  APP_NAME: io-wallet-user-func
+  API_NAME: management
+
+jobs:
+  tf_apply:
+    runs-on: ubuntu-22.04
+    name: Terraform Apply
+    environment: opex-prod-cd
+    permissions:
+      id-token: write
+      contents: read
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+
+    steps:
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        name: Checkout
+
+      # mitigation: opex-dashboard-azure-action currently does not support .opex
+      # directory parameter
+      - run: |
+          cp -r apps/${{ env.APP_NAME }}/.opex ./
+        name: Update Path
+        shell: bash
+
+      - uses: pagopa/opex-dashboard-azure-action@3ad80a5e4a2d5a8f342615637072f21b687320ce # action v1.2.1
+        name: Apply Opex
+        with:
+          environment: prod
+          api-name: ${{ env.API_NAME }}
+          config: .opex/${{ env.API_NAME }}/env/prod/config.yaml
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+          docker-version: ${{ env.DOCKER_IMAGE_TAG }}
