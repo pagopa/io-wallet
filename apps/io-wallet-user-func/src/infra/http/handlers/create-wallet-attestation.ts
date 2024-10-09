@@ -1,5 +1,5 @@
 import { validateAssertion } from "@/attestation-service";
-import { sendExceptionToAppInsights } from "@/telemetry";
+import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
@@ -78,7 +78,9 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
     ),
     RTE.map((wallet_attestation) => ({ wallet_attestation })),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) => sendExceptionToAppInsights(error, req.body)),
+    RTE.orElseFirstW((error) =>
+      sendExceptionWithBodyToAppInsights(error, req.body),
+    ),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );

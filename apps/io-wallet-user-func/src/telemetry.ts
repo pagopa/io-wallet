@@ -5,24 +5,27 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 
-const getFiscalCode: (input: unknown) => FiscalCode | undefined = (body) =>
+const getFiscalCode: (input: unknown) => FiscalCode | undefined = (input) =>
   pipe(
-    t.type({ fiscal_code: FiscalCode }).decode(body),
+    t.type({ fiscal_code: FiscalCode }).decode(input),
     E.fold(
       () => undefined,
       (decoded) => decoded.fiscal_code,
     ),
   );
 
-// it sends an exception to the Application Insights logs
-// if the fiscal_code is present in the body, it's sent separately for better query on logs
-export const sendExceptionToAppInsights = (error: Error, payload: unknown) =>
+// it sends an exception to the Application Insights logs along with the request body
+// if the fiscal_code is present in the body, it is sent separately for better query on logs
+export const sendExceptionWithBodyToAppInsights = (
+  error: Error,
+  body: unknown,
+) =>
   pipe(
-    payload,
+    body,
     getFiscalCode,
     (fiscalCode) =>
       fiscalCode
-        ? sendTelemetryException(error, { fiscalCode, payload })
-        : sendTelemetryException(error, { payload }),
+        ? sendTelemetryException(error, { fiscalCode, body })
+        : sendTelemetryException(error, { body }),
     RTE.fromReader,
   );
