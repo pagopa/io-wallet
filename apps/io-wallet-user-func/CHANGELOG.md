@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.2.7
+
+### Patch Changes
+
+- 8125ecf: Fix test attestation
+
 ## 1.2.6
 
 ### Patch Changes
