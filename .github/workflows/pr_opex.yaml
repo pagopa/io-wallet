@@ -113,8 +113,8 @@ jobs:
             })
             const botComment = comments.find(comment => {
               return comment.user.type === 'Bot' && comment.body.includes(`Terraform Plan ('Opex')`)
-            }))
-            const commentBody = `#### 📖 Terraform Plan ('${{ steps.directory.outputs.dir }}') - ${status
+            })
+            const commentBody = `#### 📖 Terraform Plan ('${{ env.TEMPLATE_DIR }}') - ${status}
             <details>
             <summary>Terraform Plan</summary>
 
