@@ -83,50 +83,63 @@ jobs:
 
       - name: Terraform Plan
         shell: bash
-        id: terraform_plan
+        id: plan
         working-directory: ${{ env.TEMPLATE_DIR }}
         run: |
-          bash ./terraform.sh plan prod -no-color | tee plan_output.txt
-          OUTPUT="$(cat plan_output.txt | grep -v "Refreshing state" | tail -c 60000)"
-          echo "$OUTPUT" > plan_output_multiline.txt
+          bash ./terraform.sh plan prod -no-color 2>&1 | grep -v "hidden-link:"  | tee plan_output.txt
+
+          OUTPUT=$(grep -Ev "Refreshing state|state lock|Reading|Read" plan_output.txt | tail -c 60000)
+
+          printf "%s" "$OUTPUT" > plan_output_multiline.txt
+
+          if grep -q "::error::Terraform exited with code" plan_output.txt; then
+            echo "failed"
+            exit 1
+          fi
 
       - name: Post Plan on PR
-        id: terraform_plan_comment
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6.4.1
-        if: github.event_name == 'pull_request'
+        id: comment
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        if: always() && github.event_name == 'pull_request'
         with:
           script: |
             const fs = require('fs');
             const output = fs.readFileSync('${{ env.TEMPLATE_DIR }}/plan_output_multiline.txt', 'utf8');
+            const status = '${{ steps.plan.outcome }}'
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number
             })
             const botComment = comments.find(comment => {
-              return comment.user.type === 'Bot' && comment.body.includes('Terraform Plan')
-            })
-            const commentBody = `#### Terraform Plan 📖
+              return comment.user.type === 'Bot' && comment.body.includes(`Terraform Plan ('Opex')`)
+            }))
+            const commentBody = `#### 📖 Terraform Plan ('${{ steps.directory.outputs.dir }}') - ${status
             <details>
-            <summary>Terraform Plan for '${{ env.API_NAME }}'</summary>
+            <summary>Terraform Plan</summary>
 
             \`\`\`hcl
             ${output}
             \`\`\`
+
             </details>
             `;
             if (botComment) {
-              await github.rest.issues.updateComment({
+              await github.rest.issues.deleteComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: commentBody,
                 comment_id: botComment.id
               })
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: commentBody,
-                issue_number: context.issue.number
-              })
             }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody,
+              issue_number: context.issue.number
+            })
+
+      - name: Check Terraform Plan Result
+        if: always() && steps.plan.outcome != 'success'
+        run: |
+          exit 1
