@@ -25,7 +25,7 @@ export const sendExceptionWithBodyToAppInsights = (
     getFiscalCode,
     (fiscalCode) =>
       fiscalCode
-        ? sendTelemetryException(error, { fiscalCode, body })
+        ? sendTelemetryException(error, { body, fiscalCode })
         : sendTelemetryException(error, { body }),
     RTE.fromReader,
   );
