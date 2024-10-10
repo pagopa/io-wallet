@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
@@ -44,6 +46,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     log: () => () => void 0,
   };
 
+  const telemetryClient: appInsights.TelemetryClient = {
+    trackException: () => void 0,
+  } as unknown as appInsights.TelemetryClient;
+
   const req = {
     ...H.request("https://wallet-provider.example.org/"),
     body: {
@@ -59,6 +65,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -84,6 +91,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -108,6 +116,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -136,6 +145,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
@@ -165,6 +175,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });

@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import {
   ANDROID_CRL_URL,
   ANDROID_PLAY_INTEGRITY_URL,
@@ -69,6 +71,10 @@ describe("CreateWalletInstanceHandler", () => {
     skipSignatureValidation: false,
   };
 
+  const telemetryClient: appInsights.TelemetryClient = {
+    trackException: () => void 0,
+  } as unknown as appInsights.TelemetryClient;
+
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -81,6 +87,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -106,6 +113,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -136,6 +144,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -170,6 +179,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -204,6 +214,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetAllByUserId,
     });
@@ -239,6 +250,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 

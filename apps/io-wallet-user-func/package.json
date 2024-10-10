@@ -21,6 +21,7 @@
     "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^13.1.1",
     "@peculiar/asn1-android": "^2.3.10",
+    "applicationinsights": "^3.3.0",
     "asn1js": "^3.0.5",
     "cbor-x": "^1.5.9",
     "fp-ts": "^2.16.0",

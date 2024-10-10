@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import { CredentialRepository } from "@/credential";
 import { JwtValidate } from "@/jwt-validator";
 import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
@@ -42,6 +44,10 @@ describe("SetWalletInstanceStatusHandler", () => {
     log: () => () => void 0,
   };
 
+  const telemetryClient: appInsights.TelemetryClient = {
+    trackException: () => void 0,
+  } as unknown as appInsights.TelemetryClient;
+
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org/"),
@@ -60,6 +66,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -87,6 +94,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -120,6 +128,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -153,6 +162,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -191,6 +201,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -224,6 +235,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -259,6 +271,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate: jwtValidateThatFails,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -300,6 +313,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository:
         userTrialSubscriptionRepositoryUnsubscribed,
       walletInstanceRepository,
@@ -340,6 +354,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository: userTrialSubscriptionRepositoryThatFails,
       walletInstanceRepository,
     });
@@ -377,6 +392,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
@@ -418,6 +434,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
@@ -454,6 +471,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       jwtValidate: jwtValidateThatFails,
       logger,
+      telemetryClient,
       userTrialSubscriptionRepository,
       walletInstanceRepository,
     });

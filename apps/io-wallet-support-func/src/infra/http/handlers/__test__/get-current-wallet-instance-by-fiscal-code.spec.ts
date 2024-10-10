@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -35,6 +37,10 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       ),
   };
 
+  const telemetryClient: appInsights.TelemetryClient = {
+    trackException: () => void 0,
+  } as unknown as appInsights.TelemetryClient;
+
   const req = {
     ...H.request("https://wallet-provider.example.org"),
     body: {
@@ -50,6 +56,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -93,6 +100,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -140,6 +148,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -194,6 +203,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -225,6 +235,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -251,6 +262,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -277,6 +289,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -300,6 +313,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
@@ -325,6 +339,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });

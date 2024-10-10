@@ -1,3 +1,5 @@
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -59,6 +61,10 @@ const pidIssuerClient = new PidIssuerClient(
   config.federationEntity.basePath.href,
 );
 
+appInsights.setup().start();
+
+const appInsightsClient = appInsights.defaultClient;
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
@@ -77,6 +83,7 @@ app.http("createWalletAttestation", {
     federationEntityMetadata: config.federationEntity,
     nonceRepository,
     signer,
+    telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -88,6 +95,7 @@ app.http("createWalletInstance", {
   handler: CreateWalletInstanceFunction({
     attestationServiceConfiguration: config.attestationService,
     nonceRepository,
+    telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -96,7 +104,10 @@ app.http("createWalletInstance", {
 
 app.http("getNonce", {
   authLevel: "function",
-  handler: GetNonceFunction({ nonceRepository }),
+  handler: GetNonceFunction({
+    nonceRepository,
+    telemetryClient: appInsightsClient,
+  }),
   methods: ["GET"],
   route: "nonce",
 });
@@ -106,6 +117,7 @@ app.timer("generateEntityConfiguration", {
     federationEntityMetadata: config.federationEntity,
     inputDecoder: t.unknown,
     signer,
+    telemetryClient: appInsightsClient,
   }),
   return: output.storageBlob({
     connection: "EntityConfigurationStorageAccount",
@@ -118,6 +130,7 @@ app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceStatusFunction({
     jwtValidate: tokenValidate,
+    telemetryClient: appInsightsClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
@@ -130,6 +143,7 @@ app.http("setWalletInstanceStatus", {
   handler: SetWalletInstanceStatusFunction({
     credentialRepository: pidIssuerClient,
     jwtValidate: tokenValidate,
+    telemetryClient: appInsightsClient,
     userTrialSubscriptionRepository: trialSystemClient,
     walletInstanceRepository,
   }),
@@ -141,6 +155,7 @@ app.http("setCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: SetCurrentWalletInstanceStatusFunction({
     credentialRepository: pidIssuerClient,
+    telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
   methods: ["PUT"],

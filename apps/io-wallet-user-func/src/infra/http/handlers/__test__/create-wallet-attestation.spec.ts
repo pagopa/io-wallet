@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+import * as appInsights from "applicationinsights";
+// eslint-disable-next-line perfectionist/sort-imports
 import {
   ANDROID_CRL_URL,
   ANDROID_PLAY_INTEGRITY_URL,
@@ -79,6 +81,10 @@ const walletInstanceRepository: WalletInstanceRepository = {
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
+const telemetryClient: appInsights.TelemetryClient = {
+  trackException: () => void 0,
+} as unknown as appInsights.TelemetryClient;
+
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
@@ -119,6 +125,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -166,6 +173,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -216,6 +224,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -260,6 +269,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 

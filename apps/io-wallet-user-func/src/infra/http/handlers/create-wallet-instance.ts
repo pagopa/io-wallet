@@ -3,6 +3,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
+import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
   insertWalletInstance,
@@ -85,6 +86,9 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       ),
     ),
     RTE.map(() => H.empty),
+    RTE.orElseFirstW((error) =>
+      sendExceptionWithBodyToAppInsights(error, req.body),
+    ),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );
