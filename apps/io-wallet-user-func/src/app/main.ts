@@ -61,7 +61,7 @@ const pidIssuerClient = new PidIssuerClient(
   config.federationEntity.basePath.href,
 );
 
-appInsights.setup().start();
+appInsights.setup().setUseDiskRetryCaching(true).start();
 
 const appInsightsClient = appInsights.defaultClient;
 
