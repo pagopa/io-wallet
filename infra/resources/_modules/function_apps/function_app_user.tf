@@ -25,7 +25,7 @@ module "function_app_user_02" {
   app_settings      = local.function_app_user.app_settings
   slot_app_settings = local.function_app_user.app_settings
 
-  tier = "xl"
+  tier = "xxl"
 
   tags = var.tags
 }
@@ -49,8 +49,21 @@ module "function_app_user_autoscaler_02" {
 
   scale_metrics = {
     cpu = {
-      upper_threshold = 50
-      increase_by     = 2
+      upper_threshold   = 50
+      increase_by       = 2
+      cooldown_increase = 1
+
+      cooldown_decrease = 2
+    }
+    requests = {
+      upper_threshold           = 5000
+      increase_by               = 2
+      statistic_increase        = "Max"
+      time_aggregation_increase = "Maximum"
+
+      decrease_by       = 1
+      lower_threshold   = 1000
+      cooldown_decrease = 1
     }
   }
 

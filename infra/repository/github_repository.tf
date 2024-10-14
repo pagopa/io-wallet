@@ -25,4 +25,18 @@ resource "github_repository" "this" {
   vulnerability_alerts = true
 
   archive_on_destroy = true
+
+  security_and_analysis {
+    secret_scanning {
+      status = "enabled"
+    }
+
+    secret_scanning_push_protection {
+      status = "enabled"
+    }
+
+    advanced_security {
+      status = "enabled"
+    }
+  }
 }
