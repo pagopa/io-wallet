@@ -87,7 +87,7 @@ locals {
 
       HttpRequestTimeout = "5000"
 
-      AppInsightsConnectionString = data.azurerm_application_insights.common.connection_string
+      AppInsightsConnectionString = var.application_insights_connection_string
     }
   }
 }
