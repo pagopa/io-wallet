@@ -1,9 +1,8 @@
 locals {
   function_app_user = {
     app_settings = merge({
-      FUNCTIONS_WORKER_RUNTIME       = "node"
-      FUNCTIONS_WORKER_PROCESS_COUNT = 4
-      NODE_ENV                       = "production"
+      FUNCTIONS_WORKER_RUNTIME = "node"
+      NODE_ENV                 = "production"
 
       // Keepalive fields are all optionals
       FETCH_KEEPALIVE_ENABLED             = "true"
@@ -60,9 +59,8 @@ locals {
 
   function_app_support = {
     app_settings = merge({
-      FUNCTIONS_WORKER_RUNTIME       = "node"
-      FUNCTIONS_WORKER_PROCESS_COUNT = 4
-      NODE_ENV                       = "production"
+      FUNCTIONS_WORKER_RUNTIME = "node"
+      NODE_ENV                 = "production"
 
       // Keepalive fields are all optionals
       FETCH_KEEPALIVE_ENABLED             = "true"
