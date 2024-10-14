@@ -5,7 +5,7 @@ import * as t from "io-ts";
 import {
   AzureAppInsightsConfig,
   getAzureAppInsightsConfigFromEnvironment,
-} from "io-wallet-common/infra/azure/appInsights/config";
+} from "io-wallet-common/infra/azure/appinsights/config";
 import {
   AzureCosmosConfig,
   getAzureCosmosConfigFromEnvironment,
