@@ -1,5 +1,16 @@
 # io-wallet-support-func
 
+## 1.3.0
+
+### Minor Changes
+
+- 4144850: Add exceptions log
+
+### Patch Changes
+
+- Updated dependencies [4144850]
+  - io-wallet-common@1.1.0
+
 ## 1.2.3
 
 ### Patch Changes
