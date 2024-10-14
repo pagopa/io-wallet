@@ -26,8 +26,6 @@ module "function_app_support" {
   app_settings      = local.function_app_support.app_settings
   slot_app_settings = local.function_app_support.app_settings
 
-  application_insights_connection_string = var.application_insights_connection_string
-
   tier = "l"
 
   tags = var.tags

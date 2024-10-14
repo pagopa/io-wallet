@@ -86,6 +86,8 @@ locals {
       PidIssuerApiRequestTimeout = "10000"
 
       HttpRequestTimeout = "5000"
+
+      AppInsightsConnectionString = var.application_insights_connection_string
     }
   }
 }

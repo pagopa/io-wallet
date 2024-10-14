@@ -1,3 +1,4 @@
+import ai from "@/infra/azure/appinsights/start";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/functions/get-current-wallet-instance-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
@@ -34,6 +35,8 @@ const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
+const appInsightsClient = ai.defaultClient;
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
@@ -46,6 +49,7 @@ app.http("healthCheck", {
 app.http("getCurrentWalletInstanceByFiscalCode", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceByFiscalCodeFunction({
+    telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
