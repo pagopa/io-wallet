@@ -88,6 +88,8 @@ locals {
       PidIssuerApiRequestTimeout = "10000"
 
       HttpRequestTimeout = "5000"
+
+      AppInsightsConnectionString = data.azurerm_application_insights.common.connection_string
     }
   }
 }

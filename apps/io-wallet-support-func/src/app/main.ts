@@ -1,5 +1,4 @@
-import * as appInsights from "applicationinsights";
-// eslint-disable-next-line perfectionist/sort-imports
+import ai from "@/infra/azure/appinsights/start";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/functions/get-current-wallet-instance-by-fiscal-code";
 import { HealthFunction } from "@/infra/azure/functions/health";
@@ -36,9 +35,7 @@ const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-appInsights.setup().start();
-
-const appInsightsClient = appInsights.defaultClient;
+const appInsightsClient = ai.defaultClient;
 
 app.http("healthCheck", {
   authLevel: "anonymous",

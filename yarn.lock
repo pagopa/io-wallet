@@ -4243,7 +4243,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fp-ts@npm:^2.13.1, fp-ts@npm:^2.16.0":
+"fp-ts@npm:^2.13.1, fp-ts@npm:^2.16.0, fp-ts@npm:^2.16.9":
   version: 2.16.9
   resolution: "fp-ts@npm:2.16.9"
   checksum: 10c0/704fcc2e792bd17cb653e7b62b5d9d905c04327776df8bf2a1f67e1c6823b06c7c36036345279ac04f0b6b7214ad01f91f109f548e144c9f866a491392fbfbcc
@@ -4748,7 +4748,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"io-ts@npm:^2.2.20":
+"io-ts@npm:^2.2.20, io-ts@npm:^2.2.21":
   version: 2.2.21
   resolution: "io-ts@npm:2.2.21"
   peerDependencies:
@@ -4790,6 +4790,8 @@ __metadata:
     applicationinsights: "npm:^3.3.0"
     azure-functions-core-tools: "npm:^4.0.5907"
     eslint: "npm:8.57.0"
+    fp-ts: "npm:^2.16.9"
+    io-ts: "npm:^2.2.21"
     io-wallet-common: "workspace:^"
     prettier: "npm:3.2.5"
     tsup: "npm:^8.0.2"

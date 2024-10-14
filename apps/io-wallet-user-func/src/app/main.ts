@@ -1,5 +1,4 @@
-import * as appInsights from "applicationinsights";
-// eslint-disable-next-line perfectionist/sort-imports
+import ai from "@/infra/azure/appinsights/start";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -61,9 +60,7 @@ const pidIssuerClient = new PidIssuerClient(
   config.federationEntity.basePath.href,
 );
 
-appInsights.setup().setUseDiskRetryCaching(true).start();
-
-const appInsightsClient = appInsights.defaultClient;
+const appInsightsClient = ai.defaultClient;
 
 app.http("healthCheck", {
   authLevel: "anonymous",

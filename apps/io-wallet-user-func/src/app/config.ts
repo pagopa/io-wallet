@@ -7,6 +7,10 @@ import * as RE from "fp-ts/lib/ReaderEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import {
+  AzureAppInsightsConfig,
+  getAzureAppInsightsConfigFromEnvironment,
+} from "io-wallet-common/infra/azure/appInsights/config";
+import {
   AzureCosmosConfig,
   getAzureCosmosConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/cosmos/config";
@@ -73,6 +77,7 @@ export type AttestationServiceConfiguration = t.TypeOf<
 >;
 
 const AzureConfig = t.type({
+  appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
@@ -244,19 +249,23 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   AzureConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
   }),
-  RE.map(({ cosmos, entityConfigurationStorageContainerName }) => ({
-    cosmos,
-    storage: {
-      entityConfiguration: {
-        containerName: entityConfigurationStorageContainerName,
+  RE.map(
+    ({ appInsights, cosmos, entityConfigurationStorageContainerName }) => ({
+      appInsights,
+      cosmos,
+      storage: {
+        entityConfiguration: {
+          containerName: entityConfigurationStorageContainerName,
+        },
       },
-    },
-  })),
+    }),
+  ),
 );
 
 const getJwtValidatorConfigFromEnvironment: RE.ReaderEither<
