@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.1.0
+
+### Minor Changes
+
+- 4144850: Add exceptions log
+
 ## 1.0.4
 
 ### Patch Changes
