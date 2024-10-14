@@ -45,6 +45,7 @@
     "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
     "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
     "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
+    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED"
   }
 }

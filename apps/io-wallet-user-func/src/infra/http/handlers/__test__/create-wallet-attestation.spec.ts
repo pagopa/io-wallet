@@ -13,6 +13,7 @@ import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as appInsights from "applicationinsights";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
@@ -79,6 +80,10 @@ const walletInstanceRepository: WalletInstanceRepository = {
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
+const telemetryClient: appInsights.TelemetryClient = {
+  trackException: () => void 0,
+} as unknown as appInsights.TelemetryClient;
+
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
@@ -119,6 +124,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -166,6 +172,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -216,6 +223,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -260,6 +268,7 @@ describe("CreateWalletAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 

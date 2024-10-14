@@ -25,8 +25,6 @@ module "function_app_user_02" {
   app_settings      = local.function_app_user.app_settings
   slot_app_settings = local.function_app_user.app_settings
 
-  application_insights_connection_string = var.application_insights_connection_string
-
   tier = "xxl"
 
   tags = var.tags
