@@ -24,7 +24,9 @@ export class CosmosDbNonceRepository implements NonceRepository {
         },
         (error) => {
           if (error instanceof Error && error.name === "TimeoutError") {
-            return new ServiceUnavailableError(error.message);
+            return new ServiceUnavailableError(
+              `The request to the database has timed out: ${error.message}`,
+            );
           }
           if (
             typeof error === "object" &&
@@ -49,7 +51,9 @@ export class CosmosDbNonceRepository implements NonceRepository {
       },
       (error) =>
         error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(error.message)
+          ? new ServiceUnavailableError(
+              `The request to the database has timed out: ${error.message}`,
+            )
           : new Error(`Error inserting nonce: ${error}`),
     );
   }

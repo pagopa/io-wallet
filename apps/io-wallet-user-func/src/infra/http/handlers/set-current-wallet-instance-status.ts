@@ -54,7 +54,11 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       RTE.chainW(revokeCurrentUserWalletInstance),
       RTE.map(() => H.empty),
       RTE.orElseFirstW((error) =>
-        sendExceptionWithBodyToAppInsights(error, req.body),
+        sendExceptionWithBodyToAppInsights(
+          error,
+          req.body,
+          "setCurrentWalletInstanceStatus",
+        ),
       ),
       RTE.orElseW(logErrorAndReturnResponse),
     ),

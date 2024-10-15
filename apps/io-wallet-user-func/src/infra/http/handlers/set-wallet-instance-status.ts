@@ -53,6 +53,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
           pipe(
             sendTelemetryException(error, {
               fiscalCode,
+              functionName: "setWalletInstanceStatus",
               pathParameter: req.path,
               payload: req.body,
             }),

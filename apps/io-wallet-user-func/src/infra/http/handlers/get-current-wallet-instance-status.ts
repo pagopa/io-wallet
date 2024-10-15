@@ -22,6 +22,7 @@ export const GetCurrentWalletInstanceStatusHandler = H.of(
             pipe(
               sendTelemetryException(error, {
                 fiscalCode,
+                functionName: "getCurrentWalletInstanceStatus",
               }),
               RTE.fromReader,
             ),
