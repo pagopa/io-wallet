@@ -65,7 +65,9 @@ export class PidIssuerClient
         },
         (error) =>
           error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(error.message)
+            ? new ServiceUnavailableError(
+                `The call to the PID issuer has timed out: ${error.message}`,
+              )
             : new Error(`error revoking all user credentials: ${error}`),
       ),
     );
