@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.1
+
+### Patch Changes
+
+- 3a7b52d: Add functionName in application insights exceptions
+
 ## 1.3.0
 
 ### Minor Changes
