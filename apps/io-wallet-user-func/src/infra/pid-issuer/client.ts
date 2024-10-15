@@ -33,7 +33,10 @@ export class PidIssuerClient
             });
             return result.status === 404;
           },
-          (error) => new Error(`error checking PID issuer health: ${error}`),
+          (error) =>
+            new Error(
+              `Error occurred while checking PID issuer health: ${error}`,
+            ),
         )
       : TE.of(true);
 
@@ -66,9 +69,11 @@ export class PidIssuerClient
         (error) =>
           error instanceof Error && error.name === "TimeoutError"
             ? new ServiceUnavailableError(
-                `The call to the PID issuer has timed out: ${error.message}`,
+                `The request to the PID issuer has timed out: ${error.message}`,
               )
-            : new Error(`error revoking all user credentials: ${error}`),
+            : new Error(
+                `Error occurred while making a request to the PID issuer: ${error}`,
+              ),
       ),
     );
 

@@ -44,7 +44,9 @@ export class CosmosDbWalletInstanceRepository
       },
       (error) =>
         error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(error.message)
+          ? new ServiceUnavailableError(
+              `The request to the database has timed out: ${error.message}`,
+            )
           : new Error(`Error updating wallet instances: ${error}`),
     );
   }
@@ -55,7 +57,9 @@ export class CosmosDbWalletInstanceRepository
         () => this.#container.item(id, userId).read(),
         (error) =>
           error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(error.message)
+            ? new ServiceUnavailableError(
+                `The request to the database has timed out: ${error.message}`,
+              )
             : new Error(`Error getting wallet instance: ${error}`),
       ),
       TE.chain(({ resource }) =>
@@ -96,7 +100,9 @@ export class CosmosDbWalletInstanceRepository
         },
         (error) =>
           error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(error.message)
+            ? new ServiceUnavailableError(
+                `The request to the database has timed out: ${error.message}`,
+              )
             : new Error(`Error getting wallet instances by user id: ${error}`),
       ),
       TE.chain((items) =>
@@ -144,7 +150,9 @@ export class CosmosDbWalletInstanceRepository
         },
         (error) =>
           error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(error.message)
+            ? new ServiceUnavailableError(
+                `The request to the database has timed out: ${error.message}`,
+              )
             : new Error(`Error getting wallet instances by user id: ${error}`),
       ),
       TE.chain(
@@ -176,7 +184,9 @@ export class CosmosDbWalletInstanceRepository
       },
       (error) =>
         error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(error.message)
+          ? new ServiceUnavailableError(
+              `The request to the database has timed out: ${error.message}`,
+            )
           : new Error(`Error inserting wallet instance: ${error}`),
     );
   }

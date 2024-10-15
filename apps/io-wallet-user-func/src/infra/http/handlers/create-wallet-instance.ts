@@ -87,7 +87,11 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     ),
     RTE.map(() => H.empty),
     RTE.orElseFirstW((error) =>
-      sendExceptionWithBodyToAppInsights(error, req.body),
+      sendExceptionWithBodyToAppInsights(
+        error,
+        req.body,
+        "createWalletInstance",
+      ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),
   ),

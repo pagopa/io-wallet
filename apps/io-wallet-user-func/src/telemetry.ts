@@ -19,13 +19,14 @@ const getFiscalCode: (input: unknown) => FiscalCode | undefined = (input) =>
 export const sendExceptionWithBodyToAppInsights = (
   error: Error,
   body: unknown,
+  functionName: string,
 ) =>
   pipe(
     body,
     getFiscalCode,
     (fiscalCode) =>
       fiscalCode
-        ? sendTelemetryException(error, { body, fiscalCode })
-        : sendTelemetryException(error, { body }),
+        ? sendTelemetryException(error, { body, functionName, fiscalCode })
+        : sendTelemetryException(error, { body, functionName }),
     RTE.fromReader,
   );
