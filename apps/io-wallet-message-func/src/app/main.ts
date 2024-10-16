@@ -1,9 +1,10 @@
-import { HealthFunction } from "@/infra/azure/functions/health";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
+
+import { HealthFunction } from "../infra/azure/functions/health";
 import { getAppConfigFromEnvironment } from "./configs/config";
 
 const configOrError = pipe(
@@ -26,8 +27,6 @@ const cosmosClient = new CosmosClient({
   },
   endpoint: config.azure.cosmos.endpoint,
 });
-
-const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
