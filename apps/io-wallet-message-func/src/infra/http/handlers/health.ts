@@ -10,7 +10,11 @@ import { HealthCheckError } from "io-wallet-common/error";
 import { getCosmosHealth } from "io-wallet-common/infra/azure/cosmos/health-check";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-const getHealthCheck: RTE.ReaderTaskEither<{ cosmosClient: CosmosClient; }, Error, void> = ({ cosmosClient }) =>
+const getHealthCheck: RTE.ReaderTaskEither<
+  { cosmosClient: CosmosClient },
+  Error,
+  void
+> = ({ cosmosClient }) =>
   pipe(
     [pipe({ cosmosClient }, getCosmosHealth)],
     RA.wilt(T.ApplicativePar)(identity),
