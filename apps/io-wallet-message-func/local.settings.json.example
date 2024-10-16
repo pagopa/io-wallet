@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+
+    "IoServiceBaseUrl": "IO_SERVICE_BASE_URL",
+    "IoServiceApiKey": "IO_SERVICE_BASE_URL",
+    "IoServiceRequestTimeout": "IO_SERVICE_REQUEST_TIMEOUT",
+
+    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
+    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
+    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT"
+  }
+}

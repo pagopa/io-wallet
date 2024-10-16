@@ -4776,6 +4776,30 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"io-wallet-message-func@workspace:apps/io-wallet-message-func":
+  version: 0.0.0-use.local
+  resolution: "io-wallet-message-func@workspace:apps/io-wallet-message-func"
+  dependencies:
+    "@azure/cosmos": "npm:^4.1.1"
+    "@azure/functions": "npm:^4.5.1"
+    "@azure/identity": "npm:^4.4.1"
+    "@pagopa/eslint-config": "npm:^4.0.1"
+    "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
+    "@pagopa/ts-commons": "npm:^13.1.1"
+    "@vitest/coverage-v8": "npm:^2.1.1"
+    applicationinsights: "npm:^3.3.0"
+    azure-functions-core-tools: "npm:^4.0.5907"
+    eslint: "npm:8.57.0"
+    fp-ts: "npm:^2.16.9"
+    io-ts: "npm:^2.2.21"
+    io-wallet-common: "workspace:^"
+    prettier: "npm:3.2.5"
+    tsup: "npm:^8.0.2"
+    typescript: "npm:^5.4.5"
+    vitest: "npm:^2.1.1"
+  languageName: unknown
+  linkType: soft
+
 "io-wallet-support-func@workspace:apps/io-wallet-support-func":
   version: 0.0.0-use.local
   resolution: "io-wallet-support-func@workspace:apps/io-wallet-support-func"
