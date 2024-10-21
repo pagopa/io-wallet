@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.2
+
+### Patch Changes
+
+- c51f327: Update AI settings
+
 ## 1.3.1
 
 ### Patch Changes
