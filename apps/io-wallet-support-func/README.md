@@ -22,7 +22,7 @@ This project uses [Yarn](https://classic.yarnpkg.com/) as depndencies manager.
 
 Moreover, this project is strongly correlated to different [Azure Cloud](https://learn.microsoft.com/en-us/azure/?product=popular) Resources, all available by logging in with your user name directly to the Azure portal. The two most important Azure resources used by this service are [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) and [Azure CosmosDB](https://learn.microsoft.com/en-us/azure/cosmos-db/).
 
-> ❗❗❗ if you haven't already, it's strongly recommended to read the README.md file at the monorepo level (in the root directory of the monorepo). It will give you more context and a better understanding of how to get this project started. The `io-wallet-support-func` uses the `io-wallet-common` package; you can see under the `packages/` folder of the monorepo.
+> ❗❗❗ if you haven't already, it's strongly recommended to read the `README.md` file at the monorepo level (in the root directory of the monorepo). It will give you more context and a better understanding of how to get this project started. The `io-wallet-support-func` uses the `io-wallet-common` package; you can see under the `packages/` folder of the monorepo.
 
 ### Prerequisites
 
