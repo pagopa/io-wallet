@@ -52,6 +52,8 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     integrityAssertion,
   } = params;
 
+  const errors = [];
+
   // First check whether the clientData has been signed correctly with the hardware key
   const signatureValidated = validateAssertionSignature(
     hardwareKey,
@@ -104,19 +106,22 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
         /* If it fails I continue the for loop anyway to try other bundleIdentifiers.
          * The check is still done at the end on the value of responseValidated
          */
+        errors.push(e);
       }
+    } else {
+      errors.push(result);
     }
   }
 
   if (!tokenPayloadExternal || !bundleIdentifier) {
     throw new Error(
-      "[Android Assertion] Invalid token payload from Play Integrity API response",
+      `[Android Assertion] Invalid token payload from Play Integrity API response ${errors}`,
     );
   }
 
   if (!responseValidated) {
     throw new Error(
-      "[Android Assertion] Integrity Response did not pass validation",
+      `[Android Assertion] Integrity Response did not pass validation ${errors}`,
     );
   }
 };
