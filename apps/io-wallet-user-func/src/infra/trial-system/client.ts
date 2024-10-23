@@ -1,4 +1,4 @@
-import { TrialSystemApiClientConfig } from "@/app/config";
+import { TrialSystemApiClientConfig } from "@/app/configs/config";
 import { UserTrialSubscriptionRepository } from "@/user";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";

@@ -11,17 +11,14 @@ import {
   getAzureAppInsightsConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/appinsights/config";
 import {
-  AzureCosmosConfig,
-  getAzureCosmosConfigFromEnvironment,
-} from "io-wallet-common/infra/azure/cosmos/config";
-import {
   readFromEnvironment,
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
-import { FederationEntityMetadata } from "../entity-configuration";
+import { FederationEntityMetadata } from "../../entity-configuration";
+import { CosmosDbConfig, getCosmosDbConfigFromEnvironment } from "./cosmosDbConfig";
 
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
@@ -78,10 +75,7 @@ export type AttestationServiceConfiguration = t.TypeOf<
 
 const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
-  cosmos: AzureCosmosConfig,
-  storage: t.type({
-    entityConfiguration: t.type({ containerName: t.string }),
-  }),
+  cosmos: CosmosDbConfig,
 });
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
@@ -250,7 +244,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
-    cosmos: getAzureCosmosConfigFromEnvironment,
+    cosmos: getCosmosDbConfigFromEnvironment,
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),

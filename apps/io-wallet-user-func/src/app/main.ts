@@ -15,12 +15,11 @@ import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
-import { DefaultAzureCredential } from "@azure/identity";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
-import { getConfigFromEnvironment } from "./config";
+import { getConfigFromEnvironment } from "./configs/config";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -33,15 +32,7 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
-const credential = new DefaultAzureCredential();
-
-const cosmosClient = new CosmosClient({
-  aadCredentials: credential,
-  connectionPolicy: {
-    requestTimeout: config.azure.cosmos.requestTimeout,
-  },
-  endpoint: config.azure.cosmos.endpoint,
-});
+const cosmosClient = new CosmosClient(config.azure.cosmos.connectionString);
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
@@ -118,6 +109,7 @@ app.timer("generateEntityConfiguration", {
   }),
   return: output.storageBlob({
     connection: "EntityConfigurationStorageAccount",
+    //@ts-ignore
     path: `${config.azure.storage.entityConfiguration.containerName}/openid-federation`,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours

@@ -1,4 +1,4 @@
-import { Config, PidIssuerApiClientConfig } from "@/app/config";
+import { Config, PidIssuerApiClientConfig } from "@/app/configs/config";
 import { CredentialRepository } from "@/credential";
 import { removeTrailingSlash } from "@/url";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";

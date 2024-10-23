@@ -2,6 +2,7 @@
   "IsEncrypted": false,
   "Values": {
     "FUNCTIONS_WORKER_RUNTIME": "node",
+    "CosmosDbConnectionString": "COSMOS_DB_CONNECTION_STRING",
     "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
