@@ -7,7 +7,10 @@ import {
   AzureAppInsightsConfig,
   getAzureAppInsightsConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/appinsights/config";
-import { readFromEnvironment, stringToNumberDecoderRE } from "io-wallet-common/infra/env";
+import {
+  readFromEnvironment,
+  stringToNumberDecoderRE,
+} from "io-wallet-common/infra/env";
 
 const CosmosDbConfig = t.type({
   connectionString: t.string,
@@ -50,7 +53,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
-    cosmos: getCosmosDbConfigFromEnvironment
+    cosmos: getCosmosDbConfigFromEnvironment,
   }),
   RE.map(({ appInsights, cosmos }) => ({
     azure: {
