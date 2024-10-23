@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.3
+
+### Patch Changes
+
+- f9dbfdd: Add integrity error logs
+
 ## 1.3.2
 
 ### Patch Changes
