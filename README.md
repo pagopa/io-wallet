@@ -108,7 +108,7 @@ yarn build          # [Description]
                     #       results, for each project (or package), are stored under the dist/ directory,
                     #       in the root directory of the project.
                     # [Aliases]
-                    #       yarn run format
+                    #       yarn run build
 
 
 yarn version        # [Description]
