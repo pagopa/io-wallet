@@ -28,13 +28,17 @@ Moreover, this project is strongly correlated to different [Azure Cloud](https:/
 
 The following dependencies are strongly required:
 
-- Node ^20
+- Node ^20.13
 - Yarn ^4
 
 The following dependencies are optional, but they are necessary to start the service locally in complete autonomy:
 
 - AZ CLI ^2
 - Python ^3
+
+If you are interested in infrastructure issues, you may find it convenient to install terraform on your local machine:
+
+- Terraform ^1.7.5
 
 ### Installation
 
@@ -62,7 +66,6 @@ The template contains the following environment variables:
 - `CosmosDbRequestTimeout` (required): the CosmosDB request timeout (expressed in milliseconds, where 1000ms = 1s).
 - `HttpRequestTimeout` (required): the HTTP request timeout (expressed in milliseconds, where 1000ms = 1s).
 - `AppInsightsConnectionString` (required): the AppInsights connection string.
-
 
 ### Useful Commands
 
@@ -132,6 +135,7 @@ yarn build:watch    # [Description]
 ### Quickstart
 
 Before following the steps below:
+
 - Make sure your Node version is as specified in the `.node-version` file.
 - Make sure you've build the `io-wallet-common` package at the monorepo level. This is a very important package for the `io-wallet-support-func`.
 
@@ -139,7 +143,7 @@ To quickly start this project in a local environment, run the following commands
 
 ```bash
 yarn            # installing all dependencies and creating the node_modules/ directory
-yarn build      # building the project and creating the dist/ directory 
+yarn build      # building the project and creating the dist/ directory
 yarn start      # generating different log into your shell
 ```
 

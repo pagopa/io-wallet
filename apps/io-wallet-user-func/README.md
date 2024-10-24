@@ -28,13 +28,17 @@ Moreover, this project is strongly correlated to different [Azure Cloud](https:/
 
 The following dependencies are strongly required:
 
-- Node ^20
+- Node ^20.13
 - Yarn ^4
 
 The following dependencies are optional, but they are necessary to start the service locally in complete autonomy:
 
 - AZ CLI ^2
 - Python ^3
+
+If you are interested in infrastructure issues, you may find it convenient to install terraform on your local machine:
+
+- Terraform ^1.7.5
 
 ### Installation
 
