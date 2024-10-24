@@ -123,14 +123,102 @@ app.timer("generateEntityConfiguration", {
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
 
+import { HttpRequest, InvocationContext, HttpHandler } from "@azure/functions";
+import {
+  Attributes,
+  SpanKind,
+  SpanOptions,
+  SpanStatusCode,
+  TraceFlags,
+  context,
+  trace,
+  Span,
+  SpanContext,
+} from "@opentelemetry/api";
+import {
+  SEMATTRS_HTTP_METHOD,
+  SEMATTRS_HTTP_STATUS_CODE,
+  SEMATTRS_HTTP_URL,
+} from "@opentelemetry/semantic-conventions";
+
+function createAppInsightsWrapper(func: HttpHandler) {
+  return async (req: HttpRequest, invocationContext: InvocationContext) => {
+    const startTime = Date.now();
+
+    // Extract the trace context from the incoming request
+    const traceParent = req.headers.get("traceparent");
+    const parts = traceParent?.split("-");
+
+    const parentSpanContext: SpanContext | null =
+      parts &&
+      parts.length === 4 &&
+      parts[1].length === 32 &&
+      parts[2].length === 16
+        ? {
+            traceId: parts[1],
+            spanId: parts[2],
+            traceFlags: TraceFlags.NONE,
+          }
+        : null;
+
+    const activeContext = context.active();
+
+    // Set span context as the parent context if any
+    const parentContext = parentSpanContext
+      ? trace.setSpanContext(activeContext, parentSpanContext)
+      : activeContext;
+
+    const attributes: Attributes = {
+      [SEMATTRS_HTTP_METHOD]: "HTTP",
+      [SEMATTRS_HTTP_URL]: req.url,
+    };
+
+    const options: SpanOptions = {
+      kind: SpanKind.SERVER,
+      attributes: attributes,
+      startTime: startTime,
+    };
+
+    const span: Span = trace
+      .getTracer("ApplicationInsightsTracer")
+      .startSpan(`${req.method} ${req.url}`, options, parentContext);
+
+    let res;
+    try {
+      res = await context.with(trace.setSpan(activeContext, span), async () => {
+        return await func(req, invocationContext);
+      });
+      const status = res?.status;
+      if (status) {
+        span.setStatus({
+          code: status < 400 ? SpanStatusCode.OK : SpanStatusCode.ERROR,
+        });
+        span.setAttribute(SEMATTRS_HTTP_STATUS_CODE, status);
+      }
+    } catch (error) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: error instanceof Error ? error.message : JSON.stringify(error),
+      });
+      throw error;
+    } finally {
+      span.end(Date.now());
+    }
+
+    return res;
+  };
+}
+
 app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
-  handler: GetCurrentWalletInstanceStatusFunction({
-    jwtValidate: tokenValidate,
-    telemetryClient: appInsightsClient,
-    userTrialSubscriptionRepository: trialSystemClient,
-    walletInstanceRepository,
-  }),
+  handler: createAppInsightsWrapper(
+    GetCurrentWalletInstanceStatusFunction({
+      jwtValidate: tokenValidate,
+      telemetryClient: appInsightsClient,
+      userTrialSubscriptionRepository: trialSystemClient,
+      walletInstanceRepository,
+    }),
+  ),
   methods: ["GET"],
   route: "wallet-instances/current/status",
 });
