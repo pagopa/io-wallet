@@ -21,7 +21,15 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
-const cosmosClient = new CosmosClient(config.azure.cosmos.connectionString);
+const credential = new DefaultAzureCredential();
+
+const cosmosClient = new CosmosClient({
+  aadCredentials: credential,
+  connectionPolicy: {
+    requestTimeout: config.azure.cosmos.requestTimeout,
+  },
+  endpoint: config.azure.cosmos.endpoint,
+});
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 

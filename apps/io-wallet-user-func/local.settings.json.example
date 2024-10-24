@@ -6,7 +6,6 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "NODE_ENV": "development",
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
-    "CosmosDbConnectionString": "COSMOS_DB_CONNECTION_STRING",
     "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",

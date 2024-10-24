@@ -106,7 +106,6 @@ The template contains the following environment variables:
 - `HttpRequestTimeout` (required): the HTTP request timeout (expressed in milliseconds, where 1000ms = 1s).
 - `AppInsightsConnectionString` (required): the AppInsights connection string.
 
-
 ### Useful Commands
 
 ```bash
@@ -176,6 +175,7 @@ yarn build:watch    # [Description]
 ### Quickstart
 
 Before following the steps below:
+
 - Make sure your Node version is as specified in the `.node-version` file.
 - Make sure you've build the `io-wallet-common` package at the monorepo level. This is a very important package for the `io-wallet-user-func`.
 
@@ -183,7 +183,7 @@ To quickly start this project in a local environment, run the following commands
 
 ```bash
 yarn            # installing all dependencies and creating the node_modules/ directory
-yarn build      # building the project and creating the dist/ directory 
+yarn build      # building the project and creating the dist/ directory
 yarn start      # generating different log into your shell
 ```
 
