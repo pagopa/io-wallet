@@ -20,7 +20,7 @@ This project uses the main fllowing NPM packages:
 - [vitest](https://classic.yarnpkg.com/en/package/vitest)
 - [applicationinsights](https://classic.yarnpkg.com/en/package/applicationinsights)
 
-This project uses [Yarn](https://classic.yarnpkg.com/) as depndencies manager. This project is a simple package that is seen as a "container" (NPM package) by all projects that use it. Both projects that are part of this monorepo use `io-wallet-common`.
+This project uses [Yarn](https://classic.yarnpkg.com/) as dependencies manager. This project is a simple package that is seen as a "container" (NPM package) by all projects that use it. Both projects that are part of this monorepo use `io-wallet-common`.
 
 ### Prerequisites
 

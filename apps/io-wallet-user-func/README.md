@@ -18,7 +18,7 @@ This project uses the main fllowing NPM packages:
 - [tsup](https://classic.yarnpkg.com/en/package/tsup)
 - [vitest](https://classic.yarnpkg.com/en/package/vitest)
 
-This project uses [Yarn](https://classic.yarnpkg.com/) as depndencies manager.
+This project uses [Yarn](https://classic.yarnpkg.com/) as dependencies manager.
 
 Moreover, this project is strongly correlated to different [Azure Cloud](https://learn.microsoft.com/en-us/azure/?product=popular) Resources, all available by logging in with your user name directly to the Azure portal. The two most important Azure resources used by this service are [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) and [Azure CosmosDB](https://learn.microsoft.com/en-us/azure/cosmos-db/).
 

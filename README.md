@@ -11,7 +11,7 @@ A monorepo is a single repository containing multiple different projects, with w
 - `io-wallet-support-func`: it contains all functionalities for assistance and support.
 - `io-wallet-user-func`: it contains all functionalities used by the IO Wallet app end users.
 
-It's strongly recommended to start looking at the code and understanding how Azure functions work from the `io-wallet-support-func` project, even just to have a basic overview. The `io-wallet` monorepo contains a package also, called `io-wallet-common`, present into the `packages/` folder, present in the root directory of the monorepo: this package is used by all two previous projects and it's very important for these. You can see the `io-wallet-common` package like a local NPM package that includes all the common functionalities and utilities of both the `io-wallet-support-func` and `io-wallet-message-func` projects.
+The `io-wallet` monorepo contains a package also, called `io-wallet-common`, present into the `packages/` folder, present in the root directory: this package contains all the shared code among the workspaces. You can see the `io-wallet-common` package like a local NPM package that includes all the common functionalities and utilities of both the `io-wallet-support-func` and `io-wallet-message-func` projects.
 
 Each project has an own `README.md` file that includes these sections:
 
@@ -22,7 +22,7 @@ Each project has an own `README.md` file that includes these sections:
 - **Useful Commands**: show a list of useful command, necessary to have a complete overview of the specific project.
 - **Quickstart**: a minimal and essential tutorial to make the project operational in a very short time, without going into a lot of explanations!
 
-It is recommended that you read the README.md files of both projects only after reading the current README. In according to this monorepo, in this codepase you can find the `io-wallet.code-workspace` file, a small [JSON](https://www.json.org/) that includes some informations about the location of all projects and packages included in this monorepo. Moreover, in according to the Turborepo documentation, you can find the `turbo.json` file, that includes all necessary configurations about the `turbo` command. Another reference to the existence of multiple node projects is present in the `package.json` file: there is an attribute called `"workspace"`, inside which there are the directories of the two projects (`io-wallet-support-func` and `io-wallet-user-func`) and the package (`io-wallet-common`) present in this monorepo.
+It is recommended that you read the README.md files of both projects only after reading the current README. In according to this monorepo, in this codepase you can find the `io-wallet.code-workspace` file, a small VSCode configuration file that includes some informations about the location of all projects and packages included in this monorepo. It's useful mainly for VSCode (one of the most used code editor). Moreover, in according to the Turborepo documentation, you can find the `turbo.json` file, that includes all necessary configurations about the `turbo` command. Another reference to the existence of multiple node projects is present in the `package.json` file: there is an attribute called `"workspace"`, inside which there are the directories of the two projects (`io-wallet-support-func` and `io-wallet-user-func`) and the package (`io-wallet-common`) present in this monorepo.
 
 A small overview of the most NPM packages used in this monorepo is the following list:
 
@@ -36,7 +36,7 @@ A small overview of the most NPM packages used in this monorepo is the following
 - [tsup](https://classic.yarnpkg.com/en/package/tsup)
 - [vitest](https://classic.yarnpkg.com/en/package/vitest)
 
-This project uses [Yarn](https://classic.yarnpkg.com/) as depndencies manager and [Turborepo](https://turbo.build/repo/docs) as monorepo manager. Before continuing to read, it is strongly recommended to read both documentations, especially the Turbo one.
+This project uses [Yarn](https://classic.yarnpkg.com/) as dependencies manager and [Turborepo](https://turbo.build/repo/docs) as monorepo manager. Before continuing to read, it is strongly recommended to read both documentations, especially the Turbo one.
 
 All the projects present in this monorepo are strongly correlated to different [Azure Cloud](https://learn.microsoft.com/en-us/azure/?product=popular) Resources, all available by logging in with your user name directly to the Azure portal. The two most important Azure resources used by this service are [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) and [Azure CosmosDB](https://learn.microsoft.com/en-us/azure/cosmos-db/). In this case also, before continuing to read, it's strongly recommended to read the relevant documentation.
 
@@ -124,9 +124,11 @@ yarn release        # [Description]
 
 
 yarn code-review    # [Description]
-                    #       This command, for each project and package, runs a kind of "pipeline" (in a local environment) with the following steps:
-                    #       typechecking (with typecheck), code linting (with eslint) and unit testing (with vitest). This is a very useful command
-                    #       to pass the workflow controls (very similar) when you create a PR, or push new code in an existing PR.
+                    #       For each project and package, runs a script with the following commands:
+                    #       typechecking (with typecheck), code linting (with eslint) and unit testing
+                    #       (with vitest). This is a very useful command performed by the github 
+                    #       workflow when you create a PR, or push new code in an existing PR, to
+                    #       ensure the code quality.
                     # [Aliases]
                     #       yarn run code-review
 ```
