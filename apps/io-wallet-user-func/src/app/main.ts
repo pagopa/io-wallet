@@ -1,4 +1,5 @@
 import ai from "@/infra/azure/appinsights/start";
+import createAppInsightsWrapper from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -64,47 +65,55 @@ const appInsightsClient = ai.defaultClient;
 
 app.http("healthCheck", {
   authLevel: "anonymous",
-  handler: HealthFunction({
-    cosmosClient,
-    pidIssuerClient,
-    trialSystemClient,
-  }),
+  handler: createAppInsightsWrapper(
+    HealthFunction({
+      cosmosClient,
+      pidIssuerClient,
+      trialSystemClient,
+    }),
+  ),
   methods: ["GET"],
   route: "health",
 });
 
 app.http("createWalletAttestation", {
   authLevel: "function",
-  handler: CreateWalletAttestationFunction({
-    attestationServiceConfiguration: config.attestationService,
-    federationEntityMetadata: config.federationEntity,
-    nonceRepository,
-    signer,
-    telemetryClient: appInsightsClient,
-    walletInstanceRepository,
-  }),
+  handler: createAppInsightsWrapper(
+    CreateWalletAttestationFunction({
+      attestationServiceConfiguration: config.attestationService,
+      federationEntityMetadata: config.federationEntity,
+      nonceRepository,
+      signer,
+      telemetryClient: appInsightsClient,
+      walletInstanceRepository,
+    }),
+  ),
   methods: ["POST"],
   route: "token",
 });
 
 app.http("createWalletInstance", {
   authLevel: "function",
-  handler: CreateWalletInstanceFunction({
-    attestationServiceConfiguration: config.attestationService,
-    nonceRepository,
-    telemetryClient: appInsightsClient,
-    walletInstanceRepository,
-  }),
+  handler: createAppInsightsWrapper(
+    CreateWalletInstanceFunction({
+      attestationServiceConfiguration: config.attestationService,
+      nonceRepository,
+      telemetryClient: appInsightsClient,
+      walletInstanceRepository,
+    }),
+  ),
   methods: ["POST"],
   route: "wallet-instances",
 });
 
 app.http("getNonce", {
   authLevel: "function",
-  handler: GetNonceFunction({
-    nonceRepository,
-    telemetryClient: appInsightsClient,
-  }),
+  handler: createAppInsightsWrapper(
+    GetNonceFunction({
+      nonceRepository,
+      telemetryClient: appInsightsClient,
+    }),
+  ),
   methods: ["GET"],
   route: "nonce",
 });
@@ -125,36 +134,42 @@ app.timer("generateEntityConfiguration", {
 
 app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
-  handler: GetCurrentWalletInstanceStatusFunction({
-    jwtValidate: tokenValidate,
-    telemetryClient: appInsightsClient,
-    userTrialSubscriptionRepository: trialSystemClient,
-    walletInstanceRepository,
-  }),
+  handler: createAppInsightsWrapper(
+    GetCurrentWalletInstanceStatusFunction({
+      jwtValidate: tokenValidate,
+      telemetryClient: appInsightsClient,
+      userTrialSubscriptionRepository: trialSystemClient,
+      walletInstanceRepository,
+    }),
+  ),
   methods: ["GET"],
   route: "wallet-instances/current/status",
 });
 
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
-  handler: SetWalletInstanceStatusFunction({
-    credentialRepository: pidIssuerClient,
-    jwtValidate: tokenValidate,
-    telemetryClient: appInsightsClient,
-    userTrialSubscriptionRepository: trialSystemClient,
-    walletInstanceRepository,
-  }),
+  handler: createAppInsightsWrapper(
+    SetWalletInstanceStatusFunction({
+      credentialRepository: pidIssuerClient,
+      jwtValidate: tokenValidate,
+      telemetryClient: appInsightsClient,
+      userTrialSubscriptionRepository: trialSystemClient,
+      walletInstanceRepository,
+    }),
+  ),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
 });
 
 app.http("setCurrentWalletInstanceStatus", {
   authLevel: "function",
-  handler: SetCurrentWalletInstanceStatusFunction({
-    credentialRepository: pidIssuerClient,
-    telemetryClient: appInsightsClient,
-    walletInstanceRepository,
-  }),
+  handler: createAppInsightsWrapper(
+    SetCurrentWalletInstanceStatusFunction({
+      credentialRepository: pidIssuerClient,
+      telemetryClient: appInsightsClient,
+      walletInstanceRepository,
+    }),
+  ),
   methods: ["PUT"],
   route: "wallet-instances/current/status",
 });

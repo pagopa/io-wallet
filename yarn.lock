@@ -4807,6 +4807,8 @@ __metadata:
     "@azure/cosmos": "npm:^4.1.1"
     "@azure/functions": "npm:^4.5.1"
     "@azure/identity": "npm:^4.4.1"
+    "@opentelemetry/api": "npm:^1.9.0"
+    "@opentelemetry/semantic-conventions": "npm:^1.27.0"
     "@pagopa/eslint-config": "npm:^4.0.1"
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
