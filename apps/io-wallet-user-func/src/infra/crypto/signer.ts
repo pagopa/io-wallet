@@ -8,7 +8,7 @@ import * as t from "io-ts";
 import { ECKey, Jwk, RSAKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
-import { CryptoConfiguration } from "../../app/configs/config";
+import { CryptoConfiguration } from "../../app/config";
 import { JwtHeader, Signer } from "../../signer";
 
 const supportedSignAlgorithms = [

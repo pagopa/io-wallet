@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import { DeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { AttestationServiceConfiguration } from "./app/configs/config";
+import { AttestationServiceConfiguration } from "./app/config";
 import { MobileAttestationService } from "./infra/attestation-service";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { WalletInstanceRequest } from "./wallet-instance-request";
