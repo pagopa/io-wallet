@@ -1,4 +1,4 @@
-import { AttestationServiceConfiguration } from "@/app/configs/config";
+import { AttestationServiceConfiguration } from "@/app/config";
 import {
   ValidatedAttestation,
   validateAttestation,

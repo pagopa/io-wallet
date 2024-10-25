@@ -5,7 +5,7 @@ import {
   APPLE_APP_ATTESTATION_ROOT_CA,
   GOOGLE_PUBLIC_KEY,
   HARDWARE_PUBLIC_TEST_KEY,
-} from "@/app/configs/config";
+} from "@/app/config";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";

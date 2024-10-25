@@ -1,7 +1,7 @@
 import {
   APPLE_APP_ATTESTATION_ROOT_CA,
   decodeBase64String,
-} from "@/app/configs/config";
+} from "@/app/config";
 import { decode } from "cbor-x";
 import { describe, expect, it } from "vitest";
 

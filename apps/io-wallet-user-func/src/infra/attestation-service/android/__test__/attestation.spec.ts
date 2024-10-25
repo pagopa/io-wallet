@@ -2,7 +2,7 @@ import {
   ANDROID_CRL_URL,
   GOOGLE_PUBLIC_KEY,
   decodeBase64String,
-} from "@/app/configs/config";
+} from "@/app/config";
 import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 

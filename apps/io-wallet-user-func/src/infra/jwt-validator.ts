@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { JwtValidatorConfig } from "@/app/configs/config";
+import { JwtValidatorConfig } from "@/app/config";
 import { JwtValidate } from "@/jwt-validator";
 import { getValidateJWT } from "@pagopa/ts-commons/lib/jwt_with_key_rotation";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
