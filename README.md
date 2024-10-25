@@ -8,8 +8,8 @@ This is the `io-wallet` repository, a monorepo that use [NodeJS](https://nodejs.
 
 A monorepo is a single repository containing multiple different projects, with well-defined relationships and responsabilities. The `io-wallet` monorepo contains two main projects under the `app/` folder, present in the root directory of the monorepo:
 
-- `io-wallet-support-func`: it contains all functionalities for assistance and support. It's a simple backend.
-- `io-wallet-user-func`: it contains all functionalities used by the IO Wallet app end users. It's a complex backend.
+- `io-wallet-support-func`: it contains all functionalities for assistance and support.
+- `io-wallet-user-func`: it contains all functionalities used by the IO Wallet app end users.
 
 It's strongly recommended to start looking at the code and understanding how Azure functions work from the `io-wallet-support-func` project, even just to have a basic overview. The `io-wallet` monorepo contains a package also, called `io-wallet-common`, present into the `packages/` folder, present in the root directory of the monorepo: this package is used by all two previous projects and it's very important for these. You can see the `io-wallet-common` package like a local NPM package that includes all the common functionalities and utilities of both the `io-wallet-support-func` and `io-wallet-message-func` projects.
 
