@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.4
+
+### Patch Changes
+
+- 9486e3c: Added `requests` telemetry in Application Insights
+
 ## 1.3.3
 
 ### Patch Changes
