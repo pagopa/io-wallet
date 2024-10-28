@@ -12,7 +12,7 @@ import {
 } from "@opentelemetry/api";
 
 // this wrapper enables logging of requests to Application Insights
-export default function createAppInsightsHandlerWrapper(func: HttpHandler) {
+export default function withAppInsights(func: HttpHandler) {
   return async (req: HttpRequest, invocationContext: InvocationContext) => {
     const startTime = Date.now();
 

@@ -1,5 +1,5 @@
 import ai from "@/infra/azure/appinsights/start";
-import createAppInsightsWrapper from "@/infra/azure/appinsights/wrapper-handler";
+import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -65,7 +65,7 @@ const appInsightsClient = ai.defaultClient;
 
 app.http("healthCheck", {
   authLevel: "anonymous",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     HealthFunction({
       cosmosClient,
       pidIssuerClient,
@@ -78,7 +78,7 @@ app.http("healthCheck", {
 
 app.http("createWalletAttestation", {
   authLevel: "function",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     CreateWalletAttestationFunction({
       attestationServiceConfiguration: config.attestationService,
       federationEntityMetadata: config.federationEntity,
@@ -94,7 +94,7 @@ app.http("createWalletAttestation", {
 
 app.http("createWalletInstance", {
   authLevel: "function",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationServiceConfiguration: config.attestationService,
       nonceRepository,
@@ -108,7 +108,7 @@ app.http("createWalletInstance", {
 
 app.http("getNonce", {
   authLevel: "function",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     GetNonceFunction({
       nonceRepository,
       telemetryClient: appInsightsClient,
@@ -134,7 +134,7 @@ app.timer("generateEntityConfiguration", {
 
 app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     GetCurrentWalletInstanceStatusFunction({
       jwtValidate: tokenValidate,
       telemetryClient: appInsightsClient,
@@ -148,7 +148,7 @@ app.http("getCurrentWalletInstanceStatus", {
 
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     SetWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
       jwtValidate: tokenValidate,
@@ -163,7 +163,7 @@ app.http("setWalletInstanceStatus", {
 
 app.http("setCurrentWalletInstanceStatus", {
   authLevel: "function",
-  handler: createAppInsightsWrapper(
+  handler: withAppInsights(
     SetCurrentWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
       telemetryClient: appInsightsClient,
