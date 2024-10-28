@@ -58,54 +58,6 @@ To copy the environment variables template, run the following command:
 cp local.settings.json.example local.settings.json
 ```
 
-The template contains the following environment variables:
-
-- `NODE_TLS_REJECT_UNAUTHORIZED` (required): todo
-- `AzureWebJobsStorage` (required): todo
-- `NODE_ENV` (required): todo
-- `AzureFunctionsJobHost__logging__logLevel__Function` (required): todo
-- `FederationEntityBasePath` (required): todo
-- `FederationEntityOrganizationName` (required): todo
-- `FederationEntityHomepageUri` (required): todo
-- `FederationEntityPolicyUri` (required): todo
-- `FederationEntityTosUri` (required): todo
-- `FederationEntityLogoUri` (required): todo
-- `FederationEntityTrustAnchorUri` (required): todo
-- `WalletKeys` (required): todo
-- `IosBundleIdentifiers` (required): todo
-- `AndroidBundleIdentifiers` (required): todo
-- `IosTeamIdentifier` (required): todo
-- `AppleRootCertificate` (required): todo
-- `GooglePublicKey` (required): todo
-- `AndroidCrlUrl` (required): todo
-- `AndroidPlayIntegrityUrl` (required): todo
-- `AllowDevelopmentEnvironment` (required): todo
-- `GoogleAppCredentialsEncoded` (required): todo
-- `AndroidPlayStoreCertificateHash` (required): todo
-- `EntityConfigurationStorageContainerName` (required): todo
-- `EntityConfigurationStorageAccount__serviceUri` (required): todo
-- `StorageAccount__queueServiceUri` (required): todo
-- `HubSpidLoginJwtPubKey` (required): todo
-- `HubSpidLoginJwtIssuer` (required): todo
-- `HubSpidLoginClientBaseUrl` (required): todo
-- `ExchangeJwtIssuer` (required): todo
-- `ExchangeJwtPubKey` (required): todo
-- `TrialSystemApiBaseURL` (required): todo
-- `TrialSystemApiKey` (required): todo
-- `TrialSystemTrialId` (required): todo
-- `TrialSystemFeatureFlag` (required): todo
-- `PidIssuerApiBaseURL` (required): todo
-- `PidIssuerApiClientCertificate` (required): todo
-- `PidIssuerApiClientPrivateKey` (required): todo
-- `PidIssuerApiRootCACertificate` (required): todo
-- `PidIssuerApiRequestTimeout` (required): todo
-- `FUNCTIONS_WORKER_RUNTIME` (required, fixed value): always set to `node`. This is necessary for the `@azure/functions` SDK.
-- `CosmosDbEndpoint` (required): the CosmosDB endpoint.
-- `CosmosDbDatabaseName` (required): the database name hosted by the CosmosDB.
-- `CosmosDbRequestTimeout` (required): the CosmosDB request timeout (expressed in milliseconds, where 1000ms = 1s).
-- `HttpRequestTimeout` (required): the HTTP request timeout (expressed in milliseconds, where 1000ms = 1s).
-- `AppInsightsConnectionString` (required): the AppInsights connection string.
-
 ### Useful Commands
 
 ```bash

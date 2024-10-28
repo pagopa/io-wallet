@@ -58,15 +58,6 @@ To copy the environment variables template, run the following command:
 cp local.settings.json.example local.settings.json
 ```
 
-The template contains the following environment variables:
-
-- `FUNCTIONS_WORKER_RUNTIME` (required, fixed value): always set to `node`. This is necessary for the `@azure/functions` SDK.
-- `CosmosDbEndpoint` (required): the CosmosDB endpoint.
-- `CosmosDbDatabaseName` (required): the database name hosted by the CosmosDB.
-- `CosmosDbRequestTimeout` (required): the CosmosDB request timeout (expressed in milliseconds, where 1000ms = 1s).
-- `HttpRequestTimeout` (required): the HTTP request timeout (expressed in milliseconds, where 1000ms = 1s).
-- `AppInsightsConnectionString` (required): the AppInsights connection string.
-
 ### Useful Commands
 
 ```bash

@@ -1,11 +1,11 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "FUNCTIONS_WORKER_RUNTIME": "node",
-    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
-    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
-    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
-    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
-    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING"
+    "FUNCTIONS_WORKER_RUNTIME": "node", // must be always "node" in local environment
+    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT", // (required, string) the cosmosdb endpoint, taken directly on azure portal
+    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME", // (required, string) the cosmosdb name, taken directly on azure portal
+    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT", // (required, number as string) the cosmosdb request timeout, expressed in milliseconds
+    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT", // (required, number as string) the http request timeout, expressed in milliseconds
+    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING" // (required, string) the app insights connection string, taken directly on azure portal
   }
 }
