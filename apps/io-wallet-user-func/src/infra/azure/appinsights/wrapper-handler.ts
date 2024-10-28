@@ -1,7 +1,6 @@
 import { HttpHandler, HttpRequest, InvocationContext } from "@azure/functions";
 import {
   Attributes,
-  Span,
   SpanContext,
   SpanKind,
   SpanOptions,
