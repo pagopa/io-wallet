@@ -16,7 +16,12 @@
   "dependencies": {
     "@azure/cosmos": "^4.1.1",
     "@azure/functions": "^4.5.1",
+    "@azure/functions-opentelemetry-instrumentation": "^0.1.0",
     "@azure/identity": "^4.4.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/instrumentation": "^0.54.0",
+    "@opentelemetry/instrumentation-undici": "^0.7.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^13.1.1",
