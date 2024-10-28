@@ -14,45 +14,57 @@ import {
 // this wrapper enables logging of requests to Application Insights
 export default function withAppInsights(func: HttpHandler) {
   return async (req: HttpRequest, invocationContext: InvocationContext) => {
-    const startTime = Date.now();
+    let span;
+    let activeContext;
 
-    // Extract the trace context from the incoming request
-    const traceParent = req.headers.get("traceparent");
-    const parts = traceParent?.split("-");
+    try {
+      const startTime = Date.now();
 
-    const parentSpanContext: SpanContext | null =
-      parts &&
-      parts.length === 4 &&
-      parts[1].length === 32 &&
-      parts[2].length === 16
-        ? {
-            spanId: parts[2],
-            traceFlags: TraceFlags.NONE,
-            traceId: parts[1],
-          }
-        : null;
+      // Extract the trace context from the incoming request
+      const traceParent = req.headers.get("traceparent");
+      const parts = traceParent?.split("-");
 
-    const activeContext = context.active();
+      // 'traceparent' contains 4 parts:
+      // - parts[0]: version (e.g., "00")
+      // - parts[1]: traceId (32 characters, 16 bytes, hexadecimal)
+      // - parts[2]: spanId (16 characters, 8 bytes, hexadecimal)
+      // - parts[3]: traceFlags (indicates whether the trace is sampled)
+      const parentSpanContext: SpanContext | null =
+        parts &&
+        parts.length === 4 &&
+        parts[1].length === 32 &&
+        parts[2].length === 16
+          ? {
+              spanId: parts[2],
+              traceFlags: TraceFlags.NONE,
+              traceId: parts[1],
+            }
+          : null;
 
-    // Set span context as the parent context if any
-    const parentContext = parentSpanContext
-      ? trace.setSpanContext(activeContext, parentSpanContext)
-      : activeContext;
+      activeContext = context.active();
 
-    const attributes: Attributes = {
-      ["http.method"]: "HTTP",
-      ["http.url"]: req.url,
-    };
+      // Set span context as the parent context if any
+      const parentContext = parentSpanContext
+        ? trace.setSpanContext(activeContext, parentSpanContext)
+        : activeContext;
 
-    const options: SpanOptions = {
-      attributes: attributes,
-      kind: SpanKind.SERVER,
-      startTime: startTime,
-    };
+      const attributes: Attributes = {
+        ["http.method"]: "HTTP",
+        ["http.url"]: req.url,
+      };
 
-    const span: Span = trace
-      .getTracer("ApplicationInsightsTracer")
-      .startSpan(`${req.method} ${req.url}`, options, parentContext);
+      const options: SpanOptions = {
+        attributes: attributes,
+        kind: SpanKind.SERVER,
+        startTime: startTime,
+      };
+
+      span = trace
+        .getTracer("ApplicationInsightsTracer")
+        .startSpan(`${req.method} ${req.url}`, options, parentContext);
+    } catch (error) {
+      return await func(req, invocationContext);
+    }
 
     let res;
     try {

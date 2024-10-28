@@ -150,6 +150,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@azure/functions-opentelemetry-instrumentation@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@azure/functions-opentelemetry-instrumentation@npm:0.1.0"
+  dependencies:
+    "@opentelemetry/instrumentation": "npm:^0.52.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.3.0
+  checksum: 10c0/7c95c0d989447aa5ed305f7e1f7cda4f0f2bd5575ca914c4ed6d0ab74b95eac50db1fc59e13027c1bb88a9d1a27add642af4b1cad45405b4fbadee4ed22d5fd8
+  languageName: node
+  linkType: hard
+
 "@azure/functions@npm:^4.0.1, @azure/functions@npm:^4.5.0, @azure/functions@npm:^4.5.1":
   version: 4.5.1
   resolution: "@azure/functions@npm:4.5.1"
@@ -1711,7 +1722,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation@npm:^0.52.1":
+"@opentelemetry/instrumentation@npm:^0.52.0, @opentelemetry/instrumentation@npm:^0.52.1":
   version: 0.52.1
   resolution: "@opentelemetry/instrumentation@npm:0.52.1"
   dependencies:
@@ -4854,6 +4865,7 @@ __metadata:
   dependencies:
     "@azure/cosmos": "npm:^4.1.1"
     "@azure/functions": "npm:^4.5.1"
+    "@azure/functions-opentelemetry-instrumentation": "npm:^0.1.0"
     "@azure/identity": "npm:^4.4.1"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/instrumentation": "npm:^0.54.0"
