@@ -62,6 +62,7 @@ export default function withAppInsights(func: HttpHandler) {
         .getTracer("ApplicationInsightsTracer")
         .startSpan(`${req.method} ${req.url}`, options, parentContext);
     } catch (error) {
+      // If there is an error creating the span, just execute the function
       return await func(req, invocationContext);
     }
 
