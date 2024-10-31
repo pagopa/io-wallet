@@ -23,7 +23,7 @@ locals {
       FederationEntityLogoUri          = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
       IosBundleIdentifiers             = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet"
       IosTeamIdentifier                = "M2X5YQ4BJ7"
-      AndroidBundleIdentifiers         = "UnknownPackage"
+      AndroidBundleIdentifiers         = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage"
       AndroidCrlUrl                    = "https://android.googleapis.com/attestation/status"
       AndroidPlayIntegrityUrl          = "https://www.googleapis.com/auth/playintegrity"
       AndroidPlayStoreCertificateHash  = "feT-Pqrgg__NiwcDAehlAtPx6tHdZqwUK618VEdVT4I"
