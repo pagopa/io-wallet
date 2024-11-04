@@ -177,8 +177,10 @@ module "apim" {
 
   project_legacy = local.project_legacy
   apim = {
-    name                = local.apim.name
-    resource_group_name = local.apim.resource_group_name
+    name                    = local.apim.name
+    resource_group_name     = local.apim.resource_group_name
+    name_itn                = local.apim_itn.name
+    resource_group_name_itn = local.apim_itn.resource_group_name
   }
 
   function_apps = {

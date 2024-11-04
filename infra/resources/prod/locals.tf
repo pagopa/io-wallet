@@ -25,6 +25,11 @@ locals {
     }
   }
 
+  apim_itn = {
+    name                = "${local.project}-apim-01"
+    resource_group_name = "${local.project}-common-rg-01"
+  }
+
   tags = {
     CostCenter     = "TS310 - PAGAMENTI & SERVIZI"
     CreatedBy      = "Terraform"
