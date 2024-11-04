@@ -145,9 +145,12 @@ export const validateRevocation = async (
   });
 
   if (isRevoked) {
-    throw new AndroidAttestationError("Certificate is revoked", {
-      x509Chain,
-    });
+    throw new AndroidAttestationError(
+      "A certificate within the chain has been revoked by Google",
+      {
+        x509Chain,
+      },
+    );
   }
   return x509Chain;
 };
