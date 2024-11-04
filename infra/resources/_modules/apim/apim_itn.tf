@@ -3,8 +3,8 @@ module "apim_itn_web_wallet_api" {
   source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
 
   name                  = format("%s-ioweb-wallet", var.project_legacy)
-  api_management_name   = var.apim.name
-  resource_group_name   = var.apim.resource_group_name
+  api_management_name   = var.apim.name_itn
+  resource_group_name   = var.apim.resource_group_name_itn
   product_ids           = [var.product_id]
   subscription_required = false
 
@@ -25,8 +25,8 @@ module "apim_itn_web_wallet_api" {
 
 # resource "azurerm_api_management_named_value" "user_func_key" {
 #   name                = "io-wallet-user-func-key"
-#   api_management_name = var.apim.name
-#   resource_group_name = var.apim.resource_group_name
+#   api_management_name = var.apim.name_itn
+#   resource_group_name = var.apim.resource_group_name_itn
 #   display_name        = "io-wallet-user-func-key"
 #   value               = data.azurerm_key_vault_secret.funciowallet_default.value
 #   secret              = "true"
@@ -42,8 +42,8 @@ module "apim_itn_wallet_support_api" {
   source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
 
   name                  = format("%s-wallet-support-api", var.project_legacy)
-  api_management_name   = var.apim.name
-  resource_group_name   = var.apim.resource_group_name
+  api_management_name   = var.apim.name_itn
+  resource_group_name   = var.apim.resource_group_name_itn
   product_ids           = [module.apim_itn_wallet_support_product.product_id]
   subscription_required = true
 
@@ -64,8 +64,8 @@ module "apim_itn_wallet_support_api" {
 
 # resource "azurerm_api_management_named_value" "support_func_key" {
 #   name                = "io-wallet-support-func-key"
-#   api_management_name = var.apim.name
-#   resource_group_name = var.apim.resource_group_name
+#   api_management_name = var.apim.name_itn
+#   resource_group_name = var.apim.resource_group_name_itn
 #   display_name        = "io-wallet-support-func-key"
 #   value               = data.azurerm_key_vault_secret.support_func_key_default.value
 #   secret              = "true"
@@ -83,8 +83,8 @@ module "apim_itn_wallet_support_product" {
   display_name = "IO WALLET SUPPORT API"
   description  = "Product containing APIs for Wallet Support Assistance"
 
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name_itn
+  resource_group_name = var.apim.resource_group_name_itn
 
   published             = true
   subscription_required = true
