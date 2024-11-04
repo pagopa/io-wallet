@@ -136,13 +136,12 @@ app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     GetCurrentWalletInstanceStatusFunction({
-      jwtValidate: tokenValidate,
       telemetryClient: appInsightsClient,
       userTrialSubscriptionRepository: trialSystemClient,
       walletInstanceRepository,
     }),
   ),
-  methods: ["GET"],
+  methods: ["POST"],
   route: "wallet-instances/current/status",
 });
 

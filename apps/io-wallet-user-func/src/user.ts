@@ -4,7 +4,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { flow, pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
-import { ForbiddenError } from "io-wallet-common/error";
+import { EntityNotFoundError } from "io-wallet-common/error";
 
 export enum SubscriptionStateEnum {
   "ACTIVE" = "ACTIVE",
@@ -50,16 +50,14 @@ const isUserSubscriptionActive: (
 
 export const ensureUserInWhitelist: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<
-  UserTrialSubscriptionEnvironment,
-  ForbiddenError,
-  void
-> = flow(
+) => RTE.ReaderTaskEither<UserTrialSubscriptionEnvironment, Error, void> = flow(
   isUserSubscriptionActive,
   RTE.chain((isActive) =>
     isActive ? RTE.right(undefined) : RTE.left(new Error()),
   ),
-  RTE.mapLeft(() => new ForbiddenError()),
+  RTE.mapLeft(
+    () => new EntityNotFoundError("The user does not belong to the trial"),
+  ),
 );
 
 // Load testing users have a dummy fiscal code that starts with: LVTEST00A00

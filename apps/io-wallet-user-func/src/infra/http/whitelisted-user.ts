@@ -17,3 +17,8 @@ export const requireWhitelistedFiscalCodeFromToken: (
   Error,
   FiscalCode
 > = flow(requireFiscalCodeFromToken, RTE.chainFirstW(ensureUserInWhitelist));
+
+export const requireWhitelistedFiscalCode: (
+  fiscalCode: FiscalCode,
+) => RTE.ReaderTaskEither<UserTrialSubscriptionEnvironment, Error, void> =
+  ensureUserInWhitelist;

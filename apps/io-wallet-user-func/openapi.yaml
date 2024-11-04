@@ -83,12 +83,11 @@ paths:
           $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/current/status:
-    get:
+    post:
       summary: Retrieve the current Wallet Instance status
       operationId: getCurrentWalletInstanceStatus
       security:
         - FunctionsKey: []
-          BearerAuth: []
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -96,12 +95,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WalletData"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
         "503":
