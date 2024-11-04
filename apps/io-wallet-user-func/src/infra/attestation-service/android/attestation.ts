@@ -132,9 +132,18 @@ export const validateRevocation = async (
     });
   }
   const crl = (await res.json()) as CRL; // Add type assertion for crl
-  const isRevoked = x509Chain.some(
-    (cert) => cert.serialNumber.toLowerCase() in crl.entries,
+
+  const revokedSerials = Object.keys(crl.entries).map((key) =>
+    key.toLowerCase(),
   );
+
+  const isRevoked = x509Chain.some((cert) => {
+    const currentSn = cert.serialNumber.toLowerCase();
+    return revokedSerials.some((revokedSerial) =>
+      currentSn.includes(revokedSerial),
+    );
+  });
+
   if (isRevoked) {
     throw new AndroidAttestationError("Certificate is revoked", {
       x509Chain,
