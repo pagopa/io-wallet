@@ -2,6 +2,7 @@
     <inbound>
         <base />
         <!-- forwards the call to the Function App -->
+        <set-header name="Authorization" exists-action="delete" />
         <set-method>POST</set-method>
         <set-header name="Content-Type" exists-action="override">
             <value>application/json</value>
