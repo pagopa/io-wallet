@@ -12,13 +12,8 @@ import { validateRevocation, verifyAttestation } from "../attestation";
 import { androidMockData } from "./config";
 
 describe("AndroidAttestationValidation", () => {
-  const {
-    androidCrlUrl,
-    attestation,
-    hardwareKey,
-    revokedX509Chain,
-    validX509Chain,
-  } = androidMockData;
+  const { attestation, hardwareKey, revokedX509Chain, validX509Chain } =
+    androidMockData;
 
   const data = Buffer.from(attestation, "base64");
   const x509ChainString = data.toString("utf-8").split(",");
@@ -61,7 +56,7 @@ describe("AndroidAttestationValidation", () => {
     const validChain = validX509Chain.map((c) => new X509Certificate(c));
     const validation = await validateRevocation(
       validChain,
-      androidCrlUrl,
+      ANDROID_CRL_URL,
       4000,
     );
     expect(validation).toBe(validChain);
@@ -71,7 +66,7 @@ describe("AndroidAttestationValidation", () => {
     const invalidChain = revokedX509Chain.map((c) => new X509Certificate(c));
 
     await expect(
-      validateRevocation(invalidChain, androidCrlUrl, 4000),
+      validateRevocation(invalidChain, ANDROID_CRL_URL, 4000),
     ).rejects.toThrow(AndroidAttestationError);
   });
 });
