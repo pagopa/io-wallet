@@ -82,7 +82,7 @@ const fetchAndCheckAllWalletInstancesKeyRevocation = (
   continuationToken?: string,
 ): TE.TaskEither<Error, void> =>
   pipe(
-    walletInstanceRepository.getAllActive({
+    walletInstanceRepository.getAllValid({
       continuationToken,
       maxItemCount: 50,
     }),

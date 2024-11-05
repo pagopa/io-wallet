@@ -18,7 +18,7 @@ const WalletInstanceBase = t.intersection([
   }),
 ]);
 
-const WalletInstanceValid = t.intersection([
+export const WalletInstanceValid = t.intersection([
   WalletInstanceBase,
   t.type({
     isRevoked: t.literal(false),

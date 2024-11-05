@@ -17,6 +17,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
     getAllByUserId: () => TE.left(new Error("not implemented")),
+    getAllValid: () => TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
         O.some({
@@ -136,6 +137,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
+        getAllValid: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
@@ -165,6 +167,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
+        getAllValid: () => TE.left(new Error("not implemented")),
         getLastByUserId: () =>
           TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),
         insert: () => TE.left(new Error("not implemented")),
