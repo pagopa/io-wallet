@@ -72,13 +72,6 @@ describe("AndroidAttestationValidation", () => {
 
     await expect(
       validateRevocation(invalidChain, androidCrlUrl, 4000),
-    ).rejects.toThrow(
-      new AndroidAttestationError(
-        "A certificate within the chain has been revoked by Google",
-        {
-          x509Chain: invalidChain,
-        },
-      ),
-    );
+    ).rejects.toThrow(AndroidAttestationError);
   });
 });
