@@ -30,3 +30,27 @@ resource "azurerm_storage_container" "well_known" {
   # tfsec:ignore:azure-storage-no-public-access
   container_access_type = "container"
 }
+
+resource "azurerm_storage_container" "exchange" {
+  name                 = "exchange"
+  storage_account_name = azurerm_storage_account.this.name
+
+  # tfsec:ignore:azure-storage-no-public-access
+  container_access_type = "container"
+}
+
+resource "azurerm_storage_container" "hub-spid-login" {
+  name                 = "hub-spid-login"
+  storage_account_name = azurerm_storage_account.this.name
+
+  # tfsec:ignore:azure-storage-no-public-access
+  container_access_type = "container"
+}
+
+resource "azurerm_storage_container" "pdnd" {
+  name                 = "pdnd"
+  storage_account_name = azurerm_storage_account.this.name
+
+  # tfsec:ignore:azure-storage-no-public-access
+  container_access_type = "container"
+}
