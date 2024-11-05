@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.5
+
+### Patch Changes
+
+- 47bcac6: Fix Android Attestation revocation validation
+
 ## 1.3.4
 
 ### Patch Changes
