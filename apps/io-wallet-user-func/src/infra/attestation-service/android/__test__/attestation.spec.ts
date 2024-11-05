@@ -7,6 +7,7 @@ import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 
 import { base64ToPem } from "..";
+import { AndroidAttestationError } from "../../errors";
 import { validateRevocation, verifyAttestation } from "../attestation";
 import { androidMockData } from "./config";
 
@@ -71,6 +72,13 @@ describe("AndroidAttestationValidation", () => {
 
     await expect(
       validateRevocation(invalidChain, androidCrlUrl, 4000),
-    ).rejects.toThrow();
+    ).rejects.toThrow(
+      new AndroidAttestationError(
+        "A certificate within the chain has been revoked by Google",
+        {
+          x509Chain: invalidChain,
+        },
+      ),
+    );
   });
 });
