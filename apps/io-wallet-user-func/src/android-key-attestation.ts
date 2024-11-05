@@ -12,6 +12,7 @@ import { AttestationServiceConfiguration } from "./app/config";
 import { validateRevocation } from "./infra/attestation-service/android/attestation";
 import {
   WalletInstanceRepository,
+  getAllValidWalletInstances,
   revokeUserWalletInstances,
 } from "./wallet-instance";
 
@@ -82,7 +83,9 @@ const fetchAndCheckAllWalletInstancesKeyRevocation = (
   continuationToken?: string,
 ): TE.TaskEither<Error, void> =>
   pipe(
-    walletInstanceRepository.getAllValid({
+    // TODO SIW-1818
+    { walletInstanceRepository },
+    getAllValidWalletInstances({
       continuationToken,
       maxItemCount: 50,
     }),

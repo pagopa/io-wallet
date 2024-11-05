@@ -167,3 +167,18 @@ export const revokeUserValidWalletInstancesExceptOne: (
       revokeUserWalletInstances(userId, validWalletInstances),
     ),
   );
+
+export const getAllValidWalletInstances: (options: {
+  continuationToken?: string;
+  maxItemCount?: number;
+}) => RTE.ReaderTaskEither<
+  WalletInstanceEnvironment,
+  Error,
+  O.Option<{
+    continuationToken?: string;
+    walletInstances: WalletInstanceValid[];
+  }>
+> =
+  (options) =>
+  ({ walletInstanceRepository }) =>
+    walletInstanceRepository.getAllValid(options);
