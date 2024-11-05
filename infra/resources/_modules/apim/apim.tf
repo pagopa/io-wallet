@@ -18,9 +18,9 @@ module "apim_v2_web_wallet_api" {
   content_format = "openapi"
 
   # NOTE: This openapi does not contains `upgradeToken` endpoint, since it's not necessary
-  content_value = file("${path.module}/api/ioweb/user-function/_swagger.json")
+  content_value = file("${path.module}/api/ioweb/_swagger.json")
 
-  xml_content = file("${path.module}/api/ioweb/user-function/_base_policy.xml")
+  xml_content = file("${path.module}/api/ioweb/_base_policy.xml")
 }
 
 resource "azurerm_api_management_named_value" "user_func_key" {
