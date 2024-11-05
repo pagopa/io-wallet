@@ -11,9 +11,7 @@ import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { CryptoSigner } from "@/infra/crypto/signer";
-import { jwtValidate } from "@/infra/jwt-validator";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
-import { TrialSystemClient } from "@/infra/trial-system/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -52,10 +50,6 @@ const signer = new CryptoSigner(config.crypto);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const tokenValidate = jwtValidate(config.jwtValidator);
-
-const trialSystemClient = new TrialSystemClient(config.trialSystem);
-
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
   config.federationEntity.basePath.href,
@@ -69,7 +63,6 @@ app.http("healthCheck", {
     HealthFunction({
       cosmosClient,
       pidIssuerClient,
-      trialSystemClient,
     }),
   ),
   methods: ["GET"],
@@ -137,7 +130,6 @@ app.http("getCurrentWalletInstanceStatus", {
   handler: withAppInsights(
     GetCurrentWalletInstanceStatusFunction({
       telemetryClient: appInsightsClient,
-      userTrialSubscriptionRepository: trialSystemClient,
       walletInstanceRepository,
     }),
   ),
@@ -150,9 +142,7 @@ app.http("setWalletInstanceStatus", {
   handler: withAppInsights(
     SetWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
-      jwtValidate: tokenValidate,
       telemetryClient: appInsightsClient,
-      userTrialSubscriptionRepository: trialSystemClient,
       walletInstanceRepository,
     }),
   ),

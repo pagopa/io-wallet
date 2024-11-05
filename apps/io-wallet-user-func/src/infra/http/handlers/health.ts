@@ -2,10 +2,6 @@ import {
   PidIssuerHealthCheck,
   getPidIssuerHealth,
 } from "@/infra/pid-issuer/health-check";
-import {
-  TrialSystemHealthCheck,
-  getTrialSystemHealth,
-} from "@/infra/trial-system/health-check";
 import { CosmosClient } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
 import * as O from "fp-ts/Option";
@@ -22,16 +18,14 @@ const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
     pidIssuerClient: PidIssuerHealthCheck;
-    trialSystemClient: TrialSystemHealthCheck;
   },
   Error,
   void
-> = ({ cosmosClient, pidIssuerClient, trialSystemClient }) =>
+> = ({ cosmosClient, pidIssuerClient }) =>
   // It runs multiple health checks in parallel
   pipe(
     [
       pipe({ cosmosClient }, getCosmosHealth),
-      pipe({ trialSystemClient }, getTrialSystemHealth),
       pipe({ pidIssuerClient }, getPidIssuerHealth),
     ],
     RA.wilt(T.ApplicativePar)(identity),

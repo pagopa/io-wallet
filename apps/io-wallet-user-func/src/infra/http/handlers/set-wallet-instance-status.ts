@@ -1,7 +1,7 @@
 import { revokeAllCredentials } from "@/credential";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import { lookup } from "fp-ts/Record";
 import * as E from "fp-ts/lib/Either";
@@ -10,8 +10,6 @@ import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-
-import { requireWhitelistedFiscalCodeFromToken } from "../whitelisted-user";
 
 const requireWalletInstanceId: (
   req: H.HttpRequest,
@@ -23,7 +21,10 @@ const requireWalletInstanceId: (
     E.chainW(H.parse(NonEmptyString, `Invalid "id" supplied`)),
   );
 
-const SetWalletInstanceStatusBody = t.literal("REVOKED");
+const SetWalletInstanceStatusBody = t.type({
+  fiscal_code: FiscalCode,
+  status: t.literal("REVOKED"),
+});
 
 type SetWalletInstanceStatusBody = t.TypeOf<typeof SetWalletInstanceStatusBody>;
 
@@ -34,19 +35,21 @@ const requireSetWalletInstanceStatusBody: (
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    req,
-    requireWhitelistedFiscalCodeFromToken,
-    RTE.chainW((fiscalCode) =>
+    sequenceS(E.Apply)({
+      fiscalCode: pipe(
+        req,
+        requireSetWalletInstanceStatusBody,
+        E.map(({ fiscal_code }) => fiscal_code),
+      ),
+      walletInstanceId: pipe(req, requireWalletInstanceId),
+    }),
+    RTE.fromEither,
+    RTE.chain(({ fiscalCode, walletInstanceId }) =>
       pipe(
-        sequenceS(E.Apply)({
-          body: pipe(req, requireSetWalletInstanceStatusBody),
-          walletInstanceId: pipe(req, requireWalletInstanceId),
-        }),
-        RTE.fromEither,
         // invoke PID issuer services to revoke all credentials for that user
-        RTE.chainFirstW(() => revokeAllCredentials(fiscalCode)),
-        // access our database to revoke the wallet instance
-        RTE.chainW(({ walletInstanceId }) =>
+        revokeAllCredentials(fiscalCode),
+        RTE.chainW(() =>
+          // access our database to revoke the wallet instance
           revokeUserWalletInstances(fiscalCode, [walletInstanceId]),
         ),
         RTE.orElseFirstW((error) =>

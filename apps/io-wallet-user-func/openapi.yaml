@@ -88,6 +88,12 @@ paths:
       operationId: getCurrentWalletInstanceStatus
       security:
         - FunctionsKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetCurrentWalletInstanceStatusBody"
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -132,7 +138,6 @@ paths:
       operationId: setWalletInstanceStatus
       security:
         - FunctionsKey: []
-          BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -146,7 +151,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SetWalletInstanceStatusData"
+              $ref: "#/components/schemas/SetWalletInstanceStatusWithFiscalCodeData"
       responses:
         "204":
           description: Wallet Instance status successfully set
@@ -334,6 +339,14 @@ components:
       required:
         - grant_type
         - assertion
+        - fiscal_code
+
+    GetCurrentWalletInstanceStatusBody:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: "#/components/schemas/FiscalCode"
+      required:
         - fiscal_code
 
     ProblemJson:

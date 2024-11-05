@@ -9,7 +9,6 @@ import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { WalletInstanceToStatusApiModel } from "../encoders/wallet-instance";
-import { requireWhitelistedFiscalCode } from "../whitelisted-user";
 
 const GetCurrentWalletInstanceStatusBody = t.type({
   fiscal_code: FiscalCode,
@@ -32,7 +31,6 @@ export const GetCurrentWalletInstanceStatusHandler = H.of(
       req,
       requireFiscalCode,
       RTE.fromEither,
-      RTE.chainFirst(requireWhitelistedFiscalCode),
       RTE.chainW((fiscalCode) =>
         pipe(
           getCurrentWalletInstance(fiscalCode),

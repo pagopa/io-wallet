@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -49,14 +48,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     method: "POST",
   };
 
-  const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
-    featureFlag: "true",
-    getUserSubscriptionDetail: () =>
-      TE.right({
-        state: SubscriptionStateEnum["ACTIVE"],
-      }),
-  };
-
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
@@ -67,7 +58,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -99,7 +89,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -110,36 +99,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 422,
-      }),
-    });
-  });
-
-  it("should return a 404 HTTP response on inactive user subscription", async () => {
-    const userTrialSubscriptionRepositoryUnsubscribed: UserTrialSubscriptionRepository =
-      {
-        featureFlag: "true",
-        getUserSubscriptionDetail: () =>
-          TE.right({
-            state: SubscriptionStateEnum["UNSUBSCRIBED"],
-          }),
-      };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      telemetryClient,
-      userTrialSubscriptionRepository:
-        userTrialSubscriptionRepositoryUnsubscribed,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 404,
       }),
     });
   });
@@ -157,7 +116,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -186,7 +144,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
@@ -216,7 +173,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
