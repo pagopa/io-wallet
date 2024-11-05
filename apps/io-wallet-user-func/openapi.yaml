@@ -157,10 +157,6 @@ paths:
           description: Wallet Instance status successfully set
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -206,13 +202,6 @@ components:
 
     BadRequest:
       description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    Unauthorized:
-      description: Unauthorized
       content:
         application/json:
           schema:
