@@ -4,16 +4,16 @@
     "title": "IO Wallet - IO Web API",
     "version": "1.0.0"
   },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
   "paths": {
     "/wallet-instances/current/status": {
       "get": {
         "summary": "Retrieve the current Wallet Instance status",
         "operationId": "getCurrentWalletInstanceStatus",
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
         "responses": {
           "200": {
             "description": "Wallet Instance status successfully retrieved",
@@ -44,11 +44,6 @@
       "put": {
         "summary": "Revoke a Wallet Instance",
         "operationId": "setWalletInstanceStatus",
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ],
         "parameters": [
           {
             "in": "path",
@@ -94,11 +89,6 @@
   },
   "components": {
     "securitySchemes": {
-      "FunctionsKey": {
-        "type": "apiKey",
-        "name": "X-Functions-Key",
-        "in": "header"
-      },
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
