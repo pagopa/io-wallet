@@ -1,3 +1,4 @@
+import * as appInsights from "applicationinsights";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import * as O from "fp-ts/lib/Option";
@@ -41,6 +42,7 @@ const validateAttestedKeyAndRevokeIfNecessary =
   (
     attestationServiceConfiguration: AttestationServiceConfiguration,
     walletInstanceRepository: WalletInstanceRepository,
+    telemetryClient: appInsights.TelemetryClient,
   ) =>
   (walletInstance: WalletInstance) =>
     pipe(
@@ -54,15 +56,29 @@ const validateAttestedKeyAndRevokeIfNecessary =
       ),
       // If the validation fails, revoke the user's wallet instance
       TE.alt(() =>
-        revokeUserWalletInstances(walletInstance.userId, [walletInstance.id])({
-          walletInstanceRepository,
-        }),
+        pipe(
+          revokeUserWalletInstances(walletInstance.userId, [walletInstance.id])(
+            {
+              walletInstanceRepository,
+            },
+          ),
+          TE.map(() =>
+            telemetryClient.trackEvent({
+              name: "REVOKED_WALLET_INSTANCE_FOR_INVALID_CERTIFICATE",
+              properties: {
+                fiscalCode: walletInstance.userId,
+                walletInstanceId: walletInstance.id,
+              },
+            }),
+          ),
+        ),
       ),
     );
 
 const fetchAndCheckAllWalletInstancesKeyRevocation = (
   walletInstanceRepository: WalletInstanceRepository,
   attestationServiceConfiguration: AttestationServiceConfiguration,
+  telemetryClient: appInsights.TelemetryClient,
   continuationToken?: string,
 ): TE.TaskEither<Error, void> =>
   pipe(
@@ -81,6 +97,7 @@ const fetchAndCheckAllWalletInstancesKeyRevocation = (
               validateAttestedKeyAndRevokeIfNecessary(
                 attestationServiceConfiguration,
                 walletInstanceRepository,
+                telemetryClient,
               ),
             ),
             // Execute all TaskEithers in sequence, collecting results
@@ -92,6 +109,7 @@ const fetchAndCheckAllWalletInstancesKeyRevocation = (
                   ? fetchAndCheckAllWalletInstancesKeyRevocation(
                       walletInstanceRepository,
                       attestationServiceConfiguration,
+                      telemetryClient,
                       newToken,
                     ) // Recursive call if there are more instances to fetch
                   : TE.right(undefined), // Finish if no more tokens
@@ -104,12 +122,18 @@ const fetchAndCheckAllWalletInstancesKeyRevocation = (
 export const checkWalletInstancesAttestedKeyRevocation: RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
+    telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
   Error,
   void
-> = ({ attestationServiceConfiguration, walletInstanceRepository }) =>
+> = ({
+  attestationServiceConfiguration,
+  telemetryClient,
+  walletInstanceRepository,
+}) =>
   fetchAndCheckAllWalletInstancesKeyRevocation(
     walletInstanceRepository,
     attestationServiceConfiguration,
+    telemetryClient,
   );
