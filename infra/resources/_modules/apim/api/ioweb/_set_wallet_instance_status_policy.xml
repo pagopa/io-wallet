@@ -7,9 +7,11 @@
         <set-header name="Content-Type" exists-action="override">
             <value>application/json</value>
         </set-header>
+        <set-variable name="requestBody" value="@{ return context.Request.Body.As<string>(preserveContent: true); }" />
         <set-body>@{
             var fiscalCode = context.Variables["fiscalCode"];
-            return $"{{ \"status\": \"REVOKED\", \"fiscal_code\": \"{fiscalCode}\" }}";
+            var status = context.Variables["requestBody"];
+            return $"{{ \"status\": {status}, \"fiscal_code\": \"{fiscalCode}\" }}";
         }</set-body>
         <set-header name="x-functions-key" exists-action="override">
             <value>{{io-wallet-user-func-key}}</value>
