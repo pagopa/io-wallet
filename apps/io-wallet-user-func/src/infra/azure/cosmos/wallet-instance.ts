@@ -7,7 +7,10 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
+import {
+  WalletInstance,
+  WalletInstanceValid,
+} from "io-wallet-common/wallet-instance";
 
 const toError = (message: string) => (error: unknown) =>
   error instanceof Error && error.name === "TimeoutError"
@@ -75,7 +78,48 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  getAllActive(
+  getAllByUserId(userId: WalletInstance["userId"]) {
+    return pipe(
+      TE.tryCatch(async () => {
+        const { resources: items } = await this.#container.items
+          .query({
+            parameters: [
+              {
+                name: "@partitionKey",
+                value: userId,
+              },
+            ],
+            query: "SELECT * FROM c WHERE c.userId = @partitionKey",
+          })
+          .fetchAll();
+        return items;
+      }, toError("Error getting wallet instances by user id")),
+      TE.chain((items) =>
+        pipe(
+          items,
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            () =>
+              pipe(
+                items,
+                t.array(WalletInstance).decode,
+                E.map(O.some),
+                E.mapLeft(
+                  () =>
+                    new Error(
+                      "Error getting wallet instances: invalid result format",
+                    ),
+                ),
+                TE.fromEither,
+              ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  getAllValid(
     options: { continuationToken?: string; maxItemCount?: number } = {},
   ) {
     return pipe(
@@ -109,51 +153,10 @@ export class CosmosDbWalletInstanceRepository
             () =>
               pipe(
                 items,
-                t.array(WalletInstance).decode,
+                t.array(WalletInstanceValid).decode,
                 E.map((walletInstances) =>
                   O.some({ continuationToken, walletInstances }),
                 ),
-                E.mapLeft(
-                  () =>
-                    new Error(
-                      "Error getting wallet instances: invalid result format",
-                    ),
-                ),
-                TE.fromEither,
-              ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  getAllByUserId(userId: WalletInstance["userId"]) {
-    return pipe(
-      TE.tryCatch(async () => {
-        const { resources: items } = await this.#container.items
-          .query({
-            parameters: [
-              {
-                name: "@partitionKey",
-                value: userId,
-              },
-            ],
-            query: "SELECT * FROM c WHERE c.userId = @partitionKey",
-          })
-          .fetchAll();
-        return items;
-      }, toError("Error getting wallet instances by user id")),
-      TE.chain((items) =>
-        pipe(
-          items,
-          RA.head,
-          O.fold(
-            () => TE.right(O.none),
-            () =>
-              pipe(
-                items,
-                t.array(WalletInstance).decode,
-                E.map(O.some),
                 E.mapLeft(
                   () =>
                     new Error(
