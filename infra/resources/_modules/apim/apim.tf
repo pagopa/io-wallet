@@ -23,6 +23,24 @@ module "apim_v2_web_wallet_api" {
   xml_content = file("${path.module}/api/ioweb/_base_policy.xml")
 }
 
+resource "azurerm_api_management_api_operation_policy" "get_current_wallet_instance_status_policy" {
+  api_name            = module.apim_v2_web_wallet_api.name
+  operation_id        = "getCurrentWalletInstanceStatus"
+  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name
+
+  xml_content = file("${path.module}/api/ioweb/_get_current_wallet_instance_status_policy.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
+  api_name            = module.apim_v2_web_wallet_api.name
+  operation_id        = "setWalletInstanceStatus"
+  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name
+
+  xml_content = file("${path.module}/api/ioweb/_set_wallet_instance_status_policy.xml")
+}
+
 resource "azurerm_api_management_named_value" "user_func_key" {
   name                = "io-wallet-user-func-key"
   api_management_name = var.apim.name

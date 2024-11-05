@@ -46,18 +46,6 @@
             </when>
             <otherwise />
         </choose>
-        <!-- forwards the call to the Function App -->
-        <set-method>POST</set-method>
-        <set-header name="Content-Type" exists-action="override">
-            <value>application/json</value>
-        </set-header>
-        <set-body>@{
-            var fiscalCode = context.Variables["fiscalCode"];
-            return $"{{ \"fiscal_code\": \"{fiscalCode}\" }}";
-        }</set-body>
-        <set-header name="x-functions-key" exists-action="override">
-            <value>{{io-wallet-user-func-key}}</value>
-        </set-header>
     </inbound>
     <outbound>
         <base />
