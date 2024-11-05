@@ -2,6 +2,7 @@ import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { CheckWalletInstancesAttestedKeyRevocationFunction } from "@/infra/azure/functions/check-wallet-instances-keys-revocation";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
@@ -172,4 +173,14 @@ app.http("setCurrentWalletInstanceStatus", {
   ),
   methods: ["PUT"],
   route: "wallet-instances/current/status",
+});
+
+app.timer("checkWalletInstancesAttestedKeyRevocation", {
+  handler: CheckWalletInstancesAttestedKeyRevocationFunction({
+    attestationServiceConfiguration: config.attestationService,
+    inputDecoder: t.unknown,
+    telemetryClient: appInsightsClient,
+    walletInstanceRepository,
+  }),
+  schedule: "*/10 * * * * *",
 });
