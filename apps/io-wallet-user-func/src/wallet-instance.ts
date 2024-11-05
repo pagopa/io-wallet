@@ -32,6 +32,13 @@ export interface WalletInstanceRepository {
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  getAllActive: (options: {
+    continuationToken?: string;
+    maxItemCount?: number;
+  }) => TE.TaskEither<
+    Error,
+    O.Option<{ continuationToken?: string; walletInstances: WalletInstance[] }>
+  >;
   getAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
