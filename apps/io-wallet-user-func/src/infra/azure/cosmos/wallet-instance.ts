@@ -177,6 +177,63 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
+  getNotRevokedByDiffirentIdAndUserId(
+    id: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ) {
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          const { resources: items } = await this.#container.items
+            .query({
+              parameters: [
+                {
+                  name: "@partitionKey",
+                  value: userId,
+                },
+                {
+                  name: "@idKey",
+                  value: id,
+                },
+              ],
+              query:
+                "SELECT * FROM c WHERE c.id != @idKey AND c.userId = @partitionKey AND c.isRevoked = false",
+            })
+            .fetchAll();
+          return items;
+        },
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(
+                `The request to the database has timed out: ${error.message}`,
+              )
+            : new Error(`Error getting wallet instances by user id: ${error}`),
+      ),
+      TE.chain((items) =>
+        pipe(
+          items,
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            () =>
+              pipe(
+                items,
+                t.array(WalletInstance).decode,
+                E.map(O.some),
+                E.mapLeft(
+                  () =>
+                    new Error(
+                      "Error getting wallet instances: invalid result format",
+                    ),
+                ),
+                TE.fromEither,
+              ),
+          ),
+        ),
+      ),
+    );
+  }
+
   insert(walletInstance: WalletInstance) {
     return TE.tryCatch(
       async () => {
