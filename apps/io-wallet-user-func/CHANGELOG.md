@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 1.3.6
+
+### Patch Changes
+
+- 35fdcb0: Moved IO Web token validation to APIM
+- Updated dependencies [35fdcb0]
+  - io-wallet-common@1.1.1
+
 ## 1.3.5
 
 ### Patch Changes
