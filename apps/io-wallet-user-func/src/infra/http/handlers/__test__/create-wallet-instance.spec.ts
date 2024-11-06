@@ -19,6 +19,7 @@ import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
+import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -40,9 +41,10 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getAllByUserId: () => TE.right(O.some([])),
+    getNotRevokedByDiffirentIdAndUserId: () => TE.right(O.some([])),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     insert: () => TE.right(undefined),
+    getAllByUserId: () => TE.left(new Error("not implemented")),
   };
 
   const logger = {
@@ -163,9 +165,10 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -193,14 +196,15 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on getAllByUserId error", async () => {
-    const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
+  it("should return a 500 HTTP response on getNotRevokedByDiffirentIdAndUserId error", async () => {
+    const walletInstanceRepositoryThatFailsOnGetNotRevokedByDiffirentIdAndUserId: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
+        getNotRevokedByDiffirentIdAndUserId: () => TE.left(new Error("failed on getNotRevokedByDiffirentIdAndUserId!")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -215,7 +219,7 @@ describe("CreateWalletInstanceHandler", () => {
       nonceRepository,
       telemetryClient,
       walletInstanceRepository:
-        walletInstanceRepositoryThatFailsOnGetAllByUserId,
+        walletInstanceRepositoryThatFailsOnGetNotRevokedByDiffirentIdAndUserId,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -234,9 +238,10 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
