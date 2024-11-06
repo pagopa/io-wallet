@@ -1,6 +1,5 @@
 /* eslint-disable max-lines-per-function */
 import { PidIssuerHealthCheck } from "@/infra/pid-issuer/health-check";
-import { TrialSystemHealthCheck } from "@/infra/trial-system/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -19,16 +18,6 @@ describe("HealthHandler", () => {
   const cosmosClientThatFails = {
     getDatabaseAccount: () => Promise.reject(new Error("foo")),
   } as CosmosClient;
-
-  const trialSystemClient: TrialSystemHealthCheck = {
-    featureFlag: "true",
-    healthCheck: () => TE.right(true),
-  };
-
-  const trialSystemClientThatFails: TrialSystemHealthCheck = {
-    featureFlag: "true",
-    healthCheck: () => TE.left(new Error("trial-system-error")),
-  };
 
   const pidIssuerClient: PidIssuerHealthCheck = {
     healthCheck: () => TE.right(true),
@@ -50,7 +39,6 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pidIssuerClient,
-      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -74,7 +62,6 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pidIssuerClient,
-      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -93,14 +80,13 @@ describe("HealthHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getCosmosHealth and getTrialSystemHealth return an error", async () => {
+  it("should return a 500 HTTP response when getCosmosHealth and getPidIssuerHealth return an error", async () => {
     const handler = HealthHandler({
       cosmosClient: cosmosClientThatFails,
       input: H.request("https://wallet-provider.example.org"),
       inputDecoder: H.HttpRequest,
       logger,
-      pidIssuerClient,
-      trialSystemClient: trialSystemClientThatFails,
+      pidIssuerClient: pidIssuerClientThatFails,
     });
 
     const result = await handler();
@@ -124,36 +110,10 @@ describe("HealthHandler", () => {
       });
       expect(body).toEqual(
         expect.objectContaining({
-          detail: expect.stringContaining("trial-system-error"),
+          detail: expect.stringContaining("pid-issuer-error"),
         }),
       );
     }
-  });
-
-  it("should return a 500 HTTP response when getTrialSystemHealth returns an error", async () => {
-    const handler = HealthHandler({
-      cosmosClient,
-      input: H.request("https://wallet-provider.example.org"),
-      inputDecoder: H.HttpRequest,
-      logger,
-      pidIssuerClient,
-      trialSystemClient: trialSystemClientThatFails,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: {
-        body: {
-          detail: "The function is not healthy. Error: trial-system-error",
-          status: 500,
-          title: "Internal Server Error",
-        },
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
-      },
-    });
   });
 
   it("should return a 500 HTTP response when getPidIssuerHealth returns an error", async () => {
@@ -163,7 +123,6 @@ describe("HealthHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       pidIssuerClient: pidIssuerClientThatFails,
-      trialSystemClient,
     });
 
     await expect(handler()).resolves.toEqual({

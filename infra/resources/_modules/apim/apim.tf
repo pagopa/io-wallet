@@ -18,9 +18,27 @@ module "apim_v2_web_wallet_api" {
   content_format = "openapi"
 
   # NOTE: This openapi does not contains `upgradeToken` endpoint, since it's not necessary
-  content_value = file("${path.module}/api/ioweb/user-function/_swagger.json")
+  content_value = file("${path.module}/api/ioweb/_swagger.json")
 
-  xml_content = file("${path.module}/api/ioweb/user-function/_base_policy.xml")
+  xml_content = file("${path.module}/api/ioweb/_base_policy.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "get_current_wallet_instance_status_policy" {
+  api_name            = module.apim_v2_web_wallet_api.name
+  operation_id        = "getCurrentWalletInstanceStatus"
+  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name
+
+  xml_content = file("${path.module}/api/ioweb/_get_current_wallet_instance_status_policy.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
+  api_name            = module.apim_v2_web_wallet_api.name
+  operation_id        = "setWalletInstanceStatus"
+  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name
+
+  xml_content = file("${path.module}/api/ioweb/_set_wallet_instance_status_policy.xml")
 }
 
 resource "azurerm_api_management_named_value" "user_func_key" {
@@ -32,9 +50,32 @@ resource "azurerm_api_management_named_value" "user_func_key" {
   secret              = "true"
 }
 
+resource "azurerm_api_management_named_value" "trial_id" {
+  name                = "trial-id"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "trial-id"
+  value               = "01J2GN4TA8FB6DPTAX3T3YD6M1"
+  secret              = false
+}
+
+resource "azurerm_api_management_named_value" "trial_system_api_key" {
+  name                = "trial-system-api-key"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "trial-system-api-key"
+  value               = data.azurerm_key_vault_secret.trial_system_api_key.value
+  secret              = true
+}
+
 data "azurerm_key_vault_secret" "funciowallet_default" {
   name         = "funciowallet-KEY-APPBACKEND"
   key_vault_id = var.key_vault_id
+}
+
+data "azurerm_key_vault_secret" "trial_system_api_key" {
+  name         = "TrialSystemApiKey"
+  key_vault_id = var.key_vault_wallet_id
 }
 
 // SUPPORT API
