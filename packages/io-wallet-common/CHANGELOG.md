@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.1.1
+
+### Patch Changes
+
+- 35fdcb0: Moved IO Web token validation to APIM
+
 ## 1.1.0
 
 ### Minor Changes
