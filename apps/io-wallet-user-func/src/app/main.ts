@@ -182,5 +182,5 @@ app.timer("checkWalletInstancesAttestedKeyRevocation", {
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
-  schedule: "0 0 * * * *",
+  schedule: "*/10 * * * * *",
 });

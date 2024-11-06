@@ -73,7 +73,9 @@ const walletInstanceRepository: WalletInstanceRepository = {
       }),
     ),
   getAllByUserId: () => TE.left(new Error("not implemented")),
-  getAllValid: () => TE.left(new Error("not implemented")),
+  getAllValid: function () {
+    throw new Error("not implemented");
+  },
   getLastByUserId: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
 };
@@ -204,7 +206,9 @@ describe("CreateWalletAttestationHandler", async () => {
           }),
         ),
       getAllByUserId: () => TE.left(new Error("not implemented")),
-      getAllValid: () => TE.left(new Error("not implemented")),
+      getAllValid: function () {
+        throw new Error("not implemented");
+      },
       getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
     };
@@ -250,7 +254,9 @@ describe("CreateWalletAttestationHandler", async () => {
       batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
       getAllByUserId: () => TE.left(new Error("not implemented")),
-      getAllValid: () => TE.left(new Error("not implemented")),
+      getAllValid: function () {
+        throw new Error("not implemented");
+      },
       getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
     };

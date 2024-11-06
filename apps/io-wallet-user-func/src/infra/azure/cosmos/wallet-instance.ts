@@ -1,5 +1,10 @@
 import { WalletInstanceRepository } from "@/wallet-instance";
-import { Container, Database, PatchOperationInput } from "@azure/cosmos";
+import {
+  Container,
+  Database,
+  FeedResponse,
+  PatchOperationInput,
+} from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
@@ -119,56 +124,37 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  getAllValid(
-    options: { continuationToken?: string; maxItemCount?: number } = {},
-  ) {
-    return pipe(
-      TE.tryCatch(async () => {
-        const { continuationToken, resources: items } =
-          await this.#container.items
-            .query(
-              {
-                parameters: [
-                  {
-                    name: "@isRevoked",
-                    value: false,
-                  },
-                ],
-                query: "SELECT * FROM c WHERE c.isRevoked = @isRevoked",
-              },
-              {
-                continuationToken: options.continuationToken,
-                maxItemCount: options.maxItemCount ?? 25,
-              },
-            )
-            .fetchNext();
-        return { continuationToken, items };
-      }, toError("Error getting all wallet instances")),
-      TE.chain(({ continuationToken, items }) =>
-        pipe(
-          items,
-          RA.head,
-          O.fold(
-            () => TE.right(O.none),
-            () =>
-              pipe(
-                items,
-                t.array(WalletInstanceValid).decode,
-                E.map((walletInstances) =>
-                  O.some({ continuationToken, walletInstances }),
-                ),
-                E.mapLeft(
-                  () =>
-                    new Error(
-                      "Error getting wallet instances: invalid result format",
-                    ),
-                ),
-                TE.fromEither,
+  async *getAllValid(): AsyncGenerator<E.Either<Error, WalletInstanceValid>> {
+    const query = "SELECT * FROM c WHERE c.isRevoked = @isRevoked";
+    const parameters = [
+      {
+        name: "@isRevoked",
+        value: false,
+      },
+    ];
+
+    const cosmosResponse: AsyncIterable<FeedResponse<WalletInstanceValid>> =
+      this.#container.items
+        .query({
+          parameters,
+          query,
+        })
+        .getAsyncIterator();
+
+    for await (const { resources } of cosmosResponse) {
+      for (const resource of resources) {
+        yield pipe(
+          resource,
+          WalletInstanceValid.decode,
+          E.mapLeft(
+            (e) =>
+              new Error(
+                `Error getting wallet instances, invalid result format: ${e}`,
               ),
           ),
-        ),
-      ),
-    );
+        );
+      }
+    }
   }
 
   getLastByUserId(userId: WalletInstance["userId"]) {
