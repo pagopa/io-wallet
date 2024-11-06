@@ -1,6 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { JwtValidate } from "@/jwt-validator";
-import { SubscriptionStateEnum, UserTrialSubscriptionRepository } from "@/user";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -8,7 +6,7 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { UnauthorizedError } from "io-wallet-common/error";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
 
 import { GetCurrentWalletInstanceStatusHandler } from "../get-current-wallet-instance-status";
@@ -42,17 +40,12 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
-  const jwtValidate: JwtValidate = () =>
-    TE.right({
-      fiscal_number: "AAACCC94D55H501P",
-    });
-
-  const userTrialSubscriptionRepository: UserTrialSubscriptionRepository = {
-    featureFlag: "true",
-    getUserSubscriptionDetail: () =>
-      TE.right({
-        state: SubscriptionStateEnum["ACTIVE"],
-      }),
+  const req = {
+    ...H.request("https://wallet-provider.example.org"),
+    body: {
+      fiscal_code: "GSPMTA98L25E625O",
+    },
+    method: "POST",
   };
 
   const telemetryClient: appInsights.TelemetryClient = {
@@ -60,19 +53,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   } as unknown as appInsights.TelemetryClient;
 
   it("should return a 200 HTTP response on success", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      headers: {
-        authorization: "Bearer xxx",
-      },
-    };
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      jwtValidate,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -91,49 +76,19 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 400 HTTP response when authorization header is missing", async () => {
+  it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
+      body: {
+        foo: "GSPMTA98L25E625O",
+      },
+      method: "POST",
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      jwtValidate,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 400,
-      }),
-    });
-  });
-
-  it("should return a 422 HTTP response when authorization header is an empty string", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "",
-      },
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      jwtValidate,
-      logger,
-      telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -144,150 +99,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 422,
-      }),
-    });
-  });
-
-  it("should return a 422 HTTP response when token is missing in authorization header", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "Bearer ",
-      },
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      jwtValidate,
-      logger,
-      telemetryClient,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 422,
-      }),
-    });
-  });
-
-  it("should return a 422 HTTP response when token does not contain `fiscal_number`", async () => {
-    const jwtValidate: JwtValidate = () =>
-      TE.right({
-        foo: "AAACCC94D55H501P",
-      });
-
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "Bearer xxx",
-      },
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      jwtValidate,
-      logger,
-      telemetryClient,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 422,
-      }),
-    });
-  });
-
-  it("should return a 401 HTTP response on jwt forbidden error", async () => {
-    const jwtValidateThatFails: JwtValidate = () =>
-      TE.left(new UnauthorizedError());
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "Bearer xxx",
-      },
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      jwtValidate: jwtValidateThatFails,
-      logger,
-      telemetryClient,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 401,
-      }),
-    });
-  });
-
-  it("should return a 403 HTTP response on inactive user subscription", async () => {
-    const userTrialSubscriptionRepositoryUnsubscribed: UserTrialSubscriptionRepository =
-      {
-        featureFlag: "true",
-        getUserSubscriptionDetail: () =>
-          TE.right({
-            state: SubscriptionStateEnum["UNSUBSCRIBED"],
-          }),
-      };
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: "REVOKED",
-      headers: {
-        authorization: "Bearer xxx",
-      },
-      path: {
-        id: "foo",
-      },
-    };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      jwtValidate,
-      logger,
-      telemetryClient,
-      userTrialSubscriptionRepository:
-        userTrialSubscriptionRepositoryUnsubscribed,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 403,
       }),
     });
   });
@@ -300,19 +111,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       getLastByUserId: () => TE.right(O.none),
       insert: () => TE.left(new Error("not implemented")),
     };
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      headers: {
-        authorization: "Bearer xxx",
-      },
-    };
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      jwtValidate,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository,
     });
 
@@ -336,19 +139,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
         getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
         insert: () => TE.left(new Error("not implemented")),
       };
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      headers: {
-        authorization: "Bearer xxx",
-      },
-    };
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      jwtValidate,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
@@ -364,24 +159,22 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on jwtValidate error", async () => {
-    const jwtValidateThatFails: JwtValidate = () =>
-      TE.left(new Error("failed on jwtValidationAndDecode!"));
-
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      headers: {
-        authorization: "Bearer xxx",
-      },
-    };
+  it("should return a 503 HTTP response when getLastByUserId returns ServiceUnavailableError", async () => {
+    const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
+      {
+        batchPatch: () => TE.left(new Error("not implemented")),
+        get: () => TE.left(new Error("not implemented")),
+        getAllByUserId: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new ServiceUnavailableError("foo")),
+        insert: () => TE.left(new Error("not implemented")),
+      };
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,
-      jwtValidate: jwtValidateThatFails,
       logger,
       telemetryClient,
-      userTrialSubscriptionRepository,
-      walletInstanceRepository,
+      walletInstanceRepository:
+        walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -390,7 +183,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
         headers: expect.objectContaining({
           "Content-Type": "application/problem+json",
         }),
-        statusCode: 500,
+        statusCode: 503,
       }),
     });
   });

@@ -1,0 +1,54 @@
+<!-- TODO SIW-1820 -->
+<policies>
+    <inbound>
+        <base />
+        <cors>
+            <allowed-origins>
+                <origin>https://ioapp.it/</origin>
+            </allowed-origins>
+            <allowed-methods preflight-result-max-age="300">
+                <method>OPTIONS</method>
+                <method>GET</method>
+                <method>PUT</method>
+            </allowed-methods>
+            <allowed-headers>
+                <header>Content-Type</header>
+                <header>Authorization</header>
+            </allowed-headers>
+        </cors>
+        <!-- validate the jwt using the specified OpenID configuration URLs. Both URLs are used to ensure token validation across different identity providers -->
+        <validate-jwt header-name="Authorization" require-scheme="Bearer" output-token-variable-name="jwt">
+            <openid-config url="https://wallet.io.pagopa.it/hub-spid-login/openid-configuration" />
+            <openid-config url="https://wallet.io.pagopa.it/exchange/openid-configuration" />
+            <required-claims>
+                <claim name="fiscal_number" />
+            </required-claims>
+        </validate-jwt>
+        <!-- get the claim fiscal_number -->
+        <set-variable name="fiscalCode" value="@((string)((Jwt)context.Variables["jwt"]).Claims.GetValueOrDefault("fiscal_number"))" />
+        <!-- send the request to trial system -->
+        <send-request mode="new" response-variable-name="trialSystemResponse" timeout="5">
+            <set-url>@($"https://api.trial.pagopa.it/manage/api/v1/trials/{{trial-id}}/subscriptions/{context.Variables["fiscalCode"]}")</set-url>
+            <set-method>GET</set-method>
+            <set-header name="Ocp-Apim-Subscription-Key" exists-action="override">
+                <value>{{trial-system-api-key}}</value>
+            </set-header>
+        </send-request>
+        <set-variable name="isActive" value="@{
+            var state = (string)((IResponse)context.Variables["trialSystemResponse"]).Body.As<JObject>()["state"];
+            return state == "ACTIVE";
+        } " />
+        <choose>
+            <when condition="@(context.Variables.GetValueOrDefault<bool>("isActive") != true)">
+                <return-response>
+                    <set-status code="403" reason="Forbidden" />
+                    <set-body template="liquid">{ "detail": "Access to this resource is forbidden", "status": 403, "title": "Forbidden" } </set-body>
+                </return-response>
+            </when>
+            <otherwise />
+        </choose>
+    </inbound>
+    <outbound>
+        <base />
+    </outbound>
+</policies>
