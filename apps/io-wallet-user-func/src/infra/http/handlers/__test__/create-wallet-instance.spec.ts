@@ -19,7 +19,6 @@ import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -41,10 +40,10 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getNotRevokedByDiffirentIdAndUserId: () => TE.right(O.some([])),
-    getLastByUserId: () => TE.left(new Error("not implemented")),
-    insert: () => TE.right(undefined),
     getAllByUserId: () => TE.left(new Error("not implemented")),
+    getLastByUserId: () => TE.left(new Error("not implemented")),
+    getNotRevokedByDiffirentIdAndUserId: () => TE.right(O.some([])),
+    insert: () => TE.right(undefined),
   };
 
   const logger = {
@@ -165,10 +164,11 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getNotRevokedByDiffirentIdAndUserId: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("failed on insert!")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () =>
+          TE.left(new Error("not implemented")),
+        insert: () => TE.left(new Error("failed on insert!")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -201,10 +201,11 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getNotRevokedByDiffirentIdAndUserId: () => TE.left(new Error("failed on getNotRevokedByDiffirentIdAndUserId!")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () =>
+          TE.left(new Error("failed on getNotRevokedByDiffirentIdAndUserId!")),
+        insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -238,10 +239,11 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getNotRevokedByDiffirentIdAndUserId: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () =>
+          TE.left(new Error("not implemented")),
+        insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
