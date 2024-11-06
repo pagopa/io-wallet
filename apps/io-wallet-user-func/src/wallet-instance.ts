@@ -1,4 +1,6 @@
+import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
+import * as R from "fp-ts/Reader";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
@@ -35,16 +37,7 @@ export interface WalletInstanceRepository {
   getAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
-  getAllValid: (options: {
-    continuationToken?: string;
-    maxItemCount?: number;
-  }) => TE.TaskEither<
-    Error,
-    O.Option<{
-      continuationToken?: string;
-      walletInstances: WalletInstanceValid[];
-    }>
-  >;
+  getAllValid: () => AsyncGenerator<E.Either<Error, WalletInstanceValid>>;
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
@@ -168,17 +161,7 @@ export const revokeUserValidWalletInstancesExceptOne: (
     ),
   );
 
-export const getAllValidWalletInstances: (options: {
-  continuationToken?: string;
-  maxItemCount?: number;
-}) => RTE.ReaderTaskEither<
+export const getAllValidWalletInstances: R.Reader<
   WalletInstanceEnvironment,
-  Error,
-  O.Option<{
-    continuationToken?: string;
-    walletInstances: WalletInstanceValid[];
-  }>
-> =
-  (options) =>
-  ({ walletInstanceRepository }) =>
-    walletInstanceRepository.getAllValid(options);
+  AsyncGenerator<E.Either<Error, WalletInstanceValid>>
+> = ({ walletInstanceRepository }) => walletInstanceRepository.getAllValid();

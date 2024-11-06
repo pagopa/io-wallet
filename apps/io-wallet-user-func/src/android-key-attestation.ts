@@ -1,12 +1,10 @@
 import * as appInsights from "applicationinsights";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
-import * as O from "fp-ts/lib/Option";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
+import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
 import { validateRevocation } from "./infra/attestation-service/android/attestation";
@@ -16,16 +14,23 @@ import {
   revokeUserWalletInstances,
 } from "./wallet-instance";
 
+type WalletInstanceValidWithDetails = {
+  deviceDetails: { platform: string; x509Chain: string[] };
+} & WalletInstanceValid;
+
+const hasValidChain = (
+  walletInstance: WalletInstanceValid,
+): walletInstance is WalletInstanceValidWithDetails =>
+  !!walletInstance.deviceDetails &&
+  walletInstance.deviceDetails.platform === "android" &&
+  !!walletInstance.deviceDetails.x509Chain;
+
 const validateKeyAttestationChain = async (
-  walletInstance: WalletInstance,
+  walletInstance: WalletInstanceValid,
   attestationServiceConfiguration: AttestationServiceConfiguration,
 ) => {
   // Check if device details exist and the platform is Android with a valid x509 chain. For iOS is not necessary.
-  if (
-    walletInstance.deviceDetails &&
-    walletInstance.deviceDetails.platform === "android" &&
-    walletInstance.deviceDetails.x509Chain
-  ) {
+  if (hasValidChain(walletInstance)) {
     const x509Chain = walletInstance.deviceDetails.x509Chain.map(
       (cert) => new X509Certificate(cert),
     );
@@ -39,13 +44,23 @@ const validateKeyAttestationChain = async (
   }
 };
 
-const validateAttestedKeyAndRevokeIfNecessary =
-  (
-    attestationServiceConfiguration: AttestationServiceConfiguration,
-    walletInstanceRepository: WalletInstanceRepository,
-    telemetryClient: appInsights.TelemetryClient,
-  ) =>
-  (walletInstance: WalletInstance) =>
+const validateAttestedKeyAndRevokeIfNecessary: (
+  walletInstance: WalletInstanceValid,
+) => RTE.ReaderTaskEither<
+  {
+    attestationServiceConfiguration: AttestationServiceConfiguration;
+    telemetryClient: appInsights.TelemetryClient;
+    walletInstanceRepository: WalletInstanceRepository;
+  },
+  Error,
+  void
+> =
+  (walletInstance: WalletInstanceValid) =>
+  ({
+    attestationServiceConfiguration,
+    telemetryClient,
+    walletInstanceRepository,
+  }) =>
     pipe(
       TE.tryCatch(
         () =>
@@ -76,52 +91,6 @@ const validateAttestedKeyAndRevokeIfNecessary =
       ),
     );
 
-const fetchAndCheckAllWalletInstancesKeyRevocation = (
-  walletInstanceRepository: WalletInstanceRepository,
-  attestationServiceConfiguration: AttestationServiceConfiguration,
-  telemetryClient: appInsights.TelemetryClient,
-  continuationToken?: string,
-): TE.TaskEither<Error, void> =>
-  pipe(
-    // TODO SIW-1818
-    { walletInstanceRepository },
-    getAllValidWalletInstances({
-      continuationToken,
-      maxItemCount: 50,
-    }),
-    TE.chain(
-      O.fold(
-        () => TE.right(undefined), // Return early if there are no wallet instances
-        ({ continuationToken: newToken, walletInstances }) =>
-          pipe(
-            walletInstances,
-            // Map each wallet instance to its validation function
-            RA.map(
-              validateAttestedKeyAndRevokeIfNecessary(
-                attestationServiceConfiguration,
-                walletInstanceRepository,
-                telemetryClient,
-              ),
-            ),
-            // Execute all TaskEithers in sequence, collecting results
-            RA.sequence(TE.ApplicativeSeq),
-            TE.chain(
-              () =>
-                // Check if there is a continuation token for pagination
-                O.isSome(O.fromNullable(newToken))
-                  ? fetchAndCheckAllWalletInstancesKeyRevocation(
-                      walletInstanceRepository,
-                      attestationServiceConfiguration,
-                      telemetryClient,
-                      newToken,
-                    ) // Recursive call if there are more instances to fetch
-                  : TE.right(undefined), // Finish if no more tokens
-            ),
-          ),
-      ),
-    ),
-  );
-
 export const checkWalletInstancesAttestedKeyRevocation: RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
@@ -130,13 +99,21 @@ export const checkWalletInstancesAttestedKeyRevocation: RTE.ReaderTaskEither<
   },
   Error,
   void
-> = ({
-  attestationServiceConfiguration,
-  telemetryClient,
-  walletInstanceRepository,
-}) =>
-  fetchAndCheckAllWalletInstancesKeyRevocation(
-    walletInstanceRepository,
-    attestationServiceConfiguration,
-    telemetryClient,
+> = (params) =>
+  pipe(params, getAllValidWalletInstances, (generator) =>
+    TE.tryCatch(async () => {
+      for await (const result of generator) {
+        pipe(
+          result,
+          E.fold(
+            () => TE.right(undefined),
+            (walletInstance) =>
+              pipe(
+                params,
+                validateAttestedKeyAndRevokeIfNecessary(walletInstance),
+              ),
+          ),
+        )(); //Execute TaskEither for each element of the loop
+      }
+    }, E.toError),
   );
