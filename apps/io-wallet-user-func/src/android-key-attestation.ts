@@ -14,13 +14,13 @@ import {
   revokeUserWalletInstances,
 } from "./wallet-instance";
 
-type WalletInstanceValidWithDetails = {
+type WalletInstanceValidWithAndroidCertificatesChain = {
   deviceDetails: { platform: string; x509Chain: string[] };
 } & WalletInstanceValid;
 
-const hasValidChain = (
+const hasAndroidCertificatesChain = (
   walletInstance: WalletInstanceValid,
-): walletInstance is WalletInstanceValidWithDetails =>
+): walletInstance is WalletInstanceValidWithAndroidCertificatesChain =>
   !!walletInstance.deviceDetails &&
   walletInstance.deviceDetails.platform === "android" &&
   !!walletInstance.deviceDetails.x509Chain;
@@ -30,7 +30,7 @@ const validateKeyAttestationChain = async (
   attestationServiceConfiguration: AttestationServiceConfiguration,
 ) => {
   // Check if device details exist and the platform is Android with a valid x509 chain. For iOS is not necessary.
-  if (hasValidChain(walletInstance)) {
+  if (hasAndroidCertificatesChain(walletInstance)) {
     const x509Chain = walletInstance.deviceDetails.x509Chain.map(
       (cert) => new X509Certificate(cert),
     );
