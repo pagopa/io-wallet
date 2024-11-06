@@ -111,7 +111,7 @@ export const checkWalletInstancesAttestedKeyRevocation: RTE.ReaderTaskEither<
   pipe(params, getAllValidWalletInstances, (generator) =>
     TE.tryCatch(async () => {
       for await (const result of generator) {
-        pipe(
+        await pipe(
           result,
           E.fold(
             () => TE.right(undefined),
