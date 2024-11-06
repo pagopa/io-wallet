@@ -7,7 +7,10 @@ import { pipe } from "fp-ts/lib/function";
 import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
-import { validateRevocation } from "./infra/attestation-service/android/attestation";
+import {
+  validateIssuance,
+  validateRevocation,
+} from "./infra/attestation-service/android/attestation";
 import {
   WalletInstanceRepository,
   getAllValidWalletInstances,
@@ -35,6 +38,11 @@ const validateKeyAttestationChain = async (
       (cert) => new X509Certificate(cert),
     );
 
+    // Validate issuance and expiration of the certificates
+    validateIssuance(
+      x509Chain,
+      attestationServiceConfiguration.googlePublicKey,
+    );
     // Validate revocation of the certificates using the provided CRL URL
     await validateRevocation(
       x509Chain,
