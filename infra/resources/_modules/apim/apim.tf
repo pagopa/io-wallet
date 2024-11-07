@@ -141,3 +141,21 @@ module "apim_v2_wallet_pdnd_api" {
 
   xml_content = file("${path.module}/api/pdnd/_base_policy.xml")
 }
+
+resource "azurerm_api_management_api_operation_policy" "health_check_policy" {
+  api_name            = module.apim_v2_wallet_pdnd_api.name
+  operation_id        = "healthCheck"
+  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name
+
+  xml_content = file("${path.module}/api/pdnd/_health_check_policy.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
+  api_name            = module.apim_v2_wallet_pdnd_api.name
+  operation_id        = "setWalletInstanceStatus"
+  resource_group_name = var.apim.resource_group_name
+  api_management_name = var.apim.name
+
+  xml_content = file("${path.module}/api/pdnd/_set_wallet_instance_status_policy.xml")
+}
