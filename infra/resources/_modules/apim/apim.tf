@@ -116,3 +116,28 @@ data "azurerm_key_vault_secret" "support_func_key_default" {
   name         = "io-wallet-support-func-key"
   key_vault_id = var.key_vault_wallet_id
 }
+
+// PDND API
+module "apim_v2_wallet_pdnd_api" {
+  source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
+
+  name                  = format("%s-wallet-pdnd-api", var.project_legacy)
+  api_management_name   = var.apim.name
+  resource_group_name   = var.apim.resource_group_name
+  product_ids           = [module.apim_v2_wallet_pdnd_product.product_id]
+  subscription_required = false
+
+  service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
+
+
+  description  = "API access limited by PDND token authentication"
+  display_name = "IO Wallet - PDND"
+  path         = "api/v1/wallet"
+  protocols    = ["https"]
+
+  content_format = "openapi"
+
+  content_value = file("${path.module}/api/pdnd/_swagger.json")
+
+  xml_content = file("${path.module}/api/pdnd/_base_policy.xml")
+}

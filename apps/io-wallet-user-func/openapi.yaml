@@ -187,10 +187,6 @@ components:
       type: apiKey
       name: X-Functions-Key
       in: header
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
 
   responses:
     Forbidden:
@@ -243,10 +239,6 @@ components:
             $ref: "#/components/schemas/ProblemJson"
 
   schemas:
-    SetWalletInstanceStatusData:
-      type: string
-      enum: ["REVOKED"]
-
     SetWalletInstanceStatusWithFiscalCodeData:
       type: object
       properties:
