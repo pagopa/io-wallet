@@ -33,6 +33,8 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
           userId: "AAA" as FiscalCode,
         }),
       ),
+    getNotRevokedByDiffirentIdAndUserId: () =>
+      TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
 
@@ -137,6 +139,8 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () =>
+          TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
@@ -167,6 +171,8 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
         getAllByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () =>
           TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),
+        getNotRevokedByDiffirentIdAndUserId: () =>
+          TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetCurrentWalletInstanceStatusHandler({

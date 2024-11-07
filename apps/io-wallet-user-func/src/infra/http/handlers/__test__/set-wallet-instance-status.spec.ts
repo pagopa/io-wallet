@@ -15,6 +15,8 @@ describe("SetWalletInstanceStatusHandler", () => {
     get: () => TE.left(new Error("not implemented")),
     getAllByUserId: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
+    getNotRevokedByDiffirentIdAndUserId: () =>
+      TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
 
@@ -125,6 +127,8 @@ describe("SetWalletInstanceStatusHandler", () => {
         get: () => TE.left(new Error("not implemented")),
         getAllByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getNotRevokedByDiffirentIdAndUserId: () =>
+          TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetWalletInstanceStatusHandler({
