@@ -5,10 +5,7 @@
         <validate-jwt header-name="Authorization" require-scheme="Bearer">
             <openid-config url="https://wallet.io.pagopa.it/pdnd/openid-configuration" />
         </validate-jwt>
-        <!-- forwards the call to the Function App -->
-        <set-header name="x-functions-key" exists-action="override">
-            <value>{{io-wallet-user-func-key}}</value>
-        </set-header>
+        <set-header name="Authorization" exists-action="delete" />
     </inbound>
     <outbound>
         <base />

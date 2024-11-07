@@ -10,6 +10,57 @@
     }
   ],
   "paths": {
+    "/status": {
+      "get": {
+        "operationId": "healthCheck",
+        "summary": "Used to check if the function is healthy",
+        "responses": {
+          "200": {
+            "description": "The function is health",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["about:blank"]
+                    },
+                    "title": {
+                      "type": "string",
+                      "enum": ["OK"]
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32",
+                      "enum": [200]
+                    },
+                    "detail": {
+                      "type": "string",
+                      "enum": ["The service is healthy"]
+                    },
+                    "instance": {
+                      "type": "string",
+                      "enum": ["/status"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/wallet-instances/{id}/status": {
       "put": {
         "summary": "Revoke a Wallet Instance",
