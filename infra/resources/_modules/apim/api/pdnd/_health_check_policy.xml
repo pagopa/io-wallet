@@ -1,0 +1,22 @@
+<policies>
+    <inbound>
+        <base />
+        <rewrite-uri template="/health" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+        <choose>
+            <when condition="@(context.Response.StatusCode == 200)">
+                <set-body>@{
+                    return $"{{ \"type\": \"about:blank\", \"title\": \"OK\", \"status\": 200, \"detail\": \"The service is healthy\", \"instance\": \"/status\" }}";
+                }</set-body>
+            </when>
+        </choose>
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

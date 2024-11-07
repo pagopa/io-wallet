@@ -1,0 +1,18 @@
+<policies>
+    <inbound>
+        <base />
+        <!-- forwards the call to the Function App -->
+        <set-header name="x-functions-key" exists-action="override">
+            <value>{{io-wallet-user-func-key}}</value>
+        </set-header>
+    </inbound>
+    <outbound>
+        <base />
+    </outbound>
+    <backend>
+        <base />
+    </backend>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
