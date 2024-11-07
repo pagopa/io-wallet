@@ -196,7 +196,7 @@
             "minimum": 100,
             "maximum": 600,
             "exclusiveMaximum": true,
-            "example": 200
+            "example": 500
           },
           "detail": {
             "type": "string",
