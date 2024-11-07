@@ -130,7 +130,7 @@ module "apim_v2_wallet_pdnd_api" {
   service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
 
 
-  description  = "API access limited by PDND token authentication"
+  description  = "foo"
   display_name = "IO Wallet - PDND"
   path         = "api/v1/wallet/pdnd"
   protocols    = ["https"]
