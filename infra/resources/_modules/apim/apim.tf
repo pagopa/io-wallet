@@ -132,7 +132,7 @@ module "apim_v2_wallet_pdnd_api" {
 
   description  = "API access limited by PDND token authentication"
   display_name = "IO Wallet - PDND"
-  path         = "api/v1/wallet"
+  path         = "api/v1/wallet/pdnd"
   protocols    = ["https"]
 
   content_format = "openapi"
