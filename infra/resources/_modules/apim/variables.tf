@@ -14,10 +14,8 @@ variable "tags" {
 
 variable "apim" {
   type = object({
-    name                    = string
-    resource_group_name     = string
-    name_itn                = optional(string)
-    resource_group_name_itn = optional(string)
+    name                = string
+    resource_group_name = string
   })
   description = "APIM configuration variables"
 }

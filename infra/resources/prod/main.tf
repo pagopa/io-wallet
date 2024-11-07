@@ -177,10 +177,36 @@ module "apim" {
 
   project_legacy = local.project_legacy
   apim = {
-    name                    = local.apim.name
-    resource_group_name     = local.apim.resource_group_name
-    name_itn                = local.apim_itn.name
-    resource_group_name_itn = local.apim_itn.resource_group_name
+    name                = local.apim.name
+    resource_group_name = local.apim.resource_group_name
+  }
+
+  function_apps = {
+    user_function = {
+      function_hostname = module.function_apps.function_app_user_02.default_hostname
+    }
+    support_function = {
+      function_hostname = module.function_apps.function_app_support.default_hostname
+    }
+  }
+
+  key_vault_id        = data.azurerm_key_vault.weu_common.id
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
+  product_id = local.apim.products.io_web.product_id
+
+  tags = local.tags
+}
+
+module "apim_itn" {
+  source = "../_modules/apim"
+
+  revision = "v1"
+
+  project_legacy = local.project_legacy
+  apim = {
+    name                = local.apim_itn.name
+    resource_group_name = local.apim_itn.resource_group_name
   }
 
   function_apps = {
