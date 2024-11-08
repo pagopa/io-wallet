@@ -2,7 +2,7 @@ resource "azurerm_monitor_metric_alert" "storage_account_low_availability" {
   name                = "[${azurerm_storage_account.this.name}] Low Availability"
   resource_group_name = var.resource_group_name
   scopes              = [azurerm_storage_account.this.id]
-  description         = "The average availability is less than 99.8%. Runbook: not needed."
+  description         = "The average availability is less than 99.8%. Runbook: https://pagopa.atlassian.net/wiki/spaces/SIW/pages/1311735955/Runbook"
   severity            = 0
   window_size         = "PT5M"
   frequency           = "PT5M"

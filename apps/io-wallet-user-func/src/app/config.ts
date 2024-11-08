@@ -1,10 +1,8 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
-import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
-import { flow, pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import {
   AzureAppInsightsConfig,
@@ -86,32 +84,6 @@ const AzureConfig = t.type({
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
 
-const JwtValidatorConfig = t.type({
-  exchange: t.type({
-    jwtIssuer: NonEmptyString,
-    jwtPubKey: NonEmptyString,
-  }),
-  hubSpidLogin: t.type({
-    clientBaseUrl: NonEmptyString,
-    jwtIssuer: NonEmptyString,
-    jwtPubKey: NonEmptyString,
-  }),
-});
-
-export type JwtValidatorConfig = t.TypeOf<typeof JwtValidatorConfig>;
-
-const TrialSystemApiClientConfig = t.type({
-  apiKey: t.string,
-  baseURL: t.string,
-  featureFlag: t.string,
-  requestTimeout: NumberFromString,
-  trialId: t.string,
-});
-
-export type TrialSystemApiClientConfig = t.TypeOf<
-  typeof TrialSystemApiClientConfig
->;
-
 const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
   clientCertificate: t.string,
@@ -130,9 +102,7 @@ export const Config = t.type({
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
-  jwtValidator: JwtValidatorConfig,
   pidIssuer: PidIssuerApiClientConfig,
-  trialSystem: TrialSystemApiClientConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -268,78 +238,6 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
-const getJwtValidatorConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  JwtValidatorConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    exchangeJwtIssuer: readFromEnvironment("ExchangeJwtIssuer"),
-    exchangeJwtPubKey: pipe(
-      readFromEnvironment("ExchangeJwtPubKey"),
-      RE.map(decodeBase64String),
-    ),
-    hubSpidLoginClientBaseUrl: readFromEnvironment("HubSpidLoginClientBaseUrl"),
-    hubSpidLoginJwtIssuer: readFromEnvironment("HubSpidLoginJwtIssuer"),
-    hubSpidLoginJwtPubKey: pipe(
-      readFromEnvironment("HubSpidLoginJwtPubKey"),
-      RE.map(decodeBase64String),
-    ),
-  }),
-  RE.map(
-    ({
-      exchangeJwtIssuer,
-      exchangeJwtPubKey,
-      hubSpidLoginClientBaseUrl,
-      hubSpidLoginJwtIssuer,
-      hubSpidLoginJwtPubKey,
-    }) => ({
-      exchange: {
-        jwtIssuer: exchangeJwtIssuer,
-        jwtPubKey: exchangeJwtPubKey,
-      },
-      hubSpidLogin: {
-        clientBaseUrl: hubSpidLoginClientBaseUrl,
-        jwtIssuer: hubSpidLoginJwtIssuer,
-        jwtPubKey: hubSpidLoginJwtPubKey,
-      },
-    }),
-  ),
-  RE.chainW(
-    flow(
-      JwtValidatorConfig.decode,
-      RE.fromEither,
-      RE.mapLeft((errs) => Error(readableReportSimplified(errs))),
-    ),
-  ),
-);
-
-const getTrialSystemConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  Omit<TrialSystemApiClientConfig, "requestTimeout">
-> = pipe(
-  sequenceS(RE.Apply)({
-    trialSystemApiBaseURL: readFromEnvironment("TrialSystemApiBaseURL"),
-    trialSystemApiKey: readFromEnvironment("TrialSystemApiKey"),
-    trialSystemFeatureFlag: readFromEnvironment("TrialSystemFeatureFlag"),
-    trialSystemTrialId: readFromEnvironment("TrialSystemTrialId"),
-  }),
-  RE.map(
-    ({
-      trialSystemApiBaseURL,
-      trialSystemApiKey,
-      trialSystemFeatureFlag,
-      trialSystemTrialId,
-    }) => ({
-      apiKey: trialSystemApiKey,
-      baseURL: trialSystemApiBaseURL,
-      featureFlag: trialSystemFeatureFlag,
-      trialId: trialSystemTrialId,
-    }),
-  ),
-);
-
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -402,26 +300,13 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
-    jwtValidator: getJwtValidatorConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
-    trialSystem: getTrialSystemConfigFromEnvironment,
   }),
-  RE.map(
-    ({
-      attestationService,
+  RE.map(({ attestationService, httpRequestTimeout, ...remainingConfigs }) => ({
+    ...remainingConfigs,
+    attestationService: {
+      ...attestationService,
       httpRequestTimeout,
-      trialSystem,
-      ...remainingConfigs
-    }) => ({
-      ...remainingConfigs,
-      attestationService: {
-        ...attestationService,
-        httpRequestTimeout,
-      },
-      trialSystem: {
-        ...trialSystem,
-        requestTimeout: httpRequestTimeout,
-      },
-    }),
-  ),
+    },
+  })),
 );

@@ -1,51 +1,42 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "NODE_TLS_REJECT_UNAUTHORIZED": 0, // (required, number) must be always 0 in local environment
-    "AzureWebJobsStorage": "",  // (required, string) must be always "" (an empty string) in local environment
-    "FUNCTIONS_WORKER_RUNTIME": "node", // (required, string) must be always "node" in local environment
-    "NODE_ENV": "development", // (required, string) must be always "development" in local environment
-    "AzureFunctionsJobHost__logging__logLevel__Function": "Trace", // (required, string) the logging level of the azure function (see the azure function docs for more info)
-    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT", // (required, string) the cosmosdb endpoint, taken directly on azure portal
-    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME", // (required, string) the cosmosdb name, taken directly on azure portal
-    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT", // (required, number as string) the cosmosdb request timeout, expressed in milliseconds
-    "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH", // (required, string) the base path of the federation entity
-    "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME", // (required, string) the organization name of the federation entity
-    "FederationEntityHomepageUri": "FEDERATION_ENTITY_HOMEPAGE_URI", // (required, string) the home page uri of the federation entity
-    "FederationEntityPolicyUri": "FEDERATION_ENTITY_PRIVACY_URI", // (required, string) the privacy uri of the federation entity
-    "FederationEntityTosUri": "FEDERATION_ENTITY_TOS_URI", // (required, string) the tos uri of the federation entity
-    "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI", // (required, string) the logo uri of the federation entity
-    "WalletKeys": "ARRAY_OF_WALLET_KEYS_IN_JWK_FORMAT_BASE64_ENCODED", // (required, string) an array of string, where each string is a jwk key encoded in base64
-    "IosBundleIdentifiers": "APPLE_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA", // (required, string) wallet instance bundles (apple) separated by comma
-    "AndroidBundleIdentifiers": "ANDROID_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA", // (required, string) wallet instance bundles (android) separated by comma
-    "AndroidPlayStoreCertificateHash": "ANDROID_WALLET_INSTANCE_PLAY_STORE_CERTIFICATE_SHA256", // (required, string) the sha256 of the wallet instance certificate for android playstore
-    "IosTeamIdentifier": "IO_TEAM_IDENTIFIER", // (required, string) the io team identifier
-    "AppleRootCertificate": "-----BEGIN CERTIFICATE-----\nMIICITCCAaegAwIBAgIQC/O+DvHN0uD7jG5yH2IXmDAKBggqhkjOPQQDAzBSMSYwJAYDVQQDDB1BcHBsZSBBcHAgQXR0ZXN0YXRpb24gUm9vdCBDQTETMBEGA1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTAeFw0yMDAzMTgxODMyNTNaFw00NTAzMTUwMDAwMDBaMFIxJjAkBgNVBAMMHUFwcGxlIEFwcCBBdHRlc3RhdGlvbiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJbmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAERTHhmLW07ATaFQIEVwTtT4dyctdhNbJhFs/Ii2FdCgAHGbpphY3+d8qjuDngIN3WVhQUBHAoMeQ/cLiP1sOUtgjqK9auYen1mMEvRq9Sk3Jm5X8U62H+xTD3FE9TgS41o0IwQDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSskRBTM72+aEH/pwyp5frq5eWKoTAOBgNVHQ8BAf8EBAMCAQYwCgYIKoZIzj0EAwMDaAAwZQIwQgFGnByvsiVbpTKwSga0kP0e8EeDS4+sQmTvb7vn53O5+FRXgeLhpJ06ysC5PrOyAjEAp5U4xDgEgllF7En3VcE3iexZZtKeYnpqtijVoyFraWVIyd/dganmrduC1bmTBGwD\n-----END CERTIFICATE-----", // (required, string) the apple root certificate
-    "GooglePublicKey": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAr7bHgiuxpwHsK7Qui8xU\nFmOr75gvMsd/dTEDDJdSSxtf6An7xyqpRR90PL2abxM1dEqlXnf2tqw1Ne4Xwl5j\nlRfdnJLmN0pTy/4lj4/7tv0Sk3iiKkypnEUtR6WfMgH0QZfKHM1+di+y9TFRtv6y\n//0rb+T+W8a9nsNL/ggjnar86461qO0rOs2cXjp3kOG1FEJ5MVmFmBGtnrKpa73X\npXyTqRxB/M0n1n/W9nGqC4FSYa04T6N5RIZGBN2z2MT5IKGbFlbC8UrW0DxW7AYI\nmQQcHtGl/m00QLVWutHQoVJYnFPlXTcHYvASLu+RhhsbDmxMgJJ0mcDpvsC4PjvB\n+TxywElgS70vE0XmLD+OJtvsBslHZvPBKCOdT0MS+tgSOIfga+z1Z1g7+DVagf7q\nuvmag8jfPioyKvxnK/EgsTUVi2ghzq8wm27ud/mIM7AY2qEORR8Go3TVB4HzWQgp\nZrt3i5MIlCaY504LzSRiigHCzAPlHws+W0rB5N+er5/2pJKnfBSDiCiFAVtCLOZ7\ngLiMm0jhO2B6tUXHI/+MRPjy02i59lINMRRev56GKtcd9qO/0kUJWdZTdA2XoS82\nixPvZtXQpUpuL12ab+9EaDK8Z4RHJYYfCT3Q5vNAXaiWQ+8PTWm2QgBR/bkwSWc+\nNpUFgNPN9PvQi8WEg5UmAGMCAwEAAQ==\n-----END PUBLIC KEY-----", // (required, string) the google public key
-    "AndroidCrlUrl": "https://android.googleapis.com/attestation/status", // (required, string) the android crl url
-    "AndroidPlayIntegrityUrl": "https://www.googleapis.com/auth/playintegrity", // (required, string) the android play store integrity url
-    "AllowedDeveloperUsers": "ALLOWED_DEVELOPER_USERS_FISCAL_CODE_SEPARATED_BY_COMMA", // (required, string) a list of fiscal codes, representing the enabled users, separated by commands. It can be an empty string also
-    "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED", // (required, string) the google app credentials encoded in base64
-    "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI", // (required, string) the service uri of entity configuration storage account, taken directly on azure portal
-    "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME", // (required, string) the container name of the entity configuration storage account, taken directly on azure portal
-    "HubSpidLoginJwtPubKey": "HUB_SPID_LOGIN_JWT_PUB_KEY", // (required, string) the public key for the spid login
-    "HubSpidLoginJwtIssuer": "HUB_SPID_LOGIN_JWT_ISSUER", // (required, string) the issuer for the spid login
-    "HubSpidLoginClientBaseUrl": "HUB_SPID_LOGIN_CLIENT_BASE_URL", // (required, string) the client base url for the spid login
-    "ExchangeJwtIssuer": "EXCHANGE_JWT_ISSUER", // (required, string) the issuer for the jwt exchange
-    "ExchangeJwtPubKey": "EXCHANGE_JWT_PUB_KEY", // (required, string) the public key for the jwt exchange
-    "TrialSystemApiBaseURL": "TRIAL_SYSTEM_API_BASE_URL", // (required, string) the base url of the trial system service
-    "TrialSystemApiKey": "TRIAL_SYSTEM_API_KEY", // (required, string) the api key to use the trial system apis
-    "TrialSystemTrialId": "TRIAL_SYSTEM_TRIAL_ID", // (required, string) the trial id to use the trial system apis
-    "TrialSystemFeatureFlag": "TRIAL_SYSTEM_FEATURE_FLAG", // (required, boolean) the trial system feature flag to use the trial system apis
-    "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL", // (required, string) the base url of the pid issuer service
-    "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE", // (required, string) the client certificate to use the pid issuer apis
-    "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY", // (required, string) the client private key to use the pid issuer apis
-    "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE", // (required, string) the root certificate to use the pid issuer apis
-    "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED", // (required, string) a flag that enables/disables the health check of the pid issuer service
-    "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT", // (required, string) the request timeout, expressed in milliseconds, to the pid issuer service
-    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT", // (required, string) the http request timeout, expressed in timeout
-    "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION", // (optional, boolean) a flag that enables/disables the signature validation
-    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING", // (required, string) the app insights connection string, taken directly on azure portal
-    "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED" // (optional, string) the hardware public test key
+    "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "NODE_ENV": "development",
+    "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
+    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
+    "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
+    "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
+    "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
+    "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME",
+    "FederationEntityHomepageUri": "FEDERATION_ENTITY_HOMEPAGE_URI",
+    "FederationEntityPolicyUri": "FEDERATION_ENTITY_PRIVACY_URI",
+    "FederationEntityTosUri": "FEDERATION_ENTITY_TOS_URI",
+    "FederationEntityLogoUri": "FEDERATION_ENTITY_LOGO_URI",
+    "WalletKeys": "ARRAY_OF_WALLET_KEYS_IN_JWK_FORMAT_BASE64_ENCODED",
+    "IosBundleIdentifiers": "APPLE_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA",
+    "AndroidBundleIdentifiers": "ANDROID_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA",
+    "AndroidPlayStoreCertificateHash": "ANDROID_WALLET_INSTANCE_PLAY_STORE_CERTIFICATE_SHA256",
+    "IosTeamIdentifier": "IO_TEAM_IDENTIFIER",
+    "AppleRootCertificate": "-----BEGIN CERTIFICATE-----\nMIICITCCAaegAwIBAgIQC/O+DvHN0uD7jG5yH2IXmDAKBggqhkjOPQQDAzBSMSYwJAYDVQQDDB1BcHBsZSBBcHAgQXR0ZXN0YXRpb24gUm9vdCBDQTETMBEGA1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTAeFw0yMDAzMTgxODMyNTNaFw00NTAzMTUwMDAwMDBaMFIxJjAkBgNVBAMMHUFwcGxlIEFwcCBBdHRlc3RhdGlvbiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJbmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAERTHhmLW07ATaFQIEVwTtT4dyctdhNbJhFs/Ii2FdCgAHGbpphY3+d8qjuDngIN3WVhQUBHAoMeQ/cLiP1sOUtgjqK9auYen1mMEvRq9Sk3Jm5X8U62H+xTD3FE9TgS41o0IwQDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSskRBTM72+aEH/pwyp5frq5eWKoTAOBgNVHQ8BAf8EBAMCAQYwCgYIKoZIzj0EAwMDaAAwZQIwQgFGnByvsiVbpTKwSga0kP0e8EeDS4+sQmTvb7vn53O5+FRXgeLhpJ06ysC5PrOyAjEAp5U4xDgEgllF7En3VcE3iexZZtKeYnpqtijVoyFraWVIyd/dganmrduC1bmTBGwD\n-----END CERTIFICATE-----",
+    "GooglePublicKey": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAr7bHgiuxpwHsK7Qui8xU\nFmOr75gvMsd/dTEDDJdSSxtf6An7xyqpRR90PL2abxM1dEqlXnf2tqw1Ne4Xwl5j\nlRfdnJLmN0pTy/4lj4/7tv0Sk3iiKkypnEUtR6WfMgH0QZfKHM1+di+y9TFRtv6y\n//0rb+T+W8a9nsNL/ggjnar86461qO0rOs2cXjp3kOG1FEJ5MVmFmBGtnrKpa73X\npXyTqRxB/M0n1n/W9nGqC4FSYa04T6N5RIZGBN2z2MT5IKGbFlbC8UrW0DxW7AYI\nmQQcHtGl/m00QLVWutHQoVJYnFPlXTcHYvASLu+RhhsbDmxMgJJ0mcDpvsC4PjvB\n+TxywElgS70vE0XmLD+OJtvsBslHZvPBKCOdT0MS+tgSOIfga+z1Z1g7+DVagf7q\nuvmag8jfPioyKvxnK/EgsTUVi2ghzq8wm27ud/mIM7AY2qEORR8Go3TVB4HzWQgp\nZrt3i5MIlCaY504LzSRiigHCzAPlHws+W0rB5N+er5/2pJKnfBSDiCiFAVtCLOZ7\ngLiMm0jhO2B6tUXHI/+MRPjy02i59lINMRRev56GKtcd9qO/0kUJWdZTdA2XoS82\nixPvZtXQpUpuL12ab+9EaDK8Z4RHJYYfCT3Q5vNAXaiWQ+8PTWm2QgBR/bkwSWc+\nNpUFgNPN9PvQi8WEg5UmAGMCAwEAAQ==\n-----END PUBLIC KEY-----",
+    "AndroidCrlUrl": "https://android.googleapis.com/attestation/status",
+    "AndroidPlayIntegrityUrl": "https://www.googleapis.com/auth/playintegrity",
+    "AllowedDeveloperUsers": "ALLOWED_DEVELOPER_USERS_FISCAL_CODE_SEPARATED_BY_COMMA",
+    "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
+    "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI",
+    "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
+    "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
+    "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
+    "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
+    "PidIssuerApiRootCACertificate": "PID_ISSUER_API_ROOT_CA_CERTIFICATE",
+    "PidIssuerHealthCheckEnabled": "PID_ISSUER_HEALTH_CHECK_ENABLED",
+    "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
+    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
+    "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
+    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED"
   }
 }
