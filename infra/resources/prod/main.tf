@@ -103,8 +103,8 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  storage_account_queue_connection_string = module.storage_account.storage_account_queue.primary_connection_string
-  revocation_queue_name                   = module.storage_account.revocation_queue_name.name
+  # storage_account_queue_connection_string = module.storage_account.storage_account_queue.primary_connection_string
+  revocation_queue_name = module.storage_account.revocation_queue_name.name
 
   user_func = local.user_func
 
