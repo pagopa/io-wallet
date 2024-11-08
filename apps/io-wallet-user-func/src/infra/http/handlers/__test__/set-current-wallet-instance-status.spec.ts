@@ -16,7 +16,8 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getAllByUserId: () => TE.left(new Error("not implemented")),
+    getLastActiveWalletInstanceByUserId: () =>
+      TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
         O.some({
@@ -33,8 +34,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
           userId: "AAA" as FiscalCode,
         }),
       ),
-    getNotRevokedByDiffirentIdAndUserId: () =>
-      TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
 
@@ -137,10 +136,9 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
-        getNotRevokedByDiffirentIdAndUserId: () =>
+        getLastActiveWalletInstanceByUserId: () =>
           TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
@@ -168,11 +166,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
+        getLastActiveWalletInstanceByUserId: () =>
+          TE.left(new Error("not implemented")),
         getLastByUserId: () =>
           TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),
-        getNotRevokedByDiffirentIdAndUserId: () =>
-          TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetCurrentWalletInstanceStatusHandler({

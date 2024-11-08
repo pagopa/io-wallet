@@ -32,16 +32,13 @@ export interface WalletInstanceRepository {
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  getAllByUserId: (
+  getLastActiveWalletInstanceByUserId: (
+    id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  getNotRevokedByDiffirentIdAndUserId: (
-    id: WalletInstance["id"],
-    userId: WalletInstance["userId"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
@@ -132,7 +129,7 @@ const getUserValidWalletInstancesIdExceptOne: (
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.getNotRevokedByDiffirentIdAndUserId(
+      walletInstanceRepository.getLastActiveWalletInstanceByUserId(
         walletInstanceId,
         userId,
       ),

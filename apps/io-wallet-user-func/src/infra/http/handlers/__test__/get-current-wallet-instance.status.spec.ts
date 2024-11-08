@@ -20,7 +20,8 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.left(new Error("not implemented")),
     get: () => TE.left(new Error("not implemented")),
-    getAllByUserId: () => TE.left(new Error("not implemented")),
+    getLastActiveWalletInstanceByUserId: () =>
+      TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
         O.some({
@@ -37,8 +38,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
           userId: "AAA" as FiscalCode,
         }),
       ),
-    getNotRevokedByDiffirentIdAndUserId: () =>
-      TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
 
@@ -109,10 +108,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     const walletInstanceRepository: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.left(new Error("not implemented")),
-      getAllByUserId: () => TE.left(new Error("not implemented")),
-      getLastByUserId: () => TE.right(O.none),
-      getNotRevokedByDiffirentIdAndUserId: () =>
+      getLastActiveWalletInstanceByUserId: () =>
         TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.right(O.none),
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetCurrentWalletInstanceStatusHandler({
@@ -139,10 +137,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
-        getNotRevokedByDiffirentIdAndUserId: () =>
+        getLastActiveWalletInstanceByUserId: () =>
           TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = GetCurrentWalletInstanceStatusHandler({
@@ -170,10 +167,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new ServiceUnavailableError("foo")),
-        getNotRevokedByDiffirentIdAndUserId: () =>
+        getLastActiveWalletInstanceByUserId: () =>
           TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new ServiceUnavailableError("foo")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = GetCurrentWalletInstanceStatusHandler({

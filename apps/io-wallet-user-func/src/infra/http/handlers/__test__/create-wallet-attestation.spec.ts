@@ -72,10 +72,9 @@ const walletInstanceRepository: WalletInstanceRepository = {
         userId: mockFiscalCode,
       }),
     ),
-  getAllByUserId: () => TE.left(new Error("not implemented")),
-  getLastByUserId: () => TE.left(new Error("not implemented")),
-  getNotRevokedByDiffirentIdAndUserId: () =>
+  getLastActiveWalletInstanceByUserId: () =>
     TE.left(new Error("not implemented")),
+  getLastByUserId: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
 };
 
@@ -204,10 +203,9 @@ describe("CreateWalletAttestationHandler", async () => {
             userId: mockFiscalCode,
           }),
         ),
-      getAllByUserId: () => TE.left(new Error("not implemented")),
-      getLastByUserId: () => TE.left(new Error("not implemented")),
-      getNotRevokedByDiffirentIdAndUserId: () =>
+      getLastActiveWalletInstanceByUserId: () =>
         TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
@@ -251,10 +249,9 @@ describe("CreateWalletAttestationHandler", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
-      getAllByUserId: () => TE.left(new Error("not implemented")),
-      getLastByUserId: () => TE.left(new Error("not implemented")),
-      getNotRevokedByDiffirentIdAndUserId: () =>
+      getLastActiveWalletInstanceByUserId: () =>
         TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
