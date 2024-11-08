@@ -93,8 +93,8 @@ export const validateAndroidAssertion = (
     E.chain(J.parse),
     E.mapLeft(
       () =>
-        new Error(
-          "[Android Assertion] Unable to parse Google App Credentials string",
+        new AndroidAssertionError(
+          "Unable to parse Google App Credentials string",
         ),
     ),
     E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),

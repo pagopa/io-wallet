@@ -45,7 +45,7 @@ export const validateiOSAttestation = (
   pipe(
     E.tryCatch(
       () => decode(data),
-      () => new Error(`[iOS Attestation] Unable to decode data`),
+      () => new IosAttestationError(`Unable to decode data`),
     ),
     E.chainW(
       parse(iOsAttestation, "[iOS Attestation] attestation format is invalid"),
