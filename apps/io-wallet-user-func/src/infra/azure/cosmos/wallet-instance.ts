@@ -7,7 +7,7 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
+import { WalletInstance, WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
@@ -122,7 +122,7 @@ export class CosmosDbWalletInstanceRepository
             () =>
               pipe(
                 items,
-                t.array(WalletInstance).decode,
+                t.array(WalletInstanceValid).decode,
                 E.map(O.some),
                 E.mapLeft(
                   () =>
