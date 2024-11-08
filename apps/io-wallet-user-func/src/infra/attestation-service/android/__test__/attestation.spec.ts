@@ -7,7 +7,6 @@ import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 
 import { base64ToPem } from "..";
-import { AndroidAttestationError } from "../../errors";
 import { validateRevocation, verifyAttestation } from "../attestation";
 import { androidMockData } from "./config";
 
@@ -47,6 +46,7 @@ describe("AndroidAttestationValidation", () => {
         x509Chain: x509Chain.map((el) => el.toString()),
       },
       hardwareKey,
+      success: true,
     };
 
     await expect(result).resolves.toEqual(expectedResult);
@@ -59,14 +59,14 @@ describe("AndroidAttestationValidation", () => {
       ANDROID_CRL_URL,
       4000,
     );
-    expect(validation).toBe(validChain);
+    expect(validation).toHaveProperty("success", true);
   });
 
-  it("should return an exception for revoked chain", async () => {
+  it("should return an error for revoked chain", async () => {
     const invalidChain = revokedX509Chain.map((c) => new X509Certificate(c));
 
     await expect(
       validateRevocation(invalidChain, ANDROID_CRL_URL, 4000),
-    ).rejects.toThrow(AndroidAttestationError);
+    ).resolves.toHaveProperty("success", false);
   });
 });

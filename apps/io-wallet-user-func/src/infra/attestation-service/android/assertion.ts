@@ -5,7 +5,7 @@ import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
 
-import { AndroidAssertionError } from "../errors";
+import { ValidationResult } from "../errors";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
@@ -39,7 +39,9 @@ export interface VerifyAssertionParams {
 
 export const playintegrity = google.playintegrity("v1");
 
-export const verifyAssertion = async (params: VerifyAssertionParams) => {
+export const verifyAssertion = async (
+  params: VerifyAssertionParams,
+): Promise<ValidationResult> => {
   const {
     allowDevelopmentEnvironment,
     androidPlayIntegrityUrl,
@@ -62,7 +64,10 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   if (!signatureValidated) {
-    throw new AndroidAssertionError("Invalid hardware signature");
+    return {
+      reason: "Invalid hardware signature",
+      success: false,
+    };
   }
 
   // Then verify the integrity token
@@ -114,16 +119,20 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   }
 
   if (!tokenPayloadExternal || !bundleIdentifier) {
-    throw new Error(
-      `[Android Assertion] Invalid token payload from Play Integrity API response: ${errors.join(",")}`,
-    );
+    return {
+      reason: `Invalid token payload from Play Integrity API response: ${errors.join(",")}`,
+      success: false,
+    };
   }
 
   if (!responseValidated) {
-    throw new Error(
-      `[Android Assertion] Integrity Response did not pass validation: ${errors.join(",")}`,
-    );
+    return {
+      reason: `Integrity Response did not pass validation: ${errors.join(",")}`,
+      success: false,
+    };
   }
+
+  return { success: true };
 };
 
 export const validateAssertionSignature = async (
@@ -133,7 +142,7 @@ export const validateAssertionSignature = async (
 ) => {
   const joseHardwareKey = await importJWK(hardwareKey);
   if (!("type" in joseHardwareKey)) {
-    throw new AndroidAssertionError("Invalid Hardware Key format");
+    throw new Error("Invalid Hardware Key format");
   }
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
 
@@ -150,7 +159,7 @@ export const validateIntegrityResponse = (
   clientData: string,
   allowDevelopmentEnvironment: boolean,
   androidPlayStoreCertificateHash: string,
-) => {
+): ValidationResult => {
   /**
    * 1. You must first check that the values in the requestDetails field match those of the original
    * request before checking each integrity verdict. Verify the requestDetails part of the JSON payload
@@ -160,32 +169,43 @@ export const validateIntegrityResponse = (
   const requestDetails = integrityResponse.requestDetails;
 
   if (!requestDetails) {
-    throw new AndroidAssertionError("Invalid requestDetails");
+    return {
+      reason: "Invalid requestDetails",
+      success: false,
+    };
   }
 
   if (requestDetails.requestPackageName !== bundleIdentifier) {
-    throw new Error(
-      `The bundle identifier ${requestDetails.requestPackageName} does not match ${bundleIdentifier}.`,
-    );
+    return {
+      reason: `The bundle identifier ${requestDetails.requestPackageName} does not match ${bundleIdentifier}.`,
+      success: false,
+    };
   }
 
   const clientDataHash = createHash("sha256").update(clientData).digest("hex");
 
   if (requestDetails.requestHash !== clientDataHash) {
-    throw new Error(
-      `The client data hash ${requestDetails.requestHash} does not match ${clientDataHash}.`,
-    );
+    return {
+      reason: `The client data hash ${requestDetails.requestHash} does not match ${clientDataHash}.`,
+      success: false,
+    };
   }
 
   if (!requestDetails.timestampMillis) {
-    throw new AndroidAssertionError("Invalid timestamp");
+    return {
+      reason: "Invalid timestamp",
+      success: false,
+    };
   }
 
   const tsMills = parseInt(requestDetails.timestampMillis, 10);
   const tsMillsDiff = new Date().getTime() - new Date(tsMills).getTime();
 
   if (tsMillsDiff > ALLOWED_WINDOW_MILLIS) {
-    throw new AndroidAssertionError("It's been too long since the request");
+    return {
+      reason: "It's been too long since the request",
+      success: false,
+    };
   }
 
   /**
@@ -195,36 +215,45 @@ export const validateIntegrityResponse = (
 
   const appIntegrity = integrityResponse.appIntegrity;
   if (!appIntegrity) {
-    throw new Error(`[Android Assertion] Invalid App Integrity field.`);
+    return {
+      reason: `Invalid App Integrity field.`,
+      success: false,
+    };
   }
 
   if (
     !allowDevelopmentEnvironment &&
     appIntegrity.appRecognitionVerdict !== "PLAY_RECOGNIZED"
   ) {
-    throw new Error(
-      `The app does not match the versions distributed by Google Play.`,
-    );
+    return {
+      reason: `The app does not match the versions distributed by Google Play.`,
+      success: false,
+    };
   }
 
   if (appIntegrity.packageName !== bundleIdentifier) {
-    throw new Error(
-      `The package name ${appIntegrity.packageName} does not match ${bundleIdentifier}.`,
-    );
+    return {
+      reason: `The package name ${appIntegrity.packageName} does not match ${bundleIdentifier}.`,
+      success: false,
+    };
   }
 
   const certificateSha256Digest = appIntegrity.certificateSha256Digest;
   if (!certificateSha256Digest) {
-    throw new Error(`[Android Assertion] Certificate digest not present`);
+    return {
+      reason: `Certificate digest not present`,
+      success: false,
+    };
   }
 
   if (
     !allowDevelopmentEnvironment &&
     certificateSha256Digest.indexOf(androidPlayStoreCertificateHash) === -1
   ) {
-    throw new Error(
-      `The app certificate does not match the versions distributed by Google Play.`,
-    );
+    return {
+      reason: `The app certificate does not match the versions distributed by Google Play.`,
+      success: false,
+    };
   }
 
   /**
@@ -235,16 +264,25 @@ export const validateIntegrityResponse = (
 
   const deviceIntegrity = integrityResponse.deviceIntegrity;
   if (!deviceIntegrity) {
-    throw new Error(`[Android Assertion] Invalid Device Integrity field.`);
+    return {
+      reason: `Invalid Device Integrity field.`,
+      success: false,
+    };
   }
 
   const deviceRecognitionVerdict = deviceIntegrity.deviceRecognitionVerdict;
   if (!deviceRecognitionVerdict || deviceRecognitionVerdict.length <= 0) {
-    throw new Error(`[Android Assertion] Invalid Device Recognition Verdict.`);
+    return {
+      reason: `Invalid Device Recognition Verdict.`,
+      success: false,
+    };
   }
 
   if (deviceRecognitionVerdict.indexOf("MEETS_DEVICE_INTEGRITY") === -1) {
-    throw new AndroidAssertionError("Device no meets integrity check");
+    return {
+      reason: `Device no meets integrity check.`,
+      success: false,
+    };
   }
 
   /**
@@ -252,17 +290,21 @@ export const validateIntegrityResponse = (
    */
   const accountDetails = integrityResponse.accountDetails;
   if (!accountDetails) {
-    throw new Error(`[Android Assertion] Invalid Account Details field.`);
+    return {
+      reason: `Invalid Account Details field.`,
+      success: false,
+    };
   }
 
   if (
     !allowDevelopmentEnvironment &&
     accountDetails.appLicensingVerdict !== "LICENSED"
   ) {
-    throw new Error(
-      `[Android Assertion] The user doesn't have an app entitlement.`,
-    );
+    return {
+      reason: `The user doesn't have an app entitlement.`,
+      success: false,
+    };
   }
 
-  return true;
+  return { success: true };
 };
