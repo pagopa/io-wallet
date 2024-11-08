@@ -32,7 +32,7 @@ resource "azurerm_api_management_api_operation_policy" "get_current_wallet_insta
   xml_content = file("${path.module}/api/ioweb/_get_current_wallet_instance_status_policy.xml")
 }
 
-resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_web_policy" {
+resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
   api_name            = module.apim_v2_web_wallet_api.name
   operation_id        = "setWalletInstanceStatus"
   resource_group_name = var.apim.resource_group_name
