@@ -24,7 +24,7 @@ export class WalletInstanceRevocationStorageQueue
         TE.tryCatch(
           () =>
             this.#client.sendMessage(walletInstanceString, {
-              visibilityTimeout: 60 * 60 * 24, //24 hour
+              visibilityTimeout: 60 * 60 * 24, //24 hours
             }),
           E.toError,
         ),
