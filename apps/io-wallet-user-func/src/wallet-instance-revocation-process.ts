@@ -43,7 +43,7 @@ const needToBeRevoked = async (
   return false;
 };
 
-export const checkWalletInstancesAttestedKeyRevocation: (
+export const revokeInvalidWalletInstances: (
   walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
 ) => RTE.ReaderTaskEither<
   {
