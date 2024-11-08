@@ -32,7 +32,7 @@ resource "azurerm_api_management_api_operation_policy" "get_current_wallet_insta
   xml_content = file("${path.module}/api/ioweb/_get_current_wallet_instance_status_policy.xml")
 }
 
-resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
+resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_web_policy" {
   api_name            = module.apim_v2_web_wallet_api.name
   operation_id        = "setWalletInstanceStatus"
   resource_group_name = var.apim.resource_group_name
@@ -142,7 +142,7 @@ module "apim_v2_wallet_pdnd_api" {
   xml_content = file("${path.module}/api/pdnd/_base_policy.xml")
 }
 
-resource "azurerm_api_management_api_operation_policy" "health_check_policy" {
+resource "azurerm_api_management_api_operation_policy" "health_check_pdnd_policy" {
   api_name            = module.apim_v2_wallet_pdnd_api.name
   operation_id        = "healthCheck"
   resource_group_name = var.apim.resource_group_name
@@ -151,7 +151,7 @@ resource "azurerm_api_management_api_operation_policy" "health_check_policy" {
   xml_content = file("${path.module}/api/pdnd/_health_check_policy.xml")
 }
 
-resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
+resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_pdnd_policy" {
   api_name            = module.apim_v2_wallet_pdnd_api.name
   operation_id        = "setWalletInstanceStatus"
   resource_group_name = var.apim.resource_group_name
