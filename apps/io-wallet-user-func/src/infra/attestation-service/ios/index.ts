@@ -9,6 +9,7 @@ import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { ValidatedAttestation } from "../../../attestation-service";
+import { IosAssertionError, IosAttestationError } from "../errors";
 import { verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";
 
@@ -64,6 +65,13 @@ export const validateiOSAttestation = (
               teamIdentifier,
             }),
           E.toError,
+        ),
+        TE.chain((attestationValidationResult) =>
+          attestationValidationResult.success
+            ? TE.right(attestationValidationResult)
+            : TE.left(
+                new IosAttestationError(attestationValidationResult.reason),
+              ),
         ),
         TE.chainW((result) =>
           pipe(
@@ -124,5 +132,10 @@ export const validateiOSAssertion = (
           }),
         E.toError,
       ),
+    ),
+    TE.chain((assertionValidationResult) =>
+      assertionValidationResult.success
+        ? TE.right(undefined)
+        : TE.left(new IosAssertionError(assertionValidationResult.reason)),
     ),
   );

@@ -421,7 +421,6 @@ const validateExtension = async (
   return {
     deviceDetails,
     hardwareKey,
-
     success: true,
   };
 };

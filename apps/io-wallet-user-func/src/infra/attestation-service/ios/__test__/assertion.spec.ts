@@ -30,6 +30,6 @@ describe("iOSAssertionValidation", () => {
       teamIdentifier,
     });
 
-    await expect(result).resolves.empty;
+    await expect(result).resolves.toEqual({ success: true });
   });
 });
