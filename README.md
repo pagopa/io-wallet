@@ -64,6 +64,37 @@ If you are interested in infrastructure issues, you may find it convenient to in
 
 - Terraform ^1.7.5
 
+### Setting the Azure Subscription to access the Dev CosmosDB
+
+In order to start the two backend projects `io-wallet-support-func` and `io-wallet-user-func`, you must first login with the correct user on Azure and set the subscription (of which you are part) that you want to use. To do this, you must have the Azure `az-cli` package. See the *Prerequisites* section of this doc for more info.
+
+This process is necessary so that backend applications started locally can connect to the cosmosdb (usually the test one). So, open a new shell instance and run the following commands, in order:
+
+```bash
+az login                                        # After this command, you will probably be redirect
+                                                # to your main browser, where you can login with your credentials.
+
+az account set --subscription DEV-IO            # This command allow you to set and use the DEV-IO subscription.
+                                                # The DEV-IO subscription allows the backend apps to connect to
+                                                # the dev cosmosdb.
+
+az ad user show --id YOUR_EMAIL                 # Get the info of a specific user, by email. In this case,
+                                                # the YOUR_EMAIL parameter indicates your work email. Among
+                                                # the various information returned by the command, it is
+                                                # necessary to take and store the Principal ID, which you will
+                                                # use in the next command.
+
+az cosmosdb sql role assignment create
+    --account-name io-d-itn-common-cosno-01
+    --resource-group io-d-itn-common-rg-01
+    --scope "/" --principal-id PRINCIPAL_ID
+    --role-definition-id
+        00000000-0000-0000-0000-000000000002    # This is the last command! This command allows you to access
+                                                # the dev cosmosdb in read and write mode, so you can run
+                                                # all the tests you want.
+
+```
+
 ### Installation
 
 ```bash
