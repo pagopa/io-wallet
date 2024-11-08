@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "IO Wallet - IO Web API",
+    "title": "IO Wallet API",
     "version": "1.0.0"
   },
   "security": [
@@ -10,32 +10,53 @@
     }
   ],
   "paths": {
-    "/wallet-instances/current/status": {
+    "/status": {
       "get": {
-        "summary": "Retrieve the current Wallet Instance status",
-        "operationId": "getCurrentWalletInstanceStatus",
+        "operationId": "healthCheck",
+        "summary": "Used to check if the function is healthy",
         "responses": {
           "200": {
-            "description": "Wallet Instance status successfully retrieved",
+            "description": "The function is health",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WalletData"
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["about:blank"]
+                    },
+                    "title": {
+                      "type": "string",
+                      "enum": ["OK"]
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32",
+                      "enum": [200]
+                    },
+                    "detail": {
+                      "type": "string",
+                      "enum": ["The service is healthy"]
+                    },
+                    "instance": {
+                      "type": "string",
+                      "enum": ["/status"]
+                    }
+                  }
                 }
               }
             }
           },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "description": "Internal Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemJson"
+                }
+              }
+            }
           }
         }
       }
@@ -54,7 +75,7 @@
             }
           }
         ],
-        "description": "Revoke the Wallet Instance associated with the authenticated user. \nIf the Wallet Instance is already revoked, the operation succeed.\n",
+        "description": "Revoke the Wallet Instance. \nIf the Wallet Instance is already revoked, the operation succeed.\n",
         "requestBody": {
           "content": {
             "application/json": {
@@ -74,14 +95,14 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
           "422": {
             "$ref": "#/components/responses/UnprocessableContent"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
           }
         }
       }
@@ -96,16 +117,6 @@
       }
     },
     "responses": {
-      "Forbidden": {
-        "description": "The server understands the request but refuses to authorize it",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ProblemJson"
-            }
-          }
-        }
-      },
       "BadRequest": {
         "description": "Validation error",
         "content": {
@@ -155,25 +166,36 @@
             }
           }
         }
+      },
+      "ServiceUnavailable": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ProblemJson" }
+          }
+        }
       }
     },
     "schemas": {
       "SetWalletInstanceStatusData": {
-        "type": "string",
-        "enum": ["REVOKED"]
-      },
-      "WalletData": {
-        "description": "Describes the status of the wallet.",
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
+          "status": {
+            "type": "string",
+            "enum": ["REVOKED"]
           },
-          "is_revoked": {
-            "type": "boolean"
+          "fiscal_code": {
+            "$ref": "#/components/schemas/FiscalCode"
           }
         },
-        "required": ["id", "is_revoked"]
+        "required": ["status", "fiscal_code"]
+      },
+      "FiscalCode": {
+        "type": "string",
+        "description": "User's fiscal code.",
+        "format": "FiscalCode",
+        "x-import": "@pagopa/ts-commons/lib/strings",
+        "example": "SPNDNL80R13C555X"
       },
       "ProblemJson": {
         "type": "object",

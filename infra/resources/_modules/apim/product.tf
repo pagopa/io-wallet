@@ -12,3 +12,18 @@ module "apim_v2_wallet_support_product" {
   subscription_required = true
   approval_required     = false
 }
+
+module "apim_v2_wallet_pdnd_product" {
+  source = "github.com/pagopa/terraform-azurerm-v3//api_management_product?ref=v8.27.0"
+
+  product_id   = format("%s-wallet-pdnd-api", var.project_legacy)
+  display_name = "IO WALLET PDND TOKEN-PROTECTED APIs"
+  description  = "Product containing APIs that must be called using the PDND token for authentication"
+
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+
+  published             = true
+  subscription_required = false
+  approval_required     = false
+}
