@@ -7,6 +7,7 @@ import { EntityNotFoundError } from "io-wallet-common/error";
 import {
   WalletInstance,
   WalletInstanceValid,
+  WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
 
 class RevokedWalletInstance extends Error {
@@ -156,4 +157,19 @@ export const revokeUserValidWalletInstancesExceptOne: (
     RTE.chain((validWalletInstances) =>
       revokeUserWalletInstances(userId, validWalletInstances),
     ),
+  );
+
+export const filterValidWithAndroidCertificatesChain = (
+  walletInstances: WalletInstance[],
+): RTE.ReaderTaskEither<
+  void,
+  Error,
+  readonly WalletInstanceValidWithAndroidCertificatesChain[]
+> =>
+  pipe(
+    walletInstances,
+    RA.filterMap(
+      flow(WalletInstanceValidWithAndroidCertificatesChain.decode, O.getRight),
+    ),
+    RTE.of,
   );

@@ -2,6 +2,7 @@ import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
@@ -10,14 +11,21 @@ import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
+import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
+import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { QueueServiceClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import {
+  WalletInstance,
+  WalletInstanceValidWithAndroidCertificatesChain,
+} from "io-wallet-common/wallet-instance";
 
 import { getConfigFromEnvironment } from "./config";
 
@@ -41,6 +49,16 @@ const cosmosClient = new CosmosClient({
   },
   endpoint: config.azure.cosmos.endpoint,
 });
+
+const queueServiceClient = QueueServiceClient.fromConnectionString(
+  config.azure.queue.walletInstanceRevocation.connectionString,
+);
+
+const revocationQueue = new WalletInstanceRevocationStorageQueue(
+  queueServiceClient.getQueueClient(
+    config.azure.queue.walletInstanceRevocation.name,
+  ),
+);
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
@@ -161,4 +179,34 @@ app.http("setCurrentWalletInstanceStatus", {
   ),
   methods: ["PUT"],
   route: "wallet-instances/current/status",
+});
+
+app.cosmosDB("addWalletInstanceToValidationQueue", {
+  connection: "CosmosDbEndpoint",
+  containerName: "wallet-instances",
+  createLeaseContainerIfNotExists: true,
+  databaseName: config.azure.cosmos.dbName,
+  handler: AddWalletInstanceToValidationQueueFunction({
+    inputDecoder: t.array(WalletInstance),
+  }),
+  leaseContainerName: "leases",
+  leaseContainerPrefix: "wallet-instances-consumer-",
+  maxItemsPerInvocation: 50,
+  return: output.storageQueue({
+    connection: "StorageAccountQueueConnectionString",
+    queueName: config.azure.queue.walletInstanceRevocation.name,
+  }),
+  startFromBeginning: true,
+});
+
+app.storageQueue("validateWalletInstance", {
+  connection: "StorageAccountQueueConnectionString",
+  handler: ValidateWalletInstanceAttestedKeyFunction({
+    attestationServiceConfiguration: config.attestationService,
+    inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
+    revocationQueue,
+    telemetryClient: appInsightsClient,
+    walletInstanceRepository,
+  }),
+  queueName: config.azure.queue.walletInstanceRevocation.name,
 });
