@@ -1,0 +1,19 @@
+<policies>
+    <inbound>
+        <base />
+        <!-- validate the jwt using the specified OpenID configuration URLs -->
+        <validate-jwt header-name="Authorization" require-scheme="Bearer">
+            <openid-config url="https://wallet.io.pagopa.it/pdnd/openid-configuration" />
+        </validate-jwt>
+        <set-header name="Authorization" exists-action="delete" />
+    </inbound>
+    <outbound>
+        <base />
+    </outbound>
+    <backend>
+        <base />
+    </backend>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
