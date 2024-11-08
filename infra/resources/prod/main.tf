@@ -103,6 +103,9 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
+  storage_account_queue_connection_string = data.azurerm_storage_account.wallet_revocation_storage.primary_connection_string
+  revocation_queue_name = module.azurerm_storage_queue.wallet_instances_revocation_check.name
+
   user_func = local.user_func
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id

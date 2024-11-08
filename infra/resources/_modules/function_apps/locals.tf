@@ -78,6 +78,9 @@ locals {
       HttpRequestTimeout = "5000"
 
       AppInsightsConnectionString = var.application_insights_connection_string
+
+      RevocationQueueName = var.revocation_queue_name
+      StorageAccountQueueConnectionString = var.storage_account_queue_connection_string
     }
   }
 }
