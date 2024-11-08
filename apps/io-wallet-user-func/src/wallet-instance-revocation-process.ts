@@ -86,7 +86,8 @@ export const checkWalletInstancesAttestedKeyRevocation: (
               ),
               TE.chain(() => TE.right(undefined)),
             )
-          : pipe(walletInstance, revocationQueue.insert),
+          : // Re-enter it in the queue for later verification.
+            pipe(walletInstance, revocationQueue.insert),
       ),
     );
 
