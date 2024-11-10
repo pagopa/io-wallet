@@ -15,6 +15,7 @@ import { ValidationResult } from "./infra/attestation-service/errors";
 import { WalletInstanceRevocationStorageQueue } from "./infra/azure/queue/wallet-instance-revocation";
 import {
   WalletInstanceRepository,
+  getValidWalletInstanceWithAndroidCertificatesChain,
   revokeUserWalletInstances,
 } from "./wallet-instance";
 
@@ -68,9 +69,22 @@ export const revokeInvalidWalletInstances: (
     walletInstanceRepository,
   }) =>
     pipe(
-      TE.tryCatch(
-        () => needToBeRevoked(walletInstance, attestationServiceConfiguration),
-        E.toError,
+      // Get it again from DB because it might have changed
+      getValidWalletInstanceWithAndroidCertificatesChain(
+        walletInstance.id,
+        walletInstance.userId,
+      )({
+        walletInstanceRepository,
+      }),
+      TE.chain((validWalletInstanceWithAndroidCertificatesChain) =>
+        TE.tryCatch(
+          () =>
+            needToBeRevoked(
+              validWalletInstanceWithAndroidCertificatesChain,
+              attestationServiceConfiguration,
+            ),
+          E.toError,
+        ),
       ),
       TE.chain((validationResult) =>
         !validationResult.success

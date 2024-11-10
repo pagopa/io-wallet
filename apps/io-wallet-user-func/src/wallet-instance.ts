@@ -1,3 +1,4 @@
+import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
@@ -90,6 +91,30 @@ export const getValidWalletInstance: (
           : TE.right(walletInstance),
       ),
     );
+
+export const getValidWalletInstanceWithAndroidCertificatesChain: (
+  id: WalletInstance["id"],
+  userId: WalletInstance["userId"],
+) => RTE.ReaderTaskEither<
+  WalletInstanceEnvironment,
+  Error,
+  WalletInstanceValidWithAndroidCertificatesChain
+> = (id, userId) =>
+  flow(
+    getValidWalletInstance(id, userId),
+    TE.chain(
+      flow(
+        WalletInstanceValidWithAndroidCertificatesChain.decode,
+        E.mapLeft(
+          () =>
+            new Error(
+              "Wallet Instance does not have a certificate chain for android",
+            ),
+        ),
+        TE.fromEither,
+      ),
+    ),
+  );
 
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
