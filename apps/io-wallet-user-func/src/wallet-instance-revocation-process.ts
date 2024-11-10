@@ -42,11 +42,7 @@ const needToBeRevoked = async (
     httpRequestTimeout,
   );
 
-  if (!revocationValidationResult.success) {
-    return revocationValidationResult;
-  }
-
-  return { success: true };
+  return revocationValidationResult;
 };
 
 export const revokeInvalidWalletInstances: (
