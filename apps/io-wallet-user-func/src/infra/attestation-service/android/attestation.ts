@@ -102,7 +102,6 @@ export const verifyAttestation = async (
  * Obtain a reference to the X.509 certificate chain parsing and validation library that is most appropriate for your toolset.
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
  * @param x509Chain - The chain of {@link X509Certificate} certificates.
- * @throws {Error} - If the chain is invalid.
  */
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
@@ -151,7 +150,6 @@ export const validateIssuance = (
  * 4.
  * Check each certificate's revocation status to ensure that none of the certificates have been revoked.
  * @param x509Chain - The chain of {@link X509Certificate} certificates.
- * @throws {Error} - If there is a connection error.
  */
 export const validateRevocation = async (
   x509Chain: readonly X509Certificate[],

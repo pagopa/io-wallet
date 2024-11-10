@@ -11,6 +11,7 @@ import {
   validateIssuance,
   validateRevocation,
 } from "./infra/attestation-service/android/attestation";
+import { ValidationResult } from "./infra/attestation-service/errors";
 import { WalletInstanceRevocationStorageQueue } from "./infra/azure/queue/wallet-instance-revocation";
 import {
   WalletInstanceRepository,
@@ -20,27 +21,31 @@ import {
 const needToBeRevoked = async (
   walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
   attestationServiceConfiguration: AttestationServiceConfiguration,
-) => {
+): Promise<ValidationResult> => {
   const x509Chain = walletInstance.deviceDetails.x509Chain.map(
     (cert) => new X509Certificate(cert),
   );
 
-  try {
-    // Validate issuance and expiration of the certificates
-    validateIssuance(
-      x509Chain,
-      attestationServiceConfiguration.googlePublicKey,
-    );
-    // Validate revocation of the certificates using the provided CRL URL
-    await validateRevocation(
-      x509Chain,
-      attestationServiceConfiguration.androidCrlUrl,
-      attestationServiceConfiguration.httpRequestTimeout,
-    );
-  } catch {
-    return true;
+  const { androidCrlUrl, googlePublicKey, httpRequestTimeout } =
+    attestationServiceConfiguration;
+
+  const issuanceValidationResult = validateIssuance(x509Chain, googlePublicKey);
+
+  if (!issuanceValidationResult.success) {
+    return issuanceValidationResult;
   }
-  return false;
+
+  const revocationValidationResult = await validateRevocation(
+    x509Chain,
+    androidCrlUrl,
+    httpRequestTimeout,
+  );
+
+  if (!revocationValidationResult.success) {
+    return revocationValidationResult;
+  }
+
+  return { success: true };
 };
 
 export const revokeInvalidWalletInstances: (
@@ -67,8 +72,8 @@ export const revokeInvalidWalletInstances: (
         () => needToBeRevoked(walletInstance, attestationServiceConfiguration),
         E.toError,
       ),
-      TE.chain((toRevoke) =>
-        toRevoke
+      TE.chain((validationResult) =>
+        !validationResult.success
           ? pipe(
               revokeUserWalletInstances(walletInstance.userId, [
                 walletInstance.id,
@@ -80,6 +85,7 @@ export const revokeInvalidWalletInstances: (
                   name: "REVOKED_WALLET_INSTANCE_FOR_INVALID_CERTIFICATE",
                   properties: {
                     fiscalCode: walletInstance.userId,
+                    reason: validationResult.reason,
                     walletInstanceId: walletInstance.id,
                   },
                 }),
