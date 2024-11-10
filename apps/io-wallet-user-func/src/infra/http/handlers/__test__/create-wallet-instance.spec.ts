@@ -7,6 +7,7 @@ import {
   HARDWARE_PUBLIC_TEST_KEY,
   decodeBase64String,
 } from "@/app/config";
+import { MobileAttestationService } from "@/infra/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -70,6 +71,10 @@ describe("CreateWalletInstanceHandler", () => {
     skipSignatureValidation: false,
   };
 
+  const attestationService = new MobileAttestationService(
+    attestationServiceConfiguration,
+  );
+
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
@@ -81,7 +86,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -107,7 +112,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -138,7 +143,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -173,7 +178,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -208,7 +213,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -244,7 +249,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

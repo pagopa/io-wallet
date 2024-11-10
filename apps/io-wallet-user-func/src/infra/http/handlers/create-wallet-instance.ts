@@ -1,5 +1,5 @@
-import { AttestationServiceConfiguration } from "@/app/config";
 import {
+  AttestationService,
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
@@ -100,18 +100,15 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
 const skipAttestationValidation: (
   walletInstanceRequest: WalletInstanceRequest,
 ) => RTE.ReaderTaskEither<
-  { attestationServiceConfiguration: AttestationServiceConfiguration },
+  { attestationService: AttestationService },
   Error,
   ValidatedAttestation
 > =
   (walletInstanceRequest) =>
-  ({ attestationServiceConfiguration }) =>
+  ({ attestationService }) =>
     pipe(
       E.tryCatch(
-        () =>
-          createPublicKey(
-            attestationServiceConfiguration.hardwarePublicTestKey,
-          ),
+        () => createPublicKey(attestationService.getHardwarePublicTestKey()),
         E.toError,
       ),
       TE.fromEither,

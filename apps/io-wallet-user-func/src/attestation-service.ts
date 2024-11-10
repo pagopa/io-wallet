@@ -28,6 +28,7 @@ export interface ValidateAssertionRequest {
 }
 
 export interface AttestationService {
+  getHardwarePublicTestKey: () => string;
   validateAssertion: (
     request: ValidateAssertionRequest,
   ) => TE.TaskEither<Error, void>;

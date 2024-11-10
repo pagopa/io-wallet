@@ -6,6 +6,7 @@ import {
   GOOGLE_PUBLIC_KEY,
   HARDWARE_PUBLIC_TEST_KEY,
 } from "@/app/config";
+import { MobileAttestationService } from "@/infra/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -58,6 +59,10 @@ const attestationServiceConfiguration = {
   ],
   skipSignatureValidation: true,
 };
+
+const attestationService = new MobileAttestationService(
+  attestationServiceConfiguration,
+);
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
@@ -117,7 +122,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -165,7 +170,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -216,7 +221,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -261,7 +266,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,

@@ -51,6 +51,8 @@ export class MobileAttestationService implements AttestationService {
       O.isSome,
     );
 
+  getHardwarePublicTestKey = () => this.#configuration.hardwarePublicTestKey;
+
   validateAssertion = ({
     hardwareKey,
     hardwareSignature,
