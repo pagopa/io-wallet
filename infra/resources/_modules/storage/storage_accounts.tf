@@ -10,3 +10,15 @@ resource "azurerm_storage_account" "wallet_revocation_storage" {
 
   tags = var.tags
 }
+
+data "azurerm_storage_account" "wallet_revocation_storage_data" {
+  name                = azurerm_storage_account.wallet_revocation_storage.name
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_key_vault_secret" "wallet_revocation_storage" {
+  name         = "WalletRevocationStorageConnectionString"
+  value        = data.azurerm_storage_account.wallet_revocation_storage_data.primary_connection_string
+  key_vault_id = var.key_vault_wallet_id
+  sensitive    = true
+}
