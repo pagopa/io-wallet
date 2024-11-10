@@ -100,9 +100,9 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
   Error,
   WalletInstanceValidWithAndroidCertificatesChain
 > = (id, userId) =>
-  flow(
+  pipe(
     getValidWalletInstance(id, userId),
-    TE.chain(
+    RTE.chainEitherK(
       flow(
         WalletInstanceValidWithAndroidCertificatesChain.decode,
         E.mapLeft(
@@ -111,7 +111,6 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
               "Wallet Instance does not have a certificate chain for android",
             ),
         ),
-        TE.fromEither,
       ),
     ),
   );
