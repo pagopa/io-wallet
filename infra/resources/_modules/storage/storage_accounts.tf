@@ -19,6 +19,6 @@ data "azurerm_storage_account" "wallet_revocation_storage_data" {
 resource "azurerm_key_vault_secret" "wallet_revocation_storage_connection_string" {
   name         = "WalletRevocationStorageConnectionString"
   value        = data.azurerm_storage_account.wallet_revocation_storage_data.primary_connection_string
-  key_vault_id = module.key_vaults.key_vault_wallet.id
+  key_vault_id = var.key_vault_wallet_id
   sensitive    = true
 }
