@@ -207,5 +207,7 @@ module "storage_account" {
   location            = local.location
   resource_group_name = azurerm_resource_group.wallet.name
 
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
   tags = local.tags
 }
