@@ -137,7 +137,7 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.httpRequestTimeout,
             ),
           ],
-          RA.wilt(T.ApplicativePar)(identity),
+          RA.wilt(T.ApplicativeSeq)(identity),
           T.map(getErrorsOrFirstValidValue),
         ),
       ),
