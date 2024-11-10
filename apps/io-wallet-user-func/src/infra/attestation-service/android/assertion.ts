@@ -280,7 +280,7 @@ export const validateIntegrityResponse = (
 
   if (deviceRecognitionVerdict.indexOf("MEETS_DEVICE_INTEGRITY") === -1) {
     return {
-      reason: `Device no meets integrity check.`,
+      reason: `Device doesn't meet integrity check.`,
       success: false,
     };
   }
