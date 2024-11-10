@@ -188,6 +188,7 @@ app.cosmosDB("addWalletInstanceToValidationQueue", {
   databaseName: config.azure.cosmos.dbName,
   handler: AddWalletInstanceToValidationQueueFunction({
     inputDecoder: t.array(WalletInstance),
+    telemetryClient: appInsightsClient,
   }),
   leaseContainerName: "leases",
   leaseContainerPrefix: "wallet-instances-consumer-",
