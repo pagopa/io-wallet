@@ -58,7 +58,7 @@ locals {
       },
       {
         name                  = "StorageAccountQueueConnectionString"
-        key_vault_secret_name = azurerm_key_vault_secret.wallet_revocation_storage.name
+        key_vault_secret_name = data.azurerm_key_vault_secret.wallet_revocation_storage.name
       }
     ]
   }
