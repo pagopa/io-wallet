@@ -55,10 +55,6 @@ locals {
       {
         name                  = "AllowedDeveloperUsers"
         key_vault_secret_name = "AllowedDeveloperUsers"
-      },
-      {
-        name                  = "StorageAccountQueueConnectionString"
-        key_vault_secret_name = data.azurerm_key_vault_secret.revocation_queue_connection_string.name
       }
     ]
   }
