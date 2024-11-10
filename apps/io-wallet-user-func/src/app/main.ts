@@ -1,3 +1,4 @@
+import { MobileAttestationService } from "@/infra/attestation-service";
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
@@ -57,6 +58,10 @@ const pidIssuerClient = new PidIssuerClient(
 
 const appInsightsClient = ai.defaultClient;
 
+const mobileAttestationService = new MobileAttestationService(
+  config.attestationService,
+);
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: withAppInsights(
@@ -73,7 +78,7 @@ app.http("createWalletAttestation", {
   authLevel: "function",
   handler: withAppInsights(
     CreateWalletAttestationFunction({
-      attestationServiceConfiguration: config.attestationService,
+      attestationService: mobileAttestationService,
       federationEntityMetadata: config.federationEntity,
       nonceRepository,
       signer,
