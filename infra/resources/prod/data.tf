@@ -60,6 +60,13 @@ data "azurerm_key_vault_secret" "notification_email" {
   key_vault_id = module.key_vaults.key_vault_wallet.id
 }
 
+resource "azurerm_key_vault_secret" "revocation_queue_connection_string" {
+  name         = "StorageAccountQueueConnectionString"
+  value        = data.azurerm_storage_account.wallet_revocation_storage.primary_connection_string
+  key_vault_id = module.key_vaults.key_vault_wallet.id
+  sensitive    = true
+}
+
 data "azurerm_monitor_action_group" "io" {
   name                = "ioperror"
   resource_group_name = data.azurerm_resource_group.weu_common.name

@@ -37,7 +37,6 @@ locals {
       PidIssuerHealthCheckEnabled   = false
 
       RevocationQueueName = var.revocation_queue_name
-      # StorageAccountQueueConnectionString = var.storage_account_queue_connection_string
 
       WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
       WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
