@@ -5,7 +5,6 @@ import * as jose from "jose";
 import * as pkijs from "pkijs";
 
 import { iOsAttestation } from ".";
-import { IosAttestationError } from "../errors";
 
 const APPATTESTDEVELOP = Buffer.from("appattestdevelop").toString("hex");
 const APPATTESTPROD = Buffer.concat([
@@ -23,7 +22,17 @@ export interface VerifyAttestationParams {
   teamIdentifier: string;
 }
 
-export const verifyAttestation = async (params: VerifyAttestationParams) => {
+type IosAttestationValidationResult =
+  | {
+      deviceDetails: IosDeviceDetails;
+      hardwareKey: jose.JWK;
+      success: true;
+    }
+  | { reason: string; success: false };
+
+export const verifyAttestation = async (
+  params: VerifyAttestationParams,
+): Promise<IosAttestationValidationResult> => {
   const {
     allowDevelopmentEnvironment,
     appleRootCertificate,
@@ -43,7 +52,10 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   // Convert X509 string to X509Certificate obj
   const rootCertificate = new X509Certificate(appleRootCertificate);
   if (!rootCertificate) {
-    throw new IosAttestationError("Invalid Apple root certificate");
+    return {
+      reason: "Invalid Apple root certificate",
+      success: false,
+    };
   }
 
   // https://developer.apple.com/documentation/devicecheck/validating_apps_that_connect_to_your_server
@@ -58,12 +70,17 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 
   if (subCaCertificate !== undefined) {
     if (!subCaCertificate.verify(rootCertificate.publicKey)) {
-      throw new Error(
-        "sub CA certificate is not signed by Apple App Attestation Root CA",
-      );
+      return {
+        reason:
+          "sub CA certificate is not signed by Apple App Attestation Root CA",
+        success: false,
+      };
     }
   } else {
-    throw new IosAttestationError("no sub CA certificate found");
+    return {
+      reason: "No sub CA certificate found",
+      success: false,
+    };
   }
 
   const clientCertificate = certificates.find((certificate) =>
@@ -72,12 +89,17 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
 
   if (clientCertificate !== undefined) {
     if (!clientCertificate.verify(subCaCertificate.publicKey)) {
-      throw new Error(
-        "client CA certificate is not signed by Apple App Attestation CA 1",
-      );
+      return {
+        reason:
+          "Client CA certificate is not signed by Apple App Attestation CA",
+        success: false,
+      };
     }
   } else {
-    throw new IosAttestationError("no client CA certificate found");
+    return {
+      reason: "No client CA certificate found",
+      success: false,
+    };
   }
 
   // 2. Create clientDataHash as the SHA256 hash of the one-time challenge your server sends to your
@@ -107,7 +129,10 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
       .valueHex,
   ).toString("hex");
   if (actualNonce !== nonce) {
-    throw new IosAttestationError("nonce does not match");
+    return {
+      reason: "Nonce does not match",
+      success: false,
+    };
   }
 
   // 5. Create the SHA256 hash of the public key in credCert, and verify that it matches the key identifier from your app
@@ -118,7 +143,10 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
     .update(publicKey.toString("hex"), "hex") // Convert publicKey to hexadecimal string
     .digest("base64url");
   if (publicKeyHash !== keyId) {
-    throw new IosAttestationError("keyId does not match");
+    return {
+      reason: "keyId does not match",
+      success: false,
+    };
   }
 
   // 6. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
@@ -133,14 +161,20 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   );
 
   if (bundleIdentifiersCheck.length === 0) {
-    throw new IosAttestationError("appId does not match");
+    return {
+      reason: "appId does not match",
+      success: false,
+    };
   }
 
   // 7. Verify that the authenticator data’s counter field equals 0.
   const signCount = authData.subarray(33, 37).readInt32BE();
 
   if (signCount !== 0) {
-    throw new IosAttestationError("signCount is not 0");
+    return {
+      reason: "signCount is not 0",
+      success: false,
+    };
   }
 
   // 8. Verify that the authenticator data’s aaguid field is either appattestdevelop if operating in the development
@@ -148,11 +182,17 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const aaguid = authData.subarray(37, 53).toString("hex");
 
   if (aaguid !== APPATTESTDEVELOP && aaguid !== APPATTESTPROD) {
-    throw new IosAttestationError("aaguid is not valid");
+    return {
+      reason: "aaguid is not valid",
+      success: false,
+    };
   }
 
   if (aaguid === APPATTESTDEVELOP && !allowDevelopmentEnvironment) {
-    throw new IosAttestationError("development environment is not allowed");
+    return {
+      reason: "development environment is not allowed",
+      success: false,
+    };
   }
 
   // 9. Verify that the authenticator data’s credentialId field is the same as the key identifier.
@@ -160,7 +200,10 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   const credentialId = authData.subarray(55, 55 + credentialIdLength);
 
   if (credentialId.toString("base64url") !== keyId) {
-    throw new IosAttestationError("credentialId does not match");
+    return {
+      reason: "credentialId does not match",
+      success: false,
+    };
   }
 
   const hardwareKey = await jose.exportJWK(clientCertificate.publicKey);
@@ -168,5 +211,6 @@ export const verifyAttestation = async (params: VerifyAttestationParams) => {
   return {
     deviceDetails,
     hardwareKey,
+    success: true,
   };
 };

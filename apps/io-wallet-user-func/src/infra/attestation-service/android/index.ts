@@ -10,7 +10,7 @@ import * as S from "fp-ts/lib/string";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { ValidatedAttestation } from "../../attestation-service";
-import { AndroidAttestationError } from "../errors";
+import { AndroidAssertionError, AndroidAttestationError } from "../errors";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";
 
@@ -35,10 +35,7 @@ export const validateAndroidAttestation = (
         E.tryCatch(
           () => new X509Certificate(cert),
           () =>
-            new AndroidAttestationError(
-              `Unable to decode X509 certificate`,
-              {},
-            ),
+            new AndroidAttestationError(`Unable to decode X509 certificate`),
         ),
       ),
     ),
@@ -57,6 +54,13 @@ export const validateAndroidAttestation = (
               x509Chain,
             }),
           E.toError,
+        ),
+        TE.chain((attestationValidationResult) =>
+          attestationValidationResult.success
+            ? TE.right(attestationValidationResult)
+            : TE.left(
+                new AndroidAttestationError(attestationValidationResult.reason),
+              ),
         ),
         TE.chainW(({ deviceDetails, hardwareKey }) =>
           pipe(
@@ -89,8 +93,8 @@ export const validateAndroidAssertion = (
     E.chain(J.parse),
     E.mapLeft(
       () =>
-        new Error(
-          "[Android Assertion] Unable to parse Google App Credentials string",
+        new AndroidAssertionError(
+          "Unable to parse Google App Credentials string",
         ),
     ),
     E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
@@ -111,5 +115,10 @@ export const validateAndroidAssertion = (
           }),
         E.toError,
       ),
+    ),
+    TE.chain((assertionValidationResult) =>
+      assertionValidationResult.success
+        ? TE.right(undefined)
+        : TE.left(new AndroidAssertionError(assertionValidationResult.reason)),
     ),
   );
