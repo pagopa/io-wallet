@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.7
+
+### Patch Changes
+
+- f465ea9: Refactor to validation result for attestation/assertion library
+
 ## 1.3.6
 
 ### Patch Changes
