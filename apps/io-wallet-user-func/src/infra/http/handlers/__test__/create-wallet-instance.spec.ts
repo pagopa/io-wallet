@@ -50,7 +50,7 @@ describe("CreateWalletInstanceHandler", () => {
     log: () => () => void 0,
   };
 
-  const attestationService: AttestationService = {
+  const mockAttestationService: AttestationService = {
     getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
     validateAssertion: (request: ValidateAssertionRequest) =>
       TE.right(undefined),
@@ -83,7 +83,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -109,7 +109,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -140,7 +140,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -175,7 +175,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -210,7 +210,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -246,7 +246,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

@@ -38,7 +38,7 @@ const logger = {
   log: () => () => void 0,
 };
 
-const attestationService: AttestationService = {
+const mockAttestationService: AttestationService = {
   getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
   validateAssertion: (request: ValidateAssertionRequest) => TE.right(undefined),
   validateAttestation: (
@@ -117,7 +117,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -165,7 +165,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -216,7 +216,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -261,7 +261,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationService,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
