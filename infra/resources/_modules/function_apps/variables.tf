@@ -87,6 +87,17 @@ variable "user_func" {
   description = "Configuration of the user-func"
 }
 
+variable "support_func" {
+  type = object({
+    app_settings = list(object({
+      name                  = string
+      value                 = optional(string, "")
+      key_vault_secret_name = optional(string)
+    }))
+  })
+  description = "Configuration of the support-func"
+}
+
 variable "application_insights_connection_string" {
   type        = string
   description = "Application Insights instrumentation key"

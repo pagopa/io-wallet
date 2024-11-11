@@ -105,7 +105,8 @@ module "function_apps" {
 
   revocation_queue_name = module.storage_account.revocation_queue_name.name
 
-  user_func = local.user_func
+  user_func    = local.user_func
+  support_func = local.support_func
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
 
