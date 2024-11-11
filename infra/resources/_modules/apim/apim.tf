@@ -68,6 +68,14 @@ resource "azurerm_api_management_named_value" "trial_system_api_key" {
   secret              = true
 }
 
+resource "azurerm_api_management_named_value" "trial_system_feature_flag" {
+  name                = "trial-system-feature-flag"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "trial-system-feature-flag"
+  value               = true
+}
+
 data "azurerm_key_vault_secret" "funciowallet_default" {
   name         = "funciowallet-KEY-APPBACKEND"
   key_vault_id = var.key_vault_id
