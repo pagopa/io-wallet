@@ -1,21 +1,20 @@
-resource "azurerm_storage_account" "wallet_revocation_storage" {
-  name                      = "${replace(var.project, "-", "")}walletrevocation01"
-  resource_group_name       = var.resource_group_name
-  location                  = var.location
-  account_tier              = "Standard"
-  account_kind              = "StorageV2"
-  account_replication_type  = "ZRS"
-  shared_access_key_enabled = false
-  enable_https_traffic_only       = true
-  allow_nested_items_to_be_public = false
-  public_network_access_enabled   = false
-  min_tls_version           = "TLS1_2"
+module "storage_account_queue" {
+  source = "github.com/pagopa/dx//infra/modules/azure_storage_account?ref=main"
+  environment         = local.environment
+  tier                = "l"
+  resource_group_name = var.resource_group_name
+
+  subnet_pep_id                        = var.subnet_pep_id
+  private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
+
+  subservices_enabled = {
+    blob  = false
+    file  = false
+    queue = true
+    table = false
+  }
+
+  action_group_id = var.action_group_id
 
   tags = var.tags
-}
-
-resource "azurerm_key_vault_secret" "wallet_revocation_storage_connection_string" {
-  name         = "WalletRevocationStorageConnectionString"
-  value        = azurerm_storage_account.wallet_revocation_storage.primary_connection_string
-  key_vault_id = var.key_vault_wallet_id
 }

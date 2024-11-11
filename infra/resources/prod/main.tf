@@ -203,11 +203,12 @@ module "apim" {
 module "storage_account" {
   source = "../_modules/storage"
 
-  project             = local.project
+  prefix              = local.prefix
+  env_short           = local.env_short
   location            = local.location
+  domain              = local.domain
+  app_name            = "revocation"
+  instance_number     = "01"
   resource_group_name = azurerm_resource_group.wallet.name
-
-  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
-
   tags = local.tags
 }
