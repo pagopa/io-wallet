@@ -12,6 +12,10 @@ export enum OperatingSystem {
   iOS = "Apple iOS",
 }
 
+export type ValidationResult =
+  | { reason: string; success: false }
+  | { success: true };
+
 export interface ValidatedAttestation {
   deviceDetails: DeviceDetails;
   hardwareKey: JwkPublicKey;
