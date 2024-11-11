@@ -1,56 +1,68 @@
 import * as appInsights from "applicationinsights";
-import { X509Certificate } from "crypto";
+import { X509Certificate, createPublicKey } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
+import { ValidationResult } from "./attestation-service";
 import {
+  getCrlFromUrl,
   validateIssuance,
   validateRevocation,
-} from "./infra/attestation-service/android/attestation";
-import { ValidationResult } from "./infra/attestation-service/errors";
-import { WalletInstanceRevocationStorageQueue } from "./infra/azure/queue/wallet-instance-revocation";
+} from "./certificates";
 import {
   WalletInstanceRepository,
   getValidWalletInstanceWithAndroidCertificatesChain,
   revokeUserWalletInstances,
 } from "./wallet-instance";
 
-const needToBeRevoked = async (
-  walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
-  attestationServiceConfiguration: AttestationServiceConfiguration,
-): Promise<ValidationResult> => {
-  const x509Chain = walletInstance.deviceDetails.x509Chain.map(
-    (cert) => new X509Certificate(cert),
-  );
-
-  const { androidCrlUrl, googlePublicKey, httpRequestTimeout } =
-    attestationServiceConfiguration;
-
-  const issuanceValidationResult = validateIssuance(x509Chain, googlePublicKey);
-
-  if (!issuanceValidationResult.success) {
-    return issuanceValidationResult;
-  }
-
-  const revocationValidationResult = await validateRevocation(
-    x509Chain,
-    androidCrlUrl,
-    httpRequestTimeout,
-  );
-
-  return revocationValidationResult;
-};
+const validateWalletInstanceCertificatesChain =
+  (attestationServiceConfiguration: AttestationServiceConfiguration) =>
+  (
+    walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
+  ): TE.TaskEither<Error, ValidationResult> => {
+    const { androidCrlUrl, googlePublicKey, httpRequestTimeout } =
+      attestationServiceConfiguration;
+    return pipe(
+      walletInstance.deviceDetails.x509Chain,
+      RA.map((cert) => E.tryCatch(() => new X509Certificate(cert), E.toError)),
+      RA.sequence(E.Applicative),
+      TE.fromEither,
+      TE.chain((x509Chain) =>
+        pipe(
+          E.tryCatch(
+            () => validateIssuance(x509Chain, createPublicKey(googlePublicKey)),
+            E.toError,
+          ),
+          TE.fromEither,
+          TE.chain((issuanceValidationResult) =>
+            issuanceValidationResult.success
+              ? pipe(
+                  getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
+                  TE.chain((attestationCrl) =>
+                    TE.tryCatch(
+                      () => validateRevocation(x509Chain, attestationCrl),
+                      E.toError,
+                    ),
+                  ),
+                )
+              : TE.right(issuanceValidationResult),
+          ),
+        ),
+      ),
+    );
+  };
 
 export const revokeInvalidWalletInstances: (
   walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
 ) => RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
-    revocationQueue: WalletInstanceRevocationStorageQueue;
+    revocationQueue: WalletInstanceRevocationQueue;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
@@ -72,14 +84,9 @@ export const revokeInvalidWalletInstances: (
       )({
         walletInstanceRepository,
       }),
-      TE.chain((validWalletInstanceWithAndroidCertificatesChain) =>
-        TE.tryCatch(
-          () =>
-            needToBeRevoked(
-              validWalletInstanceWithAndroidCertificatesChain,
-              attestationServiceConfiguration,
-            ),
-          E.toError,
+      TE.chain(
+        validateWalletInstanceCertificatesChain(
+          attestationServiceConfiguration,
         ),
       ),
       TE.chain((validationResult) =>

@@ -1,5 +1,8 @@
 import { ValidationResult } from "@/attestation-service";
 import { KeyObject, X509Certificate } from "crypto";
+import * as E from "fp-ts/lib/Either";
+import * as TE from "fp-ts/lib/TaskEither";
+import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
 /**
@@ -97,3 +100,25 @@ export const validateRevocation = async (
   }
   return { success: true };
 };
+
+export const getCrlFromUrl = (
+  crlUrl: string,
+  httpRequestTimeout = 4000,
+): TE.TaskEither<Error, CRL> =>
+  pipe(
+    TE.tryCatch(
+      () =>
+        fetch(crlUrl, {
+          method: "GET",
+          signal: AbortSignal.timeout(httpRequestTimeout),
+        }),
+      E.toError,
+    ),
+    TE.chain((response) => TE.tryCatch(() => response.json(), E.toError)),
+    TE.chainEitherK((json) =>
+      pipe(
+        CRL.decode(json),
+        E.mapLeft(() => new Error("CRL invalid format")),
+      ),
+    ),
+  );
