@@ -1,4 +1,4 @@
-module "storage_account_queue" {
+module "storage_account" {
   source = "github.com/pagopa/dx//infra/modules/azure_storage_account?ref=main"
 
   environment         = local.environment

@@ -103,7 +103,7 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  revocation_queue_name = module.storage_account.revocation_queue_name.name
+  revocation_queue_name = module.storage_accounts.revocation_queue_name.name
 
   user_func = local.user_func
 
@@ -170,6 +170,12 @@ module "iam" {
     name                = module.cdn.storage_account_cdn.name
     resource_group_name = module.cdn.storage_account_cdn.resource_group_name
   }
+
+  storage_account = {
+    id                  = module.storage_accounts.wallet.id
+    name                = module.storage_accounts.wallet.name
+    resource_group_name = module.storage_accounts.wallet.resource_group_name
+  }
 }
 
 module "apim" {
@@ -200,14 +206,14 @@ module "apim" {
   tags = local.tags
 }
 
-module "storage_account" {
-  source = "../_modules/storage"
+module "storage_accounts" {
+  source = "../_modules/storage_accounts"
 
   prefix          = local.prefix
   env_short       = local.env_short
   location        = local.location
-  domain          = local.domain
-  app_name        = "rev"
+  domain          = null
+  app_name        = local.domain
   instance_number = "01"
 
   resource_group_name = azurerm_resource_group.wallet.name
