@@ -10,7 +10,7 @@ export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   rootPublicKey: KeyObject,
 ): ValidationResult => {
-  // Check dates
+  // Check certificates expiration dates
   const now = new Date();
   const datesValid = x509Chain.every(
     (c) => new Date(c.validFrom) <= now && now <= new Date(c.validTo),
@@ -27,7 +27,7 @@ export const validateIssuance = (
     x509Chain.forEach((cert, index) => {
       if (index < x509Chain.length - 1) {
         const parent = x509Chain[index + 1];
-        if (!cert || !parent || cert.verify(parent.publicKey) === false) {
+        if (!cert || !parent || !cert.verify(parent.publicKey)) {
           return {
             reason: "Certificates chain is invalid",
             success: false,
@@ -37,6 +37,7 @@ export const validateIssuance = (
     });
   }
 
+  // Check the signature of root certificate with root public key
   const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
   if (!rootCert || !rootCert.verify(rootPublicKey)) {
     return {
@@ -69,14 +70,14 @@ export const validateRevocation = async (
   crlUrl: string,
   httpRequestTimeout: number,
 ): Promise<ValidationResult> => {
-  const res = await fetch(crlUrl, {
+  const crlResponse = await fetch(crlUrl, {
     method: "GET",
     signal: AbortSignal.timeout(httpRequestTimeout),
   });
-  if (!res.ok) {
-    throw new Error("Failed to fetch CRL");
+  if (!crlResponse.ok) {
+    throw new Error(`Failed to fetch CRL from ${crlUrl}`);
   }
-  const crl = (await res.json()) as CRL; // Add type assertion for crl
+  const crl = (await crlResponse.json()) as CRL;
 
   const revokedSerials = Object.keys(crl.entries).map((key) =>
     key.toLowerCase(),
