@@ -38,3 +38,18 @@ variable "resource_group_name" {
   type        = string
   description = "Name of the resource group where resources will be created"
 }
+
+variable "action_group_id" {
+  type        = string
+  description = "Id of the alert action group"
+}
+
+variable "private_dns_zone_resource_group_name" {
+  type        = string
+  description = "Resource group of the Private DNS Zone used for private endpoints"
+}
+
+variable "subnet_pep_id" {
+  type        = string
+  description = "Id of the private endpoints' subnet"
+}
