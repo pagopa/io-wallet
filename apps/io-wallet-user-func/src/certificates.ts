@@ -3,7 +3,7 @@ import { KeyObject, X509Certificate } from "crypto";
 
 /**
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
- * @param x509Chain - The chain of {@link X509Certificate} certificates.
+ * @param x509Chain - The chain of {@link X509Certificate} certificates. The root certificate must be the last element of the array.
  * @param rootPublicKey - The public key of root certificate.
  */
 export const validateIssuance = (
@@ -29,7 +29,7 @@ export const validateIssuance = (
         const parent = x509Chain[index + 1];
         if (!cert || !parent || cert.verify(parent.publicKey) === false) {
           return {
-            reason: "Certificates  chain is invalid",
+            reason: "Certificates chain is invalid",
             success: false,
           };
         }
