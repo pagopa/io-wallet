@@ -195,15 +195,14 @@ describe("CreateWalletInstanceHandler", () => {
   });
 
   it("should return a 500 HTTP response on getValidByUserIdExcludingOne error", async () => {
-    const walletInstanceRepositoryThatFailsOnGetNotRevokedByDiffirentIdAndUserId: WalletInstanceRepository =
-      {
-        batchPatch: () => TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
-        getValidByUserIdExcludingOne: () =>
-          TE.left(new Error("failed on getValidByUserIdExcludingOne!")),
-        insert: () => TE.left(new Error("not implemented")),
-      };
+    const getValidByUserIdExcludingOne: WalletInstanceRepository = {
+      batchPatch: () => TE.left(new Error("not implemented")),
+      get: () => TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
+      getValidByUserIdExcludingOne: () =>
+        TE.left(new Error("failed on getValidByUserIdExcludingOne!")),
+      insert: () => TE.left(new Error("not implemented")),
+    };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
@@ -216,8 +215,7 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       telemetryClient,
-      walletInstanceRepository:
-        walletInstanceRepositoryThatFailsOnGetNotRevokedByDiffirentIdAndUserId,
+      walletInstanceRepository: getValidByUserIdExcludingOne,
     });
 
     await expect(handler()).resolves.toEqual({
