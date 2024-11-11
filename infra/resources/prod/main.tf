@@ -203,12 +203,18 @@ module "apim" {
 module "storage_account" {
   source = "../_modules/storage"
 
-  prefix              = local.prefix
-  env_short           = local.env_short
-  location            = local.location
-  domain              = local.domain
-  app_name            = "revocation"
-  instance_number     = "01"
+  prefix          = local.prefix
+  env_short       = local.env_short
+  location        = local.location
+  domain          = local.domain
+  app_name        = "revocation"
+  instance_number = "01"
+
   resource_group_name = azurerm_resource_group.wallet.name
+
+  subnet_pep_id                        = data.azurerm_subnet.pep.id
+  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
+  action_group_id                      = module.monitoring.action_group_wallet.id
+
   tags = local.tags
 }
