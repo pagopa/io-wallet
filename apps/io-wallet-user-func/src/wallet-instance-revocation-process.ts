@@ -21,13 +21,15 @@ import {
 } from "./wallet-instance";
 
 const validateWalletInstanceCertificatesChain =
-  (attestationServiceConfiguration: AttestationServiceConfiguration) =>
+  ({
+    androidCrlUrl,
+    googlePublicKey,
+    httpRequestTimeout,
+  }: AttestationServiceConfiguration) =>
   (
     walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
-  ): TE.TaskEither<Error, ValidationResult> => {
-    const { androidCrlUrl, googlePublicKey, httpRequestTimeout } =
-      attestationServiceConfiguration;
-    return pipe(
+  ): TE.TaskEither<Error, ValidationResult> =>
+    pipe(
       walletInstance.deviceDetails.x509Chain,
       RA.map((cert) => E.tryCatch(() => new X509Certificate(cert), E.toError)),
       RA.sequence(E.Applicative),
@@ -55,7 +57,6 @@ const validateWalletInstanceCertificatesChain =
         ),
       ),
     );
-  };
 
 export const revokeInvalidWalletInstances: (
   walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
