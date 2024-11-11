@@ -103,6 +103,8 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
+  revocation_queue_name = module.storage_account.revocation_queue_name.name
+
   user_func = local.user_func
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
@@ -194,6 +196,18 @@ module "apim" {
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   product_id = local.apim.products.io_web.product_id
+
+  tags = local.tags
+}
+
+module "storage_account" {
+  source = "../_modules/storage"
+
+  project             = local.project
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   tags = local.tags
 }
