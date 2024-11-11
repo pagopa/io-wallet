@@ -6,6 +6,7 @@ import {
 } from "@/attestation-service";
 import { ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { createPublicKey } from "crypto";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
 import * as O from "fp-ts/Option";
@@ -14,7 +15,9 @@ import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { identity, pipe } from "fp-ts/function";
 import { Separated } from "fp-ts/lib/Separated";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
+import * as jose from "jose";
 
 import {
   validateAndroidAssertion,
@@ -51,7 +54,17 @@ export class MobileAttestationService implements AttestationService {
       O.isSome,
     );
 
-  getHardwarePublicTestKey = () => this.#configuration.hardwarePublicTestKey;
+  getHardwarePublicTestKey = () =>
+    pipe(
+      E.tryCatch(
+        () => createPublicKey(this.#configuration.hardwarePublicTestKey),
+        E.toError,
+      ),
+      TE.fromEither,
+      TE.chain((el) => TE.tryCatch(() => jose.exportJWK(el), E.toError)),
+      TE.chainEitherKW(JwkPublicKey.decode),
+      TE.mapLeft(() => new Error("Invalid test hardware public key")),
+    );
 
   validateAssertion = ({
     hardwareKey,
