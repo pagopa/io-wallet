@@ -9,17 +9,20 @@ import { KeyObject, X509Certificate } from "crypto";
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   rootPublicKey: KeyObject,
+  skipExpirationvalidation = false,
 ): ValidationResult => {
-  // Check certificates expiration dates
-  const now = new Date();
-  const datesValid = x509Chain.every(
-    (c) => new Date(c.validFrom) <= now && now <= new Date(c.validTo),
-  );
-  if (!datesValid) {
-    return {
-      reason: "Certificates expired",
-      success: false,
-    };
+  if (!skipExpirationvalidation) {
+    // Check certificates expiration dates
+    const now = new Date();
+    const datesValid = x509Chain.every(
+      (c) => new Date(c.validFrom) <= now && now <= new Date(c.validTo),
+    );
+    if (!datesValid) {
+      return {
+        reason: "Certificates expired",
+        success: false,
+      };
+    }
   }
 
   // Check that each certificate, except for the last, is issued by the subsequent one.
