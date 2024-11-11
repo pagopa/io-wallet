@@ -1,3 +1,4 @@
+import { CRL, validateIssuance, validateRevocation } from "@/certificates";
 import {
   AttestationApplicationId,
   NonStandardKeyDescription,
@@ -9,8 +10,6 @@ import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
-import { validateIssuance, validateRevocation } from "../../../certificates";
-
 /**
  * Key attestation extension data schema OID
  * https://developer.android.com/privacy-and-security/security-key-attestation#key_attestation_ext_schema
@@ -18,11 +17,10 @@ import { validateIssuance, validateRevocation } from "../../../certificates";
 const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 
 export interface VerifyAttestationParams {
-  androidCrlUrl: string;
+  attestationCrl: CRL;
   bundleIdentifiers: string[];
   challenge: string;
   googlePublicKey: string;
-  httpRequestTimeout: number;
   x509Chain: readonly X509Certificate[];
 }
 
@@ -37,8 +35,7 @@ type AndroidAttestationValidationResult =
 export const verifyAttestation = async (
   params: VerifyAttestationParams,
 ): Promise<AndroidAttestationValidationResult> => {
-  const { androidCrlUrl, googlePublicKey, httpRequestTimeout, x509Chain } =
-    params;
+  const { attestationCrl, googlePublicKey, x509Chain } = params;
 
   if (x509Chain.length <= 0) {
     return {
@@ -60,8 +57,7 @@ export const verifyAttestation = async (
   // 4. Check each certificate's revocation status to ensure that none of the certificates have been revoked.
   const revocationValidationResult = await validateRevocation(
     x509Chain,
-    androidCrlUrl,
-    httpRequestTimeout,
+    attestationCrl,
   );
 
   if (!revocationValidationResult.success) {

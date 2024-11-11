@@ -1,3 +1,4 @@
+import { CRL } from "@/certificates";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 
 const challenge = "randomvalue";
@@ -26,6 +27,19 @@ const integrityAssertion =
 
 const bundleIdentifier = "com.ioreactnativeintegrityexample";
 
+const mockCrl: CRL = {
+  entries: {
+    "09703144777339823906": {
+      reason: "KEY_COMPROMISE",
+      status: "REVOKED",
+    },
+    c8966fcb2fbb0d7a: {
+      reason: "SOFTWARE_FLAW",
+      status: "SUSPENDED",
+    },
+  },
+};
+
 export const androidMockData = {
   attestation,
   bundleIdentifier,
@@ -33,4 +47,5 @@ export const androidMockData = {
   ephemeralKey,
   hardwareKey,
   integrityAssertion,
+  mockCrl,
 };

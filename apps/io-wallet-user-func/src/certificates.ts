@@ -1,5 +1,6 @@
 import { ValidationResult } from "@/attestation-service";
 import { KeyObject, X509Certificate } from "crypto";
+import * as t from "io-ts";
 
 /**
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
@@ -56,33 +57,27 @@ export const validateIssuance = (
 /**
  * Simplified type definition for the Certificate Revocation List (CRL) object.
  */
-interface CRL {
-  entries: Record<
-    string,
-    { comment: string; expires: string; reason: string; status: string }
-  >;
-}
+export const CRL = t.type({
+  entries: t.record(
+    t.string,
+    t.partial({
+      reason: t.string,
+      status: t.string,
+    }),
+  ),
+});
+export type CRL = t.TypeOf<typeof CRL>;
 
 /**
  * Check each certificate's revocation status to ensure that none of the certificates have been revoked.
  * @param x509Chain - The chain of {@link X509Certificate} certificates.
- * @param crlUrl - The URL of the revocation list.
+ * @param crl - The certificates revocation list.
  * @param httpRequestTimeout - The timeout for CRL fetch request in ms.
  */
 export const validateRevocation = async (
   x509Chain: readonly X509Certificate[],
-  crlUrl: string,
-  httpRequestTimeout: number,
+  crl: CRL,
 ): Promise<ValidationResult> => {
-  const crlResponse = await fetch(crlUrl, {
-    method: "GET",
-    signal: AbortSignal.timeout(httpRequestTimeout),
-  });
-  if (!crlResponse.ok) {
-    throw new Error(`Failed to fetch CRL from ${crlUrl}`);
-  }
-  const crl = (await crlResponse.json()) as CRL;
-
   const revokedSerials = Object.keys(crl.entries).map((key) =>
     key.toLowerCase(),
   );
