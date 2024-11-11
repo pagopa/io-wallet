@@ -40,8 +40,8 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getValidByUserIdExcludingOne: () => TE.right(O.some([])),
     getLastByUserId: () => TE.left(new Error("not implemented")),
+    getValidByUserIdExcludingOne: () => TE.right(O.some([])),
     insert: () => TE.right(undefined),
   };
 
@@ -163,9 +163,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
       };
     const req = {
@@ -199,11 +199,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getValidByUserIdExcludingOne: () =>
-          TE.left(
-            new Error("failed on getValidByUserIdExcludingOne!"),
-          ),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getValidByUserIdExcludingOne: () =>
+          TE.left(new Error("failed on getValidByUserIdExcludingOne!")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
@@ -238,9 +236,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const req = {

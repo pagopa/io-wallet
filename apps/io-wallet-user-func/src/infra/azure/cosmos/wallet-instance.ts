@@ -84,6 +84,53 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
+  getLastByUserId(userId: WalletInstance["userId"]) {
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          const { resources: items } = await this.#container.items
+            .query({
+              parameters: [
+                {
+                  name: "@partitionKey",
+                  value: userId,
+                },
+              ],
+              query:
+                "SELECT TOP 1 * FROM c WHERE c.userId = @partitionKey ORDER BY c.createdAt DESC",
+            })
+            .fetchAll();
+          return items;
+        },
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(
+                `The request to the database has timed out: ${error.message}`,
+              )
+            : new Error(`Error getting wallet instances by user id: ${error}`),
+      ),
+      TE.chain(
+        flow(
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            flow(
+              WalletInstance.decode,
+              E.map(O.some),
+              E.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting last wallet instance: invalid result format",
+                  ),
+              ),
+              TE.fromEither,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   getValidByUserIdExcludingOne(
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -135,53 +182,6 @@ export class CosmosDbWalletInstanceRepository
                 ),
                 TE.fromEither,
               ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  getLastByUserId(userId: WalletInstance["userId"]) {
-    return pipe(
-      TE.tryCatch(
-        async () => {
-          const { resources: items } = await this.#container.items
-            .query({
-              parameters: [
-                {
-                  name: "@partitionKey",
-                  value: userId,
-                },
-              ],
-              query:
-                "SELECT TOP 1 * FROM c WHERE c.userId = @partitionKey ORDER BY c.createdAt DESC",
-            })
-            .fetchAll();
-          return items;
-        },
-        (error) =>
-          error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(
-                `The request to the database has timed out: ${error.message}`,
-              )
-            : new Error(`Error getting wallet instances by user id: ${error}`),
-      ),
-      TE.chain(
-        flow(
-          RA.head,
-          O.fold(
-            () => TE.right(O.none),
-            flow(
-              WalletInstance.decode,
-              E.map(O.some),
-              E.mapLeft(
-                () =>
-                  new Error(
-                    "Error getting last wallet instance: invalid result format",
-                  ),
-              ),
-              TE.fromEither,
-            ),
           ),
         ),
       ),

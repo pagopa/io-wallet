@@ -13,9 +13,8 @@ describe("SetWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getValidByUserIdExcludingOne: () =>
-      TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
+    getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
 
@@ -124,9 +123,9 @@ describe("SetWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetWalletInstanceStatusHandler({
