@@ -207,7 +207,7 @@ module "storage_account" {
   env_short       = local.env_short
   location        = local.location
   domain          = local.domain
-  app_name        = "revocation"
+  app_name        = "rev"
   instance_number = "01"
 
   resource_group_name = azurerm_resource_group.wallet.name
