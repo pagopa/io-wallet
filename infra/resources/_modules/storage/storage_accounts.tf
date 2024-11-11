@@ -6,6 +6,9 @@ resource "azurerm_storage_account" "wallet_revocation_storage" {
   account_kind              = "StorageV2"
   account_replication_type  = "ZRS"
   shared_access_key_enabled = false
+  enable_https_traffic_only       = true
+  allow_nested_items_to_be_public = false
+  public_network_access_enabled   = false
   min_tls_version           = "TLS1_2"
 
   tags = var.tags
