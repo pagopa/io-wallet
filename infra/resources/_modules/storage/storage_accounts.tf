@@ -12,7 +12,7 @@ resource "azurerm_storage_account" "wallet_revocation_storage" {
 }
 
 resource "azurerm_key_vault_secret" "wallet_revocation_storage_connection_string" {
-  name  = "WalletRevocationStorageConnectionString"
-  value = azurerm_storage_account.wallet_revocation_storage.primary_connection_string
+  name         = "WalletRevocationStorageConnectionString"
+  value        = azurerm_storage_account.wallet_revocation_storage.primary_connection_string
   key_vault_id = var.key_vault_wallet_id
 }

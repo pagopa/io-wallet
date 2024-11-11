@@ -27,6 +27,7 @@
 | <a name="module_iam"></a> [iam](#module\_iam) | ../_modules/iam | n/a |
 | <a name="module_key_vaults"></a> [key\_vaults](#module\_key\_vaults) | ../_modules/key_vaults | n/a |
 | <a name="module_monitoring"></a> [monitoring](#module\_monitoring) | ../_modules/monitoring | n/a |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | ../_modules/storage | n/a |
 
 ## Resources
 
