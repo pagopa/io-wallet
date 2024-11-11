@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
 import {
-  ANDROID_CRL_URL,
-  ANDROID_PLAY_INTEGRITY_URL,
-  APPLE_APP_ATTESTATION_ROOT_CA,
-  GOOGLE_PUBLIC_KEY,
-  HARDWARE_PUBLIC_TEST_KEY,
-} from "@/app/config";
+  AttestationService,
+  ValidateAssertionRequest,
+} from "@/attestation-service";
+import { MobileAttestationService } from "@/infra/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -39,24 +38,25 @@ const logger = {
   log: () => () => void 0,
 };
 
-const attestationServiceConfiguration = {
-  allowedDeveloperUsers: [mockFiscalCode],
-  androidBundleIdentifiers: [
-    "org.reactjs.native.example.IoReactNativeIntegrityExample",
-  ],
-  androidCrlUrl: ANDROID_CRL_URL,
-  androidPlayIntegrityUrl: ANDROID_PLAY_INTEGRITY_URL,
-  androidPlayStoreCertificateHash: "",
-  appleRootCertificate: APPLE_APP_ATTESTATION_ROOT_CA,
-  googleAppCredentialsEncoded: "",
-  googlePublicKey: GOOGLE_PUBLIC_KEY,
-  hardwarePublicTestKey: HARDWARE_PUBLIC_TEST_KEY,
-  httpRequestTimeout: 0,
-  iOsTeamIdentifier: "M2X5YQ4BJ7",
-  iosBundleIdentifiers: [
-    "org.reactjs.native.example.IoReactNativeIntegrityExample",
-  ],
-  skipSignatureValidation: true,
+const mockAttestationService: AttestationService = {
+  getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
+  validateAssertion: (request: ValidateAssertionRequest) => TE.right(undefined),
+  validateAttestation: (
+    attestation: NonEmptyString,
+    nonce: NonEmptyString,
+    hardwareKeyTag: NonEmptyString,
+    user: FiscalCode,
+  ) =>
+    TE.right({
+      deviceDetails: { platform: "ios" },
+      hardwareKey: {
+        crv: "P-256",
+        kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
+        kty: "EC",
+        x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
+        y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
+      },
+    }),
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
@@ -117,7 +117,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -165,7 +165,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -216,7 +216,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -261,7 +261,7 @@ describe("CreateWalletAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletAttestationHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
       inputDecoder: H.HttpRequest,
