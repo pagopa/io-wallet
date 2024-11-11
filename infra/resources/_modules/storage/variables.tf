@@ -1,12 +1,32 @@
 
-variable "project" {
+variable "prefix" {
   type        = string
-  description = "IO prefix and short environment"
+  description = "IO prefix"
+}
+
+variable "env_short" {
+  type        = string
+  description = "IO env_short"
 }
 
 variable "location" {
   type        = string
   description = "Azure region"
+}
+
+variable "domain" {
+  type        = string
+  description = "Azure domain"
+}
+
+variable "app_name" {
+  type        = string
+  description = "Azure app_name"
+}
+
+variable "instance_number" {
+  type        = string
+  description = "Azure instance_number"
 }
 
 variable "tags" {
@@ -17,9 +37,4 @@ variable "tags" {
 variable "resource_group_name" {
   type        = string
   description = "Name of the resource group where resources will be created"
-}
-
-variable "key_vault_wallet_id" {
-  type        = string
-  description = "Id of the wallet Key Vault where save secrets"
 }

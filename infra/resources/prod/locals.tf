@@ -2,6 +2,7 @@ locals {
   prefix         = "io"
   env_short      = "p"
   location_short = "itn"
+  domain         = "wallet"
   # the project on which the resources will be created
   # it's the prefix of any resource name
   # it includes the choosen location
@@ -59,10 +60,6 @@ locals {
       {
         name                  = "AllowedDeveloperUsers"
         key_vault_secret_name = "AllowedDeveloperUsers"
-      },
-      {
-        name                  = "StorageAccountQueueConnectionString"
-        key_vault_secret_name = module.storage_account.wallet_revocation_storage_connection_string_secret_name
       }
     ]
   }
