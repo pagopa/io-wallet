@@ -26,7 +26,7 @@ module "function_app_support" {
   app_settings      = local.function_app_support.app_settings
   slot_app_settings = local.function_app_support.app_settings
 
-  tier = "premium"
+  tier = "l"
 
   tags = var.tags
 }
