@@ -20,7 +20,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.left(new Error("not implemented")),
     get: () => TE.left(new Error("not implemented")),
-    getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+    getActiveByUserIdExcludingCurrentWallet: () =>
       TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
@@ -108,7 +108,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     const walletInstanceRepository: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.left(new Error("not implemented")),
-      getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+      getActiveByUserIdExcludingCurrentWallet: () =>
         TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.right(O.none),
       insert: () => TE.left(new Error("not implemented")),
@@ -137,7 +137,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+        getActiveByUserIdExcludingCurrentWallet: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
         insert: () => TE.left(new Error("not implemented")),
@@ -167,7 +167,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+        getActiveByUserIdExcludingCurrentWallet: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new ServiceUnavailableError("foo")),
         insert: () => TE.left(new Error("not implemented")),

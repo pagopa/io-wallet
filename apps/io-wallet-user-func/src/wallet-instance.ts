@@ -32,7 +32,7 @@ export interface WalletInstanceRepository {
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  getActiveWalletInstanceByUserIdExcludingWalletInstanceId: (
+  getActiveByUserIdExcludingCurrentWallet: (
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
@@ -129,7 +129,7 @@ const getUserValidWalletInstancesIdExceptOne: (
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.getActiveWalletInstanceByUserIdExcludingWalletInstanceId(
+      walletInstanceRepository.getActiveByUserIdExcludingCurrentWallet(
         walletInstanceId,
         userId,
       ),

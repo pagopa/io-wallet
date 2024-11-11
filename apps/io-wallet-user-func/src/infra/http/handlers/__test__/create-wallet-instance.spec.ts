@@ -40,8 +40,7 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
-      TE.right(O.some([])),
+    getActiveByUserIdExcludingCurrentWallet: () => TE.right(O.some([])),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     insert: () => TE.right(undefined),
   };
@@ -164,7 +163,7 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+        getActiveByUserIdExcludingCurrentWallet: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
@@ -195,16 +194,14 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on getActiveWalletInstanceByUserIdExcludingWalletInstanceId error", async () => {
+  it("should return a 500 HTTP response on getActiveByUserIdExcludingCurrentWallet error", async () => {
     const walletInstanceRepositoryThatFailsOnGetNotRevokedByDiffirentIdAndUserId: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+        getActiveByUserIdExcludingCurrentWallet: () =>
           TE.left(
-            new Error(
-              "failed on getActiveWalletInstanceByUserIdExcludingWalletInstanceId!",
-            ),
+            new Error("failed on getActiveByUserIdExcludingCurrentWallet!"),
           ),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
@@ -241,7 +238,7 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveWalletInstanceByUserIdExcludingWalletInstanceId: () =>
+        getActiveByUserIdExcludingCurrentWallet: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
