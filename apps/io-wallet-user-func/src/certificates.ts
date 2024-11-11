@@ -5,6 +5,7 @@ import { KeyObject, X509Certificate } from "crypto";
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
  * @param x509Chain - The chain of {@link X509Certificate} certificates. The root certificate must be the last element of the array.
  * @param rootPublicKey - The public key of root certificate.
+ * @param skipExpirationvalidation - Skip validation of certificates expiration, default is false.
  */
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
