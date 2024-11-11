@@ -2,7 +2,7 @@ import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 
-import { DeviceDetails } from "./device-details";
+import { AndroidDeviceDetails, DeviceDetails } from "./device-details";
 import { JwkPublicKey } from "./jwk";
 
 const WalletInstanceBase = t.intersection([
@@ -18,7 +18,7 @@ const WalletInstanceBase = t.intersection([
   }),
 ]);
 
-const WalletInstanceValid = t.intersection([
+export const WalletInstanceValid = t.intersection([
   WalletInstanceBase,
   t.type({
     isRevoked: t.literal(false),
@@ -41,3 +41,19 @@ export const WalletInstance = t.union([
 ]);
 
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
+
+export const WalletInstanceValidWithAndroidCertificatesChain = t.intersection([
+  WalletInstanceValid,
+  t.type({
+    deviceDetails: t.intersection([
+      AndroidDeviceDetails,
+      t.type({
+        x509Chain: t.array(t.string),
+      }),
+    ]),
+  }),
+]);
+
+export type WalletInstanceValidWithAndroidCertificatesChain = t.TypeOf<
+  typeof WalletInstanceValidWithAndroidCertificatesChain
+>;
