@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 1.3.8
+
+### Patch Changes
+
+- 40f7a27: Refactor certificates validation
+
 ## 1.3.7
 
 ### Patch Changes
