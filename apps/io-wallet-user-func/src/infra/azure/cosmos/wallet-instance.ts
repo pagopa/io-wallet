@@ -84,7 +84,7 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  getActiveByUserIdExcludingCurrentWallet(
+  getValidByUserIdExcludingOne(
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) {

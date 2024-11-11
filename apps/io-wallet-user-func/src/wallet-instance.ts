@@ -129,7 +129,7 @@ const getUserValidWalletInstancesIdExceptOne: (
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.getActiveByUserIdExcludingCurrentWallet(
+      walletInstanceRepository.getValidByUserIdExcludingOne(
         walletInstanceId,
         userId,
       ),

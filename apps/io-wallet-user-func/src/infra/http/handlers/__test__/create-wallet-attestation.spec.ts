@@ -72,7 +72,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
         userId: mockFiscalCode,
       }),
     ),
-  getActiveByUserIdExcludingCurrentWallet: () =>
+  getValidByUserIdExcludingOne: () =>
     TE.left(new Error("not implemented")),
   getLastByUserId: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
@@ -203,7 +203,7 @@ describe("CreateWalletAttestationHandler", async () => {
             userId: mockFiscalCode,
           }),
         ),
-      getActiveByUserIdExcludingCurrentWallet: () =>
+      getValidByUserIdExcludingOne: () =>
         TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
@@ -249,7 +249,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
-      getActiveByUserIdExcludingCurrentWallet: () =>
+      getValidByUserIdExcludingOne: () =>
         TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),

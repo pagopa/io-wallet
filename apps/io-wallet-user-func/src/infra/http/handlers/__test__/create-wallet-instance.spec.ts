@@ -40,7 +40,7 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getActiveByUserIdExcludingCurrentWallet: () => TE.right(O.some([])),
+    getValidByUserIdExcludingOne: () => TE.right(O.some([])),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     insert: () => TE.right(undefined),
   };
@@ -163,7 +163,7 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveByUserIdExcludingCurrentWallet: () =>
+        getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
@@ -194,14 +194,14 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on getActiveByUserIdExcludingCurrentWallet error", async () => {
+  it("should return a 500 HTTP response on getValidByUserIdExcludingOne error", async () => {
     const walletInstanceRepositoryThatFailsOnGetNotRevokedByDiffirentIdAndUserId: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveByUserIdExcludingCurrentWallet: () =>
+        getValidByUserIdExcludingOne: () =>
           TE.left(
-            new Error("failed on getActiveByUserIdExcludingCurrentWallet!"),
+            new Error("failed on getValidByUserIdExcludingOne!"),
           ),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
@@ -238,7 +238,7 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveByUserIdExcludingCurrentWallet: () =>
+        getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),

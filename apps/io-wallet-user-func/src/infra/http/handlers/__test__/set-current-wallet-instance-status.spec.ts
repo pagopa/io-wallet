@@ -16,7 +16,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getActiveByUserIdExcludingCurrentWallet: () =>
+    getValidByUserIdExcludingOne: () =>
       TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
@@ -136,7 +136,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveByUserIdExcludingCurrentWallet: () =>
+        getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
@@ -166,7 +166,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getActiveByUserIdExcludingCurrentWallet: () =>
+        getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         getLastByUserId: () =>
           TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),
