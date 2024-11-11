@@ -73,7 +73,7 @@ describe("AndroidAssertionValidation", async () => {
       "-sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w",
     );
 
-    expect(responseValidated).toEqual(true);
+    expect(responseValidated).toEqual({ success: true });
   });
 
   it("should validate integrity response in development mode", () => {
@@ -104,6 +104,6 @@ describe("AndroidAssertionValidation", async () => {
       "-sYXRdwJA3hvue3mKpYrOZ9zSPC7b4mbgzJmdZEDO5w",
     );
 
-    expect(responseValidated).toEqual(true);
+    expect(responseValidated).toEqual({ success: true });
   });
 });

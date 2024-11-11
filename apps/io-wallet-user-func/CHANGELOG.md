@@ -1,5 +1,25 @@
 # io-wallet-user-func
 
+## 1.3.7
+
+### Patch Changes
+
+- f465ea9: Refactor to validation result for attestation/assertion library
+
+## 1.3.6
+
+### Patch Changes
+
+- 35fdcb0: Moved IO Web token validation to APIM
+- Updated dependencies [35fdcb0]
+  - io-wallet-common@1.1.1
+
+## 1.3.5
+
+### Patch Changes
+
+- 47bcac6: Fix Android Attestation revocation validation
+
 ## 1.3.4
 
 ### Patch Changes

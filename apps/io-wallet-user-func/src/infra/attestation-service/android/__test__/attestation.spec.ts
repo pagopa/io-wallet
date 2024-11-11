@@ -7,11 +7,12 @@ import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 
 import { base64ToPem } from "..";
-import { verifyAttestation } from "../attestation";
+import { validateRevocation, verifyAttestation } from "../attestation";
 import { androidMockData } from "./config";
 
 describe("AndroidAttestationValidation", () => {
-  const { attestation, hardwareKey } = androidMockData;
+  const { attestation, hardwareKey, revokedX509Chain, validX509Chain } =
+    androidMockData;
 
   const data = Buffer.from(attestation, "base64");
   const x509ChainString = data.toString("utf-8").split(",");
@@ -45,8 +46,27 @@ describe("AndroidAttestationValidation", () => {
         x509Chain: x509Chain.map((el) => el.toString()),
       },
       hardwareKey,
+      success: true,
     };
 
     await expect(result).resolves.toEqual(expectedResult);
+  });
+
+  it("should return a validated attestation", async () => {
+    const validChain = validX509Chain.map((c) => new X509Certificate(c));
+    const validation = await validateRevocation(
+      validChain,
+      ANDROID_CRL_URL,
+      4000,
+    );
+    expect(validation).toHaveProperty("success", true);
+  });
+
+  it("should return an error for revoked chain", async () => {
+    const invalidChain = revokedX509Chain.map((c) => new X509Certificate(c));
+
+    await expect(
+      validateRevocation(invalidChain, ANDROID_CRL_URL, 4000),
+    ).resolves.toHaveProperty("success", false);
   });
 });

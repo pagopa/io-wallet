@@ -83,12 +83,17 @@ paths:
           $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/current/status:
-    get:
+    post:
       summary: Retrieve the current Wallet Instance status
       operationId: getCurrentWalletInstanceStatus
       security:
         - FunctionsKey: []
-          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetCurrentWalletInstanceStatusBody"
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -96,12 +101,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WalletData"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
         "503":
@@ -135,7 +138,6 @@ paths:
       operationId: setWalletInstanceStatus
       security:
         - FunctionsKey: []
-          BearerAuth: []
       parameters:
         - in: path
           name: id
@@ -149,16 +151,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SetWalletInstanceStatusData"
+              $ref: "#/components/schemas/SetWalletInstanceStatusWithFiscalCodeData"
       responses:
         "204":
           description: Wallet Instance status successfully set
         "400":
           $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -189,10 +187,6 @@ components:
       type: apiKey
       name: X-Functions-Key
       in: header
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
 
   responses:
     Forbidden:
@@ -204,13 +198,6 @@ components:
 
     BadRequest:
       description: Validation error
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/ProblemJson"
-
-    Unauthorized:
-      description: Unauthorized
       content:
         application/json:
           schema:
@@ -252,10 +239,6 @@ components:
             $ref: "#/components/schemas/ProblemJson"
 
   schemas:
-    SetWalletInstanceStatusData:
-      type: string
-      enum: ["REVOKED"]
-
     SetWalletInstanceStatusWithFiscalCodeData:
       type: object
       properties:
@@ -339,6 +322,14 @@ components:
         - assertion
         - fiscal_code
 
+    GetCurrentWalletInstanceStatusBody:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: "#/components/schemas/FiscalCode"
+      required:
+        - fiscal_code
+
     ProblemJson:
       type: object
       properties:
@@ -365,7 +356,7 @@ components:
           minimum: 100
           maximum: 600
           exclusiveMaximum: true
-          example: 200
+          example: 500
         detail:
           type: string
           description: |-

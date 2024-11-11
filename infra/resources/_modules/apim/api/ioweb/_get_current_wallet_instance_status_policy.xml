@@ -1,0 +1,27 @@
+<policies>
+    <inbound>
+        <base />
+        <!-- forwards the call to the Function App -->
+        <set-header name="Authorization" exists-action="delete" />
+        <set-method>POST</set-method>
+        <set-header name="Content-Type" exists-action="override">
+            <value>application/json</value>
+        </set-header>
+        <set-body>@{
+            var fiscalCode = context.Variables["fiscalCode"];
+            return $"{{ \"fiscal_code\": \"{fiscalCode}\" }}";
+        }</set-body>
+        <set-header name="x-functions-key" exists-action="override">
+            <value>{{io-wallet-user-func-key}}</value>
+        </set-header>
+    </inbound>
+    <outbound>
+        <base />
+    </outbound>
+    <backend>
+        <base />
+    </backend>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
