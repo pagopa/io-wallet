@@ -1,3 +1,4 @@
+import { CRL } from "@/certificates";
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
@@ -45,15 +46,31 @@ export const validateAndroidAttestation = (
       pipe(
         TE.tryCatch(
           () =>
-            verifyAttestation({
-              androidCrlUrl,
-              bundleIdentifiers,
-              challenge: nonce,
-              googlePublicKey,
-              httpRequestTimeout,
-              x509Chain,
+            fetch(androidCrlUrl, {
+              method: "GET",
+              signal: AbortSignal.timeout(httpRequestTimeout),
             }),
           E.toError,
+        ),
+        TE.chain((response) => TE.tryCatch(() => response.json(), E.toError)),
+        TE.chainEitherK((json) =>
+          pipe(
+            CRL.decode(json),
+            E.mapLeft(() => new Error("CRL invalid format")),
+          ),
+        ),
+        TE.chain((attestationCrl) =>
+          TE.tryCatch(
+            () =>
+              verifyAttestation({
+                attestationCrl,
+                bundleIdentifiers,
+                challenge: nonce,
+                googlePublicKey,
+                x509Chain,
+              }),
+            E.toError,
+          ),
         ),
         TE.chain((attestationValidationResult) =>
           attestationValidationResult.success

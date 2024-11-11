@@ -1,9 +1,9 @@
+import { ValidationResult } from "@/attestation-service";
 import { createHash, createVerify } from "crypto";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
 
 import { iOsAssertion } from ".";
-import { ValidationResult } from "../errors";
 
 export interface VerifyAssertionParams {
   bundleIdentifiers: string[];
