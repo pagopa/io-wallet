@@ -33,7 +33,7 @@ export interface WalletInstanceRepository {
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getLastActiveWalletInstanceByUserId: (
-    id: WalletInstance["id"],
+    walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   getLastByUserId: (

@@ -85,7 +85,7 @@ export class CosmosDbWalletInstanceRepository
   }
 
   getLastActiveWalletInstanceByUserId(
-    id: WalletInstance["id"],
+    walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) {
     return pipe(
@@ -100,7 +100,7 @@ export class CosmosDbWalletInstanceRepository
                 },
                 {
                   name: "@idKey",
-                  value: id,
+                  value: walletInstanceId,
                 },
               ],
               query:
