@@ -27,7 +27,3 @@ export class IosAttestationError extends Error {
     super(`[iOS Attestation Error] ${message}`);
   }
 }
-
-export type ValidationResult =
-  | { reason: string; success: false }
-  | { success: true };

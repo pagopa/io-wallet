@@ -1,3 +1,4 @@
+import { validateIssuance } from "@/certificates";
 import * as asn1js from "asn1js";
 import { X509Certificate, createHash } from "crypto";
 import { IosDeviceDetails } from "io-wallet-common/device-details";
@@ -63,39 +64,21 @@ export const verifyAttestation = async (
   //    sub CA certificate and the second of which is the client certificate.
 
   const certificates = attStmt.x5c.map((data) => new X509Certificate(data));
-
-  const subCaCertificate = certificates.find((certificate) =>
-    certificate.issuer.includes("Apple App Attestation Root CA"),
+  const issuanceValidation = validateIssuance(
+    certificates,
+    rootCertificate.publicKey,
+    allowDevelopmentEnvironment,
   );
 
-  if (subCaCertificate !== undefined) {
-    if (!subCaCertificate.verify(rootCertificate.publicKey)) {
-      return {
-        reason:
-          "sub CA certificate is not signed by Apple App Attestation Root CA",
-        success: false,
-      };
-    }
-  } else {
-    return {
-      reason: "No sub CA certificate found",
-      success: false,
-    };
+  if (!issuanceValidation.success) {
+    return issuanceValidation;
   }
 
   const clientCertificate = certificates.find((certificate) =>
     certificate.issuer.includes("Apple App Attestation CA 1"),
   );
 
-  if (clientCertificate !== undefined) {
-    if (!clientCertificate.verify(subCaCertificate.publicKey)) {
-      return {
-        reason:
-          "Client CA certificate is not signed by Apple App Attestation CA",
-        success: false,
-      };
-    }
-  } else {
+  if (!clientCertificate) {
     return {
       reason: "No client CA certificate found",
       success: false,
