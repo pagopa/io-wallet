@@ -60,6 +60,10 @@ locals {
       {
         name                  = "AllowedDeveloperUsers"
         key_vault_secret_name = "AllowedDeveloperUsers"
+      },
+      {
+        name                  = "AllowedDeveloperUsers"
+        key_vault_secret_name = module.wallet.connection_string_secret_name
       }
     ]
   }
