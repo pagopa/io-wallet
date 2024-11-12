@@ -62,8 +62,8 @@ locals {
         key_vault_secret_name = "AllowedDeveloperUsers"
       },
       {
-        name                  = "StorageAccountQueueConnectionString"
-        key_vault_secret_name = module.storage_account.wallet_revocation_storage_connection_string_secret_name
+        name                  = "StorageConnectionString"
+        key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
       },
       {
         name                  = "AppInsightsConnectionString"
@@ -77,10 +77,6 @@ locals {
       {
         name                  = "AppInsightsConnectionString"
         key_vault_secret_name = "AppInsightsConnectionString"
-      },
-      {
-        name                  = "StorageConnectionString"
-        key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
       }
     ]
   }
