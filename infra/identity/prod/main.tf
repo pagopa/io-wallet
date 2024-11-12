@@ -26,6 +26,7 @@ module "federated_identities" {
   env_short = local.env_short
   env       = local.env
   domain    = local.domain
+  location  = local.location
 
   repositories = [local.repo_name]
 
@@ -46,6 +47,7 @@ module "federated_identities" {
           "Key Vault Reader",
           "Key Vault Crypto User",
           "Key Vault Secrets User",
+          "Storage Queue Data Reader"
         ]
       }
     }
@@ -64,6 +66,7 @@ module "federated_identities" {
           "Key Vault Crypto Officer",
           "Key Vault Secrets Officer",
           "Role Based Access Control Administrator",
+          "Storage Queue Data Contributor"
         ]
       }
     }
@@ -81,6 +84,7 @@ module "app_federated_identities" {
   env_short = local.env_short
   env       = "app-${local.env}"
   domain    = "${local.domain}-app"
+  location  = local.location
 
   repositories = [local.repo_name]
 
@@ -110,6 +114,7 @@ module "opex_federated_identities" {
   env_short = local.env_short
   env       = "opex-${local.env}"
   domain    = "${local.domain}-opex"
+  location  = local.location
 
   repositories = [local.repo_name]
 

@@ -17,6 +17,10 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
+import {
+  SlackConfig,
+  getSlackConfigFromEnvironment,
+} from "io-wallet-common/infra/slack/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
@@ -109,6 +113,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   pidIssuer: PidIssuerApiClientConfig,
+  slack: SlackConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -231,8 +236,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       "EntityConfigurationStorageContainerName",
     ),
     revocationQueueName: readFromEnvironment("RevocationQueueName"),
-    storageAccountQueueConnectionString: readFromEnvironment(
-      "StorageAccountQueueConnectionString",
+    storageAccountConnectionString: readFromEnvironment(
+      "StorageConnectionString",
     ),
   }),
   RE.map(
@@ -241,13 +246,13 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       cosmos,
       entityConfigurationStorageContainerName,
       revocationQueueName,
-      storageAccountQueueConnectionString,
+      storageAccountConnectionString,
     }) => ({
       appInsights,
       cosmos,
       queue: {
         walletInstanceRevocation: {
-          connectionString: storageAccountQueueConnectionString,
+          connectionString: storageAccountConnectionString,
           name: revocationQueueName,
         },
       },
@@ -323,6 +328,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     pidIssuer: getPidIssuerConfigFromEnvironment,
+    slack: getSlackConfigFromEnvironment,
   }),
   RE.map(({ attestationService, httpRequestTimeout, ...remainingConfigs }) => ({
     ...remainingConfigs,

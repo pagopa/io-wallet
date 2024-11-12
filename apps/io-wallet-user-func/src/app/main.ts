@@ -23,6 +23,7 @@ import { QueueServiceClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
 import {
   WalletInstance,
   WalletInstanceValidWithAndroidCertificatesChain,
@@ -79,6 +80,8 @@ const appInsightsClient = ai.defaultClient;
 const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
+
+const slackNotificationService = new SlackNotificationService(config.slack);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
@@ -199,17 +202,18 @@ app.cosmosDB("addWalletInstanceToValidationQueue", {
   leaseContainerPrefix: "wallet-instances-consumer-",
   maxItemsPerInvocation: 50,
   return: output.storageQueue({
-    connection: "StorageAccountQueueConnectionString",
+    connection: "StorageConnectionString",
     queueName: config.azure.queue.walletInstanceRevocation.name,
   }),
   startFromBeginning: true,
 });
 
 app.storageQueue("validateWalletInstance", {
-  connection: "StorageAccountQueueConnectionString",
+  connection: "StorageConnectionString",
   handler: ValidateWalletInstanceAttestedKeyFunction({
     attestationServiceConfiguration: config.attestationService,
     inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
+    notificationService: slackNotificationService,
     revocationQueue,
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
