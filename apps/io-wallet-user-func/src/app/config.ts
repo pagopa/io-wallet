@@ -103,12 +103,19 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const SlackConfig = t.type({
+  statusChannelWebhook: t.string,
+});
+
+export type SlackConfig = t.TypeOf<typeof SlackConfig>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   pidIssuer: PidIssuerApiClientConfig,
+  slack: SlackConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -132,6 +139,16 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
       "Federation entity configuration is invalid",
     ),
   ),
+);
+
+export const getSlackConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  SlackConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    statusChannelWebhook: readFromEnvironment("SlackStatusChannelWebhook"),
+  }),
 );
 
 export const getCryptoConfigFromEnvironment: RE.ReaderEither<
@@ -323,6 +340,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     pidIssuer: getPidIssuerConfigFromEnvironment,
+    slack: getSlackConfigFromEnvironment,
   }),
   RE.map(({ attestationService, httpRequestTimeout, ...remainingConfigs }) => ({
     ...remainingConfigs,
