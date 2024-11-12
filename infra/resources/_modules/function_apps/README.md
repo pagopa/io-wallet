@@ -57,8 +57,8 @@ No requirements.
 | <a name="input_revocation_queue_name"></a> [revocation\_queue\_name](#input\_revocation\_queue\_name) | Wallet Instance Revocation Queue Name | `string` | n/a | yes |
 | <a name="input_storage_account_cdn_name"></a> [storage\_account\_cdn\_name](#input\_storage\_account\_cdn\_name) | Name of the CDN storage account | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
-| <a name="input_user_func"></a> [user\_func](#input\_user\_func) | Configuration of the user-func | <pre>object({<br/>    app_settings = list(object({<br/>      name                  = string<br/>      value                 = optional(string, "")<br/>      key_vault_secret_name = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
-| <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
+| <a name="input_user_func"></a> [user\_func](#input\_user\_func) | Configuration of the user-func | <pre>object({<br>    app_settings = list(object({<br>      name                  = string<br>      value                 = optional(string, "")<br>      key_vault_secret_name = optional(string)<br>    }))<br>  })</pre> | n/a | yes |
+| <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br>    name                = string<br>    resource_group_name = string<br>  })</pre> | n/a | yes |
 
 ## Outputs
 

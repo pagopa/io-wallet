@@ -41,8 +41,8 @@ No requirements.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_apim"></a> [apim](#input\_apim) | APIM configuration variables | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
-| <a name="input_function_apps"></a> [function\_apps](#input\_function\_apps) | APIM configuration variables | <pre>object({<br/>    user_function = object({<br/>      function_hostname = string<br/>    })<br/>    support_function = object({<br/>      function_hostname = string<br/>    })<br/>  })</pre> | n/a | yes |
+| <a name="input_apim"></a> [apim](#input\_apim) | APIM configuration variables | <pre>object({<br>    name                = string<br>    resource_group_name = string<br>  })</pre> | n/a | yes |
+| <a name="input_function_apps"></a> [function\_apps](#input\_function\_apps) | APIM configuration variables | <pre>object({<br>    user_function = object({<br>      function_hostname = string<br>    })<br>    support_function = object({<br>      function_hostname = string<br>    })<br>  })</pre> | n/a | yes |
 | <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Key Vault ID | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Wallet Key Vault ID | `string` | n/a | yes |
 | <a name="input_product_id"></a> [product\_id](#input\_product\_id) | Product ID | `string` | n/a | yes |
