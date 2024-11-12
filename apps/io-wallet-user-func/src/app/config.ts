@@ -17,6 +17,10 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
+import {
+  SlackConfig,
+  getSlackConfigFromEnvironment,
+} from "io-wallet-common/infra/slack/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
@@ -103,12 +107,6 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
-const SlackConfig = t.type({
-  statusChannelWebhook: t.string,
-});
-
-export type SlackConfig = t.TypeOf<typeof SlackConfig>;
-
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   azure: AzureConfig,
@@ -139,16 +137,6 @@ const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
       "Federation entity configuration is invalid",
     ),
   ),
-);
-
-export const getSlackConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  SlackConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    statusChannelWebhook: readFromEnvironment("SlackStatusChannelWebhook"),
-  }),
 );
 
 export const getCryptoConfigFromEnvironment: RE.ReaderEither<

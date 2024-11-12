@@ -49,7 +49,7 @@ export const validateIssuance = (
   const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
   if (!rootCert || !rootCert.verify(rootPublicKey)) {
     return {
-      reason: `Root certificate is not signed by root public key provided: ${x509Chain}`,
+      reason: `Root certificate is not signed by root public key provided: ${rootCert.serialNumber}`,
       success: false,
     };
   }
@@ -85,16 +85,16 @@ export const validateRevocation = async (
     key.toLowerCase(),
   );
 
-  const isRevoked = x509Chain.some((cert) => {
+  const revokedCertificates = x509Chain.filter((cert) => {
     const currentSn = cert.serialNumber.toLowerCase();
     return revokedSerials.some((revokedSerial) =>
       currentSn.includes(revokedSerial),
     );
   });
 
-  if (isRevoked) {
+  if (revokedCertificates.length > 0) {
     return {
-      reason: `A certificate within the chain has been revoked: ${x509Chain}`,
+      reason: `A certificate within the chain has been revoked: ${revokedCertificates.map((c) => c.serialNumber)}`,
       success: false,
     };
   }
