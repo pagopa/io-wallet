@@ -1,5 +1,14 @@
 # io-wallet-support-func
 
+## 1.3.3
+
+### Patch Changes
+
+- 47c24e1: Add Wallet Instance Attested Key revocation event based
+- Updated dependencies [47c24e1]
+- Updated dependencies [853fea6]
+  - io-wallet-common@1.2.0
+
 ## 1.3.2
 
 ### Patch Changes
