@@ -1,28 +1,28 @@
-import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { lookup } from "fp-ts/Record";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
-import * as t from "io-ts";
+import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { WalletInstanceToStatusApiModel } from "../encoders/wallet-instance";
 
-const GetCurrentWalletInstanceStatusBody = t.type({
-  fiscal_code: FiscalCode,
-});
-
-type GetCurrentWalletInstanceStatusBody = t.TypeOf<
-  typeof GetCurrentWalletInstanceStatusBody
->;
-
 const requireFiscalCode = (req: H.HttpRequest) =>
   pipe(
-    req.body,
-    H.parse(GetCurrentWalletInstanceStatusBody),
-    E.map(({ fiscal_code }) => fiscal_code),
+    req.headers,
+    lookup("fiscal-code"),
+    E.fromOption(
+      () => new H.HttpBadRequestError("Missing fiscal-code in header"),
+    ),
+    E.chainW(
+      H.parse(
+        FiscalCode,
+        "The content of fiscal-code header is not a valid fiscal code",
+      ),
+    ),
   );
 
 export const GetCurrentWalletInstanceStatusHandler = H.of(
@@ -37,10 +37,12 @@ export const GetCurrentWalletInstanceStatusHandler = H.of(
           RTE.map(WalletInstanceToStatusApiModel.encode),
           RTE.map(H.successJson),
           RTE.orElseFirstW((error) =>
-            sendExceptionWithBodyToAppInsights(
-              error,
-              req.body,
-              "getCurrentWalletInstanceStatus",
+            pipe(
+              sendTelemetryException(error, {
+                fiscalCode,
+                functionName: "getCurrentWalletInstanceStatus",
+              }),
+              RTE.fromReader,
             ),
           ),
         ),
