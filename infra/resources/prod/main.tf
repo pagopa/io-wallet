@@ -222,5 +222,7 @@ module "storage_accounts" {
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
   action_group_id                      = module.monitoring.action_group_wallet.id
 
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
   tags = local.tags
 }

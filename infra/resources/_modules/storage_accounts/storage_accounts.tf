@@ -19,3 +19,10 @@ module "storage_account" {
 
   tags = var.tags
 }
+
+resource "azurerm_key_vault_secret" "st_connection_string" {
+  name         = "StorageConnectionString"
+  value        = module.storage_account.primary_connection_string
+  key_vault_id = var.key_vault_wallet_id
+  content_type = "connection string"
+}

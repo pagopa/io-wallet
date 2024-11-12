@@ -53,3 +53,8 @@ variable "subnet_pep_id" {
   type        = string
   description = "Id of the private endpoints' subnet"
 }
+
+variable "key_vault_wallet_id" {
+  type        = string
+  description = "Id of the wallet Key Vault where storage account saves secrets"
+}
