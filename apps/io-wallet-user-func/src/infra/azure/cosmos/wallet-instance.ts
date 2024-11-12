@@ -7,7 +7,10 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
+import {
+  WalletInstance,
+  WalletInstanceValid,
+} from "io-wallet-common/wallet-instance";
 
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
@@ -81,55 +84,6 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  getAllByUserId(userId: WalletInstance["userId"]) {
-    return pipe(
-      TE.tryCatch(
-        async () => {
-          const { resources: items } = await this.#container.items
-            .query({
-              parameters: [
-                {
-                  name: "@partitionKey",
-                  value: userId,
-                },
-              ],
-              query: "SELECT * FROM c WHERE c.userId = @partitionKey",
-            })
-            .fetchAll();
-          return items;
-        },
-        (error) =>
-          error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(
-                `The request to the database has timed out: ${error.message}`,
-              )
-            : new Error(`Error getting wallet instances by user id: ${error}`),
-      ),
-      TE.chain((items) =>
-        pipe(
-          items,
-          RA.head,
-          O.fold(
-            () => TE.right(O.none),
-            () =>
-              pipe(
-                items,
-                t.array(WalletInstance).decode,
-                E.map(O.some),
-                E.mapLeft(
-                  () =>
-                    new Error(
-                      "Error getting wallet instances: invalid result format",
-                    ),
-                ),
-                TE.fromEither,
-              ),
-          ),
-        ),
-      ),
-    );
-  }
-
   getLastByUserId(userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(
@@ -171,6 +125,63 @@ export class CosmosDbWalletInstanceRepository
               ),
               TE.fromEither,
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  getValidByUserIdExcludingOne(
+    walletInstanceId: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ) {
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          const { resources: items } = await this.#container.items
+            .query({
+              parameters: [
+                {
+                  name: "@partitionKey",
+                  value: userId,
+                },
+                {
+                  name: "@idKey",
+                  value: walletInstanceId,
+                },
+              ],
+              query:
+                "SELECT * FROM c WHERE c.id != @idKey AND c.userId = @partitionKey AND c.isRevoked = false",
+            })
+            .fetchAll();
+          return items;
+        },
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(
+                `The request to the database has timed out: ${error.message}`,
+              )
+            : new Error(`Error getting wallet instances by user id: ${error}`),
+      ),
+      TE.chain((items) =>
+        pipe(
+          items,
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            () =>
+              pipe(
+                items,
+                t.array(WalletInstanceValid).decode,
+                E.map(O.some),
+                E.mapLeft(
+                  () =>
+                    new Error(
+                      "Error getting wallet instances: invalid result format",
+                    ),
+                ),
+                TE.fromEither,
+              ),
           ),
         ),
       ),
