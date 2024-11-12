@@ -14,7 +14,7 @@ locals {
   project_legacy = "${local.prefix}-${local.env_short}"
 
   location           = "italynorth"
-  secondary_location = "germanywestcentral"
+  secondary_location = "spaincentral"
 
   apim = {
     name                = "${local.project_legacy}-apim-v2-api"
