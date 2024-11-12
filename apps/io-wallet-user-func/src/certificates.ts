@@ -94,7 +94,7 @@ export const validateRevocation = async (
 
   if (revokedCertificates.length > 0) {
     return {
-      reason: `A certificate within the chain has been revoked: ${revokedCertificates.map((c) => c.serialNumber)}`,
+      reason: `A certificate within the chain has been revoked: ${revokedCertificates.map((c) => c.serialNumber).join(", ")}`,
       success: false,
     };
   }
