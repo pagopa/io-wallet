@@ -62,7 +62,7 @@ locals {
         key_vault_secret_name = "AllowedDeveloperUsers"
       },
       {
-        name                  = "AllowedDeveloperUsers"
+        name                  = "StorageConnectionString"
         key_vault_secret_name = module.wallet.connection_string_secret_name
       }
     ]
