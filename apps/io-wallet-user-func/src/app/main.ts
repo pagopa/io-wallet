@@ -202,14 +202,14 @@ app.cosmosDB("addWalletInstanceToValidationQueue", {
   leaseContainerPrefix: "wallet-instances-consumer-",
   maxItemsPerInvocation: 50,
   return: output.storageQueue({
-    connection: "StorageAccountQueueConnectionString",
+    connection: "StorageConnectionString",
     queueName: config.azure.queue.walletInstanceRevocation.name,
   }),
   startFromBeginning: true,
 });
 
 app.storageQueue("validateWalletInstance", {
-  connection: "StorageAccountQueueConnectionString",
+  connection: "StorageConnectionString",
   handler: ValidateWalletInstanceAttestedKeyFunction({
     attestationServiceConfiguration: config.attestationService,
     inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,

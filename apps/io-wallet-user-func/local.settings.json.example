@@ -28,7 +28,7 @@
     "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
     "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI",
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
-    "StorageAccountQueueConnectionString": "REVOCATION_QUEUE_STORAGE_ACCOUNT_CONNECTION_STRING",
+    "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
     "RevocationQueueName": "REVOCATION_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
