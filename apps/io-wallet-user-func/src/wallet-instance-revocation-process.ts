@@ -5,6 +5,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
+import { NotificationService } from "io-wallet-common/notification";
 import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
@@ -14,6 +15,7 @@ import {
   validateIssuance,
   validateRevocation,
 } from "./certificates";
+import { obfuscatedUserId } from "./user";
 import {
   WalletInstanceRepository,
   getValidWalletInstanceWithAndroidCertificatesChain,
@@ -63,6 +65,7 @@ export const revokeInvalidWalletInstances: (
 ) => RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
+    notificationService: NotificationService;
     revocationQueue: WalletInstanceRevocationQueue;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
@@ -73,6 +76,7 @@ export const revokeInvalidWalletInstances: (
   (walletInstance: WalletInstanceValidWithAndroidCertificatesChain) =>
   ({
     attestationServiceConfiguration,
+    notificationService,
     revocationQueue,
     telemetryClient,
     walletInstanceRepository,
@@ -107,6 +111,18 @@ export const revokeInvalidWalletInstances: (
                     walletInstanceId: walletInstance.id,
                   },
                 }),
+              ),
+              TE.chain(() =>
+                pipe(
+                  notificationService.sendMessage(
+                    `Revoked Wallet Instance with id: *${walletInstance.id}*.\n
+                    UserId: ${obfuscatedUserId(walletInstance.userId)}.\n
+                    Reason: ${validationResult.reason}`,
+                  ),
+                  TE.map(() => undefined),
+                  //Fire and forget
+                  TE.alt(() => TE.right(undefined)),
+                ),
               ),
               TE.chain(() => TE.right(undefined)),
             )
