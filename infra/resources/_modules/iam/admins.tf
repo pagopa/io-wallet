@@ -30,4 +30,22 @@ module "admins_roles" {
       role                 = "owner"
     }
   ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      role                 = "reader"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      role                 = "owner"
+    }
+  ]
 }
