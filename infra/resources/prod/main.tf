@@ -103,6 +103,8 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
+  revocation_queue_name = module.storage_accounts.revocation_queue_name.name
+
   user_func = local.user_func
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
@@ -168,6 +170,12 @@ module "iam" {
     name                = module.cdn.storage_account_cdn.name
     resource_group_name = module.cdn.storage_account_cdn.resource_group_name
   }
+
+  storage_account = {
+    id                  = module.storage_accounts.wallet.id
+    name                = module.storage_accounts.wallet.name
+    resource_group_name = module.storage_accounts.wallet.resource_group_name
+  }
 }
 
 module "apim" {
@@ -194,6 +202,27 @@ module "apim" {
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   product_id = local.apim.products.io_web.product_id
+
+  tags = local.tags
+}
+
+module "storage_accounts" {
+  source = "../_modules/storage_accounts"
+
+  prefix          = local.prefix
+  env_short       = local.env_short
+  location        = local.location
+  domain          = null
+  app_name        = local.domain
+  instance_number = "01"
+
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  subnet_pep_id                        = data.azurerm_subnet.pep.id
+  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
+  action_group_id                      = module.monitoring.action_group_wallet.id
+
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
 
   tags = local.tags
 }

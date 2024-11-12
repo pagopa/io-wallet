@@ -17,6 +17,10 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
+import {
+  SlackConfig,
+  getSlackConfigFromEnvironment,
+} from "io-wallet-common/infra/slack/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 import { FederationEntityMetadata } from "../entity-configuration";
@@ -77,6 +81,12 @@ export type AttestationServiceConfiguration = t.TypeOf<
 const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
+  queue: t.type({
+    walletInstanceRevocation: t.type({
+      connectionString: t.string,
+      name: t.string,
+    }),
+  }),
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
   }),
@@ -103,6 +113,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   pidIssuer: PidIssuerApiClientConfig,
+  slack: SlackConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -224,11 +235,27 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
+    revocationQueueName: readFromEnvironment("RevocationQueueName"),
+    storageAccountConnectionString: readFromEnvironment(
+      "StorageConnectionString",
+    ),
   }),
   RE.map(
-    ({ appInsights, cosmos, entityConfigurationStorageContainerName }) => ({
+    ({
       appInsights,
       cosmos,
+      entityConfigurationStorageContainerName,
+      revocationQueueName,
+      storageAccountConnectionString,
+    }) => ({
+      appInsights,
+      cosmos,
+      queue: {
+        walletInstanceRevocation: {
+          connectionString: storageAccountConnectionString,
+          name: revocationQueueName,
+        },
+      },
       storage: {
         entityConfiguration: {
           containerName: entityConfigurationStorageContainerName,
@@ -301,6 +328,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     pidIssuer: getPidIssuerConfigFromEnvironment,
+    slack: getSlackConfigFromEnvironment,
   }),
   RE.map(({ attestationService, httpRequestTimeout, ...remainingConfigs }) => ({
     ...remainingConfigs,

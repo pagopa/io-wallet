@@ -1,19 +1,13 @@
-import {
-  ANDROID_CRL_URL,
-  GOOGLE_PUBLIC_KEY,
-  decodeBase64String,
-} from "@/app/config";
+import { GOOGLE_PUBLIC_KEY, decodeBase64String } from "@/app/config";
 import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 
 import { base64ToPem } from "..";
-import { AndroidAttestationError } from "../../errors";
-import { validateRevocation, verifyAttestation } from "../attestation";
+import { verifyAttestation } from "../attestation";
 import { androidMockData } from "./config";
 
 describe("AndroidAttestationValidation", () => {
-  const { attestation, hardwareKey, revokedX509Chain, validX509Chain } =
-    androidMockData;
+  const { attestation, hardwareKey, mockCrl } = androidMockData;
 
   const data = Buffer.from(attestation, "base64");
   const x509ChainString = data.toString("utf-8").split(",");
@@ -24,11 +18,10 @@ describe("AndroidAttestationValidation", () => {
 
   it("should return a validated attestation", async () => {
     const result = verifyAttestation({
-      androidCrlUrl: ANDROID_CRL_URL,
+      attestationCrl: mockCrl,
       bundleIdentifiers: ["com.ioreactnativeintegrityexample"],
       challenge: "randomvalue",
       googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
-      httpRequestTimeout: 1000,
       x509Chain,
     });
     const expectedResult = {
@@ -47,26 +40,9 @@ describe("AndroidAttestationValidation", () => {
         x509Chain: x509Chain.map((el) => el.toString()),
       },
       hardwareKey,
+      success: true,
     };
 
     await expect(result).resolves.toEqual(expectedResult);
-  });
-
-  it("should return a validated attestation", async () => {
-    const validChain = validX509Chain.map((c) => new X509Certificate(c));
-    const validation = await validateRevocation(
-      validChain,
-      ANDROID_CRL_URL,
-      4000,
-    );
-    expect(validation).toBe(validChain);
-  });
-
-  it("should return an exception for revoked chain", async () => {
-    const invalidChain = revokedX509Chain.map((c) => new X509Certificate(c));
-
-    await expect(
-      validateRevocation(invalidChain, ANDROID_CRL_URL, 4000),
-    ).rejects.toThrow(AndroidAttestationError);
   });
 });

@@ -1,3 +1,4 @@
+import { CRL, validateIssuance, validateRevocation } from "@/certificates";
 import {
   AttestationApplicationId,
   NonStandardKeyDescription,
@@ -9,18 +10,6 @@ import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
-import { AndroidAttestationError } from "../errors";
-
-/**
- * Simplified type definition for the Certificate Revocation List (CRL) object.
- */
-interface CRL {
-  entries: Record<
-    string,
-    { comment: string; expires: string; reason: string; status: string }
-  >;
-}
-
 /**
  * Key attestation extension data schema OID
  * https://developer.android.com/privacy-and-security/security-key-attestation#key_attestation_ext_schema
@@ -28,131 +17,75 @@ interface CRL {
 const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 
 export interface VerifyAttestationParams {
-  androidCrlUrl: string;
+  attestationCrl: CRL;
   bundleIdentifiers: string[];
   challenge: string;
   googlePublicKey: string;
-  httpRequestTimeout: number;
   x509Chain: readonly X509Certificate[];
 }
 
-export const verifyAttestation = async (params: VerifyAttestationParams) => {
-  const { androidCrlUrl, googlePublicKey, httpRequestTimeout, x509Chain } =
-    params;
+type AndroidAttestationValidationResult =
+  | {
+      deviceDetails: AndroidDeviceDetails;
+      hardwareKey: jose.JWK;
+      success: true;
+    }
+  | { reason: string; success: false };
+
+export const verifyAttestation = async (
+  params: VerifyAttestationParams,
+): Promise<AndroidAttestationValidationResult> => {
+  const { attestationCrl, googlePublicKey, x509Chain } = params;
 
   if (x509Chain.length <= 0) {
-    throw new AndroidAttestationError("No certificates provided", {
-      x509Chain,
-    });
+    return {
+      reason: "No certificates provided",
+      success: false,
+    };
   }
 
-  validateIssuance(x509Chain, googlePublicKey);
-  await validateRevocation(x509Chain, androidCrlUrl, httpRequestTimeout);
+  // 3. Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
+  const issuanceValidationResult = validateIssuance(
+    x509Chain,
+    createPublicKey(googlePublicKey),
+  );
+
+  if (!issuanceValidationResult.success) {
+    return issuanceValidationResult;
+  }
+
+  // 4. Check each certificate's revocation status to ensure that none of the certificates have been revoked.
+  const revocationValidationResult = await validateRevocation(
+    x509Chain,
+    attestationCrl,
+  );
+
+  if (!revocationValidationResult.success) {
+    return revocationValidationResult;
+  }
+
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
+  const validationExcentionResult = await validateExtension(
+    certWithExtension,
+    params,
+  );
+
+  if (!validationExcentionResult.success) {
+    return validationExcentionResult;
+  }
+
   const deviceDetails = {
-    ...validateExtension(certWithExtension, params),
+    ...validationExcentionResult.deviceDetails,
     x509Chain: x509Chain.map((x509) => x509.toString()),
   };
 
-  const hardwareKey = await jose.exportJWK(certWithExtension.publicKey);
-
   return {
     deviceDetails,
-    hardwareKey,
+    hardwareKey: validationExcentionResult.hardwareKey,
+
+    success: true,
   };
-};
-
-/**
- * 3.
- * Obtain a reference to the X.509 certificate chain parsing and validation library that is most appropriate for your toolset.
- * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
- * @param x509Chain - The chain of {@link X509Certificate} certificates.
- * @throws {Error} - If the chain is invalid.
- */
-export const validateIssuance = (
-  x509Chain: readonly X509Certificate[],
-  googlePublicKey: string,
-) => {
-  // Check dates
-  const now = new Date();
-  const datesValid = x509Chain.every(
-    (c) => new Date(c.validFrom) <= now && now <= new Date(c.validTo),
-  );
-  if (!datesValid) {
-    throw new AndroidAttestationError("Certificates expired", {
-      x509Chain,
-    });
-  }
-
-  // Check that each certificate, except for the last, is issued by the subsequent one.
-  if (x509Chain.length >= 2) {
-    x509Chain.forEach((cert, index) => {
-      if (index < x509Chain.length - 1) {
-        const parent = x509Chain[index + 1];
-        if (!cert || !parent || cert.verify(parent.publicKey) === false) {
-          throw new AndroidAttestationError("Certificate chain is invalid", {
-            x509Chain,
-          });
-        }
-      }
-    });
-  }
-
-  const publicKey = createPublicKey(googlePublicKey);
-  const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
-  if (!rootCert || !rootCert.verify(publicKey)) {
-    throw new AndroidAttestationError(
-      "Root certificate is not signed by Google Hardware Attestation Root CA",
-      {
-        x509Chain,
-      },
-    );
-  }
-};
-
-/**
- * 4.
- * Check each certificate's revocation status to ensure that none of the certificates have been revoked.
- * @param x509Chain - The chain of {@link X509Certificate} certificates.
- * @throws {Error} - If any certificate in the chain is revoked.
- */
-export const validateRevocation = async (
-  x509Chain: readonly X509Certificate[],
-  androidCrlUrl: string,
-  httpRequestTimeout: number,
-) => {
-  const res = await fetch(androidCrlUrl, {
-    method: "GET",
-    signal: AbortSignal.timeout(httpRequestTimeout),
-  });
-  if (!res.ok) {
-    throw new AndroidAttestationError("Failed to fetch CRL", {
-      x509Chain,
-    });
-  }
-  const crl = (await res.json()) as CRL; // Add type assertion for crl
-
-  const revokedSerials = Object.keys(crl.entries).map((key) =>
-    key.toLowerCase(),
-  );
-
-  const isRevoked = x509Chain.some((cert) => {
-    const currentSn = cert.serialNumber.toLowerCase();
-    return revokedSerials.some((revokedSerial) =>
-      currentSn.includes(revokedSerial),
-    );
-  });
-
-  if (isRevoked) {
-    throw new AndroidAttestationError(
-      "A certificate within the chain has been revoked by Google",
-      {
-        x509Chain,
-      },
-    );
-  }
-  return x509Chain;
 };
 
 /**
@@ -163,6 +96,7 @@ export const validateRevocation = async (
  *  Use the parser to extract the key attestation certificate extension data from that certificate.
  * @param x509Chain - The chain of {@link X509Certificate} certificates.
  * @throws {Error} - If no key attestation extension is found.
+
  */
 const validateKeyAttestationExtension = (
   x509Chain: readonly X509Certificate[],
@@ -184,9 +118,7 @@ const validateKeyAttestationExtension = (
     return certWithExtension;
   }
 
-  throw new AndroidAttestationError("No key attestation extension found", {
-    x509Chain,
-  });
+  throw new Error("No key attestation extension found");
 };
 
 const extractExtension = (certificate: X509Certificate, oid: string) => {
@@ -201,20 +133,19 @@ const extractExtension = (certificate: X509Certificate, oid: string) => {
  * values that you expect the hardware-backed key to contain.
  * @param extension - The 1.3.6.1.4.1.11129.2.1.17 {@link pkijs.Extension} extension.
  * @param attestationParams - The verify attestation {@link VerifyAttestationParams} params.
- * @throws {Error} - If the validation fail.
  */
-const validateExtension = (
+const validateExtension = async (
   certWithExtension: X509Certificate,
   attestationParams: VerifyAttestationParams,
-) => {
+): Promise<AndroidAttestationValidationResult> => {
   const { bundleIdentifiers, challenge } = attestationParams;
 
   const extension = extractExtension(certWithExtension, KEY_OID);
   if (!extension) {
-    throw new AndroidAttestationError(
-      "Unable to extract extension from certificate",
-      { x509Chain: [certWithExtension] },
-    );
+    return {
+      reason: `Unable to extract extension from certificate: ${certWithExtension}`,
+      success: false,
+    };
   }
 
   const extensionBerEncoded = extension.extnValue.getValue();
@@ -276,17 +207,17 @@ const validateExtension = (
    * if the Android system becomes compromised.
    */
   if (keyDescription.attestationSecurityLevel <= 0) {
-    throw new AndroidAttestationError(
-      `Attestation security level too low: ${keyDescription.attestationSecurityLevel}.`,
-      { deviceDetails },
-    );
+    return {
+      reason: `Attestation security level too low: ${keyDescription.attestationSecurityLevel}.`,
+      success: false,
+    };
   }
 
   if (keyDescription.keymasterSecurityLevel <= 0) {
-    throw new AndroidAttestationError(
-      `Key master security level too low: ${keyDescription.keymasterSecurityLevel}.`,
-      { deviceDetails },
-    );
+    return {
+      reason: `Key master security level too low: ${keyDescription.keymasterSecurityLevel}.`,
+      success: false,
+    };
   }
 
   // Check challenge
@@ -295,10 +226,11 @@ const validateExtension = (
   ).toString("utf-8");
 
   if (receivedChallenge !== challenge) {
-    throw new AndroidAttestationError(
-      "The received challenge does not match the one contained in the certificate.",
-      { deviceDetails },
-    );
+    return {
+      reason:
+        "The received challenge does not match the one contained in the certificate.",
+      success: false,
+    };
   }
 
   // Check softwareEnforced authorization list
@@ -308,10 +240,10 @@ const validateExtension = (
   );
 
   if (!softwareEnforced || !softwareEnforced.attestationApplicationId) {
-    throw new AndroidAttestationError(
-      `Unable to found attestationApplicationId in key attestation.`,
-      { deviceDetails },
-    );
+    return {
+      reason: `Unable to found attestationApplicationId in key attestation.`,
+      success: false,
+    };
   }
 
   const attestationApplicationId = AsnConvert.parse(
@@ -325,10 +257,10 @@ const validateExtension = (
   );
 
   if (!packageInfo) {
-    throw new AndroidAttestationError(
-      `Unable to found packageInfo in key attestation.`,
-      { deviceDetails },
-    );
+    return {
+      reason: `Unable to found packageInfo in key attestation.`,
+      success: false,
+    };
   }
 
   const packageName = Buffer.from(
@@ -340,10 +272,10 @@ const validateExtension = (
   );
 
   if (bundleIdentifiersCheck.length === 0) {
-    throw new AndroidAttestationError(
-      `The bundle identifier ${packageName} does not match any of ${bundleIdentifiers}.`,
-      { deviceDetails },
-    );
+    return {
+      reason: `The bundle identifier ${packageName} does not match any of ${bundleIdentifiers}.`,
+      success: false,
+    };
   }
 
   // Check teeEnforced Root Of Trust
@@ -351,19 +283,20 @@ const validateExtension = (
     (el) => el.rootOfTrust,
   );
   if (!teeEnforcedWithRoT || !teeEnforcedWithRoT.rootOfTrust) {
-    throw new AndroidAttestationError(
-      `Unable to found a Root Of Trust in teeEnforced data.`,
-      { deviceDetails },
-    );
+    return {
+      reason: `Unable to found a Root Of Trust in teeEnforced data.`,
+      success: false,
+    };
   }
 
   const rootOfTrust = teeEnforcedWithRoT.rootOfTrust;
 
   // Check if bootloader in locked
   if (!rootOfTrust.deviceLocked) {
-    throw new AndroidAttestationError(`BootLoader unlocked!`, {
-      deviceDetails,
-    });
+    return {
+      reason: `BootLoader unlocked!`,
+      success: false,
+    };
   }
 
   /*
@@ -378,11 +311,17 @@ const validateExtension = (
    * 3) Failed
    */
   if (rootOfTrust.verifiedBootState !== 0) {
-    throw new AndroidAttestationError(
-      `VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`,
-      { deviceDetails },
-    );
+    return {
+      reason: `VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`,
+      success: false,
+    };
   }
 
-  return deviceDetails;
+  const hardwareKey = await jose.exportJWK(certWithExtension.publicKey);
+
+  return {
+    deviceDetails,
+    hardwareKey,
+    success: true,
+  };
 };

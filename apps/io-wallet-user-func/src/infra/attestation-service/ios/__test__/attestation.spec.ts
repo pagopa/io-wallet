@@ -36,6 +36,7 @@ describe("iOSAttestationValidation", () => {
         platform: "ios",
       },
       hardwareKey,
+      success: true,
     };
 
     await expect(result).resolves.toEqual(expectedResult);

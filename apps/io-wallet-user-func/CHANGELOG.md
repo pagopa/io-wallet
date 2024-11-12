@@ -1,5 +1,30 @@
 # io-wallet-user-func
 
+## 1.3.9
+
+### Minor Changes
+
+- 47c24e1: Add Wallet Instance Attested Key revocation event based
+
+### Patch Changes
+
+- 853fea6: Add slack notification message on Wallet Instance revocation
+- Updated dependencies [47c24e1]
+- Updated dependencies [853fea6]
+  - io-wallet-common@1.2.0
+
+## 1.3.8
+
+### Patch Changes
+
+- 40f7a27: Refactor certificates validation
+
+## 1.3.7
+
+### Patch Changes
+
+- f465ea9: Refactor to validation result for attestation/assertion library
+
 ## 1.3.6
 
 ### Patch Changes

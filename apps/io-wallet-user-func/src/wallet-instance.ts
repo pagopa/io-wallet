@@ -1,3 +1,4 @@
+import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
@@ -7,6 +8,7 @@ import { EntityNotFoundError } from "io-wallet-common/error";
 import {
   WalletInstance,
   WalletInstanceValid,
+  WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
 
 class RevokedWalletInstance extends Error {
@@ -32,12 +34,13 @@ export interface WalletInstanceRepository {
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  getAllByUserId: (
-    userId: WalletInstance["userId"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  getValidByUserIdExcludingOne: (
+    walletInstanceId: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
@@ -90,6 +93,29 @@ export const getValidWalletInstance: (
       ),
     );
 
+export const getValidWalletInstanceWithAndroidCertificatesChain: (
+  id: WalletInstance["id"],
+  userId: WalletInstance["userId"],
+) => RTE.ReaderTaskEither<
+  WalletInstanceEnvironment,
+  Error,
+  WalletInstanceValidWithAndroidCertificatesChain
+> = (id, userId) =>
+  pipe(
+    getValidWalletInstance(id, userId),
+    RTE.chainEitherK(
+      flow(
+        WalletInstanceValidWithAndroidCertificatesChain.decode,
+        E.mapLeft(
+          () =>
+            new Error(
+              "Wallet Instance does not have a certificate chain for android",
+            ),
+        ),
+      ),
+    ),
+  );
+
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
@@ -128,18 +154,14 @@ const getUserValidWalletInstancesIdExceptOne: (
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.getAllByUserId(userId),
+      walletInstanceRepository.getValidByUserIdExcludingOne(
+        walletInstanceId,
+        userId,
+      ),
       TE.map(
         O.fold(
           () => [],
-          flow(
-            RA.filterMap((walletInstance) =>
-              walletInstance.id !== walletInstanceId &&
-              walletInstance.isRevoked === false
-                ? O.some(walletInstance.id)
-                : O.none,
-            ),
-          ),
+          flow(RA.filterMap((walletInstance) => O.some(walletInstance.id))),
         ),
       ),
     );
@@ -156,4 +178,19 @@ export const revokeUserValidWalletInstancesExceptOne: (
     RTE.chain((validWalletInstances) =>
       revokeUserWalletInstances(userId, validWalletInstances),
     ),
+  );
+
+export const filterValidWithAndroidCertificatesChain = (
+  walletInstances: WalletInstance[],
+): RTE.ReaderTaskEither<
+  void,
+  Error,
+  readonly WalletInstanceValidWithAndroidCertificatesChain[]
+> =>
+  pipe(
+    walletInstances,
+    RA.filterMap(
+      flow(WalletInstanceValidWithAndroidCertificatesChain.decode, O.getRight),
+    ),
+    RTE.of,
   );

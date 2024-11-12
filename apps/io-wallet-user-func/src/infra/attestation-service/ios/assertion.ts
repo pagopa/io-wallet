@@ -1,9 +1,9 @@
+import { ValidationResult } from "@/attestation-service";
 import { createHash, createVerify } from "crypto";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
 
 import { iOsAssertion } from ".";
-import { IosAssertionError } from "../errors";
 
 export interface VerifyAssertionParams {
   bundleIdentifiers: string[];
@@ -15,7 +15,9 @@ export interface VerifyAssertionParams {
   teamIdentifier: string;
 }
 
-export const verifyAssertion = async (params: VerifyAssertionParams) => {
+export const verifyAssertion = async (
+  params: VerifyAssertionParams,
+): Promise<ValidationResult> => {
   const {
     bundleIdentifiers,
     clientData,
@@ -33,7 +35,10 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   const joseHardwareKey = await importJWK(hardwareKey);
 
   if (!("type" in joseHardwareKey)) {
-    throw new IosAssertionError("Invalid Hardware Key format");
+    return {
+      reason: "Invalid Hardware Key format",
+      success: false,
+    };
   }
 
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
@@ -54,7 +59,10 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
     !skipSignatureValidation &&
     !verifier.verify(publicHardwareKeyPem, signature)
   ) {
-    throw new IosAssertionError("invalid signature");
+    return {
+      reason: "Invalid signature",
+      success: false,
+    };
   }
 
   // 5. Compute the SHA256 hash of your app’s App ID, and verify that it’s the same as the authenticator data’s RP ID hash.
@@ -70,12 +78,19 @@ export const verifyAssertion = async (params: VerifyAssertionParams) => {
   );
 
   if (bundleIdentifiersCheck.length === 0) {
-    throw new IosAssertionError("appId does not match");
+    return {
+      reason: "appId does not match",
+      success: false,
+    };
   }
 
   // 6. Verify that the authenticator data’s counter field is larger than the stored signCount.
   const nextSignCount = authenticatorData.subarray(33, 37).readInt32BE();
   if (nextSignCount <= signCount) {
-    throw new IosAssertionError("invalid signCount");
+    return {
+      reason: "Invalid signCount",
+      success: false,
+    };
   }
+  return { success: true };
 };

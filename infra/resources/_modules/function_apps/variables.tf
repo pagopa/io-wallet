@@ -114,3 +114,8 @@ variable "action_group_io_id" {
   type        = string
   description = "Id of the Action Group shared among all IO teams"
 }
+
+variable "revocation_queue_name" {
+  type        = string
+  description = "Wallet Instance Revocation Queue Name"
+}
