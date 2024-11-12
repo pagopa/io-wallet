@@ -63,7 +63,7 @@ locals {
       },
       {
         name                  = "StorageConnectionString"
-        key_vault_secret_name = module.wallet.connection_string_secret_name
+        key_vault_secret_name = module.storage_account.wallet.connection_string_secret_name
       }
     ]
   }
