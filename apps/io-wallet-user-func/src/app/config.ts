@@ -236,8 +236,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       "EntityConfigurationStorageContainerName",
     ),
     revocationQueueName: readFromEnvironment("RevocationQueueName"),
-    storageAccountQueueConnectionString: readFromEnvironment(
-      "StorageAccountQueueConnectionString",
+    storageAccountConnectionString: readFromEnvironment(
+      "StorageConnectionString",
     ),
   }),
   RE.map(
@@ -246,13 +246,13 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       cosmos,
       entityConfigurationStorageContainerName,
       revocationQueueName,
-      storageAccountQueueConnectionString,
+      storageAccountConnectionString,
     }) => ({
       appInsights,
       cosmos,
       queue: {
         walletInstanceRevocation: {
-          connectionString: storageAccountQueueConnectionString,
+          connectionString: storageAccountConnectionString,
           name: revocationQueueName,
         },
       },
