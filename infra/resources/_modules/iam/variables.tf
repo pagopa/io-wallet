@@ -42,3 +42,12 @@ variable "cdn_storage_account" {
   })
   description = "Storage Account Id used for CDN"
 }
+
+variable "storage_account" {
+  type = object({
+    id                  = string
+    name                = string
+    resource_group_name = string
+  })
+  description = "Generic Storage Account for Wallet uses"
+}
