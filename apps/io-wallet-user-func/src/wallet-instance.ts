@@ -34,12 +34,13 @@ export interface WalletInstanceRepository {
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  getAllByUserId: (
-    userId: WalletInstance["userId"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  getValidByUserIdExcludingOne: (
+    walletInstanceId: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
@@ -153,18 +154,14 @@ const getUserValidWalletInstancesIdExceptOne: (
   (userId, walletInstanceId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.getAllByUserId(userId),
+      walletInstanceRepository.getValidByUserIdExcludingOne(
+        walletInstanceId,
+        userId,
+      ),
       TE.map(
         O.fold(
           () => [],
-          flow(
-            RA.filterMap((walletInstance) =>
-              walletInstance.id !== walletInstanceId &&
-              walletInstance.isRevoked === false
-                ? O.some(walletInstance.id)
-                : O.none,
-            ),
-          ),
+          flow(RA.filterMap((walletInstance) => O.some(walletInstance.id))),
         ),
       ),
     );
