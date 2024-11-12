@@ -53,8 +53,16 @@ locals {
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
       },
       {
+        name                  = "SlackStatusChannelWebhook"
+        key_vault_secret_name = "SlackStatusChannelWebhook"
+      },
+      {
         name                  = "AllowedDeveloperUsers"
         key_vault_secret_name = "AllowedDeveloperUsers"
+      },
+      {
+        name                  = "StorageAccountQueueConnectionString"
+        key_vault_secret_name = module.storage_account.wallet_revocation_storage_connection_string_secret_name
       }
     ]
   }

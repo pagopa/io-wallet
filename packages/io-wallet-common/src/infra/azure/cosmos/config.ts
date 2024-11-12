@@ -21,7 +21,7 @@ export const getAzureCosmosConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     dbName: readFromEnvironment("CosmosDbDatabaseName"),
-    endpoint: readFromEnvironment("CosmosDbEndpoint"),
+    endpoint: readFromEnvironment("CosmosDbEndpoint__accountEndpoint"),
     requestTimeout: pipe(
       readFromEnvironment("CosmosDbRequestTimeout"),
       RE.chainW(stringToNumberDecoderRE),

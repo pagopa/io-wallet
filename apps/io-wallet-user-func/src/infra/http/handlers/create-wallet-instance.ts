@@ -1,5 +1,5 @@
-import { AttestationServiceConfiguration } from "@/app/config";
 import {
+  AttestationService,
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
@@ -12,7 +12,6 @@ import {
 import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { createPublicKey } from "crypto";
 import { sequenceS } from "fp-ts/Apply";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
@@ -20,8 +19,6 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { JwkPublicKey } from "io-wallet-common/jwk";
-import * as jose from "jose";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -100,24 +97,14 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
 const skipAttestationValidation: (
   walletInstanceRequest: WalletInstanceRequest,
 ) => RTE.ReaderTaskEither<
-  { attestationServiceConfiguration: AttestationServiceConfiguration },
+  { attestationService: AttestationService },
   Error,
   ValidatedAttestation
 > =
   (walletInstanceRequest) =>
-  ({ attestationServiceConfiguration }) =>
+  ({ attestationService }) =>
     pipe(
-      E.tryCatch(
-        () =>
-          createPublicKey(
-            attestationServiceConfiguration.hardwarePublicTestKey,
-          ),
-        E.toError,
-      ),
-      TE.fromEither,
-      TE.chain((el) => TE.tryCatch(() => jose.exportJWK(el), E.toError)),
-      TE.chainEitherKW(JwkPublicKey.decode),
-      TE.mapLeft(() => new Error("Invalid test hardware public key")),
+      attestationService.getHardwarePublicTestKey(),
       TE.map((hardwareKey) => ({
         createdAt: new Date(),
         deviceDetails: {

@@ -6,7 +6,7 @@
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "NODE_ENV": "development",
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
-    "CosmosDbEndpoint": "COSMOS_DB_ENDPOINT",
+    "CosmosDbEndpoint__accountEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
     "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
@@ -28,6 +28,8 @@
     "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
     "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI",
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
+    "StorageAccountQueueConnectionString": "REVOCATION_QUEUE_STORAGE_ACCOUNT_CONNECTION_STRING",
+    "RevocationQueueName": "REVOCATION_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
     "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
@@ -37,6 +39,7 @@
     "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
     "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
     "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-    "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED"
+    "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED",
+    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK"
   }
 }

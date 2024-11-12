@@ -1,12 +1,16 @@
 # io-wallet-user-func
 
+## 1.3.8
+
+### Patch Changes
+
+- 40f7a27: Refactor certificates validation
+
 ## 1.3.7
 
 ### Patch Changes
 
-- WalletInstanceRepository improvement
-- Updated dependencies
-  - io-wallet-common@1.1.2
+- f465ea9: Refactor to validation result for attestation/assertion library
 
 ## 1.3.6
 
