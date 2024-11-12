@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 1.3.7
+
+### Patch Changes
+
+- WalletInstanceRepository improvement
+- Updated dependencies
+  - io-wallet-common@1.1.2
+
 ## 1.3.6
 
 ### Patch Changes

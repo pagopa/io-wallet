@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.1.2
+
+### Patch Changes
+
+- WalletInstanceRepository improvement
+
 ## 1.1.1
 
 ### Patch Changes
