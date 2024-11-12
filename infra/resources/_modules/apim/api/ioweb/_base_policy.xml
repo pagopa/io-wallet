@@ -35,18 +35,28 @@
                         <value>{{trial-system-api-key}}</value>
                     </set-header>
                 </send-request>
-                <set-variable name="isActive" value="@{
+                <choose>
+                    <when condition="@(((IResponse)context.Variables["trialSystemResponse"]).StatusCode == 200)">
+                        <set-variable name="isActive" value="@{
                         var state = (string)((IResponse)context.Variables["trialSystemResponse"]).Body.As<JObject>()["state"];
                         return state == "ACTIVE";
-                    } " />
-                <choose>
-                    <when condition="@(context.Variables.GetValueOrDefault<bool>("isActive") != true)">
+                    }" />
+                        <choose>
+                            <when condition="@(context.Variables.GetValueOrDefault<bool>("isActive") != true)">
+                                <return-response>
+                                    <set-status code="403" reason="Forbidden" />
+                                    <set-body template="liquid">{ "detail": "Access to this resource is forbidden", "status": 403, "title": "Forbidden" }</set-body>
+                                </return-response>
+                            </when>
+                            <otherwise />
+                        </choose>
+                    </when>
+                    <otherwise>
                         <return-response>
                             <set-status code="403" reason="Forbidden" />
-                            <set-body template="liquid">{ "detail": "Access to this resource is forbidden", "status": 403, "title": "Forbidden" } </set-body>
+                            <set-body template="liquid">{ "detail": "Access to this resource is forbidden", "status": 403, "title": "Forbidden" }</set-body>
                         </return-response>
-                    </when>
-                    <otherwise />
+                    </otherwise>
                 </choose>
             </when>
         </choose>
