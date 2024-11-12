@@ -1,0 +1,13 @@
+# https://avd.aquasec.com/misconfig/azure/
+
+# Secret should have an expiry date specified.
+AVD-AZU-0017
+
+# Vault network ACL does not block access by default.
+AVD-AZU-0013
+
+# GitHub branch protection does not require signed commits.
+AVD-GIT-0004
+
+# The minimum TLS version for Storage Accounts should be TLS1_2
+AVD-AZU-0011
