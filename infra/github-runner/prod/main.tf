@@ -28,8 +28,8 @@ module "container_app_job_selfhosted_runner" {
   repo_name = local.repo_name
 
   container_app_environment = {
-    name                = "${local.prefix}-${local.env_short}-github-runner-cae"
-    resource_group_name = "${local.prefix}-${local.env_short}-github-runner-rg"
+    name                = "${local.prefix}-${local.env_short}-itn-github-runner-cae-01"
+    resource_group_name = "${local.prefix}-${local.env_short}-itn-github-runner-rg-01"
   }
 
   key_vault = {
