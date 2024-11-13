@@ -1,5 +1,5 @@
 import * as appInsights from "applicationinsights";
-import { X509Certificate, createPublicKey } from "crypto";
+import { X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
@@ -12,11 +12,7 @@ import {
 } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
-import {
-  getCrlFromUrl,
-  validateIssuance,
-  validateRevocation,
-} from "./certificates";
+import { getCrlFromUrl, validateRevocation } from "./certificates";
 import { obfuscatedUserId } from "./user";
 import {
   WalletInstanceRepository,
@@ -29,11 +25,7 @@ export type ValidationCertificatesResult =
   | { success: true };
 
 const validateWalletInstanceCertificatesChain =
-  ({
-    androidCrlUrl,
-    googlePublicKey,
-    httpRequestTimeout,
-  }: AttestationServiceConfiguration) =>
+  ({ androidCrlUrl, httpRequestTimeout }: AttestationServiceConfiguration) =>
   (
     walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
   ): TE.TaskEither<Error, ValidationCertificatesResult> =>
@@ -44,36 +36,20 @@ const validateWalletInstanceCertificatesChain =
       TE.fromEither,
       TE.chain((x509Chain) =>
         pipe(
-          E.tryCatch(
-            () => validateIssuance(x509Chain, createPublicKey(googlePublicKey)),
-            E.toError,
+          getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
+          TE.chain((attestationCrl) =>
+            TE.tryCatch(
+              () => validateRevocation(x509Chain, attestationCrl),
+              E.toError,
+            ),
           ),
-          TE.fromEither,
-          TE.chain((issuanceValidationResult) =>
-            issuanceValidationResult.success
-              ? pipe(
-                  getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
-                  TE.chain((attestationCrl) =>
-                    TE.tryCatch(
-                      () => validateRevocation(x509Chain, attestationCrl),
-                      E.toError,
-                    ),
-                  ),
-                  TE.map((validationRevocation) =>
-                    validationRevocation.success
-                      ? { success: true }
-                      : {
-                          certificatesRevocationReason:
-                            "CERTIFICATE_REVOKED_BY_ISSUER" as RevocationReason,
-                          success: false,
-                        },
-                  ),
-                )
-              : TE.right({
-                  certificatesRevocationReason:
-                    "CERTIFICATE_EXPIRED_OR_INVALID" as RevocationReason,
+          TE.map((validationRevocation) =>
+            validationRevocation.success
+              ? { success: true }
+              : {
+                  certificatesRevocationReason: "CERTIFICATE_REVOKED_BY_ISSUER",
                   success: false,
-                }),
+                },
           ),
         ),
       ),

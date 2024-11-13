@@ -28,7 +28,6 @@ export const WalletInstanceValid = t.intersection([
 export type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
 
 export const RevocationReason = t.union([
-  t.literal("CERTIFICATE_EXPIRED_OR_INVALID"),
   t.literal("CERTIFICATE_REVOKED_BY_ISSUER"),
   t.literal("NEW_WALLET_INSTANCE_CREATED"),
   t.literal("REVOKED_BY_USER"),
