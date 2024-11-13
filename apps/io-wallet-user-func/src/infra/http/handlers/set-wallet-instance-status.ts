@@ -10,7 +10,6 @@ import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { RevocationReason } from "io-wallet-common/wallet-instance";
 
 const requireWalletInstanceId: (
   req: H.HttpRequest,
@@ -54,7 +53,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
           revokeUserWalletInstances(
             fiscalCode,
             [walletInstanceId],
-            RevocationReason.RevokedByUser,
+            "REVOKED_BY_USER",
           ),
         ),
         RTE.orElseFirstW((error) =>

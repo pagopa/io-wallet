@@ -27,12 +27,13 @@ export const WalletInstanceValid = t.intersection([
 
 export type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
 
-export enum RevocationReason {
-  CertificateExpiredOrInvalid = "CERTIFICATE_EXPIRED_OR_INVALID",
-  CertificateRevoked = "CERTIFICATE_REVOKED_BY_ISSUER",
-  NewWalletInstanceCreated = "NEW_WALLET_INSTANCE_CREATED",
-  RevokedByUser = "REVOKED_BY_USER",
-}
+export const RevocationReason = t.union([
+  t.literal("CERTIFICATE_EXPIRED_OR_INVALID"),
+  t.literal("CERTIFICATE_REVOKED_BY_ISSUER"),
+  t.literal("NEW_WALLET_INSTANCE_CREATED"),
+  t.literal("REVOKED_BY_USER"),
+]);
+export type RevocationReason = t.TypeOf<typeof RevocationReason>;
 
 const WalletInstanceRevoked = t.intersection([
   WalletInstanceBase,
@@ -41,7 +42,7 @@ const WalletInstanceRevoked = t.intersection([
     revokedAt: IsoDateFromString,
   }),
   t.partial({
-    revocationReason: t.keyof(RevocationReason),
+    revocationReason: RevocationReason,
   }),
 ]);
 

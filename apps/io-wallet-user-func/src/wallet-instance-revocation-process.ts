@@ -64,14 +64,14 @@ const validateWalletInstanceCertificatesChain =
                       ? { success: true }
                       : {
                           certificatesRevocationReason:
-                            RevocationReason.CertificateRevoked as RevocationReason,
+                            "CERTIFICATE_REVOKED_BY_ISSUER" as RevocationReason,
                           success: false,
                         },
                   ),
                 )
               : TE.right({
                   certificatesRevocationReason:
-                    RevocationReason.CertificateExpiredOrInvalid as RevocationReason,
+                    "CERTIFICATE_EXPIRED_OR_INVALID" as RevocationReason,
                   success: false,
                 }),
           ),
