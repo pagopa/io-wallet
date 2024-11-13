@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 1.3.10
+
+### Patch Changes
+
+- 07d296c: Add revocation reason to Wallet Instance
+- Updated dependencies [07d296c]
+  - io-wallet-common@1.2.1
+
 ## 1.3.9
 
 ### Minor Changes
