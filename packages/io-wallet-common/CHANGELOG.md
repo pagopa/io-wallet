@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.2.1
+
+### Patch Changes
+
+- 07d296c: Add revocation reason to Wallet Instance
+
 ## 1.2.0
 
 ### Minor Changes
