@@ -77,7 +77,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               revokeUserValidWalletInstancesExceptOne(
                 walletInstanceRequest.fiscalCode,
                 walletInstanceRequest.hardwareKeyTag,
-                RevocationReason.newWalletInstanceCreated,
+                RevocationReason.NewWalletInstanceCreated,
               ),
             ),
           ),

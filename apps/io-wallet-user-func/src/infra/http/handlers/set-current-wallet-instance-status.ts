@@ -40,7 +40,7 @@ const revokeCurrentUserWalletInstance: (
     fiscalCode,
     getCurrentWalletInstance,
     RTE.chainW(({ id, userId }) =>
-      revokeUserWalletInstances(userId, [id], RevocationReason.revokedByUser),
+      revokeUserWalletInstances(userId, [id], RevocationReason.RevokedByUser),
     ),
   );
 
