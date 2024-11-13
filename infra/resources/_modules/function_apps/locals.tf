@@ -44,7 +44,7 @@ locals {
       local.function_apps.common_app_settings,
       {
         for s in var.user_func.app_settings :
-        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.project}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
+        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=${s.key_vault_secret_name})" : s.value
       }
     )
   }
@@ -68,7 +68,7 @@ locals {
       local.function_apps.common_app_settings,
       {
         for s in var.support_func.app_settings :
-        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.project}-wallet-kv-01;SecretName=${s.key_vault_secret_name})" : s.value
+        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=${s.key_vault_secret_name})" : s.value
       }
     )
   }
