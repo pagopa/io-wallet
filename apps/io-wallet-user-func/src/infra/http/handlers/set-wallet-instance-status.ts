@@ -54,7 +54,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
           revokeUserWalletInstances(
             fiscalCode,
             [walletInstanceId],
-            RevocationReason.revokedThroughIoWeb,
+            RevocationReason.revokedByUser,
           ),
         ),
         RTE.orElseFirstW((error) =>

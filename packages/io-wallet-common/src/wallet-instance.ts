@@ -31,8 +31,7 @@ export enum RevocationReason {
   certificateExpiredOrInvalid = "CERTIFICATE_EXPIRED_OR_INVALID",
   certificateRevoked = "CERTIFICATE_REVOKED_BY_ISSUER",
   newWalletInstanceCreated = "NEW_WALLET_INSTANCE_CREATED",
-  revokedThroughAppIo = "REVOKED_THROUGH_APP_IO",
-  revokedThroughIoWeb = "REVOKED_THROUGH_IO_WEB",
+  revokedByUser = "REVOKED_BY_USER",
 }
 
 const WalletInstanceRevoked = t.intersection([
