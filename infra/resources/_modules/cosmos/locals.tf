@@ -24,7 +24,7 @@ locals {
       name               = "leases"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 15000
+        max_throughput = 1000
       }
       default_ttl = null
     }
