@@ -24,7 +24,7 @@ export const validateIssuance = (
     );
     if (!datesValid) {
       return {
-        reason: "Certificates expired",
+        reason: `Certificates expired: ${x509Chain}`,
         success: false,
       };
     }
@@ -37,7 +37,7 @@ export const validateIssuance = (
         const parent = x509Chain[index + 1];
         if (!cert || !parent || !cert.verify(parent.publicKey)) {
           return {
-            reason: "Certificates chain is invalid",
+            reason: `Certificates chain is invalid: ${x509Chain}`,
             success: false,
           };
         }
@@ -49,7 +49,7 @@ export const validateIssuance = (
   const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
   if (!rootCert || !rootCert.verify(rootPublicKey)) {
     return {
-      reason: `Root certificate is not signed by root public key provided: ${rootCert.serialNumber}`,
+      reason: `Root certificate is not signed by root public key provided: ${x509Chain}`,
       success: false,
     };
   }

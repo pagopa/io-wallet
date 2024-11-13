@@ -6,6 +6,7 @@ import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import { EntityNotFoundError } from "io-wallet-common/error";
 import {
+  RevocationReason,
   WalletInstance,
   WalletInstanceValid,
   WalletInstanceValidWithAndroidCertificatesChain,
@@ -40,7 +41,7 @@ export interface WalletInstanceRepository {
   getValidByUserIdExcludingOne: (
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstance[]>>;
+  ) => TE.TaskEither<Error, O.Option<WalletInstanceValid[]>>;
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
@@ -119,8 +120,9 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
+  reason: RevocationReason,
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
-  (userId, walletInstancesId) =>
+  (userId, walletInstancesId, reason) =>
   ({ walletInstanceRepository }) =>
     walletInstancesId.length
       ? walletInstanceRepository.batchPatch(
@@ -136,6 +138,11 @@ export const revokeUserWalletInstances: (
                 op: "add",
                 path: "/revokedAt",
                 value: new Date(),
+              },
+              {
+                op: "add",
+                path: "/revocationReason",
+                value: reason,
               },
             ],
           })),
@@ -169,14 +176,16 @@ const getUserValidWalletInstancesIdExceptOne: (
 export const revokeUserValidWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
+  reason: RevocationReason,
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
   userId,
   walletInstanceId,
+  reason,
 ) =>
   pipe(
     getUserValidWalletInstancesIdExceptOne(userId, walletInstanceId),
     RTE.chain((validWalletInstances) =>
-      revokeUserWalletInstances(userId, validWalletInstances),
+      revokeUserWalletInstances(userId, validWalletInstances, reason),
     ),
   );
 
