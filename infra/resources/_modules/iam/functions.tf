@@ -28,6 +28,14 @@ module "func_app_user_02" {
       role                 = "writer"
     }
   ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      role                 = "writer"
+    }
+  ]
 }
 
 module "func_app_user_slot_02" {
