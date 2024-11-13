@@ -19,6 +19,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { RevocationReason } from "io-wallet-common/wallet-instance";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -76,6 +77,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               revokeUserValidWalletInstancesExceptOne(
                 walletInstanceRequest.fiscalCode,
                 walletInstanceRequest.hardwareKeyTag,
+                RevocationReason.newWalletInstanceCreated,
               ),
             ),
           ),

@@ -6,10 +6,12 @@ import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { NotificationService } from "io-wallet-common/notification";
-import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
+import {
+  RevocationReason,
+  WalletInstanceValidWithAndroidCertificatesChain,
+} from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
-import { ValidationResult } from "./attestation-service";
 import {
   getCrlFromUrl,
   validateIssuance,
@@ -22,6 +24,10 @@ import {
   revokeUserWalletInstances,
 } from "./wallet-instance";
 
+export type ValidationCertificatesResult =
+  | { certificatesRevocationReason: RevocationReason; success: false }
+  | { success: true };
+
 const validateWalletInstanceCertificatesChain =
   ({
     androidCrlUrl,
@@ -30,7 +36,7 @@ const validateWalletInstanceCertificatesChain =
   }: AttestationServiceConfiguration) =>
   (
     walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
-  ): TE.TaskEither<Error, ValidationResult> =>
+  ): TE.TaskEither<Error, ValidationCertificatesResult> =>
     pipe(
       walletInstance.deviceDetails.x509Chain,
       RA.map((cert) => E.tryCatch(() => new X509Certificate(cert), E.toError)),
@@ -53,8 +59,21 @@ const validateWalletInstanceCertificatesChain =
                       E.toError,
                     ),
                   ),
+                  TE.map((validationRevocation) =>
+                    validationRevocation.success
+                      ? { success: true }
+                      : {
+                          certificatesRevocationReason:
+                            RevocationReason.certificateRevoked as RevocationReason,
+                          success: false,
+                        },
+                  ),
                 )
-              : TE.right(issuanceValidationResult),
+              : TE.right({
+                  certificatesRevocationReason:
+                    RevocationReason.certificateExpiredOrInvalid as RevocationReason,
+                  success: false,
+                }),
           ),
         ),
       ),
@@ -97,17 +116,19 @@ export const revokeInvalidWalletInstances: (
       TE.chain((validationResult) =>
         !validationResult.success
           ? pipe(
-              revokeUserWalletInstances(walletInstance.userId, [
-                walletInstance.id,
-              ])({
+              revokeUserWalletInstances(
+                walletInstance.userId,
+                [walletInstance.id],
+                validationResult.certificatesRevocationReason,
+              )({
                 walletInstanceRepository,
               }),
               TE.map(() =>
                 telemetryClient.trackEvent({
-                  name: "REVOKED_WALLET_INSTANCE_FOR_INVALID_CERTIFICATE",
+                  name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
                   properties: {
                     fiscalCode: walletInstance.userId,
-                    reason: validationResult.reason,
+                    reason: validationResult.certificatesRevocationReason,
                     walletInstanceId: walletInstance.id,
                   },
                 }),
@@ -117,7 +138,7 @@ export const revokeInvalidWalletInstances: (
                   notificationService.sendMessage(
                     `Revoked Wallet Instance with id: *${walletInstance.id}*.\n
                     UserId: ${obfuscatedUserId(walletInstance.userId)}.\n
-                    Reason: ${validationResult.reason}`,
+                    Reason: ${validationResult.certificatesRevocationReason}`,
                   ),
                   TE.map(() => undefined),
                   //Fire and forget
