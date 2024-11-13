@@ -192,7 +192,6 @@ app.http("setCurrentWalletInstanceStatus", {
 app.cosmosDB("addWalletInstanceToValidationQueue", {
   connection: "CosmosDbEndpoint",
   containerName: "wallet-instances",
-  createLeaseContainerIfNotExists: true,
   databaseName: config.azure.cosmos.dbName,
   handler: AddWalletInstanceToValidationQueueFunction({
     inputDecoder: t.array(WalletInstance),
