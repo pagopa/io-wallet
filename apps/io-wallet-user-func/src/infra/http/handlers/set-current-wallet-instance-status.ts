@@ -38,7 +38,9 @@ const revokeCurrentUserWalletInstance: (
   pipe(
     fiscalCode,
     getCurrentWalletInstance,
-    RTE.chainW(({ id, userId }) => revokeUserWalletInstances(userId, [id])),
+    RTE.chainW(({ id, userId }) =>
+      revokeUserWalletInstances(userId, [id], "REVOKED_BY_USER"),
+    ),
   );
 
 export const SetCurrentWalletInstanceStatusHandler = H.of(
