@@ -106,9 +106,9 @@ module "apim_v2_wallet_support_api" {
 
   content_format = "openapi"
 
-  content_value = file("${path.module}/api/support-function/_swagger.json")
+  content_value = file("${path.module}/api/support/_swagger.json")
 
-  xml_content = file("${path.module}/api/support-function/_base_policy.xml")
+  xml_content = file("${path.module}/api/support/_base_policy.xml")
 }
 
 resource "azurerm_api_management_named_value" "support_func_key" {
