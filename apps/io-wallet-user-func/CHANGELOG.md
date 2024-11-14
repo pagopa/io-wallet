@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.0.0
+
+### Major Changes
+
+- 2e7ce98: Updated getCurrentWalletInstanceStatus method from POST to GET
+
 ## 1.3.10
 
 ### Patch Changes
