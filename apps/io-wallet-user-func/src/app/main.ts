@@ -159,7 +159,7 @@ app.http("getCurrentWalletInstanceStatus", {
       walletInstanceRepository,
     }),
   ),
-  methods: ["POST"],
+  methods: ["GET"],
   route: "wallet-instances/current/status",
 });
 

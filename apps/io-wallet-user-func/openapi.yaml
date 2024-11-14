@@ -83,17 +83,17 @@ paths:
           $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/current/status:
-    post:
+    get:
       summary: Retrieve the current Wallet Instance status
       operationId: getCurrentWalletInstanceStatus
       security:
         - FunctionsKey: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetCurrentWalletInstanceStatusBody"
+      parameters:
+        - in: header
+          name: fiscal-code
+          required: true
+          schema:
+            $ref: "#/components/schemas/FiscalCode"
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -101,6 +101,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WalletData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -320,14 +322,6 @@ components:
       required:
         - grant_type
         - assertion
-        - fiscal_code
-
-    GetCurrentWalletInstanceStatusBody:
-      type: object
-      properties:
-        fiscal_code:
-          $ref: "#/components/schemas/FiscalCode"
-      required:
         - fiscal_code
 
     ProblemJson:

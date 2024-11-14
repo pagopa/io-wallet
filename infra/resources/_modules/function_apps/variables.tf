@@ -71,6 +71,11 @@ variable "key_vault_wallet_id" {
   description = "Id of the wallet Key Vault where save secrets"
 }
 
+variable "key_vault_wallet_name" {
+  type        = string
+  description = "Name of the wallet Key Vault where save secrets"
+}
+
 variable "storage_account_cdn_name" {
   type        = string
   description = "Name of the CDN storage account"
@@ -85,6 +90,17 @@ variable "user_func" {
     }))
   })
   description = "Configuration of the user-func"
+}
+
+variable "support_func" {
+  type = object({
+    app_settings = list(object({
+      name                  = string
+      value                 = optional(string, "")
+      key_vault_secret_name = optional(string)
+    }))
+  })
+  description = "Configuration of the support-func"
 }
 
 variable "application_insights_connection_string" {
