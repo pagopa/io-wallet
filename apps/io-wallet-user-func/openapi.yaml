@@ -100,7 +100,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WalletData"
+                $ref: "#/components/schemas/WalletInstanceData"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -112,7 +112,7 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
     put:
-      summary: Revoke current Wallet Instance
+      summary: Revoke the current Wallet Instance
       operationId: setCurrentWalletInstanceStatus
       security:
         - FunctionsKey: []
@@ -135,6 +135,39 @@ paths:
           $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/{id}/status:
+    get:
+      summary: Retrieve a Wallet Instance status
+      operationId: getWalletInstanceStatus
+      security:
+        - FunctionsKey: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: fiscal-code
+          required: true
+          schema:
+            $ref: "#/components/schemas/FiscalCode"
+      responses:
+        "200":
+          description: Wallet Instance status successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletInstanceData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
     put:
       summary: Revoke a Wallet Instance
       operationId: setWalletInstanceStatus
@@ -253,7 +286,7 @@ components:
         - status
         - fiscal_code
 
-    WalletData:
+    WalletInstanceData:
       description: |-
         Describes the status of the wallet.
       type: object
@@ -262,6 +295,8 @@ components:
           type: string
         is_revoked:
           type: boolean
+        revocation_reason:
+          $ref: "#/components/schemas/RevocationReason"
       required:
         - id
         - is_revoked
@@ -323,6 +358,15 @@ components:
         - grant_type
         - assertion
         - fiscal_code
+
+    RevocationReason:
+      type: string
+      enum:
+        [
+          "CERTIFICATE_REVOKED_BY_ISSUER",
+          "NEW_WALLET_INSTANCE_CREATED",
+          "REVOKED_BY_USER",
+        ]
 
     ProblemJson:
       type: object
