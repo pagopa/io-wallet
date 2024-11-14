@@ -42,10 +42,10 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
   const req = {
     ...H.request("https://wallet-provider.example.org"),
-    body: {
-      fiscal_code: "GSPMTA98L25E625O",
+    headers: {
+      "fiscal-code": "GSPMTA98L25E625O",
     },
-    method: "POST",
+    method: "GET",
   };
 
   const telemetryClient: appInsights.TelemetryClient = {
@@ -76,14 +76,43 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 422 HTTP response on invalid body", async () => {
+  it("should return a 400 HTTP response when fiscal_code header is missing", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
-      body: {
-        foo: "GSPMTA98L25E625O",
+      headers: {
+        fiscalcode: "GSPMTA98L25E625O",
       },
-      method: "POST",
+      method: "GET",
     };
+
+    const handler = GetCurrentWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 400,
+      }),
+    });
+  });
+
+  it("should return a 422 HTTP response when fiscal_code header is not a valid fiscal code", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      headers: {
+        "fiscal-code": "foo",
+      },
+      method: "GET",
+    };
+
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,

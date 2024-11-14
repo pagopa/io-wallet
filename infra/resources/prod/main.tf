@@ -98,14 +98,16 @@ module "function_apps" {
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
-  key_vault_id        = data.azurerm_key_vault.weu_common.id
-  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+  key_vault_id          = data.azurerm_key_vault.weu_common.id
+  key_vault_wallet_id   = module.key_vaults.key_vault_wallet.id
+  key_vault_wallet_name = module.key_vaults.key_vault_wallet.name
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
   revocation_queue_name = module.storage_accounts.revocation_queue_name.name
 
-  user_func = local.user_func
+  user_func    = local.user_func
+  support_func = local.support_func
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
 

@@ -64,6 +64,19 @@ locals {
       {
         name                  = "StorageConnectionString"
         key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
+      },
+      {
+        name                  = "AppInsightsConnectionString"
+        key_vault_secret_name = "AppInsightsConnectionString"
+      }
+    ]
+  }
+
+  support_func = {
+    app_settings = [
+      {
+        name                  = "AppInsightsConnectionString"
+        key_vault_secret_name = "AppInsightsConnectionString"
       }
     ]
   }

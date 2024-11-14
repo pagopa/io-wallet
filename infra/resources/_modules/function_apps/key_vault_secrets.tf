@@ -13,3 +13,11 @@ resource "azurerm_key_vault_secret" "func_support_default_key" {
   key_vault_id = var.key_vault_wallet_id
   content_type = "token"
 }
+
+# tfsec:ignore:azure-keyvault-ensure-secret-expiry
+resource "azurerm_key_vault_secret" "app_insights_connection_string" {
+  name         = "AppInsightsConnectionString"
+  value        = var.application_insights_connection_string
+  key_vault_id = var.key_vault_wallet_id
+  content_type = "token"
+}
