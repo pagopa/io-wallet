@@ -1,9 +1,8 @@
 import { revokeAllCredentials } from "@/credential";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
-import { lookup } from "fp-ts/Record";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
@@ -11,15 +10,7 @@ import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-const requireWalletInstanceId: (
-  req: H.HttpRequest,
-) => E.Either<Error, NonEmptyString> = (req) =>
-  pipe(
-    req.path,
-    lookup("id"),
-    E.fromOption(() => new H.HttpBadRequestError(`Missing "id" in path`)),
-    E.chainW(H.parse(NonEmptyString, `Invalid "id" supplied`)),
-  );
+import { requireWalletInstanceId } from "../wallet-instance";
 
 const SetWalletInstanceStatusBody = t.type({
   fiscal_code: FiscalCode,
