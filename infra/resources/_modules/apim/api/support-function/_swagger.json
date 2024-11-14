@@ -110,6 +110,9 @@
           "revoked_at": {
             "$ref": "#/components/schemas/Timestamp"
           },
+          "revocation_reason": {
+            "$ref": "#/components/schemas/RevocationReason"
+          },
           "device_details": {
             "$ref": "#/components/schemas/DeviceDetails"
           }
@@ -210,6 +213,14 @@
           {
             "$ref": "#/components/schemas/IosDeviceDetails"
           }
+        ]
+      },
+      "RevocationReason": {
+        "type": "string",
+        "enum": [
+          "CERTIFICATE_REVOKED_BY_ISSUER",
+          "NEW_WALLET_INSTANCE_CREATED",
+          "REVOKED_BY_USER"
         ]
       }
     }

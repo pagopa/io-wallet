@@ -2,6 +2,7 @@ locals {
   prefix         = "io"
   env_short      = "p"
   location_short = "itn"
+  domain         = "wallet"
   # the project on which the resources will be created
   # it's the prefix of any resource name
   # it includes the choosen location
@@ -13,7 +14,7 @@ locals {
   project_legacy = "${local.prefix}-${local.env_short}"
 
   location           = "italynorth"
-  secondary_location = "germanywestcentral"
+  secondary_location = "spaincentral"
 
   apim = {
     name                = "${local.project_legacy}-apim-v2-api"
@@ -58,8 +59,29 @@ locals {
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
       },
       {
+        name                  = "SlackStatusChannelWebhook"
+        key_vault_secret_name = "SlackStatusChannelWebhook"
+      },
+      {
         name                  = "AllowedDeveloperUsers"
         key_vault_secret_name = "AllowedDeveloperUsers"
+      },
+      {
+        name                  = "StorageConnectionString"
+        key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
+      },
+      {
+        name                  = "AppInsightsConnectionString"
+        key_vault_secret_name = "AppInsightsConnectionString"
+      }
+    ]
+  }
+
+  support_func = {
+    app_settings = [
+      {
+        name                  = "AppInsightsConnectionString"
+        key_vault_secret_name = "AppInsightsConnectionString"
       }
     ]
   }

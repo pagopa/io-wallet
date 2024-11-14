@@ -1,5 +1,38 @@
 # io-wallet-user-func
 
+## 2.0.0
+
+### Major Changes
+
+- 2e7ce98: Updated getCurrentWalletInstanceStatus method from POST to GET
+
+## 1.3.10
+
+### Patch Changes
+
+- 07d296c: Add revocation reason to Wallet Instance
+- Updated dependencies [07d296c]
+  - io-wallet-common@1.2.1
+
+## 1.3.9
+
+### Minor Changes
+
+- 47c24e1: Add Wallet Instance Attested Key revocation event based
+
+### Patch Changes
+
+- 853fea6: Add slack notification message on Wallet Instance revocation
+- Updated dependencies [47c24e1]
+- Updated dependencies [853fea6]
+  - io-wallet-common@1.2.0
+
+## 1.3.8
+
+### Patch Changes
+
+- 40f7a27: Refactor certificates validation
+
 ## 1.3.7
 
 ### Patch Changes

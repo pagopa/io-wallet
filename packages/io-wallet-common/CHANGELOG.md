@@ -1,5 +1,27 @@
 # io-wallet-common
 
+## 1.2.1
+
+### Patch Changes
+
+- 07d296c: Add revocation reason to Wallet Instance
+
+## 1.2.0
+
+### Minor Changes
+
+- 853fea6: Add slack notification message on Wallet Instance revocation
+
+### Patch Changes
+
+- 47c24e1: Add Wallet Instance Attested Key revocation event based
+
+## 1.1.2
+
+### Patch Changes
+
+- WalletInstanceRepository improvement
+
 ## 1.1.1
 
 ### Patch Changes

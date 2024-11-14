@@ -1,19 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
+import { HARDWARE_PUBLIC_TEST_KEY, decodeBase64String } from "@/app/config";
 import {
-  ANDROID_CRL_URL,
-  ANDROID_PLAY_INTEGRITY_URL,
-  APPLE_APP_ATTESTATION_ROOT_CA,
-  GOOGLE_PUBLIC_KEY,
-  HARDWARE_PUBLIC_TEST_KEY,
-  decodeBase64String,
-} from "@/app/config";
+  AttestationService,
+  ValidateAssertionRequest,
+} from "@/attestation-service";
+import { MobileAttestationService } from "@/infra/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
+import { createPublicKey } from "crypto";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
@@ -40,8 +40,8 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getAllByUserId: () => TE.right(O.some([])),
     getLastByUserId: () => TE.left(new Error("not implemented")),
+    getValidByUserIdExcludingOne: () => TE.right(O.some([])),
     insert: () => TE.right(undefined),
   };
 
@@ -50,24 +50,26 @@ describe("CreateWalletInstanceHandler", () => {
     log: () => () => void 0,
   };
 
-  const attestationServiceConfiguration = {
-    allowedDeveloperUsers: [mockFiscalCode],
-    androidBundleIdentifiers: [
-      "org.reactjs.native.example.IoReactNativeIntegrityExample",
-    ],
-    androidCrlUrl: decodeBase64String(ANDROID_CRL_URL),
-    androidPlayIntegrityUrl: decodeBase64String(ANDROID_PLAY_INTEGRITY_URL),
-    androidPlayStoreCertificateHash: "",
-    appleRootCertificate: decodeBase64String(APPLE_APP_ATTESTATION_ROOT_CA),
-    googleAppCredentialsEncoded: "",
-    googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
-    hardwarePublicTestKey: decodeBase64String(HARDWARE_PUBLIC_TEST_KEY),
-    httpRequestTimeout: 0,
-    iOsTeamIdentifier: "M2X5YQ4BJ7",
-    iosBundleIdentifiers: [
-      "org.reactjs.native.example.IoReactNativeIntegrityExample",
-    ],
-    skipSignatureValidation: false,
+  const mockAttestationService: AttestationService = {
+    getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
+    validateAssertion: (request: ValidateAssertionRequest) =>
+      TE.right(undefined),
+    validateAttestation: (
+      attestation: NonEmptyString,
+      nonce: NonEmptyString,
+      hardwareKeyTag: NonEmptyString,
+      user: FiscalCode,
+    ) =>
+      TE.right({
+        deviceDetails: { platform: "ios" },
+        hardwareKey: {
+          crv: "P-256",
+          kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
+          kty: "EC",
+          x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
+          y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
+        },
+      }),
   };
 
   const telemetryClient: appInsights.TelemetryClient = {
@@ -81,7 +83,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -107,7 +109,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -138,7 +140,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -163,8 +165,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getValidByUserIdExcludingOne: () =>
+          TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
       };
     const req = {
@@ -173,7 +176,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -193,29 +196,28 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on getAllByUserId error", async () => {
-    const walletInstanceRepositoryThatFailsOnGetAllByUserId: WalletInstanceRepository =
-      {
-        batchPatch: () => TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("failed on getAllByUserId!")),
-        getLastByUserId: () => TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("not implemented")),
-      };
+  it("should return a 500 HTTP response on getValidByUserIdExcludingOne error", async () => {
+    const walletInstanceRepositoryThatFails: WalletInstanceRepository = {
+      batchPatch: () => TE.left(new Error("not implemented")),
+      get: () => TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
+      getValidByUserIdExcludingOne: () =>
+        TE.left(new Error("failed on getValidByUserIdExcludingOne!")),
+      insert: () => TE.left(new Error("not implemented")),
+    };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       telemetryClient,
-      walletInstanceRepository:
-        walletInstanceRepositoryThatFailsOnGetAllByUserId,
+      walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -234,8 +236,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         get: () => TE.left(new Error("not implemented")),
-        getAllByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getValidByUserIdExcludingOne: () =>
+          TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
     const req = {
@@ -244,7 +247,7 @@ describe("CreateWalletInstanceHandler", () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
-      attestationServiceConfiguration,
+      attestationService: mockAttestationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
