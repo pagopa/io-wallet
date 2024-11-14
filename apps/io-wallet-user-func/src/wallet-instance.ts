@@ -49,6 +49,21 @@ export interface WalletInstanceEnvironment {
   walletInstanceRepository: WalletInstanceRepository;
 }
 
+export const getWalletInstance: (
+  id: WalletInstance["id"],
+  userId: WalletInstance["userId"],
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
+  (id, userId) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      walletInstanceRepository.get(id, userId),
+      TE.chain(
+        TE.fromOption(
+          () => new EntityNotFoundError("Wallet instance not found"),
+        ),
+      ),
+    );
+
 export const getCurrentWalletInstance: (
   userId: WalletInstance["userId"],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
