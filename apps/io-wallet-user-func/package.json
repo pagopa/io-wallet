@@ -31,7 +31,7 @@
     "asn1js": "^3.0.5",
     "cbor-x": "^1.6.0",
     "fp-ts": "^2.16.9",
-    "googleapis": "^134.0.0",
+    "googleapis": "^144.0.0",
     "io-ts": "^2.2.21",
     "io-wallet-common": "workspace:^",
     "jose": "5.9.6",

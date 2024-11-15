@@ -4819,13 +4819,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"googleapis@npm:^134.0.0":
-  version: 134.0.0
-  resolution: "googleapis@npm:134.0.0"
+"googleapis@npm:^144.0.0":
+  version: 144.0.0
+  resolution: "googleapis@npm:144.0.0"
   dependencies:
     google-auth-library: "npm:^9.0.0"
     googleapis-common: "npm:^7.0.0"
-  checksum: 10c0/6291bffe382fc29d754e418fe58f800e7e2bb0141b45c51e97b64540a064c49fecb00826d6bf765ab955ee22063aa8673fff191a916faa3c5b0e0db8a9ba326f
+  checksum: 10c0/a5ad4c5be32817f7960fac2aa52b1bbc658242ed1874fb08ed84dbdf36b9fa401077e6e425928e453629d14b1f0d54ee31a1dc0959705465b489f31bd3f36f4a
   languageName: node
   linkType: hard
 
@@ -5114,7 +5114,7 @@ __metadata:
     cbor-x: "npm:^1.6.0"
     eslint: "npm:9.14.0"
     fp-ts: "npm:^2.16.9"
-    googleapis: "npm:^134.0.0"
+    googleapis: "npm:^144.0.0"
     io-ts: "npm:^2.2.21"
     io-wallet-common: "workspace:^"
     jose: "npm:5.9.6"
