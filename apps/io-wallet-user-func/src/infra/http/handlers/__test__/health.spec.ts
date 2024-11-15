@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { PidIssuerHealthCheck } from "@/infra/pid-issuer/health-check";
 import { CosmosClient, DatabaseAccount, ResourceResponse } from "@azure/cosmos";
 import * as H from "@pagopa/handler-kit";
