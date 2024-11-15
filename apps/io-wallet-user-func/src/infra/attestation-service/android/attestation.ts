@@ -109,7 +109,7 @@ const validateKeyAttestationExtension = (
    * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
    * 3) appending that certificate to the original certificate chain.
    */
-  const certWithExtension = x509Chain.findLast((certificate) => {
+  const certWithExtension = x509Chain.find((certificate) => {
     const ext = extractExtension(certificate, KEY_OID);
     return ext ?? false;
   });
