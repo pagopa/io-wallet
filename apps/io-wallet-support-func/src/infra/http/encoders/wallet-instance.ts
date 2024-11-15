@@ -5,7 +5,10 @@ import {
   AndroidDeviceDetails,
   IosDeviceDetails,
 } from "io-wallet-common/device-details";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
+import {
+  RevocationReason,
+  WalletInstance,
+} from "io-wallet-common/wallet-instance";
 
 const androidDevicePlatform = AndroidDeviceDetails.types[0].props.platform;
 
@@ -34,6 +37,7 @@ const WalletInstanceApiModel = t.intersection([
   }),
   t.partial({
     device_details: DeviceDetails,
+    revocation_reason: RevocationReason,
     revoked_at: IsoDateFromString,
   }),
 ]);
@@ -56,6 +60,9 @@ export const WalletInstanceToApiModel: t.Encoder<
     is_revoked: isRevoked,
     ...("revokedAt" in additionalFields && {
       revoked_at: additionalFields.revokedAt,
+    }),
+    ...("revocationReason" in additionalFields && {
+      revocation_reason: additionalFields.revocationReason,
     }),
     ...(deviceDetails && {
       device_details: {
