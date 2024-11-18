@@ -13,6 +13,12 @@
     </inbound>
     <outbound>
         <base />
+        <set-body template="liquid">
+            {
+                "id": "{{body.id}}",
+                "is_revoked": {{body.is_revoked}}
+            }
+        </set-body>
     </outbound>
     <backend>
         <base />

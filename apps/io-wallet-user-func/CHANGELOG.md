@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.0.1
+
+### Patch Changes
+
+- 125dfbe: Added getWalletInstance endpoint
+
 ## 2.0.0
 
 ### Major Changes
