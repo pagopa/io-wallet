@@ -50,6 +50,46 @@ export const ANDROID_CRL_URL =
 export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
 
+export const MailUpConfig = t.type({
+  accountSecret: t.string,
+  accountUsername: t.string,
+  enabled: t.boolean,
+  senderEmail: t.string,
+  serviceBaseUrl: t.string,
+});
+
+export type MailUpConfig = t.TypeOf<typeof MailUpConfig>;
+
+export const getMailUpConfiguration: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  MailUpConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    accountSecret: pipe(
+      readFromEnvironment("MailUpAccountSecret"),
+      RE.orElse(() => RE.right("1h")),
+    ),
+    accountUsername: pipe(
+      readFromEnvironment("MailUpAccountUsername"),
+      RE.orElse(() => RE.right("")),
+    ),
+    enabled: pipe(
+      readFromEnvironment("MailUpEnabled"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
+    ),
+    senderEmail: pipe(
+      readFromEnvironment("MailUpSenderEmail"),
+      RE.orElse(() => RE.right("")),
+    ),
+    serviceBaseUrl: pipe(
+      readFromEnvironment("MailUpServiceBaseUrl"),
+      RE.orElse(() => RE.right("")),
+    ),
+  }),
+);
+
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
   jwtDefaultAlg: t.string,
@@ -327,6 +367,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
+    mailup: getMailUpConfiguration,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),
