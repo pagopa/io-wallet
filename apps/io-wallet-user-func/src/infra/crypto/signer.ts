@@ -11,18 +11,7 @@ import * as jose from "jose";
 import { CryptoConfiguration } from "../../app/config";
 import { JwtHeader, Signer } from "../../signer";
 
-const supportedSignAlgorithms = [
-  "ES256",
-  "ES256K",
-  "ES384",
-  "ES512",
-  "RS256",
-  "RS384",
-  "RS512",
-  "PS256",
-  "PS384",
-  "PS512",
-];
+const supportedSignAlgorithms = ["ES256"];
 
 export class CryptoSigner implements Signer {
   #configuration: CryptoConfiguration;
