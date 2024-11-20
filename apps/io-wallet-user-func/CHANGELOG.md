@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.0.2
+
+### Patch Changes
+
+- 0feaede: Remove unused algs
+
 ## 2.0.1
 
 ### Patch Changes
