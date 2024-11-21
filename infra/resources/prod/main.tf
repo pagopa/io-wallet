@@ -34,6 +34,16 @@ resource "azurerm_resource_group" "wallet" {
   tags = local.tags
 }
 
+module "ids" {
+  source = "../_modules/ids"
+
+  project             = local.project
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  tags = local.tags
+}
+
 module "key_vaults" {
   source = "../_modules/key_vaults"
 
