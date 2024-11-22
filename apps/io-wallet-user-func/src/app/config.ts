@@ -50,41 +50,47 @@ export const ANDROID_CRL_URL =
 export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
 
-export const MailUpConfig = t.type({
+export const MailServiceConfig = t.type({
   accountSecret: t.string,
   accountUsername: t.string,
   enabled: t.boolean,
+  requestTimeout: NumberFromString,
   senderEmail: t.string,
   serviceBaseUrl: t.string,
 });
 
-export type MailUpConfig = t.TypeOf<typeof MailUpConfig>;
+export type MailServiceConfig = t.TypeOf<typeof MailServiceConfig>;
 
-export const getMailUpConfiguration: RE.ReaderEither<
+export const getMailServiceConfiguration: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  MailUpConfig
+  MailServiceConfig
 > = pipe(
   sequenceS(RE.Apply)({
     accountSecret: pipe(
-      readFromEnvironment("MailUpAccountSecret"),
+      readFromEnvironment("MailServiceAccountSecret"),
       RE.orElse(() => RE.right("1h")),
     ),
     accountUsername: pipe(
-      readFromEnvironment("MailUpAccountUsername"),
+      readFromEnvironment("MailServiceAccountUsername"),
       RE.orElse(() => RE.right("")),
     ),
     enabled: pipe(
-      readFromEnvironment("MailUpEnabled"),
+      readFromEnvironment("MailServiceEnabled"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
     ),
+    requestTimeout: pipe(
+      readFromEnvironment("MailServiceRequestTimeout"),
+      RE.chainW(stringToNumberDecoderRE),
+      RE.orElse(() => RE.right(5_000)),
+    ),
     senderEmail: pipe(
-      readFromEnvironment("MailUpSenderEmail"),
+      readFromEnvironment("MailServiceSenderEmail"),
       RE.orElse(() => RE.right("")),
     ),
     serviceBaseUrl: pipe(
-      readFromEnvironment("MailUpServiceBaseUrl"),
+      readFromEnvironment("MailServiceBaseUrl"),
       RE.orElse(() => RE.right("")),
     ),
   }),
@@ -152,6 +158,7 @@ export const Config = t.type({
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
+  mailService: MailServiceConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
 });
@@ -367,7 +374,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
-    mailup: getMailUpConfiguration,
+    mailService: getMailServiceConfiguration,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),

@@ -3,6 +3,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
+import { sendEmail } from "@/email-provider";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
@@ -78,6 +79,16 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 walletInstanceRequest.hardwareKeyTag,
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
+            ),
+            RTE.map(() =>
+              sendEmail({
+                accountSecret: "",
+                accountUsername: "",
+                enabled: true,
+                requestTimeout: 5000,
+                senderEmail: "",
+                serviceBaseUrl: "",
+              })(),
             ),
           ),
         ),

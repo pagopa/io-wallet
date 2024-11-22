@@ -41,10 +41,11 @@
     "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED",
     "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK",
-    "MailUpServiceBaseUrl": "MAILUP_SERVICE_BASE_URL",
-    "MailUpAccountUsername": "MAILUP_ACCOUNT_USERNAME",
-    "MailUpAccountSecret": "MAILUP_ACCOUNT_SECRET",
-    "MailUpSenderEmail": "MAILUP_SENDER_EMAIL",
-    "MailUpEnabled": "MAILUP_ENABLED"
+    "MailServiceBaseUrl": "MAIL_SERVICE_BASE_URL",
+    "MailServiceAccountUsername": "MAIL_SERVICE_ACCOUNT_USERNAME",
+    "MailServiceAccountSecret": "MAIL_SERVICE_ACCOUNT_SECRET",
+    "MailServiceSenderEmail": "MAIL_SERVICE_SENDER_EMAIL",
+    "MailServiceRequestTimeout": "MAIL_SERVICE_REQUEST_TIMEOUT",
+    "MailServiceEnabled": "MAIL_SERVICE_ENABLED"
   }
 }
