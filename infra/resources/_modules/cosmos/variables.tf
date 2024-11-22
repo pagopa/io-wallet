@@ -39,3 +39,8 @@ variable "action_group_io_id" {
   type        = string
   description = "Id of the Action Group shared among all IO teams"
 }
+
+variable "user_assigned_managed_identity_id" {
+  type        = string
+  description = ""
+}
