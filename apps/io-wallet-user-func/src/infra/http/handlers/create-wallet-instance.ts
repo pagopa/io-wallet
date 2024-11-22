@@ -82,12 +82,12 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             ),
             RTE.map(() =>
               sendEmail({
-                accountSecret: "",
-                accountUsername: "",
-                enabled: true,
-                requestTimeout: 5000,
-                senderEmail: "",
-                serviceBaseUrl: "",
+                accountSecret: "", // to do
+                accountUsername: "", // to do
+                enabled: true, // to do
+                requestTimeout: 5000, // to do
+                senderEmail: "", // to do
+                serviceBaseUrl: "", // to do
               })(),
             ),
           ),
