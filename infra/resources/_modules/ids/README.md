@@ -33,5 +33,7 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_psn_identity"></a> [psn\_identity](#output\_psn\_identity) | n/a |
 <!-- END_TF_DOCS -->

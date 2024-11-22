@@ -82,6 +82,8 @@ module "cosmos" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
+  user_assigned_managed_identity_id = module.ids.psn_identity.id
+
   tags = local.tags
 }
 
