@@ -1,5 +1,16 @@
 # io-wallet-support-func
 
+## 1.4.0
+
+### Minor Changes
+
+- 94c97c3: Added migrateWalletInstances user function and updated repository dependencies
+
+### Patch Changes
+
+- Updated dependencies [94c97c3]
+  - io-wallet-common@1.3.0
+
 ## 1.3.4
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # io-wallet-user-func
 
+## 2.1.0
+
+### Minor Changes
+
+- 94c97c3: Added migrateWalletInstances user function and updated repository dependencies
+
+### Patch Changes
+
+- Updated dependencies [94c97c3]
+  - io-wallet-common@1.3.0
+
 ## 2.0.2
 
 ### Patch Changes
