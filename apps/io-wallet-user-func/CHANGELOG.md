@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.1.2
+
+### Patch Changes
+
+- d1179a6: Updated migrateWalletInstances function
+
 ## 2.1.1
 
 ### Patch Changes
