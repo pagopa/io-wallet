@@ -26,16 +26,16 @@
     "@azure/cosmos": "^4.1.1",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/logger": "^1.0.1",
-    "@pagopa/ts-commons": "^13.1.1",
-    "applicationinsights": "^3.3.0",
-    "fp-ts": "^2.16.0",
-    "io-ts": "^2.2.20"
+    "@pagopa/ts-commons": "^13.1.2",
+    "applicationinsights": "^3.4.0",
+    "fp-ts": "^2.16.9",
+    "io-ts": "^2.2.21"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",
-    "eslint": "8.57.0",
-    "prettier": "3.2.5",
-    "typescript": "^5.4.5",
-    "vitest": "^1.5.0"
+    "eslint": "9.14.0",
+    "prettier": "3.3.3",
+    "typescript": "5.6.3",
+    "vitest": "^2.1.5"
   }
 }
