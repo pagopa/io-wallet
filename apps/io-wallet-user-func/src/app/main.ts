@@ -237,7 +237,6 @@ app.storageQueue("validateWalletInstance", {
 app.cosmosDB("migrateWalletInstances", {
   connection: "CosmosDbEndpoint",
   containerName: "wallet-instances",
-  createLeaseCollectionIfNotExists: true,
   databaseName: config.azure.cosmos.dbName,
   handler: MigrateWalletInstancesFunction({
     inputDecoder: t.array(WalletInstance),
