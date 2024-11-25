@@ -15,7 +15,7 @@ locals {
       name               = "nonces"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 2000
+        max_throughput = 4000
       }
       default_ttl = 300
     },
