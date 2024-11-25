@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
