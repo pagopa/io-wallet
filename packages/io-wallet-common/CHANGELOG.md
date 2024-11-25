@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.3.0
+
+### Minor Changes
+
+- 94c97c3: Added migrateWalletInstances user function and updated repository dependencies
+
 ## 1.2.1
 
 ### Patch Changes
