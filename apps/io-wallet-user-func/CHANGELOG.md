@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 2.1.1
+
+### Patch Changes
+
+- 1671ade: Updated turbo dependency version
+- Updated dependencies [1671ade]
+  - io-wallet-common@1.3.1
+
 ## 2.1.0
 
 ### Minor Changes

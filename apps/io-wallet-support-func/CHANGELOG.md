@@ -1,5 +1,13 @@
 # io-wallet-support-func
 
+## 1.4.1
+
+### Patch Changes
+
+- 1671ade: Updated turbo dependency version
+- Updated dependencies [1671ade]
+  - io-wallet-common@1.3.1
+
 ## 1.4.0
 
 ### Minor Changes
