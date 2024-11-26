@@ -23,6 +23,7 @@ No requirements.
 |------|------|
 | [azurerm_key_vault_secret.st_connection_string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_storage_queue.wallet_instances_revocation_check](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
+| [azurerm_storage_queue.wallet_instances_revocation_check_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
 
 ## Inputs
 
@@ -46,5 +47,6 @@ No requirements.
 | Name | Description |
 |------|-------------|
 | <a name="output_revocation_queue_name"></a> [revocation\_queue\_name](#output\_revocation\_queue\_name) | n/a |
+| <a name="output_revocation_queue_name_02"></a> [revocation\_queue\_name\_02](#output\_revocation\_queue\_name\_02) | n/a |
 | <a name="output_wallet"></a> [wallet](#output\_wallet) | n/a |
 <!-- END_TF_DOCS -->
