@@ -235,7 +235,7 @@ app.storageQueue("validateWalletInstance", {
 });
 
 app.cosmosDB("migrateWalletInstances", {
-  connection: "CosmosDbEndpoint",
+  connection: "CosmosDbEndpoint1",
   containerName: "wallet-instances",
   databaseName: config.azure.cosmos.dbName,
   handler: MigrateWalletInstancesFunction({
