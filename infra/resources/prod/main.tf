@@ -106,7 +106,7 @@ module "function_apps" {
   }
 
   cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet_02.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
+  cosmos_database_name = module.cosmos.cosmos_account_wallet_02.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
