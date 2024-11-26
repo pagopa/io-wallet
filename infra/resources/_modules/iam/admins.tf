@@ -10,6 +10,12 @@ module "admins_roles" {
       resource_group_name = var.cosmos_db.resource_group_name
       database            = var.cosmos_db.database_name
       role                = "writer"
+    },
+    {
+      account_name        = var.cosmos_db_02.name
+      resource_group_name = var.cosmos_db_02.resource_group_name
+      database            = var.cosmos_db_02.database_name
+      role                = "writer"
     }
   ]
 
