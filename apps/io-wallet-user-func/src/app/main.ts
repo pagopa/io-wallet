@@ -11,7 +11,6 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
-import { MigrateWalletInstancesFunction } from "@/infra/azure/functions/migrate-wallet-instances";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
@@ -232,23 +231,4 @@ app.storageQueue("validateWalletInstance", {
     walletInstanceRepository,
   }),
   queueName: config.azure.queue.walletInstanceRevocation.name,
-});
-
-app.cosmosDB("migrateWalletInstances", {
-  connection: "CosmosDbEndpoint",
-  containerName: "wallet-instances",
-  databaseName: config.azure.cosmos.dbName,
-  handler: MigrateWalletInstancesFunction({
-    inputDecoder: t.array(WalletInstance),
-    telemetryClient: appInsightsClient,
-  }),
-  leaseContainerName: "leases-migration",
-  maxItemsPerInvocation: 50,
-  return: output.cosmosDB({
-    connection: "CosmosDbConnectionStringTemp",
-    containerName: "wallet-instances",
-    createIfNotExists: false,
-    databaseName: "db",
-  }),
-  startFromBeginning: true,
 });
