@@ -8,6 +8,12 @@ module "func_app_user_02" {
       resource_group_name = var.cosmos_db.resource_group_name
       database            = var.cosmos_db.database_name
       role                = "writer"
+    },
+    {
+      account_name        = var.cosmos_db_02.name
+      resource_group_name = var.cosmos_db_02.resource_group_name
+      database            = var.cosmos_db_02.database_name
+      role                = "writer"
     }
   ]
 
@@ -40,6 +46,12 @@ module "func_app_user_slot_02" {
       account_name        = var.cosmos_db.name
       resource_group_name = var.cosmos_db.resource_group_name
       database            = var.cosmos_db.database_name
+      role                = "writer"
+    },
+    {
+      account_name        = var.cosmos_db_02.name
+      resource_group_name = var.cosmos_db_02.resource_group_name
+      database            = var.cosmos_db_02.database_name
       role                = "writer"
     }
   ]
@@ -75,6 +87,12 @@ module "func_app_support" {
       resource_group_name = var.cosmos_db.resource_group_name
       database            = var.cosmos_db.database_name
       role                = "reader"
+    },
+    {
+      account_name        = var.cosmos_db_02.name
+      resource_group_name = var.cosmos_db_02.resource_group_name
+      database            = var.cosmos_db_02.database_name
+      role                = "reader"
     }
   ]
 
@@ -99,6 +117,12 @@ module "func_app_support_slot" {
       account_name        = var.cosmos_db.name
       resource_group_name = var.cosmos_db.resource_group_name
       database            = var.cosmos_db.database_name
+      role                = "reader"
+    },
+    {
+      account_name        = var.cosmos_db_02.name
+      resource_group_name = var.cosmos_db_02.resource_group_name
+      database            = var.cosmos_db_02.database_name
       role                = "reader"
     }
   ]
