@@ -7,7 +7,6 @@
     "NODE_ENV": "development",
     "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
     "CosmosDbEndpoint__accountEndpoint": "COSMOS_DB_ENDPOINT",
-    "CosmosDbEndpoint1__accountEndpoint": "COSMOS_DB_ENDPOINT_1",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
     "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
