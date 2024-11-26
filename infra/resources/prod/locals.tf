@@ -73,10 +73,6 @@ locals {
       {
         name                  = "AppInsightsConnectionString"
         key_vault_secret_name = "AppInsightsConnectionString"
-      },
-      {
-        name                  = "CosmosDbConnectionStringTemp"
-        key_vault_secret_name = "CosmosDbConnectionStringTemp"
       }
     ]
   }

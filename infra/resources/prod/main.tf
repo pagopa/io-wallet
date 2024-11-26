@@ -105,8 +105,8 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
+  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet_02.endpoint
+  cosmos_database_name = module.cosmos.cosmos_account_wallet_02.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
@@ -116,7 +116,7 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  revocation_queue_name = module.storage_accounts.revocation_queue_name.name
+  revocation_queue_name = module.storage_accounts.revocation_queue_name_02.name
 
   user_func    = local.user_func
   support_func = local.support_func
