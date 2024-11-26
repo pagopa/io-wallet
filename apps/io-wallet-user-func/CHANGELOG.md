@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.1.3
+
+### Patch Changes
+
+- d7e2dba: Changed cosmosdb env var in migrateWalletInstances function
+
 ## 2.1.2
 
 ### Patch Changes
