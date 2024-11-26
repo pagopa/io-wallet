@@ -158,6 +158,17 @@ module "iam" {
     ]
   }
 
+  cosmos_db_02 = {
+    id                  = module.cosmos.cosmos_account_wallet_02.id
+    name                = module.cosmos.cosmos_account_wallet_02.name
+    resource_group_name = module.cosmos.cosmos_account_wallet_02.resource_group_name
+    database_name       = module.cosmos.cosmos_account_wallet_02.database_name
+    admin_ids = [
+      data.azuread_group.io_developers.object_id,
+      data.azuread_group.io_admin.object_id,
+    ]
+  }
+
   function_app = {
     user_func_02 = {
       principal_id         = module.function_apps.function_app_user_02.principal_id
