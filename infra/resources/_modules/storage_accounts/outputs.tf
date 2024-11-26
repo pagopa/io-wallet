@@ -4,6 +4,12 @@ output "revocation_queue_name" {
   }
 }
 
+output "revocation_queue_name_02" {
+  value = {
+    name = azurerm_storage_queue.wallet_instances_revocation_check_02.name
+  }
+}
+
 output "wallet" {
   value = {
     id                            = module.storage_account.id
