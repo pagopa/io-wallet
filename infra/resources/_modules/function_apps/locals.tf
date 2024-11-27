@@ -56,13 +56,13 @@ locals {
   function_app_user = {
     app_settings = merge(local.function_app_user_common_app_settings,
       {
-        for to_disable in local.function_app_user.staging_disabled :
+        for to_disable in local.function_app_user_staging_disabled :
         format("AzureWebJobs.%s.Disabled", to_disable) => false
       }
     )
     slot_app_settings = merge(local.function_app_user_common_app_settings,
       {
-        for to_disable in local.function_app_user.staging_disabled :
+        for to_disable in local.function_app_user_staging_disabled :
         format("AzureWebJobs.%s.Disabled", to_disable) => true
       }
     )
