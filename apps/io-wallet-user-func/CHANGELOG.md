@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.2.1
+
+### Patch Changes
+
+- e6e197b: Changed leaseContainerName for addWalletInstanceToValidationQueue function
+
 ## 2.2.0
 
 ### Minor Changes
