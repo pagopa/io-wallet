@@ -22,8 +22,9 @@ module "function_app_user_02" {
     resource_group_name = var.virtual_network.resource_group_name
   }
 
-  app_settings      = local.function_app_user.app_settings
-  slot_app_settings = local.function_app_user.app_settings
+  app_settings             = local.function_app_user.app_settings
+  slot_app_settings        = local.function_app_user.slot_app_settings
+  sticky_app_setting_names = local.function_app_user_staging_disabled
 
   tier = "xxl"
 
