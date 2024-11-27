@@ -47,7 +47,7 @@ locals {
     }
   )
 
-  function_app_user_staging_disabled = [
+  function_app_user_slot_disabled = [
     "addWalletInstanceToValidationQueue",
     "validateWalletInstance",
     "generateEntityConfiguration"
@@ -56,13 +56,13 @@ locals {
   function_app_user = {
     app_settings = merge(local.function_app_user_common_app_settings,
       {
-        for to_disable in local.function_app_user_staging_disabled :
+        for to_disable in local.function_app_user_slot_disabled :
         format("AzureWebJobs.%s.Disabled", to_disable) => 0
       }
     )
     slot_app_settings = merge(local.function_app_user_common_app_settings,
       {
-        for to_disable in local.function_app_user_staging_disabled :
+        for to_disable in local.function_app_user_slot_disabled :
         format("AzureWebJobs.%s.Disabled", to_disable) => 1
       }
     )
