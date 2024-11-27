@@ -1,0 +1,157 @@
+:root {
+  color-scheme: light dark;
+  supported-color-schemes: light dark;
+}
+
+body,
+.mail-body {
+  background-color: #FFFFFF;
+}
+
+.header {
+  background-color: #FFFFFF;
+  /* border-top: 8px solid #0073E6; */
+}
+
+.section {
+  background-color: #FFFFFF;
+}
+
+.title div {
+  /* Text Primary */
+  color: #17324D !important;
+}
+
+.text div {
+  /* Text Primary */
+  color: #17324D !important;
+}
+
+.text-secondary,
+.text-secondary div {
+  /* Text Secondary */
+  color: #5C6F82 !important;
+}
+
+p {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.text-secondary a,
+.text a {
+  color: #0073E6 !important;
+}
+
+.link {
+  color: #0073E6 !important;
+}
+
+.divider p {
+  border-color: #E3E7EB !important;
+}
+
+/* Message Preview Block */
+
+.message-preview {
+  background-color: #FAFAFA;
+}
+
+@media (prefers-color-scheme: light) {
+
+  .dark-img,
+  [data-ogsc] .dark-img {
+    display: none !important;
+    mso-hide: all !important;
+  }
+
+  .light-img,
+  [data-ogsc] .light-img {
+    display: block;
+    display: block !important;
+  }
+}
+
+@media (min-width: 600px) {
+
+  .mobile {
+    display: none;
+  }
+
+  .desktop {
+    display: block;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+
+  body,
+  .mail-body {
+    background-color: #323232;
+  }
+
+  .header {
+    background-color: #323232;
+    /* border-top: 8px solid #3da2ff; */
+  }
+
+  .section {
+    background-color: #323232;
+  }
+
+  .message-preview {
+    background-color: #424242;
+  }
+
+  .divider p {
+    border-color: #757575 !important;
+  }
+
+  .title div {
+    color: #ffffff !important;
+  }
+
+  .text div {
+    color: #ffffff !important;
+  }
+
+  .text-secondary,
+  .text-secondary div {
+    /* Gray-200 */
+    color: #E0E0E0 !important;
+  }
+
+  .text-secondary a,
+  .text a {
+    color: #3da2ff !important;
+  }
+
+  .link {
+    color: #3da2ff !important;
+  }
+
+  .cta table td,
+  .cta table td>a {
+    background-color: #3da2ff !important;
+  }
+
+  /* IMAGES */
+  /* Source: https://www.litmus.com/blog/the-ultimate-guide-to-dark-mode-for-email-marketers/ */
+
+  .dark-img,
+  [data-ogsc] .dark-img {
+    display: block !important;
+    overflow: visible !important;
+    float: none !important;
+    line-height: auto !important;
+    margin-top: 0px !important;
+    visibility: inherit !important;
+  }
+
+  .light-img,
+  [data-ogsc] .light-img {
+    display: none;
+    display: none !important;
+    mso-hide: all !important;
+  }
+}

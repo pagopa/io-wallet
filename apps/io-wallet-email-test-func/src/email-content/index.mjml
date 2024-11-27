@@ -1,0 +1,104 @@
+<mjml lang="it">
+
+  <!-- HEAD SECTION -->
+  <mj-head>
+    <mj-title>IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO</mj-title>
+    <mj-font
+      name="Titillium Web"
+      href="https://selfcare.pagopa.it/assets/font/selfhostedfonts.css"
+    />
+    <mj-attributes>
+      <mj-all font-family="Titillium Web, system-ui, sans-serif" />
+    </mj-attributes>
+    <mj-raw>
+      <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+      <meta name="color-scheme" content="light dark" />
+      <meta name="supported-color-schemes" content="light dark" />
+    </mj-raw>
+  </mj-head>
+
+  <!-- BODY SECTION -->
+  <mj-body css-class="mail-body">
+    <mj-include path="./style.css" type="css" />
+    <mj-wrapper padding-right="20px" padding-left="20px">
+
+      <!-- LOGO -->
+      <mj-include path="./main-logo.mjml" />
+
+      <!-- CONTENUTO TESTUALE -->
+      <mj-section css-class="section" padding="0px" padding-bottom="8px">
+        <mj-column>
+          <!-- Title & Main Message -->
+          <mj-text
+            css-class="title"
+            font-weight="bold"
+            align="left"
+            padding-top="24px"
+            padding-bottom="8px"
+            padding-left="0px"
+            padding-right="0px"
+            color="#17324D">
+            <h1 style="font-size: 32px; line-height: 36px; margin: 0">
+              IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO
+            </h1>
+          </mj-text>
+          <mj-text
+            css-class="text"
+            font-size="16px"
+            line-height="24px"
+            font-weight="regular"
+            align="left"
+            color="#17324D"
+            padding-top="0px"
+            padding-bottom="0px"
+            padding-left="0px"
+            padding-right="0px">
+            <p>
+              Ciao,<br />
+              il tuo portafoglio sull'app IO è pronto a <strong>ricevere la versione digitale dei<br />
+              tuoi documenti</strong> personali!
+            </p>
+            <p>
+              <strong>Il primo passo: la tua identità digitale</strong>
+            </p>
+            <p>
+              Inizia con la tua identità digitale: è un passaggio necessario per<br />
+              garantire la sicurezza nell'aggiuntadei documenti successivi.
+            </p>
+            <p>
+              Se hai già aggiunto la tua identità digitale al Portafoglio, puoi già<br />
+              proseguire con l'aggiunta degli altri documenti disponibili in fase di<br />
+              sperimentazione.
+            </p>
+            <p>
+              <strong>Utile da sapere</strong>
+            </p>
+            <p>
+              I tuoi documenti sono al sicuro: puoi revocare in qualsiasi momento la<br />
+              funzionalità IT Wallet, anche se non hai più il controllo del dispositivo<br />
+              mobile su cui hai installato l'app IO.
+            </p>
+            <p>
+              Per farlo, clicca su
+              <a href="${handleAccessLink}" style="color: #0073e6" class="link">gestisci accesso</a>.
+            </p>
+            <p>
+              <strong>Domande e risposte</strong>
+            </p>
+            <p>
+              Consulta tutte le FAQ <a href="${faqLink}" style="color: #0073e6" class="link">FAQ</a>
+              su IT Wallet per trovare risposta ad eventuali<br />
+              dubbi.
+            </p>
+          </mj-text>
+        </mj-column>
+      </mj-section>      
+
+      <!-- DIVIDER -->
+      <mj-include path="./divider.mjml" />
+
+      <!-- FOOTER-->
+      <mj-include path="./footer.mjml" />
+    </mj-wrapper>
+  </mj-body>
+</mjml>

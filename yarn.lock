@@ -2139,6 +2139,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pagopa/io-functions-commons@npm:^29.3.0":
+  version: 29.3.0
+  resolution: "@pagopa/io-functions-commons@npm:29.3.0"
+  dependencies:
+    "@azure/cosmos": "npm:^4.0.0"
+    "@azure/data-tables": "npm:^13.2.2"
+    "@pagopa/ts-commons": "npm:^13.1.1"
+    applicationinsights: "npm:^2.9.5"
+    azure-storage: "npm:^2.10.5"
+    cidr-matcher: "npm:^2.1.1"
+    helmet: "npm:^4.6.0"
+    helmet-csp: "npm:^2.5.1"
+    node-fetch: "npm:^2.6.1"
+    nodemailer: "npm:^6.9.13"
+    nodemailer-sendgrid: "npm:^1.0.3"
+    referrer-policy: "npm:^1.1.0"
+    rehype-stringify: "npm:^3.0.0"
+    remark-frontmatter: "npm:^2.0.0"
+    remark-parse: "npm:^5.0.0"
+    remark-rehype: "npm:^3.0.0"
+    request-ip: "npm:^3.3.0"
+    ulid: "npm:^2.3.0"
+    unified: "npm:^9.2.2"
+    winston: "npm:^3.1.0"
+  peerDependencies:
+    "@azure/functions": ^3.2.0
+    express: ^4.15.3
+    fp-ts: ^2.16.5
+    io-ts: ^2.2.21
+  checksum: 10c0/530469426afcf671d47d44310dd04c65efeb66ca067dd80e61f67f349ac60e18764c1be2d6e009f551df7fd29eb10c236ea7fef78ae3c3847fa6073f377a38fb
+  languageName: node
+  linkType: hard
+
 "@pagopa/logger@npm:^1.0.1":
   version: 1.0.1
   resolution: "@pagopa/logger@npm:1.0.1"
@@ -5550,6 +5583,26 @@ __metadata:
     prettier: "npm:3.2.5"
     typescript: "npm:^5.4.5"
     vitest: "npm:^1.5.0"
+  languageName: unknown
+  linkType: soft
+
+"io-wallet-email-test-func@workspace:apps/io-wallet-email-test-func":
+  version: 0.0.0-use.local
+  resolution: "io-wallet-email-test-func@workspace:apps/io-wallet-email-test-func"
+  dependencies:
+    "@azure/functions": "npm:^4.5.1"
+    "@pagopa/eslint-config": "npm:^4.0.1"
+    "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
+    "@pagopa/io-functions-commons": "npm:^29.3.0"
+    "@pagopa/ts-commons": "npm:^13.1.1"
+    azure-functions-core-tools: "npm:^4.0.5907"
+    eslint: "npm:8.57.0"
+    fp-ts: "npm:^2.16.9"
+    io-ts: "npm:^2.2.21"
+    io-wallet-common: "workspace:^"
+    prettier: "npm:3.2.5"
+    tsup: "npm:^8.0.2"
+    typescript: "npm:^5.4.5"
   languageName: unknown
   linkType: soft
 
