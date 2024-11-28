@@ -44,7 +44,7 @@
     "MailhogHost": "MAILHOG_HOST",
     "MailupUsername": "MAILUP_USERNAME",
     "MailupSecret": "MAILUP_SECRET",
-    "MailEnabled": "MAIL_ENABLED",
+    "MailFeatureFlag": "MAIL_ENABLED",
     "MailSender": "MAIL_SENDER"
   }
 }

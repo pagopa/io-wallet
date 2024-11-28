@@ -26,7 +26,7 @@ describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
   const mailConfigMock = {
-    enabled: false,
+    mailFeatureFlag: false,
     mailSender: "",
     mailhogHost: "",
     mailupSecret: "",

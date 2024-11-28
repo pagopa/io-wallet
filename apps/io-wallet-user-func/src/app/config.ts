@@ -51,7 +51,7 @@ export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
 
 export const MailConfig = t.type({
-  enabled: t.boolean,
+  mailFeatureFlag: t.boolean,
   mailSender: t.string,
   mailhogHost: t.string,
   mailupSecret: t.string,
@@ -66,8 +66,8 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
   MailConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    enabled: pipe(
-      readFromEnvironment("MailEnabled"),
+    mailFeatureFlag: pipe(
+      readFromEnvironment("MailFeatureFlag"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
     ),

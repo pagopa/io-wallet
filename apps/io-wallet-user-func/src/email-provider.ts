@@ -26,7 +26,7 @@ export const sendEmail: (
     pipe(
       TE.tryCatch(
         async () => {
-          if (!configs.mail.enabled) {
+          if (!configs.mail.mailFeatureFlag) {
             return;
           }
 
