@@ -41,6 +41,11 @@ export const sendEmailHandler = async () => {
 
     // eslint-disable-next-line no-console, @typescript-eslint/no-explicit-any
     console.log("result is ", (result as any).left);
+
+    return {
+      body: "Test executed",
+      status: 200,
+    };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log("error is ", error);
