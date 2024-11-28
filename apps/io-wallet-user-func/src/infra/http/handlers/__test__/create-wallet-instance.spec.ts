@@ -25,6 +25,14 @@ const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
+  const mailConfigMock = {
+    enabled: false,
+    mailSender: "",
+    mailhogHost: "",
+    mailupSecret: "",
+    mailupUsername: "",
+  };
+
   const walletInstanceRequest = {
     challenge,
     fiscal_code: mockFiscalCode,
@@ -87,6 +95,7 @@ describe("CreateWalletInstanceHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      mail: mailConfigMock,
       nonceRepository,
       telemetryClient,
       walletInstanceRepository,
@@ -113,6 +122,7 @@ describe("CreateWalletInstanceHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      mail: mailConfigMock,
       nonceRepository,
       telemetryClient,
       walletInstanceRepository,
@@ -144,6 +154,7 @@ describe("CreateWalletInstanceHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      mail: mailConfigMock,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       telemetryClient,
       walletInstanceRepository,
@@ -180,6 +191,7 @@ describe("CreateWalletInstanceHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      mail: mailConfigMock,
       nonceRepository,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
@@ -215,6 +227,7 @@ describe("CreateWalletInstanceHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      mail: mailConfigMock,
       nonceRepository,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
@@ -251,6 +264,7 @@ describe("CreateWalletInstanceHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      mail: mailConfigMock,
       nonceRepository,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
