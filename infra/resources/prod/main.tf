@@ -34,6 +34,16 @@ resource "azurerm_resource_group" "wallet" {
   tags = local.tags
 }
 
+module "ids" {
+  source = "../_modules/ids"
+
+  project             = local.project
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  tags = local.tags
+}
+
 module "key_vaults" {
   source = "../_modules/key_vaults"
 
@@ -72,6 +82,8 @@ module "cosmos" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
+  user_assigned_managed_identity_id = module.ids.psn_identity.id
+
   tags = local.tags
 }
 
@@ -93,8 +105,8 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
+  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet_02.endpoint
+  cosmos_database_name = module.cosmos.cosmos_account_wallet_02.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
@@ -104,7 +116,7 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  revocation_queue_name = module.storage_accounts.revocation_queue_name.name
+  revocation_queue_name = module.storage_accounts.revocation_queue_name_02.name
 
   user_func    = local.user_func
   support_func = local.support_func
@@ -140,6 +152,17 @@ module "iam" {
     name                = module.cosmos.cosmos_account_wallet.name
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
     database_name       = module.cosmos.cosmos_account_wallet.database_name
+    admin_ids = [
+      data.azuread_group.io_developers.object_id,
+      data.azuread_group.io_admin.object_id,
+    ]
+  }
+
+  cosmos_db_02 = {
+    id                  = module.cosmos.cosmos_account_wallet_02.id
+    name                = module.cosmos.cosmos_account_wallet_02.name
+    resource_group_name = module.cosmos.cosmos_account_wallet_02.resource_group_name
+    database_name       = module.cosmos.cosmos_account_wallet_02.database_name
     admin_ids = [
       data.azuread_group.io_developers.object_id,
       data.azuread_group.io_admin.object_id,

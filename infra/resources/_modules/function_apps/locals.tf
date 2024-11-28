@@ -76,8 +76,9 @@ locals {
   function_apps = {
     common_app_settings = {
       CosmosDbEndpoint__accountEndpoint = var.cosmos_db_endpoint
-      CosmosDbDatabaseName              = var.cosmos_database_name
-      CosmosDbRequestTimeout            = "5000"
+
+      CosmosDbDatabaseName   = var.cosmos_database_name
+      CosmosDbRequestTimeout = "5000"
 
       PidIssuerApiRequestTimeout = "10000"
 

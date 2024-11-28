@@ -1,5 +1,42 @@
 # io-wallet-user-func
 
+## 2.2.0
+
+### Minor Changes
+
+- 02fd0bb: Removed migrateWalletInstances function
+
+## 2.1.3
+
+### Patch Changes
+
+- d7e2dba: Changed cosmosdb env var in migrateWalletInstances function
+
+## 2.1.2
+
+### Patch Changes
+
+- d1179a6: Updated migrateWalletInstances function
+
+## 2.1.1
+
+### Patch Changes
+
+- 1671ade: Updated turbo dependency version
+- Updated dependencies [1671ade]
+  - io-wallet-common@1.3.1
+
+## 2.1.0
+
+### Minor Changes
+
+- 94c97c3: Added migrateWalletInstances user function and updated repository dependencies
+
+### Patch Changes
+
+- Updated dependencies [94c97c3]
+  - io-wallet-common@1.3.0
+
 ## 2.0.2
 
 ### Patch Changes
