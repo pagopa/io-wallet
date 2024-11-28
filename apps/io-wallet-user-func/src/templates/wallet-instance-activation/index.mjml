@@ -25,7 +25,7 @@
       <!-- LOGO -->
       <mj-include path="./main-logo.mjml" />
 
-      <!-- CONTENUTO TESTUALE -->
+      <!-- TEXT CONTENT -->
       <mj-section css-class="section" padding="0px" padding-bottom="8px">
         <mj-column>
           <!-- Title & Main Message -->
