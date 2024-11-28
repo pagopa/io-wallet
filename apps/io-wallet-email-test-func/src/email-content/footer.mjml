@@ -8,9 +8,7 @@
       color="#5C6F82"
       padding="0px"
     >
-      <p>
-        Ricevi questo messaggio perché hai un'utenza attiva su App IO.
-      </p>
+      <p>Ricevi questo messaggio perché hai un'utenza attiva su App IO.</p>
     </mj-text>
   </mj-column>
 </mj-section>

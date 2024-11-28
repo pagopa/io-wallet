@@ -5,32 +5,32 @@
 
 body,
 .mail-body {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .header {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   /* border-top: 8px solid #0073E6; */
 }
 
 .section {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .title div {
   /* Text Primary */
-  color: #17324D !important;
+  color: #17324d !important;
 }
 
 .text div {
   /* Text Primary */
-  color: #17324D !important;
+  color: #17324d !important;
 }
 
 .text-secondary,
 .text-secondary div {
   /* Text Secondary */
-  color: #5C6F82 !important;
+  color: #5c6f82 !important;
 }
 
 p {
@@ -40,25 +40,24 @@ p {
 
 .text-secondary a,
 .text a {
-  color: #0073E6 !important;
+  color: #0073e6 !important;
 }
 
 .link {
-  color: #0073E6 !important;
+  color: #0073e6 !important;
 }
 
 .divider p {
-  border-color: #E3E7EB !important;
+  border-color: #e3e7eb !important;
 }
 
 /* Message Preview Block */
 
 .message-preview {
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 }
 
 @media (prefers-color-scheme: light) {
-
   .dark-img,
   [data-ogsc] .dark-img {
     display: none !important;
@@ -73,7 +72,6 @@ p {
 }
 
 @media (min-width: 600px) {
-
   .mobile {
     display: none;
   }
@@ -84,7 +82,6 @@ p {
 }
 
 @media (prefers-color-scheme: dark) {
-
   body,
   .mail-body {
     background-color: #323232;
@@ -118,7 +115,7 @@ p {
   .text-secondary,
   .text-secondary div {
     /* Gray-200 */
-    color: #E0E0E0 !important;
+    color: #e0e0e0 !important;
   }
 
   .text-secondary a,
@@ -131,7 +128,7 @@ p {
   }
 
   .cta table td,
-  .cta table td>a {
+  .cta table td > a {
     background-color: #3da2ff !important;
   }
 
