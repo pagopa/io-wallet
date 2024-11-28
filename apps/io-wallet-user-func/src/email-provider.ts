@@ -22,33 +22,35 @@ export const sendEmail: (
           }
           const userEmail = ""; // to do - get the email by fiscalCode
 
-          await sendMail(
-            getMailerTransporter({
-              MAIL_FROM: configs.mail.mailhogHost?.length
-                ? configs.mail.mailSender
-                : userEmail,
-              MAIL_TRANSPORTS: undefined,
-              MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
-                ? configs.mail.mailhogHost
-                : undefined,
-              MAILUP_SECRET: configs.mail.mailupSecret?.length
-                ? configs.mail.mailupSecret
-                : undefined,
-              MAILUP_USERNAME: configs.mail.mailupUsername?.length
-                ? configs.mail.mailupUsername
-                : undefined,
-              NODE_ENV: "development",
-              SENDGRID_API_KEY: undefined,
-            } as never),
-            {
-              from: configs.mail.mailSender,
-              html: emailTemplate,
-              subject:
-                "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
-              text: "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
-              to: userEmail,
-            },
-          )();
+          const mailTransporter = await getMailerTransporter({
+            MAIL_FROM: configs.mail.mailhogHost?.length
+              ? configs.mail.mailSender
+              : userEmail,
+            MAIL_TRANSPORTS: undefined,
+            MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
+              ? configs.mail.mailhogHost
+              : undefined,
+            MAILUP_SECRET: configs.mail.mailupSecret?.length
+              ? configs.mail.mailupSecret
+              : undefined,
+            MAILUP_USERNAME: configs.mail.mailupUsername?.length
+              ? configs.mail.mailupUsername
+              : undefined,
+            NODE_ENV: "development",
+            SENDGRID_API_KEY: undefined,
+          } as never);
+
+          await sendMail(mailTransporter, {
+            from: configs.mail.mailSender,
+            html: emailTemplate(
+              "to do", // faq link
+              "to do", // access link
+            ),
+            subject:
+              "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
+            text: "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
+            to: "test@test.test", // userEmail,
+          })();
         },
         (error) => new Error(String(error)),
       ),

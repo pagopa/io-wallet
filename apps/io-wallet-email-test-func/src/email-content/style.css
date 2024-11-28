@@ -10,7 +10,7 @@ body,
 
 .header {
   background-color: #ffffff;
-  /* border-top: 8px solid #0073E6; */
+  /* border-top: 8px solid #0162c3; */
 }
 
 .section {
@@ -30,7 +30,7 @@ body,
 .text-secondary,
 .text-secondary div {
   /* Text Secondary */
-  color: #5c6f82 !important;
+  color: #A2ADB8 !important;
 }
 
 p {
@@ -40,11 +40,11 @@ p {
 
 .text-secondary a,
 .text a {
-  color: #0073e6 !important;
+  color: #0162c3 !important;
 }
 
 .link {
-  color: #0073e6 !important;
+  color: #0162c3 !important;
 }
 
 .divider p {
@@ -84,16 +84,16 @@ p {
 @media (prefers-color-scheme: dark) {
   body,
   .mail-body {
-    background-color: #323232;
+    background-color: #FFF;
   }
 
   .header {
-    background-color: #323232;
+    background-color: #FFF;
     /* border-top: 8px solid #3da2ff; */
   }
 
   .section {
-    background-color: #323232;
+    background-color: #FFF;
   }
 
   .message-preview {
