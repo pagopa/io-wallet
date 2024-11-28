@@ -50,47 +50,41 @@ export const ANDROID_CRL_URL =
 export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
 
-export const MailServiceConfig = t.type({
-  accountSecret: t.string,
-  accountUsername: t.string,
+export const MailConfig = t.type({
   enabled: t.boolean,
-  requestTimeout: NumberFromString,
-  senderEmail: t.string,
-  serviceBaseUrl: t.string,
+  mailSender: t.string,
+  mailhogHost: t.string,
+  mailupSecret: t.string,
+  mailupUsername: t.string,
 });
 
-export type MailServiceConfig = t.TypeOf<typeof MailServiceConfig>;
+export type MailConfig = t.TypeOf<typeof MailConfig>;
 
-export const getMailServiceConfiguration: RE.ReaderEither<
+export const getMailConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  MailServiceConfig
+  MailConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    accountSecret: pipe(
-      readFromEnvironment("MailServiceAccountSecret"),
-      RE.orElse(() => RE.right("1h")),
-    ),
-    accountUsername: pipe(
-      readFromEnvironment("MailServiceAccountUsername"),
-      RE.orElse(() => RE.right("")),
-    ),
     enabled: pipe(
-      readFromEnvironment("MailServiceEnabled"),
+      readFromEnvironment("MailEnabled"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
     ),
-    requestTimeout: pipe(
-      readFromEnvironment("MailServiceRequestTimeout"),
-      RE.chainW(stringToNumberDecoderRE),
-      RE.orElse(() => RE.right(5_000)),
-    ),
-    senderEmail: pipe(
-      readFromEnvironment("MailServiceSenderEmail"),
+    mailSender: pipe(
+      readFromEnvironment("MailSender"),
       RE.orElse(() => RE.right("")),
     ),
-    serviceBaseUrl: pipe(
-      readFromEnvironment("MailServiceBaseUrl"),
+    mailhogHost: pipe(
+      readFromEnvironment("MailhogHost"),
+      RE.orElse(() => RE.right("")),
+    ),
+    mailupSecret: pipe(
+      readFromEnvironment("MailupSecret"),
+      RE.orElse(() => RE.right("")),
+    ),
+    mailupUsername: pipe(
+      readFromEnvironment("MailupUsername"),
       RE.orElse(() => RE.right("")),
     ),
   }),
@@ -158,7 +152,7 @@ export const Config = t.type({
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
-  mailService: MailServiceConfig,
+  mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
 });
@@ -374,7 +368,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
-    mailService: getMailServiceConfiguration,
+    mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),

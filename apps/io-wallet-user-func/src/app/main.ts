@@ -117,6 +117,7 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
+      mail: config.mail,
       nonceRepository,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,

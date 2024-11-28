@@ -5,7 +5,7 @@ import {
 
 export const sendEmailHandler = async () => {
   try {
-    // --------- directly from io-functon-common ---------
+    // --------- MAILUP CONFIG - directly from io-functon-common ---------
     // export const MailupMailerConfig = t.interface({
     //     MAILHOG_HOSTNAME: t.undefined,
     //     MAILUP_SECRET: NonEmptyString,
@@ -41,10 +41,6 @@ export const sendEmailHandler = async () => {
 
     // eslint-disable-next-line no-console, @typescript-eslint/no-explicit-any
     console.log("result is ", (result as any).left);
-
-    return {
-      body: "Email sent!",
-    };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log("error is ", error);

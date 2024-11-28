@@ -1,66 +1,55 @@
+import emailTemplate from "@/templates/wallet-instance-activation/index.html";
+import {
+  getMailerTransporter,
+  sendMail,
+} from "@pagopa/io-functions-commons/dist/src/mailer";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
+import { pipe } from "fp-ts/lib/function";
 
-import { type MailServiceConfig } from "./app/config";
+import { MailConfig } from "./app/config";
 
-export const sendEmail = (mailServiceConfig: MailServiceConfig) =>
-  mailServiceConfig.enabled
-    ? TE.tryCatch(
+export const sendEmail: (
+  fiscalCode: string,
+) => RTE.ReaderTaskEither<{ mail: MailConfig }, Error, void> =
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (fiscalCode) => (configs) =>
+    pipe(
+      TE.tryCatch(
         async () => {
-          await fetch(
-            new URL(`/messages/sendmessage`, mailServiceConfig.serviceBaseUrl),
+          if (!configs.mail.enabled) {
+            return;
+          }
+          const userEmail = ""; // to do - get the email by fiscalCode
+
+          await sendMail(
+            getMailerTransporter({
+              MAIL_FROM: configs.mail.mailhogHost?.length
+                ? configs.mail.mailSender
+                : userEmail,
+              MAIL_TRANSPORTS: undefined,
+              MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
+                ? configs.mail.mailhogHost
+                : undefined,
+              MAILUP_SECRET: configs.mail.mailupSecret?.length
+                ? configs.mail.mailupSecret
+                : undefined,
+              MAILUP_USERNAME: configs.mail.mailupUsername?.length
+                ? configs.mail.mailupUsername
+                : undefined,
+              NODE_ENV: "development",
+              SENDGRID_API_KEY: undefined,
+            } as never),
             {
-              body: JSON.stringify({
-                Attachments: null,
-                Bcc: [],
-                Cc: [],
-                CharSet: "utf-8",
-                EmbeddedImages: [],
-                ExtendedHeaders: null,
-                From: { Email: "test@test.test", Name: "Test User" },
-                Html: {
-                  Body: "<div>Hello Mr. [firstname] [lastname], how are you today?",
-                  BodyTag: "<body>",
-                  DocType: null,
-                  Head: null,
-                },
-                ReplyTo: null,
-                Subject: "Testing email",
-                Text: "Testing email",
-                To: [
-                  {
-                    Email: "christian.alessandro.atzeni@it.ey.com",
-                    Name: "Christian Alessandro Atzeni",
-                  },
-                ],
-                User: {
-                  Secret: mailServiceConfig.accountSecret,
-                  Username: mailServiceConfig.accountUsername,
-                },
-                XSmtpAPI: {
-                  CampaignCode: "1001",
-                  CampaignName: "Test Campaign",
-                  CampaignReport: null,
-                  ClickTracking: null,
-                  DynamicFields: [
-                    { N: "firstname", V: "Christian Alessandro" },
-                    { N: "lastname", V: "Atzeni" },
-                  ],
-                  Footer: true,
-                  Header: false,
-                  Priority: null,
-                  Schedule: "2021-09-14T17:58+02:00",
-                  SkipDynamicFields: null,
-                  ViewTracking: null,
-                },
-              }),
-              method: "POST",
-              signal: AbortSignal.timeout(mailServiceConfig.requestTimeout),
+              from: configs.mail.mailSender,
+              html: emailTemplate,
+              subject:
+                "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
+              text: "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
+              to: userEmail,
             },
-          );
+          )();
         },
-        (error) =>
-          new Error(
-            `Error occurred while sending email, during the wallet instance creation: ${error}`,
-          ),
-      )
-    : TE.of(true);
+        (error) => new Error(String(error)),
+      ),
+    );

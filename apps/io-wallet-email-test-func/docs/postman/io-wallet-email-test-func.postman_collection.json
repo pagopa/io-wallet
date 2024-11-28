@@ -1,0 +1,40 @@
+{
+  "info": {
+    "_postman_id": "a5c3eede-a759-4b46-a970-4c915c274674",
+    "name": "io-wallet-email-test-func",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "10313594"
+  },
+  "item": [
+    {
+      "name": "healthcheck",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7071/api/v1/wallet/test/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "7071",
+          "path": ["api", "v1", "wallet", "test", "health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "test email send",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7071/api/v1/wallet/test/email",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "7071",
+          "path": ["api", "v1", "wallet", "test", "email"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -80,16 +80,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
-            RTE.map(() =>
-              sendEmail({
-                accountSecret: "", // to do
-                accountUsername: "", // to do
-                enabled: true, // to do
-                requestTimeout: 5000, // to do
-                senderEmail: "", // to do
-                serviceBaseUrl: "", // to do
-              })(),
-            ),
+            RTE.chainW(() => sendEmail(walletInstanceRequest.fiscalCode)),
           ),
         ),
       ),
