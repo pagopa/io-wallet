@@ -5,6 +5,7 @@ import {
 } from "@/attestation-service";
 import { sendEmail } from "@/email-provider";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
+import WalletInstanceActivationEmailTemplate from "@/templates/wallet-instance-activation/index.html";
 import { isLoadTestUser } from "@/user";
 import {
   insertWalletInstance,
@@ -80,7 +81,18 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
-            RTE.chainW(() => sendEmail(walletInstanceRequest.fiscalCode)),
+            RTE.chainW(() =>
+              sendEmail({
+                html: WalletInstanceActivationEmailTemplate(
+                  "to do", // to do - set the faq link
+                  "to do", // to do - set the correct access link
+                ),
+                subject:
+                  "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
+                text: "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
+                to: "test@test.test", // to do - get the email by the fiscal code
+              }),
+            ),
           ),
         ),
       ),

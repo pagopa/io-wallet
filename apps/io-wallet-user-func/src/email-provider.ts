@@ -1,4 +1,3 @@
-import emailTemplate from "@/templates/wallet-instance-activation/index.html";
 import {
   getMailerTransporter,
   sendMail,
@@ -6,26 +5,33 @@ import {
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
+import * as t from "io-ts";
 
 import { MailConfig } from "./app/config";
 
+export const SendEmailParams = t.type({
+  html: t.string,
+  subject: t.string,
+  text: t.string,
+  to: t.string,
+});
+
+export type SendEmailParams = t.TypeOf<typeof SendEmailParams>;
+
 export const sendEmail: (
-  fiscalCode: string,
+  params: SendEmailParams,
 ) => RTE.ReaderTaskEither<{ mail: MailConfig }, Error, void> =
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (fiscalCode) => (configs) =>
+  ({ html, subject, text, to }) =>
+  (configs) =>
     pipe(
       TE.tryCatch(
         async () => {
           if (!configs.mail.enabled) {
             return;
           }
-          const userEmail = ""; // to do - get the email by fiscalCode
 
           const mailTransporter = await getMailerTransporter({
-            MAIL_FROM: configs.mail.mailhogHost?.length
-              ? configs.mail.mailSender
-              : userEmail,
+            MAIL_FROM: configs.mail.mailSender,
             MAIL_TRANSPORTS: undefined,
             MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
               ? configs.mail.mailhogHost
@@ -42,14 +48,10 @@ export const sendEmail: (
 
           await sendMail(mailTransporter, {
             from: configs.mail.mailSender,
-            html: emailTemplate(
-              "to do", // faq link
-              "to do", // access link
-            ),
-            subject:
-              "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
-            text: "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
-            to: "test@test.test", // userEmail,
+            html,
+            subject,
+            text,
+            to,
           })();
         },
         (error) => new Error(String(error)),
