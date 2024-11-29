@@ -1,8 +1,5 @@
-import PagoPaBlueLogo from "@/templates/wallet-instance-activation/logo_app_io.png";
-import PagoPaWhiteLogo from "@/templates/wallet-instance-activation/logo_app_io_white.png";
-
 // eslint-disable-next-line max-lines-per-function
-export default (faqLink: string, handleAccessLink: string): string => `
+export default (faqLink: string, handleAccessLink: string) => `
 <!doctype html>
 <html lang="it" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -130,7 +127,7 @@ export default (faqLink: string, handleAccessLink: string): string => `
     .text-secondary,
     .text-secondary div {
       /* Text Secondary */
-      color: #A2ADB8 !important;
+      color: #a2adb8 !important;
     }
 
     p {
@@ -185,16 +182,16 @@ export default (faqLink: string, handleAccessLink: string): string => `
 
       body,
       .mail-body {
-        background-color: #FFF;
+        background-color: #fff;
       }
 
       .header {
-        background-color: #FFF;
+        background-color: #fff;
         /* border-top: 8px solid #3da2ff; */
       }
 
       .section {
-        background-color: #FFF;
+        background-color: #fff;
       }
 
       .message-preview {
@@ -285,7 +282,7 @@ export default (faqLink: string, handleAccessLink: string): string => `
                                     <tbody>
                                       <tr>
                                         <td style="width:36px;">
-                                          <img alt="" src="${PagoPaBlueLogo}" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="36" height="auto" />
+                                          <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAMAAADQmBKKAAAARVBMVEUAAAAAc+YAcucAc+YAc+YAc+MAcuYAcN8Ac+cAc+QAcuYAcuYAc+QAdOYAc+YAc+gAcucAc+cAceQAdOYAcuYAcuQAc+ZZ8xRTAAAAFnRSTlMA3yDvv0CAEJ+QcN9Qz69vYF8wj49gsM2YIAAAA5ZJREFUeNrtnAlu4zAMRaldXuOk7b//UQdIMMEUY4cWacVG4HcA95mkqaVS6OTk5OTk5GNIoRkc4HzT0wFI0eGJiZZ25uLwC3OlXfnGf3zRjmTMkEmDPj4HitGEBVraBWuwgEu0BxGLRNoDAxwqRD1eEOj9NHhBQ+/H4wUDvR+HFzh6P3gJsXy+0OFSNuAFnlbx2Z99wAt6ej/JYZGO1vLRg+tyiDpLu9BigSvtRLP5J2b7Sx4Hc4+9M36M/W23SX4KjZ8rAucvN1WMGpHNZUZGtACdOvzCtVRO8GDx/dqsx3+UXEyitThD6aK4vyffDU1Q6fCYngQodHiypZoEg1JcS9VIIySMzyDtH54H5kY1+IacSJuTPHAkI2ug4+tgPkA+mA+QD+YDxIP5bLZPlwQ+Vfd8RmyGsxWWKio8qbHg0ZdRit7c575WUEA65v6i9eunK9/YGM/998W1dRPGLwFjSb9SJ4zfgL6U9KsJDPqGbR3THQQBUoUol3SHCVWIfJGmSgHitzPbknE4oBBj7wQw9PTEl3T0XCy0sld4dmfYMD1ILsSVSMmu+VRPKIqEfD0hLxGyqCeEJBDqawr9CIQy5nHR0q15Bv/BL6GU7zgskwVCA+Z5rNN/5mJiVrdVUy6UmHfzKiGkYqHAdNlWJxSKhVrmSZNOqC0WapgnRZ1QUyw0Yh7zyH4yOqGRESro04O9f9lYFgrgGQqEuPdzY84OSiFTLOTAoBNyxUKoK4RT6POFDlfUBgzv/uyHukJeN3TohfRDR1NBSDW4tnKhGxhE048gEHLMJF81QUsCISRmpqCZwpIRCFl6cAvMlsNA5UKNQOiH6fWqZdAkEGrWCl0FQkkg5NLKnFvRZkO5EL7WCXmSCLUCIcRVg8+VFxLn7AGemHwJIfSXzGRMIEQelfAkEwqoxFUgVDNEHUmFJlThKhaiDhXorFyoRwUiCYQqVlFHGqGAzbmqhKjBxgykE0pb17UVCNVMWiStELUVEqYSorFSC+KF6pdRoC2EyHYVCogXqm8USSBU0SiTQKiiUSaBUEWjTNsKka1zsNIobirFGsfhvOYkVi9NWxdK37KlVdgMCd7SIgmziG8Y6A94e+2h0Nipw1N0fojHlij5QByt/kSoXZs4fxV9vZHKmcaC6HC0jq85Hjt5vMDEVPCs/Kvm5CxfVip9qr3fNDI+JtJy6y+N93+vcw25+dn9ZzJOTk5OTk7exR910/wgI592uwAAAABJRU5ErkJggg==" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="36" height="auto" />
                                         </td>
                                       </tr>
                                     </tbody>
@@ -293,7 +290,7 @@ export default (faqLink: string, handleAccessLink: string): string => `
                                 </td>
                               </tr>
                               <div class="dark-img" style="mso-hide: all; display: none; padding: 10px 0px">
-                                <img src="${PagoPaWhiteLogo}" width="36px" class="dark-img" style="display: none" />
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAMAAADQmBKKAAAARVBMVEUAAAAAc+YAcucAc+YAc+YAc+MAcuYAcN8Ac+cAc+QAcuYAcuYAc+QAdOYAc+YAc+gAcucAc+cAceQAdOYAcuYAcuQAc+ZZ8xRTAAAAFnRSTlMA3yDvv0CAEJ+QcN9Qz69vYF8wj49gsM2YIAAAA5ZJREFUeNrtnAlu4zAMRaldXuOk7b//UQdIMMEUY4cWacVG4HcA95mkqaVS6OTk5OTk5GNIoRkc4HzT0wFI0eGJiZZ25uLwC3OlXfnGf3zRjmTMkEmDPj4HitGEBVraBWuwgEu0BxGLRNoDAxwqRD1eEOj9NHhBQ+/H4wUDvR+HFzh6P3gJsXy+0OFSNuAFnlbx2Z99wAt6ej/JYZGO1vLRg+tyiDpLu9BigSvtRLP5J2b7Sx4Hc4+9M36M/W23SX4KjZ8rAucvN1WMGpHNZUZGtACdOvzCtVRO8GDx/dqsx3+UXEyitThD6aK4vyffDU1Q6fCYngQodHiypZoEg1JcS9VIIySMzyDtH54H5kY1+IacSJuTPHAkI2ug4+tgPkA+mA+QD+YDxIP5bLZPlwQ+Vfd8RmyGsxWWKio8qbHg0ZdRit7c575WUEA65v6i9eunK9/YGM/998W1dRPGLwFjSb9SJ4zfgL6U9KsJDPqGbR3THQQBUoUol3SHCVWIfJGmSgHitzPbknE4oBBj7wQw9PTEl3T0XCy0sld4dmfYMD1ILsSVSMmu+VRPKIqEfD0hLxGyqCeEJBDqawr9CIQy5nHR0q15Bv/BL6GU7zgskwVCA+Z5rNN/5mJiVrdVUy6UmHfzKiGkYqHAdNlWJxSKhVrmSZNOqC0WapgnRZ1QUyw0Yh7zyH4yOqGRESro04O9f9lYFgrgGQqEuPdzY84OSiFTLOTAoBNyxUKoK4RT6POFDlfUBgzv/uyHukJeN3TohfRDR1NBSDW4tnKhGxhE048gEHLMJF81QUsCISRmpqCZwpIRCFl6cAvMlsNA5UKNQOiH6fWqZdAkEGrWCl0FQkkg5NLKnFvRZkO5EL7WCXmSCLUCIcRVg8+VFxLn7AGemHwJIfSXzGRMIEQelfAkEwqoxFUgVDNEHUmFJlThKhaiDhXorFyoRwUiCYQqVlFHGqGAzbmqhKjBxgykE0pb17UVCNVMWiStELUVEqYSorFSC+KF6pdRoC2EyHYVCogXqm8USSBU0SiTQKiiUSaBUEWjTNsKka1zsNIobirFGsfhvOYkVi9NWxdK37KlVdgMCd7SIgmziG8Y6A94e+2h0Nipw1N0fojHlij5QByt/kSoXZs4fxV9vZHKmcaC6HC0jq85Hjt5vMDEVPCs/Kvm5CxfVip9qr3fNDI+JtJy6y+N93+vcw25+dn9ZzJOTk5OTk7exR910/wgI592uwAAAABJRU5ErkJggg==" width="36px" class="dark-img" style="display: none" />
                               </div>
                             </tbody>
                           </table>
