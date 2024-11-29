@@ -23,37 +23,36 @@ export const sendEmail: (
 ) => RTE.ReaderTaskEither<{ mail: MailConfig }, Error, void> =
   ({ html, subject, text, to }) =>
   (configs) =>
-    pipe(
-      TE.tryCatch(
-        async () => {
-          if (!configs.mail.mailFeatureFlag) {
-            return;
-          }
-
-          const mailTransporter = await getMailerTransporter({
-            MAIL_FROM: configs.mail.mailSender,
-            MAIL_TRANSPORTS: undefined,
-            MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
-              ? configs.mail.mailhogHost
-              : undefined,
-            MAILUP_SECRET: configs.mail.mailupSecret?.length
-              ? configs.mail.mailupSecret
-              : undefined,
-            MAILUP_USERNAME: configs.mail.mailupUsername?.length
-              ? configs.mail.mailupUsername
-              : undefined,
-            NODE_ENV: "development",
-            SENDGRID_API_KEY: undefined,
-          } as never);
-
-          await sendMail(mailTransporter, {
-            from: configs.mail.mailSender,
-            html,
-            subject,
-            text,
-            to,
-          })();
-        },
-        (error) => new Error(String(error)),
-      ),
-    );
+    configs.mail.mailFeatureFlag
+      ? pipe(
+          TE.tryCatch(
+            async () => {
+              await sendMail(
+                getMailerTransporter({
+                  MAIL_FROM: configs.mail.mailSender,
+                  MAIL_TRANSPORTS: undefined,
+                  MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
+                    ? configs.mail.mailhogHost
+                    : undefined,
+                  MAILUP_SECRET: configs.mail.mailupSecret?.length
+                    ? configs.mail.mailupSecret
+                    : undefined,
+                  MAILUP_USERNAME: configs.mail.mailupUsername?.length
+                    ? configs.mail.mailupUsername
+                    : undefined,
+                  NODE_ENV: "development",
+                  SENDGRID_API_KEY: undefined,
+                } as never),
+                {
+                  from: configs.mail.mailSender,
+                  html,
+                  subject,
+                  text,
+                  to,
+                },
+              )();
+            },
+            (error) => new Error(String(error)),
+          ),
+        )
+      : TE.right(undefined);
