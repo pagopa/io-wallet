@@ -28,7 +28,6 @@ describe("CreateWalletInstanceHandler", () => {
   const mailConfigMock = {
     mailFeatureFlag: false,
     mailSender: "",
-    mailupHost: "",
     mailupSecret: "",
     mailupUsername: "",
   };

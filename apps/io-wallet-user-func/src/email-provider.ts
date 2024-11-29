@@ -27,10 +27,10 @@ export const sendEmail: (
           getMailerTransporter({
             MAIL_FROM: configs.mail.mailSender,
             MAIL_TRANSPORTS: undefined,
-            MAILHOG_HOSTNAME: configs.mail.mailupHost,
+            MAILHOG_HOSTNAME: undefined,
             MAILUP_SECRET: configs.mail.mailupSecret,
             MAILUP_USERNAME: configs.mail.mailupUsername,
-            NODE_ENV: "development",
+            NODE_ENV: "production",
             SENDGRID_API_KEY: undefined,
           } as never),
           {
