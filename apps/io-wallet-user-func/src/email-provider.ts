@@ -31,15 +31,9 @@ export const sendEmail: (
                 getMailerTransporter({
                   MAIL_FROM: configs.mail.mailSender,
                   MAIL_TRANSPORTS: undefined,
-                  MAILHOG_HOSTNAME: configs.mail.mailhogHost?.length
-                    ? configs.mail.mailhogHost
-                    : undefined,
-                  MAILUP_SECRET: configs.mail.mailupSecret?.length
-                    ? configs.mail.mailupSecret
-                    : undefined,
-                  MAILUP_USERNAME: configs.mail.mailupUsername?.length
-                    ? configs.mail.mailupUsername
-                    : undefined,
+                  MAILHOG_HOSTNAME: configs.mail.mailupHost,
+                  MAILUP_SECRET: configs.mail.mailupSecret,
+                  MAILUP_USERNAME: configs.mail.mailupUsername,
                   NODE_ENV: "development",
                   SENDGRID_API_KEY: undefined,
                 } as never),

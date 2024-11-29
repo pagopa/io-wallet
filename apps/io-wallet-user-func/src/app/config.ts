@@ -53,7 +53,7 @@ export const ANDROID_PLAY_INTEGRITY_URL =
 export const MailConfig = t.type({
   mailFeatureFlag: t.boolean,
   mailSender: t.string,
-  mailhogHost: t.string,
+  mailupHost: t.string,
   mailupSecret: t.string,
   mailupUsername: t.string,
 });
@@ -75,8 +75,8 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("MailSender"),
       RE.orElse(() => RE.right("")),
     ),
-    mailhogHost: pipe(
-      readFromEnvironment("MailhogHost"),
+    mailupHost: pipe(
+      readFromEnvironment("MailupHost"),
       RE.orElse(() => RE.right("")),
     ),
     mailupSecret: pipe(
