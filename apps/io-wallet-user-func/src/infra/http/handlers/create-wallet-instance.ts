@@ -44,9 +44,17 @@ type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
 
-// const getUserEmailByFiscalCode = (
-//   fiscalCode: string,
-// ): TE.TaskEither<Error, string> => TE.right(`${fiscalCode}@test.test`); // to do - [SIW-1560] get the user email by the fiscal code
+// [SIW-1560] to do - a mock function that return the user email by the fiscal code
+const getUserEmailByFiscalCode = (
+  fiscalCode: string,
+): TE.TaskEither<Error, string> =>
+  pipe(
+    TE.tryCatch(
+      async () => `${fiscalCode}@test.test`,
+      (error) =>
+        new Error(`Error getting the user email by fiscal code: ${error}`),
+    ),
+  );
 
 export const getTransporter: () => RTE.ReaderTaskEither<
   { mail: MailConfig },
@@ -119,15 +127,21 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               pipe(
                 getTransporter(),
                 RTE.chain((transporter) =>
-                  sendEmail(transporter, {
-                    html: WalletInstanceActivationEmailTemplate(
-                      WALLET_ACTIVATION_EMAIL_FAQ_LINK,
-                      WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
+                  pipe(
+                    getUserEmailByFiscalCode(walletInstanceRequest.fiscalCode),
+                    RTE.fromTaskEither,
+                    RTE.chain((email) =>
+                      sendEmail(transporter, {
+                        html: WalletInstanceActivationEmailTemplate(
+                          WALLET_ACTIVATION_EMAIL_FAQ_LINK,
+                          WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
+                        ),
+                        subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
+                        text: WALLET_ACTIVATION_EMAIL_TEXT,
+                        to: email,
+                      }),
                     ),
-                    subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
-                    text: WALLET_ACTIVATION_EMAIL_TEXT,
-                    to: "test@test.test", // to do - [SIW-1560] get the user email by the fiscal code
-                  }),
+                  ),
                 ),
               ),
             ),
