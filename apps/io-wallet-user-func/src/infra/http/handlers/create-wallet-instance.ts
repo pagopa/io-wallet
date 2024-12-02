@@ -57,12 +57,12 @@ export const getTransporter: () => RTE.ReaderTaskEither<
     async () =>
       await getMailerTransporter({
         MAIL_FROM: configs.mail.mailSender,
-        MAIL_TRANSPORTS: undefined,
-        MAILHOG_HOSTNAME: undefined,
+        MAIL_TRANSPORTS: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+        MAILHOG_HOSTNAME: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
         MAILUP_SECRET: configs.mail.mailupSecret,
         MAILUP_USERNAME: configs.mail.mailupUsername,
-        NODE_ENV: "production",
-        SENDGRID_API_KEY: undefined,
+        NODE_ENV: "production", // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+        SENDGRID_API_KEY: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
       }),
     (error) => new Error(`Error getting the mailer transporter: ${error}`),
   );
