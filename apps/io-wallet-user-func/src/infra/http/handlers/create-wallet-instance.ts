@@ -1,6 +1,9 @@
 import {
+  MailConfig,
   WALLET_ACTIVATION_EMAIL_FAQ_LINK,
   WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
+  WALLET_ACTIVATION_EMAIL_SUBJECT,
+  WALLET_ACTIVATION_EMAIL_TEXT,
 } from "@/app/config";
 import {
   AttestationService,
@@ -17,6 +20,10 @@ import {
 } from "@/wallet-instance";
 import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
+import {
+  MailerTransporter,
+  getMailerTransporter,
+} from "@pagopa/io-functions-commons/dist/src/mailer";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import { pipe } from "fp-ts/function";
@@ -36,6 +43,29 @@ const WalletInstanceRequestPayload = t.type({
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
+
+// const getUserEmailByFiscalCode = (
+//   fiscalCode: string,
+// ): TE.TaskEither<Error, string> => TE.right(`${fiscalCode}@test.test`); // to do - [SIW-1560] get the user email by the fiscal code
+
+export const getTransporter: () => RTE.ReaderTaskEither<
+  { mail: MailConfig },
+  Error,
+  MailerTransporter
+> = () => (configs) =>
+  TE.tryCatch(
+    async () =>
+      await getMailerTransporter({
+        MAIL_FROM: configs.mail.mailSender,
+        MAIL_TRANSPORTS: undefined,
+        MAILHOG_HOSTNAME: undefined,
+        MAILUP_SECRET: configs.mail.mailupSecret,
+        MAILUP_USERNAME: configs.mail.mailupUsername,
+        NODE_ENV: "production",
+        SENDGRID_API_KEY: undefined,
+      }),
+    (error) => new Error(`Error getting the mailer transporter: ${error}`),
+  );
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -86,16 +116,20 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               ),
             ),
             RTE.chainW(() =>
-              sendEmail({
-                html: WalletInstanceActivationEmailTemplate(
-                  WALLET_ACTIVATION_EMAIL_FAQ_LINK,
-                  WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
+              pipe(
+                getTransporter(),
+                RTE.chain((transporter) =>
+                  sendEmail(transporter, {
+                    html: WalletInstanceActivationEmailTemplate(
+                      WALLET_ACTIVATION_EMAIL_FAQ_LINK,
+                      WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
+                    ),
+                    subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
+                    text: WALLET_ACTIVATION_EMAIL_TEXT,
+                    to: "test@test.test", // to do - [SIW-1560] get the user email by the fiscal code
+                  }),
                 ),
-                subject:
-                  "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
-                text: "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",
-                to: "test@test.test", // to do - get the email by the fiscal code
-              }),
+              ),
             ),
           ),
         ),
