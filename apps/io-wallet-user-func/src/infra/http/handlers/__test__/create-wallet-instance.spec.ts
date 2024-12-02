@@ -11,7 +11,11 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import {
+  FiscalCode,
+  INonEmptyStringTag,
+  NonEmptyString,
+} from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import { createPublicKey } from "crypto";
 import * as O from "fp-ts/Option";
@@ -27,9 +31,9 @@ describe("CreateWalletInstanceHandler", () => {
 
   const mailConfigMock = {
     mailFeatureFlag: false,
-    mailSender: "",
-    mailupSecret: "",
-    mailupUsername: "",
+    mailSender: "test_mail_sender" as INonEmptyStringTag & string,
+    mailupSecret: "test_mailup_secret" as INonEmptyStringTag & string,
+    mailupUsername: "test_mailup_username" as INonEmptyStringTag & string,
   };
 
   const walletInstanceRequest = {

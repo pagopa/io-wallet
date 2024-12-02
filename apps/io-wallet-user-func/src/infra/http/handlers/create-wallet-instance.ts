@@ -1,4 +1,8 @@
 import {
+  WALLET_ACTIVATION_EMAIL_FAQ_LINK,
+  WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
+} from "@/app/config";
+import {
   AttestationService,
   ValidatedAttestation,
   validateAttestation,
@@ -84,8 +88,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             RTE.chainW(() =>
               sendEmail({
                 html: WalletInstanceActivationEmailTemplate(
-                  "to do", // to do - set the faq link
-                  "to do", // to do - set the correct access link
+                  WALLET_ACTIVATION_EMAIL_FAQ_LINK,
+                  WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
                 ),
                 subject:
                   "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO",

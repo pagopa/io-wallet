@@ -1,5 +1,6 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -52,12 +53,17 @@ export const ANDROID_PLAY_INTEGRITY_URL =
 
 export const MailConfig = t.type({
   mailFeatureFlag: t.boolean,
-  mailSender: t.string,
-  mailupSecret: t.string,
-  mailupUsername: t.string,
+  mailSender: t.intersection([t.string, NonEmptyString]),
+  mailupSecret: t.intersection([t.string, NonEmptyString]),
+  mailupUsername: t.intersection([t.string, NonEmptyString]),
 });
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
+
+export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
+  "https://io.italia.it/documenti-su-io/faq/#n1_12";
+export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
+  "https://ioapp.it/it/accedi/?refresh=true";
 
 export const getMailConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -70,9 +76,18 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
     ),
-    mailSender: readFromEnvironment("MailSender"),
-    mailupSecret: readFromEnvironment("MailupSecret"),
-    mailupUsername: readFromEnvironment("MailupUsername"),
+    mailSender: pipe(
+      readFromEnvironment("MailSender"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mail sender")),
+    ),
+    mailupSecret: pipe(
+      readFromEnvironment("MailupSecret"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup secret")),
+    ),
+    mailupUsername: pipe(
+      readFromEnvironment("MailupUsername"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup username")),
+    ),
   }),
 );
 

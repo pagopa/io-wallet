@@ -21,8 +21,10 @@ export const sendEmail: (
   params: SendEmailParams,
 ) => RTE.ReaderTaskEither<{ mail: MailConfig }, Error, void> =
   ({ html, subject, text, to }) =>
-  (configs) =>
-    configs.mail.mailFeatureFlag
+  (configs) => {
+    // eslint-disable-next-line no-console
+    console.log("configs.mail = ", configs.mail);
+    return configs.mail.mailFeatureFlag
       ? sendMail(
           getMailerTransporter({
             MAIL_FROM: configs.mail.mailSender,
@@ -32,7 +34,7 @@ export const sendEmail: (
             MAILUP_USERNAME: configs.mail.mailupUsername,
             NODE_ENV: "production",
             SENDGRID_API_KEY: undefined,
-          } as never),
+          }),
           {
             from: configs.mail.mailSender,
             html,
@@ -42,3 +44,4 @@ export const sendEmail: (
           },
         )
       : TE.right(undefined);
+  };
