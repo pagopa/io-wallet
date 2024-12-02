@@ -15,11 +15,11 @@ export const SendEmailParams = t.type({
   to: t.string,
 });
 
-export type SendEmailParams = t.TypeOf<typeof SendEmailParams>;
+export type SendEmailNotificationParams = t.TypeOf<typeof SendEmailParams>;
 
-export const sendEmail: (
+export const sendEmailNotification: (
   transporter: MailerTransporter,
-  params: SendEmailParams,
+  params: SendEmailNotificationParams,
 ) => RTE.ReaderTaskEither<{ mail: MailConfig }, Error, void> =
   (transporter, { html, subject, text, to }) =>
   (configs) =>

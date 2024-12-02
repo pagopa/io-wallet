@@ -10,7 +10,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
-import { sendEmail } from "@/email-provider";
+import { sendEmailNotification } from "@/email-provider";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import WalletInstanceActivationEmailTemplate from "@/templates/wallet-instance-activation/index.html";
 import { isLoadTestUser } from "@/user";
@@ -61,18 +61,20 @@ export const getTransporter: () => RTE.ReaderTaskEither<
   Error,
   MailerTransporter
 > = () => (configs) =>
-  TE.tryCatch(
-    async () =>
-      await getMailerTransporter({
-        MAIL_FROM: configs.mail.mailSender,
-        MAIL_TRANSPORTS: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-        MAILHOG_HOSTNAME: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-        MAILUP_SECRET: configs.mail.mailupSecret,
-        MAILUP_USERNAME: configs.mail.mailupUsername,
-        NODE_ENV: "production", // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-        SENDGRID_API_KEY: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-      }),
-    (error) => new Error(`Error getting the mailer transporter: ${error}`),
+  pipe(
+    TE.tryCatch(
+      async () =>
+        getMailerTransporter({
+          MAIL_FROM: configs.mail.mailSender,
+          MAIL_TRANSPORTS: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+          MAILHOG_HOSTNAME: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+          MAILUP_SECRET: configs.mail.mailupSecret,
+          MAILUP_USERNAME: configs.mail.mailupUsername,
+          NODE_ENV: "production", // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+          SENDGRID_API_KEY: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+        }),
+      (error) => new Error(`Error getting the mailer transporter: ${error}`),
+    ),
   );
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
@@ -125,13 +127,13 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             ),
             RTE.chainW(() =>
               pipe(
-                getTransporter(),
-                RTE.chain((transporter) =>
+                getUserEmailByFiscalCode(walletInstanceRequest.fiscalCode),
+                RTE.fromTaskEither,
+                RTE.chain((email) =>
                   pipe(
-                    getUserEmailByFiscalCode(walletInstanceRequest.fiscalCode),
-                    RTE.fromTaskEither,
-                    RTE.chain((email) =>
-                      sendEmail(transporter, {
+                    getTransporter(),
+                    RTE.chain((transporter) =>
+                      sendEmailNotification(transporter, {
                         html: WalletInstanceActivationEmailTemplate(
                           WALLET_ACTIVATION_EMAIL_FAQ_LINK,
                           WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
