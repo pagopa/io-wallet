@@ -1,3 +1,4 @@
+import { EmailNotificationService } from "@/email-notification-service";
 import { MobileAttestationService } from "@/infra/attestation-service";
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
@@ -84,6 +85,8 @@ const mobileAttestationService = new MobileAttestationService(
 
 const slackNotificationService = new SlackNotificationService(config.slack);
 
+const emailNotificationService = new EmailNotificationService(config.mail);
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: withAppInsights(
@@ -117,7 +120,7 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      mail: config.mail,
+      emailNotificationService,
       nonceRepository,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,

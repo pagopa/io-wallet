@@ -1,5 +1,4 @@
 import {
-  MailConfig,
   WALLET_ACTIVATION_EMAIL_FAQ_LINK,
   WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
   WALLET_ACTIVATION_EMAIL_SUBJECT,
@@ -10,7 +9,10 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
-import { sendEmailNotification } from "@/email-provider";
+import {
+  EmailNotificationService,
+  SendEmailNotificationParams,
+} from "@/email-notification-service";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import WalletInstanceActivationEmailTemplate from "@/templates/wallet-instance-activation/index.html";
 import { isLoadTestUser } from "@/user";
@@ -20,10 +22,7 @@ import {
 } from "@/wallet-instance";
 import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
-import {
-  MailerTransporter,
-  getMailerTransporter,
-} from "@pagopa/io-functions-commons/dist/src/mailer";
+import { MailerTransporter } from "@pagopa/io-functions-commons/dist/src/mailer";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import { pipe } from "fp-ts/function";
@@ -57,25 +56,36 @@ const getUserEmailByFiscalCode = (
   );
 
 export const getTransporter: () => RTE.ReaderTaskEither<
-  { mail: MailConfig },
+  { emailNotificationService: EmailNotificationService },
   Error,
   MailerTransporter
-> = () => (configs) =>
-  pipe(
+> =
+  () =>
+  ({ emailNotificationService }) =>
     TE.tryCatch(
-      async () =>
-        getMailerTransporter({
-          MAIL_FROM: configs.mail.mailSender,
-          MAIL_TRANSPORTS: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-          MAILHOG_HOSTNAME: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-          MAILUP_SECRET: configs.mail.mailupSecret,
-          MAILUP_USERNAME: configs.mail.mailupUsername,
-          NODE_ENV: "production", // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-          SENDGRID_API_KEY: undefined, // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-        }),
+      async () => emailNotificationService.getTransporter(),
       (error) => new Error(`Error getting the mailer transporter: ${error}`),
-    ),
-  );
+    );
+
+export const sendEmailToUser: (
+  transporter: MailerTransporter,
+  params: SendEmailNotificationParams,
+) => RTE.ReaderTaskEither<
+  { emailNotificationService: EmailNotificationService },
+  Error,
+  void
+> =
+  (transporter, params) =>
+  ({ emailNotificationService }) =>
+    pipe(
+      TE.tryCatch(
+        async () =>
+          await emailNotificationService.sendEmail(transporter, params)(),
+        (error) => new Error(`Error sending the mail to the user: ${error}`),
+      ),
+      TE.chain((res) => TE.fromEither(res)),
+      TE.map(() => undefined),
+    );
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -133,7 +143,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                   pipe(
                     getTransporter(),
                     RTE.chain((transporter) =>
-                      sendEmailNotification(transporter, {
+                      sendEmailToUser(transporter, {
                         html: WalletInstanceActivationEmailTemplate(
                           WALLET_ACTIVATION_EMAIL_FAQ_LINK,
                           WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
