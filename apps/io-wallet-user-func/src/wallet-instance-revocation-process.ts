@@ -12,7 +12,7 @@ import {
 } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "./app/config";
-import { getCrlFromUrl, validateRevocation } from "./certificates";
+import { getCrlFromUrls, validateRevocation } from "./certificates";
 import { obfuscatedUserId } from "./user";
 import {
   WalletInstanceRepository,
@@ -25,7 +25,7 @@ export type ValidationCertificatesResult =
   | { success: true };
 
 const validateWalletInstanceCertificatesChain =
-  ({ androidCrlUrl, httpRequestTimeout }: AttestationServiceConfiguration) =>
+  ({ androidCrlUrls, httpRequestTimeout }: AttestationServiceConfiguration) =>
   (
     walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
   ): TE.TaskEither<Error, ValidationCertificatesResult> =>
@@ -36,7 +36,7 @@ const validateWalletInstanceCertificatesChain =
       TE.fromEither,
       TE.chain((x509Chain) =>
         pipe(
-          getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
+          getCrlFromUrls(androidCrlUrls, httpRequestTimeout),
           TE.chain((attestationCrl) =>
             TE.tryCatch(
               () => validateRevocation(x509Chain, attestationCrl),
