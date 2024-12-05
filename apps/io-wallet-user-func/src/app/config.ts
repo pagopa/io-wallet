@@ -61,7 +61,7 @@ export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 export const AttestationServiceConfiguration = t.type({
   allowedDeveloperUsers: t.array(t.string),
   androidBundleIdentifiers: t.array(t.string),
-  androidCrlUrl: t.string,
+  androidCrlUrls: t.array(t.string),
   androidPlayIntegrityUrl: t.string,
   androidPlayStoreCertificateHash: t.string,
   appleRootCertificate: t.string,
@@ -178,9 +178,10 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.map((identifiers) => identifiers.split(",")),
       RE.orElse(() => RE.right(["it.pagopa.io.app"])),
     ),
-    androidCrlUrl: pipe(
-      readFromEnvironment("AndroidCrlUrl"),
-      RE.orElse(() => RE.right(ANDROID_CRL_URL)),
+    androidCrlUrls: pipe(
+      readFromEnvironment("AndroidCrlUrls"),
+      RE.map((identifiers) => identifiers.split(",")),
+      RE.orElse(() => RE.right([ANDROID_CRL_URL])),
     ),
     androidPlayIntegrityUrl: pipe(
       readFromEnvironment("AndroidPlayIntegrityUrl"),
