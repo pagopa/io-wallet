@@ -61,8 +61,7 @@ export const sendEmailToUser: (
         emailNotificationService.sendEmail(params),
         (error) => new Error(`Error sending the mail to the user: ${error}`),
       ),
-      TE.chain((res) => TE.fromEither(res)),
-      TE.map(() => undefined),
+      TE.chain(() => TE.right(undefined)),
     );
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
