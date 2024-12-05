@@ -53,9 +53,9 @@ export const ANDROID_PLAY_INTEGRITY_URL =
 
 export const MailConfig = t.type({
   mailFeatureFlag: t.boolean,
-  mailSender: t.intersection([t.string, NonEmptyString]),
-  mailupSecret: t.intersection([t.string, NonEmptyString]),
-  mailupUsername: t.intersection([t.string, NonEmptyString]),
+  mailSender: NonEmptyString,
+  mailupSecret: NonEmptyString,
+  mailupUsername: NonEmptyString,
 });
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
