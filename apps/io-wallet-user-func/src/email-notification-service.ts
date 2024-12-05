@@ -23,7 +23,6 @@ export interface IEmailNotificationService {
     params: SendEmailNotificationParams,
   ) => MailerConfig;
   sendEmail: (
-    transporter: MailerConfig,
     params: SendEmailNotificationParams,
   ) => TE.TaskEither<Error, void>;
 }
@@ -43,13 +42,9 @@ export class EmailNotificationService implements IEmailNotificationService {
     });
 
   sendEmail: (
-    transporter: MailerConfig,
     params: SendEmailNotificationParams,
-  ) => TE.TaskEither<Error, void> = (
-    transporter: MailerConfig,
-    params: SendEmailNotificationParams,
-  ) =>
-    sendMail(transporter, {
+  ) => TE.TaskEither<Error, void> = (params: SendEmailNotificationParams) =>
+    sendMail(this.getTransporter(), {
       from: this.#configuration.mailSender,
       html: params.html,
       subject: params.subject,

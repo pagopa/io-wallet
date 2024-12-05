@@ -22,7 +22,6 @@ import {
 } from "@/wallet-instance";
 import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
-import { MailerTransporter } from "@pagopa/io-functions-commons/dist/src/mailer";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import { pipe } from "fp-ts/function";
@@ -50,32 +49,18 @@ const getUserEmailByFiscalCode = (
 ): TE.TaskEither<Error, string> =>
   pipe(TE.left(new Error("Not implemented yet")));
 
-export const getTransporter: () => RTE.ReaderTaskEither<
-  { emailNotificationService: EmailNotificationService },
-  Error,
-  MailerTransporter
-> =
-  () =>
-  ({ emailNotificationService }) =>
-    TE.tryCatch(
-      async () => emailNotificationService.getTransporter(),
-      (error) => new Error(`Error getting the mailer transporter: ${error}`),
-    );
-
 export const sendEmailToUser: (
-  transporter: MailerTransporter,
   params: SendEmailNotificationParams,
 ) => RTE.ReaderTaskEither<
   { emailNotificationService: EmailNotificationService },
   Error,
   void
 > =
-  (transporter, params) =>
+  (params) =>
   ({ emailNotificationService }) =>
     pipe(
       TE.tryCatch(
-        async () =>
-          await emailNotificationService.sendEmail(transporter, params)(),
+        async () => await emailNotificationService.sendEmail(params)(),
         (error) => new Error(`Error sending the mail to the user: ${error}`),
       ),
       TE.chain((res) => TE.fromEither(res)),
@@ -135,20 +120,15 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 getUserEmailByFiscalCode(walletInstanceRequest.fiscalCode),
                 RTE.fromTaskEither,
                 RTE.chain((email) =>
-                  pipe(
-                    getTransporter(),
-                    RTE.chain((transporter) =>
-                      sendEmailToUser(transporter, {
-                        html: WalletInstanceActivationEmailTemplate(
-                          WALLET_ACTIVATION_EMAIL_FAQ_LINK,
-                          WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
-                        ),
-                        subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
-                        text: WALLET_ACTIVATION_EMAIL_TEXT,
-                        to: email,
-                      }),
+                  sendEmailToUser({
+                    html: WalletInstanceActivationEmailTemplate(
+                      WALLET_ACTIVATION_EMAIL_FAQ_LINK,
+                      WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
                     ),
-                  ),
+                    subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
+                    text: WALLET_ACTIVATION_EMAIL_TEXT,
+                    to: email,
+                  }),
                 ),
               ),
             ),
