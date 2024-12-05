@@ -60,7 +60,7 @@ export const sendEmailToUser: (
   ({ emailNotificationService }) =>
     pipe(
       TE.tryCatch(
-        async () => await emailNotificationService.sendEmail(params)(),
+        emailNotificationService.sendEmail(params),
         (error) => new Error(`Error sending the mail to the user: ${error}`),
       ),
       TE.chain((res) => TE.fromEither(res)),
