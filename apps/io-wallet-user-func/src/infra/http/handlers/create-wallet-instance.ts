@@ -45,15 +45,10 @@ type WalletInstanceRequestPayload = t.TypeOf<
 
 // [SIW-1560] to do - a mock function that return the user email by the fiscal code
 const getUserEmailByFiscalCode = (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fiscalCode: string,
 ): TE.TaskEither<Error, string> =>
-  pipe(
-    TE.tryCatch(
-      async () => `${fiscalCode}@test.test`,
-      (error) =>
-        new Error(`Error getting the user email by fiscal code: ${error}`),
-    ),
-  );
+  pipe(TE.left(new Error("Not implemented yet")));
 
 export const getTransporter: () => RTE.ReaderTaskEither<
   { emailNotificationService: EmailNotificationService },
