@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
-import { HARDWARE_PUBLIC_TEST_KEY, decodeBase64String } from "@/app/config";
 import {
   AttestationService,
   ValidateAssertionRequest,
 } from "@/attestation-service";
-import {
-  EmailNotificationService,
-  SendEmailNotificationParams,
-} from "@/email-notification-service";
-import { MobileAttestationService } from "@/infra/attestation-service";
+import { SendEmailNotificationParams } from "@/email-notification-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -22,7 +17,6 @@ import {
   NonEmptyString,
 } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
-import { createPublicKey } from "crypto";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";

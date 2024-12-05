@@ -9,10 +9,8 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
-import {
-  EmailNotificationService,
-  SendEmailNotificationParams,
-} from "@/email-notification-service";
+import { SendEmailNotificationParams } from "@/email-notification-service";
+import { EmailNotificationService } from "@/infra/email-notification-service";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import WalletInstanceActivationEmailTemplate from "@/templates/wallet-instance-activation/index.html";
 import { isLoadTestUser } from "@/user";

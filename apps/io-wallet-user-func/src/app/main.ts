@@ -1,4 +1,3 @@
-import { EmailNotificationService } from "@/email-notification-service";
 import { MobileAttestationService } from "@/infra/attestation-service";
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
@@ -17,6 +16,7 @@ import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wal
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { EmailNotificationService } from "@/infra/email-notification-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
