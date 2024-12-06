@@ -12,12 +12,5 @@ overrides:
   hosts:
     - api-app.io.pagopa.it
   endpoints:
-    - /wallet-instances/{id}/status:
-      availability_threshold: 0.99 # Default: 99%
-      availability_evaluation_frequency: 10 # Default: 10
-      availability_evaluation_time_window: 30 # Default: 20
-      availability_event_occurrences: 4 # Default: 1
+    /api/v1/wallet/wallet-instances/{id}/status:
       response_time_threshold: 10
-      response_time_evaluation_frequency: 10 # Default: 10
-      response_time_evaluation_time_window: 30 # Default: 20
-      response_time_event_occurrences: 4 # Default: 1
