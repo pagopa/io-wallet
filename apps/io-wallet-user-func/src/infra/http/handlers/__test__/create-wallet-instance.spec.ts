@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
-import { HARDWARE_PUBLIC_TEST_KEY, decodeBase64String } from "@/app/config";
 import {
   AttestationService,
   ValidateAssertionRequest,
 } from "@/attestation-service";
-import { MobileAttestationService } from "@/infra/attestation-service";
+import { SendEmailNotificationParams } from "@/email-notification-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { EmailNotificationService } from "@/infra/email-notification-service";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
+import { MailerTransporter } from "@pagopa/io-functions-commons/dist/src/mailer";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
-import { createPublicKey } from "crypto";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
@@ -72,6 +72,10 @@ describe("CreateWalletInstanceHandler", () => {
       }),
   };
 
+  const mockEmailNotificationService: EmailNotificationService = {
+    sendEmail: (params: SendEmailNotificationParams) => TE.right(undefined),
+  } as EmailNotificationService;
+
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
@@ -84,6 +88,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -110,6 +115,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -141,6 +147,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -177,6 +184,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -212,6 +220,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -248,6 +257,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

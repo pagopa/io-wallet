@@ -1,5 +1,6 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -49,6 +50,50 @@ export const ANDROID_CRL_URL =
 
 export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
+
+export const MailConfig = t.type({
+  mailFeatureFlag: t.boolean,
+  mailSender: NonEmptyString,
+  mailupSecret: NonEmptyString,
+  mailupUsername: NonEmptyString,
+});
+
+export type MailConfig = t.TypeOf<typeof MailConfig>;
+
+export const WALLET_ACTIVATION_EMAIL_SUBJECT =
+  "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO";
+export const WALLET_ACTIVATION_EMAIL_TEXT =
+  "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO";
+export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
+  "https://io.italia.it/documenti-su-io/faq/#n1_12";
+export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
+  "https://ioapp.it/it/accedi/?refresh=true";
+
+export const getMailConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  MailConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    mailFeatureFlag: pipe(
+      readFromEnvironment("MailFeatureFlag"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
+    ),
+    mailSender: pipe(
+      readFromEnvironment("MailSender"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mail sender")),
+    ),
+    mailupSecret: pipe(
+      readFromEnvironment("MailupSecret"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup secret")),
+    ),
+    mailupUsername: pipe(
+      readFromEnvironment("MailupUsername"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup username")),
+    ),
+  }),
+);
 
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
@@ -112,6 +157,7 @@ export const Config = t.type({
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
+  mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
 });
@@ -328,6 +374,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
+    mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),

@@ -40,6 +40,10 @@
     "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
     "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED",
-    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK"
+    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK",
+    "MailupUsername": "MAILUP_USERNAME",
+    "MailupSecret": "MAILUP_SECRET",
+    "MailFeatureFlag": "MAIL_ENABLED",
+    "MailSender": "MAIL_SENDER"
   }
 }
