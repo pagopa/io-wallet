@@ -110,7 +110,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               pipe(
                 getUserEmailByFiscalCode(walletInstanceRequest.fiscalCode),
                 RTE.fromTaskEither,
-                RTE.chain((email) =>
+                RTE.chain((emailAddress) =>
                   sendEmailToUser({
                     html: WalletInstanceActivationEmailTemplate(
                       WALLET_ACTIVATION_EMAIL_FAQ_LINK,
@@ -118,7 +118,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                     ),
                     subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
                     text: WALLET_ACTIVATION_EMAIL_TEXT,
-                    to: email,
+                    to: emailAddress,
                   }),
                 ),
               ),
