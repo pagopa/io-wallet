@@ -56,13 +56,7 @@ export const sendEmailToUser: (
 > =
   (params) =>
   ({ emailNotificationService }) =>
-    pipe(
-      TE.tryCatch(
-        emailNotificationService.sendEmail(params),
-        (error) => new Error(`Error sending the mail to the user: ${error}`),
-      ),
-      TE.chain(() => TE.right(undefined)),
-    );
+    pipe(params, emailNotificationService.sendEmail);
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
