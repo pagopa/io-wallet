@@ -44,7 +44,8 @@ type WalletInstanceRequestPayload = t.TypeOf<
 const getUserEmailByFiscalCode = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fiscalCode: string,
-): TE.TaskEither<Error, string> => TE.left(new Error("Not implemented yet"));
+): RTE.ReaderTaskEither<void, Error, string> =>
+  RTE.left(new Error("Not implemented yet"));
 
 export const sendEmailToUser: (
   params: SendEmailNotificationParams,
@@ -108,8 +109,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             RTE.chainW(() =>
               pipe(
                 getUserEmailByFiscalCode(walletInstanceRequest.fiscalCode),
-                RTE.fromTaskEither,
-                RTE.chain((emailAddress) =>
+                RTE.chainW((emailAddress) =>
                   sendEmailToUser({
                     html: WalletInstanceActivationEmailTemplate(
                       WALLET_ACTIVATION_EMAIL_FAQ_LINK,
