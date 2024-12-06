@@ -44,7 +44,7 @@ type WalletInstanceRequestPayload = t.TypeOf<
 const getUserEmailByFiscalCode = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fiscalCode: string,
-): RTE.ReaderTaskEither<void, Error, string> =>
+): RTE.ReaderTaskEither<object, Error, string> =>
   RTE.left(new Error("Not implemented yet"));
 
 export const sendEmailToUser: (

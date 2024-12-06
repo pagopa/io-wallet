@@ -6,6 +6,7 @@ import {
 } from "@/attestation-service";
 import { SendEmailNotificationParams } from "@/email-notification-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { EmailNotificationService } from "@/infra/email-notification-service";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
@@ -71,14 +72,9 @@ describe("CreateWalletInstanceHandler", () => {
       }),
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mockEmailNotificationService: any = {
-    getTransporter: () => ({}) as MailerTransporter,
-    sendEmail: (
-      transporter: MailerTransporter,
-      params: SendEmailNotificationParams,
-    ) => TE.right(undefined),
-  };
+  const mockEmailNotificationService: EmailNotificationService = {
+    sendEmail: (params: SendEmailNotificationParams) => TE.right(undefined),
+  } as EmailNotificationService;
 
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
