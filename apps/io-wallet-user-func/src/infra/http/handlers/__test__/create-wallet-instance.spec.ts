@@ -11,11 +11,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { MailerTransporter } from "@pagopa/io-functions-commons/dist/src/mailer";
 import * as L from "@pagopa/logger";
-import {
-  FiscalCode,
-  INonEmptyStringTag,
-  NonEmptyString,
-} from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
@@ -27,13 +23,6 @@ const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
-
-  const mailConfigMock = {
-    mailFeatureFlag: false,
-    mailSender: "test_mail_sender" as INonEmptyStringTag & string,
-    mailupSecret: "test_mailup_secret" as INonEmptyStringTag & string,
-    mailupUsername: "test_mailup_username" as INonEmptyStringTag & string,
-  };
 
   const walletInstanceRequest = {
     challenge,
