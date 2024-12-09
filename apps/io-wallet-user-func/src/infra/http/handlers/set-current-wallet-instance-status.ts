@@ -1,10 +1,10 @@
-import { revokeAllCredentials } from "@/credential";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import {
   WalletInstanceEnvironment,
   revokeUserWalletInstances,
 } from "@/wallet-instance";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -43,6 +43,10 @@ const revokeCurrentUserWalletInstance: (
     ),
   );
 
+declare const enqueueFiscalCode: (
+  fiscalCode: FiscalCode,
+) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void>;
+
 export const SetCurrentWalletInstanceStatusHandler = H.of(
   (req: H.HttpRequest) =>
     pipe(
@@ -50,8 +54,8 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       requireSetCurrentWalletInstanceStatusBody,
       E.map(({ fiscal_code }) => fiscal_code),
       RTE.fromEither,
-      // invoke PID issuer services to revoke all credentials for that user
-      RTE.chainFirst(revokeAllCredentials), // TODO: SIW-1708 analysis on asynchronous call
+      // TODO: comment
+      RTE.chainFirst(enqueueFiscalCode),
       // revoke the wallet instance in the database
       RTE.chainW(revokeCurrentUserWalletInstance),
       RTE.map(() => H.empty),

@@ -81,13 +81,18 @@ export type AttestationServiceConfiguration = t.TypeOf<
 const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
-  queue: t.type({
-    walletInstanceRevocation: t.type({
-      connectionString: t.string,
-      name: t.string,
-    }),
-  }),
   storage: t.type({
+    common: t.type({
+      connectionString: t.string,
+      queues: t.type({
+        pidIssuerRevokeApi: t.type({
+          name: t.string,
+        }),
+        walletInstanceRevocation: t.type({
+          name: t.string,
+        }),
+      }),
+    }),
     entityConfiguration: t.type({ containerName: t.string }),
   }),
 });
@@ -236,6 +241,9 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
+    pidIssuerRevokeApiQueueName: readFromEnvironment(
+      "PidIssuerRevokeApiQueueName",
+    ),
     revocationQueueName: readFromEnvironment("RevocationQueueName"),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
@@ -246,18 +254,24 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       appInsights,
       cosmos,
       entityConfigurationStorageContainerName,
+      pidIssuerRevokeApiQueueName,
       revocationQueueName,
       storageAccountConnectionString,
     }) => ({
       appInsights,
       cosmos,
-      queue: {
-        walletInstanceRevocation: {
-          connectionString: storageAccountConnectionString,
-          name: revocationQueueName,
-        },
-      },
       storage: {
+        common: {
+          connectionString: storageAccountConnectionString,
+          queues: {
+            pidIssuerRevokeApi: {
+              name: pidIssuerRevokeApiQueueName,
+            },
+            walletInstanceRevocation: {
+              name: revocationQueueName,
+            },
+          },
+        },
         entityConfiguration: {
           containerName: entityConfigurationStorageContainerName,
         },
