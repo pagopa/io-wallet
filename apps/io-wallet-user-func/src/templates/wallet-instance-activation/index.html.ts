@@ -338,7 +338,7 @@ export default (faqLink: string, handleAccessLink: string) => `
                                     <p>
                                       <strong>Domande e risposte</strong>
                                     </p>
-                                    <p> Consulta tutte le FAQ <a href="${faqLink}" style="color: #0162c3" class="link">FAQ</a> su IT Wallet per trovare risposta ad eventuali<br /> dubbi. </p>
+                                    <p> Consulta tutte le <a href="${faqLink}" style="color: #0162c3" class="link">FAQ</a> su IT Wallet per trovare risposta ad eventuali<br /> dubbi. </p>
                                   </div>
                                 </td>
                               </tr>
