@@ -25,6 +25,7 @@
     "@opentelemetry/semantic-conventions": "^1.27.0",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
+    "@pagopa/io-functions-commons": "^29.3.0",
     "@pagopa/ts-commons": "^13.1.2",
     "@peculiar/asn1-android": "^2.3.13",
     "applicationinsights": "^3.4.0",
@@ -36,12 +37,14 @@
     "io-wallet-common": "workspace:^",
     "jose": "5.9.6",
     "jsonwebtoken": "^9.0.2",
+    "mjml": "^4.15.3",
     "pkijs": "^3.2.4",
     "undici": "^6.21.0"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/mjml": "^4",
     "@vitest/coverage-v8": "^2.1.5",
     "azure-functions-core-tools": "^4.0.6610",
     "eslint": "9.14.0",
