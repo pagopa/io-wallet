@@ -328,7 +328,7 @@ export default (faqLink: string, handleAccessLink: string) => `
                                     <p>
                                       <strong>Il primo passo: la tua identità digitale</strong>
                                     </p>
-                                    <p> Inizia con la tua identità digitale: è un passaggio necessario per<br /> garantire la sicurezza nell'aggiuntadei documenti successivi. </p>
+                                    <p> Inizia con la tua identità digitale: è un passaggio necessario per<br /> garantire la sicurezza nell'aggiunta dei documenti successivi. </p>
                                     <p> Se hai già aggiunto la tua identità digitale al Portafoglio, puoi già<br /> proseguire con l'aggiunta degli altri documenti disponibili in fase di<br /> sperimentazione. </p>
                                     <p>
                                       <strong>Utile da sapere</strong>
