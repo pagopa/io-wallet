@@ -3,6 +3,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
+import { WalletInstanceCreationStorageQueue } from "@/infra/azure/queue/wallet-instance-creation";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
@@ -19,6 +20,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -30,6 +32,28 @@ const WalletInstanceRequestPayload = t.type({
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
+
+// export const sendEmailToUser: (
+//   params: SendEmailNotificationParams,
+// ) => RTE.ReaderTaskEither<
+//   { emailNotificationService: EmailNotificationService },
+//   Error,
+//   void
+// > =
+//   (params) =>
+//   ({ emailNotificationService }) =>
+//     pipe(params, emailNotificationService.sendEmail);
+
+export const insertInCreationQueue: (
+  walletInstance: WalletInstance,
+) => RTE.ReaderTaskEither<
+  { creationQueue: WalletInstanceCreationStorageQueue },
+  Error,
+  void
+> =
+  (walletInstance) =>
+  ({ creationQueue }) =>
+    creationQueue.insert(walletInstance);
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -79,6 +103,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
+            RTE.chainW(() => insertInCreationQueue(walletInstance)),
           ),
         ),
       ),

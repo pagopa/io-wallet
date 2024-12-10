@@ -15,6 +15,7 @@ import { SendEmailOnWalletInstanceCreation } from "@/infra/azure/functions/send-
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
+import { WalletInstanceCreationStorageQueue } from "@/infra/azure/queue/wallet-instance-creation";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
@@ -62,6 +63,12 @@ const queueServiceClient = QueueServiceClient.fromConnectionString(
 const revocationQueue = new WalletInstanceRevocationStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.queue.walletInstanceRevocation.name,
+  ),
+);
+
+const creationQueue = new WalletInstanceCreationStorageQueue(
+  queueServiceClient.getQueueClient(
+    config.azure.queue.walletInstanceCreation.name,
   ),
 );
 
@@ -121,6 +128,7 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
+      creationQueue,
       nonceRepository,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,

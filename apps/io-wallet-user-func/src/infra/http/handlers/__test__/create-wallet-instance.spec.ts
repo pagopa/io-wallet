@@ -5,6 +5,7 @@ import {
   ValidateAssertionRequest,
 } from "@/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { WalletInstanceCreationStorageQueue } from "@/infra/azure/queue/wallet-instance-creation";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
@@ -28,6 +29,10 @@ describe("CreateWalletInstanceHandler", () => {
     hardware_key_tag: keyId,
     key_attestation: attestation,
   };
+
+  const creationQueue: WalletInstanceCreationStorageQueue = {
+    insert: () => TE.right(void 0),
+  } as unknown as WalletInstanceCreationStorageQueue;
 
   const nonceRepository: NonceRepository = {
     delete: () => TE.right(void 0),
@@ -81,6 +86,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -107,6 +113,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -138,6 +145,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -174,6 +182,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -209,6 +218,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -245,6 +255,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
