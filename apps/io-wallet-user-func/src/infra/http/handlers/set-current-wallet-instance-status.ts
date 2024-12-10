@@ -1,3 +1,4 @@
+import { enqueue } from "@/infra/azure/storage/queue";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import {
@@ -43,10 +44,6 @@ const revokeCurrentUserWalletInstance: (
     ),
   );
 
-declare const enqueueFiscalCode: (
-  fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void>;
-
 export const SetCurrentWalletInstanceStatusHandler = H.of(
   (req: H.HttpRequest) =>
     pipe(
@@ -54,8 +51,8 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       requireSetCurrentWalletInstanceStatusBody,
       E.map(({ fiscal_code }) => fiscal_code),
       RTE.fromEither,
-      // TODO: comment
-      RTE.chainFirst(enqueueFiscalCode),
+      // writes the fiscal code to the queue to request the revocation of credentials from the issuer asynchronously
+      RTE.chainFirst(enqueue),
       // revoke the wallet instance in the database
       RTE.chainW(revokeCurrentUserWalletInstance),
       RTE.map(() => H.empty),

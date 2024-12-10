@@ -1,3 +1,4 @@
+import { enqueue } from "@/infra/azure/storage/queue";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -10,7 +11,6 @@ import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { requireWalletInstanceId } from "../wallet-instance";
-import { QueueClient } from "@azure/storage-queue";
 
 const SetWalletInstanceStatusBody = t.type({
   fiscal_code: FiscalCode,
@@ -23,10 +23,6 @@ const requireSetWalletInstanceStatusBody: (
   req: H.HttpRequest,
 ) => E.Either<Error, SetWalletInstanceStatusBody> = (req) =>
   pipe(req.body, H.parse(SetWalletInstanceStatusBody, "Invalid body supplied"));
-
-declare const enqueueFiscalCode: (
-  fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void>;
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -41,9 +37,9 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
     RTE.fromEither,
     RTE.chain(({ fiscalCode, walletInstanceId }) =>
       pipe(
-        // TODO: comment
         fiscalCode,
-        enqueueFiscalCode,
+        // writes the fiscal code to the queue to request the revocation of credentials from the issuer asynchronously
+        enqueue,
         RTE.chainW(() =>
           // access our database to revoke the wallet instance
           revokeUserWalletInstances(

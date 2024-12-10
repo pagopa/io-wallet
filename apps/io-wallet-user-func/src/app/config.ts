@@ -82,7 +82,8 @@ const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
   storage: t.type({
-    common: t.type({
+    entityConfiguration: t.type({ containerName: t.string }),
+    walletInstances: t.type({
       connectionString: t.string,
       queues: t.type({
         pidIssuerRevokeApi: t.type({
@@ -93,7 +94,6 @@ const AzureConfig = t.type({
         }),
       }),
     }),
-    entityConfiguration: t.type({ containerName: t.string }),
   }),
 });
 
@@ -261,7 +261,10 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       appInsights,
       cosmos,
       storage: {
-        common: {
+        entityConfiguration: {
+          containerName: entityConfigurationStorageContainerName,
+        },
+        walletInstances: {
           connectionString: storageAccountConnectionString,
           queues: {
             pidIssuerRevokeApi: {
@@ -271,9 +274,6 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
               name: revocationQueueName,
             },
           },
-        },
-        entityConfiguration: {
-          containerName: entityConfigurationStorageContainerName,
         },
       },
     }),
