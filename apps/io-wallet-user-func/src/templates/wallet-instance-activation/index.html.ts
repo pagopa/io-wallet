@@ -1,10 +1,10 @@
 // eslint-disable-next-line max-lines-per-function
-export default (faqLink: string, handleAccessLink: string) => `
+export default (firstName: string, faqLink: string, ioAppLink: string) => `
 <!doctype html>
 <html lang="it" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
 <head>
-  <title>IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO</title>
+  <title>Documenti su IO - Aggiungi la versione digitale dei tuoi documenti al Portafoglio</title>
   <!--[if !mso]><!-->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <!--<![endif]-->
@@ -317,28 +317,28 @@ export default (faqLink: string, handleAccessLink: string) => `
                               <tr>
                                 <td align="left" class="title" style="font-size:0px;padding:10px 25px;padding-top:24px;padding-right:0px;padding-bottom:8px;padding-left:0px;word-break:break-word;">
                                   <div style="font-family:Titillium Web, system-ui, sans-serif;font-size:13px;font-weight:bold;line-height:1;text-align:left;color:#17324D;">
-                                    <h1 style="font-size: 32px; line-height: 36px; margin: 0"> IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO </h1>
+                                    <h1 style="font-size: 32px; line-height: 36px; margin: 0"> Documenti su IO - Aggiungi la versione digitale dei tuoi documenti al Portafoglio </h1>
                                   </div>
                                 </td>
                               </tr>
                               <tr>
                                 <td align="left" class="text" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
                                   <div style="font-family:Titillium Web, system-ui, sans-serif;font-size:16px;font-weight:regular;line-height:24px;text-align:left;color:#17324D;">
-                                    <p> Ciao,<br /> il tuo portafoglio sull'app IO è pronto a <strong>ricevere la versione digitale dei<br /> tuoi documenti</strong> personali! </p>
+                                    <p> Ciao ${firstName},<br /><br /> il tuo portafoglio sull'app IO è pronto a <strong>ricevere la versione digitale dei<br /> tuoi documenti</strong> personali! </p>
                                     <p>
-                                      <strong>Il primo passo: la tua identità digitale</strong>
+                                      <strong>Attiva Documenti su IO</strong>
                                     </p>
-                                    <p> Inizia con la tua identità digitale: è un passaggio necessario per<br /> garantire la sicurezza nell'aggiunta dei documenti successivi. </p>
-                                    <p> Se hai già aggiunto la tua identità digitale al Portafoglio, puoi già<br /> proseguire con l'aggiunta degli altri documenti disponibili in fase di<br /> sperimentazione. </p>
+                                    <p> L'attivazione di <strong>Documenti su IO</strong> con SPID o CIE è un passaggio di<br /> necessario per aggiungere e custodire nel Portafoglio dell'app i<br /> tuoi documenti in tutta sicurezza. </p>
                                     <p>
                                       <strong>Utile da sapere</strong>
                                     </p>
-                                    <p> I tuoi documenti sono al sicuro: puoi revocare in qualsiasi momento la<br /> funzionalità IT Wallet, anche se non hai più il controllo del dispositivo<br /> mobile su cui hai installato l'app IO. </p>
-                                    <p> Per farlo, clicca su <a href="${handleAccessLink}" style="color: #0162c3" class="link">gestisci accesso</a>. </p>
+                                    <p> Puoi disattivare la funzionalità Documenti su IO in qualsiasi momento<br /> dall'app, premendo su "Cos'è" nella sezione Portafoglio.<br />
+                                    </p>
+                                    <p> Se non hai più il controllo del tuo dispositivo mobile, puoi disattivare<br /> Documenti su IO anche tramite il sito <a href="${ioAppLink}" style="color: #0162c3" class="link">ioapp.it</a>, accedendo con SPID o<br /> CIE. </p>
                                     <p>
                                       <strong>Domande e risposte</strong>
                                     </p>
-                                    <p> Consulta tutte le <a href="${faqLink}" style="color: #0162c3" class="link">FAQ</a> su IT Wallet per trovare risposta ad eventuali<br /> dubbi. </p>
+                                    <p> Per saperne di più su Documenti su IO consulta le <a href="${faqLink}" style="color: #0162c3" class="link">FAQ</a> dedicate. </p>
                                   </div>
                                 </td>
                               </tr>
