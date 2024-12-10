@@ -11,7 +11,7 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
-import { SendEmailOnWalletInstanceCreation } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
+import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
@@ -249,7 +249,7 @@ app.storageQueue("validateWalletInstance", {
 
 app.storageQueue("sendEmailOnWalletInstanceCreation", {
   connection: "StorageConnectionString",
-  handler: SendEmailOnWalletInstanceCreation({
+  handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceCreationEntry,
   }),
