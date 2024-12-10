@@ -9,8 +9,8 @@ import WalletInstanceActivationEmailTemplate from "@/templates/wallet-instance-a
 import * as H from "@pagopa/handler-kit";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
 
+import { WalletInstanceCreationEntry } from "../azure/queue/wallet-instance";
 import { EmailNotificationService } from "../email-notification-service";
 
 // [SIW-1560] to do - a mock function that return the user email by the fiscal code
@@ -32,7 +32,7 @@ export const sendEmailToUser: (
     emailNotificationService.sendEmail(params);
 
 export const SendEmailOnWalletInstanceCreationHandler = H.of(
-  (walletInstance: WalletInstance) =>
+  (walletInstance: WalletInstanceCreationEntry) =>
     pipe(
       getUserInfoByFiscalCode(walletInstance.userId),
       RTE.chainW(({ email, firstName }) =>

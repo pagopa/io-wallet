@@ -282,7 +282,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
-    creationQueueName: readFromEnvironment("CreationQueueName"),
+    creationQueueName: readFromEnvironment("WalletInstanceCreationQueueName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),

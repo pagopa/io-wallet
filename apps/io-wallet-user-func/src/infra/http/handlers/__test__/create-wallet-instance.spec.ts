@@ -30,7 +30,7 @@ describe("CreateWalletInstanceHandler", () => {
     key_attestation: attestation,
   };
 
-  const creationQueue: WalletInstanceStorageQueue = {
+  const walletInstanceCreationQueue: WalletInstanceStorageQueue = {
     insert: () => TE.right(void 0),
   } as unknown as WalletInstanceStorageQueue;
 
@@ -86,12 +86,12 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       telemetryClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository,
     });
 
@@ -113,12 +113,12 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       telemetryClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository,
     });
 
@@ -145,12 +145,12 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       telemetryClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository,
     });
 
@@ -182,12 +182,12 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       telemetryClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -218,12 +218,12 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       telemetryClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
 
@@ -255,12 +255,12 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      creationQueue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       telemetryClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 

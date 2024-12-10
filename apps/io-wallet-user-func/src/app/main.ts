@@ -15,7 +15,10 @@ import { SendEmailOnWalletInstanceCreation } from "@/infra/azure/functions/send-
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
-import { WalletInstanceStorageQueue } from "@/infra/azure/queue/wallet-instance";
+import {
+  WalletInstanceCreationEntry,
+  WalletInstanceStorageQueue,
+} from "@/infra/azure/queue/wallet-instance";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
@@ -59,13 +62,13 @@ const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.queue.walletInstanceRevocation.connectionString,
 );
 
-const revocationQueue = new WalletInstanceStorageQueue(
+const walletInstanceRevocationQueue = new WalletInstanceStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.queue.walletInstanceRevocation.name,
   ),
 );
 
-const creationQueue = new WalletInstanceStorageQueue(
+const walletInstanceCreationQueue = new WalletInstanceStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.queue.walletInstanceCreation.name,
   ),
@@ -127,9 +130,9 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      creationQueue,
       nonceRepository,
       telemetryClient: appInsightsClient,
+      walletInstanceCreationQueue,
       walletInstanceRepository,
     }),
   ),
@@ -237,7 +240,7 @@ app.storageQueue("validateWalletInstance", {
     attestationServiceConfiguration: config.attestationService,
     inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
     notificationService: slackNotificationService,
-    revocationQueue,
+    revocationQueue: walletInstanceRevocationQueue,
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
@@ -248,7 +251,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   connection: "StorageConnectionString",
   handler: SendEmailOnWalletInstanceCreation({
     emailNotificationService,
-    inputDecoder: WalletInstance,
+    inputDecoder: WalletInstanceCreationEntry,
   }),
   queueName: config.azure.queue.walletInstanceCreation.name,
 });

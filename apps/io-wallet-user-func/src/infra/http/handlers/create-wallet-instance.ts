@@ -33,27 +33,19 @@ type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
 
-// export const sendEmailToUser: (
-//   params: SendEmailNotificationParams,
-// ) => RTE.ReaderTaskEither<
-//   { emailNotificationService: EmailNotificationService },
-//   Error,
-//   void
-// > =
-//   (params) =>
-//   ({ emailNotificationService }) =>
-//     pipe(params, emailNotificationService.sendEmail);
-
 export const insertInCreationQueue: (
   walletInstance: WalletInstance,
 ) => RTE.ReaderTaskEither<
-  { creationQueue: WalletInstanceStorageQueue },
+  { walletInstanceCreationQueue: WalletInstanceStorageQueue },
   Error,
   void
 > =
   (walletInstance) =>
-  ({ creationQueue }) =>
-    creationQueue.insert(walletInstance);
+  ({ walletInstanceCreationQueue }) =>
+    walletInstanceCreationQueue.insert({
+      id: walletInstance.id,
+      userId: walletInstance.userId,
+    });
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
