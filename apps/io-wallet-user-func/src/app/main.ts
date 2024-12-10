@@ -243,5 +243,5 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
     emailNotificationService,
     inputDecoder: WalletInstance,
   }),
-  queueName: config.azure.queue.walletInstanceRevocation.name,
+  queueName: config.azure.queue.walletInstanceCreation.name,
 });

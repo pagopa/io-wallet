@@ -29,7 +29,7 @@ export const sendEmailToUser: (
 > =
   (params) =>
   ({ emailNotificationService }) =>
-    pipe(params, emailNotificationService.sendEmail);
+    emailNotificationService.sendEmail(params);
 
 export const SendEmailOnWalletInstanceCreationHandler = H.of(
   (walletInstance: WalletInstance) =>
