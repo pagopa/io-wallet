@@ -3,7 +3,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
-import { WalletInstanceCreationStorageQueue } from "@/infra/azure/queue/wallet-instance-creation";
+import { WalletInstanceStorageQueue } from "@/infra/azure/queue/wallet-instance";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
@@ -47,7 +47,7 @@ type WalletInstanceRequestPayload = t.TypeOf<
 export const insertInCreationQueue: (
   walletInstance: WalletInstance,
 ) => RTE.ReaderTaskEither<
-  { creationQueue: WalletInstanceCreationStorageQueue },
+  { creationQueue: WalletInstanceStorageQueue },
   Error,
   void
 > =

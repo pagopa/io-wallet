@@ -5,7 +5,7 @@ import {
   ValidateAssertionRequest,
 } from "@/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
-import { WalletInstanceCreationStorageQueue } from "@/infra/azure/queue/wallet-instance-creation";
+import { WalletInstanceStorageQueue } from "@/infra/azure/queue/wallet-instance";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
@@ -30,9 +30,9 @@ describe("CreateWalletInstanceHandler", () => {
     key_attestation: attestation,
   };
 
-  const creationQueue: WalletInstanceCreationStorageQueue = {
+  const creationQueue: WalletInstanceStorageQueue = {
     insert: () => TE.right(void 0),
-  } as unknown as WalletInstanceCreationStorageQueue;
+  } as unknown as WalletInstanceStorageQueue;
 
   const nonceRepository: NonceRepository = {
     delete: () => TE.right(void 0),

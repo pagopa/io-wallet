@@ -15,8 +15,7 @@ import { SendEmailOnWalletInstanceCreation } from "@/infra/azure/functions/send-
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
-import { WalletInstanceCreationStorageQueue } from "@/infra/azure/queue/wallet-instance-creation";
-import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
+import { WalletInstanceStorageQueue } from "@/infra/azure/queue/wallet-instance";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
@@ -60,13 +59,13 @@ const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.queue.walletInstanceRevocation.connectionString,
 );
 
-const revocationQueue = new WalletInstanceRevocationStorageQueue(
+const revocationQueue = new WalletInstanceStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.queue.walletInstanceRevocation.name,
   ),
 );
 
-const creationQueue = new WalletInstanceCreationStorageQueue(
+const creationQueue = new WalletInstanceStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.queue.walletInstanceCreation.name,
   ),

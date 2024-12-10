@@ -1,17 +1,17 @@
-import { WalletInstanceRevocationQueue } from "@/wallet-instance-revocation-process";
 import { QueueClient } from "@azure/storage-queue";
 import * as E from "fp-ts/lib/Either";
 import * as J from "fp-ts/lib/Json";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
-import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
 
-export class WalletInstanceRevocationStorageQueue
-  implements WalletInstanceRevocationQueue
-{
+export interface IWalletInstanceStorageQueue {
+  insert: <T>(walletInstance: T) => TE.TaskEither<Error, void>;
+}
+
+export class WalletInstanceStorageQueue implements IWalletInstanceStorageQueue {
   #client: QueueClient;
 
-  insert = (walletInstance: WalletInstanceValidWithAndroidCertificatesChain) =>
+  insert = <T>(walletInstance: T) =>
     pipe(
       walletInstance,
       J.stringify,
@@ -24,7 +24,7 @@ export class WalletInstanceRevocationStorageQueue
         TE.tryCatch(
           () =>
             this.#client.sendMessage(walletInstanceString, {
-              visibilityTimeout: 60 * 60 * 24, //24 hours
+              visibilityTimeout: 60 * 60 * 24, // 24 hours
             }),
           E.toError,
         ),
