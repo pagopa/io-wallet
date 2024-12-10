@@ -11,6 +11,7 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { SendEmailOnWalletInstanceCreation } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
@@ -120,7 +121,6 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      emailNotificationService,
       nonceRepository,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
@@ -233,6 +233,15 @@ app.storageQueue("validateWalletInstance", {
     revocationQueue,
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
+  }),
+  queueName: config.azure.queue.walletInstanceRevocation.name,
+});
+
+app.storageQueue("sendEmailOnWalletInstanceCreation", {
+  connection: "StorageConnectionString",
+  handler: SendEmailOnWalletInstanceCreation({
+    emailNotificationService,
+    inputDecoder: WalletInstance,
   }),
   queueName: config.azure.queue.walletInstanceRevocation.name,
 });

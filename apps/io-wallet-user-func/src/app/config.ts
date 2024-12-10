@@ -127,6 +127,10 @@ const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
   queue: t.type({
+    walletInstanceCreation: t.type({
+      connectionString: t.string,
+      name: t.string,
+    }),
     walletInstanceRevocation: t.type({
       connectionString: t.string,
       name: t.string,
@@ -278,6 +282,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
+    creationQueueName: readFromEnvironment("CreationQueueName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
@@ -290,6 +295,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     ({
       appInsights,
       cosmos,
+      creationQueueName,
       entityConfigurationStorageContainerName,
       revocationQueueName,
       storageAccountConnectionString,
@@ -297,6 +303,10 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       appInsights,
       cosmos,
       queue: {
+        walletInstanceCreation: {
+          connectionString: storageAccountConnectionString,
+          name: creationQueueName,
+        },
         walletInstanceRevocation: {
           connectionString: storageAccountConnectionString,
           name: revocationQueueName,

@@ -1,18 +1,9 @@
 import {
-  WALLET_ACTIVATION_EMAIL_FAQ_LINK,
-  WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
-  WALLET_ACTIVATION_EMAIL_SUBJECT,
-  WALLET_ACTIVATION_EMAIL_TEXT,
-} from "@/app/config";
-import {
   AttestationService,
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
-import { SendEmailNotificationParams } from "@/email-notification-service";
-import { EmailNotificationService } from "@/infra/email-notification-service";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
-import WalletInstanceActivationEmailTemplate from "@/templates/wallet-instance-activation/index.html";
 import { isLoadTestUser } from "@/user";
 import {
   insertWalletInstance,
@@ -39,24 +30,6 @@ const WalletInstanceRequestPayload = t.type({
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
-
-// [SIW-1560] to do - a mock function that return the user email by the fiscal code
-const getUserInfoByFiscalCode = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fiscalCode: string,
-): RTE.ReaderTaskEither<object, Error, { email: string; firstName: string }> =>
-  RTE.left(new Error("Not implemented yet"));
-
-export const sendEmailToUser: (
-  params: SendEmailNotificationParams,
-) => RTE.ReaderTaskEither<
-  { emailNotificationService: EmailNotificationService },
-  Error,
-  void
-> =
-  (params) =>
-  ({ emailNotificationService }) =>
-    pipe(params, emailNotificationService.sendEmail);
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -104,23 +77,6 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 walletInstanceRequest.fiscalCode,
                 walletInstanceRequest.hardwareKeyTag,
                 "NEW_WALLET_INSTANCE_CREATED",
-              ),
-            ),
-            RTE.chainW(() =>
-              pipe(
-                getUserInfoByFiscalCode(walletInstanceRequest.fiscalCode),
-                RTE.chainW(({ email, firstName }) =>
-                  sendEmailToUser({
-                    html: WalletInstanceActivationEmailTemplate(
-                      firstName,
-                      WALLET_ACTIVATION_EMAIL_FAQ_LINK,
-                      WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
-                    ),
-                    subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
-                    text: WALLET_ACTIVATION_EMAIL_TEXT,
-                    to: email,
-                  }),
-                ),
               ),
             ),
           ),
