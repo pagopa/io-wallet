@@ -286,7 +286,9 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
-    revocationQueueName: readFromEnvironment("RevocationQueueName"),
+    revocationQueueName: readFromEnvironment(
+      "WalletInstanceRevocationQueueName",
+    ),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
     ),
