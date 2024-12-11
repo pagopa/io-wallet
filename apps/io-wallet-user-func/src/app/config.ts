@@ -89,7 +89,7 @@ const AzureConfig = t.type({
         pidIssuerRevokeApi: t.type({
           name: t.string,
         }),
-        walletInstanceRevocation: t.type({
+        validateCertificates: t.type({
           name: t.string,
         }),
       }),
@@ -244,9 +244,11 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     pidIssuerRevokeApiQueueName: readFromEnvironment(
       "PidIssuerRevokeApiQueueName",
     ),
-    revocationQueueName: readFromEnvironment("RevocationQueueName"),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
+    ),
+    validateWalletInstanceCertificatesQueueName: readFromEnvironment(
+      "ValidateWalletInstanceCertificatesQueueName",
     ),
   }),
   RE.map(
@@ -255,8 +257,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       cosmos,
       entityConfigurationStorageContainerName,
       pidIssuerRevokeApiQueueName,
-      revocationQueueName,
       storageAccountConnectionString,
+      validateWalletInstanceCertificatesQueueName,
     }) => ({
       appInsights,
       cosmos,
@@ -270,8 +272,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
             pidIssuerRevokeApi: {
               name: pidIssuerRevokeApiQueueName,
             },
-            walletInstanceRevocation: {
-              name: revocationQueueName,
+            validateCertificates: {
+              name: validateWalletInstanceCertificatesQueueName,
             },
           },
         },

@@ -135,3 +135,8 @@ variable "revocation_queue_name" {
   type        = string
   description = "Wallet Instance Revocation Queue Name"
 }
+
+variable "validate_wallet_instance_certificates_queue_name" {
+  type        = string
+  description = "Wallet Instance Certificates Validation Queue Name"
+}

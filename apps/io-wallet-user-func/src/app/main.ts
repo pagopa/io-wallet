@@ -61,7 +61,7 @@ const queueServiceClient = QueueServiceClient.fromConnectionString(
 
 const revocationQueue = new WalletInstanceRevocationStorageQueue(
   queueServiceClient.getQueueClient(
-    config.azure.storage.walletInstances.queues.walletInstanceRevocation.name,
+    config.azure.storage.walletInstances.queues.validateCertificates.name,
   ),
 );
 
@@ -222,7 +222,7 @@ app.cosmosDB("addWalletInstanceToValidationQueue", {
   return: output.storageQueue({
     connection: "StorageConnectionString",
     queueName:
-      config.azure.storage.walletInstances.queues.walletInstanceRevocation.name,
+      config.azure.storage.walletInstances.queues.validateCertificates.name,
   }),
   startFromBeginning: true,
 });
@@ -238,7 +238,7 @@ app.storageQueue("validateWalletInstance", {
     walletInstanceRepository,
   }),
   queueName:
-    config.azure.storage.walletInstances.queues.walletInstanceRevocation.name,
+    config.azure.storage.walletInstances.queues.validateCertificates.name,
 });
 
 app.storageQueue("callPidIssuerRevokeApi", {
