@@ -23,7 +23,11 @@ module "function_app_user_02" {
   }
 
   app_settings      = local.function_app_user.app_settings
-  slot_app_settings = local.function_app_user.app_settings
+  slot_app_settings = local.function_app_user.slot_app_settings
+  sticky_app_setting_names = [
+    for to_disable in local.function_app_user_slot_disabled :
+    format("AzureWebJobs.%s.Disabled", to_disable)
+  ]
 
   tier = "xxl"
 

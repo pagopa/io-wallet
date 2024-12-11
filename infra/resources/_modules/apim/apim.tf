@@ -73,7 +73,7 @@ resource "azurerm_api_management_named_value" "trial_system_feature_flag" {
   api_management_name = var.apim.name
   resource_group_name = var.apim.resource_group_name
   display_name        = "trial-system-feature-flag"
-  value               = true
+  value               = false
 }
 
 data "azurerm_key_vault_secret" "funciowallet_default" {

@@ -223,7 +223,7 @@ app.cosmosDB("addWalletInstanceToValidationQueue", {
     inputDecoder: t.array(WalletInstance),
     telemetryClient: appInsightsClient,
   }),
-  leaseContainerName: "leases",
+  leaseContainerName: "leases-revoke-wallet-instance",
   leaseContainerPrefix: "wallet-instances-consumer-",
   maxItemsPerInvocation: 50,
   return: output.storageQueue({

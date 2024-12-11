@@ -1,5 +1,17 @@
 # io-wallet-user-func
 
+## 2.2.2
+
+### Patch Changes
+
+- 50c4813: Add multiple Android CRL url
+
+## 2.2.1
+
+### Patch Changes
+
+- e6e197b: Changed leaseContainerName for addWalletInstanceToValidationQueue function
+
 ## 2.2.0
 
 ### Minor Changes
