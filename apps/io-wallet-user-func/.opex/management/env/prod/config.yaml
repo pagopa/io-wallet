@@ -11,6 +11,3 @@ action_groups:
 overrides:
   hosts:
     - api-app.io.pagopa.it
-  endpoints:
-    /api/v1/wallet/wallet-instances/{id}/status:
-      response_time_threshold: 10

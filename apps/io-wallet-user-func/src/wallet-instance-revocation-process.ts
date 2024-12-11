@@ -13,7 +13,7 @@ import {
 
 import { AttestationServiceConfiguration } from "./app/config";
 import { getCrlFromUrls, validateRevocation } from "./certificates";
-import { WalletInstanceRevocationStorageQueue } from "./infra/azure/queue/wallet-instance-revocation";
+import { WalletInstanceRevocationStorageQueue } from "./infra/azure/storage/wallet-instance-revocation";
 import { obfuscatedUserId } from "./user";
 import {
   WalletInstanceRepository,

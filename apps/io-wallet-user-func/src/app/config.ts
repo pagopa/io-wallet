@@ -138,6 +138,17 @@ const AzureConfig = t.type({
   }),
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
+    walletInstances: t.type({
+      connectionString: t.string,
+      queues: t.type({
+        pidIssuerRevokeApi: t.type({
+          name: t.string,
+        }),
+        walletInstanceRevocation: t.type({
+          name: t.string,
+        }),
+      }),
+    }),
   }),
 });
 
@@ -287,9 +298,10 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
-    revocationQueueName: readFromEnvironment(
-      "WalletInstanceRevocationQueueName",
+    pidIssuerRevokeApiQueueName: readFromEnvironment(
+      "PidIssuerRevokeApiQueueName",
     ),
+    revocationQueueName: readFromEnvironment("RevocationQueueName"),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
     ),
@@ -300,6 +312,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       cosmos,
       creationQueueName,
       entityConfigurationStorageContainerName,
+      pidIssuerRevokeApiQueueName,
       revocationQueueName,
       storageAccountConnectionString,
     }) => ({
@@ -318,6 +331,17 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       storage: {
         entityConfiguration: {
           containerName: entityConfigurationStorageContainerName,
+        },
+        walletInstances: {
+          connectionString: storageAccountConnectionString,
+          queues: {
+            pidIssuerRevokeApi: {
+              name: pidIssuerRevokeApiQueueName,
+            },
+            walletInstanceRevocation: {
+              name: revocationQueueName,
+            },
+          },
         },
       },
     }),

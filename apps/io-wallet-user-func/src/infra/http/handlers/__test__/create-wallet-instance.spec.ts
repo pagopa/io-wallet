@@ -5,9 +5,9 @@ import {
   ValidateAssertionRequest,
 } from "@/attestation-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
-import { WalletInstanceStorageQueue } from "@/infra/azure/queue/wallet-instance";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -29,10 +29,6 @@ describe("CreateWalletInstanceHandler", () => {
     hardware_key_tag: keyId,
     key_attestation: attestation,
   };
-
-  const walletInstanceCreationQueue: WalletInstanceStorageQueue = {
-    insert: () => TE.right(void 0),
-  } as unknown as WalletInstanceStorageQueue;
 
   const nonceRepository: NonceRepository = {
     delete: () => TE.right(void 0),
@@ -74,6 +70,10 @@ describe("CreateWalletInstanceHandler", () => {
       }),
   };
 
+  const queueClient: QueueClient = {
+    sendMessage: () => TE.right(undefined),
+  } as unknown as QueueClient;
+
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
@@ -90,8 +90,8 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
-      walletInstanceCreationQueue,
       walletInstanceRepository,
     });
 
@@ -117,8 +117,8 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
-      walletInstanceCreationQueue,
       walletInstanceRepository,
     });
 
@@ -149,8 +149,8 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
+      queueClient,
       telemetryClient,
-      walletInstanceCreationQueue,
       walletInstanceRepository,
     });
 
@@ -186,8 +186,8 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
-      walletInstanceCreationQueue,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -222,8 +222,8 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
-      walletInstanceCreationQueue,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
 
@@ -259,8 +259,8 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
-      walletInstanceCreationQueue,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
