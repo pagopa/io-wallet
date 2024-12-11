@@ -118,6 +118,7 @@ module "function_apps" {
 
   revocation_queue_name                            = module.storage_accounts.revocation_queue_name_02.name
   validate_wallet_instance_certificates_queue_name = module.storage_accounts.revocation_queue_name_02.name
+  pid_issuer_revoke_api_queue_name                 = module.storage_accounts.pid_issuer_revoke_api_queue_name_01
 
   user_func    = local.user_func
   support_func = local.support_func

@@ -140,3 +140,8 @@ variable "validate_wallet_instance_certificates_queue_name" {
   type        = string
   description = "Wallet Instance Certificates Validation Queue Name"
 }
+
+variable "pid_issuer_revoke_api_queue_name" {
+  type        = string
+  description = "Pid Issuer Revoke API Queue Name"
+}
