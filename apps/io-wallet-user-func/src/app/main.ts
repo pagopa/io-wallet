@@ -58,7 +58,7 @@ const cosmosClient = new CosmosClient({
 const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.storage.walletInstances.connectionString,
   {
-    retryOptions: { maxTries: 4 }, // Retry options
+    retryOptions: { maxTries: 4 },
   },
 );
 

@@ -6,7 +6,6 @@ export interface CredentialRepository {
   revokeAllCredentials: (fiscalCode: FiscalCode) => TE.TaskEither<Error, void>;
 }
 
-// tt
 export const revokeAllCredentials: (
   fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<
