@@ -6,7 +6,10 @@ import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 
 export interface IWalletInstanceStorageQueue {
-  insert: <T>(walletInstance: T) => TE.TaskEither<Error, void>;
+  insert: <T>(
+    walletInstance: T,
+    visibilityTimeout: number,
+  ) => TE.TaskEither<Error, void>;
 }
 
 export const WalletInstanceCreationEntry = t.type({
@@ -21,7 +24,7 @@ export type WalletInstanceCreationEntry = t.TypeOf<
 export class WalletInstanceStorageQueue implements IWalletInstanceStorageQueue {
   #client: QueueClient;
 
-  insert = <T>(walletInstance: T) =>
+  insert = <T>(walletInstance: T, visibilityTimeout: number) =>
     pipe(
       walletInstance,
       J.stringify,
@@ -34,7 +37,7 @@ export class WalletInstanceStorageQueue implements IWalletInstanceStorageQueue {
         TE.tryCatch(
           () =>
             this.#client.sendMessage(walletInstanceString, {
-              visibilityTimeout: 60 * 60 * 24, // 24 hours
+              visibilityTimeout: visibilityTimeout,
             }),
           E.toError,
         ),

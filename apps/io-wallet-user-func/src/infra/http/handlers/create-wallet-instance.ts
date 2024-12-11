@@ -42,10 +42,13 @@ export const insertInCreationQueue: (
 > =
   (walletInstance) =>
   ({ walletInstanceCreationQueue }) =>
-    walletInstanceCreationQueue.insert({
-      id: walletInstance.id,
-      userId: walletInstance.userId,
-    });
+    walletInstanceCreationQueue.insert(
+      {
+        id: walletInstance.id,
+        userId: walletInstance.userId,
+      },
+      Infinity,
+    );
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
