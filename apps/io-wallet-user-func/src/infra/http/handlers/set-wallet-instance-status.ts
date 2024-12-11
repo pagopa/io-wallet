@@ -37,17 +37,14 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
     RTE.fromEither,
     RTE.chain(({ fiscalCode, walletInstanceId }) =>
       pipe(
-        fiscalCode,
-        // writes the fiscal code to the queue to request the revocation of credentials from the issuer asynchronously
-        enqueue,
-        RTE.chainW(() =>
-          // access our database to revoke the wallet instance
-          revokeUserWalletInstances(
-            fiscalCode,
-            [walletInstanceId],
-            "REVOKED_BY_USER",
-          ),
+        // access our database to revoke the wallet instance
+        revokeUserWalletInstances(
+          fiscalCode,
+          [walletInstanceId],
+          "REVOKED_BY_USER",
         ),
+        // writes the fiscal code to the queue to request the revocation of credentials from the issuer asynchronously
+        RTE.chainW(() => enqueue(fiscalCode)),
         RTE.orElseFirstW((error) =>
           pipe(
             sendTelemetryException(error, {
