@@ -148,7 +148,7 @@ export class MobileAttestationService implements AttestationService {
               hardwareKeyTag,
               this.#configuration.androidBundleIdentifiers,
               this.#configuration.googlePublicKey,
-              this.#configuration.androidCrlUrl,
+              this.#configuration.androidCrlUrls,
               this.#configuration.httpRequestTimeout,
             ),
           ],

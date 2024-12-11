@@ -1,4 +1,4 @@
-import { getCrlFromUrl } from "@/certificates";
+import { getCrlFromUrls } from "@/certificates";
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
@@ -25,7 +25,7 @@ export const validateAndroidAttestation = (
   hardwareKeyTag: NonEmptyString,
   bundleIdentifiers: string[],
   googlePublicKey: string,
-  androidCrlUrl: string,
+  androidCrlUrls: string[],
   httpRequestTimeout: number,
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
@@ -44,7 +44,7 @@ export const validateAndroidAttestation = (
     TE.fromEither,
     TE.chain((x509Chain) =>
       pipe(
-        getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
+        getCrlFromUrls(androidCrlUrls, httpRequestTimeout),
         TE.chain((attestationCrl) =>
           TE.tryCatch(
             () =>

@@ -3,7 +3,12 @@ import {
   HARDWARE_PUBLIC_TEST_KEY,
   decodeBase64String,
 } from "@/app/config";
-import { CRL, validateIssuance, validateRevocation } from "@/certificates";
+import {
+  CRL,
+  mergeCRL,
+  validateIssuance,
+  validateRevocation,
+} from "@/certificates";
 import { X509Certificate, createPublicKey } from "crypto";
 import { describe, expect, it } from "vitest";
 
@@ -63,5 +68,75 @@ describe("CertificatesValidation", () => {
     );
     const validation = validateIssuance(validChain, fakePublicKey);
     expect(validation).toHaveProperty("success", false);
+  });
+});
+
+describe("mergeCRL", () => {
+  it("should return a valid merged CRL with single item", async () => {
+    const crlA = {
+      entries: {
+        a: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+      },
+    };
+
+    const result = mergeCRL([crlA]);
+    expect(result).toStrictEqual(crlA);
+  });
+
+  it("should return a valid merged CRL with multiple items", async () => {
+    const crlA = {
+      entries: {
+        a: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+      },
+    };
+
+    const crlB = {
+      entries: {
+        a: { reason: "SOFTWARE_FLAW", status: "REVOKED" },
+        d: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+      },
+    };
+
+    const mergedCrl = {
+      entries: {
+        a: { reason: "SOFTWARE_FLAW", status: "REVOKED" },
+        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        d: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+      },
+    };
+
+    const result = mergeCRL([crlA, crlB]);
+    expect(result).toStrictEqual(mergedCrl);
+  });
+
+  it("should return a valid merged CRL with an empty item", async () => {
+    const crlA = {
+      entries: {
+        a: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
+      },
+    };
+
+    const crlB = {
+      entries: {},
+    };
+
+    const result = mergeCRL([crlA, crlB]);
+    expect(result).toStrictEqual(crlA);
+  });
+
+  it("should return an empty CRL", async () => {
+    const crlEmpty = {
+      entries: {},
+    };
+
+    const result = mergeCRL([]);
+    expect(result).toStrictEqual(crlEmpty);
   });
 });
