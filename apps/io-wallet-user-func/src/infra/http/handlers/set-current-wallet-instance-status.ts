@@ -5,7 +5,6 @@ import {
   WalletInstanceEnvironment,
   revokeUserWalletInstances,
 } from "@/wallet-instance";
-import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
