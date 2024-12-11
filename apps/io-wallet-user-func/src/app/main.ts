@@ -19,6 +19,7 @@ import {
   WalletInstanceCreationEntry,
   WalletInstanceStorageQueue,
 } from "@/infra/azure/queue/wallet-instance";
+import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
@@ -62,7 +63,7 @@ const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.queue.walletInstanceRevocation.connectionString,
 );
 
-const walletInstanceRevocationQueue = new WalletInstanceStorageQueue(
+const walletInstanceRevocationQueue = new WalletInstanceRevocationStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.queue.walletInstanceRevocation.name,
   ),
