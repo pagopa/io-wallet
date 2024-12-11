@@ -15,10 +15,7 @@ import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functio
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
-import {
-  WalletInstanceCreationEntry,
-  WalletInstanceStorageQueue,
-} from "@/infra/azure/queue/wallet-instance";
+import { WalletInstanceStorageQueue } from "@/infra/azure/queue/wallet-instance";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
@@ -27,6 +24,7 @@ import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { QueueServiceClient } from "@azure/storage-queue";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -252,7 +250,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   connection: "StorageConnectionString",
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
-    inputDecoder: WalletInstanceCreationEntry,
+    inputDecoder: FiscalCode,
   }),
   queueName: config.azure.queue.walletInstanceCreation.name,
 });

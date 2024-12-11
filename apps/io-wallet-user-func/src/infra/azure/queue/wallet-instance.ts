@@ -3,7 +3,6 @@ import * as E from "fp-ts/lib/Either";
 import * as J from "fp-ts/lib/Json";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
-import * as t from "io-ts";
 
 export interface IWalletInstanceStorageQueue {
   insert: <T>(
@@ -11,15 +10,6 @@ export interface IWalletInstanceStorageQueue {
     visibilityTimeout: number,
   ) => TE.TaskEither<Error, void>;
 }
-
-export const WalletInstanceCreationEntry = t.type({
-  id: t.string,
-  userId: t.string,
-});
-
-export type WalletInstanceCreationEntry = t.TypeOf<
-  typeof WalletInstanceCreationEntry
->;
 
 export class WalletInstanceStorageQueue implements IWalletInstanceStorageQueue {
   #client: QueueClient;
