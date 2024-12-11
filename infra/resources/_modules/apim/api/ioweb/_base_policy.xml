@@ -4,6 +4,7 @@
         <cors>
             <allowed-origins>
                 <origin>https://ioapp.it/</origin>
+                <origin>https://account.ioapp.it/</origin>
             </allowed-origins>
             <allowed-methods preflight-result-max-age="300">
                 <method>OPTIONS</method>
