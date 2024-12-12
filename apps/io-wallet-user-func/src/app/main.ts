@@ -4,6 +4,7 @@ import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
+import { CallPidIssuerRevokeApiFunction } from "@/infra/azure/functions/call-pid-issuer-revoke-api";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
@@ -14,7 +15,7 @@ import { HealthFunction } from "@/infra/azure/functions/health";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
-import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/queue/wallet-instance-revocation";
+import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
@@ -22,6 +23,7 @@ import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { QueueServiceClient } from "@azure/storage-queue";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -55,13 +57,17 @@ const cosmosClient = new CosmosClient({
 });
 
 const queueServiceClient = QueueServiceClient.fromConnectionString(
-  config.azure.queue.walletInstanceRevocation.connectionString,
+  config.azure.storage.walletInstances.connectionString,
 );
 
 const revocationQueue = new WalletInstanceRevocationStorageQueue(
   queueServiceClient.getQueueClient(
-    config.azure.queue.walletInstanceRevocation.name,
+    config.azure.storage.walletInstances.queues.validateCertificates.name,
   ),
+);
+
+const pidIssuerRevokeApiQueue = queueServiceClient.getQueueClient(
+  config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
 );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
@@ -184,7 +190,7 @@ app.http("setWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     SetWalletInstanceStatusFunction({
-      credentialRepository: pidIssuerClient,
+      queueClient: pidIssuerRevokeApiQueue,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -197,7 +203,7 @@ app.http("setCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     SetCurrentWalletInstanceStatusFunction({
-      credentialRepository: pidIssuerClient,
+      queueClient: pidIssuerRevokeApiQueue,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -219,7 +225,8 @@ app.cosmosDB("addWalletInstanceToValidationQueue", {
   maxItemsPerInvocation: 50,
   return: output.storageQueue({
     connection: "StorageConnectionString",
-    queueName: config.azure.queue.walletInstanceRevocation.name,
+    queueName:
+      config.azure.storage.walletInstances.queues.validateCertificates.name,
   }),
   startFromBeginning: true,
 });
@@ -234,5 +241,17 @@ app.storageQueue("validateWalletInstance", {
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
-  queueName: config.azure.queue.walletInstanceRevocation.name,
+  queueName:
+    config.azure.storage.walletInstances.queues.validateCertificates.name,
+});
+
+app.storageQueue("callPidIssuerRevokeApi", {
+  connection: "StorageConnectionString",
+  handler: CallPidIssuerRevokeApiFunction({
+    credentialRepository: pidIssuerClient,
+    inputDecoder: FiscalCode,
+    telemetryClient: appInsightsClient,
+  }),
+  queueName:
+    config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
 });

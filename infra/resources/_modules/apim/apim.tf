@@ -50,40 +50,9 @@ resource "azurerm_api_management_named_value" "user_func_key" {
   secret              = "true"
 }
 
-resource "azurerm_api_management_named_value" "trial_id" {
-  name                = "trial-id"
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
-  display_name        = "trial-id"
-  value               = "01J2GN4TA8FB6DPTAX3T3YD6M1"
-  secret              = false
-}
-
-resource "azurerm_api_management_named_value" "trial_system_api_key" {
-  name                = "trial-system-api-key"
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
-  display_name        = "trial-system-api-key"
-  value               = data.azurerm_key_vault_secret.trial_system_api_key.value
-  secret              = true
-}
-
-resource "azurerm_api_management_named_value" "trial_system_feature_flag" {
-  name                = "trial-system-feature-flag"
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
-  display_name        = "trial-system-feature-flag"
-  value               = false
-}
-
 data "azurerm_key_vault_secret" "funciowallet_default" {
   name         = "funciowallet-KEY-APPBACKEND"
   key_vault_id = var.key_vault_id
-}
-
-data "azurerm_key_vault_secret" "trial_system_api_key" {
-  name         = "TrialSystemApiKey"
-  key_vault_id = var.key_vault_wallet_id
 }
 
 // SUPPORT API
