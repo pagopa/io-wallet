@@ -29,7 +29,7 @@
     "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI",
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
     "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
-    "RevocationQueueName": "REVOCATION_QUEUE_NAME",
+    "ValidateWalletInstanceCertificatesQueueName": "VALIDATE_WALLET_INSTANCE_CERTIFICATES_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
     "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
@@ -40,6 +40,7 @@
     "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
     "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED",
-    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK"
+    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK",
+    "PidIssuerRevokeApiQueueName": "PID_ISSUER_REVOKE_API_QUEUE_NAME"
   }
 }
