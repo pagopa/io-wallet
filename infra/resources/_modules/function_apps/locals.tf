@@ -53,7 +53,8 @@ locals {
     "addWalletInstanceToValidationQueue",
     "validateWalletInstance",
     "generateEntityConfiguration",
-    "callPidIssuerRevokeApi"
+    "callPidIssuerRevokeApi",
+    "sendEmailOnWalletInstanceCreationQueue",
   ]
 
   function_app_user = {

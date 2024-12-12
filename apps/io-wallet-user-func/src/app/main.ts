@@ -261,7 +261,7 @@ app.storageQueue("callPidIssuerRevokeApi", {
     config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
 });
 
-app.storageQueue("sendEmailOnWalletInstanceCreation", {
+app.storageQueue("sendEmailOnWalletInstanceCreationQueue", {
   connection: "StorageConnectionString",
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
