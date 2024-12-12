@@ -1,15 +1,10 @@
+import { IWalletInstanceRevocationStorageQueue } from "@/wallet-instance-revocation-process";
 import { QueueClient } from "@azure/storage-queue";
 import * as E from "fp-ts/lib/Either";
 import * as J from "fp-ts/lib/Json";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
-
-export interface IWalletInstanceRevocationStorageQueue {
-  insert: (
-    walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
-  ) => TE.TaskEither<Error, void>;
-}
 
 export class WalletInstanceRevocationStorageQueue
   implements IWalletInstanceRevocationStorageQueue

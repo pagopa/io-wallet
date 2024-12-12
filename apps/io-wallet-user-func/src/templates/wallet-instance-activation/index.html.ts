@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-lines-per-function
-export default (firstName: string, faqLink: string, ioAppLink: string) => `
+export default (faqLink: string, ioAppLink: string) => `
 <!doctype html>
 <html lang="it" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
@@ -324,7 +324,7 @@ export default (firstName: string, faqLink: string, ioAppLink: string) => `
                               <tr>
                                 <td align="left" class="text" style="font-size:0px;padding:10px 25px;padding-top:0px;padding-right:0px;padding-bottom:0px;padding-left:0px;word-break:break-word;">
                                   <div style="font-family:Titillium Web, system-ui, sans-serif;font-size:16px;font-weight:regular;line-height:24px;text-align:left;color:#17324D;">
-                                    <p> Ciao ${firstName},<br /><br /> il tuo portafoglio sull'app IO è pronto a <strong>ricevere la versione digitale dei<br /> tuoi documenti</strong> personali! </p>
+                                    <p> Ciao,<br /><br /> il tuo portafoglio sull'app IO è pronto a <strong>ricevere la versione digitale dei<br /> tuoi documenti</strong> personali! </p>
                                     <p>
                                       <strong>Attiva Documenti su IO</strong>
                                     </p>

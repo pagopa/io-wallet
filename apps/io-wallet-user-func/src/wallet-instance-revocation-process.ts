@@ -128,3 +128,9 @@ export const revokeInvalidWalletInstances: (
             revocationQueue.insert(walletInstance),
       ),
     );
+
+export interface IWalletInstanceRevocationStorageQueue {
+  insert: (
+    walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
+  ) => TE.TaskEither<Error, void>;
+}
