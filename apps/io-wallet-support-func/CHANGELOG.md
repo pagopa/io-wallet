@@ -1,5 +1,13 @@
 # io-wallet-support-func
 
+## 1.4.2
+
+### Patch Changes
+
+- 9d44162: Added async call to PID issuer
+- Updated dependencies [9d44162]
+  - io-wallet-common@1.3.2
+
 ## 1.4.1
 
 ### Patch Changes
