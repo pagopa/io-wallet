@@ -7,7 +7,7 @@ import {
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
-import { QueueClient } from "@azure/storage-queue";
+import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -72,7 +72,11 @@ describe("CreateWalletInstanceHandler", () => {
   };
 
   const queueClient: QueueClient = {
-    sendMessage: async () => TE.right({ errorCode: undefined }),
+    sendMessage: () =>
+      Promise.resolve({
+        errorCode: undefined,
+        messageId: "messageId",
+      } as QueueSendMessageResponse),
   } as unknown as QueueClient;
 
   const telemetryClient: appInsights.TelemetryClient = {
