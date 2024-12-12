@@ -1,10 +1,10 @@
-# IO Wallet - Support Function
+# IO Wallet - User Function
 
 ### Introduction
 
 Welcome! 😊
 
-This is the `io-wallet-support-func`, a backend porject made in [NodeJS](https://nodejs.org/), [TypeScript](https://www.typescriptlang.org/), [fp-ts](https://gcanti.github.io/fp-ts/) and different [Azure SDKs](https://azure.github.io/azure-sdk/#javascript) for the IO Wallet app. This backend includes the necessary functionality to support IO Wallet users.
+This is the `io-wallet-user-func`, a backend porject made in [NodeJS](https://nodejs.org/), [TypeScript](https://www.typescriptlang.org/), [fp-ts](https://gcanti.github.io/fp-ts/) and different [Azure SDKs](https://azure.github.io/azure-sdk/#javascript) for the IO Wallet app. This backend includes the necessary functionality used directly from the IO Wallet end users.
 
 This project uses the main fllowing NPM packages:
 
@@ -22,7 +22,7 @@ This project uses [Yarn](https://classic.yarnpkg.com/) as dependencies manager.
 
 Moreover, this project is strongly correlated to different [Azure Cloud](https://learn.microsoft.com/en-us/azure/?product=popular) Resources, all available by logging in with your user name directly to the Azure portal. The two most important Azure resources used by this service are [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) and [Azure CosmosDB](https://learn.microsoft.com/en-us/azure/cosmos-db/).
 
-> ❗❗❗ if you haven't already, it's strongly recommended to read the `README.md` file at the monorepo level (in the root directory of the monorepo). It will give you more context and a better understanding of how to get this project started. The `io-wallet-support-func` uses the `io-wallet-common` package; you can see under the `packages/` folder of the monorepo.
+> ❗❗❗ if you haven't already, it's strongly recommended to read the `README.md` file at the monorepo level (in the root directory of the monorepo). It will give you more context and a better understanding of how to get this project started. The `io-wallet-user-func` uses the `io-wallet-common` package; you can see under the `packages/` folder of the monorepo.
 
 ### Prerequisites
 
@@ -64,7 +64,8 @@ cp local.settings.json.example local.settings.json
 yarn start          # [Description]
                     #       Run the function in a local environment
                     # [Aliases]
-                    #       func start --port 7072
+                    #       func start
+                    #       func start --port 7071
                     #       yarn run start
 
 
@@ -128,7 +129,7 @@ yarn build:watch    # [Description]
 Before following the steps below:
 
 - Make sure your Node version is as specified in the `.node-version` file.
-- Make sure you've build the `io-wallet-common` package at the monorepo level. This is a very important package for the `io-wallet-support-func`.
+- Make sure you've build the `io-wallet-common` package at the monorepo level. This is a very important package for the `io-wallet-user-func`.
 
 To quickly start this project in a local environment, run the following commands in the order they appear:
 
@@ -138,7 +139,7 @@ yarn build      # building the project and creating the dist/ directory
 yarn start      # generating different log into your shell
 ```
 
-To make sure the function is up, just go to a browser and type the following URL in the search bar, which invokes the healthcheck API: `http://localhost:7072/api/v1/wallet/health`. Alternatively, if you have the curl package installed on your operating system, simply open a terminal and type the following command:
+To make sure the function is up, just go to a browser and type the following URL in the search bar, which invokes the healthcheck API: `http://localhost:7071/api/v1/wallet/health`. Alternatively, if you have the curl package installed on your operating system, simply open a terminal and type the following command:
 
 ```bash
 curl http://localhost:7071/api/v1/wallet/health
@@ -150,7 +151,7 @@ In both cases, you should see the following response, expressed in JSON format:
 { "message": "it works!" }
 ```
 
-As you can see, the function is listening on `7072` port. You can change the listening port with the following command:
+As you can see, the function is listening on `7071` port. You can change the listening port with the following command:
 
 ```bash
 func start --port YOUR_PORT
