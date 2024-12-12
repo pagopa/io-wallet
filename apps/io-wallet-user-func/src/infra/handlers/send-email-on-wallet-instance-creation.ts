@@ -14,10 +14,10 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { EmailNotificationService } from "../email-notification-service";
 
 // [SIW-1560] to do - a mock function that return the user email by the fiscal code
-const getUserInfoByFiscalCode = (
+const getUserEmailByFiscalCode = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fiscalCode: string,
-): RTE.ReaderTaskEither<object, Error, { email: string; firstName: string }> =>
+): RTE.ReaderTaskEither<object, Error, string> =>
   RTE.left(new Error("Not implemented yet"));
 
 export const sendEmailToUser: (
@@ -34,17 +34,16 @@ export const sendEmailToUser: (
 export const SendEmailOnWalletInstanceCreationHandler = H.of(
   (fiscalCode: FiscalCode) =>
     pipe(
-      getUserInfoByFiscalCode(fiscalCode),
-      RTE.chainW(({ email, firstName }) =>
+      getUserEmailByFiscalCode(fiscalCode),
+      RTE.chainW((emailAddress) =>
         sendEmailToUser({
           html: WalletInstanceActivationEmailTemplate(
-            firstName,
             WALLET_ACTIVATION_EMAIL_FAQ_LINK,
             WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
           ),
           subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
           text: WALLET_ACTIVATION_EMAIL_TEXT,
-          to: email,
+          to: emailAddress,
         }),
       ),
     ),
