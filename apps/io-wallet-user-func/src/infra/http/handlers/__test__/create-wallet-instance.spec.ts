@@ -4,18 +4,17 @@ import {
   AttestationService,
   ValidateAssertionRequest,
 } from "@/attestation-service";
-import { SendEmailNotificationParams } from "@/email-notification-service";
 import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
-import { EmailNotificationService } from "@/infra/email-notification-service";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
-import { MailerTransporter } from "@pagopa/io-functions-commons/dist/src/mailer";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import { pipe } from "fp-ts/lib/function";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
@@ -72,9 +71,9 @@ describe("CreateWalletInstanceHandler", () => {
       }),
   };
 
-  const mockEmailNotificationService: EmailNotificationService = {
-    sendEmail: (params: SendEmailNotificationParams) => TE.right(undefined),
-  } as EmailNotificationService;
+  const queueClient: QueueClient = {
+    sendMessage: () => TE.right({ errorCode: undefined }),
+  } as unknown as QueueClient;
 
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
@@ -88,11 +87,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -115,11 +114,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -147,11 +146,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -184,11 +183,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
@@ -220,11 +219,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
@@ -257,11 +256,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailNotificationService: mockEmailNotificationService,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });

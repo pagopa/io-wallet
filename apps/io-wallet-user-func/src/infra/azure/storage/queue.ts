@@ -26,7 +26,7 @@ const sendMessage =
   > =>
   ({ queueClient }) =>
     pipe(
-      TE.tryCatch(() => queueClient.sendMessage(message), E.toError),
+      TE.tryCatch(async () => queueClient.sendMessage(message), E.toError),
       TE.filterOrElse(
         (response) => response.errorCode === undefined,
         (response) => new StorageQueueError(response.errorCode),

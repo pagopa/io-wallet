@@ -126,6 +126,12 @@ export type AttestationServiceConfiguration = t.TypeOf<
 const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
+  queue: t.type({
+    walletInstanceCreation: t.type({
+      connectionString: t.string,
+      name: t.string,
+    }),
+  }),
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
     walletInstances: t.type({
@@ -284,6 +290,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
+    creationQueueName: readFromEnvironment("WalletInstanceCreationQueueName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
@@ -301,6 +308,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     ({
       appInsights,
       cosmos,
+      creationQueueName,
       entityConfigurationStorageContainerName,
       pidIssuerRevokeApiQueueName,
       storageAccountConnectionString,
@@ -308,6 +316,12 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     }) => ({
       appInsights,
       cosmos,
+      queue: {
+        walletInstanceCreation: {
+          connectionString: storageAccountConnectionString,
+          name: creationQueueName,
+        },
+      },
       storage: {
         entityConfiguration: {
           containerName: entityConfigurationStorageContainerName,

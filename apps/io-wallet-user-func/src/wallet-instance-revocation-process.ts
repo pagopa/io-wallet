@@ -13,6 +13,7 @@ import {
 
 import { AttestationServiceConfiguration } from "./app/config";
 import { getCrlFromUrls, validateRevocation } from "./certificates";
+import { WalletInstanceRevocationStorageQueue } from "./infra/azure/storage/wallet-instance-revocation";
 import { obfuscatedUserId } from "./user";
 import {
   WalletInstanceRepository,
@@ -61,7 +62,7 @@ export const revokeInvalidWalletInstances: (
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
     notificationService: NotificationService;
-    revocationQueue: WalletInstanceRevocationQueue;
+    revocationQueue: WalletInstanceRevocationStorageQueue;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
@@ -124,12 +125,6 @@ export const revokeInvalidWalletInstances: (
               TE.chain(() => TE.right(undefined)),
             )
           : // Re-enter it in the queue for later verification.
-            pipe(walletInstance, revocationQueue.insert),
+            revocationQueue.insert(walletInstance),
       ),
     );
-
-export interface WalletInstanceRevocationQueue {
-  insert: (
-    walletInstance: WalletInstanceValidWithAndroidCertificatesChain,
-  ) => TE.TaskEither<Error, void>;
-}
