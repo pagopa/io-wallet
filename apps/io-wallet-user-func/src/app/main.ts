@@ -19,6 +19,7 @@ import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functio
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationService } from "@/infra/email-notification-service";
+import { getEmail } from "@/infra/handlers/send-email-on-wallet-instance-creation";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -265,6 +266,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   connection: "StorageConnectionString",
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
+    getEmail: getEmail(config.authProfile),
     inputDecoder: FiscalCode,
   }),
   queueName: config.azure.storage.walletInstances.queues.sendEmail.name,

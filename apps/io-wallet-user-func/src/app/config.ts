@@ -147,6 +147,14 @@ const AzureConfig = t.type({
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
 
+const AuthProfileApiConfig = t.type({
+  apiKey: t.string,
+  baseURL: t.string,
+  httpRequestTimeout: NumberFromString,
+});
+
+export type AuthProfileApiConfig = t.TypeOf<typeof AuthProfileApiConfig>;
+
 const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
   clientCertificate: t.string,
@@ -162,6 +170,7 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
+  authProfile: AuthProfileApiConfig,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
@@ -384,6 +393,15 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
+const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  Omit<AuthProfileApiConfig, "httpRequestTimeout">
+> = sequenceS(RE.Apply)({
+  apiKey: readFromEnvironment("AuthProfileApiKey"),
+  baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
+});
+
 export const getConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -391,6 +409,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     attestationService: getAttestationServiceConfigFromEnvironment,
+    authProfile: getAuthProfileApiConfigFromEnvironment,
     azure: getAzureConfigFromEnvironment,
     crypto: getCryptoConfigFromEnvironment,
     federationEntity: getFederationEntityConfigFromEnvironment,
@@ -402,11 +421,22 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),
-  RE.map(({ attestationService, httpRequestTimeout, ...remainingConfigs }) => ({
-    ...remainingConfigs,
-    attestationService: {
-      ...attestationService,
+  RE.map(
+    ({
+      attestationService,
+      authProfile,
       httpRequestTimeout,
-    },
-  })),
+      ...remainingConfigs
+    }) => ({
+      ...remainingConfigs,
+      attestationService: {
+        ...attestationService,
+        httpRequestTimeout,
+      },
+      authProfile: {
+        ...authProfile,
+        httpRequestTimeout,
+      },
+    }),
+  ),
 );
