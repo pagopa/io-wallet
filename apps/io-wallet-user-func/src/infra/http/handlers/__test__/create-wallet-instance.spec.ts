@@ -24,6 +24,8 @@ const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
+  const emailQueuingEnabled = true;
+
   const walletInstanceRequest = {
     challenge,
     fiscal_code: mockFiscalCode,
@@ -91,6 +93,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -118,6 +121,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -150,6 +154,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -187,6 +192,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -223,6 +229,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -260,6 +267,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

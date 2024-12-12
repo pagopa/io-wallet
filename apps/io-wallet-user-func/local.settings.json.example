@@ -30,7 +30,6 @@
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
     "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
     "SendEmailQueueName": "WALLET_INSTANCE_ACTIVATION_EMAIL_QUEUE",
-    "RevocationQueueName": "REVOCATION_QUEUE_NAME",
     "ValidateWalletInstanceCertificatesQueueName": "VALIDATE_WALLET_INSTANCE_CERTIFICATES_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
