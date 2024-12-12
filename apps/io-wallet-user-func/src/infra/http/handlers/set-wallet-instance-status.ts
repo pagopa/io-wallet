@@ -1,4 +1,4 @@
-import { revokeAllCredentials } from "@/credential";
+import { enqueue } from "@/infra/azure/storage/queue";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -37,16 +37,14 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
     RTE.fromEither,
     RTE.chain(({ fiscalCode, walletInstanceId }) =>
       pipe(
-        // invoke PID issuer services to revoke all credentials for that user
-        revokeAllCredentials(fiscalCode),
-        RTE.chainW(() =>
-          // access our database to revoke the wallet instance
-          revokeUserWalletInstances(
-            fiscalCode,
-            [walletInstanceId],
-            "REVOKED_BY_USER",
-          ),
+        // access our database to revoke the wallet instance
+        revokeUserWalletInstances(
+          fiscalCode,
+          [walletInstanceId],
+          "REVOKED_BY_USER",
         ),
+        // writes the fiscal code to the queue to request the revocation of credentials from the issuer asynchronously
+        RTE.chainW(() => enqueue(fiscalCode)),
         RTE.orElseFirstW((error) =>
           pipe(
             sendTelemetryException(error, {
