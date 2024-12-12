@@ -72,7 +72,7 @@ describe("CreateWalletInstanceHandler", () => {
   };
 
   const queueClient: QueueClient = {
-    sendMessage: () => TE.right({ errorCode: undefined }),
+    sendMessage: async () => TE.right({ errorCode: undefined }),
   } as unknown as QueueClient;
 
   const telemetryClient: appInsights.TelemetryClient = {
