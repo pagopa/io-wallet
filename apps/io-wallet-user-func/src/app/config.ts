@@ -293,9 +293,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     pidIssuerRevokeApiQueueName: readFromEnvironment(
       "PidIssuerRevokeApiQueueName",
     ),
-    sendEmailQueueName: readFromEnvironment(
-      "WalletInstanceActivationEmailQueue",
-    ),
+    sendEmailQueueName: readFromEnvironment("SendEmailQueueName"),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
     ),

@@ -71,7 +71,7 @@ const pidIssuerRevokeApiQueue = queueServiceClient.getQueueClient(
   config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
 );
 
-const walletInstanceActivationQueue = queueServiceClient.getQueueClient(
+const sendEmailQueue = queueServiceClient.getQueueClient(
   config.azure.storage.walletInstances.queues.sendEmail.name,
 );
 
@@ -132,7 +132,7 @@ app.http("createWalletInstance", {
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
       nonceRepository,
-      queueClient: walletInstanceActivationQueue,
+      queueClient: sendEmailQueue,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
