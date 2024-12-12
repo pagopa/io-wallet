@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.3.2
+
+### Patch Changes
+
+- 9d44162: Added async call to PID issuer
+
 ## 1.3.1
 
 ### Patch Changes
