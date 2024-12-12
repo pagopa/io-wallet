@@ -131,10 +131,6 @@ const AzureConfig = t.type({
       connectionString: t.string,
       name: t.string,
     }),
-    walletInstanceRevocation: t.type({
-      connectionString: t.string,
-      name: t.string,
-    }),
   }),
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
@@ -144,7 +140,7 @@ const AzureConfig = t.type({
         pidIssuerRevokeApi: t.type({
           name: t.string,
         }),
-        walletInstanceRevocation: t.type({
+        validateCertificates: t.type({
           name: t.string,
         }),
       }),
@@ -301,9 +297,11 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     pidIssuerRevokeApiQueueName: readFromEnvironment(
       "PidIssuerRevokeApiQueueName",
     ),
-    revocationQueueName: readFromEnvironment("RevocationQueueName"),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
+    ),
+    validateWalletInstanceCertificatesQueueName: readFromEnvironment(
+      "ValidateWalletInstanceCertificatesQueueName",
     ),
   }),
   RE.map(
@@ -313,8 +311,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
       creationQueueName,
       entityConfigurationStorageContainerName,
       pidIssuerRevokeApiQueueName,
-      revocationQueueName,
       storageAccountConnectionString,
+      validateWalletInstanceCertificatesQueueName,
     }) => ({
       appInsights,
       cosmos,
@@ -322,10 +320,6 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
         walletInstanceCreation: {
           connectionString: storageAccountConnectionString,
           name: creationQueueName,
-        },
-        walletInstanceRevocation: {
-          connectionString: storageAccountConnectionString,
-          name: revocationQueueName,
         },
       },
       storage: {
@@ -338,8 +332,8 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
             pidIssuerRevokeApi: {
               name: pidIssuerRevokeApiQueueName,
             },
-            walletInstanceRevocation: {
-              name: revocationQueueName,
+            validateCertificates: {
+              name: validateWalletInstanceCertificatesQueueName,
             },
           },
         },

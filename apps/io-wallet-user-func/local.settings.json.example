@@ -31,6 +31,7 @@
     "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
     "WalletInstanceCreationQueueName": "WALLET_INSTANCE_CREATION_QUEUE_NAME",
     "RevocationQueueName": "REVOCATION_QUEUE_NAME",
+    "ValidateWalletInstanceCertificatesQueueName": "VALIDATE_WALLET_INSTANCE_CERTIFICATES_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
     "PidIssuerApiClientPrivateKey": "PID_ISSUER_API_CLIENT_PRIVATE_KEY",
