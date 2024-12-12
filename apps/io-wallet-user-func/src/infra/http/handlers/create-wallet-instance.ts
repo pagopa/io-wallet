@@ -3,6 +3,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
+import { enqueue } from "@/infra/azure/storage/queue";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
@@ -79,6 +80,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
+            RTE.chainW(() => enqueue(walletInstance.userId)),
           ),
         ),
       ),

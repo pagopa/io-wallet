@@ -1,4 +1,4 @@
-import { WalletInstanceRevocationQueue } from "@/wallet-instance-revocation-process";
+import { IWalletInstanceRevocationStorageQueue } from "@/wallet-instance-revocation-process";
 import { QueueClient } from "@azure/storage-queue";
 import * as E from "fp-ts/lib/Either";
 import * as J from "fp-ts/lib/Json";
@@ -7,7 +7,7 @@ import { pipe } from "fp-ts/lib/function";
 import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
 
 export class WalletInstanceRevocationStorageQueue
-  implements WalletInstanceRevocationQueue
+  implements IWalletInstanceRevocationStorageQueue
 {
   #client: QueueClient;
 
@@ -24,7 +24,7 @@ export class WalletInstanceRevocationStorageQueue
         TE.tryCatch(
           () =>
             this.#client.sendMessage(walletInstanceString, {
-              visibilityTimeout: 60 * 60 * 24, //24 hours
+              visibilityTimeout: 60 * 60 * 24, // 24 hours
             }),
           E.toError,
         ),

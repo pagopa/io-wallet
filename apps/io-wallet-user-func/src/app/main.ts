@@ -12,11 +12,13 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { EmailNotificationService } from "@/infra/email-notification-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -59,7 +61,7 @@ const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.storage.walletInstances.connectionString,
 );
 
-const revocationQueue = new WalletInstanceRevocationStorageQueue(
+const walletInstanceRevocationQueue = new WalletInstanceRevocationStorageQueue(
   queueServiceClient.getQueueClient(
     config.azure.storage.walletInstances.queues.validateCertificates.name,
   ),
@@ -67,6 +69,10 @@ const revocationQueue = new WalletInstanceRevocationStorageQueue(
 
 const pidIssuerRevokeApiQueue = queueServiceClient.getQueueClient(
   config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
+);
+
+const sendEmailQueue = queueServiceClient.getQueueClient(
+  config.azure.storage.walletInstances.queues.sendEmail.name,
 );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
@@ -89,6 +95,8 @@ const mobileAttestationService = new MobileAttestationService(
 );
 
 const slackNotificationService = new SlackNotificationService(config.slack);
+
+const emailNotificationService = new EmailNotificationService(config.mail);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
@@ -124,6 +132,7 @@ app.http("createWalletInstance", {
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
       nonceRepository,
+      queueClient: sendEmailQueue,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -233,7 +242,7 @@ app.storageQueue("validateWalletInstance", {
     attestationServiceConfiguration: config.attestationService,
     inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
     notificationService: slackNotificationService,
-    revocationQueue,
+    revocationQueue: walletInstanceRevocationQueue,
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
@@ -250,4 +259,13 @@ app.storageQueue("callPidIssuerRevokeApi", {
   }),
   queueName:
     config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
+});
+
+app.storageQueue("sendEmailOnWalletInstanceCreation", {
+  connection: "StorageConnectionString",
+  handler: SendEmailOnWalletInstanceCreationFunction({
+    emailNotificationService,
+    inputDecoder: FiscalCode,
+  }),
+  queueName: config.azure.storage.walletInstances.queues.sendEmail.name,
 });
