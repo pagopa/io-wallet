@@ -29,7 +29,7 @@
     "EntityConfigurationStorageAccount__serviceUri": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT__SERVICE_URI",
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
     "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
-    "WalletInstanceCreationQueueName": "WALLET_INSTANCE_CREATION_QUEUE_NAME",
+    "WalletInstanceActivationEmailQueue": "WALLET_INSTANCE_ACTIVATION_EMAIL_QUEUE",
     "RevocationQueueName": "REVOCATION_QUEUE_NAME",
     "ValidateWalletInstanceCertificatesQueueName": "VALIDATE_WALLET_INSTANCE_CERTIFICATES_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",

@@ -126,12 +126,6 @@ export type AttestationServiceConfiguration = t.TypeOf<
 const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
-  queue: t.type({
-    walletInstanceCreation: t.type({
-      connectionString: t.string,
-      name: t.string,
-    }),
-  }),
   storage: t.type({
     entityConfiguration: t.type({ containerName: t.string }),
     walletInstances: t.type({
@@ -141,6 +135,9 @@ const AzureConfig = t.type({
           name: t.string,
         }),
         validateCertificates: t.type({
+          name: t.string,
+        }),
+        walletInstanceActivation: t.type({
           name: t.string,
         }),
       }),
@@ -290,7 +287,6 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
-    creationQueueName: readFromEnvironment("WalletInstanceCreationQueueName"),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
@@ -303,25 +299,22 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
     validateWalletInstanceCertificatesQueueName: readFromEnvironment(
       "ValidateWalletInstanceCertificatesQueueName",
     ),
+    walletInstanceActivationEmailQueue: readFromEnvironment(
+      "WalletInstanceActivationEmailQueue",
+    ),
   }),
   RE.map(
     ({
       appInsights,
       cosmos,
-      creationQueueName,
       entityConfigurationStorageContainerName,
       pidIssuerRevokeApiQueueName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
+      walletInstanceActivationEmailQueue,
     }) => ({
       appInsights,
       cosmos,
-      queue: {
-        walletInstanceCreation: {
-          connectionString: storageAccountConnectionString,
-          name: creationQueueName,
-        },
-      },
       storage: {
         entityConfiguration: {
           containerName: entityConfigurationStorageContainerName,
@@ -334,6 +327,9 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
             },
             validateCertificates: {
               name: validateWalletInstanceCertificatesQueueName,
+            },
+            walletInstanceActivation: {
+              name: walletInstanceActivationEmailQueue,
             },
           },
         },

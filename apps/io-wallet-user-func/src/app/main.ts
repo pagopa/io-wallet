@@ -71,8 +71,8 @@ const pidIssuerRevokeApiQueue = queueServiceClient.getQueueClient(
   config.azure.storage.walletInstances.queues.pidIssuerRevokeApi.name,
 );
 
-const walletInstanceCreationQueue = queueServiceClient.getQueueClient(
-  config.azure.queue.walletInstanceCreation.name,
+const walletInstanceActivationQueue = queueServiceClient.getQueueClient(
+  config.azure.storage.walletInstances.queues.walletInstanceActivation.name,
 );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
@@ -132,7 +132,7 @@ app.http("createWalletInstance", {
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
       nonceRepository,
-      queueClient: walletInstanceCreationQueue,
+      queueClient: walletInstanceActivationQueue,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -267,5 +267,6 @@ app.storageQueue("sendEmailOnWalletInstanceCreationQueue", {
     emailNotificationService,
     inputDecoder: FiscalCode,
   }),
-  queueName: config.azure.queue.walletInstanceCreation.name,
+  queueName:
+    config.azure.storage.walletInstances.queues.walletInstanceActivation.name,
 });
