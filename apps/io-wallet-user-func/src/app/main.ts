@@ -18,8 +18,7 @@ import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wal
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
-import { EmailNotificationService } from "@/infra/email-notification-service";
-import { getEmail } from "@/infra/handlers/send-email-on-wallet-instance-creation";
+import { EmailNotificationService, getEmail } from "@/infra/email";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
