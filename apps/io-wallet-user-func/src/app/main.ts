@@ -18,7 +18,7 @@ import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wal
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
-import { EmailNotificationService } from "@/infra/email-notification-service";
+import { EmailNotificationServiceClient } from "@/infra/email";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -96,7 +96,10 @@ const mobileAttestationService = new MobileAttestationService(
 
 const slackNotificationService = new SlackNotificationService(config.slack);
 
-const emailNotificationService = new EmailNotificationService(config.mail);
+const emailNotificationService = new EmailNotificationServiceClient({
+  authProfileApiConfig: config.authProfile,
+  mailConfig: config.mail,
+});
 
 app.http("healthCheck", {
   authLevel: "anonymous",
