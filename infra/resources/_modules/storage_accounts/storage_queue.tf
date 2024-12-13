@@ -12,3 +12,8 @@ resource "azurerm_storage_queue" "pid_issuer_revoke_api_01" {
   name                 = "pid-issuer-revoke-api-01"
   storage_account_name = module.storage_account.name
 }
+
+resource "azurerm_storage_queue" "wallet_instance_send_email_01" {
+  name                 = "wallet-instances-send-email-01"
+  storage_account_name = module.storage_account.name
+}
