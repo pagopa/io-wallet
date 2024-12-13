@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "<= 3.106.1"
+      version = "< 5.0"
     }
 
     azuread = {
@@ -83,6 +83,7 @@ module "cosmos" {
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
+  psn_service_principal_id          = data.azuread_service_principal.psn_app_id.client_id
 
   tags = local.tags
 }
