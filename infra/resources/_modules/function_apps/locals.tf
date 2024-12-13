@@ -39,6 +39,8 @@ locals {
     RevocationQueueName                         = var.revocation_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
+    AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-fn-01.azurewebsites.net"
+
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
     WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
     },

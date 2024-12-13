@@ -73,6 +73,10 @@ locals {
       {
         name                  = "AppInsightsConnectionString"
         key_vault_secret_name = "AppInsightsConnectionString"
+      },
+      {
+        name                  = "AuthProfileApiKey"
+        key_vault_secret_name = "AuthProfileApiKey"
       }
     ]
   }
