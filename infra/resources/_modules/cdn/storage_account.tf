@@ -15,11 +15,6 @@ resource "azurerm_storage_account" "this" {
     versioning_enabled = true
   }
 
-  # static_website {
-  #   index_document     = "index.html"
-  #   error_404_document = "404.html"
-  # }
-
   tags = var.tags
 }
 
