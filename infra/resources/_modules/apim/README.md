@@ -15,11 +15,11 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_apim_v2_wallet_pdnd_api"></a> [apim\_v2\_wallet\_pdnd\_api](#module\_apim\_v2\_wallet\_pdnd\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | api_mdoules |
+| <a name="module_apim_v2_wallet_pdnd_api"></a> [apim\_v2\_wallet\_pdnd\_api](#module\_apim\_v2\_wallet\_pdnd\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_pdnd_product"></a> [apim\_v2\_wallet\_pdnd\_product](#module\_apim\_v2\_wallet\_pdnd\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
-| <a name="module_apim_v2_wallet_support_api"></a> [apim\_v2\_wallet\_support\_api](#module\_apim\_v2\_wallet\_support\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | api_mdoules |
+| <a name="module_apim_v2_wallet_support_api"></a> [apim\_v2\_wallet\_support\_api](#module\_apim\_v2\_wallet\_support\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_product"></a> [apim\_v2\_wallet\_support\_product](#module\_apim\_v2\_wallet\_support\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
-| <a name="module_apim_v2_web_wallet_api"></a> [apim\_v2\_web\_wallet\_api](#module\_apim\_v2\_web\_wallet\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | api_mdoules |
+| <a name="module_apim_v2_web_wallet_api"></a> [apim\_v2\_web\_wallet\_api](#module\_apim\_v2\_web\_wallet\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 
 ## Resources
 
