@@ -1,31 +1,37 @@
 import { AuthProfileApiConfig, MailConfig } from "@/app/config";
-import {
-  GetEmail,
-  IEmailNotificationService,
-  SendEmailNotificationParams,
-} from "@/email";
+import { EmailNotificationService, SendEmailNotificationParams } from "@/email";
 import {
   getMailerTransporter,
   sendMail,
 } from "@pagopa/io-functions-commons/dist/src/mailer";
-import { EmailString } from "@pagopa/ts-commons/lib/strings";
+import { EmailString, FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
-export const getEmail: (config: AuthProfileApiConfig) => GetEmail =
-  (config) => (fiscalCode) =>
+export class EmailNotificationServiceClient
+  implements EmailNotificationService
+{
+  #authProfileApiConfig: AuthProfileApiConfig;
+  #mailConfig: MailConfig;
+
+  getUserEmail = (fiscalCode: FiscalCode) =>
     pipe(
       TE.tryCatch(
         async () => {
           const result = await fetch(
-            new URL(`/api/v1/profiles/${fiscalCode}`, config.baseURL),
+            new URL(
+              `/api/v1/profiles/${fiscalCode}`,
+              this.#authProfileApiConfig.baseURL,
+            ),
             {
               headers: {
-                "x-functions-key": config.apiKey,
+                "x-functions-key": this.#authProfileApiConfig.apiKey,
               },
               method: "GET",
-              signal: AbortSignal.timeout(config.httpRequestTimeout),
+              signal: AbortSignal.timeout(
+                this.#authProfileApiConfig.httpRequestTimeout,
+              ),
             },
           );
           if (!result.ok) {
@@ -50,28 +56,23 @@ export const getEmail: (config: AuthProfileApiConfig) => GetEmail =
       TE.map(({ email }) => email),
     );
 
-export class EmailNotificationService implements IEmailNotificationService {
-  #configuration: MailConfig;
-
-  sendEmail: (
-    params: SendEmailNotificationParams,
-  ) => TE.TaskEither<Error, void> = (params: SendEmailNotificationParams) =>
-    this.#configuration.mailFeatureFlag
+  sendEmail = (params: SendEmailNotificationParams) =>
+    this.#mailConfig.mailFeatureFlag
       ? pipe(
           // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
           {
-            MAIL_FROM: this.#configuration.mailSender,
+            MAIL_FROM: this.#mailConfig.mailSender,
             MAIL_TRANSPORTS: undefined,
             MAILHOG_HOSTNAME: undefined,
-            MAILUP_SECRET: this.#configuration.mailupSecret,
-            MAILUP_USERNAME: this.#configuration.mailupUsername,
+            MAILUP_SECRET: this.#mailConfig.mailupSecret,
+            MAILUP_USERNAME: this.#mailConfig.mailupUsername,
             NODE_ENV: "production",
             SENDGRID_API_KEY: undefined,
           },
           getMailerTransporter,
           (transporter) =>
             sendMail(transporter, {
-              from: this.#configuration.mailSender,
+              from: this.#mailConfig.mailSender,
               html: params.html,
               subject: params.subject,
               text: params.text,
@@ -80,7 +81,14 @@ export class EmailNotificationService implements IEmailNotificationService {
         )
       : TE.right(undefined);
 
-  constructor(mailConfig: MailConfig) {
-    this.#configuration = mailConfig;
+  constructor({
+    authProfileApiConfig,
+    mailConfig,
+  }: {
+    authProfileApiConfig: AuthProfileApiConfig;
+    mailConfig: MailConfig;
+  }) {
+    this.#authProfileApiConfig = authProfileApiConfig;
+    this.#mailConfig = mailConfig;
   }
 }

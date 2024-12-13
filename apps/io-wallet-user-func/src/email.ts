@@ -15,7 +15,8 @@ export type SendEmailNotificationParams = t.TypeOf<
   typeof SendEmailNotificationParams
 >;
 
-export interface IEmailNotificationService {
+export interface EmailNotificationService {
+  getUserEmail: (fiscalCode: FiscalCode) => TE.TaskEither<Error, EmailString>;
   sendEmail: (
     params: SendEmailNotificationParams,
   ) => TE.TaskEither<Error, void>;
@@ -24,21 +25,21 @@ export interface IEmailNotificationService {
 export const sendEmailToUser: (
   params: SendEmailNotificationParams,
 ) => RTE.ReaderTaskEither<
-  { emailNotificationService: IEmailNotificationService },
+  { emailNotificationService: EmailNotificationService },
   Error,
   void
 > =
   (params) =>
-  ({ emailNotificationService }) =>
-    emailNotificationService.sendEmail(params);
-
-export type GetEmail = (
-  fiscalCode: FiscalCode,
-) => TE.TaskEither<Error, EmailString>;
+  ({ emailNotificationService: { sendEmail } }) =>
+    pipe(params, sendEmail);
 
 export const getUserEmailByFiscalCode: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<{ getEmail: GetEmail }, Error, string> =
+) => RTE.ReaderTaskEither<
+  { emailNotificationService: EmailNotificationService },
+  Error,
+  string
+> =
   (fiscalCode) =>
-  ({ getEmail }) =>
-    pipe(fiscalCode, getEmail);
+  ({ emailNotificationService: { getUserEmail } }) =>
+    pipe(fiscalCode, getUserEmail);
