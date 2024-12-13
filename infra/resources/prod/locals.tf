@@ -77,6 +77,18 @@ locals {
       {
         name                  = "AuthProfileApiKey"
         key_vault_secret_name = "AuthProfileApiKey"
+      },
+      {
+        name                  = "MailupUsername"
+        key_vault_secret_name = "MailupUsername"
+      },
+      {
+        name                  = "MailupSecret"
+        key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name                  = "MailSender"
+        key_vault_secret_name = "MailSender"
       }
     ]
   }

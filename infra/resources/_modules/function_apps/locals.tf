@@ -39,6 +39,8 @@ locals {
     SendEmailQueueName                         = var.send_email_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
+    MailFeatureFlag = true
+
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-fn-01.azurewebsites.net"
 
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
