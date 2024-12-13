@@ -6,7 +6,7 @@ output "send_email_queue_name" {
 
 output "send_email_queue_name_01" {
   value = {
-    name = azurerm_storage_queue.wallet_instances_revocation_check_02.name
+    name = azurerm_storage_queue.wallet_instances_creation_check_01.name
   }
 }
 
