@@ -1,10 +1,10 @@
-output "revocation_queue_name" {
+output "send_email_queue_name" {
   value = {
     name = azurerm_storage_queue.wallet_instances_revocation_check.name
   }
 }
 
-output "revocation_queue_name_02" {
+output "send_email_queue_name_01" {
   value = {
     name = azurerm_storage_queue.wallet_instances_revocation_check_02.name
   }

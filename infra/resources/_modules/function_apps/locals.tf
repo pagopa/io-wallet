@@ -36,6 +36,7 @@ locals {
     PidIssuerHealthCheckEnabled   = false
 
     PidIssuerRevokeApiQueueName                 = var.pid_issuer_revoke_api_queue_name
+    SendEmailQueueName                         = var.send_email_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-fn-01.azurewebsites.net"
