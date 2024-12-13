@@ -57,29 +57,27 @@ export class EmailNotificationServiceClient
     );
 
   sendEmail = (params: SendEmailNotificationParams) =>
-    this.#mailConfig.mailFeatureFlag
-      ? pipe(
-          // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
-          {
-            MAIL_FROM: this.#mailConfig.mailSender,
-            MAIL_TRANSPORTS: undefined,
-            MAILHOG_HOSTNAME: undefined,
-            MAILUP_SECRET: this.#mailConfig.mailupSecret,
-            MAILUP_USERNAME: this.#mailConfig.mailupUsername,
-            NODE_ENV: "production",
-            SENDGRID_API_KEY: undefined,
-          },
-          getMailerTransporter,
-          (transporter) =>
-            sendMail(transporter, {
-              from: this.#mailConfig.mailSender,
-              html: params.html,
-              subject: params.subject,
-              text: params.text,
-              to: params.to,
-            }),
-        )
-      : TE.right(undefined);
+    pipe(
+      // required to comply with the constraints imposed by the MailupMailerConfig type from @pagopa/io-functions-commons
+      {
+        MAIL_FROM: this.#mailConfig.mailSender,
+        MAIL_TRANSPORTS: undefined,
+        MAILHOG_HOSTNAME: undefined,
+        MAILUP_SECRET: this.#mailConfig.mailupSecret,
+        MAILUP_USERNAME: this.#mailConfig.mailupUsername,
+        NODE_ENV: "production",
+        SENDGRID_API_KEY: undefined,
+      },
+      getMailerTransporter,
+      (transporter) =>
+        sendMail(transporter, {
+          from: this.#mailConfig.mailSender,
+          html: params.html,
+          subject: params.subject,
+          text: params.text,
+          to: params.to,
+        }),
+    );
 
   constructor({
     authProfileApiConfig,

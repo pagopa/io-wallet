@@ -41,12 +41,9 @@ const sendEmail =
     Error,
     void
   > =>
-  ({ emailQueuingEnabled }) =>
+  ({ emailQueuingEnabled, queueClient }) =>
     emailQueuingEnabled
-      ? pipe(
-          TE.tryCatch(async () => enqueue(fiscalCode), E.toError),
-          TE.map(() => undefined),
-        )
+      ? pipe({ queueClient }, enqueue(fiscalCode))
       : TE.right(undefined);
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
