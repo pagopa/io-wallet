@@ -40,7 +40,6 @@
     "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
     "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED",
-    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK",
-    "PidIssuerRevokeApiQueueName": "PID_ISSUER_REVOKE_API_QUEUE_NAME"
+    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK"
   }
 }
