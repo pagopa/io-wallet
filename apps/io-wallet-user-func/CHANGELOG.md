@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.2.4
+
+### Patch Changes
+
+- 8798c8f: Revert to sync call to PID issuer for revoke
+
 ## 2.2.3
 
 ### Patch Changes
