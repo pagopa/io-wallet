@@ -39,7 +39,7 @@ locals {
     SendEmailQueueName                         = var.send_email_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
-    MailFeatureFlag = true
+    MailFeatureFlag = false
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
 
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-fn-01.azurewebsites.net"
