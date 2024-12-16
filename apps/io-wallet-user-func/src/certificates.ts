@@ -1,6 +1,8 @@
 import { ValidationResult } from "@/attestation-service";
 import { KeyObject, X509Certificate } from "crypto";
+import * as RR from "fp-ts/ReadonlyRecord";
 import * as E from "fp-ts/lib/Either";
+import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
@@ -24,7 +26,7 @@ export const validateIssuance = (
     );
     if (!datesValid) {
       return {
-        reason: "Certificates expired",
+        reason: `Certificates expired: ${x509Chain}`,
         success: false,
       };
     }
@@ -37,7 +39,7 @@ export const validateIssuance = (
         const parent = x509Chain[index + 1];
         if (!cert || !parent || !cert.verify(parent.publicKey)) {
           return {
-            reason: "Certificates chain is invalid",
+            reason: `Certificates chain is invalid: ${x509Chain}`,
             success: false,
           };
         }
@@ -49,7 +51,7 @@ export const validateIssuance = (
   const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
   if (!rootCert || !rootCert.verify(rootPublicKey)) {
     return {
-      reason: `Root certificate is not signed by root public key provided: ${rootCert.serialNumber}`,
+      reason: `Root certificate is not signed by root public key provided: ${x509Chain}`,
       success: false,
     };
   }
@@ -101,24 +103,49 @@ export const validateRevocation = async (
   return { success: true };
 };
 
-export const getCrlFromUrl = (
-  crlUrl: string,
+const getCrlFromUrl =
+  (httpRequestTimeout = 4000) =>
+  (crlUrl: string): TE.TaskEither<Error, CRL> =>
+    pipe(
+      TE.tryCatch(
+        () =>
+          fetch(crlUrl, {
+            method: "GET",
+            signal: AbortSignal.timeout(httpRequestTimeout),
+          }),
+        E.toError,
+      ),
+      TE.chain((response) => TE.tryCatch(() => response.json(), E.toError)),
+      TE.chainEitherK((json) =>
+        pipe(
+          CRL.decode(json),
+          E.mapLeft(() => new Error("CRL invalid format")),
+        ),
+      ),
+    );
+
+export const mergeCRL = (input: readonly CRL[]): CRL =>
+  pipe(
+    input,
+    RA.reduce<CRL, CRL["entries"]>({}, (acc, curr) =>
+      pipe(
+        curr.entries,
+        RR.toReadonlyArray,
+        RA.reduce(acc, (merged, [key, value]) =>
+          RR.upsertAt(key, value)(merged),
+        ),
+      ),
+    ),
+    (entries) => ({ entries }),
+  );
+
+export const getCrlFromUrls = (
+  crlUrls: string[],
   httpRequestTimeout = 4000,
 ): TE.TaskEither<Error, CRL> =>
   pipe(
-    TE.tryCatch(
-      () =>
-        fetch(crlUrl, {
-          method: "GET",
-          signal: AbortSignal.timeout(httpRequestTimeout),
-        }),
-      E.toError,
-    ),
-    TE.chain((response) => TE.tryCatch(() => response.json(), E.toError)),
-    TE.chainEitherK((json) =>
-      pipe(
-        CRL.decode(json),
-        E.mapLeft(() => new Error("CRL invalid format")),
-      ),
-    ),
+    crlUrls,
+    RA.map(getCrlFromUrl(httpRequestTimeout)),
+    RA.sequence(TE.ApplicativePar),
+    TE.map(mergeCRL),
   );

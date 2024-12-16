@@ -21,10 +21,12 @@
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_apim"></a> [apim](#module\_apim) | ../_modules/apim | n/a |
+| <a name="module_apim_itn"></a> [apim\_itn](#module\_apim\_itn) | ../_modules/apim | n/a |
 | <a name="module_cdn"></a> [cdn](#module\_cdn) | ../_modules/cdn | n/a |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | ../_modules/cosmos | n/a |
 | <a name="module_function_apps"></a> [function\_apps](#module\_function\_apps) | ../_modules/function_apps | n/a |
 | <a name="module_iam"></a> [iam](#module\_iam) | ../_modules/iam | n/a |
+| <a name="module_ids"></a> [ids](#module\_ids) | ../_modules/ids | n/a |
 | <a name="module_key_vaults"></a> [key\_vaults](#module\_key\_vaults) | ../_modules/key_vaults | n/a |
 | <a name="module_monitoring"></a> [monitoring](#module\_monitoring) | ../_modules/monitoring | n/a |
 | <a name="module_storage_accounts"></a> [storage\_accounts](#module\_storage\_accounts) | ../_modules/storage_accounts | n/a |

@@ -1,5 +1,88 @@
 # io-wallet-user-func
 
+## 2.2.3
+
+### Patch Changes
+
+- 9d44162: Added async call to PID issuer
+- Updated dependencies [9d44162]
+  - io-wallet-common@1.3.2
+
+## 2.2.2
+
+### Patch Changes
+
+- 50c4813: Add multiple Android CRL url
+
+## 2.2.1
+
+### Patch Changes
+
+- e6e197b: Changed leaseContainerName for addWalletInstanceToValidationQueue function
+
+## 2.2.0
+
+### Minor Changes
+
+- 02fd0bb: Removed migrateWalletInstances function
+
+## 2.1.3
+
+### Patch Changes
+
+- d7e2dba: Changed cosmosdb env var in migrateWalletInstances function
+
+## 2.1.2
+
+### Patch Changes
+
+- d1179a6: Updated migrateWalletInstances function
+
+## 2.1.1
+
+### Patch Changes
+
+- 1671ade: Updated turbo dependency version
+- Updated dependencies [1671ade]
+  - io-wallet-common@1.3.1
+
+## 2.1.0
+
+### Minor Changes
+
+- 94c97c3: Added migrateWalletInstances user function and updated repository dependencies
+
+### Patch Changes
+
+- Updated dependencies [94c97c3]
+  - io-wallet-common@1.3.0
+
+## 2.0.2
+
+### Patch Changes
+
+- 0feaede: Remove unused algs
+
+## 2.0.1
+
+### Patch Changes
+
+- 125dfbe: Added getWalletInstance endpoint
+
+## 2.0.0
+
+### Major Changes
+
+- 2e7ce98: Updated getCurrentWalletInstanceStatus method from POST to GET
+
+## 1.3.10
+
+### Patch Changes
+
+- 07d296c: Add revocation reason to Wallet Instance
+- Updated dependencies [07d296c]
+  - io-wallet-common@1.2.1
+
 ## 1.3.9
 
 ### Minor Changes

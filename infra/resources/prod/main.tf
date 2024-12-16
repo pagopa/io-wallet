@@ -34,6 +34,16 @@ resource "azurerm_resource_group" "wallet" {
   tags = local.tags
 }
 
+module "ids" {
+  source = "../_modules/ids"
+
+  project             = local.project
+  location            = local.location
+  resource_group_name = azurerm_resource_group.wallet.name
+
+  tags = local.tags
+}
+
 module "key_vaults" {
   source = "../_modules/key_vaults"
 
@@ -72,6 +82,8 @@ module "cosmos" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
+  user_assigned_managed_identity_id = module.ids.psn_identity.id
+
   tags = local.tags
 }
 
@@ -93,19 +105,23 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
+  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet_02.endpoint
+  cosmos_database_name = module.cosmos.cosmos_account_wallet_02.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
-  key_vault_id        = data.azurerm_key_vault.weu_common.id
-  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+  key_vault_id          = data.azurerm_key_vault.weu_common.id
+  key_vault_wallet_id   = module.key_vaults.key_vault_wallet.id
+  key_vault_wallet_name = module.key_vaults.key_vault_wallet.name
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  revocation_queue_name = module.storage_accounts.revocation_queue_name.name
+  revocation_queue_name                            = module.storage_accounts.revocation_queue_name_02.name
+  validate_wallet_instance_certificates_queue_name = module.storage_accounts.revocation_queue_name_02.name
+  pid_issuer_revoke_api_queue_name                 = module.storage_accounts.pid_issuer_revoke_api_queue_name_01.name
 
-  user_func = local.user_func
+  user_func    = local.user_func
+  support_func = local.support_func
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
 
@@ -138,6 +154,17 @@ module "iam" {
     name                = module.cosmos.cosmos_account_wallet.name
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
     database_name       = module.cosmos.cosmos_account_wallet.database_name
+    admin_ids = [
+      data.azuread_group.io_developers.object_id,
+      data.azuread_group.io_admin.object_id,
+    ]
+  }
+
+  cosmos_db_02 = {
+    id                  = module.cosmos.cosmos_account_wallet_02.id
+    name                = module.cosmos.cosmos_account_wallet_02.name
+    resource_group_name = module.cosmos.cosmos_account_wallet_02.resource_group_name
+    database_name       = module.cosmos.cosmos_account_wallet_02.database_name
     admin_ids = [
       data.azuread_group.io_developers.object_id,
       data.azuread_group.io_admin.object_id,
@@ -187,6 +214,34 @@ module "apim" {
   apim = {
     name                = local.apim.name
     resource_group_name = local.apim.resource_group_name
+  }
+
+  function_apps = {
+    user_function = {
+      function_hostname = module.function_apps.function_app_user_02.default_hostname
+    }
+    support_function = {
+      function_hostname = module.function_apps.function_app_support.default_hostname
+    }
+  }
+
+  key_vault_id        = data.azurerm_key_vault.weu_common.id
+  key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
+  product_id = local.apim.products.io_web.product_id
+
+  tags = local.tags
+}
+
+module "apim_itn" {
+  source = "../_modules/apim"
+
+  revision = "v1"
+
+  project_legacy = local.project_legacy
+  apim = {
+    name                = local.apim_itn.name
+    resource_group_name = local.apim_itn.resource_group_name
   }
 
   function_apps = {

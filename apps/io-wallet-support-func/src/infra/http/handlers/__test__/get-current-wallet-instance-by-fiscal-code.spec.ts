@@ -89,6 +89,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             },
             id: "123" as NonEmptyString,
             isRevoked: true,
+            revocationReason: "NEW_WALLET_INSTANCE_CREATED",
             revokedAt: mockDate,
             signCount: 0,
             userId: "AAACCCZ55H501P" as FiscalCode,
@@ -110,6 +111,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
           created_at: mockDate,
           id: "123",
           is_revoked: true,
+          revocation_reason: "NEW_WALLET_INSTANCE_CREATED",
           revoked_at: mockDate,
         },
         headers: expect.objectContaining({
@@ -137,6 +139,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             },
             id: "123" as NonEmptyString,
             isRevoked: true,
+            revocationReason: "NEW_WALLET_INSTANCE_CREATED",
             revokedAt: mockDate,
             signCount: 0,
             userId: "AAACCCZ55H501P" as FiscalCode,
@@ -161,6 +164,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
           },
           id: "123",
           is_revoked: true,
+          revocation_reason: "NEW_WALLET_INSTANCE_CREATED",
           revoked_at: mockDate,
         },
         headers: expect.objectContaining({
@@ -192,6 +196,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
             },
             id: "123" as NonEmptyString,
             isRevoked: true,
+            revocationReason: "NEW_WALLET_INSTANCE_CREATED",
             revokedAt: mockDate,
             signCount: 0,
             userId: "AAACCCZ55H501P" as FiscalCode,
@@ -216,6 +221,7 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
           },
           id: "123",
           is_revoked: true,
+          revocation_reason: "NEW_WALLET_INSTANCE_CREATED",
           revoked_at: mockDate,
         },
         headers: expect.objectContaining({

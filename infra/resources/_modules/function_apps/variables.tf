@@ -71,6 +71,11 @@ variable "key_vault_wallet_id" {
   description = "Id of the wallet Key Vault where save secrets"
 }
 
+variable "key_vault_wallet_name" {
+  type        = string
+  description = "Name of the wallet Key Vault where save secrets"
+}
+
 variable "storage_account_cdn_name" {
   type        = string
   description = "Name of the CDN storage account"
@@ -85,6 +90,17 @@ variable "user_func" {
     }))
   })
   description = "Configuration of the user-func"
+}
+
+variable "support_func" {
+  type = object({
+    app_settings = list(object({
+      name                  = string
+      value                 = optional(string, "")
+      key_vault_secret_name = optional(string)
+    }))
+  })
+  description = "Configuration of the support-func"
 }
 
 variable "application_insights_connection_string" {
@@ -118,4 +134,14 @@ variable "action_group_io_id" {
 variable "revocation_queue_name" {
   type        = string
   description = "Wallet Instance Revocation Queue Name"
+}
+
+variable "validate_wallet_instance_certificates_queue_name" {
+  type        = string
+  description = "Wallet Instance Certificates Validation Queue Name"
+}
+
+variable "pid_issuer_revoke_api_queue_name" {
+  type        = string
+  description = "Pid Issuer Revoke API Queue Name"
 }

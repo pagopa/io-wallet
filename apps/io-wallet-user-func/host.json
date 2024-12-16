@@ -9,9 +9,9 @@
       "routePrefix": "api/v1/wallet"
     },
     "queues": {
-        "visibilityTimeout" : "00:05:00",
-        "batchSize": 16,
-        "maxDequeueCount": 5
+      "visibilityTimeout": "00:05:00",
+      "batchSize": 16,
+      "maxDequeueCount": 5
     }
   }
 }

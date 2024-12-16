@@ -1,5 +1,29 @@
 # io-wallet-common
 
+## 1.3.2
+
+### Patch Changes
+
+- 9d44162: Added async call to PID issuer
+
+## 1.3.1
+
+### Patch Changes
+
+- 1671ade: Updated turbo dependency version
+
+## 1.3.0
+
+### Minor Changes
+
+- 94c97c3: Added migrateWalletInstances user function and updated repository dependencies
+
+## 1.2.1
+
+### Patch Changes
+
+- 07d296c: Add revocation reason to Wallet Instance
+
 ## 1.2.0
 
 ### Minor Changes

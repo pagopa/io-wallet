@@ -14,7 +14,7 @@ locals {
   project_legacy = "${local.prefix}-${local.env_short}"
 
   location           = "italynorth"
-  secondary_location = "germanywestcentral"
+  secondary_location = "spaincentral"
 
   apim = {
     name                = "${local.project_legacy}-apim-v2-api"
@@ -24,6 +24,11 @@ locals {
         product_id = "io-web-api"
       }
     }
+  }
+
+  apim_itn = {
+    name                = "${local.project}-apim-01"
+    resource_group_name = "${local.project}-common-rg-01"
   }
 
   tags = {
@@ -64,6 +69,19 @@ locals {
       {
         name                  = "StorageConnectionString"
         key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
+      },
+      {
+        name                  = "AppInsightsConnectionString"
+        key_vault_secret_name = "AppInsightsConnectionString"
+      }
+    ]
+  }
+
+  support_func = {
+    app_settings = [
+      {
+        name                  = "AppInsightsConnectionString"
+        key_vault_secret_name = "AppInsightsConnectionString"
       }
     ]
   }
