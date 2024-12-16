@@ -106,8 +106,8 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet_02.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet_02.database_name
+  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
+  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
@@ -150,22 +150,11 @@ module "cdn" {
 module "iam" {
   source = "../_modules/iam"
 
-  cosmos_db = {
+  cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id
     name                = module.cosmos.cosmos_account_wallet.name
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
     database_name       = module.cosmos.cosmos_account_wallet.database_name
-    admin_ids = [
-      data.azuread_group.io_developers.object_id,
-      data.azuread_group.io_admin.object_id,
-    ]
-  }
-
-  cosmos_db_02 = {
-    id                  = module.cosmos.cosmos_account_wallet_02.id
-    name                = module.cosmos.cosmos_account_wallet_02.name
-    resource_group_name = module.cosmos.cosmos_account_wallet_02.resource_group_name
-    database_name       = module.cosmos.cosmos_account_wallet_02.database_name
     admin_ids = [
       data.azuread_group.io_developers.object_id,
       data.azuread_group.io_admin.object_id,

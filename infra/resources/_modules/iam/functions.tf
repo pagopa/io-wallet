@@ -4,12 +4,6 @@ module "func_app_user_02" {
 
   cosmos = [
     {
-      account_name        = var.cosmos_db.name
-      resource_group_name = var.cosmos_db.resource_group_name
-      database            = var.cosmos_db.database_name
-      role                = "writer"
-    },
-    {
       account_name        = var.cosmos_db_02.name
       resource_group_name = var.cosmos_db_02.resource_group_name
       database            = var.cosmos_db_02.database_name
@@ -42,12 +36,6 @@ module "func_app_user_slot_02" {
   principal_id = var.function_app.user_func_02.staging_principal_id
 
   cosmos = [
-    {
-      account_name        = var.cosmos_db.name
-      resource_group_name = var.cosmos_db.resource_group_name
-      database            = var.cosmos_db.database_name
-      role                = "writer"
-    },
     {
       account_name        = var.cosmos_db_02.name
       resource_group_name = var.cosmos_db_02.resource_group_name
@@ -83,12 +71,6 @@ module "func_app_support" {
 
   cosmos = [
     {
-      account_name        = var.cosmos_db.name
-      resource_group_name = var.cosmos_db.resource_group_name
-      database            = var.cosmos_db.database_name
-      role                = "reader"
-    },
-    {
       account_name        = var.cosmos_db_02.name
       resource_group_name = var.cosmos_db_02.resource_group_name
       database            = var.cosmos_db_02.database_name
@@ -113,12 +95,6 @@ module "func_app_support_slot" {
   principal_id = var.function_app.support_func.staging_principal_id
 
   cosmos = [
-    {
-      account_name        = var.cosmos_db.name
-      resource_group_name = var.cosmos_db.resource_group_name
-      database            = var.cosmos_db.database_name
-      role                = "reader"
-    },
     {
       account_name        = var.cosmos_db_02.name
       resource_group_name = var.cosmos_db_02.resource_group_name
