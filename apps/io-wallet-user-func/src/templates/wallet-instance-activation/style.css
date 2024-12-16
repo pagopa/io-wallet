@@ -144,11 +144,4 @@ p {
     margin-top: 0px !important;
     visibility: inherit !important;
   }
-
-  .light-img,
-  [data-ogsc] .light-img {
-    display: none;
-    display: none !important;
-    mso-hide: all !important;
-  }
 }
