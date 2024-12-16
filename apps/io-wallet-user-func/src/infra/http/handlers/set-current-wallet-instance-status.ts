@@ -1,4 +1,4 @@
-import { enqueue } from "@/infra/azure/storage/queue";
+import { revokeAllCredentials } from "@/credential";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import {
@@ -50,10 +50,10 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       requireSetCurrentWalletInstanceStatusBody,
       E.map(({ fiscal_code }) => fiscal_code),
       RTE.fromEither,
+      // invoke PID issuer services to revoke all credentials for that user
+      RTE.chainFirst(revokeAllCredentials),
       // revoke the wallet instance in the database
-      RTE.chainFirst(revokeCurrentUserWalletInstance),
-      // writes the fiscal code to the queue to request the revocation of credentials from the issuer asynchronously
-      RTE.chainW(enqueue),
+      RTE.chainW(revokeCurrentUserWalletInstance),
       RTE.map(() => H.empty),
       RTE.orElseFirstW((error) =>
         sendExceptionWithBodyToAppInsights(

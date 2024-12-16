@@ -1,5 +1,5 @@
+import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
-import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -35,13 +35,9 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
-  const queueClient: QueueClient = {
-    sendMessage: () =>
-      Promise.resolve({
-        errorCode: undefined,
-        messageId: "messageId",
-      } as QueueSendMessageResponse),
-  } as unknown as QueueClient;
+  const pidIssuerClient: CredentialRepository = {
+    revokeAllCredentials: () => TE.right(undefined),
+  };
 
   const logger = {
     format: L.format.simple,
@@ -63,10 +59,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
 
   it("should return a 204 HTTP response on success", async () => {
     const handler = SetCurrentWalletInstanceStatusHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -89,10 +85,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       method: "PUT",
     };
     const handler = SetCurrentWalletInstanceStatusHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -108,6 +104,31 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
+  it("should return a 500 HTTP response on revokeAllCredentials error", async () => {
+    const pidIssuerClientThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () =>
+        TE.left(new Error("failed on revokeAllCredentials!")),
+    };
+    const handler = SetCurrentWalletInstanceStatusHandler({
+      credentialRepository: pidIssuerClientThatFailsOnRevoke,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
   it("should return a 500 HTTP response on batchPatch error", async () => {
     const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
       {
@@ -119,10 +140,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
@@ -150,10 +171,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
         insert: () => TE.left(new Error("not implemented")),
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueClient,
       telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
