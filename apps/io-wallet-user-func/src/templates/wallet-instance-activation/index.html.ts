@@ -145,7 +145,7 @@ export default (faqLink: string, ioAppLink: string) => `
     }
 
     .divider p {
-      border-color: #e3e7eb !important;
+      border-color: #A2ADB8 !important;
     }
 
     /* Message Preview Block */
@@ -182,16 +182,16 @@ export default (faqLink: string, ioAppLink: string) => `
 
       body,
       .mail-body {
-        background-color: #fff;
+        background-color: #323232;
       }
 
       .header {
-        background-color: #fff;
+        background-color: #323232;
         /* border-top: 8px solid #3da2ff; */
       }
 
       .section {
-        background-color: #fff;
+        background-color: #323232;
       }
 
       .message-preview {
@@ -199,15 +199,19 @@ export default (faqLink: string, ioAppLink: string) => `
       }
 
       .divider p {
-        border-color: #757575 !important;
+        border-color: #A2ADB8 !important;
       }
 
       .title div {
         color: #000 !important;
       }
 
+      h1 {
+        color: #E0E0E0 !important;
+      }
+
       .text div {
-        color: #000 !important;
+        color: #E0E0E0 !important;
       }
 
       .text-secondary,
@@ -240,6 +244,13 @@ export default (faqLink: string, ioAppLink: string) => `
         line-height: auto !important;
         margin-top: 0px !important;
         visibility: inherit !important;
+      }
+
+      .light-img,
+      [data-ogsc] .light-img {
+        display: none;
+        display: none !important;
+        mso-hide: all !important;
       }
     }
 
@@ -282,6 +293,9 @@ export default (faqLink: string, ioAppLink: string) => `
                                   </table>
                                 </td>
                               </tr>
+                              <div class="dark-img" style="mso-hide: all; display: none; padding: 10px 0px">
+                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAMAAADQmBKKAAAAPFBMVEUAAAD////////////////////////////////////////////////////////////////////////////YSWgTAAAAE3RSTlMA3yDvv0CAEHBfn5BQz6+gjzDe8v8wYwAAA45JREFUeNrtnNuu4jAMRZ170htw9v//60igQXM0UNcxSSvU9YpUVp3EqYMLnZycnJycfA0pjLMDnB8nOgApOjwx0dLOZIdfmEK7csV/XGlHBrxgIA36+BwoRgVvyLQL1uANLtEeRLwl0h4Y4FAhmrBCoP6MWGGk/nisMFN/HFZw1B+sQizfL3S4IZuxgqdNfPeyD1hhov4kh7cY2spXb67vQ2Qs7ULGGwrtxPjxJWanPCyzucfeGb/E6UYSLnjBpbre9O5VjvX5porRWGWTX8hUFaDF4Bcuk5zgweIn2oaN5h+dmKpqcQZpUTzdB9/NY1Dp8JiJ1PA6IgZLLQkGUlymZqQFNSzPIO0fngfmRi24gqPr3p08cCQja6DjejAfYDiYDzAczAeIB/P52Dldkvm0P/NZ8DGcbVCqqPCkxoJHP41S9Ob+7GuFE0jPq2+0fvvjyhUfxnO/vrjcdsD4EjBK8pWBEv4AOkvyVQGDPmFbx2QHWYD0IbpIskNBEyI/SVOjAPHHmVmyDwcIMfZOAMNET7wko1/EQhtzhWdPhg2TgxRCzBSRnJqXdkKxSsi3E/I1QhbthJAqhKaWQoUTEqwxFy3dxmfwH/wSSsMdx1QgUqEZr7ndPy2vYmI2p1UjF0rMvXmVEJJYKDBZNuuEglgoM1cqOqEsFhqZK0Wd0CgWWvAak54P/xqhhRES5OnZ3lf2yioL4JkFQtz9ueWeY3RCRizkwKATcmIhtBXCKfT9Qoeb1AYMvZf93FbI67YOvZB+6xjbCo1ioVwvdANPFguFCiG3vV4JYqFUIYTEVXSKR1gyFUKWHtwCc+Qwk1xorBAqTK5XlUGlQmhkhFSFYqoQcmnjmFvFYYNECFdGSHPYQLlCCHHT5lN4oeoxe4AnZsghhCkP3IjJhcijEZ7qhAIaUQRCPUL0Q7VCBU0oAqEeJ+fG1gtNaEAkgVCHWfRDGqGAj1NUQjTiw8wkEOr4IzAv1GnQImmFKDcYMJUQLQ1SECvUuRmFF+rTrhNJINS3oYkX6mB0IYFQ56Y4vZDeaKDPCpFt01hpFG8qxRbtcF7TiTWZ2ieOIL3LTJuwF9TgLb0lMVswR/l4g7fXNoVGow6PqH+Ix0qUfCCOrO8ItVsHzpeq1RtJTlm00eG79MRh8ljBxCS41oWZc1t5/7KS9Ko2ewcYHxNpuU159P7v61zzMJbd/ybj5OTk5OSkF38ATtWUce7S/q4AAAAASUVORK5CYII=" width="36px" class="dark-img" style="display: none" />
+                              </div>
                             </tbody>
                           </table>
                         </div>
@@ -324,11 +338,11 @@ export default (faqLink: string, ioAppLink: string) => `
                                     </p>
                                     <p> Puoi disattivare la funzionalità Documenti su IO in qualsiasi momento<br /> dall'app, premendo su "Cos'è" nella sezione Portafoglio.<br />
                                     </p>
-                                    <p> Se non hai più il controllo del tuo dispositivo mobile, puoi disattivare<br /> Documenti su IO anche tramite il sito <a href="${ioAppLink}" style="color: #0162c3" class="link">ioapp.it</a>, accedendo con SPID o<br /> CIE. </p>
+                                    <p> Se non hai più il controllo del tuo dispositivo mobile, puoi disattivare<br /> Documenti su IO anche tramite il sito <a href="${ioAppLink}" class="link">ioapp.it</a>, accedendo con SPID o<br /> CIE. </p>
                                     <p>
                                       <strong>Domande e risposte</strong>
                                     </p>
-                                    <p> Per saperne di più su Documenti su IO consulta le <a href="${faqLink}" style="color: #0162c3" class="link">FAQ</a> dedicate. </p>
+                                    <p> Per saperne di più su Documenti su IO consulta le <a href="${faqLink}" class="link">FAQ</a> dedicate. </p>
                                   </div>
                                 </td>
                               </tr>
@@ -383,7 +397,7 @@ export default (faqLink: string, ioAppLink: string) => `
                           <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                             <tbody>
                               <tr>
-                                <td align="left" class="text-secondary" style="font-size:0px;padding:0px;word-break:break-word;">
+                                <td align="left" style="font-size:0px;padding:0px;word-break:break-word;">
                                   <div style="font-family:Titillium Web, system-ui, sans-serif;font-size:14px;font-weight:regular;line-height:20px;text-align:left;color:#A2ADB8;">
                                     <p>Ricevi questo messaggio perché hai un'utenza attiva su App IO.</p>
                                   </div>

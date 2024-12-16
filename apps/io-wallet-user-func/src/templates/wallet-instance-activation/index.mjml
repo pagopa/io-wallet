@@ -58,7 +58,7 @@
             padding-right="0px"
           >
             <p>
-              Ciao ${firstName},<br /><br />
+              Ciao,<br /><br />
               il tuo portafoglio sull'app IO è pronto a
               <strong
                 >ricevere la versione digitale dei<br />
@@ -88,9 +88,8 @@
               Se non hai più il controllo del tuo dispositivo mobile, puoi
               disattivare<br />
               Documenti su IO anche tramite il sito
-              <a href="${ioAppLink}" style="color: #0162c3" class="link"
-                >ioapp.it</a
-              >, accedendo con SPID o<br />
+              <a href="${ioAppLink}" class="link">ioapp.it</a>, accedendo con
+              SPID o<br />
               CIE.
             </p>
             <p>
@@ -98,7 +97,7 @@
             </p>
             <p>
               Per saperne di più su Documenti su IO consulta le
-              <a href="${faqLink}" style="color: #0162c3" class="link">FAQ</a>
+              <a href="${faqLink}" class="link">FAQ</a>
               dedicate.
             </p>
           </mj-text>

@@ -1,7 +1,6 @@
 <mj-section css-class="section" padding="0px">
   <mj-column>
     <mj-text
-      css-class="text-secondary"
       font-size="14px"
       line-height="20px"
       font-weight="regular"

@@ -48,7 +48,7 @@ p {
 }
 
 .divider p {
-  border-color: #e3e7eb !important;
+  border-color: #a2adb8 !important;
 }
 
 /* Message Preview Block */
@@ -84,16 +84,16 @@ p {
 @media (prefers-color-scheme: dark) {
   body,
   .mail-body {
-    background-color: #fff;
+    background-color: #323232;
   }
 
   .header {
-    background-color: #fff;
+    background-color: #323232;
     /* border-top: 8px solid #3da2ff; */
   }
 
   .section {
-    background-color: #fff;
+    background-color: #323232;
   }
 
   .message-preview {
@@ -101,15 +101,19 @@ p {
   }
 
   .divider p {
-    border-color: #757575 !important;
+    border-color: #a2adb8 !important;
   }
 
   .title div {
     color: #000 !important;
   }
 
+  h1 {
+    color: #e0e0e0 !important;
+  }
+
   .text div {
-    color: #000 !important;
+    color: #e0e0e0 !important;
   }
 
   .text-secondary,
@@ -143,5 +147,12 @@ p {
     line-height: auto !important;
     margin-top: 0px !important;
     visibility: inherit !important;
+  }
+
+  .light-img,
+  [data-ogsc] .light-img {
+    display: none;
+    display: none !important;
+    mso-hide: all !important;
   }
 }
