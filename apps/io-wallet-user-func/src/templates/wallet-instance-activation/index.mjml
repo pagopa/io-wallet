@@ -24,7 +24,7 @@
     <mj-include path="./style.css" type="css" />
     <mj-wrapper padding-right="20px" padding-left="20px">
       <!-- LOGO -->
-      <mj-include path="./main-logo.mjml" />
+      <mj-include path="../partials/main-logo.mjml" />
 
       <!-- TEXT CONTENT -->
       <mj-section css-class="section" padding="0px" padding-bottom="8px">
@@ -105,10 +105,10 @@
       </mj-section>
 
       <!-- DIVIDER -->
-      <mj-include path="./divider.mjml" />
+      <mj-include path="../partials/divider.mjml" />
 
       <!-- FOOTER-->
-      <mj-include path="./footer.mjml" />
+      <mj-include path="../partials/footer.mjml" />
     </mj-wrapper>
   </mj-body>
 </mjml>

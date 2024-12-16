@@ -2579,7 +2579,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mjml@npm:^4":
+"@types/mjml@npm:^4.7.4":
   version: 4.7.4
   resolution: "@types/mjml@npm:4.7.4"
   dependencies:
@@ -5814,7 +5814,7 @@ __metadata:
     "@pagopa/ts-commons": "npm:^13.1.2"
     "@peculiar/asn1-android": "npm:^2.3.13"
     "@types/jsonwebtoken": "npm:^9.0.7"
-    "@types/mjml": "npm:^4"
+    "@types/mjml": "npm:^4.7.4"
     "@vitest/coverage-v8": "npm:^2.1.5"
     applicationinsights: "npm:^3.4.0"
     asn1js: "npm:^3.0.5"
