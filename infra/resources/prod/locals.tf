@@ -85,10 +85,6 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
-      },
-      {
-        name                  = "MailSender"
-        key_vault_secret_name = "MailSender"
       }
     ]
   }
