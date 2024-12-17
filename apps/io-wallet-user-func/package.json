@@ -34,6 +34,7 @@
     "cbor-x": "^1.6.0",
     "fp-ts": "^2.16.9",
     "googleapis": "^144.0.0",
+    "html-to-text": "5.1.1",
     "io-ts": "^2.2.21",
     "io-wallet-common": "workspace:^",
     "jose": "5.9.6",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",
+    "@types/html-to-text": "1.4.31",
     "@types/jsonwebtoken": "^9.0.7",
     "@vitest/coverage-v8": "^2.1.5",
     "azure-functions-core-tools": "^4.0.6610",
