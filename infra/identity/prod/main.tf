@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "<= 3.105.0"
+      version = "<= 3.117.0"
     }
   }
 
@@ -47,7 +47,8 @@ module "federated_identities" {
           "Key Vault Reader",
           "Key Vault Crypto User",
           "Key Vault Secrets User",
-          "Storage Queue Data Reader"
+          "Storage Queue Data Reader",
+          "Container Apps Jobs Operator",
         ]
       }
     }
