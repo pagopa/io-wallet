@@ -60,9 +60,7 @@ export const MailConfig = t.type({
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
 
-export const WALLET_ACTIVATION_EMAIL_SUBJECT =
-  "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO";
-export const WALLET_ACTIVATION_EMAIL_TEXT =
+export const WALLET_ACTIVATION_EMAIL_TITLE =
   "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO";
 export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
   "https://io.italia.it/documenti-su-io/faq/#n1_12";

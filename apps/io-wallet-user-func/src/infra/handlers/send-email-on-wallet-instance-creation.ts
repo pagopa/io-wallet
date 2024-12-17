@@ -1,8 +1,7 @@
 import {
   WALLET_ACTIVATION_EMAIL_FAQ_LINK,
   WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK,
-  WALLET_ACTIVATION_EMAIL_SUBJECT,
-  WALLET_ACTIVATION_EMAIL_TEXT,
+  WALLET_ACTIVATION_EMAIL_TITLE,
 } from "@/app/config";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
@@ -22,8 +21,8 @@ export const SendEmailOnWalletInstanceCreationHandler = H.of(
             { href: WALLET_ACTIVATION_EMAIL_FAQ_LINK } as ValidUrl,
             { href: WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK } as ValidUrl,
           ),
-          subject: WALLET_ACTIVATION_EMAIL_SUBJECT,
-          text: WALLET_ACTIVATION_EMAIL_TEXT,
+          subject: WALLET_ACTIVATION_EMAIL_TITLE,
+          text: WALLET_ACTIVATION_EMAIL_TITLE,
           to: emailAddress,
         }),
       ),

@@ -38,14 +38,12 @@
     "io-wallet-common": "workspace:^",
     "jose": "5.9.6",
     "jsonwebtoken": "^9.0.2",
-    "mjml": "^4.15.3",
     "pkijs": "^3.2.4",
     "undici": "^6.21.0"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/mjml": "^4.7.4",
     "@vitest/coverage-v8": "^2.1.5",
     "azure-functions-core-tools": "^4.0.6610",
     "eslint": "9.14.0",
