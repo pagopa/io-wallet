@@ -1,113 +1,101 @@
-# io-wallet
-EUDI Wallet and Italian Wallet implementation for App IO
+# IO Wallet
 
-## Related repositories:
-- 🪪 [io-react-native-wallet](https://github.com/pagopa/io-react-native-wallet)
-- 🔐 [io-react-native-jwt](https://github.com/pagopa/io-react-native-jwt)
-  
-## Prerequisites
+### Introduction
 
-In order to run the applications locally you need the following tool installed on your machine.
+Welcome! 😊
 
-- `Node.js`
-- `yarn`
+This is the `io-wallet` project mono-repository containing applications and packages for the IO Wallet app:
 
-The preferred way to set up the local environment is using [nodenv](https://github.com/nodenv/nodenv) to manage `Node.js` installation and `corepack` (included with `Node.js`) to manage the installation of `yarn`.
-Please refer to `.node-version` for the actual runtime version used.
+- `apps/io-wallet-support-func`: Contains functionalities for assistance and support.
+- `apps/io-wallet-user-func`: Contains functionalities for end users.
+- `packages/io-wallet-common`: Contains shared code among the workspaces.
+- `infra`: Contains infrastructure code to deploy the IO Wallet app.
 
+## Technologies
 
-## Bundles
-Applications are bundled into zip file into the `./bundles` folder.
+This project is built with [NodeJS](https://nodejs.org/) and deployed on [Azure Cloud](https://learn.microsoft.com/en-us/azure/?product=popular), utilizing [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) and [Azure CosmosDB](https://learn.microsoft.com/en-us/azure/cosmos-db/).
 
-```sh
-# Install dependencies
-yarn
-# Build applications
-yarn build
-# Bundle packages 
-yarn build:package
-# Check created bundles
-ls ./bundles
-```
+It leverages [TypeScript](https://www.typescriptlang.org/), [fp-ts](https://gcanti.github.io/fp-ts/), and several [Azure SDKs](https://azure.github.io/azure-sdk/#javascript).
 
+We use [Yarn](https://classic.yarnpkg.com/) as the dependencies manager and [Turborepo](https://turbo.build/repo/docs) as the monorepo manager.
 
-## Useful commands
+Infrastructure is managed with [Terraform](https://www.terraform.io/).
 
-This project uses `yarn@3` with workspaces to manage projects and dependencies. Here is a list of useful commands to work in this repo.
+Changelog and versioning are managed with [Changesets](https://github.com/changesets/changesets).
 
-### Work with workspaces
+### Setting the Azure Subscription to Access the Dev CosmosDB
+
+To start the backend projects `io-wallet-support-func` and `io-wallet-user-func`, you must first log in with the correct user on Azure and set the subscription you want to use. Ensure you have the Azure `az-cli` package installed. If not, follow the instructions on the [official website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+
+This process is necessary for backend applications started locally to connect to the development CosmosDB instance on Azure:
 
 ```bash
-# to execute COMMAND on WORKSPACE_NAME
-yarn workspace WORKSPACE_NAME run command
-# to execute COMMAD on all workspaces
-yarn workspace foreach run command
+az login                                        # Redirects to your main browser for login.
 
-# run unit tests on my-package
-yarn workspace my-package run test
+az account set --subscription DEV-IO            # Sets the DEV-IO subscription for backend apps to connect to the dev CosmosDB.
 
-# run the typecheck script on all workspaces
-yarn workspaces foreach run typecheck
+az ad user show --id YOUR_EMAIL                 # Retrieves user info by email. Store the Principal ID for the next command.
 
-# generate the API models for all workspaces
-yarn workspaces foreach run generate:api-models
+az cosmosdb sql role assignment create
+    --account-name io-d-itn-common-cosno-01
+    --resource-group io-d-itn-common-rg-01
+    --scope "/" --principal-id PRINCIPAL_ID
+    --role-definition-id
+        00000000-0000-0000-0000-000000000002    # Grants read and write access to the dev CosmosDB.
 ```
 
-### Add dependencies
+### Installation
 
 ```bash
-# add a dependency to the workspace root
-yarn add turbo
-
-# add a jest as dev dependency on my-package
-yarn workspace my-package add -D jest
-
-# add io-ts as dependency on each workspace
-yarn workspace foreach add io-ts
+yarn install
 ```
 
-## Infrastructure resources
+### Tasks
 
-Resources are defined using `Terraform` into `/infra`. 
+At the root level, you can run the following commands:
 
-### Configure environment
+```bash
+yarn test           # Run all unit tests (performed by vitest) for all projects and packages.
 
-`/infra/env` contains the configuration for the different environments the applications must be deployed on. Each subdirectory is an environemnt; the name of the subdirectory is the name of the environment. Each environment contains:
-* `backend.ini`, in which we set the subscription to work on;
-* `backend.tfvars`, where we reference the remote storage to keep the terraform state into;
-* `terraform.tfvars`, where developers can set actual infrastructure variables.
+yarn format         # Run code formatting (performed by prettier) for all projects and packages.
 
-### Infrastructure-as-code
-Terraform code files are meant to be into `/infra/src`. Files must be in the same directory, that is there cannot be subdirectories.
-The `main.ts` file initialize the required provider.
+yarn lint           # Run code linting (performed by ESLint) for all projects and packages without fixing errors or warnings.
 
-### Run Terraform commands
+yarn lint:fix       # Run code linting (performed by ESLint) for all projects and packages, attempting to fix correctable errors/warnings.
 
-The script `/infra/terraform.sh` is a wrapper over the `terraform` CLI that:
-* load the configuration for the selected environment
-* connect to the remote storage for the Terraform state
-* execute the command
+yarn build          # Run a build (performed by tsup-node) for all projects and packages. Build results are stored under the dist/ directory.
 
-To run a command, follow the pattern:
-```sh
-./infra/terraform.sh <command> <environment>
+yarn version        # Update all packages in the package.json file using @changesets/cli.
+
+yarn release        # Generate consistent versions of your packages using @changesets/cli.
+
+yarn code-review    # Run typechecking, code linting, and unit testing for each project and package. This command ensures code quality in PRs.
 ```
 
-examples:
-```sh
-# Run plan on prod environment
-./infra/terraform.sh plan prod 
+You can also run specific commands using `yarn workspace` for a specific project or package. Replace `PROJECT_NAME` with the actual project name:
 
-# Run apply on dev environment
-./infra/terraform.sh apply dev
+```bash
+# Typecheck
+
+# Linting and formatting
+yarn workspace PROJECT_NAME run lint
+yarn workspace PROJECT_NAME run lint:fix
+yarn workspace PROJECT_NAME run format
+
+# Unit testing
+yarn workspace PROJECT_NAME run test
+yarn workspace PROJECT_NAME run test:coverage # Not available for io-wallet-common
+
+# Build
+yarn workspace PROJECT_NAME run build
+yarn workspace PROJECT_NAME run build:watch # Not available for io-wallet-common
+
+# Start
+yarn workspace PROJECT_NAME run start # Not available for io-wallet-common
 ```
 
-### Precommit checks
+`PROJECT_NAME` can be one of the following:
 
-Check your code before commit.
-
-https://github.com/antonbabenko/pre-commit-terraform#how-to-install
-
-```sh
-pre-commit run -a
-```
+- `io-wallet-support-func`
+- `io-wallet-user-func`
+- `io-wallet-common`

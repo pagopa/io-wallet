@@ -123,26 +123,27 @@ export type AttestationServiceConfiguration = t.TypeOf<
   typeof AttestationServiceConfiguration
 >;
 
-const AzureConfig = t.type({
-  appInsights: AzureAppInsightsConfig,
-  cosmos: AzureCosmosConfig,
-  storage: t.type({
-    entityConfiguration: t.type({ containerName: t.string }),
-    walletInstances: t.type({
-      connectionString: t.string,
-      queues: t.type({
-        pidIssuerRevokeApi: t.type({
-          name: t.string,
-        }),
-        sendEmail: t.type({
-          name: t.string,
-        }),
-        validateCertificates: t.type({
-          name: t.string,
-        }),
+const AzureStorageConfig = t.type({
+  entityConfiguration: t.type({ containerName: t.string }),
+  walletInstances: t.type({
+    connectionString: t.string,
+    queues: t.type({
+      sendEmail: t.type({
+        name: t.string,
+      }),
+      validateCertificates: t.type({
+        name: t.string,
       }),
     }),
   }),
+});
+
+type AzureStorageConfig = t.TypeOf<typeof AzureStorageConfig>;
+
+const AzureConfig = t.type({
+  appInsights: AzureAppInsightsConfig,
+  cosmos: AzureCosmosConfig,
+  storage: AzureStorageConfig,
 });
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
@@ -288,19 +289,14 @@ export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   }),
 );
 
-export const getAzureConfigFromEnvironment: RE.ReaderEither<
+export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  AzureConfig
+  AzureStorageConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    appInsights: getAzureAppInsightsConfigFromEnvironment,
-    cosmos: getAzureCosmosConfigFromEnvironment,
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
-    ),
-    pidIssuerRevokeApiQueueName: readFromEnvironment(
-      "PidIssuerRevokeApiQueueName",
     ),
     sendEmailQueueName: readFromEnvironment("SendEmailQueueName"),
     storageAccountConnectionString: readFromEnvironment(
@@ -312,37 +308,44 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
-      appInsights,
-      cosmos,
       entityConfigurationStorageContainerName,
-      pidIssuerRevokeApiQueueName,
       sendEmailQueueName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
     }) => ({
-      appInsights,
-      cosmos,
-      storage: {
-        entityConfiguration: {
-          containerName: entityConfigurationStorageContainerName,
-        },
-        walletInstances: {
-          connectionString: storageAccountConnectionString,
-          queues: {
-            pidIssuerRevokeApi: {
-              name: pidIssuerRevokeApiQueueName,
-            },
-            sendEmail: {
-              name: sendEmailQueueName,
-            },
-            validateCertificates: {
-              name: validateWalletInstanceCertificatesQueueName,
-            },
+      entityConfiguration: {
+        containerName: entityConfigurationStorageContainerName,
+      },
+      walletInstances: {
+        connectionString: storageAccountConnectionString,
+        queues: {
+          sendEmail: {
+            name: sendEmailQueueName,
+          },
+          validateCertificates: {
+            name: validateWalletInstanceCertificatesQueueName,
           },
         },
       },
     }),
   ),
+);
+
+export const getAzureConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    appInsights: getAzureAppInsightsConfigFromEnvironment,
+    cosmos: getAzureCosmosConfigFromEnvironment,
+    storage: getAzureStorageConfigFromEnvironment,
+  }),
+  RE.map(({ appInsights, cosmos, storage }) => ({
+    appInsights,
+    cosmos,
+    storage,
+  })),
 );
 
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<

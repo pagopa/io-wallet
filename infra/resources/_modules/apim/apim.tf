@@ -1,6 +1,6 @@
 // IO WEB API
 module "apim_v2_web_wallet_api" {
-  source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
+  source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
 
   name                  = format("%s-ioweb-wallet", var.project_legacy)
   api_management_name   = var.apim.name
@@ -57,7 +57,7 @@ data "azurerm_key_vault_secret" "funciowallet_default" {
 
 // SUPPORT API
 module "apim_v2_wallet_support_api" {
-  source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
+  source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
 
   name                  = format("%s-wallet-support-api", var.project_legacy)
   api_management_name   = var.apim.name
@@ -96,7 +96,7 @@ data "azurerm_key_vault_secret" "support_func_key_default" {
 
 // PDND API
 module "apim_v2_wallet_pdnd_api" {
-  source = "git::https://github.com/pagopa/terraform-azurerm-v3//api_management_api?ref=v8.12.2"
+  source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
 
   name                  = format("%s-wallet-pdnd-api", var.project_legacy)
   api_management_name   = var.apim.name
