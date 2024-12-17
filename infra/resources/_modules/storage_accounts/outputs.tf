@@ -16,12 +16,6 @@ output "send_email_queue_name_01" {
   }
 }
 
-output "pid_issuer_revoke_api_queue_name_01" {
-  value = {
-    name = azurerm_storage_queue.pid_issuer_revoke_api_01.name
-  }
-}
-
 output "wallet" {
   value = {
     id                            = module.storage_account.id
