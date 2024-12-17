@@ -42,5 +42,10 @@ variable "action_group_io_id" {
 
 variable "user_assigned_managed_identity_id" {
   type        = string
-  description = ""
+  description = "Id of the user-assigned managed identity federated with PSN"
+}
+
+variable "psn_service_principal_id" {
+  type        = string
+  description = "Id of the service principal federated with PSN"
 }

@@ -1,13 +1,3 @@
-variable "cosmos_db" {
-  type = object({
-    id                  = string
-    name                = string
-    resource_group_name = string
-    database_name       = string
-    admin_ids           = set(string)
-  })
-}
-
 variable "cosmos_db_02" {
   type = object({
     id                  = string
