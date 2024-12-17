@@ -9,7 +9,7 @@ module "storage_account" {
   private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
 
   subservices_enabled = {
-    blob  = false
+    blob  = true
     file  = false
     queue = true
     table = false

@@ -64,3 +64,7 @@ data "azurerm_monitor_action_group" "io" {
   name                = "ioperror"
   resource_group_name = data.azurerm_resource_group.weu_common.name
 }
+
+data "azuread_service_principal" "psn_app_id" {
+  display_name = "${local.prefix}-${local.env_short}-psn-hsm-01"
+}
