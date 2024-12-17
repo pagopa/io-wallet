@@ -63,7 +63,7 @@ export type MailConfig = t.TypeOf<typeof MailConfig>;
 export const WALLET_ACTIVATION_EMAIL_TITLE =
   "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO";
 export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
-  "https://io.italia.it/documenti-su-io/faq/#n1_12";
+  "https://io.italia.it/documenti-su-io/faq/";
 export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://ioapp.it/it/accedi/?refresh=true";
 

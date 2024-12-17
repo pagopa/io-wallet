@@ -35,7 +35,7 @@ export class EmailNotificationServiceClient
             },
           );
           if (!result.ok) {
-            throw new Error(JSON.stringify(await result.json()));
+            throw new Error(await result.text());
           }
           return result.json();
         },
