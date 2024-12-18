@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.3.1
+
+### Patch Changes
+
+- b3ca3ff: Added fiscal codes whitelist for email test
+
 ## 2.3.0
 
 ### Minor Changes
