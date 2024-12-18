@@ -12,7 +12,7 @@ output "revocation_queue_name_02" {
 
 output "wallet_instance_creation_email_queue_name_01" {
   value = {
-    name = azurerm_storage_queue.wallet-instance-creation-send-email-01.name
+    name = azurerm_storage_queue.wallet-instance-creation-email-queue-01.name
   }
 }
 
