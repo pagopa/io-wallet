@@ -12,6 +12,11 @@ import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 
+const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
+  ignoreImage: true,
+  tables: true,
+};
+
 const htmlContent = htmlTemplate(
   { href: WALLET_ACTIVATION_EMAIL_FAQ_LINK } as ValidUrl,
   { href: WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK } as ValidUrl,
@@ -25,7 +30,7 @@ export const SendEmailOnWalletInstanceCreationHandler = H.of(
         sendEmailToUser({
           html: htmlContent,
           subject: WALLET_ACTIVATION_EMAIL_TITLE,
-          text: HtmlToText.fromString(htmlContent),
+          text: HtmlToText.fromString(htmlContent, HTML_TO_TEXT_OPTIONS),
           to: emailAddress,
         }),
       ),
