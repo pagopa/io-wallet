@@ -52,10 +52,10 @@ export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
 
 export const MailConfig = t.type({
-  mailFeatureFlag: t.boolean,
   mailSender: NonEmptyString,
   mailupSecret: NonEmptyString,
   mailupUsername: NonEmptyString,
+  wallertInstanceCreationEmailFeatureFlag: t.boolean,
 });
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
@@ -73,11 +73,6 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
   MailConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    mailFeatureFlag: pipe(
-      readFromEnvironment("MailFeatureFlag"),
-      RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false)),
-    ),
     mailSender: pipe(
       readFromEnvironment("MailSender"),
       RE.chainEitherKW(parse(NonEmptyString, "Invalid mail sender")),
@@ -89,6 +84,11 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
     mailupUsername: pipe(
       readFromEnvironment("MailupUsername"),
       RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup username")),
+    ),
+    wallertInstanceCreationEmailFeatureFlag: pipe(
+      readFromEnvironment("WallertInstanceCreationEmailFeatureFlag"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
     ),
   }),
 );

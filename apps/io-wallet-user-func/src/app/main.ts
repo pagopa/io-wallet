@@ -66,9 +66,10 @@ const walletInstanceRevocationQueue = new WalletInstanceRevocationStorageQueue(
   ),
 );
 
-const sendEmailQueueClient = queueServiceClient.getQueueClient(
-  config.azure.storage.walletInstances.queues.creationSendEmail.name,
-);
+const walletInstanceCreationEmailQueueClient =
+  queueServiceClient.getQueueClient(
+    config.azure.storage.walletInstances.queues.creationSendEmail.name,
+  );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
@@ -129,9 +130,9 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      emailQueuingEnabled: config.mail.mailFeatureFlag,
+      emailQueuingEnabled: config.mail.wallertInstanceCreationEmailFeatureFlag,
       nonceRepository,
-      queueClient: sendEmailQueueClient,
+      queueClient: walletInstanceCreationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
