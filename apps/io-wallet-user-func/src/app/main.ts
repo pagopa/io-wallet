@@ -256,6 +256,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
     inputDecoder: FiscalCode,
+    telemetryClient: appInsightsClient,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
 });

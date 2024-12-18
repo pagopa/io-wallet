@@ -11,6 +11,7 @@ import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
+import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 
 const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
   ignoreImage: true,
@@ -33,6 +34,15 @@ export const SendEmailOnWalletInstanceCreationHandler = H.of(
           text: HtmlToText.fromString(htmlContent, HTML_TO_TEXT_OPTIONS),
           to: emailAddress,
         }),
+      ),
+      RTE.orElseFirstW((error) =>
+        pipe(
+          sendTelemetryException(error, {
+            fiscalCode,
+            functionName: "sendEmailOnWalletInstanceCreation",
+          }),
+          RTE.fromReader,
+        ),
       ),
     ),
 );
