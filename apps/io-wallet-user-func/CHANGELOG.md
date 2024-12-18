@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.3.2
+
+### Patch Changes
+
+- 24dd637: Add telemetryClient in sendEmailOnWalletInstanceCreation function
+
 ## 2.3.1
 
 ### Patch Changes
