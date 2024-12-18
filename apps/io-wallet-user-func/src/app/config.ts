@@ -56,7 +56,6 @@ export const MailConfig = t.type({
   mailupSecret: NonEmptyString,
   mailupUsername: NonEmptyString,
   walletInstanceCreationEmailFeatureFlag: t.boolean,
-  whitelistFiscalCodes: t.array(t.string),
 });
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
@@ -90,13 +89,6 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("WalletInstanceCreationEmailFeatureFlag"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
-    ),
-    whitelistFiscalCodes: pipe(
-      readFromEnvironment("WhitelistEmail"),
-      RE.map((fiscalCodes) => fiscalCodes.split(",")),
-      RE.orElse(
-        (): RE.ReaderEither<NodeJS.ProcessEnv, Error, string[]> => RE.right([]),
-      ),
     ),
   }),
 );

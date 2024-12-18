@@ -135,7 +135,7 @@ app.http("createWalletInstance", {
       queueClient: walletInstanceCreationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: config.mail.whitelistFiscalCodes,
+      whitelistFiscalCodes: config.attestationService.allowedDeveloperUsers,
     }),
   ),
   methods: ["POST"],
