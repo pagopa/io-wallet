@@ -131,7 +131,7 @@ variable "action_group_io_id" {
   description = "Id of the Action Group shared among all IO teams"
 }
 
-variable "send_email_queue_name" {
+variable "wallet_instance_creation_email_queue_name" {
   type        = string
   description = "Send Email on Wallet Instance Activation Queue Name"
 }

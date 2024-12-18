@@ -126,7 +126,7 @@ const AzureStorageConfig = t.type({
   walletInstances: t.type({
     connectionString: t.string,
     queues: t.type({
-      sendEmail: t.type({
+      creationSendEmail: t.type({
         name: t.string,
       }),
       validateCertificates: t.type({
@@ -296,20 +296,22 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
-    sendEmailQueueName: readFromEnvironment("SendEmailQueueName"),
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
     ),
     validateWalletInstanceCertificatesQueueName: readFromEnvironment(
       "ValidateWalletInstanceCertificatesQueueName",
     ),
+    walletInstanceCreationEmailQueueName: readFromEnvironment(
+      "WalletInstanceCreationEmailQueueName",
+    ),
   }),
   RE.map(
     ({
       entityConfigurationStorageContainerName,
-      sendEmailQueueName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
+      walletInstanceCreationEmailQueueName,
     }) => ({
       entityConfiguration: {
         containerName: entityConfigurationStorageContainerName,
@@ -317,8 +319,8 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstances: {
         connectionString: storageAccountConnectionString,
         queues: {
-          sendEmail: {
-            name: sendEmailQueueName,
+          creationSendEmail: {
+            name: walletInstanceCreationEmailQueueName,
           },
           validateCertificates: {
             name: validateWalletInstanceCertificatesQueueName,

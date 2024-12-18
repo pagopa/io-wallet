@@ -117,7 +117,7 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  send_email_queue_name                            = module.storage_accounts.send_email_queue_name_01.name
+  wallet_instance_creation_email_queue_name = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   validate_wallet_instance_certificates_queue_name = module.storage_accounts.revocation_queue_name_02.name
 
   user_func    = local.user_func

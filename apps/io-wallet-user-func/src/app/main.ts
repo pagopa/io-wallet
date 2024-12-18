@@ -67,7 +67,7 @@ const walletInstanceRevocationQueue = new WalletInstanceRevocationStorageQueue(
 );
 
 const sendEmailQueueClient = queueServiceClient.getQueueClient(
-  config.azure.storage.walletInstances.queues.sendEmail.name,
+  config.azure.storage.walletInstances.queues.creationSendEmail.name,
 );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
@@ -255,5 +255,5 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
     emailNotificationService,
     inputDecoder: FiscalCode,
   }),
-  queueName: config.azure.storage.walletInstances.queues.sendEmail.name,
+  queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
 });
