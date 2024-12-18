@@ -37,12 +37,16 @@ const sendEmail =
   (
     fiscalCode: string,
   ): RTE.ReaderTaskEither<
-    { emailQueuingEnabled: boolean; queueClient: QueueClient },
+    {
+      emailQueuingEnabled: boolean;
+      queueClient: QueueClient;
+      whitelistFiscalCodes: string[];
+    },
     Error,
     void
   > =>
-  ({ emailQueuingEnabled, queueClient }) =>
-    emailQueuingEnabled
+  ({ emailQueuingEnabled, queueClient, whitelistFiscalCodes }) =>
+    emailQueuingEnabled || whitelistFiscalCodes.includes(fiscalCode)
       ? pipe({ queueClient }, enqueue(fiscalCode))
       : TE.right(undefined);
 
