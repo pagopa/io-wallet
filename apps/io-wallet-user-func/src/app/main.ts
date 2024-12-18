@@ -12,12 +12,14 @@ import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
+import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
+import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -70,6 +72,12 @@ const walletInstanceCreationEmailQueueClient =
   queueServiceClient.getQueueClient(
     config.azure.storage.walletInstances.queues.creationSendEmail.name,
   );
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const walletInstanceRevocationEmailQueueClient =
+  queueServiceClient.getQueueClient(
+    config.azure.storage.walletInstances.queues.revocationSendEmail.name,
+  ); // to do - to change
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
@@ -257,4 +265,14 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
     inputDecoder: FiscalCode,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
+});
+
+app.storageQueue("sendEmailOnWalletInstanceRevocation", {
+  connection: "StorageConnectionString",
+  handler: SendEmailOnWalletInstanceRevocationFunction({
+    emailNotificationService,
+    inputDecoder: WalletInstanceRevocationQueueItem,
+  }),
+  queueName:
+    config.azure.storage.walletInstances.queues.revocationSendEmail.name,
 });

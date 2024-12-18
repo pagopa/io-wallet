@@ -30,6 +30,7 @@
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
     "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
     "WalletInstanceCreationEmailQueueName": "WALLET_INSTANCE_CREATION_EMAIL_QUEUE_NAME",
+    "WalletInstanceRevocationEmailQueueName": "WALLET_INSTANCE_REVOCATION_EMAIL_QUEUE_NAME",
     "ValidateWalletInstanceCertificatesQueueName": "VALIDATE_WALLET_INSTANCE_CERTIFICATES_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
     "PidIssuerApiClientCertificate": "PID_ISSUER_API_CLIENT_CERTIFICATE",
@@ -44,8 +45,9 @@
     "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK",
     "MailupUsername": "MAILUP_USERNAME",
     "MailupSecret": "MAILUP_SECRET",
-    "WalletInstanceCreationEmailFeatureFlag": "WALLET_INSTANCE_CREATION_EMAIL_FEATURE_FLAG",
     "MailSender": "MAIL_SENDER",
+    "WalletInstanceCreationEmailFeatureFlag": "WALLET_INSTANCE_CREATION_EMAIL_FEATURE_FLAG",
+    "WalletInstanceRevocationEmailFeatureFlag": WALLET_INSTANCE_REVOCATION_EMAIL_FEATURE_FLAG,
     "AuthProfileApiKey": "AUTH_PROFILE_API_KEY",
     "AuthProfileApiBaseURL": "AUTH_PROFILE_API_BASE_URL"
   }

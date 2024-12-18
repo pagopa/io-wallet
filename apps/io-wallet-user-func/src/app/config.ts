@@ -56,6 +56,7 @@ export const MailConfig = t.type({
   mailupSecret: NonEmptyString,
   mailupUsername: NonEmptyString,
   walletInstanceCreationEmailFeatureFlag: t.boolean,
+  walletInstanceRevocationEmailFeatureFlag: t.boolean,
 });
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
@@ -66,6 +67,11 @@ export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
   "https://io.italia.it/documenti-su-io/faq/";
 export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://ioapp.it/it/accedi/?refresh=true";
+
+export const WALLET_REVOCATION_EMAIL_TITLE =
+  "Messaggi da IO: IT Wallet disattivato";
+// [SIW-1936] to do - insert the correct link value
+export const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK = "";
 
 export const getMailConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -87,6 +93,11 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
     ),
     walletInstanceCreationEmailFeatureFlag: pipe(
       readFromEnvironment("WalletInstanceCreationEmailFeatureFlag"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
+    ),
+    walletInstanceRevocationEmailFeatureFlag: pipe(
+      readFromEnvironment("WalletInstanceRevocationEmailFeatureFlag"),
       RE.map(booleanFromString),
       RE.orElse(() => RE.right(false)),
     ),
@@ -127,6 +138,9 @@ const AzureStorageConfig = t.type({
     connectionString: t.string,
     queues: t.type({
       creationSendEmail: t.type({
+        name: t.string,
+      }),
+      revocationSendEmail: t.type({
         name: t.string,
       }),
       validateCertificates: t.type({
@@ -305,6 +319,10 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
+
+    walletInstanceRevocationEmailQueueName: readFromEnvironment(
+      "WalletInstanceRevocationEmailQueueName",
+    ),
   }),
   RE.map(
     ({
@@ -312,6 +330,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
       walletInstanceCreationEmailQueueName,
+      walletInstanceRevocationEmailQueueName,
     }) => ({
       entityConfiguration: {
         containerName: entityConfigurationStorageContainerName,
@@ -321,6 +340,9 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
         queues: {
           creationSendEmail: {
             name: walletInstanceCreationEmailQueueName,
+          },
+          revocationSendEmail: {
+            name: walletInstanceRevocationEmailQueueName,
           },
           validateCertificates: {
             name: validateWalletInstanceCertificatesQueueName,
