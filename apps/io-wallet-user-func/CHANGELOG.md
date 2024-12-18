@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.3.0
+
+### Minor Changes
+
+- 4cf6097: Added email to the user after wallet instance creation
+
 ## 2.2.4
 
 ### Patch Changes
