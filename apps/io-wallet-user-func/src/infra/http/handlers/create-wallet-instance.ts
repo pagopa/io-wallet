@@ -3,6 +3,7 @@ import {
   ValidatedAttestation,
   validateAttestation,
 } from "@/attestation-service";
+import { enqueue } from "@/infra/azure/storage/queue";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
@@ -10,6 +11,7 @@ import {
   revokeUserValidWalletInstancesExceptOne,
 } from "@/wallet-instance";
 import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -30,6 +32,19 @@ const WalletInstanceRequestPayload = t.type({
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
+
+const sendEmail =
+  (
+    fiscalCode: string,
+  ): RTE.ReaderTaskEither<
+    { emailQueuingEnabled: boolean; queueClient: QueueClient },
+    Error,
+    void
+  > =>
+  ({ emailQueuingEnabled, queueClient }) =>
+    emailQueuingEnabled
+      ? pipe({ queueClient }, enqueue(fiscalCode))
+      : TE.right(undefined);
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -79,6 +94,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
+            RTE.chainW(() => sendEmail(walletInstance.userId)),
           ),
         ),
       ),

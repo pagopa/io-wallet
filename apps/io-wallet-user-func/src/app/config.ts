@@ -1,5 +1,6 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -50,6 +51,48 @@ export const ANDROID_CRL_URL =
 export const ANDROID_PLAY_INTEGRITY_URL =
   "https://www.googleapis.com/auth/playintegrity";
 
+export const MailConfig = t.type({
+  mailSender: NonEmptyString,
+  mailupSecret: NonEmptyString,
+  mailupUsername: NonEmptyString,
+  walletInstanceCreationEmailFeatureFlag: t.boolean,
+});
+
+export type MailConfig = t.TypeOf<typeof MailConfig>;
+
+export const WALLET_ACTIVATION_EMAIL_TITLE =
+  "IT Wallet - Aggiungi i tuoi documenti al Portafoglio di IO";
+export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
+  "https://io.italia.it/documenti-su-io/faq/";
+export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
+  "https://ioapp.it/it/accedi/?refresh=true";
+
+export const getMailConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  MailConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    mailSender: pipe(
+      readFromEnvironment("MailSender"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mail sender")),
+    ),
+    mailupSecret: pipe(
+      readFromEnvironment("MailupSecret"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup secret")),
+    ),
+    mailupUsername: pipe(
+      readFromEnvironment("MailupUsername"),
+      RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup username")),
+    ),
+    walletInstanceCreationEmailFeatureFlag: pipe(
+      readFromEnvironment("WalletInstanceCreationEmailFeatureFlag"),
+      RE.map(booleanFromString),
+      RE.orElse(() => RE.right(false)),
+    ),
+  }),
+);
+
 export const CryptoConfiguration = t.type({
   jwks: t.array(Jwk),
   jwtDefaultAlg: t.string,
@@ -83,6 +126,9 @@ const AzureStorageConfig = t.type({
   walletInstances: t.type({
     connectionString: t.string,
     queues: t.type({
+      creationSendEmail: t.type({
+        name: t.string,
+      }),
       validateCertificates: t.type({
         name: t.string,
       }),
@@ -100,6 +146,14 @@ const AzureConfig = t.type({
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
 
+const AuthProfileApiConfig = t.type({
+  apiKey: t.string,
+  baseURL: t.string,
+  httpRequestTimeout: NumberFromString,
+});
+
+export type AuthProfileApiConfig = t.TypeOf<typeof AuthProfileApiConfig>;
+
 const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
   clientCertificate: t.string,
@@ -115,9 +169,11 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
+  authProfile: AuthProfileApiConfig,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
+  mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
 });
@@ -246,12 +302,16 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     validateWalletInstanceCertificatesQueueName: readFromEnvironment(
       "ValidateWalletInstanceCertificatesQueueName",
     ),
+    walletInstanceCreationEmailQueueName: readFromEnvironment(
+      "WalletInstanceCreationEmailQueueName",
+    ),
   }),
   RE.map(
     ({
       entityConfigurationStorageContainerName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
+      walletInstanceCreationEmailQueueName,
     }) => ({
       entityConfiguration: {
         containerName: entityConfigurationStorageContainerName,
@@ -259,6 +319,9 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstances: {
         connectionString: storageAccountConnectionString,
         queues: {
+          creationSendEmail: {
+            name: walletInstanceCreationEmailQueueName,
+          },
           validateCertificates: {
             name: validateWalletInstanceCertificatesQueueName,
           },
@@ -333,6 +396,15 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
+const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  Omit<AuthProfileApiConfig, "httpRequestTimeout">
+> = sequenceS(RE.Apply)({
+  apiKey: readFromEnvironment("AuthProfileApiKey"),
+  baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
+});
+
 export const getConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -340,6 +412,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     attestationService: getAttestationServiceConfigFromEnvironment,
+    authProfile: getAuthProfileApiConfigFromEnvironment,
     azure: getAzureConfigFromEnvironment,
     crypto: getCryptoConfigFromEnvironment,
     federationEntity: getFederationEntityConfigFromEnvironment,
@@ -347,14 +420,26 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
+    mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),
-  RE.map(({ attestationService, httpRequestTimeout, ...remainingConfigs }) => ({
-    ...remainingConfigs,
-    attestationService: {
-      ...attestationService,
+  RE.map(
+    ({
+      attestationService,
+      authProfile,
       httpRequestTimeout,
-    },
-  })),
+      ...remainingConfigs
+    }) => ({
+      ...remainingConfigs,
+      attestationService: {
+        ...attestationService,
+        httpRequestTimeout,
+      },
+      authProfile: {
+        ...authProfile,
+        httpRequestTimeout,
+      },
+    }),
+  ),
 );
