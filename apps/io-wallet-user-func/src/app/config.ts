@@ -55,7 +55,6 @@ export const MailConfig = t.type({
   mailSender: NonEmptyString,
   mailupSecret: NonEmptyString,
   mailupUsername: NonEmptyString,
-  walletInstanceCreationEmailFeatureFlag: t.boolean,
 });
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
@@ -84,11 +83,6 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
     mailupUsername: pipe(
       readFromEnvironment("MailupUsername"),
       RE.chainEitherKW(parse(NonEmptyString, "Invalid mailup username")),
-    ),
-    walletInstanceCreationEmailFeatureFlag: pipe(
-      readFromEnvironment("WalletInstanceCreationEmailFeatureFlag"),
-      RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false)),
     ),
   }),
 );
