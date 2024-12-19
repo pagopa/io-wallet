@@ -60,13 +60,6 @@ export const MailConfig = t.type({
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
 
-export const WALLET_ACTIVATION_EMAIL_TITLE =
-  "Documenti su IO - Aggiungi i tuoi documenti al Portafoglio";
-export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
-  "https://io.italia.it/documenti-su-io/faq/";
-export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
-  "https://ioapp.it/it/accedi/?refresh=true";
-
 export const getMailConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
