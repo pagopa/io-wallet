@@ -12,6 +12,13 @@ import {
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 
+const toError = (genericMessage: string) => (error: unknown) =>
+  error instanceof Error && error.name === "TimeoutError"
+    ? new ServiceUnavailableError(
+        `The request to the database has timed out: ${error.message}`,
+      )
+    : new Error(`${genericMessage}: ${error}`);
+
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
 {
@@ -32,43 +39,25 @@ export class CosmosDbWalletInstanceRepository
     }[],
     userId: string,
   ) {
-    return TE.tryCatch(
-      async () => {
-        const operations: PatchOperationInput[] = operationsInput.map(
-          ({ id, operations }) => ({
-            id,
-            operationType: "Patch",
-            resourceBody: {
-              operations,
-            },
-          }),
-        );
-        await this.#container.items.batch(operations, userId);
-      },
-      (error) =>
-        error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(
-              `The request to the database has timed out: ${error.message}`,
-            )
-          : new Error(`Error updating wallet instances: ${error}`),
-    );
+    return TE.tryCatch(async () => {
+      const operations: PatchOperationInput[] = operationsInput.map(
+        ({ id, operations }) => ({
+          id,
+          operationType: "Patch",
+          resourceBody: {
+            operations,
+          },
+        }),
+      );
+      await this.#container.items.batch(operations, userId);
+    }, toError("Error updating wallet instances"));
   }
 
   deleteAllByUserId(userId: WalletInstance["userId"]) {
     return pipe(
-      TE.tryCatch(
-        async () => {
-          await this.#container.deleteAllItemsForPartitionKey(userId);
-        },
-        (error) => {
-          if (error instanceof Error && error.name === "TimeoutError") {
-            return new ServiceUnavailableError(
-              `The request to the database has timed out: ${error.message}`,
-            );
-          }
-          return new Error(`Error deleting wallet instances: ${error}`);
-        },
-      ),
+      TE.tryCatch(async () => {
+        await this.#container.deleteAllItemsForPartitionKey(userId);
+      }, toError("Error deleting wallet instances")),
     );
   }
 
@@ -76,12 +65,7 @@ export class CosmosDbWalletInstanceRepository
     return pipe(
       TE.tryCatch(
         () => this.#container.item(id, userId).read(),
-        (error) =>
-          error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(
-                `The request to the database has timed out: ${error.message}`,
-              )
-            : new Error(`Error getting wallet instance: ${error}`),
+        toError("Error getting wallet instance"),
       ),
       TE.chain(({ resource }) =>
         resource === undefined
@@ -104,29 +88,21 @@ export class CosmosDbWalletInstanceRepository
 
   getLastByUserId(userId: WalletInstance["userId"]) {
     return pipe(
-      TE.tryCatch(
-        async () => {
-          const { resources: items } = await this.#container.items
-            .query({
-              parameters: [
-                {
-                  name: "@partitionKey",
-                  value: userId,
-                },
-              ],
-              query:
-                "SELECT TOP 1 * FROM c WHERE c.userId = @partitionKey ORDER BY c.createdAt DESC",
-            })
-            .fetchAll();
-          return items;
-        },
-        (error) =>
-          error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(
-                `The request to the database has timed out: ${error.message}`,
-              )
-            : new Error(`Error getting wallet instances by user id: ${error}`),
-      ),
+      TE.tryCatch(async () => {
+        const { resources: items } = await this.#container.items
+          .query({
+            parameters: [
+              {
+                name: "@partitionKey",
+                value: userId,
+              },
+            ],
+            query:
+              "SELECT TOP 1 * FROM c WHERE c.userId = @partitionKey ORDER BY c.createdAt DESC",
+          })
+          .fetchAll();
+        return items;
+      }, toError("Error getting wallet instance by user id")),
       TE.chain(
         flow(
           RA.head,
@@ -154,33 +130,25 @@ export class CosmosDbWalletInstanceRepository
     userId: WalletInstance["userId"],
   ) {
     return pipe(
-      TE.tryCatch(
-        async () => {
-          const { resources: items } = await this.#container.items
-            .query({
-              parameters: [
-                {
-                  name: "@partitionKey",
-                  value: userId,
-                },
-                {
-                  name: "@idKey",
-                  value: walletInstanceId,
-                },
-              ],
-              query:
-                "SELECT * FROM c WHERE c.id != @idKey AND c.userId = @partitionKey AND c.isRevoked = false",
-            })
-            .fetchAll();
-          return items;
-        },
-        (error) =>
-          error instanceof Error && error.name === "TimeoutError"
-            ? new ServiceUnavailableError(
-                `The request to the database has timed out: ${error.message}`,
-              )
-            : new Error(`Error getting wallet instances by user id: ${error}`),
-      ),
+      TE.tryCatch(async () => {
+        const { resources: items } = await this.#container.items
+          .query({
+            parameters: [
+              {
+                name: "@partitionKey",
+                value: userId,
+              },
+              {
+                name: "@idKey",
+                value: walletInstanceId,
+              },
+            ],
+            query:
+              "SELECT * FROM c WHERE c.id != @idKey AND c.userId = @partitionKey AND c.isRevoked = false",
+          })
+          .fetchAll();
+        return items;
+      }, toError("Error getting wallet instances by user id")),
       TE.chain((items) =>
         pipe(
           items,
@@ -207,16 +175,8 @@ export class CosmosDbWalletInstanceRepository
   }
 
   insert(walletInstance: WalletInstance) {
-    return TE.tryCatch(
-      async () => {
-        await this.#container.items.create(walletInstance);
-      },
-      (error) =>
-        error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(
-              `The request to the database has timed out: ${error.message}`,
-            )
-          : new Error(`Error inserting wallet instance: ${error}`),
-    );
+    return TE.tryCatch(async () => {
+      await this.#container.items.create(walletInstance);
+    }, toError("Error inserting wallet instance"));
   }
 }
