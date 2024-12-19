@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.3.3
+
+### Patch Changes
+
+- f7ad7fa: Fix email on wallet instance creation title
+
 ## 2.3.2
 
 ### Patch Changes
