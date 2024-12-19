@@ -54,6 +54,10 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
+  deleteAllByUserId() {
+    return TE.of(undefined);
+  }
+
   get(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(
