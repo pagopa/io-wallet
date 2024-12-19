@@ -61,6 +61,7 @@ const mockAttestationService: AttestationService = {
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
+  deleteAllByUserId: () => TE.left(new Error("not implemented")),
   get: () =>
     TE.right(
       O.some({
@@ -190,6 +191,7 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
     const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
       get: () =>
         TE.right(
           O.some({
@@ -246,6 +248,7 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 404 HTTP response when the wallet instance is not found", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),

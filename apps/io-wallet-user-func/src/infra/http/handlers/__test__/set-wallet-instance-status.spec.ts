@@ -11,6 +11,7 @@ import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 describe("SetWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
+    deleteAllByUserId: () => TE.left(new Error("not implemented")),
     get: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
@@ -121,6 +122,7 @@ describe("SetWalletInstanceStatusHandler", () => {
     const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
+        deleteAllByUserId: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>

@@ -1,17 +1,16 @@
 /* eslint-disable max-lines-per-function */
+import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
-import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
 
-import { GetCurrentWalletInstanceStatusHandler } from "../get-current-wallet-instance-status";
+import { DeleteWalletInstancesHandler } from "../delete-wallet-instances";
 
-describe("GetCurrentWalletInstanceStatusHandler", () => {
+describe("DeleteWalletInstancesHandler", () => {
   const logger = {
     format: L.format.simple,
     log: () => () => void 0,
@@ -19,24 +18,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.left(new Error("not implemented")),
-    deleteAllByUserId: () => TE.left(new Error("not implemented")),
+    deleteAllByUserId: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
-    getLastByUserId: () =>
-      TE.right(
-        O.some({
-          createdAt: new Date(),
-          hardwareKey: {
-            crv: "P-256",
-            kty: "EC",
-            x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
-            y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
-          },
-          id: "123" as NonEmptyString,
-          isRevoked: false,
-          signCount: 0,
-          userId: "AAA" as FiscalCode,
-        }),
-      ),
+    getLastByUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
@@ -46,15 +30,20 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     headers: {
       "fiscal-code": "GSPMTA98L25E625O",
     },
-    method: "GET",
+    method: "DELETE",
+  };
+
+  const pidIssuerClient: CredentialRepository = {
+    revokeAllCredentials: () => TE.right(undefined),
   };
 
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
 
-  it("should return a 200 HTTP response on success", async () => {
-    const handler = GetCurrentWalletInstanceStatusHandler({
+  it("should return a 204 HTTP response on success", async () => {
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -64,16 +53,9 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
-      right: {
-        body: {
-          id: "123",
-          is_revoked: false,
-        },
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-        statusCode: 200,
-      },
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
     });
   });
 
@@ -83,10 +65,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         fiscalcode: "GSPMTA98L25E625O",
       },
-      method: "GET",
+      method: "DELETE",
     };
 
-    const handler = GetCurrentWalletInstanceStatusHandler({
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -111,10 +94,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       headers: {
         "fiscal-code": "foo",
       },
-      method: "GET",
+      method: "DELETE",
     };
 
-    const handler = GetCurrentWalletInstanceStatusHandler({
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -133,52 +117,25 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 404 HTTP response when no wallet instances is found", async () => {
-    const walletInstanceRepository: WalletInstanceRepository = {
-      batchPatch: () => TE.left(new Error("not implemented")),
-      deleteAllByUserId: () => TE.left(new Error("not implemented")),
-      get: () => TE.left(new Error("not implemented")),
-      getLastByUserId: () => TE.right(O.none),
-      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
-      insert: () => TE.left(new Error("not implemented")),
-    };
-    const handler = GetCurrentWalletInstanceStatusHandler({
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      telemetryClient,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 404,
-      }),
-    });
-  });
-
-  it("should return a 500 HTTP response on getLastByUserId error", async () => {
-    const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
+  it("should return a 500 HTTP response on deleteAllByUserId error", async () => {
+    const walletInstanceRepositoryThatFailsOnDelete: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("not implemented")),
-        deleteAllByUserId: () => TE.left(new Error("not implemented")),
+        deleteAllByUserId: () =>
+          TE.left(new Error("failed on deleteAllByUserId!")),
         get: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new Error("failed on getLastByUserId!")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),
       };
-    const handler = GetCurrentWalletInstanceStatusHandler({
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      walletInstanceRepository:
-        walletInstanceRepositoryThatFailsOnGetLastByUserId,
+      walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -192,24 +149,73 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 503 HTTP response when getLastByUserId returns ServiceUnavailableError", async () => {
-    const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
-      {
-        batchPatch: () => TE.left(new Error("not implemented")),
-        deleteAllByUserId: () => TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
-        getLastByUserId: () => TE.left(new ServiceUnavailableError("foo")),
-        getValidByUserIdExcludingOne: () =>
-          TE.left(new Error("not implemented")),
-        insert: () => TE.left(new Error("not implemented")),
-      };
-    const handler = GetCurrentWalletInstanceStatusHandler({
+  it("should return a 500 HTTP response on revokeAllCredentials error", async () => {
+    const pidIssuerClientThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () =>
+        TE.left(new Error("failed on revokeAllCredentials!")),
+    };
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClientThatFailsOnRevoke,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      walletInstanceRepository:
-        walletInstanceRepositoryThatFailsOnGetLastByUserId,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 503 HTTP response when deleteAllByUserId returns ServiceUnavailableError", async () => {
+    const walletInstanceRepositoryThatFailsOnDelete: WalletInstanceRepository =
+      {
+        batchPatch: () => TE.left(new Error("not implemented")),
+        deleteAllByUserId: () => TE.left(new ServiceUnavailableError()),
+        get: () => TE.left(new Error("not implemented")),
+        getLastByUserId: () => TE.left(new Error("not implemented")),
+        getValidByUserIdExcludingOne: () =>
+          TE.left(new Error("not implemented")),
+        insert: () => TE.left(new Error("not implemented")),
+      };
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClient,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+      walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 503,
+      }),
+    });
+  });
+
+  it("should return a 503 HTTP response when revokeAllCredentials returns ServiceUnavailableError", async () => {
+    const pidIssuerClientThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () => TE.left(new ServiceUnavailableError("foo")),
+    };
+    const handler = DeleteWalletInstancesHandler({
+      credentialRepository: pidIssuerClientThatFailsOnRevoke,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+      walletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({

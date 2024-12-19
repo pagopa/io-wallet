@@ -6,6 +6,7 @@ import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-in
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
+import { DeleteWalletInstancesFunction } from "@/infra/azure/functions/delete-wallet-instances";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
@@ -257,4 +258,17 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
     telemetryClient: appInsightsClient,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
+});
+
+app.http("deleteWalletInstances", {
+  authLevel: "function",
+  handler: withAppInsights(
+    DeleteWalletInstancesFunction({
+      credentialRepository: pidIssuerClient,
+      telemetryClient: appInsightsClient,
+      walletInstanceRepository,
+    }),
+  ),
+  methods: ["DELETE"],
+  route: "wallet-instances",
 });
