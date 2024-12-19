@@ -77,7 +77,7 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 400 HTTP response when fiscal_code header is missing", async () => {
+  it("should return a 400 HTTP response when fiscal-code header is missing", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       headers: {
