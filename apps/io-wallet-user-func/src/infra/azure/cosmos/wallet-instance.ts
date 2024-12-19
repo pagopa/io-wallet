@@ -54,8 +54,22 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  deleteAllByUserId() {
-    return TE.of(undefined);
+  deleteAllByUserId(userId: WalletInstance["userId"]) {
+    return pipe(
+      TE.tryCatch(
+        async () => {
+          await this.#container.deleteAllItemsForPartitionKey(userId);
+        },
+        (error) => {
+          if (error instanceof Error && error.name === "TimeoutError") {
+            return new ServiceUnavailableError(
+              `The request to the database has timed out: ${error.message}`,
+            );
+          }
+          return new Error(`Error deleting wallet instances: ${error}`);
+        },
+      ),
+    );
   }
 
   get(id: WalletInstance["id"], userId: WalletInstance["userId"]) {

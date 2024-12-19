@@ -5,10 +5,7 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
-import {
-  EntityNotFoundError,
-  ServiceUnavailableError,
-} from "io-wallet-common/error";
+import { ServiceUnavailableError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
 
 import { DeleteWalletInstancesHandler } from "../delete-wallet-instances";
@@ -87,35 +84,6 @@ describe("DeleteWalletInstancesHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 400,
-      }),
-    });
-  });
-
-  it("should return a 404 HTTP response when no wallet instances is found", async () => {
-    const walletInstanceRepository: WalletInstanceRepository = {
-      batchPatch: () => TE.left(new Error("not implemented")),
-      deleteAllByUserId: () => TE.left(new EntityNotFoundError()),
-      get: () => TE.left(new Error("not implemented")),
-      getLastByUserId: () => TE.left(new Error("not implemented")),
-      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
-      insert: () => TE.left(new Error("not implemented")),
-    };
-    const handler = DeleteWalletInstancesHandler({
-      credentialRepository: pidIssuerClient,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      telemetryClient,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 404,
       }),
     });
   });
