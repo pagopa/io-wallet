@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.3.4
+
+### Patch Changes
+
+- 248f6db: Removed feature flag on email sent after wallet instance creation
+
 ## 2.3.3
 
 ### Patch Changes
