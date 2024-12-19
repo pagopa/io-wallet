@@ -130,12 +130,10 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      emailQueuingEnabled: config.mail.walletInstanceCreationEmailFeatureFlag,
       nonceRepository,
       queueClient: walletInstanceCreationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: config.attestationService.allowedDeveloperUsers,
     }),
   ),
   methods: ["POST"],
