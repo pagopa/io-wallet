@@ -93,7 +93,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -101,7 +100,6 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: ["foo", "bar"],
     });
 
     await expect(handler()).resolves.toEqual({
@@ -122,7 +120,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -130,7 +127,6 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: ["foo", "bar"],
     });
 
     await expect(handler()).resolves.toEqual({
@@ -156,7 +152,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -164,7 +159,6 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: ["foo", "bar"],
     });
 
     await expect(handler()).resolves.toEqual({
@@ -195,7 +189,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -203,7 +196,6 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
-      whitelistFiscalCodes: ["foo", "bar"],
     });
 
     await expect(handler()).resolves.toEqual({
@@ -233,7 +225,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -241,7 +232,6 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
-      whitelistFiscalCodes: ["foo", "bar"],
     });
 
     await expect(handler()).resolves.toEqual({
@@ -272,7 +262,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -280,7 +269,6 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
-      whitelistFiscalCodes: ["foo", "bar"],
     });
 
     await expect(handler()).resolves.toEqual({

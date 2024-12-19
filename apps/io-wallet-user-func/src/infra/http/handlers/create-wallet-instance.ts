@@ -38,17 +38,13 @@ const sendEmail =
     fiscalCode: string,
   ): RTE.ReaderTaskEither<
     {
-      emailQueuingEnabled: boolean;
       queueClient: QueueClient;
-      whitelistFiscalCodes: string[];
     },
     Error,
     void
   > =>
-  ({ emailQueuingEnabled, queueClient, whitelistFiscalCodes }) =>
-    emailQueuingEnabled || whitelistFiscalCodes.includes(fiscalCode)
-      ? pipe({ queueClient }, enqueue(fiscalCode))
-      : TE.right(undefined);
+  ({ queueClient }) =>
+    pipe({ queueClient }, enqueue(fiscalCode));
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
