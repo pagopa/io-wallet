@@ -6,7 +6,7 @@
   },
   "security": [
     {
-      "FunctionsKey": []
+      "SubscriptionKey": []
     }
   ],
   "paths": {
@@ -46,9 +46,9 @@
   },
   "components": {
     "securitySchemes": {
-      "FunctionsKey": {
+      "SubscriptionKey": {
         "type": "apiKey",
-        "name": "X-Functions-Key",
+        "name": "Ocp-Apim-Subscription-Key",
         "in": "header"
       }
     },
