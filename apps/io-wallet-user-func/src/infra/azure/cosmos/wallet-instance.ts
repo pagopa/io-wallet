@@ -3,6 +3,7 @@ import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
+import * as A from "fp-ts/Array";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -53,11 +54,46 @@ export class CosmosDbWalletInstanceRepository
     }, toError("Error updating wallet instances"));
   }
 
-  deleteAllByUserId(userId: WalletInstance["userId"]) {
+  private getAllByUserId(
+    userId: WalletInstance["userId"],
+  ): TE.TaskEither<Error, WalletInstance[]> {
     return pipe(
       TE.tryCatch(async () => {
-        await this.#container.deleteAllItemsForPartitionKey(userId);
-      }, toError("Error deleting wallet instances")),
+        const { resources: items } = await this.#container.items
+          .readAll({
+            partitionKey: userId,
+          })
+          .fetchAll();
+        return items;
+      }, toError("Error getting wallet instances by user id")),
+      TE.chainW(
+        flow(
+          t.array(WalletInstance).decode,
+          E.mapLeft((errors) => new Error(errors.join(", "))),
+          TE.fromEither,
+        ),
+      ),
+    );
+  }
+
+  private delete(
+    id: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ): TE.TaskEither<Error, void> {
+    return TE.tryCatch(async () => {
+      await this.#container.item(id, userId).delete();
+    }, toError("Error deleting wallet instance"));
+  }
+
+  deleteAllByUserId(userId: WalletInstance["userId"]) {
+    // the functionality to delete all items given a partition key is currently in preview
+    return pipe(
+      this.getAllByUserId(userId),
+      TE.map(A.map(({ id }) => id)),
+      TE.chainW(
+        flow(A.traverse(TE.ApplicativeSeq)((id) => this.delete(id, userId))),
+      ),
+      TE.map(() => undefined),
     );
   }
 
