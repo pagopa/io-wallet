@@ -46,6 +46,28 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
+    delete:
+      operationId: deleteWalletInstances
+      summary: Delete wallet instances
+      security:
+        - FunctionsKey: []
+      parameters:
+        - in: header
+          name: fiscal-code
+          required: true
+          schema:
+            $ref: "#/components/schemas/FiscalCode"
+      responses:
+        "204":
+          description: Wallet instances successfully deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /token:
     description: This is a token endpoint (as defined in RFC 7523 section 4)

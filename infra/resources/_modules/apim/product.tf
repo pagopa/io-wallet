@@ -27,3 +27,18 @@ module "apim_v2_wallet_pdnd_product" {
   subscription_required = false
   approval_required     = false
 }
+
+module "apim_v2_wallet_admin_product" {
+  source = "github.com/pagopa/terraform-azurerm-v4//api_management_product?ref=v1.0.0"
+
+  product_id   = format("%s-wallet-admin-api", var.project_legacy)
+  display_name = "IO WALLET ADMIN APIs"
+  description  = "Product containing admin APIs"
+
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+
+  published             = true
+  subscription_required = true
+  approval_required     = false
+}

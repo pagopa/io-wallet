@@ -4,11 +4,6 @@
     "title": "IO Wallet - Support API",
     "version": "1.0.0"
   },
-  "servers": [
-    {
-      "url": "https://io-p-itn-wallet-support-func-01.azurewebsites.net/api/v1/wallet"
-    }
-  ],
   "paths": {
     "/wallet-instances/current": {
       "post": {
@@ -16,7 +11,7 @@
         "operationId": "getCurrentWalletInstanceByFiscalCode",
         "security": [
           {
-            "FunctionsKey": []
+            "SubscriptionKey": []
           }
         ],
         "requestBody": {
@@ -55,9 +50,9 @@
   },
   "components": {
     "securitySchemes": {
-      "FunctionsKey": {
+      "SubscriptionKey": {
         "type": "apiKey",
-        "name": "X-Functions-Key",
+        "name": "Ocp-Apim-Subscription-Key",
         "in": "header"
       }
     },
