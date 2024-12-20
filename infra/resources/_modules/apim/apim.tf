@@ -133,6 +133,31 @@ module "apim_v2_wallet_pdnd_api" {
   xml_content = file("${path.module}/api/pdnd/_base_policy.xml")
 }
 
+// ADMIN DELETE WALLET INSTANCES API
+module "apim_v2_wallet_admin_api" {
+  source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
+
+  name                  = format("%s-wallet-admin-api", var.project_legacy)
+  api_management_name   = var.apim.name
+  resource_group_name   = var.apim.resource_group_name
+  product_ids           = [module.apim_v2_wallet_admin_product.product_id]
+  subscription_required = false
+
+  service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
+
+
+  description  = "Admin API to delete wallet instances"
+  display_name = "IO Wallet - ADMIN"
+  path         = "api/v1/wallet/admin"
+  protocols    = ["https"]
+
+  content_format = "openapi"
+
+  content_value = file("${path.module}/api/admin/_swagger.json")
+
+  xml_content = file("${path.module}/api/admin/_base_policy.xml")
+}
+
 resource "azurerm_api_management_api_operation_policy" "health_check_pdnd_policy" {
   api_name            = module.apim_v2_wallet_pdnd_api.name
   operation_id        = "healthCheck"
