@@ -14,7 +14,6 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/lib/function";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
@@ -23,8 +22,6 @@ const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
-
-  const emailQueuingEnabled = true;
 
   const walletInstanceRequest = {
     challenge,
