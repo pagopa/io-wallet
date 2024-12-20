@@ -6,6 +6,7 @@ import {
 } from "@pagopa/io-functions-commons/dist/src/mailer";
 import { EmailString, FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
+import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
@@ -49,8 +50,10 @@ export class EmailNotificationServiceClient
           t.type({
             email: EmailString,
           }).decode,
+          E.mapLeft(
+            () => new Error("Error getting user email: invalid result format"),
+          ),
           TE.fromEither,
-          TE.mapLeft((errors) => new Error(errors.join(", "))),
         ),
       ),
       TE.map(({ email }) => email),
