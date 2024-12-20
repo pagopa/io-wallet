@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 2.4.0
+
+### Minor Changes
+
+- 1c8d468: Added deleteWalletInstances endpoint
+
 ## 2.3.4
 
 ### Patch Changes
