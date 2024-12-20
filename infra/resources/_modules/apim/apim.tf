@@ -94,6 +94,20 @@ data "azurerm_key_vault_secret" "support_func_key_default" {
   key_vault_id = var.key_vault_wallet_id
 }
 
+resource "azurerm_api_management_named_value" "user_func_key_admin" {
+  name                = "io-wallet-user-func-admin-key"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "io-wallet-user-func-admin-key"
+  value               = data.azurerm_key_vault_secret.user_func_key_admin.value
+  secret              = "true"
+}
+
+data "azurerm_key_vault_secret" "user_func_key_admin" {
+  name         = "io-wallet-user-func-admin-key"
+  key_vault_id = var.key_vault_wallet_id
+}
+
 // PDND API
 module "apim_v2_wallet_pdnd_api" {
   source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
