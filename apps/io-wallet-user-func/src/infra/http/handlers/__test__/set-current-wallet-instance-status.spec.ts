@@ -1,5 +1,6 @@
 import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -57,12 +58,24 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     method: "PUT",
   };
 
+  const emailRevocationQueuingEnabled = true;
+
+  const queueRevocationClient: QueueClient = {
+    sendMessage: () =>
+      Promise.resolve({
+        errorCode: undefined,
+        messageId: "messageId",
+      } as QueueSendMessageResponse),
+  } as unknown as QueueClient;
+
   it("should return a 204 HTTP response on success", async () => {
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
+      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -86,9 +99,11 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
+      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -111,9 +126,11 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClientThatFailsOnRevoke,
+      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -141,9 +158,11 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
+      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
@@ -172,9 +191,11 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
+      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,

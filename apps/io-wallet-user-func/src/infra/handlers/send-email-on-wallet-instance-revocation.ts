@@ -1,12 +1,13 @@
 import {
-  WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK,
+  // WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK, // [SIW-1936] to do - uncomment this line
   WALLET_REVOCATION_EMAIL_TITLE,
 } from "@/app/config";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
-import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
+// import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index"; // [SIW-1936] to do - uncomment this line
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import { ValidUrl } from "@pagopa/ts-commons/lib/url";
+// import { ValidUrl } from "@pagopa/ts-commons/lib/url"; // [SIW-1936] to do - uncomment this line
+// import { format } from "date-fns"; // [SIW-1936] to do - uncomment this line
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
@@ -26,13 +27,9 @@ const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
   tables: true,
 };
 
-// [SIW-1936] to do - this is a mock method
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getTime = (datetime: string) => "HH:mm";
+// const getRevocationTime = (datetime: Date) => format(datetime, "HH:mm"); // [SIW-1936] to do - uncomment this line
 
-// [SIW-1936] to do - this is a mock method
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getDate = (datetime: string) => "DD/MM/YYYY";
+// const getRevocationDate = (datetime: Date) => format(datetime, "dd/MM/yyyy"); // [SIW-1936] to do - uncomment this line
 
 export const SendEmailOnWalletInstanceRevocationHandler = H.of(
   (queueItem: WalletInstanceRevocationQueueItem) =>
@@ -40,12 +37,13 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
       getUserEmailByFiscalCode(queueItem.fiscalCode),
       RTE.chainW((emailAddress) =>
         pipe(
-          htmlTemplate(
-            queueItem.fiscalCode,
-            getTime(queueItem.revocationDatetime),
-            getDate(queueItem.revocationDatetime),
-            { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
-          ),
+          // htmlTemplate(
+          //   queueItem.fiscalCode,
+          //   getRevocationTime(new Date(queueItem.revocationDatetime)),
+          //   getRevocationDate(new Date(queueItem.revocationDatetime)),
+          //   { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
+          // ),
+          "", // [SIW-1936] to do - uncomment the prev lines
           (htmlContent) =>
             sendEmailToUser({
               html: htmlContent,

@@ -5,6 +5,7 @@ import {
   WalletInstanceEnvironment,
   revokeUserWalletInstances,
 } from "@/wallet-instance";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -32,9 +33,14 @@ const requireSetCurrentWalletInstanceStatusBody: (
 
 const revokeCurrentUserWalletInstance: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
-  fiscalCode,
-) =>
+) => RTE.ReaderTaskEither<
+  {
+    emailRevocationQueuingEnabled: boolean;
+    queueRevocationClient: QueueClient;
+  } & WalletInstanceEnvironment,
+  Error,
+  void
+> = (fiscalCode) =>
   pipe(
     fiscalCode,
     getCurrentWalletInstance,

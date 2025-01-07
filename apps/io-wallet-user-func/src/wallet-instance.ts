@@ -1,3 +1,4 @@
+import { QueueClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -11,6 +12,8 @@ import {
   WalletInstanceValid,
   WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
+
+import { enqueue } from "./infra/azure/storage/queue";
 
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
@@ -132,6 +135,29 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
     ),
   );
 
+const sendRevocationEmail =
+  (
+    fiscalCode: string,
+    revokedAt: string,
+  ): RTE.ReaderTaskEither<
+    {
+      emailRevocationQueuingEnabled: boolean;
+      queueRevocationClient: QueueClient;
+    },
+    Error,
+    void
+  > =>
+  ({ emailRevocationQueuingEnabled, queueRevocationClient }) =>
+    emailRevocationQueuingEnabled
+      ? pipe(
+          { queueClient: queueRevocationClient },
+          enqueue({
+            fiscalCode,
+            revokedAt,
+          }),
+        )
+      : TE.right(void 0);
+
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
@@ -140,28 +166,37 @@ export const revokeUserWalletInstances: (
   (userId, walletInstancesId, reason) =>
   ({ walletInstanceRepository }) =>
     walletInstancesId.length
-      ? walletInstanceRepository.batchPatch(
-          walletInstancesId.map((walletInstanceId) => ({
-            id: walletInstanceId,
-            operations: [
-              {
-                op: "replace",
-                path: "/isRevoked",
-                value: true,
-              },
-              {
-                op: "add",
-                path: "/revokedAt",
-                value: new Date(),
-              },
-              {
-                op: "add",
-                path: "/revocationReason",
-                value: reason,
-              },
-            ],
-          })),
-          userId,
+      ? pipe(new Date(), (revokedAt) =>
+          pipe(
+            walletInstanceRepository.batchPatch(
+              walletInstancesId.map((walletInstanceId) => ({
+                id: walletInstanceId,
+                operations: [
+                  {
+                    op: "replace",
+                    path: "/isRevoked",
+                    value: true,
+                  },
+                  {
+                    op: "add",
+                    path: "/revokedAt",
+                    value: revokedAt,
+                  },
+                  {
+                    op: "add",
+                    path: "/revocationReason",
+                    value: reason,
+                  },
+                ],
+              })),
+              userId,
+            ),
+            RTE.fromTaskEither,
+            RTE.chain(() =>
+              sendRevocationEmail(userId, revokedAt.toISOString()),
+            ),
+            RTE.right(void 0),
+          ),
         )
       : TE.right(void 0);
 

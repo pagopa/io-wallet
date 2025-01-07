@@ -73,11 +73,10 @@ const walletInstanceCreationEmailQueueClient =
     config.azure.storage.walletInstances.queues.creationSendEmail.name,
   );
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const walletInstanceRevocationEmailQueueClient =
   queueServiceClient.getQueueClient(
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
-  ); // to do - to change
+  );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
@@ -138,9 +137,13 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      emailQueuingEnabled: config.mail.walletInstanceCreationEmailFeatureFlag,
+      emailCreationQueuingEnabled:
+        config.mail.walletInstanceCreationEmailFeatureFlag,
+      emailRevocationQueuingEnabled:
+        config.mail.walletInstanceRevocationEmailFeatureFlag,
       nonceRepository,
-      queueClient: walletInstanceCreationEmailQueueClient,
+      queueCreationClient: walletInstanceCreationEmailQueueClient,
+      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -204,6 +207,9 @@ app.http("setWalletInstanceStatus", {
   handler: withAppInsights(
     SetWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
+      emailRevocationQueuingEnabled:
+        config.mail.walletInstanceRevocationEmailFeatureFlag,
+      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -217,6 +223,9 @@ app.http("setCurrentWalletInstanceStatus", {
   handler: withAppInsights(
     SetCurrentWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
+      emailRevocationQueuingEnabled:
+        config.mail.walletInstanceRevocationEmailFeatureFlag,
+      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),

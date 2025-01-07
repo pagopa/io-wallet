@@ -1,5 +1,9 @@
 import { revokeAllCredentials } from "@/credential";
-import { revokeUserWalletInstances } from "@/wallet-instance";
+import {
+  WalletInstanceEnvironment,
+  revokeUserWalletInstances,
+} from "@/wallet-instance";
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -9,6 +13,7 @@ import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 import { requireWalletInstanceId } from "../wallet-instance";
 
@@ -23,6 +28,19 @@ const requireSetWalletInstanceStatusBody: (
   req: H.HttpRequest,
 ) => E.Either<Error, SetWalletInstanceStatusBody> = (req) =>
   pipe(req.body, H.parse(SetWalletInstanceStatusBody, "Invalid body supplied"));
+
+const revokeWalletInstances = (
+  fiscalCode: WalletInstance["userId"],
+  walletInstanceId: WalletInstance["id"],
+): RTE.ReaderTaskEither<
+  {
+    emailRevocationQueuingEnabled: boolean;
+    queueRevocationClient: QueueClient;
+  } & WalletInstanceEnvironment,
+  Error,
+  void
+> =>
+  revokeUserWalletInstances(fiscalCode, [walletInstanceId], "REVOKED_BY_USER");
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -39,14 +57,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
       pipe(
         // invoke PID issuer services to revoke all credentials for that user
         revokeAllCredentials(fiscalCode),
-        RTE.chainW(() =>
-          // access our database to revoke the wallet instance
-          revokeUserWalletInstances(
-            fiscalCode,
-            [walletInstanceId],
-            "REVOKED_BY_USER",
-          ),
-        ),
+        RTE.chainW(() => revokeWalletInstances(fiscalCode, walletInstanceId)),
         RTE.orElseFirstW((error) =>
           pipe(
             sendTelemetryException(error, {
