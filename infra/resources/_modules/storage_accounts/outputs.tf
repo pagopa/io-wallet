@@ -16,6 +16,12 @@ output "wallet_instance_creation_email_queue_name_01" {
   }
 }
 
+output "wallet_instance_revocation_email_queue_name_01" {
+  value = {
+    name = azurerm_storage_queue.wallet-instance-revocation-email-queue-01.name
+  }
+}
+
 output "wallet" {
   value = {
     id                            = module.storage_account.id
