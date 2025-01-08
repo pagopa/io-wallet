@@ -135,36 +135,40 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
     ),
   );
 
-const sendRevocationEmail =
-  (
-    fiscalCode: string,
-    revokedAt: string,
-  ): RTE.ReaderTaskEither<
-    {
-      emailRevocationQueuingEnabled: boolean;
-      queueRevocationClient: QueueClient;
-    },
-    Error,
-    void
-  > =>
-  ({ emailRevocationQueuingEnabled, queueRevocationClient }) =>
-    emailRevocationQueuingEnabled
-      ? pipe(
-          { queueClient: queueRevocationClient },
-          enqueue({
-            fiscalCode,
-            revokedAt,
-          }),
-        )
-      : TE.right(void 0);
+const sendRevocationEmail = (
+  emailRevocationQueuingEnabled: boolean,
+  queueRevocationClient: QueueClient,
+  fiscalCode: string,
+  revokedAt: string,
+): TE.TaskEither<Error, void> =>
+  emailRevocationQueuingEnabled
+    ? pipe(
+        { queueClient: queueRevocationClient },
+        enqueue({
+          fiscalCode,
+          revokedAt,
+        }),
+      )
+    : TE.right(void 0);
 
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
   reason: RevocationReason,
-) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
+) => RTE.ReaderTaskEither<
+  {
+    emailRevocationQueuingEnabled: boolean;
+    queueRevocationClient: QueueClient;
+  } & WalletInstanceEnvironment,
+  Error,
+  void
+> =
   (userId, walletInstancesId, reason) =>
-  ({ walletInstanceRepository }) =>
+  ({
+    emailRevocationQueuingEnabled,
+    queueRevocationClient,
+    walletInstanceRepository,
+  }) =>
     walletInstancesId.length
       ? pipe(new Date(), (revokedAt) =>
           pipe(
@@ -191,11 +195,14 @@ export const revokeUserWalletInstances: (
               })),
               userId,
             ),
-            RTE.fromTaskEither,
-            RTE.chain(() =>
-              sendRevocationEmail(userId, revokedAt.toISOString()),
+            TE.chain(() =>
+              sendRevocationEmail(
+                emailRevocationQueuingEnabled,
+                queueRevocationClient,
+                userId,
+                revokedAt.toISOString(),
+              ),
             ),
-            RTE.right(void 0),
           ),
         )
       : TE.right(void 0);
@@ -227,11 +234,14 @@ export const revokeUserValidWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
   reason: RevocationReason,
-) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
-  userId,
-  walletInstanceId,
-  reason,
-) =>
+) => RTE.ReaderTaskEither<
+  {
+    emailRevocationQueuingEnabled: boolean;
+    queueRevocationClient: QueueClient;
+  } & WalletInstanceEnvironment,
+  Error,
+  void
+> = (userId, walletInstanceId, reason) =>
   pipe(
     getUserValidWalletInstancesIdExceptOne(userId, walletInstanceId),
     RTE.chain((validWalletInstances) =>
