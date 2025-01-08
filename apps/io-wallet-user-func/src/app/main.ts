@@ -257,8 +257,11 @@ app.storageQueue("validateWalletInstance", {
   connection: "StorageConnectionString",
   handler: ValidateWalletInstanceAttestedKeyFunction({
     attestationServiceConfiguration: config.attestationService,
+    emailRevocationQueuingEnabled:
+      config.mail.walletInstanceRevocationEmailFeatureFlag,
     inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
     notificationService: slackNotificationService,
+    queueRevocationClient: walletInstanceRevocationEmailQueueClient,
     revocationQueue: walletInstanceRevocationQueue,
     telemetryClient: appInsightsClient,
     walletInstanceRepository,
