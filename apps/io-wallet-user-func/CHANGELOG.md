@@ -1,5 +1,35 @@
 # io-wallet-user-func
 
+## 2.4.0
+
+### Minor Changes
+
+- 1c8d468: Added deleteWalletInstances endpoint
+
+## 2.3.4
+
+### Patch Changes
+
+- 248f6db: Removed feature flag on email sent after wallet instance creation
+
+## 2.3.3
+
+### Patch Changes
+
+- f7ad7fa: Fix email on wallet instance creation title
+
+## 2.3.2
+
+### Patch Changes
+
+- 24dd637: Add telemetryClient in sendEmailOnWalletInstanceCreation function
+
+## 2.3.1
+
+### Patch Changes
+
+- b3ca3ff: Added fiscal codes whitelist for email test
+
 ## 2.3.0
 
 ### Minor Changes

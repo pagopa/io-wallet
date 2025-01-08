@@ -14,7 +14,6 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/lib/function";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
@@ -41,6 +40,7 @@ describe("CreateWalletInstanceHandler", () => {
 
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
+    deleteAllByUserId: () => TE.left(new Error("not implemented")),
     get: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.right(O.some([])),
@@ -186,6 +186,7 @@ describe("CreateWalletInstanceHandler", () => {
     const walletInstanceRepositoryThatFailsOnInsert: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("not implemented")),
+        deleteAllByUserId: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
@@ -225,6 +226,7 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 500 HTTP response on getValidByUserIdExcludingOne error", async () => {
     const walletInstanceRepositoryThatFails: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
       get: () => TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () =>
@@ -265,6 +267,7 @@ describe("CreateWalletInstanceHandler", () => {
     const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
+        deleteAllByUserId: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>

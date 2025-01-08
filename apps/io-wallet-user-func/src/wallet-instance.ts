@@ -34,6 +34,9 @@ export interface WalletInstanceRepository {
     }[],
     userId: string,
   ) => TE.TaskEither<Error, void>;
+  deleteAllByUserId: (
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, void>;
   get: (
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -263,3 +266,10 @@ export const filterValidWithAndroidCertificatesChain = (
     ),
     RTE.of,
   );
+
+export const deleteUserWalletInstances: (
+  userId: WalletInstance["userId"],
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
+  (userId) =>
+  ({ walletInstanceRepository }) =>
+    walletInstanceRepository.deleteAllByUserId(userId);

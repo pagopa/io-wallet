@@ -70,8 +70,8 @@ export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
 
 export const WALLET_REVOCATION_EMAIL_TITLE =
   "Messaggi da IO: IT Wallet disattivato";
-// [SIW-1936] to do - insert the correct link value
-export const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK = "";
+export const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK =
+  "https://ioapp.it/it/accedi/";
 
 export const getMailConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,

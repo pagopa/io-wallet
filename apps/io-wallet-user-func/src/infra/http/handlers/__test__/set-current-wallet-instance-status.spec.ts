@@ -12,9 +12,11 @@ import { describe, expect, it } from "vitest";
 
 import { SetCurrentWalletInstanceStatusHandler } from "../set-current-wallet-instance-status";
 
+// eslint-disable-next-line max-lines-per-function
 describe("SetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
+    deleteAllByUserId: () => TE.left(new Error("not implemented")),
     get: () => TE.left(new Error("not implemented")),
     getLastByUserId: () =>
       TE.right(
@@ -150,6 +152,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     const walletInstanceRepositoryThatFailsOnBatchPatch: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
+        deleteAllByUserId: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
@@ -182,6 +185,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     const walletInstanceRepositoryThatFailsOnGetLastByUserId: WalletInstanceRepository =
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
+        deleteAllByUserId: () => TE.left(new Error("not implemented")),
         get: () => TE.left(new Error("not implemented")),
         getLastByUserId: () =>
           TE.left(new ServiceUnavailableError("failed on getLastByUserId!")),

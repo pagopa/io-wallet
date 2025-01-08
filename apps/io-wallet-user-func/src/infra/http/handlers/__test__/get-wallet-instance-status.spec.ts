@@ -19,6 +19,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.left(new Error("not implemented")),
+    deleteAllByUserId: () => TE.left(new Error("not implemented")),
     get: () =>
       TE.right(
         O.some({
@@ -165,7 +166,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 400 HTTP response when fiscal_code header is missing", async () => {
+  it("should return a 400 HTTP response when fiscal-code header is missing", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       headers: {
@@ -199,6 +200,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   it("should return a 404 HTTP response when no wallet instances is found", async () => {
     const walletInstanceRepository: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
       get: () => TE.right(O.none),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
@@ -223,7 +225,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 422 HTTP response when fiscal_code header is not a valid fiscal code", async () => {
+  it("should return a 422 HTTP response when fiscal-code header is not a valid fiscal code", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       headers: {
@@ -257,6 +259,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   it("should return a 500 HTTP response on get error", async () => {
     const walletInstanceRepositoryThatFailsOnGet: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
       get: () => TE.left(new Error("failed on get!")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
@@ -284,6 +287,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   it("should return a 503 HTTP response when get returns ServiceUnavailableError", async () => {
     const walletInstanceRepositoryThatFailsOnGet: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
       get: () => TE.left(new ServiceUnavailableError("foo")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
