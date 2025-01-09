@@ -23,7 +23,6 @@ const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
-  const emailCreationQueuingEnabled = true;
   const emailRevocationQueuingEnabled = true;
 
   const walletInstanceRequest = {
@@ -94,7 +93,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailCreationQueuingEnabled,
       emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -124,7 +122,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailCreationQueuingEnabled,
       emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -159,7 +156,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailCreationQueuingEnabled,
       emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -200,7 +196,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailCreationQueuingEnabled,
       emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -240,7 +235,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailCreationQueuingEnabled,
       emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -281,7 +275,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailCreationQueuingEnabled,
       emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,

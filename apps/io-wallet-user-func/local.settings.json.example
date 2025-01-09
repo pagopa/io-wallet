@@ -46,7 +46,6 @@
     "MailupUsername": "MAILUP_USERNAME",
     "MailupSecret": "MAILUP_SECRET",
     "MailSender": "MAIL_SENDER",
-    "WalletInstanceCreationEmailFeatureFlag": "WALLET_INSTANCE_CREATION_EMAIL_FEATURE_FLAG",
     "WalletInstanceRevocationEmailFeatureFlag": WALLET_INSTANCE_REVOCATION_EMAIL_FEATURE_FLAG,
     "AuthProfileApiKey": "AUTH_PROFILE_API_KEY",
     "AuthProfileApiBaseURL": "AUTH_PROFILE_API_BASE_URL"

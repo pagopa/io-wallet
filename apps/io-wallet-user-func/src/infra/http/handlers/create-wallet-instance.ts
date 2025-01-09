@@ -38,15 +38,9 @@ type WalletInstanceRequestPayload = t.TypeOf<
 const sendCreationEmail =
   (
     fiscalCode: string,
-  ): RTE.ReaderTaskEither<
-    { emailCreationQueuingEnabled: boolean; queueCreationClient: QueueClient },
-    Error,
-    void
-  > =>
-  ({ emailCreationQueuingEnabled, queueCreationClient }) =>
-    emailCreationQueuingEnabled
-      ? pipe({ queueClient: queueCreationClient }, enqueue(fiscalCode))
-      : TE.right(undefined);
+  ): RTE.ReaderTaskEither<{ queueCreationClient: QueueClient }, Error, void> =>
+  ({ queueCreationClient }) =>
+    pipe({ queueClient: queueCreationClient }, enqueue(fiscalCode));
 
 const revokeWalletInstances = (walletInstance: {
   fiscalCode: WalletInstance["userId"];

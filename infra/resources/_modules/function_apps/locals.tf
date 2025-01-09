@@ -39,7 +39,6 @@ locals {
     WalletInstanceRevocationEmailQueueName      = var.wallet_instance_revocation_email_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
-    WalletInstanceCreationEmailFeatureFlag = false
     WalletInstanceRevocationEmailFeatureFlag = false
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
 
