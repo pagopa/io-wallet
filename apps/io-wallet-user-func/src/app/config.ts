@@ -60,11 +60,6 @@ export const MailConfig = t.type({
 
 export type MailConfig = t.TypeOf<typeof MailConfig>;
 
-export const WALLET_REVOCATION_EMAIL_TITLE =
-  "Messaggi da IO: IT Wallet disattivato";
-export const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK =
-  "https://ioapp.it/it/accedi/";
-
 export const getMailConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -306,7 +301,6 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
-
     walletInstanceRevocationEmailQueueName: readFromEnvironment(
       "WalletInstanceRevocationEmailQueueName",
     ),

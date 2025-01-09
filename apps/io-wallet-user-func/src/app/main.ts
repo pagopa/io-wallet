@@ -138,11 +138,8 @@ app.http("createWalletInstance", {
   handler: withAppInsights(
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
-      emailRevocationQueuingEnabled:
-        config.mail.walletInstanceRevocationEmailFeatureFlag,
       nonceRepository,
       queueCreationClient: walletInstanceCreationEmailQueueClient,
-      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -256,11 +253,8 @@ app.storageQueue("validateWalletInstance", {
   connection: "StorageConnectionString",
   handler: ValidateWalletInstanceAttestedKeyFunction({
     attestationServiceConfiguration: config.attestationService,
-    emailRevocationQueuingEnabled:
-      config.mail.walletInstanceRevocationEmailFeatureFlag,
     inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
     notificationService: slackNotificationService,
-    queueRevocationClient: walletInstanceRevocationEmailQueueClient,
     revocationQueue: walletInstanceRevocationQueue,
     telemetryClient: appInsightsClient,
     walletInstanceRepository,

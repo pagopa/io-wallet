@@ -1,4 +1,3 @@
-import { QueueClient } from "@azure/storage-queue";
 import * as appInsights from "applicationinsights";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
@@ -62,9 +61,7 @@ export const revokeInvalidWalletInstances: (
 ) => RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
-    emailRevocationQueuingEnabled: boolean;
     notificationService: NotificationService;
-    queueRevocationClient: QueueClient;
     revocationQueue: WalletInstanceRevocationStorageQueue;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
@@ -75,9 +72,7 @@ export const revokeInvalidWalletInstances: (
   (walletInstance: WalletInstanceValidWithAndroidCertificatesChain) =>
   ({
     attestationServiceConfiguration,
-    emailRevocationQueuingEnabled,
     notificationService,
-    queueRevocationClient,
     revocationQueue,
     telemetryClient,
     walletInstanceRepository,
@@ -103,8 +98,6 @@ export const revokeInvalidWalletInstances: (
                 [walletInstance.id],
                 validationResult.certificatesRevocationReason,
               )({
-                emailRevocationQueuingEnabled,
-                queueRevocationClient,
                 walletInstanceRepository,
               }),
               TE.map(() =>

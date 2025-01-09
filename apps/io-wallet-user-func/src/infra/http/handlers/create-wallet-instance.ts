@@ -45,14 +45,7 @@ const sendCreationEmail =
 const revokeWalletInstances = (walletInstance: {
   fiscalCode: WalletInstance["userId"];
   hardwareKeyTag: WalletInstance["id"];
-}): RTE.ReaderTaskEither<
-  {
-    emailRevocationQueuingEnabled: boolean;
-    queueRevocationClient: QueueClient;
-  } & WalletInstanceEnvironment,
-  Error,
-  void
-> =>
+}): RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =>
   pipe(
     revokeUserValidWalletInstancesExceptOne(
       walletInstance.fiscalCode,

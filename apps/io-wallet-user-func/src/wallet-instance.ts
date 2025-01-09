@@ -139,12 +139,12 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
   );
 
 const sendRevocationEmail = (
-  emailRevocationQueuingEnabled: boolean,
-  queueRevocationClient: QueueClient,
   fiscalCode: string,
   revokedAt: string,
+  emailRevocationQueuingEnabled?: boolean,
+  queueRevocationClient?: QueueClient,
 ): TE.TaskEither<Error, void> =>
-  emailRevocationQueuingEnabled
+  emailRevocationQueuingEnabled && queueRevocationClient
     ? pipe(
         { queueClient: queueRevocationClient },
         enqueue({
@@ -158,20 +158,9 @@ export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
   reason: RevocationReason,
-) => RTE.ReaderTaskEither<
-  {
-    emailRevocationQueuingEnabled: boolean;
-    queueRevocationClient: QueueClient;
-  } & WalletInstanceEnvironment,
-  Error,
-  void
-> =
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (userId, walletInstancesId, reason) =>
-  ({
-    emailRevocationQueuingEnabled,
-    queueRevocationClient,
-    walletInstanceRepository,
-  }) =>
+  ({ walletInstanceRepository }) =>
     walletInstancesId.length
       ? pipe(new Date(), (revokedAt) =>
           pipe(
@@ -199,12 +188,7 @@ export const revokeUserWalletInstances: (
               userId,
             ),
             TE.chain(() =>
-              sendRevocationEmail(
-                emailRevocationQueuingEnabled,
-                queueRevocationClient,
-                userId,
-                revokedAt.toISOString(),
-              ),
+              sendRevocationEmail(userId, revokedAt.toISOString()),
             ),
           ),
         )
@@ -237,14 +221,11 @@ export const revokeUserValidWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
   reason: RevocationReason,
-) => RTE.ReaderTaskEither<
-  {
-    emailRevocationQueuingEnabled: boolean;
-    queueRevocationClient: QueueClient;
-  } & WalletInstanceEnvironment,
-  Error,
-  void
-> = (userId, walletInstanceId, reason) =>
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
+  userId,
+  walletInstanceId,
+  reason,
+) =>
   pipe(
     getUserValidWalletInstancesIdExceptOne(userId, walletInstanceId),
     RTE.chain((validWalletInstances) =>

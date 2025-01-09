@@ -1,7 +1,3 @@
-import {
-  WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK,
-  WALLET_REVOCATION_EMAIL_TITLE,
-} from "@/app/config";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
@@ -22,6 +18,11 @@ type WalletInstanceRevocationQueueItem = t.TypeOf<
   typeof WalletInstanceRevocationQueueItem
 >;
 
+export const WALLET_REVOCATION_EMAIL_TITLE =
+  "Messaggi da IO: Documenti su IO disattivato";
+export const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK =
+  "https://ioapp.it/it/accedi/";
+
 const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
   ignoreImage: true,
   tables: true,
@@ -32,14 +33,14 @@ const getRevocationTime = (datetime: Date) => format(datetime, "HH:mm");
 const getRevocationDate = (datetime: Date) => format(datetime, "dd/MM/yyyy");
 
 export const SendEmailOnWalletInstanceRevocationHandler = H.of(
-  (queueItem: WalletInstanceRevocationQueueItem) =>
+  ({ fiscalCode, revokedAt }: WalletInstanceRevocationQueueItem) =>
     pipe(
-      getUserEmailByFiscalCode(queueItem.fiscalCode),
+      getUserEmailByFiscalCode(fiscalCode),
       RTE.chainW((emailAddress) =>
         pipe(
           htmlTemplate(
-            getRevocationTime(new Date(queueItem.revokedAt)),
-            getRevocationDate(new Date(queueItem.revokedAt)),
+            getRevocationTime(new Date(revokedAt)),
+            getRevocationDate(new Date(revokedAt)),
             { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
           ),
           (htmlContent) =>

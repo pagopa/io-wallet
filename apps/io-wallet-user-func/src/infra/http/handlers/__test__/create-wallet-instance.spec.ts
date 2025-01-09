@@ -23,8 +23,6 @@ const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 describe("CreateWalletInstanceHandler", () => {
   const { attestation, challenge, keyId } = iOSMockData;
 
-  const emailRevocationQueuingEnabled = true;
-
   const walletInstanceRequest = {
     challenge,
     fiscal_code: mockFiscalCode,
@@ -93,13 +91,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueCreationClient: queueClient,
-      queueRevocationClient: queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -122,13 +118,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueCreationClient: queueClient,
-      queueRevocationClient: queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -156,13 +150,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       queueCreationClient: queueClient,
-      queueRevocationClient: queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -196,13 +188,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueCreationClient: queueClient,
-      queueRevocationClient: queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
@@ -235,13 +225,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueCreationClient: queueClient,
-      queueRevocationClient: queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
@@ -275,13 +263,11 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueCreationClient: queueClient,
-      queueRevocationClient: queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
