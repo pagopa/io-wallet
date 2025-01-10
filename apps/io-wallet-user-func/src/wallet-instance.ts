@@ -142,32 +142,30 @@ export const revokeUserWalletInstances: (
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =
   (userId, walletInstancesId, reason) =>
   ({ walletInstanceRepository }) =>
-    walletInstancesId.length
-      ? pipe(new Date(), (revokedAt) =>
-          pipe(
-            walletInstanceRepository.batchPatch(
-              walletInstancesId.map((walletInstanceId) => ({
-                id: walletInstanceId,
-                operations: [
-                  {
-                    op: "replace",
-                    path: "/isRevoked",
-                    value: true,
-                  },
-                  {
-                    op: "add",
-                    path: "/revokedAt",
-                    value: revokedAt,
-                  },
-                  {
-                    op: "add",
-                    path: "/revocationReason",
-                    value: reason,
-                  },
-                ],
-              })),
-              userId,
-            ),
+    walletInstancesId.length > 0
+      ? pipe(
+          walletInstanceRepository.batchPatch(
+            walletInstancesId.map((walletInstanceId) => ({
+              id: walletInstanceId,
+              operations: [
+                {
+                  op: "replace",
+                  path: "/isRevoked",
+                  value: true,
+                },
+                {
+                  op: "add",
+                  path: "/revokedAt",
+                  value: new Date(),
+                },
+                {
+                  op: "add",
+                  path: "/revocationReason",
+                  value: reason,
+                },
+              ],
+            })),
+            userId,
           ),
         )
       : TE.right(void 0);
