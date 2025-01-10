@@ -1,4 +1,3 @@
-import { QueueClient } from "@azure/storage-queue";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -12,8 +11,6 @@ import {
   WalletInstanceValid,
   WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
-
-import { enqueue } from "./infra/azure/storage/queue";
 
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
@@ -138,22 +135,6 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
     ),
   );
 
-const sendRevocationEmail = (
-  fiscalCode: string,
-  revokedAt: string,
-  emailRevocationQueuingEnabled?: boolean,
-  queueRevocationClient?: QueueClient,
-): TE.TaskEither<Error, void> =>
-  emailRevocationQueuingEnabled && queueRevocationClient
-    ? pipe(
-        { queueClient: queueRevocationClient },
-        enqueue({
-          fiscalCode,
-          revokedAt,
-        }),
-      )
-    : TE.right(void 0);
-
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
@@ -186,9 +167,6 @@ export const revokeUserWalletInstances: (
                 ],
               })),
               userId,
-            ),
-            TE.chain(() =>
-              sendRevocationEmail(userId, revokedAt.toISOString()),
             ),
           ),
         )

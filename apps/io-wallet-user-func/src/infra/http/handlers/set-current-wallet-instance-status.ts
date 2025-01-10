@@ -1,4 +1,5 @@
 import { revokeAllCredentials } from "@/credential";
+import { enqueue } from "@/infra/azure/storage/queue";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { getCurrentWalletInstance } from "@/wallet-instance";
 import {
@@ -10,6 +11,7 @@ import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
@@ -49,6 +51,29 @@ const revokeCurrentUserWalletInstance: (
     ),
   );
 
+const sendRevocationEmail =
+  (
+    fiscalCode: string,
+    revokedAt: string,
+  ): RTE.ReaderTaskEither<
+    {
+      emailRevocationQueuingEnabled: boolean;
+      queueRevocationClient: QueueClient;
+    },
+    Error,
+    void
+  > =>
+  ({ emailRevocationQueuingEnabled, queueRevocationClient }) =>
+    emailRevocationQueuingEnabled
+      ? pipe(
+          { queueClient: queueRevocationClient },
+          enqueue({
+            fiscalCode,
+            revokedAt,
+          }),
+        )
+      : TE.right(void 0);
+
 export const SetCurrentWalletInstanceStatusHandler = H.of(
   (req: H.HttpRequest) =>
     pipe(
@@ -59,7 +84,14 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       // invoke PID issuer services to revoke all credentials for that user
       RTE.chainFirst(revokeAllCredentials),
       // revoke the wallet instance in the database
-      RTE.chainW(revokeCurrentUserWalletInstance),
+      RTE.chainW((fiscalCode) =>
+        pipe(
+          revokeCurrentUserWalletInstance(fiscalCode),
+          RTE.chainW(() =>
+            sendRevocationEmail(fiscalCode, new Date().toISOString()),
+          ),
+        ),
+      ),
       RTE.map(() => H.empty),
       RTE.orElseFirstW((error) =>
         sendExceptionWithBodyToAppInsights(

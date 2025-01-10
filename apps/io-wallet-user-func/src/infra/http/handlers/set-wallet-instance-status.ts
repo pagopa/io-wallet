@@ -1,4 +1,5 @@
 import { revokeAllCredentials } from "@/credential";
+import { enqueue } from "@/infra/azure/storage/queue";
 import {
   WalletInstanceEnvironment,
   revokeUserWalletInstances,
@@ -9,6 +10,7 @@ import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
@@ -32,15 +34,31 @@ const requireSetWalletInstanceStatusBody: (
 const revokeWalletInstances = (
   fiscalCode: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
-): RTE.ReaderTaskEither<
-  {
-    emailRevocationQueuingEnabled: boolean;
-    queueRevocationClient: QueueClient;
-  } & WalletInstanceEnvironment,
-  Error,
-  void
-> =>
+): RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =>
   revokeUserWalletInstances(fiscalCode, [walletInstanceId], "REVOKED_BY_USER");
+
+const sendRevocationEmail =
+  (
+    fiscalCode: string,
+    revokedAt: string,
+  ): RTE.ReaderTaskEither<
+    {
+      emailRevocationQueuingEnabled: boolean;
+      queueRevocationClient: QueueClient;
+    },
+    Error,
+    void
+  > =>
+  ({ emailRevocationQueuingEnabled, queueRevocationClient }) =>
+    emailRevocationQueuingEnabled
+      ? pipe(
+          { queueClient: queueRevocationClient },
+          enqueue({
+            fiscalCode,
+            revokedAt,
+          }),
+        )
+      : TE.right(void 0);
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -57,7 +75,14 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
       pipe(
         // invoke PID issuer services to revoke all credentials for that user
         revokeAllCredentials(fiscalCode),
-        RTE.chainW(() => revokeWalletInstances(fiscalCode, walletInstanceId)),
+        RTE.chainW(() =>
+          pipe(
+            revokeWalletInstances(fiscalCode, walletInstanceId),
+            RTE.chainW(() =>
+              sendRevocationEmail(fiscalCode, new Date().toISOString()),
+            ),
+          ),
+        ),
         RTE.orElseFirstW((error) =>
           pipe(
             sendTelemetryException(error, {
