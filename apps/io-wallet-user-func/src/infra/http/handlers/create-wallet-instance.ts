@@ -7,7 +7,6 @@ import { enqueue } from "@/infra/azure/storage/queue";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
-  WalletInstanceEnvironment,
   insertWalletInstance,
   revokeUserValidWalletInstancesExceptOne,
 } from "@/wallet-instance";
@@ -22,7 +21,6 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -41,18 +39,6 @@ const sendCreationEmail =
   ): RTE.ReaderTaskEither<{ queueCreationClient: QueueClient }, Error, void> =>
   ({ queueCreationClient }) =>
     pipe({ queueClient: queueCreationClient }, enqueue(fiscalCode));
-
-const revokeWalletInstances = (walletInstance: {
-  fiscalCode: WalletInstance["userId"];
-  hardwareKeyTag: WalletInstance["id"];
-}): RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> =>
-  pipe(
-    revokeUserValidWalletInstancesExceptOne(
-      walletInstance.fiscalCode,
-      walletInstance.hardwareKeyTag,
-      "NEW_WALLET_INSTANCE_CREATED",
-    ),
-  );
 
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
@@ -96,10 +82,11 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
           pipe(
             insertWalletInstance(walletInstance),
             RTE.chainW(() =>
-              revokeWalletInstances({
-                fiscalCode: walletInstanceRequest.fiscalCode,
-                hardwareKeyTag: walletInstanceRequest.hardwareKeyTag,
-              }),
+              revokeUserValidWalletInstancesExceptOne(
+                walletInstanceRequest.fiscalCode,
+                walletInstanceRequest.hardwareKeyTag,
+                "NEW_WALLET_INSTANCE_CREATED",
+              ),
             ),
             RTE.chainW(() => sendCreationEmail(walletInstance.userId)),
           ),
