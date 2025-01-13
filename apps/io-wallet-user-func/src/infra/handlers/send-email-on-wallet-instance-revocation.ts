@@ -1,6 +1,7 @@
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
+import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { format } from "date-fns";
@@ -12,7 +13,7 @@ import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights
 
 export const WalletInstanceRevocationQueueItem = t.type({
   fiscalCode: FiscalCode,
-  revokedAt: t.string,
+  revokedAt: IsoDateFromString,
 });
 
 type WalletInstanceRevocationQueueItem = t.TypeOf<
@@ -39,8 +40,8 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
       RTE.chainW((emailAddress) =>
         pipe(
           htmlTemplate(
-            getRevocationTime(new Date(revokedAt)),
-            getRevocationDate(new Date(revokedAt)),
+            getRevocationTime(revokedAt),
+            getRevocationDate(revokedAt),
             { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
           ),
           (htmlContent) =>
