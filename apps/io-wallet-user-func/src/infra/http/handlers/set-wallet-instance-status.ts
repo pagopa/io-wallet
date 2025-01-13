@@ -67,6 +67,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
         revokeAllCredentials(fiscalCode),
         RTE.chainW(() =>
           pipe(
+            // access our database to revoke the wallet instance
             revokeUserWalletInstances(
               fiscalCode,
               [walletInstanceId],
