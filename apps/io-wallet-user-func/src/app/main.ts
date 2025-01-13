@@ -278,6 +278,7 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
   handler: SendEmailOnWalletInstanceRevocationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceRevocationQueueItem,
+    telemetryClient: appInsightsClient,
   }),
   queueName:
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
