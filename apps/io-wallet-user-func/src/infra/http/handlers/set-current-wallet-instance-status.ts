@@ -35,14 +35,9 @@ const requireSetCurrentWalletInstanceStatusBody: (
 
 const revokeCurrentUserWalletInstance: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<
-  {
-    emailRevocationQueuingEnabled: boolean;
-    queueRevocationClient: QueueClient;
-  } & WalletInstanceEnvironment,
-  Error,
-  void
-> = (fiscalCode) =>
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
+  fiscalCode,
+) =>
   pipe(
     fiscalCode,
     getCurrentWalletInstance,
