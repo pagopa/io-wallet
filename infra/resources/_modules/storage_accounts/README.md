@@ -23,6 +23,7 @@ No requirements.
 |------|------|
 | [azurerm_key_vault_secret.st_connection_string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_storage_container.cosmos_01_backup](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_storage_queue.wallet-instance-creation-email-queue-01](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
 | [azurerm_storage_queue.wallet_instances_revocation_check](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
 | [azurerm_storage_queue.wallet_instances_revocation_check_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
 
@@ -50,4 +51,5 @@ No requirements.
 | <a name="output_revocation_queue_name"></a> [revocation\_queue\_name](#output\_revocation\_queue\_name) | n/a |
 | <a name="output_revocation_queue_name_02"></a> [revocation\_queue\_name\_02](#output\_revocation\_queue\_name\_02) | n/a |
 | <a name="output_wallet"></a> [wallet](#output\_wallet) | n/a |
+| <a name="output_wallet_instance_creation_email_queue_name_01"></a> [wallet\_instance\_creation\_email\_queue\_name\_01](#output\_wallet\_instance\_creation\_email\_queue\_name\_01) | n/a |
 <!-- END_TF_DOCS -->
