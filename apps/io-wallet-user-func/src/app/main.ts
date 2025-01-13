@@ -139,7 +139,7 @@ app.http("createWalletInstance", {
     CreateWalletInstanceFunction({
       attestationService: mobileAttestationService,
       nonceRepository,
-      queueCreationClient: walletInstanceCreationEmailQueueClient,
+      queueClient: walletInstanceCreationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),

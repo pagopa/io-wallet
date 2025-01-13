@@ -95,7 +95,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      queueCreationClient: queueClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -122,7 +122,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      queueCreationClient: queueClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -154,7 +154,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
-      queueCreationClient: queueClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -192,7 +192,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      queueCreationClient: queueClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
@@ -229,7 +229,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      queueCreationClient: queueClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
@@ -267,7 +267,7 @@ describe("CreateWalletInstanceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      queueCreationClient: queueClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
