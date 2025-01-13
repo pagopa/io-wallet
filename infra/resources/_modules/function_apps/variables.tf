@@ -133,12 +133,12 @@ variable "action_group_io_id" {
 
 variable "wallet_instance_creation_email_queue_name" {
   type        = string
-  description = "Send Email on Wallet Instance Creation"
+  description = "Send Email on Wallet Instance Creation Queue Name"
 }
 
 variable "wallet_instance_revocation_email_queue_name" {
   type        = string
-  description = "Send Email on Wallet Instance Revocation"
+  description = "Send Email on Wallet Instance Revocation Queue Name"
 }
 
 variable "validate_wallet_instance_certificates_queue_name" {
