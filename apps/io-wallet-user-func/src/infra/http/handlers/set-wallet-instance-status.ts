@@ -33,14 +33,14 @@ const sendRevocationEmail =
     revokedAt: Date,
   ): RTE.ReaderTaskEither<
     {
-      emailRevocationQueuingEnabled: boolean;
       queueRevocationClient: QueueClient;
+      whitelistFiscalCodes: string[];
     },
     Error,
     void
   > =>
-  ({ emailRevocationQueuingEnabled, queueRevocationClient }) =>
-    emailRevocationQueuingEnabled
+  ({ queueRevocationClient, whitelistFiscalCodes }) =>
+    whitelistFiscalCodes.includes(fiscalCode)
       ? pipe(
           { queueClient: queueRevocationClient },
           enqueue({

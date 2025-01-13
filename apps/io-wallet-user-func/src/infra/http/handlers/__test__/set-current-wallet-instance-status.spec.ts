@@ -38,6 +38,8 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
+  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
+
   const pidIssuerClient: CredentialRepository = {
     revokeAllCredentials: () => TE.right(undefined),
   };
@@ -60,8 +62,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     method: "PUT",
   };
 
-  const emailRevocationQueuingEnabled = true;
-
   const queueRevocationClient: QueueClient = {
     sendMessage: () =>
       Promise.resolve({
@@ -73,13 +73,13 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
   it("should return a 204 HTTP response on success", async () => {
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -101,13 +101,13 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -128,13 +128,13 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClientThatFailsOnRevoke,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -161,13 +161,13 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -195,7 +195,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       };
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -203,6 +202,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({

@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 
 describe("SetWalletInstanceStatusHandler", () => {
-  const emailRevocationQueuingEnabled = true;
+  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
 
   const queueRevocationClient: QueueClient = {
     sendMessage: () =>
@@ -57,13 +57,13 @@ describe("SetWalletInstanceStatusHandler", () => {
   it("should return a 204 HTTP response on success", async () => {
     const handler = SetWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -88,13 +88,13 @@ describe("SetWalletInstanceStatusHandler", () => {
     };
     const handler = SetWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -115,13 +115,13 @@ describe("SetWalletInstanceStatusHandler", () => {
     };
     const handler = SetWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClientThatFailsOnRevoke,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -148,13 +148,13 @@ describe("SetWalletInstanceStatusHandler", () => {
       };
     const handler = SetWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
-      emailRevocationQueuingEnabled,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({

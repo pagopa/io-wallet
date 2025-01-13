@@ -39,7 +39,6 @@ locals {
     WalletInstanceRevocationEmailQueueName      = var.wallet_instance_revocation_email_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
-    WalletInstanceRevocationEmailFeatureFlag = false
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
 
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-fn-01.azurewebsites.net"
