@@ -54,7 +54,7 @@ const revokeCurrentUserWalletInstance: (
 const sendRevocationEmail =
   (
     fiscalCode: string,
-    revokedAt: string,
+    revokedAt: Date,
   ): RTE.ReaderTaskEither<
     {
       emailRevocationQueuingEnabled: boolean;
@@ -87,9 +87,7 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       RTE.chainW((fiscalCode) =>
         pipe(
           revokeCurrentUserWalletInstance(fiscalCode),
-          RTE.chainW(() =>
-            sendRevocationEmail(fiscalCode, new Date().toISOString()),
-          ),
+          RTE.chainW(() => sendRevocationEmail(fiscalCode, new Date())),
         ),
       ),
       RTE.map(() => H.empty),

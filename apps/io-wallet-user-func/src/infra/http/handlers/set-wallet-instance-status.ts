@@ -30,7 +30,7 @@ const requireSetWalletInstanceStatusBody: (
 const sendRevocationEmail =
   (
     fiscalCode: string,
-    revokedAt: string,
+    revokedAt: Date,
   ): RTE.ReaderTaskEither<
     {
       emailRevocationQueuingEnabled: boolean;
@@ -72,9 +72,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
               [walletInstanceId],
               "REVOKED_BY_USER",
             ),
-            RTE.chainW(() =>
-              sendRevocationEmail(fiscalCode, new Date().toISOString()),
-            ),
+            RTE.chainW(() => sendRevocationEmail(fiscalCode, new Date())),
           ),
         ),
         RTE.orElseFirstW((error) =>
