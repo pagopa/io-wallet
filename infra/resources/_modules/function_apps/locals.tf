@@ -36,6 +36,7 @@ locals {
     PidIssuerHealthCheckEnabled   = false
 
     WalletInstanceCreationEmailQueueName        = var.wallet_instance_creation_email_queue_name
+    WalletInstanceRevocationEmailQueueName      = var.wallet_instance_revocation_email_queue_name
     ValidateWalletInstanceCertificatesQueueName = var.validate_wallet_instance_certificates_queue_name
 
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
@@ -56,7 +57,8 @@ locals {
     "addWalletInstanceToValidationQueue",
     "validateWalletInstance",
     "generateEntityConfiguration",
-    "sendEmailOnWalletInstanceCreation"
+    "sendEmailOnWalletInstanceCreation",
+    "sendEmailOnWalletInstanceRevocation",
   ]
 
   function_app_user = {

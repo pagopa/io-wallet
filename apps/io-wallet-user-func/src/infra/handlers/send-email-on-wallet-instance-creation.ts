@@ -8,11 +8,11 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 
-export const WALLET_ACTIVATION_EMAIL_TITLE =
+const WALLET_ACTIVATION_EMAIL_TITLE =
   "Documenti su IO - Aggiungi i tuoi documenti al Portafoglio";
-export const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
+const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
   "https://io.italia.it/documenti-su-io/faq/";
-export const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
+const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://ioapp.it/it/accedi/?refresh=true";
 
 const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {

@@ -2197,15 +2197,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pagopa/io-app-email-templates@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "@pagopa/io-app-email-templates@npm:0.2.2"
+"@pagopa/io-app-email-templates@npm:0.2.3":
+  version: 0.2.3
+  resolution: "@pagopa/io-app-email-templates@npm:0.2.3"
   dependencies:
     "@pagopa/ts-commons": "npm:^13.0.0"
     fp-ts: "npm:^2.16.5"
     io-ts: "npm:^2.2.21"
     moment-timezone: "npm:^0.5.45"
-  checksum: 10c0/c82741d2077b317e30950506226225d828a37b653b665fdc8b7699c62b3e66b5c33a8bfa228ee445ed498fd58a5e76f85bfcd3d6605c33ed1b9f621d8d0427d9
+  checksum: 10c0/cf41da3e47c96d9540de41f730f3fa34623a6856ea44af2cb6021cb97cc2260502c789c18af463d2f38edb82548dbd73139a2a264a8cc4b9d3642ec4ff7b8e13
   languageName: node
   linkType: hard
 
@@ -3867,6 +3867,13 @@ __metadata:
   version: 2.0.0
   resolution: "dasherize@npm:2.0.0"
   checksum: 10c0/4ed7d69db84fec194221a28827b111ca82d32772bcb6faa5c4a8d7c45d67d8b21f3e97703ee479d58a85abd3a33aa497a66c090538d0733980564d29ae19da68
+  languageName: node
+  linkType: hard
+
+"date-fns@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "date-fns@npm:4.1.0"
+  checksum: 10c0/b79ff32830e6b7faa009590af6ae0fb8c3fd9ffad46d930548fbb5acf473773b4712ae887e156ba91a7b3dc30591ce0f517d69fd83bd9c38650fdc03b4e0bac8
   languageName: node
   linkType: hard
 
@@ -5605,7 +5612,7 @@ __metadata:
     "@pagopa/eslint-config": "npm:^4.0.1"
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
-    "@pagopa/io-app-email-templates": "npm:^0.2.2"
+    "@pagopa/io-app-email-templates": "npm:0.2.3"
     "@pagopa/io-functions-commons": "npm:^29.3.0"
     "@pagopa/ts-commons": "npm:^13.1.2"
     "@peculiar/asn1-android": "npm:^2.3.13"
@@ -5616,6 +5623,7 @@ __metadata:
     asn1js: "npm:^3.0.5"
     azure-functions-core-tools: "npm:^4.0.6610"
     cbor-x: "npm:^1.6.0"
+    date-fns: "npm:^4.1.0"
     eslint: "npm:9.14.0"
     fp-ts: "npm:^2.16.9"
     googleapis: "npm:^144.0.0"

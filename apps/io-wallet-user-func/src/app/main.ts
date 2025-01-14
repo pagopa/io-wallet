@@ -13,12 +13,14 @@ import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
+import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
+import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -70,6 +72,11 @@ const walletInstanceRevocationQueue = new WalletInstanceRevocationStorageQueue(
 const walletInstanceCreationEmailQueueClient =
   queueServiceClient.getQueueClient(
     config.azure.storage.walletInstances.queues.creationSendEmail.name,
+  );
+
+const walletInstanceRevocationEmailQueueClient =
+  queueServiceClient.getQueueClient(
+    config.azure.storage.walletInstances.queues.revocationSendEmail.name,
   );
 
 const database = cosmosClient.database(config.azure.cosmos.dbName);
@@ -196,8 +203,10 @@ app.http("setWalletInstanceStatus", {
   handler: withAppInsights(
     SetWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
+      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
+      whitelistFiscalCodes: config.attestationService.allowedDeveloperUsers,
     }),
   ),
   methods: ["PUT"],
@@ -209,8 +218,10 @@ app.http("setCurrentWalletInstanceStatus", {
   handler: withAppInsights(
     SetCurrentWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
+      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
+      whitelistFiscalCodes: config.attestationService.allowedDeveloperUsers,
     }),
   ),
   methods: ["PUT"],
@@ -258,6 +269,17 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
     telemetryClient: appInsightsClient,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
+});
+
+app.storageQueue("sendEmailOnWalletInstanceRevocation", {
+  connection: "StorageConnectionString",
+  handler: SendEmailOnWalletInstanceRevocationFunction({
+    emailNotificationService,
+    inputDecoder: WalletInstanceRevocationQueueItem,
+    telemetryClient: appInsightsClient,
+  }),
+  queueName:
+    config.azure.storage.walletInstances.queues.revocationSendEmail.name,
 });
 
 app.http("deleteWalletInstances", {
