@@ -1,5 +1,6 @@
 import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as appInsights from "applicationinsights";
@@ -9,6 +10,16 @@ import { describe, expect, it } from "vitest";
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 
 describe("SetWalletInstanceStatusHandler", () => {
+  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
+
+  const queueRevocationClient: QueueClient = {
+    sendMessage: () =>
+      Promise.resolve({
+        errorCode: undefined,
+        messageId: "messageId",
+      } as QueueSendMessageResponse),
+  } as unknown as QueueClient;
+
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     deleteAllByUserId: () => TE.left(new Error("not implemented")),
@@ -49,8 +60,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -78,8 +91,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -103,8 +118,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -134,8 +151,10 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({

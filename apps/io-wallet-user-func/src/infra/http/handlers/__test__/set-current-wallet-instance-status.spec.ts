@@ -1,5 +1,6 @@
 import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -11,6 +12,7 @@ import { describe, expect, it } from "vitest";
 
 import { SetCurrentWalletInstanceStatusHandler } from "../set-current-wallet-instance-status";
 
+// eslint-disable-next-line max-lines-per-function
 describe("SetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
@@ -36,6 +38,8 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
+  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
+
   const pidIssuerClient: CredentialRepository = {
     revokeAllCredentials: () => TE.right(undefined),
   };
@@ -58,14 +62,24 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     method: "PUT",
   };
 
+  const queueRevocationClient: QueueClient = {
+    sendMessage: () =>
+      Promise.resolve({
+        errorCode: undefined,
+        messageId: "messageId",
+      } as QueueSendMessageResponse),
+  } as unknown as QueueClient;
+
   it("should return a 204 HTTP response on success", async () => {
     const handler = SetCurrentWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -90,8 +104,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -115,8 +131,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -146,8 +164,10 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -178,9 +198,11 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      queueRevocationClient,
       telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
+      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
