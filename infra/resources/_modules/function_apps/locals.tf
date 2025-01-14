@@ -57,7 +57,8 @@ locals {
     "addWalletInstanceToValidationQueue",
     "validateWalletInstance",
     "generateEntityConfiguration",
-    "sendEmailOnWalletInstanceCreation"
+    "sendEmailOnWalletInstanceCreation",
+    "sendEmailOnWalletInstanceRevocation",
   ]
 
   function_app_user = {
