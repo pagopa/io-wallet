@@ -1,33 +1,55 @@
 {
   "$schema": "https://turbo.build/schema.v1.json",
-  "pipeline": {
+  "tasks": {
     "build": {
-      "inputs": ["src/**/*.ts"],
-      "outputs": ["dist/**"],
-      "outputMode": "errors-only",
-      "dependsOn": ["^build"]
+      "inputs": [
+        "src/**/*.ts"
+      ],
+      "outputs": [
+        "dist/**"
+      ],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputLogs": "errors-only"
     },
     "typecheck": {
-      "inputs": ["src/**/*.ts"],
+      "inputs": [
+        "src/**/*.ts"
+      ],
       "outputs": [],
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "format": {},
     "lint": {
-      "inputs": ["src/**/*.ts"],
+      "inputs": [
+        "src/**/*.ts"
+      ],
       "outputs": [],
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "lint:fix": {
-      "inputs": ["src/**/*.ts"],
+      "inputs": [
+        "src/**/*.ts"
+      ],
       "outputs": [],
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "test": {
-      "inputs": ["src/**/*.spec.ts"],
+      "inputs": [
+        "src/**/*.spec.ts"
+      ],
       "outputs": [],
-      "outputMode": "errors-only",
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputLogs": "errors-only"
     }
   }
 }
