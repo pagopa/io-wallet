@@ -5,6 +5,7 @@ import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
@@ -20,6 +21,7 @@ type WalletInstanceRevocationQueueItem = t.TypeOf<
   typeof WalletInstanceRevocationQueueItem
 >;
 
+const WALLET_REVOCATION_EMAIL_TIMEZONE = "Europe/Rome";
 const WALLET_REVOCATION_EMAIL_TITLE =
   "Messaggi da IO: Documenti su IO disattivato";
 const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK = "https://ioapp.it/it/accedi/";
@@ -29,9 +31,15 @@ const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
   tables: true,
 };
 
-const getRevocationTime = (datetime: Date) => format(datetime, "HH:mm");
+const getRevocationTime = (datetime: Date) =>
+  pipe(toZonedTime(datetime, WALLET_REVOCATION_EMAIL_TIMEZONE), (zonedDate) =>
+    format(zonedDate, "HH:mm"),
+  );
 
-const getRevocationDate = (datetime: Date) => format(datetime, "dd/MM/yyyy");
+const getRevocationDate = (datetime: Date) =>
+  pipe(toZonedTime(datetime, WALLET_REVOCATION_EMAIL_TIMEZONE), (zonedDate) =>
+    format(zonedDate, "dd/MM/yyyy"),
+  );
 
 export const SendEmailOnWalletInstanceRevocationHandler = H.of(
   ({ fiscalCode, revokedAt }: WalletInstanceRevocationQueueItem) =>
