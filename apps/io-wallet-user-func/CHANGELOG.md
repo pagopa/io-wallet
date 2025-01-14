@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.0.0
+
+### Major Changes
+
+- 19bb43d: Send email when wallet instance is revoked by user
+
 ## 2.4.0
 
 ### Minor Changes
