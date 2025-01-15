@@ -3870,19 +3870,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns-tz@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "date-fns-tz@npm:3.2.0"
-  peerDependencies:
-    date-fns: ^3.0.0 || ^4.0.0
-  checksum: 10c0/3f43300a4335d59f3515dc5196c66b4b56ef2af129eb82e4445ce0983e8ef31a5d038bc0406d669946bbbcf52ed953527527aa28b4a810995d6631a54655abcc
-  languageName: node
-  linkType: hard
-
-"date-fns@npm:^4.1.0":
-  version: 4.1.0
-  resolution: "date-fns@npm:4.1.0"
-  checksum: 10c0/b79ff32830e6b7faa009590af6ae0fb8c3fd9ffad46d930548fbb5acf473773b4712ae887e156ba91a7b3dc30591ce0f517d69fd83bd9c38650fdc03b4e0bac8
+"dayjs@npm:^1.11.13":
+  version: 1.11.13
+  resolution: "dayjs@npm:1.11.13"
+  checksum: 10c0/a3caf6ac8363c7dade9d1ee797848ddcf25c1ace68d9fe8678ecf8ba0675825430de5d793672ec87b24a69bf04a1544b176547b2539982275d5542a7955f35b7
   languageName: node
   linkType: hard
 
@@ -5632,8 +5623,7 @@ __metadata:
     asn1js: "npm:^3.0.5"
     azure-functions-core-tools: "npm:^4.0.6610"
     cbor-x: "npm:^1.6.0"
-    date-fns: "npm:^4.1.0"
-    date-fns-tz: "npm:^3.2.0"
+    dayjs: "npm:^1.11.13"
     eslint: "npm:9.14.0"
     fp-ts: "npm:^2.16.9"
     googleapis: "npm:^144.0.0"
@@ -8263,6 +8253,35 @@ __metadata:
   checksum: 10c0/6d67b9af4336a2e12b26a68c83308c7863534c65f27ed4ff7068a56f5a58f7ac703e8fc80f698a19bb154fd8f705cdf7ec347d9512b2c522c737269507e7b263
   languageName: node
   linkType: hard
+
+"test-revocation-email-func@workspace:apps/test-revocation-email-func":
+  version: 0.0.0-use.local
+  resolution: "test-revocation-email-func@workspace:apps/test-revocation-email-func"
+  dependencies:
+    "@azure/cosmos": "npm:^4.1.1"
+    "@azure/functions": "npm:^4.6.0"
+    "@azure/identity": "npm:^4.5.0"
+    "@pagopa/eslint-config": "npm:^4.0.1"
+    "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
+    "@pagopa/io-app-email-templates": "npm:0.2.3"
+    "@pagopa/io-functions-commons": "npm:^29.3.0"
+    "@pagopa/ts-commons": "npm:^13.1.2"
+    "@types/html-to-text": "npm:1.4.31"
+    "@vitest/coverage-v8": "npm:^2.1.5"
+    applicationinsights: "npm:^3.4.0"
+    azure-functions-core-tools: "npm:^4.0.6610"
+    dayjs: "npm:^1.11.13"
+    eslint: "npm:9.14.0"
+    fp-ts: "npm:^2.16.9"
+    html-to-text: "npm:5.1.1"
+    io-ts: "npm:^2.2.21"
+    io-wallet-common: "workspace:^"
+    prettier: "npm:3.3.3"
+    tsup: "npm:^8.3.5"
+    typescript: "npm:5.6.3"
+    vitest: "npm:^2.1.5"
+  languageName: unknown
+  linkType: soft
 
 "text-hex@npm:1.0.x":
   version: 1.0.0

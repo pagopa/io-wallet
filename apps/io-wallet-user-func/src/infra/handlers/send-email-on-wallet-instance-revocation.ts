@@ -4,13 +4,17 @@ import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInst
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
-import { format } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const WalletInstanceRevocationQueueItem = t.type({
   fiscalCode: FiscalCode,
@@ -31,15 +35,11 @@ const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
   tables: true,
 };
 
-const getRevocationTime = (datetime: Date) =>
-  pipe(toZonedTime(datetime, WALLET_REVOCATION_EMAIL_TIMEZONE), (zonedDate) =>
-    format(zonedDate, "HH:mm"),
-  );
+const getRevocationZonedTime = (datetime: Date) =>
+  dayjs(datetime).tz(WALLET_REVOCATION_EMAIL_TIMEZONE).format("HH:mm");
 
-const getRevocationDate = (datetime: Date) =>
-  pipe(toZonedTime(datetime, WALLET_REVOCATION_EMAIL_TIMEZONE), (zonedDate) =>
-    format(zonedDate, "dd/MM/yyyy"),
-  );
+const getRevocationZonedDate = (datetime: Date) =>
+  dayjs(datetime).tz(WALLET_REVOCATION_EMAIL_TIMEZONE).format("DD/MM/YYYY");
 
 export const SendEmailOnWalletInstanceRevocationHandler = H.of(
   ({ fiscalCode, revokedAt }: WalletInstanceRevocationQueueItem) =>
@@ -48,8 +48,8 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
       RTE.chainW((emailAddress) =>
         pipe(
           htmlTemplate(
-            getRevocationTime(revokedAt),
-            getRevocationDate(revokedAt),
+            getRevocationZonedTime(revokedAt),
+            getRevocationZonedDate(revokedAt),
             { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
           ),
           (htmlContent) =>
