@@ -1,4 +1,4 @@
-import { formatDate } from "@/datetime";
+import { DEFAULT_TIMEZONE, formatDate } from "@/datetime";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
@@ -36,8 +36,8 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
       RTE.chainW((emailAddress) =>
         pipe(
           htmlTemplate(
-            formatDate(revokedAt, "HH:mm"),
-            formatDate(revokedAt, "DD/MM/YYYY"),
+            formatDate(revokedAt, "HH:mm", DEFAULT_TIMEZONE),
+            formatDate(revokedAt, "DD/MM/YYYY", DEFAULT_TIMEZONE),
             { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
           ),
           (htmlContent) =>

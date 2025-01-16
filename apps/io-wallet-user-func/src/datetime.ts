@@ -5,13 +5,7 @@ import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const DEFAULT_TIMEZONE = "Europe/Rome";
+export const DEFAULT_TIMEZONE = "Europe/Rome";
 
-export const formatDate = (
-  datetime: Date,
-  format: string,
-  timezone = DEFAULT_TIMEZONE,
-) =>
-  dayjs(datetime)
-    .tz(timezone ?? DEFAULT_TIMEZONE)
-    .format(format);
+export const formatDate = (datetime: Date, format: string, timezone: string) =>
+  dayjs(datetime).tz(timezone).format(format);
