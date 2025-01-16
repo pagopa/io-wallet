@@ -11,7 +11,6 @@ import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as TE from "fp-ts/lib/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
@@ -53,21 +52,18 @@ const sendRevocationEmail =
   ): RTE.ReaderTaskEither<
     {
       queueRevocationClient: QueueClient;
-      whitelistFiscalCodes: string[];
     },
     Error,
     void
   > =>
-  ({ queueRevocationClient, whitelistFiscalCodes }) =>
-    whitelistFiscalCodes.includes(fiscalCode)
-      ? pipe(
-          { queueClient: queueRevocationClient },
-          enqueue({
-            fiscalCode,
-            revokedAt,
-          }),
-        )
-      : TE.right(void 0);
+  ({ queueRevocationClient }) =>
+    pipe(
+      { queueClient: queueRevocationClient },
+      enqueue({
+        fiscalCode,
+        revokedAt,
+      }),
+    );
 
 export const SetCurrentWalletInstanceStatusHandler = H.of(
   (req: H.HttpRequest) =>

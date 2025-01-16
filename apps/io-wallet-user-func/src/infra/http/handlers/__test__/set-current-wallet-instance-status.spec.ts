@@ -12,7 +12,6 @@ import { describe, expect, it } from "vitest";
 
 import { SetCurrentWalletInstanceStatusHandler } from "../set-current-wallet-instance-status";
 
-// eslint-disable-next-line max-lines-per-function
 describe("SetCurrentWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
@@ -37,8 +36,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
-
-  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
 
   const pidIssuerClient: CredentialRepository = {
     revokeAllCredentials: () => TE.right(undefined),
@@ -79,7 +76,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -107,7 +103,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -134,7 +129,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -167,7 +161,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -202,7 +195,6 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({

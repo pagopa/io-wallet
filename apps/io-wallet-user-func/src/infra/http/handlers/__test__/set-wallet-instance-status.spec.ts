@@ -10,8 +10,6 @@ import { describe, expect, it } from "vitest";
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 
 describe("SetWalletInstanceStatusHandler", () => {
-  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
-
   const queueRevocationClient: QueueClient = {
     sendMessage: () =>
       Promise.resolve({
@@ -63,7 +61,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -94,7 +91,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -121,7 +117,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -154,7 +149,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueRevocationClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
