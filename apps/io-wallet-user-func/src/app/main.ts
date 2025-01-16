@@ -203,7 +203,7 @@ app.http("setWalletInstanceStatus", {
   handler: withAppInsights(
     SetWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
-      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
+      queueClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -217,7 +217,7 @@ app.http("setCurrentWalletInstanceStatus", {
   handler: withAppInsights(
     SetCurrentWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
-      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
+      queueClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),

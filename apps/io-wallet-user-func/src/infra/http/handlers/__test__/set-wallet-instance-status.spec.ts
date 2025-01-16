@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 
 describe("SetWalletInstanceStatusHandler", () => {
-  const queueRevocationClient: QueueClient = {
+  const queueClient: QueueClient = {
     sendMessage: () =>
       Promise.resolve({
         errorCode: undefined,
@@ -58,7 +58,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -88,7 +88,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -114,7 +114,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -146,7 +146,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });

@@ -59,7 +59,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
     method: "PUT",
   };
 
-  const queueRevocationClient: QueueClient = {
+  const queueClient: QueueClient = {
     sendMessage: () =>
       Promise.resolve({
         errorCode: undefined,
@@ -73,7 +73,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -100,7 +100,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -126,7 +126,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -158,7 +158,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
@@ -191,7 +191,7 @@ describe("SetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,

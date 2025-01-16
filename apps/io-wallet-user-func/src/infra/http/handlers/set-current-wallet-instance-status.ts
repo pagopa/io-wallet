@@ -6,7 +6,6 @@ import {
   WalletInstanceEnvironment,
   revokeUserWalletInstances,
 } from "@/wallet-instance";
-import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
@@ -45,26 +44,6 @@ const revokeCurrentUserWalletInstance: (
     ),
   );
 
-const sendRevocationEmail =
-  (
-    fiscalCode: string,
-    revokedAt: Date,
-  ): RTE.ReaderTaskEither<
-    {
-      queueRevocationClient: QueueClient;
-    },
-    Error,
-    void
-  > =>
-  ({ queueRevocationClient }) =>
-    pipe(
-      { queueClient: queueRevocationClient },
-      enqueue({
-        fiscalCode,
-        revokedAt,
-      }),
-    );
-
 export const SetCurrentWalletInstanceStatusHandler = H.of(
   (req: H.HttpRequest) =>
     pipe(
@@ -78,7 +57,12 @@ export const SetCurrentWalletInstanceStatusHandler = H.of(
       RTE.chainW((fiscalCode) =>
         pipe(
           revokeCurrentUserWalletInstance(fiscalCode),
-          RTE.chainW(() => sendRevocationEmail(fiscalCode, new Date())),
+          RTE.chainW(() =>
+            enqueue({
+              fiscalCode,
+              revokedAt: new Date(),
+            }),
+          ),
         ),
       ),
       RTE.map(() => H.empty),

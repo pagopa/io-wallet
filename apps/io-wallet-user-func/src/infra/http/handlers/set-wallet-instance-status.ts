@@ -1,7 +1,6 @@
 import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
 import { revokeUserWalletInstances } from "@/wallet-instance";
-import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -26,26 +25,6 @@ const requireSetWalletInstanceStatusBody: (
 ) => E.Either<Error, SetWalletInstanceStatusBody> = (req) =>
   pipe(req.body, H.parse(SetWalletInstanceStatusBody, "Invalid body supplied"));
 
-const sendRevocationEmail =
-  (
-    fiscalCode: string,
-    revokedAt: Date,
-  ): RTE.ReaderTaskEither<
-    {
-      queueRevocationClient: QueueClient;
-    },
-    Error,
-    void
-  > =>
-  ({ queueRevocationClient }) =>
-    pipe(
-      { queueClient: queueRevocationClient },
-      enqueue({
-        fiscalCode,
-        revokedAt,
-      }),
-    );
-
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
@@ -69,7 +48,12 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
               [walletInstanceId],
               "REVOKED_BY_USER",
             ),
-            RTE.chainW(() => sendRevocationEmail(fiscalCode, new Date())),
+            RTE.chainW(() =>
+              enqueue({
+                fiscalCode,
+                revokedAt: new Date(),
+              }),
+            ),
           ),
         ),
         RTE.orElseFirstW((error) =>
