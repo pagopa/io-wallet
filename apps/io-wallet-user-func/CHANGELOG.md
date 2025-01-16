@@ -1,5 +1,17 @@
 # io-wallet-user-func
 
+## 3.0.2
+
+### Patch Changes
+
+- 98321ad: Removed the check of the fiscal code list for sending the revocation email
+
+## 3.0.1
+
+### Patch Changes
+
+- a1cc182: Bug fix: the revocation time in the email appears without considering the timezone
+
 ## 3.0.0
 
 ### Major Changes

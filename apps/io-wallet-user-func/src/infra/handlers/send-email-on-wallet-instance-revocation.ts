@@ -1,10 +1,10 @@
+import { DEFAULT_TIMEZONE, formatDate } from "@/datetime";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
-import { format } from "date-fns";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
@@ -34,10 +34,6 @@ const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
   tables: true,
 };
 
-const getRevocationTime = (datetime: Date) => format(datetime, "HH:mm");
-
-const getRevocationDate = (datetime: Date) => format(datetime, "dd/MM/yyyy");
-
 export const SendEmailOnWalletInstanceRevocationHandler = H.of(
   ({ fiscalCode, revokedAt }: WalletInstanceRevocationQueueItem) =>
     pipe(
@@ -45,8 +41,8 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
       RTE.chainW((emailAddress) =>
         pipe(
           htmlTemplate(
-            getRevocationTime(revokedAt),
-            getRevocationDate(revokedAt),
+            formatDate(revokedAt, "HH:mm", DEFAULT_TIMEZONE),
+            formatDate(revokedAt, "DD/MM/YYYY", DEFAULT_TIMEZONE),
             { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
           ),
           (htmlContent) =>
