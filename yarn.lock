@@ -142,7 +142,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/cosmos@npm:^4.0.0, @azure/cosmos@npm:^4.2.0":
+"@azure/cosmos@npm:^4.0.0, @azure/cosmos@npm:^4.1.1, @azure/cosmos@npm:^4.2.0":
   version: 4.2.0
   resolution: "@azure/cosmos@npm:4.2.0"
   dependencies:
@@ -2571,6 +2571,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/html-to-text@npm:1.4.31":
+  version: 1.4.31
+  resolution: "@types/html-to-text@npm:1.4.31"
+  checksum: 10c0/33754ef19dde66f0dd2ababc8f3ab6679148ba46b9b924dc9192bd3354729cb70e9afab35bd89c351824b9ffa27a229112b5040c1540b709e827cfc4d9380daa
+  languageName: node
+  linkType: hard
+
 "@types/html-to-text@npm:9.0.4":
   version: 9.0.4
   resolution: "@types/html-to-text@npm:9.0.4"
@@ -2826,7 +2833,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:^2.1.8":
+"@vitest/coverage-v8@npm:^2.1.5, @vitest/coverage-v8@npm:^2.1.8":
   version: 2.1.8
   resolution: "@vitest/coverage-v8@npm:2.1.8"
   dependencies:
@@ -3249,7 +3256,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"azure-functions-core-tools@npm:^4.0.6821":
+"azure-functions-core-tools@npm:^4.0.6610, azure-functions-core-tools@npm:^4.0.6821":
   version: 4.0.6821
   resolution: "azure-functions-core-tools@npm:4.0.6821"
   dependencies:
@@ -3884,6 +3891,13 @@ __metadata:
   version: 4.1.0
   resolution: "date-fns@npm:4.1.0"
   checksum: 10c0/b79ff32830e6b7faa009590af6ae0fb8c3fd9ffad46d930548fbb5acf473773b4712ae887e156ba91a7b3dc30591ce0f517d69fd83bd9c38650fdc03b4e0bac8
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:^1.11.13":
+  version: 1.11.13
+  resolution: "dayjs@npm:1.11.13"
+  checksum: 10c0/a3caf6ac8363c7dade9d1ee797848ddcf25c1ace68d9fe8678ecf8ba0675825430de5d793672ec87b24a69bf04a1544b176547b2539982275d5542a7955f35b7
   languageName: node
   linkType: hard
 
@@ -5359,7 +5373,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-to-text@npm:9.0.5":
+"html-to-text@npm:9.0.5, html-to-text@npm:^9.0.5":
   version: 9.0.5
   resolution: "html-to-text@npm:9.0.5"
   dependencies:
@@ -7313,6 +7327,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier@npm:3.3.3":
+  version: 3.3.3
+  resolution: "prettier@npm:3.3.3"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/b85828b08e7505716324e4245549b9205c0cacb25342a030ba8885aba2039a115dbcf75a0b7ca3b37bc9d101ee61fab8113fc69ca3359f2a226f1ecc07ad2e26
+  languageName: node
+  linkType: hard
+
 "prettier@npm:3.4.2":
   version: 3.4.2
   resolution: "prettier@npm:3.4.2"
@@ -8282,6 +8305,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"test-revocation-email-func@workspace:apps/test-send-email-func-for-wi-revocation":
+  version: 0.0.0-use.local
+  resolution: "test-revocation-email-func@workspace:apps/test-send-email-func-for-wi-revocation"
+  dependencies:
+    "@azure/cosmos": "npm:^4.1.1"
+    "@azure/functions": "npm:^4.6.0"
+    "@azure/identity": "npm:^4.5.0"
+    "@pagopa/eslint-config": "npm:^4.0.1"
+    "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
+    "@pagopa/io-app-email-templates": "npm:0.2.3"
+    "@pagopa/io-functions-commons": "npm:^29.3.0"
+    "@pagopa/ts-commons": "npm:^13.1.2"
+    "@types/html-to-text": "npm:1.4.31"
+    "@vitest/coverage-v8": "npm:^2.1.5"
+    applicationinsights: "npm:^3.4.0"
+    azure-functions-core-tools: "npm:^4.0.6610"
+    dayjs: "npm:^1.11.13"
+    eslint: "npm:9.14.0"
+    fp-ts: "npm:^2.16.9"
+    html-to-text: "npm:^9.0.5"
+    io-ts: "npm:^2.2.21"
+    io-wallet-common: "workspace:^"
+    prettier: "npm:3.3.3"
+    tsup: "npm:^8.3.5"
+    typescript: "npm:5.6.3"
+    vitest: "npm:^2.1.5"
+  languageName: unknown
+  linkType: soft
+
 "text-hex@npm:1.0.x":
   version: 1.0.0
   resolution: "text-hex@npm:1.0.0"
@@ -8661,6 +8713,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:5.6.3":
+  version: 5.6.3
+  resolution: "typescript@npm:5.6.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/44f61d3fb15c35359bc60399cb8127c30bae554cd555b8e2b46d68fa79d680354b83320ad419ff1b81a0bdf324197b29affe6cc28988cd6a74d4ac60c94f9799
+  languageName: node
+  linkType: hard
+
 "typescript@npm:5.7.3":
   version: 5.7.3
   resolution: "typescript@npm:5.7.3"
@@ -8668,6 +8730,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/b7580d716cf1824736cc6e628ab4cd8b51877408ba2be0869d2866da35ef8366dd6ae9eb9d0851470a39be17cbd61df1126f9e211d8799d764ea7431d5435afa
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>":
+  version: 5.6.3
+  resolution: "typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/7c9d2e07c81226d60435939618c91ec2ff0b75fbfa106eec3430f0fcf93a584bc6c73176676f532d78c3594fe28a54b36eb40b3d75593071a7ec91301533ace7
   languageName: node
   linkType: hard
 
@@ -9014,7 +9086,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^2.1.8":
+"vitest@npm:^2.1.5, vitest@npm:^2.1.8":
   version: 2.1.8
   resolution: "vitest@npm:2.1.8"
   dependencies:
