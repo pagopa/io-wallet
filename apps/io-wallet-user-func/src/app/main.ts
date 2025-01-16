@@ -203,10 +203,9 @@ app.http("setWalletInstanceStatus", {
   handler: withAppInsights(
     SetWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
-      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
+      queueClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: config.attestationService.allowedDeveloperUsers,
     }),
   ),
   methods: ["PUT"],
@@ -218,10 +217,9 @@ app.http("setCurrentWalletInstanceStatus", {
   handler: withAppInsights(
     SetCurrentWalletInstanceStatusFunction({
       credentialRepository: pidIssuerClient,
-      queueRevocationClient: walletInstanceRevocationEmailQueueClient,
+      queueClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
-      whitelistFiscalCodes: config.attestationService.allowedDeveloperUsers,
     }),
   ),
   methods: ["PUT"],
