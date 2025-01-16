@@ -10,9 +10,7 @@ import { describe, expect, it } from "vitest";
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 
 describe("SetWalletInstanceStatusHandler", () => {
-  const whitelistFiscalCodes = ["TESTCF00001, TESTCF00002, TESTCF00003"];
-
-  const queueRevocationClient: QueueClient = {
+  const queueClient: QueueClient = {
     sendMessage: () =>
       Promise.resolve({
         errorCode: undefined,
@@ -60,10 +58,9 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -91,10 +88,9 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -118,10 +114,9 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -151,10 +146,9 @@ describe("SetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueRevocationClient,
+      queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
-      whitelistFiscalCodes,
     });
 
     await expect(handler()).resolves.toEqual({
