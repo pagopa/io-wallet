@@ -1,16 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
-import {
-  AttestationService,
-  ValidateAssertionRequest,
-} from "@/attestation-service";
-import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { AttestationService } from "@/attestation-service";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
@@ -51,14 +47,8 @@ describe("CreateWalletInstanceHandler", () => {
 
   const mockAttestationService: AttestationService = {
     getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
-    validateAssertion: (request: ValidateAssertionRequest) =>
-      TE.right(undefined),
-    validateAttestation: (
-      attestation: NonEmptyString,
-      nonce: NonEmptyString,
-      hardwareKeyTag: NonEmptyString,
-      user: FiscalCode,
-    ) =>
+    validateAssertion: () => TE.right(undefined),
+    validateAttestation: () =>
       TE.right({
         deviceDetails: { platform: "ios" },
         hardwareKey: {
