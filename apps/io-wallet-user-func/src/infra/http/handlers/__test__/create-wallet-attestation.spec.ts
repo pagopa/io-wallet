@@ -1,11 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-lines-per-function */
-import {
-  AttestationService,
-  ValidateAssertionRequest,
-} from "@/attestation-service";
-import { MobileAttestationService } from "@/infra/attestation-service";
-import { iOSMockData } from "@/infra/attestation-service/ios/__test__/config";
+import { AttestationService } from "@/attestation-service";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
@@ -40,13 +35,8 @@ const logger = {
 
 const mockAttestationService: AttestationService = {
   getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
-  validateAssertion: (request: ValidateAssertionRequest) => TE.right(undefined),
-  validateAttestation: (
-    attestation: NonEmptyString,
-    nonce: NonEmptyString,
-    hardwareKeyTag: NonEmptyString,
-    user: FiscalCode,
-  ) =>
+  validateAssertion: () => TE.right(undefined),
+  validateAttestation: () =>
     TE.right({
       deviceDetails: { platform: "ios" },
       hardwareKey: {
