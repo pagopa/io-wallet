@@ -1,50 +1,42 @@
-# repository
+# IO Wallet - Repository Setup
 
+<!-- markdownlint-disable -->
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | <= 3.104.0 |
-| <a name="requirement_github"></a> [github](#requirement\_github) | 6.3.0 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~>3 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>4 |
+| <a name="requirement_github"></a> [github](#requirement\_github) | ~>6 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.104.0 |
-| <a name="provider_github"></a> [github](#provider\_github) | 6.3.0 |
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 3.0.2 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.15.0 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_repo"></a> [repo](#module\_repo) | github.com/pagopa/dx//infra/modules/azure_monorepo_single_env_starter_pack | DEVEX-179-produrre-un-modulo-terraform-per-migliorare-la-gestione-dei-permessi-rbac-sui-resource-group |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [github_actions_environment_secret.env_app_prod_cd_secrets](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/actions_environment_secret) | resource |
-| [github_actions_environment_secret.env_opex_prod_cd_secrets](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/actions_environment_secret) | resource |
-| [github_actions_environment_secret.env_opex_prod_ci_secrets](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/actions_environment_secret) | resource |
-| [github_actions_environment_secret.env_prod_cd_secrets](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/actions_environment_secret) | resource |
-| [github_actions_environment_secret.env_prod_ci_secrets](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/actions_environment_secret) | resource |
-| [github_actions_secret.repo_secrets](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/actions_secret) | resource |
-| [github_branch_default.default_master](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/branch_default) | resource |
-| [github_branch_protection.protection_master](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/branch_protection) | resource |
-| [github_repository.this](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/repository) | resource |
-| [github_repository_environment.github_repository_environment_app_prod_cd](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/repository_environment) | resource |
-| [github_repository_environment.github_repository_environment_opex_prod_cd](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/repository_environment) | resource |
-| [github_repository_environment.github_repository_environment_opex_prod_ci](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/repository_environment) | resource |
-| [github_repository_environment.github_repository_environment_prod_cd](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/repository_environment) | resource |
-| [github_repository_environment.github_repository_environment_prod_ci](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/resources/repository_environment) | resource |
+| [azuread_group.admins](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/group) | data source |
+| [azuread_group.developers](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/group) | data source |
+| [azurerm_api_management.apim](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/api_management) | data source |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| [azurerm_container_app_environment.runner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/container_app_environment) | data source |
+| [azurerm_key_vault.common](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault) | data source |
+| [azurerm_resource_group.dashboards](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+| [azurerm_resource_group.external](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 | [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
-| [azurerm_user_assigned_identity.identity_app_prod_cd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
-| [azurerm_user_assigned_identity.identity_opex_prod_cd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
-| [azurerm_user_assigned_identity.identity_opex_prod_ci](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
-| [azurerm_user_assigned_identity.identity_prod_cd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
-| [azurerm_user_assigned_identity.identity_prod_ci](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
-| [github_organization_teams.all](https://registry.terraform.io/providers/integrations/github/6.3.0/docs/data-sources/organization_teams) | data source |
+| [azurerm_virtual_network.common](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/virtual_network) | data source |
 
 ## Inputs
 
