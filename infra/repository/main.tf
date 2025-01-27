@@ -89,7 +89,7 @@ import {
 }
 
 module "repo" {
-  source = "github.com/pagopa/dx//infra/modules/azure_monorepo_single_env_starter_pack?ref=DEVEX-179-produrre-un-modulo-terraform-per-migliorare-la-gestione-dei-permessi-rbac-sui-resource-group"
+  source = "github.com/pagopa/dx//infra/modules/azure_github_environment_bootstrap?ref=main"
 
   environment = {
     prefix          = local.prefix
