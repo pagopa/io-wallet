@@ -117,8 +117,8 @@ module "function_apps" {
 
   application_insights_connection_string = data.azurerm_application_insights.common.connection_string
 
-  wallet_instance_creation_email_queue_name = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
-  wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
+  wallet_instance_creation_email_queue_name        = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
+  wallet_instance_revocation_email_queue_name      = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
   validate_wallet_instance_certificates_queue_name = module.storage_accounts.revocation_queue_name_02.name
 
   user_func    = local.user_func
@@ -156,8 +156,8 @@ module "iam" {
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
     database_name       = module.cosmos.cosmos_account_wallet.database_name
     admin_ids = [
-      data.azuread_group.io_developers.object_id,
-      data.azuread_group.io_admin.object_id,
+      data.azuread_group.eng_admins.object_id,
+      data.azuread_group.io_admins.object_id,
     ]
   }
 
@@ -177,8 +177,8 @@ module "iam" {
     name                = module.key_vaults.key_vault_wallet.name
     resource_group_name = module.key_vaults.key_vault_wallet.resource_group_name
     admin_ids = [
-      data.azuread_group.io_developers.object_id,
-      data.azuread_group.io_admin.object_id,
+      data.azuread_group.eng_admins.object_id,
+      data.azuread_group.io_admins.object_id,
     ]
   }
 
