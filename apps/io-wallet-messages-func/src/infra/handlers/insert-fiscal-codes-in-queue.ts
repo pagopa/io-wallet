@@ -13,7 +13,6 @@ interface Queue {
   queueClient: QueueClient;
 }
 
-// TODO [SIW-1995]: fp-ts
 const split: (input: string) => R.Reader<Queue, string[]> =
   (input) =>
   ({ batchSize }) => {
