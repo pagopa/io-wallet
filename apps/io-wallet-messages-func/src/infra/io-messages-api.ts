@@ -1,11 +1,11 @@
 import { MessagesServiceConfig } from "@/app/config";
 import { CodeError, Message } from "@/message";
+import Bottleneck from "bottleneck";
+import fetchRetry from "fetch-retry";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import Bottleneck from "bottleneck";
-import fetchRetry from "fetch-retry";
 
 export const sendMessageApi: ({
   config,
@@ -16,8 +16,8 @@ export const sendMessageApi: ({
 }) => Message["sendMessage"] =
   ({ config, limiter }) =>
   (content) =>
-  (fiscalCode) => {
-    return pipe(
+  (fiscalCode) =>
+    pipe(
       TE.tryCatch(
         async () => {
           const response = await limiter.schedule(() =>
@@ -58,4 +58,3 @@ export const sendMessageApi: ({
       ),
       TE.map(({ id }) => id),
     );
-  };

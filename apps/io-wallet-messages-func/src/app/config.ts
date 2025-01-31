@@ -46,11 +46,6 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     inputContainerName: readFromEnvironment("InputContainerName"),
     messagesServiceApiBaseURL: readFromEnvironment("MessagesServiceApiBaseURL"),
     messagesServiceApiKey: readFromEnvironment("MessagesServiceApiKey"),
-    outputContainerName: readFromEnvironment("OutputContainerName"),
-    queueName: readFromEnvironment("QueueName"),
-    storageAccountConnectionString: readFromEnvironment(
-      "StorageConnectionString",
-    ),
     messagesServiceMaxConcurrentRequests: pipe(
       readFromEnvironment("MessagesServiceMaxConcurrentRequests"),
       RE.chainW(stringToNumberDecoderRE),
@@ -58,6 +53,11 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     messagesServiceMinTimeConsecutiveRequests: pipe(
       readFromEnvironment("MessagesServiceMinTimeConsecutiveRequests"),
       RE.chainW(stringToNumberDecoderRE),
+    ),
+    outputContainerName: readFromEnvironment("OutputContainerName"),
+    queueName: readFromEnvironment("QueueName"),
+    storageAccountConnectionString: readFromEnvironment(
+      "StorageConnectionString",
     ),
   }),
   RE.map(

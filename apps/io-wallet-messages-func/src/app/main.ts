@@ -5,10 +5,10 @@ import { sendMessageApi } from "@/infra/io-messages-api";
 import { app } from "@azure/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
+import Bottleneck from "bottleneck";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import Bottleneck from "bottleneck";
 
 import { getConfigFromEnvironment } from "./config";
 
