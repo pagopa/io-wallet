@@ -6,11 +6,17 @@ servers:
   - url: https://io-p-itn-wallet-user-func-02.azurewebsites.net/api/v1/wallet
 paths:
   /nonce:
-    get:
+    post:
       operationId: getNonce
-      summary: Returns a randomly generated nonce
+      summary: Returns a randomly generated nonce, it accepts a fiscalBody as request body
       security:
         - FunctionsKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetNonceBody"
       responses:
         "200":
           description: Nonce successfully generated
@@ -340,6 +346,14 @@ components:
           format: binary
       required:
         - wallet_attestation
+
+    GetNonceBody:
+      type: object
+      properties:
+        fiscal_code:
+          $ref: "#/components/schemas/FiscalCode"
+      required:
+        - fiscal_code
 
     CreateWalletInstanceBody:
       type: object
