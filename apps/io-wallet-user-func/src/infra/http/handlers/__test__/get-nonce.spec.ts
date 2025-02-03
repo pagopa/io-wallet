@@ -37,8 +37,16 @@ describe("GetNonceHandler", () => {
     insert: () => TE.right(undefined),
   };
 
+  const req = {
+    ...H.request("https://api.test.it/"),
+    body: {
+      fiscal_code: "LVTEST00A00A000X",
+    },
+    method: "GET",
+  };
+
   const handler = GetNonceHandler({
-    input: H.request("https://api.test.it/"),
+    input: req,
     inputDecoder: H.HttpRequest,
     logger,
     nonceRepository,
@@ -80,7 +88,7 @@ describe("GetNonceHandler", () => {
     };
 
     const handler = GetNonceHandler({
-      input: H.request("https://api.test.it/"),
+      input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnInsert,
