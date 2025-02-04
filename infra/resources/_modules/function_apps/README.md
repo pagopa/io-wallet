@@ -62,7 +62,8 @@ No requirements.
 | <a name="input_user_func"></a> [user\_func](#input\_user\_func) | Configuration of the user-func | <pre>object({<br/>    app_settings = list(object({<br/>      name                  = string<br/>      value                 = optional(string, "")<br/>      key_vault_secret_name = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
 | <a name="input_validate_wallet_instance_certificates_queue_name"></a> [validate\_wallet\_instance\_certificates\_queue\_name](#input\_validate\_wallet\_instance\_certificates\_queue\_name) | Wallet Instance Certificates Validation Queue Name | `string` | n/a | yes |
 | <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
-| <a name="input_wallet_instance_creation_email_queue_name"></a> [wallet\_instance\_creation\_email\_queue\_name](#input\_wallet\_instance\_creation\_email\_queue\_name) | Send Email on Wallet Instance Activation Queue Name | `string` | n/a | yes |
+| <a name="input_wallet_instance_creation_email_queue_name"></a> [wallet\_instance\_creation\_email\_queue\_name](#input\_wallet\_instance\_creation\_email\_queue\_name) | Send Email on Wallet Instance Creation Queue Name | `string` | n/a | yes |
+| <a name="input_wallet_instance_revocation_email_queue_name"></a> [wallet\_instance\_revocation\_email\_queue\_name](#input\_wallet\_instance\_revocation\_email\_queue\_name) | Send Email on Wallet Instance Revocation Queue Name | `string` | n/a | yes |
 
 ## Outputs
 
