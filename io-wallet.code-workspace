@@ -12,6 +12,10 @@
       "name": "io-wallet-support-func"
     },
     {
+      "path": "apps/io-wallet-messages-func",
+      "name": "io-wallet-messages-func"
+    },
+    {
       "path": "packages/io-wallet-common",
       "name": "io-wallet-common"
     }
