@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 describe("split", () => {
   const queueClient = {} as unknown as QueueClient;
 
-  it("should split the string in batch", () => {
+  it("should split the string in array of batch of CF", () => {
     const result = split(
       "AAABBB91E17H501J\nZZZBBB91E17H501J\nDDDBBB91E17H501J\nCCCBBB91E17H501J\nTTTBBB91E17H501J",
     )({ batchSize: 2, queueClient });
