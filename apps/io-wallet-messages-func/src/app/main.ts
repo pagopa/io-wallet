@@ -42,6 +42,7 @@ const outputContainerClient = blobServiceClient.getContainerClient(
   storage.containers.output.name,
 );
 
+// we only have a single instance of the function app, so we can limit the requests as follows
 const limiter = new Bottleneck({
   maxConcurrent: messagesService.maxConcurrentRequests,
   minTime: messagesService.minTimeConsecutiveRequests,
