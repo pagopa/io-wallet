@@ -13,7 +13,7 @@ interface Queue {
   queueClient: QueueClient;
 }
 
-const split: (input: string) => R.Reader<Queue, string[]> =
+export const split: (input: string) => R.Reader<Queue, string[]> =
   (input) =>
   ({ batchSize }) => {
     const charsPerGroup = batchSize * 17;
