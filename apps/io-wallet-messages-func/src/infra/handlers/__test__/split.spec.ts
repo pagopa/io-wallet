@@ -1,6 +1,7 @@
 import { QueueClient } from "@azure/storage-queue";
-import { split } from "../insert-fiscal-codes-in-queue";
 import { describe, expect, it } from "vitest";
+
+import { split } from "../insert-fiscal-codes-in-queue";
 
 // TODO [SIW-1995]: move the test and the `split` function elsewhere
 describe("split", () => {
