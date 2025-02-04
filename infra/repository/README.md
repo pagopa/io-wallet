@@ -21,7 +21,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_repo"></a> [repo](#module\_repo) | github.com/pagopa/dx//infra/modules/azure_monorepo_single_env_starter_pack | DEVEX-179-produrre-un-modulo-terraform-per-migliorare-la-gestione-dei-permessi-rbac-sui-resource-group |
+| <a name="module_repo"></a> [repo](#module\_repo) | pagopa/dx-azure-github-environment-bootstrap/azurerm | ~>0 |
 
 ## Resources
 

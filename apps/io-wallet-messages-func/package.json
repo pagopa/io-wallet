@@ -1,0 +1,42 @@
+{
+  "name": "io-wallet-messages-func",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup-node",
+    "build:watch": "tsup-node --watch",
+    "format": "prettier --write .",
+    "lint": "eslint \"src/**\"",
+    "lint:fix": "eslint --fix \"src/**\"",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc",
+    "start": "func start"
+  },
+  "devDependencies": {
+    "@pagopa/eslint-config": "^4.0.1",
+    "eslint": "9.14.0",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.3"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.6.0",
+    "@azure/storage-blob": "^12.26.0",
+    "@azure/storage-queue": "^12.25.0",
+    "@pagopa/handler-kit": "^1.1.0",
+    "@pagopa/handler-kit-azure-func": "^2.0.7",
+    "@pagopa/ts-commons": "^13.1.2",
+    "bottleneck": "^2.19.5",
+    "fetch-retry": "^6.0.0",
+    "fp-ts": "^2.16.9",
+    "io-ts": "^2.2.22",
+    "io-wallet-common": "workspace:^",
+    "uuid": "^11.0.5"
+  },
+  "main": "dist/main.js",
+  "files": [
+    "host.json"
+  ]
+}

@@ -59,7 +59,7 @@ locals {
     Environment    = "Prod"
     BusinessUnit   = "IT Wallet"
     ManagementTeam = "IO Wallet"
-    Source         = "https://github.com/pagopa/io-ipatente/blob/main/infra/repository/prod"
+    Source         = "https://github.com/pagopa/io-wallet/blob/main/infra/repository"
     CostCenter     = "TS000 - Tecnologia e Servizi"
   }
 }

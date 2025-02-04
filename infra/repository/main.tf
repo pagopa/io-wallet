@@ -73,23 +73,9 @@ data "azuread_group" "developers" {
   display_name = local.adgroups.devs_name
 }
 
-import {
-  id = local.repository.name
-  to = module.repo.github_branch_default.main
-}
-
-import {
-  id = local.repository.name
-  to = module.repo.github_repository.this
-}
-
-import {
-  id = "${local.repository.name}:${local.repository.default_branch_name}"
-  to = module.repo.github_branch_protection.main
-}
-
 module "repo" {
-  source = "github.com/pagopa/dx//infra/modules/azure_monorepo_single_env_starter_pack?ref=DEVEX-179-produrre-un-modulo-terraform-per-migliorare-la-gestione-dei-permessi-rbac-sui-resource-group"
+  source  = "pagopa/dx-azure-github-environment-bootstrap/azurerm"
+  version = "~>0"
 
   environment = {
     prefix          = local.prefix
