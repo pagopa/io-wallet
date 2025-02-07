@@ -1,4 +1,12 @@
 repos:
+  - repo: https://github.com/pagopa/dx
+    rev: pre_commit_scripts@0.0.1
+    hooks:
+      - id: lock_modules
+        exclude: ^.*/(_modules|modules|\.terraform)(/.*)?$
+        # Configure the paths to your Terraform configurations
+        files: infra/(resources/prod|repository)
+
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.96.1
     hooks:
