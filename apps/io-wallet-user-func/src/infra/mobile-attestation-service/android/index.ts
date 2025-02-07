@@ -10,7 +10,7 @@ import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as S from "fp-ts/lib/string";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { ValidatedAttestation } from "../../attestation-service";
+import { ValidatedAttestation } from "../../mobile-attestation-service";
 import { AndroidAssertionError, AndroidAttestationError } from "../errors";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";

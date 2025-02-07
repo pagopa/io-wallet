@@ -1,0 +1,21 @@
+name: Deploy Function App (messages-func)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/io-wallet-messages-func/CHANGELOG.md"
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: pagopa/dx/.github/workflows/web_app_deploy.yaml@main
+    secrets: inherit
+    with:
+      workspace_name: io-wallet-messages-func
+      environment: app-prod
+      resource_group_name: io-p-itn-wallet-rg-01
+      web_app_name: io-p-itn-wallet-messages-func-01
+      use_staging_slot: false

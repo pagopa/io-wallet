@@ -1,4 +1,3 @@
-import { MobileAttestationService } from "@/infra/attestation-service";
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
@@ -21,6 +20,7 @@ import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wall
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
+import { MobileAttestationService } from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
