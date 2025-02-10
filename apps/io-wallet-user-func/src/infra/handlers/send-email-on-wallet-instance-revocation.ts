@@ -22,7 +22,8 @@ type WalletInstanceRevocationQueueItem = t.TypeOf<
 
 const WALLET_REVOCATION_EMAIL_TITLE =
   "Messaggi da IO: Documenti su IO disattivato";
-const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK = "https://ioapp.it/it/accedi/";
+const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK =
+  "https://account.ioapp.it/it/accedi/";
 
 const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
   selectors: [
