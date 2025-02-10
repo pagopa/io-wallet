@@ -13,7 +13,7 @@ const WALLET_ACTIVATION_EMAIL_TITLE =
 const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
   "https://io.italia.it/documenti-su-io/faq/";
 const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
-  "https://ioapp.it/it/accedi/?refresh=true";
+  "https://account.ioapp.it/it/accedi/?refresh=true";
 
 const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
   selectors: [
