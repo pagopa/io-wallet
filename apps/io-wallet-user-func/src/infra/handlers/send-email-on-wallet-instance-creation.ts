@@ -15,8 +15,13 @@ const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
 const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://ioapp.it/it/accedi/?refresh=true";
 
-const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
-  ignoreImage: true,
+const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
+  selectors: [
+    {
+      format: "skip",
+      selector: "img",
+    },
+  ],
   tables: true,
 };
 
@@ -33,7 +38,7 @@ export const SendEmailOnWalletInstanceCreationHandler = H.of(
         sendEmailToUser({
           html: htmlContent,
           subject: WALLET_ACTIVATION_EMAIL_TITLE,
-          text: HtmlToText.fromString(htmlContent, HTML_TO_TEXT_OPTIONS),
+          text: HtmlToText.htmlToText(htmlContent, HTML_TO_TEXT_OPTIONS),
           to: emailAddress,
         }),
       ),
