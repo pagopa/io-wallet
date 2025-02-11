@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.0.3
+
+### Patch Changes
+
+- e0f6d17: Updated ioapp.it link in email
+
 ## 3.0.2
 
 ### Patch Changes
