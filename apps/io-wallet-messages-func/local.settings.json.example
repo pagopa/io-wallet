@@ -1,0 +1,19 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "NODE_TLS_REJECT_UNAUTHORIZED": 0,
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "NODE_ENV": "development",
+    "AzureFunctionsJobHost__logging__logLevel__Function": "Trace",
+    "InputContainerName": "INPUT_CONTAINER_NAME",
+    "OutputContainerName": "OUTPUT_CONTAINER_NAME",
+    "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
+    "QueueName": "QUEUE_NAME",
+    "MessagesServiceApiBaseURL": "MESSAGES_SERVICE_API_BASE_URL",
+    "MessagesServiceApiKey": "MESSAGES_SERVICE_API_KEY",
+    "FiscalCodesBatchSize": "FISCAL_CODES_BATCH_SIZE",
+    "MessagesServiceMaxConcurrentRequests": "MESSAGES_SERVICE_MAX_CONCURRENT_REQUESTS",
+    "MessagesServiceMinTimeConsecutiveRequests": "MESSAGES_SERVICE_MIN_TIME_CONSECUTIVE_REQUESTS"
+  }
+}

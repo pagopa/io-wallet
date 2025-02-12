@@ -17,13 +17,12 @@ terraform {
     storage_account_name = "tfappprodio"
     container_name       = "terraform-state"
     key                  = "iowallet.resources.prod.tfstate"
+    use_azuread_auth     = true
   }
 }
 
 provider "azurerm" {
-  features {
-  }
-
+  features {}
   storage_use_azuread = true
 }
 
