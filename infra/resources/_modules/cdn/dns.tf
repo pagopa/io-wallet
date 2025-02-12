@@ -1,13 +1,3 @@
-resource "azurerm_dns_cname_record" "this" {
-  name                = local.dns_name
-  zone_name           = local.cdn_dns_zone_name
-  resource_group_name = local.dns_zone_name_resource_group_name
-  ttl                 = 3600
-  record              = azurerm_cdn_endpoint.this.fqdn
-
-  tags = var.tags
-}
-
 resource "azurerm_dns_a_record" "this" {
   name                = "@"
   zone_name           = local.wallet_cdn_dns_zone_name
