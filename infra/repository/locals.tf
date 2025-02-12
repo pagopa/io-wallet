@@ -34,7 +34,7 @@ locals {
   }
 
   tf_storage_account = {
-    name                = "tfappprodio"
+    name                = "iopitntfst001"
     resource_group_name = "terraform-state-rg"
   }
 
