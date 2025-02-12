@@ -1,7 +1,10 @@
 # Admins roles
 module "admins_roles" {
-  for_each     = var.cosmos_db_02.admin_ids
-  source       = "github.com/pagopa/dx//infra/modules/azure_role_assignments?ref=main"
+  for_each = var.admin_ids
+
+  source  = "pagopa/dx-azure-role-assignments/azurerm"
+  version = "~>0"
+
   principal_id = each.value
 
   cosmos = [
