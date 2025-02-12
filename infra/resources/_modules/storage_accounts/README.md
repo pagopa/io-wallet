@@ -15,7 +15,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | github.com/pagopa/dx//infra/modules/azure_storage_account | main |
+| <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | pagopa/dx-azure-storage-account/azurerm | ~>0 |
 
 ## Resources
 

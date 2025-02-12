@@ -27,7 +27,7 @@ data "azurerm_private_dns_zone" "privatelink_documents" {
   resource_group_name = data.azurerm_resource_group.weu_common.name
 }
 
-data "azuread_group" "io_admins" {
+data "azuread_group" "wallet_admins" {
   display_name = format("%s-%s-adgroup-wallet-admins", local.prefix, local.env_short)
 }
 

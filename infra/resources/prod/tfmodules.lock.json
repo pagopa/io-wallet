@@ -1,5 +1,15 @@
 {
   "function_apps.function_app_support.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4",
   "function_apps.function_app_user_02.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4",
-  "storage_accounts.storage_account.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4"
+  "storage_accounts.storage_account.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4",
+  "function_apps.function_app_support": "9bb1e709ec6db835ac84e6a5b9dbde1c6ad3a79c8e64c118f523fe2fd87873c6",
+  "function_apps.function_app_support_autoscaler": "b1b16764fc57ccf0d91a2375a11719e3dac5fd2a7bf77e12cbc290866deac044",
+  "function_apps.function_app_user_02": "9bb1e709ec6db835ac84e6a5b9dbde1c6ad3a79c8e64c118f523fe2fd87873c6",
+  "function_apps.function_app_user_autoscaler_02": "b1b16764fc57ccf0d91a2375a11719e3dac5fd2a7bf77e12cbc290866deac044",
+  "iam.admins_roles": "70538ac55deebe95f1379ec5abe1f3dd207b468c18f69cdb1bc3e6a946e50b56",
+  "iam.func_app_support": "70538ac55deebe95f1379ec5abe1f3dd207b468c18f69cdb1bc3e6a946e50b56",
+  "iam.func_app_support_slot": "70538ac55deebe95f1379ec5abe1f3dd207b468c18f69cdb1bc3e6a946e50b56",
+  "iam.func_app_user_02": "70538ac55deebe95f1379ec5abe1f3dd207b468c18f69cdb1bc3e6a946e50b56",
+  "iam.func_app_user_slot_02": "70538ac55deebe95f1379ec5abe1f3dd207b468c18f69cdb1bc3e6a946e50b56",
+  "storage_accounts.storage_account": "d16e09348af8e234efc72dfd8bc6031d99156e9185226ddd3e3693fe6efedd6c"
 }

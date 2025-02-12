@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "< 5.0"
+      version = "~>4"
     }
 
     azuread = {
@@ -14,9 +14,9 @@ terraform {
 
   backend "azurerm" {
     resource_group_name  = "terraform-state-rg"
-    storage_account_name = "tfappprodio"
+    storage_account_name = "iopitntfst001"
     container_name       = "terraform-state"
-    key                  = "iowallet.resources.prod.tfstate"
+    key                  = "io-wallet.resources.prod.tfstate"
     use_azuread_auth     = true
   }
 }
@@ -26,11 +26,8 @@ provider "azurerm" {
   storage_use_azuread = true
 }
 
-resource "azurerm_resource_group" "wallet" {
-  name     = "${local.project}-wallet-rg-01"
-  location = local.location
-
-  tags = local.tags
+data "azurerm_resource_group" "wallet" {
+  name = "${local.project}-wallet-rg-01"
 }
 
 module "ids" {
@@ -38,7 +35,7 @@ module "ids" {
 
   project             = local.project
   location            = local.location
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   tags = local.tags
 }
@@ -48,7 +45,7 @@ module "key_vaults" {
 
   project             = local.project
   location            = local.location
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   tenant_id = data.azurerm_client_config.current.tenant_id
 
@@ -59,7 +56,7 @@ module "monitoring" {
   source = "../_modules/monitoring"
 
   project             = local.project
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   notification_email = data.azurerm_key_vault_secret.notification_email.value
   notification_slack = data.azurerm_key_vault_secret.notification_slack.value
@@ -73,7 +70,7 @@ module "cosmos" {
   project             = local.project
   location            = local.location
   secondary_location  = local.secondary_location
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   private_endpoint_subnet_id = data.azurerm_subnet.pep.id
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
@@ -94,7 +91,7 @@ module "function_apps" {
   env_short           = local.env_short
   location            = local.location
   project             = local.project
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   cidr_subnet_user_func_02             = "10.20.19.0/24"
   cidr_subnet_support_func             = "10.20.13.0/24"
@@ -136,7 +133,7 @@ module "cdn" {
 
   project             = local.project
   location            = local.location
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law.id
 
@@ -149,15 +146,16 @@ module "cdn" {
 module "iam" {
   source = "../_modules/iam"
 
+  admin_ids = [
+    data.azuread_group.eng_admins.object_id,
+    data.azuread_group.wallet_admins.object_id,
+  ]
+
   cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id
     name                = module.cosmos.cosmos_account_wallet.name
     resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
     database_name       = module.cosmos.cosmos_account_wallet.database_name
-    admin_ids = [
-      data.azuread_group.eng_admins.object_id,
-      data.azuread_group.io_admins.object_id,
-    ]
   }
 
   function_app = {
@@ -175,10 +173,6 @@ module "iam" {
     id                  = module.key_vaults.key_vault_wallet.id
     name                = module.key_vaults.key_vault_wallet.name
     resource_group_name = module.key_vaults.key_vault_wallet.resource_group_name
-    admin_ids = [
-      data.azuread_group.eng_admins.object_id,
-      data.azuread_group.io_admins.object_id,
-    ]
   }
 
   cdn_storage_account = {
@@ -260,7 +254,7 @@ module "storage_accounts" {
   app_name        = local.domain
   instance_number = "01"
 
-  resource_group_name = azurerm_resource_group.wallet.name
+  resource_group_name = data.azurerm_resource_group.wallet.name
 
   subnet_pep_id                        = data.azurerm_subnet.pep.id
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
