@@ -4,7 +4,6 @@ variable "cosmos_db_02" {
     name                = string
     resource_group_name = string
     database_name       = string
-    admin_ids           = set(string)
   })
 }
 
@@ -23,12 +22,16 @@ variable "function_app" {
   description = "Function App system assigned identities"
 }
 
+variable "admin_ids" {
+  type        = set(string)
+  description = "Id of the Entra ID group with admin roles"
+}
+
 variable "key_vault" {
   type = object({
     id                  = string
     name                = string
     resource_group_name = string
-    admin_ids           = set(string)
   })
 
   description = "KeyVault Id and list of Entra groups who are administrator of Key Vaults"

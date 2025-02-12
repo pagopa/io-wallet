@@ -1,5 +1,7 @@
 module "func_app_user_02" {
-  source       = "github.com/pagopa/dx//infra/modules/azure_role_assignments?ref=main"
+  source  = "pagopa/dx-azure-role-assignments/azurerm"
+  version = "~>0"
+
   principal_id = var.function_app.user_func_02.principal_id
 
   cosmos = [
@@ -31,8 +33,11 @@ module "func_app_user_02" {
 }
 
 module "func_app_user_slot_02" {
-  count        = var.function_app.user_func_02.staging_principal_id != null ? 1 : 0
-  source       = "github.com/pagopa/dx//infra/modules/azure_role_assignments?ref=main"
+  count = var.function_app.user_func_02.staging_principal_id != null ? 1 : 0
+
+  source  = "pagopa/dx-azure-role-assignments/azurerm"
+  version = "~>0"
+
   principal_id = var.function_app.user_func_02.staging_principal_id
 
   cosmos = [
@@ -66,7 +71,9 @@ module "func_app_user_slot_02" {
 ### Function Support
 
 module "func_app_support" {
-  source       = "github.com/pagopa/dx//infra/modules/azure_role_assignments?ref=main"
+  source  = "pagopa/dx-azure-role-assignments/azurerm"
+  version = "~>0"
+
   principal_id = var.function_app.support_func.principal_id
 
   cosmos = [
@@ -90,8 +97,11 @@ module "func_app_support" {
 }
 
 module "func_app_support_slot" {
-  count        = var.function_app.support_func.staging_principal_id != null ? 1 : 0
-  source       = "github.com/pagopa/dx//infra/modules/azure_role_assignments?ref=main"
+  count = var.function_app.support_func.staging_principal_id != null ? 1 : 0
+
+  source  = "pagopa/dx-azure-role-assignments/azurerm"
+  version = "~>0"
+
   principal_id = var.function_app.support_func.staging_principal_id
 
   cosmos = [
