@@ -22,10 +22,16 @@ type WalletInstanceRevocationQueueItem = t.TypeOf<
 
 const WALLET_REVOCATION_EMAIL_TITLE =
   "Messaggi da IO: Documenti su IO disattivato";
-const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK = "https://ioapp.it/it/accedi/";
+const WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK =
+  "https://account.ioapp.it/it/accedi/";
 
-const HTML_TO_TEXT_OPTIONS: HtmlToTextOptions = {
-  ignoreImage: true,
+const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
+  selectors: [
+    {
+      format: "skip",
+      selector: "img",
+    },
+  ],
   tables: true,
 };
 
@@ -44,7 +50,7 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
             sendEmailToUser({
               html: htmlContent,
               subject: WALLET_REVOCATION_EMAIL_TITLE,
-              text: HtmlToText.fromString(htmlContent, HTML_TO_TEXT_OPTIONS),
+              text: HtmlToText.htmlToText(htmlContent, HTML_TO_TEXT_OPTIONS),
               to: emailAddress,
             }),
         ),

@@ -21,12 +21,14 @@ terraform {
     storage_account_name = "iopitntfst001"
     container_name       = "terraform-state"
     key                  = "io-wallet.repository.tfstate"
+    use_azuread_auth     = true
   }
 }
 
 provider "azurerm" {
   features {
   }
+  storage_use_azuread = true
 }
 
 provider "github" {
@@ -73,23 +75,9 @@ data "azuread_group" "developers" {
   display_name = local.adgroups.devs_name
 }
 
-import {
-  id = local.repository.name
-  to = module.repo.github_branch_default.main
-}
-
-import {
-  id = local.repository.name
-  to = module.repo.github_repository.this
-}
-
-import {
-  id = "${local.repository.name}:${local.repository.default_branch_name}"
-  to = module.repo.github_branch_protection.main
-}
-
 module "repo" {
-  source = "github.com/pagopa/dx//infra/modules/azure_github_environment_bootstrap?ref=main"
+  source  = "pagopa/dx-azure-github-environment-bootstrap/azurerm"
+  version = "~>0"
 
   environment = {
     prefix          = local.prefix
