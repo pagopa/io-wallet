@@ -128,5 +128,7 @@ module "repo" {
     data.azurerm_key_vault.common.id
   ]
 
+  nat_gateway_resource_group_id = "${local.prefix}-${local.env_short}-itn-common-rg-01"
+
   tags = local.tags
 }
