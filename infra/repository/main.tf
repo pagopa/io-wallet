@@ -67,6 +67,10 @@ data "azurerm_resource_group" "dashboards" {
   name = "dashboards"
 }
 
+data "azurerm_resource_group" "common_itn" {
+  name = "${local.prefix}-${local.env_short}-itn-common-rg-01"
+}
+
 data "azuread_group" "admins" {
   display_name = local.adgroups.admins_name
 }
@@ -128,7 +132,7 @@ module "repo" {
     data.azurerm_key_vault.common.id
   ]
 
-  nat_gateway_resource_group_id = "${local.prefix}-${local.env_short}-itn-common-rg-01"
+  nat_gateway_resource_group_id = data.azurerm_resource_group.common_itn.id
 
   tags = local.tags
 }
