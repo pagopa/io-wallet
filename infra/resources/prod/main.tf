@@ -151,6 +151,16 @@ module "iam" {
     data.azuread_group.wallet_admins.object_id,
   ]
 
+  cicd_principal_ids = {
+    infra = {
+      ci = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
+      cd = data.azurerm_user_assigned_identity.infra_cd_id.principal_id
+    }
+    app = {
+      cd = data.azurerm_user_assigned_identity.app_cd_id.principal_id
+    }
+  }
+
   cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id
     name                = module.cosmos.cosmos_account_wallet.name
@@ -186,6 +196,8 @@ module "iam" {
     name                = module.storage_accounts.wallet.name
     resource_group_name = module.storage_accounts.wallet.resource_group_name
   }
+
+  wallet_dns_zone_id = data.azurerm_dns_zone.wallet_io_pagopa_it.id
 }
 
 module "apim" {
@@ -261,6 +273,16 @@ module "storage_accounts" {
   action_group_id                      = module.monitoring.action_group_wallet.id
 
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
+  tags = local.tags
+}
+
+module "dns" {
+  source = "../_modules/dns"
+
+  wallet_dns_zone_name                = local.wallet_dns_zone.name
+  cdn_endpoint_id                     = module.cdn.cdn_endpoint_id
+  wallet_dns_zone_resource_group_name = local.wallet_dns_zone.resource_group_name
 
   tags = local.tags
 }
