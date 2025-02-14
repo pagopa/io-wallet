@@ -13,7 +13,6 @@ import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wal
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
-import { SetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/set-current-wallet-instance-status";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
@@ -210,20 +209,6 @@ app.http("setWalletInstanceStatus", {
   ),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
-});
-
-app.http("setCurrentWalletInstanceStatus", {
-  authLevel: "function",
-  handler: withAppInsights(
-    SetCurrentWalletInstanceStatusFunction({
-      credentialRepository: pidIssuerClient,
-      queueClient: walletInstanceRevocationEmailQueueClient,
-      telemetryClient: appInsightsClient,
-      walletInstanceRepository,
-    }),
-  ),
-  methods: ["PUT"],
-  route: "wallet-instances/current/status",
 });
 
 app.cosmosDB("addWalletInstanceToValidationQueue", {
