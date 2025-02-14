@@ -54,3 +54,22 @@ variable "storage_account" {
   })
   description = "Generic Storage Account for Wallet uses"
 }
+
+variable "cicd_principal_ids" {
+  type = object({
+    infra = object({
+      ci = string
+      cd = string
+    })
+    app = object({
+      ci = optional(string, "")
+      cd = string
+    })
+  })
+  description = "Principal ID of CICD pipelines"
+}
+
+variable "wallet_dns_zone_id" {
+  type        = string
+  description = "wallet.io.pagopa.it DNS zone id"
+}

@@ -68,3 +68,23 @@ data "azurerm_monitor_action_group" "io" {
 data "azuread_service_principal" "psn_app_id" {
   display_name = "${local.prefix}-${local.env_short}-psn-hsm-01"
 }
+
+data "azurerm_user_assigned_identity" "infra_ci_id" {
+  name                = "${local.project}-${local.domain}-infra-github-ci-id-01"
+  resource_group_name = data.azurerm_resource_group.wallet.name
+}
+
+data "azurerm_user_assigned_identity" "infra_cd_id" {
+  name                = "${local.project}-${local.domain}-infra-github-cd-id-01"
+  resource_group_name = data.azurerm_resource_group.wallet.name
+}
+
+data "azurerm_user_assigned_identity" "app_cd_id" {
+  name                = "${local.project}-${local.domain}-app-github-cd-id-01"
+  resource_group_name = data.azurerm_resource_group.wallet.name
+}
+
+data "azurerm_dns_zone" "wallet_io_pagopa_it" {
+  name                = local.wallet_dns_zone.name
+  resource_group_name = local.wallet_dns_zone.resource_group_name
+}
