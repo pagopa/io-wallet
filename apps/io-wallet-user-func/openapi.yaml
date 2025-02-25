@@ -133,28 +133,6 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
-    put:
-      summary: Revoke the current Wallet Instance
-      operationId: setCurrentWalletInstanceStatus
-      security:
-        - FunctionsKey: []
-      description: |
-        Revoke the current Wallet Instance.
-        If the Wallet Instance is already revoked, the operation will succeed.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SetWalletInstanceStatusWithFiscalCodeData"
-      responses:
-        "204":
-          description: Wallet Instance status successfully set
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/{id}/status:
     get:
