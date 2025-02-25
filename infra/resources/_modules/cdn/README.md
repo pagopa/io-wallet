@@ -22,7 +22,6 @@ No modules.
 | [azurerm_cdn_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_endpoint) | resource |
 | [azurerm_cdn_endpoint_custom_domain.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_endpoint_custom_domain) | resource |
 | [azurerm_cdn_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_profile) | resource |
-| [azurerm_dns_cname_record.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_cname_record) | resource |
 | [azurerm_monitor_diagnostic_setting.cdn_profile](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_metric_alert.storage_account_low_availability](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
@@ -48,5 +47,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#output\_cdn\_endpoint\_id) | n/a |
 | <a name="output_storage_account_cdn"></a> [storage\_account\_cdn](#output\_storage\_account\_cdn) | n/a |
 <!-- END_TF_DOCS -->

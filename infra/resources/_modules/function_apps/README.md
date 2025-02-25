@@ -15,10 +15,10 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_function_app_support"></a> [function\_app\_support](#module\_function\_app\_support) | github.com/pagopa/dx//infra/modules/azure_function_app | main |
-| <a name="module_function_app_support_autoscaler"></a> [function\_app\_support\_autoscaler](#module\_function\_app\_support\_autoscaler) | github.com/pagopa/dx//infra/modules/azure_app_service_plan_autoscaler | main |
-| <a name="module_function_app_user_02"></a> [function\_app\_user\_02](#module\_function\_app\_user\_02) | github.com/pagopa/dx//infra/modules/azure_function_app | main |
-| <a name="module_function_app_user_autoscaler_02"></a> [function\_app\_user\_autoscaler\_02](#module\_function\_app\_user\_autoscaler\_02) | github.com/pagopa/dx//infra/modules/azure_app_service_plan_autoscaler | main |
+| <a name="module_function_app_support"></a> [function\_app\_support](#module\_function\_app\_support) | pagopa/dx-azure-function-app/azurerm | ~>0 |
+| <a name="module_function_app_support_autoscaler"></a> [function\_app\_support\_autoscaler](#module\_function\_app\_support\_autoscaler) | pagopa/dx-azure-app-service-plan-autoscaler/azurerm | ~>0 |
+| <a name="module_function_app_user_02"></a> [function\_app\_user\_02](#module\_function\_app\_user\_02) | pagopa/dx-azure-function-app/azurerm | ~>0 |
+| <a name="module_function_app_user_autoscaler_02"></a> [function\_app\_user\_autoscaler\_02](#module\_function\_app\_user\_autoscaler\_02) | pagopa/dx-azure-app-service-plan-autoscaler/azurerm | ~>0 |
 
 ## Resources
 
@@ -57,11 +57,11 @@ No requirements.
 | <a name="input_project"></a> [project](#input\_project) | IO prefix and short environment | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
 | <a name="input_storage_account_cdn_name"></a> [storage\_account\_cdn\_name](#input\_storage\_account\_cdn\_name) | Name of the CDN storage account | `string` | n/a | yes |
-| <a name="input_support_func"></a> [support\_func](#input\_support\_func) | Configuration of the support-func | <pre>object({<br/>    app_settings = list(object({<br/>      name                  = string<br/>      value                 = optional(string, "")<br/>      key_vault_secret_name = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
+| <a name="input_support_func"></a> [support\_func](#input\_support\_func) | Configuration of the support-func | <pre>object({<br>    app_settings = list(object({<br>      name                  = string<br>      value                 = optional(string, "")<br>      key_vault_secret_name = optional(string)<br>    }))<br>  })</pre> | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
-| <a name="input_user_func"></a> [user\_func](#input\_user\_func) | Configuration of the user-func | <pre>object({<br/>    app_settings = list(object({<br/>      name                  = string<br/>      value                 = optional(string, "")<br/>      key_vault_secret_name = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
+| <a name="input_user_func"></a> [user\_func](#input\_user\_func) | Configuration of the user-func | <pre>object({<br>    app_settings = list(object({<br>      name                  = string<br>      value                 = optional(string, "")<br>      key_vault_secret_name = optional(string)<br>    }))<br>  })</pre> | n/a | yes |
 | <a name="input_validate_wallet_instance_certificates_queue_name"></a> [validate\_wallet\_instance\_certificates\_queue\_name](#input\_validate\_wallet\_instance\_certificates\_queue\_name) | Wallet Instance Certificates Validation Queue Name | `string` | n/a | yes |
-| <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
+| <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br>    name                = string<br>    resource_group_name = string<br>  })</pre> | n/a | yes |
 | <a name="input_wallet_instance_creation_email_queue_name"></a> [wallet\_instance\_creation\_email\_queue\_name](#input\_wallet\_instance\_creation\_email\_queue\_name) | Send Email on Wallet Instance Creation Queue Name | `string` | n/a | yes |
 | <a name="input_wallet_instance_revocation_email_queue_name"></a> [wallet\_instance\_revocation\_email\_queue\_name](#input\_wallet\_instance\_revocation\_email\_queue\_name) | Send Email on Wallet Instance Revocation Queue Name | `string` | n/a | yes |
 

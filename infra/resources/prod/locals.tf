@@ -16,6 +16,11 @@ locals {
   location           = "italynorth"
   secondary_location = "spaincentral"
 
+  wallet_dns_zone = {
+    name                = "wallet.io.pagopa.it"
+    resource_group_name = "io-p-rg-external"
+  }
+
   apim = {
     name                = "${local.project_legacy}-apim-v2-api"
     resource_group_name = "${local.project_legacy}-rg-internal"

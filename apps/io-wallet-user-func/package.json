@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -58,10 +58,7 @@
   "resolutions": {
     "cookie": "^0.7.0",
     "rollup": "^4.22.4",
-    "vite": "^5.4.6",
-    "trim": "^0.0.3",
-    "tough-cookie": "^4.1.3",
-    "xml2js": "^0.5.0"
+    "vite": "^5.4.6"
   },
   "main": "dist/main.js",
   "files": [
