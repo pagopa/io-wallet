@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.0.4
+
+### Patch Changes
+
+- 89d6a5d: Removed the PUT /wallet-instances/current/status endpoint
+
 ## 3.0.3
 
 ### Patch Changes
