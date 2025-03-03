@@ -11,7 +11,11 @@ import * as S from "fp-ts/lib/string";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { ValidatedAttestation } from "../../mobile-attestation-service";
-import { AndroidAssertionError, AndroidAttestationError } from "../errors";
+import {
+  AndroidAssertionError,
+  AndroidAttestationError,
+  UnknownAppOriginIntegrityCheckError,
+} from "../errors";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";
 
@@ -119,9 +123,18 @@ export const validateAndroidAssertion = (
         E.toError,
       ),
     ),
-    TE.chain((assertionValidationResult) =>
-      assertionValidationResult.success
-        ? TE.right(undefined)
-        : TE.left(new AndroidAssertionError(assertionValidationResult.reason)),
-    ),
+    TE.chain((assertionValidationResult) => {
+      if (assertionValidationResult.success) {
+        return TE.right(undefined);
+      } else if (
+        assertionValidationResult.reason ===
+        `The app does not match the versions distributed by Google Play.`
+      ) {
+        return TE.left(new UnknownAppOriginIntegrityCheckError());
+      } else {
+        return TE.left(
+          new AndroidAssertionError(assertionValidationResult.reason),
+        );
+      }
+    }),
   );

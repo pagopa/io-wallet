@@ -25,7 +25,9 @@ const toHttpError = (e: Error): Error => {
     case "ForbiddenError":
       return new H.HttpForbiddenError(e.message);
     // TODO SIW-1482
-    case "IntegrityCheckError":
+    case "GenericIntegrityCheckError":
+    case "UnknownAppOriginIntegrityCheckError":
+    case "OsVersionOutdatedIntegrityCheckError":
       return new H.HttpConflictError(e.message);
     case "ServiceUnavailable":
       return new H.HttpServiceUnavailableError(e.message);
