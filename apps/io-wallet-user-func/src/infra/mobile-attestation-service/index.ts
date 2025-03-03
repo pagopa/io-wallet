@@ -23,14 +23,8 @@ import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
+import { GenericIntegrityCheckError } from "./errors";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
-
-class IntegrityCheckError extends Error {
-  name = "IntegrityCheckError";
-  constructor(msg: string[]) {
-    super(msg.join(" | "));
-  }
-}
 
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +34,8 @@ const getErrorsOrFirstValidValue = (
     validated.right,
     RA.head,
     E.fromOption(
-      () => new IntegrityCheckError(validated.left.map((el) => el.message)),
+      () =>
+        new GenericIntegrityCheckError(validated.left.map((el) => el.message)),
     ),
   );
 
