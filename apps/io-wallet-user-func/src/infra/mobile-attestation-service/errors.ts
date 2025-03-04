@@ -48,3 +48,10 @@ export class OsVersionOutdatedIntegrityCheckError extends Error {
     super("INTEGRITY_ERROR_OS_VERSION_OUTDATED");
   }
 }
+
+export class CompromisedOrEmulatedDeviceIntegrityCheckError extends Error {
+  name = "CompromisedOrEmulatedDeviceIntegrityCheckError";
+  constructor() {
+    super("INTEGRITY_ERROR_COMPROMISED_OR_EMULATED_DEVICE");
+  }
+}

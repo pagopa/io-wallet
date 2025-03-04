@@ -14,6 +14,8 @@ import { ValidatedAttestation } from "../../mobile-attestation-service";
 import {
   AndroidAssertionError,
   AndroidAttestationError,
+  CompromisedOrEmulatedDeviceIntegrityCheckError,
+  OsVersionOutdatedIntegrityCheckError,
   UnknownAppOriginIntegrityCheckError,
 } from "../errors";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
@@ -131,6 +133,16 @@ export const validateAndroidAssertion = (
         `The app does not match the versions distributed by Google Play.`
       ) {
         return TE.left(new UnknownAppOriginIntegrityCheckError());
+      } else if (
+        assertionValidationResult.reason ===
+        `Device doesn't meet integrity check.`
+      ) {
+        return TE.left(new OsVersionOutdatedIntegrityCheckError());
+      } else if (
+        assertionValidationResult.reason ===
+        `Invalid Device Recognition Verdict.`
+      ) {
+        return TE.left(new CompromisedOrEmulatedDeviceIntegrityCheckError());
       } else {
         return TE.left(
           new AndroidAssertionError(assertionValidationResult.reason),
