@@ -28,6 +28,7 @@ const toHttpError = (e: Error): Error => {
     case "GenericIntegrityCheckError":
     case "UnknownAppOriginIntegrityCheckError":
     case "OsVersionOutdatedIntegrityCheckError":
+    case "CompromisedOrEmulatedDeviceIntegrityCheckError":
       return new H.HttpConflictError(e.message);
     case "ServiceUnavailable":
       return new H.HttpServiceUnavailableError(e.message);
