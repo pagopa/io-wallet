@@ -7,10 +7,6 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 
-export const MIN_ANDROID_VERSION = "7.1";
-export const MIN_ANDROID_API_LEVEL = "25";
-export const MIN_IOS_VERSION = "14.0";
-
 export enum OperatingSystem {
   android = "Android",
   iOS = "Apple iOS",
