@@ -20,8 +20,8 @@ locals {
   }
 
   apim = {
-    name                = "${local.prefix}-${local.env_short}-apim-v2-api"
-    resource_group_name = "${local.prefix}-${local.env_short}-rg-internal"
+    name                = "${local.prefix}-${local.env_short}-itn-apim-01"
+    resource_group_name = "${local.prefix}-${local.env_short}-itn-common-rg-01"
   }
 
   vnet = {
@@ -29,8 +29,8 @@ locals {
     resource_group_name = "${local.prefix}-${local.env_short}-itn-common-rg-01"
   }
 
-  dns = {
-    resource_group_name = "${local.prefix}-${local.env_short}-rg-external"
+  dns_zones = {
+    resource_group_name = "${local.prefix}-${local.env_short}-rg-common"
   }
 
   tf_storage_account = {

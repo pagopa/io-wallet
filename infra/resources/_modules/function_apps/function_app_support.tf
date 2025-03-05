@@ -34,7 +34,7 @@ module "function_app_support" {
 
 module "function_app_support_autoscaler" {
   source  = "pagopa/dx-azure-app-service-plan-autoscaler/azurerm"
-  version = "~>0"
+  version = "~>0.0"
 
   resource_group_name = var.resource_group_name
 
