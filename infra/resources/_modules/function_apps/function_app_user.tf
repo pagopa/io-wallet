@@ -1,6 +1,6 @@
 module "function_app_user_02" {
-  source  = "pagopa/dx-azure-function-app/azurerm"
-  version = "~>0"
+  source  = "pagopa-dx/azure-function-app/azurerm"
+  version = "~> 0.0"
 
   environment = {
     prefix          = var.prefix
@@ -36,8 +36,8 @@ module "function_app_user_02" {
 }
 
 module "function_app_user_autoscaler_02" {
-  source  = "pagopa/dx-azure-app-service-plan-autoscaler/azurerm"
-  version = "~>0.0"
+  source  = "pagopa-dx/azure-app-service-plan-autoscaler/azurerm"
+  version = "~> 0.0"
 
   resource_group_name = var.resource_group_name
 

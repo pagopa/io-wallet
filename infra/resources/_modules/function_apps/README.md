@@ -15,10 +15,10 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_function_app_support"></a> [function\_app\_support](#module\_function\_app\_support) | pagopa/dx-azure-function-app/azurerm | ~>0 |
-| <a name="module_function_app_support_autoscaler"></a> [function\_app\_support\_autoscaler](#module\_function\_app\_support\_autoscaler) | pagopa/dx-azure-app-service-plan-autoscaler/azurerm | ~>0.0 |
-| <a name="module_function_app_user_02"></a> [function\_app\_user\_02](#module\_function\_app\_user\_02) | pagopa/dx-azure-function-app/azurerm | ~>0 |
-| <a name="module_function_app_user_autoscaler_02"></a> [function\_app\_user\_autoscaler\_02](#module\_function\_app\_user\_autoscaler\_02) | pagopa/dx-azure-app-service-plan-autoscaler/azurerm | ~>0.0 |
+| <a name="module_function_app_support"></a> [function\_app\_support](#module\_function\_app\_support) | pagopa-dx/azure-function-app/azurerm | ~> 0.0 |
+| <a name="module_function_app_support_autoscaler"></a> [function\_app\_support\_autoscaler](#module\_function\_app\_support\_autoscaler) | pagopa-dx/azure-app-service-plan-autoscaler/azurerm | ~> 0.0 |
+| <a name="module_function_app_user_02"></a> [function\_app\_user\_02](#module\_function\_app\_user\_02) | pagopa-dx/azure-function-app/azurerm | ~> 0.0 |
+| <a name="module_function_app_user_autoscaler_02"></a> [function\_app\_user\_autoscaler\_02](#module\_function\_app\_user\_autoscaler\_02) | pagopa-dx/azure-app-service-plan-autoscaler/azurerm | ~> 0.0 |
 
 ## Resources
 

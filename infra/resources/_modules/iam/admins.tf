@@ -2,8 +2,8 @@
 module "admins_roles" {
   for_each = var.admin_ids
 
-  source  = "pagopa/dx-azure-role-assignments/azurerm"
-  version = "~>0"
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 0.0"
 
   principal_id = each.value
 
