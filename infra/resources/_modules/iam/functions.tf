@@ -1,6 +1,6 @@
 module "func_app_user_02" {
-  source  = "pagopa/dx-azure-role-assignments/azurerm"
-  version = "~>0"
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 0.0"
 
   principal_id = var.function_app.user_func_02.principal_id
 
@@ -35,8 +35,8 @@ module "func_app_user_02" {
 module "func_app_user_slot_02" {
   count = var.function_app.user_func_02.staging_principal_id != null ? 1 : 0
 
-  source  = "pagopa/dx-azure-role-assignments/azurerm"
-  version = "~>0"
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 0.0"
 
   principal_id = var.function_app.user_func_02.staging_principal_id
 
@@ -71,8 +71,8 @@ module "func_app_user_slot_02" {
 ### Function Support
 
 module "func_app_support" {
-  source  = "pagopa/dx-azure-role-assignments/azurerm"
-  version = "~>0"
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 0.0"
 
   principal_id = var.function_app.support_func.principal_id
 
@@ -99,8 +99,8 @@ module "func_app_support" {
 module "func_app_support_slot" {
   count = var.function_app.support_func.staging_principal_id != null ? 1 : 0
 
-  source  = "pagopa/dx-azure-role-assignments/azurerm"
-  version = "~>0"
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 0.0"
 
   principal_id = var.function_app.support_func.staging_principal_id
 
