@@ -41,7 +41,7 @@ locals {
 
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
 
-    AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-fn-01.azurewebsites.net"
+    AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-func-02.azurewebsites.net"
 
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
     WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
