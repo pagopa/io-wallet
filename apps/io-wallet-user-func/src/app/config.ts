@@ -157,6 +157,40 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const PdndInteropApiClientConfig = t.type({
+  audience: t.string,
+  baseURL: t.string,
+  clientId: t.string,
+  kidId: t.string,
+  privateKey: t.string,
+  requestTimeout: NumberFromString,
+});
+
+export type PdndInteropApiClientConfig = t.TypeOf<
+  typeof PdndInteropApiClientConfig
+>;
+
+export const getPdndInteropConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  PdndInteropApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    audience: readFromEnvironment("PdndInteropApiAudience"),
+    baseURL: readFromEnvironment("PdndInteropApiBaseURL"),
+    clientId: readFromEnvironment("PdndInteropApiClientId"),
+    kidId: readFromEnvironment("PdndInteropApiKidId"),
+    privateKey: pipe(
+      readFromEnvironment("PdndInteropApiPrivateKey"),
+      RE.map(decodeBase64String),
+    ),
+    requestTimeout: pipe(
+      readFromEnvironment("PdndInteropApiRequestTimeout"),
+      RE.chainW(stringToNumberDecoderRE),
+    ),
+  }),
+);
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   authProfile: AuthProfileApiConfig,
@@ -164,6 +198,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   federationEntity: FederationEntityMetadata,
   mail: MailConfig,
+  pdndInteop: PdndInteropApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
 });
@@ -418,6 +453,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     mail: getMailConfigFromEnvironment,
+    pdndInteop: getPdndInteropConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
   }),
