@@ -357,7 +357,6 @@ components:
       required:
         - grant_type
         - assertion
-        - fiscal_code
 
     RevocationReason:
       type: string

@@ -109,7 +109,7 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.androidPlayStoreCertificateHash,
               this.#configuration.googleAppCredentialsEncoded,
               this.#configuration.androidPlayIntegrityUrl,
-              this.allowDevelopmentEnvironmentForUser(user),
+              user ? this.allowDevelopmentEnvironmentForUser(user) : false,
             ),
           ],
           RA.wilt(T.ApplicativePar)(identity),

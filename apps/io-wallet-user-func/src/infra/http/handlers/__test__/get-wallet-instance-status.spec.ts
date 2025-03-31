@@ -20,7 +20,8 @@ describe("GetWalletInstanceStatusHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.left(new Error("not implemented")),
     deleteAllByUserId: () => TE.left(new Error("not implemented")),
-    get: () =>
+    get: () => TE.left(new Error("not implemented")),
+    getByUserId: () =>
       TE.right(
         O.some({
           createdAt: new Date(),
@@ -81,7 +82,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 200 HTTP response and revoked wallet instance with revocationReason on success", async () => {
-    walletInstanceRepository.get = () =>
+    walletInstanceRepository.getByUserId = () =>
       TE.right(
         O.some({
           createdAt: new Date(),
@@ -125,7 +126,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 200 HTTP response and revoked wallet instance with revocationReason on success", async () => {
-    walletInstanceRepository.get = () =>
+    walletInstanceRepository.getByUserId = () =>
       TE.right(
         O.some({
           createdAt: new Date(),
@@ -201,7 +202,8 @@ describe("GetWalletInstanceStatusHandler", () => {
     const walletInstanceRepository: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       deleteAllByUserId: () => TE.left(new Error("not implemented")),
-      get: () => TE.right(O.none),
+      get: () => TE.left(new Error("not implemented")),
+      getByUserId: () => TE.right(O.none),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
@@ -260,7 +262,8 @@ describe("GetWalletInstanceStatusHandler", () => {
     const walletInstanceRepositoryThatFailsOnGet: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       deleteAllByUserId: () => TE.left(new Error("not implemented")),
-      get: () => TE.left(new Error("failed on get!")),
+      get: () => TE.left(new Error("not implemented")),
+      getByUserId: () => TE.left(new Error("failed on get!")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
@@ -288,7 +291,8 @@ describe("GetWalletInstanceStatusHandler", () => {
     const walletInstanceRepositoryThatFailsOnGet: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       deleteAllByUserId: () => TE.left(new Error("not implemented")),
-      get: () => TE.left(new ServiceUnavailableError("foo")),
+      get: () => TE.left(new Error("not implemented")),
+      getByUserId: () => TE.left(new ServiceUnavailableError("foo")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),

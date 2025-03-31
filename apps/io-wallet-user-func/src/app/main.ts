@@ -14,6 +14,7 @@ import { HealthFunction } from "@/infra/azure/functions/health";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
+import { AddWalletInstanceByIdFunction } from "@/infra/azure/functions/add-wallet-instance-by-id";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
@@ -276,4 +277,23 @@ app.http("deleteWalletInstances", {
   ),
   methods: ["DELETE"],
   route: "wallet-instances",
+});
+
+app.cosmosDB("addWalletInstanceById", {
+  connection: "CosmosDbEndpoint",
+  containerName: "wallet-instances",
+  databaseName: config.azure.cosmos.dbName,
+  handler: AddWalletInstanceByIdFunction({
+    inputDecoder: t.array(WalletInstance),
+    telemetryClient: appInsightsClient,
+  }),
+  leaseContainerName: "leases-wallet-instances-sync",
+  leaseContainerPrefix: "wallet-instances-sync-",
+  return: output.cosmosDB({
+    connection: "CosmosDbEndpoint",
+    containerName: "wallet-instances-by-id",
+    createIfNotExists: false,
+    databaseName: config.azure.cosmos.dbName,
+  }),
+  startFromBeginning: true,
 });

@@ -16,11 +16,15 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-const WalletAttestationRequestPayload = t.type({
-  assertion: NonEmptyString,
-  fiscal_code: FiscalCode,
-  grant_type: t.literal(GRANT_TYPE_KEY_ATTESTATION),
-});
+const WalletAttestationRequestPayload = t.intersection([
+  t.type({
+    assertion: NonEmptyString,
+    grant_type: t.literal(GRANT_TYPE_KEY_ATTESTATION),
+  }),
+  t.partial({
+    fiscal_code: FiscalCode,
+  }),
+]);
 
 type WalletAttestationRequestPayload = t.TypeOf<
   typeof WalletAttestationRequestPayload
@@ -55,13 +59,10 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
       pipe(
         consumeNonce(assertion.payload.challenge),
         RTE.chainW(() =>
-          getValidWalletInstance(
-            assertion.payload.hardware_key_tag,
-            fiscalCode,
-          ),
+          getValidWalletInstance(assertion.payload.hardware_key_tag),
         ),
         RTE.chainW((walletInstance) =>
-          isLoadTestUser(fiscalCode)
+          fiscalCode && isLoadTestUser(fiscalCode)
             ? RTE.right(undefined)
             : validateAssertion(
                 assertion,
@@ -72,7 +73,7 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
         ),
         RTE.chainW(() => createWalletAttestation(assertion)),
         RTE.map((attestation) =>
-          isLoadTestUser(fiscalCode)
+          fiscalCode && isLoadTestUser(fiscalCode)
             ? "this_is_a_test_attestation"
             : attestation,
         ),

@@ -28,7 +28,7 @@ export interface ValidateAssertionRequest {
   jwk: JwkPublicKey;
   nonce: NonEmptyString;
   signCount: number;
-  user: FiscalCode;
+  user?: FiscalCode;
 }
 
 export interface AttestationService {
@@ -64,7 +64,7 @@ export const validateAssertion: (
   walletAttestationRequest: WalletAttestationRequest,
   hardwareKey: JwkPublicKey,
   signCount: number,
-  user: FiscalCode,
+  user?: FiscalCode,
 ) => RTE.ReaderTaskEither<
   { attestationService: AttestationService },
   Error,

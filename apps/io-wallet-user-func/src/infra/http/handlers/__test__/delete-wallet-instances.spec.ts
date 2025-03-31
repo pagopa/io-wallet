@@ -20,6 +20,7 @@ describe("DeleteWalletInstancesHandler", () => {
     batchPatch: () => TE.left(new Error("not implemented")),
     deleteAllByUserId: () => TE.right(undefined),
     get: () => TE.left(new Error("not implemented")),
+    getByUserId: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
@@ -124,6 +125,7 @@ describe("DeleteWalletInstancesHandler", () => {
         deleteAllByUserId: () =>
           TE.left(new Error("failed on deleteAllByUserId!")),
         get: () => TE.left(new Error("not implemented")),
+        getByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
@@ -180,6 +182,7 @@ describe("DeleteWalletInstancesHandler", () => {
         batchPatch: () => TE.left(new Error("not implemented")),
         deleteAllByUserId: () => TE.left(new ServiceUnavailableError()),
         get: () => TE.left(new Error("not implemented")),
+        getByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
