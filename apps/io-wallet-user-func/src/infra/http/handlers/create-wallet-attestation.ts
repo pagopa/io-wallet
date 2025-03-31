@@ -3,7 +3,10 @@ import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
-import { getValidWalletInstance } from "@/wallet-instance";
+import {
+  getValidWalletInstance,
+  getValidWalletInstanceByUserId,
+} from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
@@ -59,7 +62,13 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
       pipe(
         consumeNonce(assertion.payload.challenge),
         RTE.chainW(() =>
-          getValidWalletInstance(assertion.payload.hardware_key_tag),
+          // it will be possible to use just the second function as well
+          fiscalCode
+            ? getValidWalletInstanceByUserId(
+                assertion.payload.hardware_key_tag,
+                fiscalCode,
+              )
+            : getValidWalletInstance(assertion.payload.hardware_key_tag),
         ),
         RTE.chainW((walletInstance) =>
           fiscalCode && isLoadTestUser(fiscalCode)
