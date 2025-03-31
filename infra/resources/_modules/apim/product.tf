@@ -42,3 +42,18 @@ module "apim_v2_wallet_admin_product" {
   subscription_required = true
   approval_required     = false
 }
+
+module "apim_v2_wallet_app_product" {
+  source = "github.com/pagopa/terraform-azurerm-v4//api_management_product?ref=v1.0.0"
+
+  product_id   = format("%s-wallet-app-api", var.project_legacy)
+  display_name = "IO WALLET APP APIs"
+  description  = "Product containing app APIs"
+
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+
+  published             = true
+  subscription_required = true
+  approval_required     = false
+}

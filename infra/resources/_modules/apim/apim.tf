@@ -67,7 +67,6 @@ module "apim_v2_wallet_support_api" {
 
   service_url = format("https://%s/api/v1/wallet", var.function_apps.support_function.function_hostname)
 
-
   description  = "API for Wallet Support Assistance"
   display_name = "IO Wallet - Support"
   path         = "api/v1/wallet/support"
@@ -120,7 +119,6 @@ module "apim_v2_wallet_pdnd_api" {
 
   service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
 
-
   description  = "API access limited by PDND token authentication"
   display_name = "IO Wallet - PDND"
   path         = "api/v1/wallet/pdnd"
@@ -144,7 +142,6 @@ module "apim_v2_wallet_admin_api" {
   subscription_required = false
 
   service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
-
 
   description  = "Admin API to delete wallet instances"
   display_name = "IO Wallet - ADMIN"
@@ -174,4 +171,42 @@ resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_stat
   api_management_name = var.apim.name
 
   xml_content = file("${path.module}/api/pdnd/_set_wallet_instance_status_policy.xml")
+}
+
+// APP CREATE WALLET ATTESTATION API
+module "apim_v2_wallet_app_api" {
+  source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
+
+  name                  = format("%s-wallet-app-api", var.project_legacy)
+  api_management_name   = var.apim.name
+  resource_group_name   = var.apim.resource_group_name
+  product_ids           = [module.apim_v2_wallet_app_product.product_id]
+  subscription_required = true
+
+  service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
+
+  description  = "App API to create wallet attestation"
+  display_name = "IO Wallet - APP"
+  path         = "api/v1/wallet/app"
+  protocols    = ["https"]
+
+  content_format = "openapi"
+
+  content_value = file("${path.module}/api/app/_swagger.json")
+
+  xml_content = file("${path.module}/api/app/_base_policy.xml")
+}
+
+resource "azurerm_api_management_named_value" "app_func_key" {
+  name                = "io-wallet-user-func-create-wa-key"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "io-wallet-user-func-create-wa-key"
+  value               = data.azurerm_key_vault_secret.user_func_key_app.value
+  secret              = "true"
+}
+
+data "azurerm_key_vault_secret" "user_func_key_app" {
+  name         = "io-wallet-user-func-create-wa-key"
+  key_vault_id = var.key_vault_wallet_id
 }
