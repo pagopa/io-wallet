@@ -41,14 +41,14 @@ export class PdndInteropClient implements VoucherRepository {
       },
     );
 
-  requestVoucher = (clientId: string) =>
+  requestVoucher = () =>
     TE.tryCatch(
       async () => {
         const result = await fetch(new URL("/authorize", this.#baseURL), {
           body: JSON.stringify({
             client_assertion: this.generateClientAssertion(),
             client_assertion_type: PdndInteropClient.CLIENT_ASSERTION_TYPE,
-            client_id: clientId,
+            client_id: this.#clientId,
             grant_type: PdndInteropClient.GRANT_TYPE,
           }),
           method: "POST",

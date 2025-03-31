@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { CredentialRepository } from "@/credential";
+import { VoucherRepository } from "@/infra/voucher";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -37,6 +38,10 @@ describe("DeleteWalletInstancesHandler", () => {
     revokeAllCredentials: () => TE.right(undefined),
   };
 
+  const pdndInteropClient: VoucherRepository = {
+    requestVoucher: () => TE.right(""),
+  };
+
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
@@ -48,6 +53,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -74,6 +80,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -103,6 +110,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -135,6 +143,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
@@ -160,6 +169,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -191,6 +201,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
@@ -215,6 +226,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
