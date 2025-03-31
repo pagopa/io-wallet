@@ -63,7 +63,17 @@ const walletInstanceRepository: WalletInstanceRepository = {
         userId: mockFiscalCode,
       }),
     ),
-  getByUserId: () => TE.left(new Error("not implemented")),
+  getByUserId: () =>
+    TE.right(
+      O.some({
+        createdAt: new Date(),
+        hardwareKey,
+        id: "123" as NonEmptyString,
+        isRevoked: false,
+        signCount: 0,
+        userId: mockFiscalCode,
+      }),
+    ),
   getLastByUserId: () => TE.left(new Error("not implemented")),
   getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
@@ -98,7 +108,7 @@ describe("CreateWalletAttestationHandler", async () => {
     .setExpirationTime("2h")
     .sign(josePrivateKey);
 
-  it("should return a 200 HTTP response on success", async () => {
+  it("should return a 200 HTTP response on succes when fiscal_code is passed", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
@@ -179,11 +189,12 @@ describe("CreateWalletAttestationHandler", async () => {
     });
   });
 
-  it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
+  it("should return a 403 HTTP response when the wallet instance is revoked when fiscal_code is passed", async () => {
     const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       deleteAllByUserId: () => TE.left(new Error("not implemented")),
-      get: () =>
+      get: () => TE.left(new Error("not implemented")),
+      getByUserId: () =>
         TE.right(
           O.some({
             createdAt: new Date(),
@@ -195,7 +206,6 @@ describe("CreateWalletAttestationHandler", async () => {
             userId: mockFiscalCode,
           }),
         ),
-      getByUserId: () => TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
       insert: () => TE.left(new Error("not implemented")),
@@ -237,7 +247,159 @@ describe("CreateWalletAttestationHandler", async () => {
     });
   });
 
-  it("should return a 404 HTTP response when the wallet instance is not found", async () => {
+  it("should return a 404 HTTP response when the wallet instance is not found when fiscal_code is passed", async () => {
+    const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
+      batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
+      get: () => TE.left(new Error("not implemented")),
+      getByUserId: () => TE.right(O.none),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
+      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
+      insert: () => TE.left(new Error("not implemented")),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: walletAttestationRequest,
+        fiscal_code: "AAACCC94E17H501P",
+        grant_type: GRANT_TYPE_KEY_ATTESTATION,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletAttestationHandler({
+      attestationService: mockAttestationService,
+      federationEntityMetadata,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        body: {
+          detail: "Wallet instance not found",
+          status: 404,
+          title: "Not Found",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 404,
+      }),
+    });
+  });
+
+  it("should return a 200 HTTP response on succes when fiscal_code is not passed", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: walletAttestationRequest,
+        grant_type: GRANT_TYPE_KEY_ATTESTATION,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletAttestationHandler({
+      attestationService: mockAttestationService,
+      federationEntityMetadata,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletInstanceRepository,
+    });
+
+    const result = await handler();
+    expect.assertions(3);
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
+        body: expect.objectContaining({
+          wallet_attestation: expect.any(String),
+        }),
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      },
+    });
+
+    // check trailing slashes are removed
+    if (E.isRight(result)) {
+      const body = result.right.body;
+      const walletAttestation = body.wallet_attestation;
+      if (typeof walletAttestation === "string") {
+        const decoded = jose.decodeJwt(walletAttestation);
+        expect((decoded.iss || "").endsWith("/")).toBe(false);
+        expect((decoded.sub || "").endsWith("/")).toBe(false);
+      }
+    }
+  });
+
+  it("should return a 403 HTTP response when the wallet instance is revoked when fiscal_code is not passed", async () => {
+    const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
+      batchPatch: () => TE.left(new Error("not implemented")),
+      deleteAllByUserId: () => TE.left(new Error("not implemented")),
+      get: () =>
+        TE.right(
+          O.some({
+            createdAt: new Date(),
+            hardwareKey,
+            id: "123" as NonEmptyString,
+            isRevoked: true,
+            revokedAt: new Date(),
+            signCount: 0,
+            userId: mockFiscalCode,
+          }),
+        ),
+      getByUserId: () => TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
+      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
+      insert: () => TE.left(new Error("not implemented")),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: walletAttestationRequest,
+        grant_type: GRANT_TYPE_KEY_ATTESTATION,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletAttestationHandler({
+      attestationService: mockAttestationService,
+      federationEntityMetadata,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        body: {
+          detail: "The wallet instance has been revoked.",
+          status: 403,
+          title: "Forbidden",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 403,
+      }),
+    });
+  });
+
+  it("should return a 404 HTTP response when the wallet instance is not found when fiscal_code is not passed", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       deleteAllByUserId: () => TE.left(new Error("not implemented")),
@@ -251,7 +413,6 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
