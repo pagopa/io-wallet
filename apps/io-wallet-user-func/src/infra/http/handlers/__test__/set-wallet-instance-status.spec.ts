@@ -1,4 +1,5 @@
 import { CredentialRepository } from "@/credential";
+import { VoucherRepository } from "@/infra/voucher";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
@@ -48,6 +49,10 @@ describe("SetWalletInstanceStatusHandler", () => {
     revokeAllCredentials: () => TE.right(undefined),
   };
 
+  const pdndInteropClient: VoucherRepository = {
+    requestVoucher: () => TE.right(""),
+  };
+
   const telemetryClient: appInsights.TelemetryClient = {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
@@ -60,6 +65,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -90,6 +96,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -116,6 +123,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository,
     });
 
@@ -148,6 +156,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndInteropClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 

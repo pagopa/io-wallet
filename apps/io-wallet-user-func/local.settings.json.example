@@ -47,6 +47,10 @@
     "MailupSecret": "MAILUP_SECRET",
     "MailSender": "MAIL_SENDER",
     "AuthProfileApiKey": "AUTH_PROFILE_API_KEY",
-    "AuthProfileApiBaseURL": "AUTH_PROFILE_API_BASE_URL"
+    "AuthProfileApiBaseURL": "AUTH_PROFILE_API_BASE_URL",
+    "PdndInteropApiAudience": "PDND_INTEROP_API_AUDIENCE",
+    "PdndInteropApiBaseURL": "PDND_INTEROP_API_BASE_URL",
+    "PdndInteropApiClientId": "PDND_INTEROP_API_CLIENT_ID",
+    "PdndInteropApiKidId": "PDND_INTEROP_API_KID_ID"
   }
 }
