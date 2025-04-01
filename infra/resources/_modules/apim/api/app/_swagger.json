@@ -5,7 +5,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/token": {
+    "/wallet-attestation": {
       "description": "This is a token endpoint (as defined in RFC 7523 section 4)",
       "post": {
         "operationId": "createWalletAttestation",
