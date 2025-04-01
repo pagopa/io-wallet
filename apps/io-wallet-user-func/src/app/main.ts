@@ -34,7 +34,6 @@ import * as t from "io-ts";
 import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
 import {
   WalletInstance,
-  WalletInstanceValid,
   WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
 
@@ -286,7 +285,7 @@ app.cosmosDB("addWalletInstanceUserId", {
   containerName: "wallet-instances",
   databaseName: config.azure.cosmos.dbName,
   handler: AddWalletInstanceUserIdFunction({
-    inputDecoder: t.array(WalletInstanceValid),
+    inputDecoder: t.array(WalletInstance),
     telemetryClient: appInsightsClient,
   }),
   leaseContainerName: "leases-wallet-instances-user-id",
