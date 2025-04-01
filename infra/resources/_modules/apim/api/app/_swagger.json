@@ -164,9 +164,6 @@
             "minLength": 1,
             "format": "binary",
             "example": "eyJhbGciOiJFUzI1NiIsImtpZCI6InZiZVhKa3NNNDV4cGh0QU5uQ2lHNm1DeXVVNGpmR056b3BHdUt2b2dnOWMiLCJ0eXAiOiJ3YXIrand0In0.eyJpc3MiOiJodHRwczovL3dhbGxldC1wcm92aWRlci5leGFtcGxlLm9yZy9pbnN0YW5jZS92YmVYSmtzTTQ1eHBodEFObkNpRzZtQ3l1VTRqZkdOem9wR3VLdm9nZzljIiwic3ViIjoiaHR0cHM6Ly93YWxsZXQtcHJvdmlkZXIuZXhhbXBsZS5vcmcvIiwiY2hhbGxlbmdlIjoiNmVjNjkzMjQtNjBhOC00ZTViLWE2OTctYTc2NmQ4NTc5MGVhIiwiaGFyZHdhcmVfc2lnbmF0dXJlIjoiS29aSWh2Y05BUWNDb0lBd2dBSUIuLi5yZWRhY3RlZCIsImludGVncml0eV9hc3NlcnRpb24iOiJvMk5tYlhSdllYQndiR1V0WVhCd1lYLi4ucmVkYWN0ZWQiLCJoYXJkd2FyZV9rZXlfdGFnIjoiV1FoeUR5bUZLc1A5NWlGcXB6ZEVEV1c0bDdhVm5hMkZuNEpDZVdIWXRiVT0iLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4IjoiNEhOcHRJLXhyMnBqeVJKS0dNbno0V21kblFEX3VKU3E0Ujk1Tmo5OGI0NCIsInkiOiJMSVpuU0IzOXZGSmhZZ1MzazdqWEU0cjMtQ29HRlF3WnRQQklScXBObHJnIiwia2lkIjoidmJlWEprc000NXhwaHRBTm5DaUc2bUN5dVU0amZHTnpvcEd1S3ZvZ2c5YyJ9fSwidnBfZm9ybWF0c19zdXBwb3J0ZWQiOnsiand0X3ZjX2pzb24iOnsiYWxnX3ZhbHVlc19zdXBwb3J0ZWQiOlsiRVMyNTZLIiwiRVMzODQiXX0sImp3dF92cF9qc29uIjp7ImFsZ192YWx1ZXNfc3VwcG9ydGVkIjpbIkVTMjU2SyIsIkVkRFNBIl19fSwiaWF0IjoxNjg2NjQ1MTE1LCJleHAiOjE2ODY2NTIzMTV9.F32bisVth4eDdGxDjB9ByENT-oZLtSY_89uwTSePo2GMEKaeEedpXZE_9mrX7t0_Fmc5m6LNVvIIBqotqsYJYQ"
-          },
-          "fiscal_code": {
-            "$ref": "#/components/schemas/FiscalCode"
           }
         },
         "required": ["grant_type", "assertion"]
@@ -205,13 +202,6 @@
             "description": "An absolute URI that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced."
           }
         }
-      },
-      "FiscalCode": {
-        "type": "string",
-        "description": "User's fiscal code.",
-        "format": "FiscalCode",
-        "x-import": "@pagopa/ts-commons/lib/strings",
-        "example": "SPNDNL80R13C555X"
       }
     }
   }

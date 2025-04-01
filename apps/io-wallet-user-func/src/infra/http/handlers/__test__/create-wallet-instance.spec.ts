@@ -34,9 +34,9 @@ describe("CreateWalletInstanceHandler", () => {
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     deleteAllByUserId: () => TE.left(new Error("not implemented")),
-    get: () => TE.left(new Error("not implemented")),
     getByUserId: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
+    getUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.right(O.some([])),
     insert: () => TE.right(undefined),
   };
@@ -166,9 +166,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("not implemented")),
         deleteAllByUserId: () => TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
         getByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("failed on insert!")),
@@ -204,9 +204,9 @@ describe("CreateWalletInstanceHandler", () => {
     const walletInstanceRepositoryThatFails: WalletInstanceRepository = {
       batchPatch: () => TE.left(new Error("not implemented")),
       deleteAllByUserId: () => TE.left(new Error("not implemented")),
-      get: () => TE.left(new Error("not implemented")),
       getByUserId: () => TE.left(new Error("not implemented")),
       getLastByUserId: () => TE.left(new Error("not implemented")),
+      getUserId: () => TE.left(new Error("not implemented")),
       getValidByUserIdExcludingOne: () =>
         TE.left(new Error("failed on getValidByUserIdExcludingOne!")),
       insert: () => TE.left(new Error("not implemented")),
@@ -243,9 +243,9 @@ describe("CreateWalletInstanceHandler", () => {
       {
         batchPatch: () => TE.left(new Error("failed on batchPatch!")),
         deleteAllByUserId: () => TE.left(new Error("not implemented")),
-        get: () => TE.left(new Error("not implemented")),
         getByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
+        getUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),

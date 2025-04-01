@@ -1,4 +1,7 @@
-import { WalletInstanceRepository } from "@/wallet-instance";
+import {
+  WalletInstanceRepository,
+  WalletInstanceUserId,
+} from "@/wallet-instance";
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
@@ -27,7 +30,7 @@ export class CosmosDbWalletInstanceRepository
   #userIdKeyedContainer: Container;
 
   constructor(db: Database) {
-    this.#idKeyedContainer = db.container("wallet-instances-by-id");
+    this.#idKeyedContainer = db.container("wallet-instances-user-id");
     this.#userIdKeyedContainer = db.container("wallet-instances");
   }
 
@@ -104,31 +107,6 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  get(id: WalletInstance["id"]) {
-    return pipe(
-      TE.tryCatch(
-        () => this.#idKeyedContainer.item(id, id).read(),
-        toError("Error getting wallet instance"),
-      ),
-      TE.chain(({ resource }) =>
-        resource === undefined
-          ? TE.right(O.none)
-          : pipe(
-              resource,
-              WalletInstance.decode,
-              E.map(O.some),
-              E.mapLeft(
-                () =>
-                  new Error(
-                    "Error getting wallet instance: invalid result format",
-                  ),
-              ),
-              TE.fromEither,
-            ),
-      ),
-    );
-  }
-
   getByUserId(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(
@@ -189,6 +167,31 @@ export class CosmosDbWalletInstanceRepository
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  getUserId(id: WalletInstance["id"]) {
+    return pipe(
+      TE.tryCatch(
+        () => this.#idKeyedContainer.item(id, id).read(),
+        toError("Error getting wallet instance user id"),
+      ),
+      TE.chain(({ resource }) =>
+        resource === undefined
+          ? TE.right(O.none)
+          : pipe(
+              resource,
+              WalletInstanceUserId.decode,
+              E.map(O.some),
+              E.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting wallet instance user id: invalid result format",
+                  ),
+              ),
+              TE.fromEither,
+            ),
       ),
     );
   }

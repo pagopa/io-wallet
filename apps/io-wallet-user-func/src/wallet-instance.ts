@@ -1,9 +1,11 @@
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
+import * as t from "io-ts";
 import { EntityNotFoundError } from "io-wallet-common/error";
 import {
   RevocationReason,
@@ -18,6 +20,13 @@ class RevokedWalletInstance extends Error {
     super("The wallet instance has been revoked.");
   }
 }
+
+export const WalletInstanceUserId = t.type({
+  id: NonEmptyString,
+  userId: FiscalCode,
+});
+
+export type WalletInstanceUserId = t.TypeOf<typeof WalletInstanceUserId>;
 
 export interface WalletInstanceRepository {
   batchPatch: (
@@ -34,9 +43,6 @@ export interface WalletInstanceRepository {
   deleteAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, void>;
-  get: (
-    id: WalletInstance["id"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getByUserId: (
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -44,6 +50,9 @@ export interface WalletInstanceRepository {
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  getUserId: (
+    id: WalletInstance["id"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstanceUserId>>;
   getValidByUserIdExcludingOne: (
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -91,27 +100,22 @@ export const insertWalletInstance: (
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
 
-export const getValidWalletInstance: (
+export const getWalletInstanceUserId: (
   id: WalletInstance["id"],
 ) => RTE.ReaderTaskEither<
   WalletInstanceEnvironment,
   Error,
-  WalletInstanceValid
+  WalletInstanceUserId
 > =
   (id) =>
   ({ walletInstanceRepository }) =>
     pipe(
       id,
-      walletInstanceRepository.get,
+      walletInstanceRepository.getUserId,
       TE.chain(
         TE.fromOption(
           () => new EntityNotFoundError("Wallet instance not found"),
         ),
-      ),
-      TE.chain((walletInstance) =>
-        walletInstance.isRevoked
-          ? TE.left(new RevokedWalletInstance())
-          : TE.right(walletInstance),
       ),
     );
 

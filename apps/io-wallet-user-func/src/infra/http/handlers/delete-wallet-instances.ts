@@ -8,6 +8,7 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { requireFiscalCodeFromHeader } from "../fiscal-code";
 
+// delete wallet instances from `wallet-instances-user-id` collection
 export const DeleteWalletInstancesHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req,
