@@ -299,7 +299,7 @@ app.cosmosDB("addWalletInstanceUserId", {
   startFromBeginning: true,
 });
 
-// this will be the new token endpoint
+// this will replace the token endpoint
 app.http("createWalletAttestationV2", {
   authLevel: "function",
   handler: withAppInsights(
