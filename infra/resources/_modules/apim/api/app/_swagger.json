@@ -6,7 +6,6 @@
   },
   "paths": {
     "/wallet-attestation": {
-      "description": "This is a token endpoint (as defined in RFC 7523 section 4)",
       "post": {
         "operationId": "createWalletAttestation",
         "summary": "Create and return a Wallet Attestation",
