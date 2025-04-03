@@ -105,7 +105,6 @@ paths:
           $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-attestation:
-    description: This is a token endpoint (as defined in RFC 7523 section 4)
     post:
       operationId: createWalletAttestationV2
       summary: Create and return a Wallet Attestation
