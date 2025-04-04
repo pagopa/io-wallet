@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.1.0
+
+### Minor Changes
+
+- 6b58b6f: Added endpoint createWalletAttestationV2
+
 ## 3.0.4
 
 ### Patch Changes
