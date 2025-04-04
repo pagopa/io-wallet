@@ -1,9 +1,11 @@
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
+import * as t from "io-ts";
 import { EntityNotFoundError } from "io-wallet-common/error";
 import {
   RevocationReason,
@@ -18,6 +20,13 @@ class RevokedWalletInstance extends Error {
     super("The wallet instance has been revoked.");
   }
 }
+
+export const WalletInstanceUserId = t.type({
+  id: NonEmptyString,
+  userId: FiscalCode,
+});
+
+export type WalletInstanceUserId = t.TypeOf<typeof WalletInstanceUserId>;
 
 export interface WalletInstanceRepository {
   batchPatch: (
@@ -34,13 +43,16 @@ export interface WalletInstanceRepository {
   deleteAllByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, void>;
-  get: (
+  getByUserId: (
     id: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  getUserId: (
+    id: WalletInstance["id"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstanceUserId>>;
   getValidByUserIdExcludingOne: (
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -52,14 +64,14 @@ export interface WalletInstanceEnvironment {
   walletInstanceRepository: WalletInstanceRepository;
 }
 
-export const getWalletInstance: (
+export const getWalletInstanceByUserId: (
   id: WalletInstance["id"],
   userId: WalletInstance["userId"],
 ) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, WalletInstance> =
   (id, userId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.get(id, userId),
+      walletInstanceRepository.getByUserId(id, userId),
       TE.chain(
         TE.fromOption(
           () => new EntityNotFoundError("Wallet instance not found"),
@@ -88,7 +100,26 @@ export const insertWalletInstance: (
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
 
-export const getValidWalletInstance: (
+export const getWalletInstanceUserId: (
+  id: WalletInstance["id"],
+) => RTE.ReaderTaskEither<
+  WalletInstanceEnvironment,
+  Error,
+  WalletInstanceUserId
+> =
+  (id) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      id,
+      walletInstanceRepository.getUserId,
+      TE.chain(
+        TE.fromOption(
+          () => new EntityNotFoundError("Wallet instance not found"),
+        ),
+      ),
+    );
+
+export const getValidWalletInstanceByUserId: (
   id: WalletInstance["id"],
   userId: WalletInstance["userId"],
 ) => RTE.ReaderTaskEither<
@@ -99,7 +130,7 @@ export const getValidWalletInstance: (
   (id, userId) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      walletInstanceRepository.get(id, userId),
+      walletInstanceRepository.getByUserId(id, userId),
       TE.chain(
         TE.fromOption(
           () => new EntityNotFoundError("Wallet instance not found"),
@@ -121,7 +152,7 @@ export const getValidWalletInstanceWithAndroidCertificatesChain: (
   WalletInstanceValidWithAndroidCertificatesChain
 > = (id, userId) =>
   pipe(
-    getValidWalletInstance(id, userId),
+    getValidWalletInstanceByUserId(id, userId),
     RTE.chainEitherK(
       flow(
         WalletInstanceValidWithAndroidCertificatesChain.decode,

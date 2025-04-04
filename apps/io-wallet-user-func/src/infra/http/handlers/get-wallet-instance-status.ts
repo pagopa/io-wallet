@@ -1,4 +1,4 @@
-import { getWalletInstance } from "@/wallet-instance";
+import { getWalletInstanceByUserId } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/lib/Either";
@@ -20,7 +20,7 @@ export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
     RTE.fromEither,
     RTE.chainW(({ fiscalCode, walletInstanceId }) =>
       pipe(
-        getWalletInstance(walletInstanceId, fiscalCode),
+        getWalletInstanceByUserId(walletInstanceId, fiscalCode),
         RTE.map(WalletInstanceToStatusApiModel.encode),
         RTE.map(H.successJson),
         RTE.orElseFirstW((error) =>

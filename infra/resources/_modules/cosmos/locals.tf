@@ -1,7 +1,7 @@
 locals {
   wallet_cosmosdb_containers = [
     # Each document represents a wallet instance
-    # The userId partition key is the tokenized identifier of the user
+    # The userId partition key is the user fiscal code
     {
       name               = "wallet-instances"
       partition_key_path = "/userId"
@@ -20,7 +20,23 @@ locals {
       default_ttl = 300
     },
     {
+      name               = "wallet-instances-user-id"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 8000
+      }
+      default_ttl = null
+    },
+    {
       name               = "leases-revoke-wallet-instance"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 1000
+      }
+      default_ttl = null
+    },
+    {
+      name               = "leases-wallet-instances-user-id"
       partition_key_path = "/id"
       autoscale_settings = {
         max_throughput = 1000

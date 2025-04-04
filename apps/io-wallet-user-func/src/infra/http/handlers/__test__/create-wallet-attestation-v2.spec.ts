@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { AttestationService } from "@/attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -15,7 +14,7 @@ import * as TE from "fp-ts/TaskEither";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
-import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
+import { CreateWalletAttestationV2Handler } from "../create-wallet-attestation-v2";
 import { privateEcKey, publicEcKey, signer } from "./keys";
 import { federationEntityMetadata } from "./trust-anchor";
 
@@ -64,7 +63,13 @@ const walletInstanceRepository: WalletInstanceRepository = {
       }),
     ),
   getLastByUserId: () => TE.left(new Error("not implemented")),
-  getUserId: () => TE.left(new Error("not implemented")),
+  getUserId: () =>
+    TE.right(
+      O.some({
+        id: "123" as NonEmptyString,
+        userId: mockFiscalCode,
+      }),
+    ),
   getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
 };
@@ -76,7 +81,7 @@ const telemetryClient: appInsights.TelemetryClient = {
   trackException: () => void 0,
 } as unknown as appInsights.TelemetryClient;
 
-describe("CreateWalletAttestationHandler", async () => {
+describe("CreateWalletAttestationV2Handler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
     challenge,
@@ -103,12 +108,11 @@ describe("CreateWalletAttestationHandler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationHandler({
+    const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
@@ -156,7 +160,7 @@ describe("CreateWalletAttestationHandler", async () => {
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationHandler({
+    const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
@@ -181,8 +185,7 @@ describe("CreateWalletAttestationHandler", async () => {
 
   it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
     const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
-      batchPatch: () => TE.left(new Error("not implemented")),
-      deleteAllByUserId: () => TE.left(new Error("not implemented")),
+      ...walletInstanceRepository,
       getByUserId: () =>
         TE.right(
           O.some({
@@ -195,21 +198,16 @@ describe("CreateWalletAttestationHandler", async () => {
             userId: mockFiscalCode,
           }),
         ),
-      getLastByUserId: () => TE.left(new Error("not implemented")),
-      getUserId: () => TE.left(new Error("not implemented")),
-      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
-      insert: () => TE.left(new Error("not implemented")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationHandler({
+    const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,
@@ -239,24 +237,19 @@ describe("CreateWalletAttestationHandler", async () => {
 
   it("should return a 404 HTTP response when the wallet instance is not found", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
-      batchPatch: () => TE.left(new Error("not implemented")),
-      deleteAllByUserId: () => TE.left(new Error("not implemented")),
+      ...walletInstanceRepository,
       getByUserId: () => TE.right(O.none),
-      getLastByUserId: () => TE.left(new Error("not implemented")),
-      getUserId: () => TE.left(new Error("not implemented")),
-      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
-      insert: () => TE.left(new Error("not implemented")),
+      getUserId: () => TE.right(O.none),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        fiscal_code: "AAACCC94E17H501P",
         grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationHandler({
+    const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntityMetadata,
       input: req,

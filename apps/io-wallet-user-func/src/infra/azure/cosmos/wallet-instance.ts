@@ -1,4 +1,7 @@
-import { WalletInstanceRepository } from "@/wallet-instance";
+import {
+  WalletInstanceRepository,
+  WalletInstanceUserId,
+} from "@/wallet-instance";
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
@@ -23,10 +26,12 @@ const toError = (genericMessage: string) => (error: unknown) =>
 export class CosmosDbWalletInstanceRepository
   implements WalletInstanceRepository
 {
-  #container: Container;
+  #idKeyedContainer: Container;
+  #userIdKeyedContainer: Container;
 
   constructor(db: Database) {
-    this.#container = db.container("wallet-instances");
+    this.#idKeyedContainer = db.container("wallet-instances-user-id");
+    this.#userIdKeyedContainer = db.container("wallet-instances");
   }
 
   private delete(
@@ -34,7 +39,7 @@ export class CosmosDbWalletInstanceRepository
     userId: WalletInstance["userId"],
   ): TE.TaskEither<Error, void> {
     return TE.tryCatch(async () => {
-      await this.#container.item(id, userId).delete();
+      await this.#userIdKeyedContainer.item(id, userId).delete();
     }, toError("Error deleting wallet instance"));
   }
 
@@ -43,7 +48,7 @@ export class CosmosDbWalletInstanceRepository
   ): TE.TaskEither<Error, WalletInstance[]> {
     return pipe(
       TE.tryCatch(async () => {
-        const { resources: items } = await this.#container.items
+        const { resources: items } = await this.#userIdKeyedContainer.items
           .readAll({
             partitionKey: userId,
           })
@@ -86,7 +91,7 @@ export class CosmosDbWalletInstanceRepository
           },
         }),
       );
-      await this.#container.items.batch(operations, userId);
+      await this.#userIdKeyedContainer.items.batch(operations, userId);
     }, toError("Error updating wallet instances"));
   }
 
@@ -102,10 +107,10 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
-  get(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
+  getByUserId(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(
-        () => this.#container.item(id, userId).read(),
+        () => this.#userIdKeyedContainer.item(id, userId).read(),
         toError("Error getting wallet instance"),
       ),
       TE.chain(({ resource }) =>
@@ -130,7 +135,7 @@ export class CosmosDbWalletInstanceRepository
   getLastByUserId(userId: WalletInstance["userId"]) {
     return pipe(
       TE.tryCatch(async () => {
-        const { resources: items } = await this.#container.items
+        const { resources: items } = await this.#userIdKeyedContainer.items
           .query({
             parameters: [
               {
@@ -166,13 +171,38 @@ export class CosmosDbWalletInstanceRepository
     );
   }
 
+  getUserId(id: WalletInstance["id"]) {
+    return pipe(
+      TE.tryCatch(
+        () => this.#idKeyedContainer.item(id, id).read(),
+        toError("Error getting wallet instance user id"),
+      ),
+      TE.chain(({ resource }) =>
+        resource === undefined
+          ? TE.right(O.none)
+          : pipe(
+              resource,
+              WalletInstanceUserId.decode,
+              E.map(O.some),
+              E.mapLeft(
+                () =>
+                  new Error(
+                    "Error getting wallet instance user id: invalid result format",
+                  ),
+              ),
+              TE.fromEither,
+            ),
+      ),
+    );
+  }
+
   getValidByUserIdExcludingOne(
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
   ) {
     return pipe(
       TE.tryCatch(async () => {
-        const { resources: items } = await this.#container.items
+        const { resources: items } = await this.#userIdKeyedContainer.items
           .query({
             parameters: [
               {
@@ -217,7 +247,12 @@ export class CosmosDbWalletInstanceRepository
 
   insert(walletInstance: WalletInstance) {
     return TE.tryCatch(async () => {
-      await this.#container.items.create(walletInstance);
+      await this.#userIdKeyedContainer.items.create(walletInstance);
+      // we will uncomment when idKeyedContainer is synchronized with userIdKeyedContainer
+      // await this.#idKeyedContainer.items.create({
+      //   id: walletInstance.id,
+      //   userId: walletInstance.userId,
+      // });
     }, toError("Error inserting wallet instance"));
   }
 }

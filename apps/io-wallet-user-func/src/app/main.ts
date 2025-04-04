@@ -3,7 +3,9 @@ import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
+import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
+import { CreateWalletAttestationV2Function } from "@/infra/azure/functions/create-wallet-attestation-v2";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { DeleteWalletInstancesFunction } from "@/infra/azure/functions/delete-wallet-instances";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
@@ -276,4 +278,40 @@ app.http("deleteWalletInstances", {
   ),
   methods: ["DELETE"],
   route: "wallet-instances",
+});
+
+app.cosmosDB("addWalletInstanceUserId", {
+  connection: "CosmosDbEndpoint",
+  containerName: "wallet-instances",
+  databaseName: config.azure.cosmos.dbName,
+  handler: AddWalletInstanceUserIdFunction({
+    inputDecoder: t.array(WalletInstance),
+    telemetryClient: appInsightsClient,
+  }),
+  leaseContainerName: "leases-wallet-instances-user-id",
+  leaseContainerPrefix: "wallet-instances-user-id-",
+  return: output.cosmosDB({
+    connection: "CosmosDbEndpoint",
+    containerName: "wallet-instances-user-id",
+    createIfNotExists: false,
+    databaseName: config.azure.cosmos.dbName,
+  }),
+  startFromBeginning: true,
+});
+
+// this will replace the token endpoint
+app.http("createWalletAttestationV2", {
+  authLevel: "function",
+  handler: withAppInsights(
+    CreateWalletAttestationV2Function({
+      attestationService: mobileAttestationService,
+      federationEntityMetadata: config.federationEntity,
+      nonceRepository,
+      signer,
+      telemetryClient: appInsightsClient,
+      walletInstanceRepository,
+    }),
+  ),
+  methods: ["POST"],
+  route: "wallet-attestation",
 });
