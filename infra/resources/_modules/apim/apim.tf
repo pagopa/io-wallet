@@ -203,7 +203,7 @@ resource "azurerm_api_management_named_value" "app_func_key" {
   resource_group_name = var.apim.resource_group_name
   display_name        = "io-wallet-user-func-create-wa-key"
   value               = data.azurerm_key_vault_secret.user_func_key_app.value
-  secret              = "true"
+  secret              = true
 }
 
 data "azurerm_key_vault_secret" "user_func_key_app" {
