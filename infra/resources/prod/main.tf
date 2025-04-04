@@ -234,7 +234,7 @@ module "storage_accounts" {
   prefix          = local.prefix
   env_short       = local.env_short
   location        = local.location
-  domain          = null
+  domain          = ""
   app_name        = local.domain
   instance_number = "01"
 
