@@ -1,9 +1,11 @@
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
+import { CosmosDbFiscalCodeRepository } from "@/infra/azure/cosmos/fiscal-code";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
+import { CheckFiscalCodeFunction } from "@/infra/azure/functions/check-fiscal-code";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletAttestationV2Function } from "@/infra/azure/functions/create-wallet-attestation-v2";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
@@ -87,6 +89,8 @@ const nonceRepository = new CosmosDbNonceRepository(database);
 const signer = new CryptoSigner(config.crypto);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
+
+const fiscalCodeRepository = new CosmosDbFiscalCodeRepository(database);
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
@@ -314,4 +318,15 @@ app.http("createWalletAttestationV2", {
   ),
   methods: ["POST"],
   route: "wallet-attestation",
+});
+
+app.http("checkFiscalCode", {
+  authLevel: "function",
+  handler: withAppInsights(
+    CheckFiscalCodeFunction({
+      fiscalCodeRepository,
+    }),
+  ),
+  methods: ["GET"],
+  route: "fiscal-codes/{fiscalCode}/check",
 });

@@ -250,6 +250,26 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /fiscal-codes/{fiscalCode}/check:
+    get:
+      operationId: checkFiscalCode
+      summary: Used to check if the fiscal code exists into the db
+      security:
+        - FunctionsKey: []
+      parameters:
+        - in: path
+          name: fiscalCode
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The fiscal code exists
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 components:
   securitySchemes:
     FunctionsKey:

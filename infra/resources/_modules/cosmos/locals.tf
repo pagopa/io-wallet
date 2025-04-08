@@ -42,6 +42,14 @@ locals {
         max_throughput = 1000
       }
       default_ttl = null
-    }
+    },
+    {
+      name               = "fiscal-codes"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 1000
+      }
+      default_ttl = null
+    },
   ]
 }
