@@ -1,11 +1,11 @@
-import { checkFiscalCode } from "@/fiscal-code";
+import { isFiscalCodeWhitelisted } from "@/fiscal-code";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { lookup } from "fp-ts/Record";
 import { pipe } from "fp-ts/function";
+import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 export const requireFiscalCode: (
@@ -20,19 +20,20 @@ export const requireFiscalCode: (
     E.chainW(H.parse(NonEmptyString, `Invalid "fiscalCode" supplied`)),
   );
 
-export const CheckFiscalCodeHandler = H.of((req: H.HttpRequest) =>
+export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
   pipe(
-    sequenceS(E.Apply)({
-      fiscalCode: pipe(req, requireFiscalCode),
-    }),
+    pipe(req, requireFiscalCode),
     RTE.fromEither,
-    RTE.chain(({ fiscalCode }) =>
+    RTE.chain((fiscalCode) => isFiscalCodeWhitelisted(fiscalCode)),
+    RTE.map(H.successJson),
+    RTE.orElseFirstW((error) =>
       pipe(
-        checkFiscalCode(fiscalCode),
-        RTE.map(() => ({})),
+        sendTelemetryException(error, {
+          functionName: "IsFiscalCodeWhitelisted",
+        }),
+        RTE.fromReader,
       ),
     ),
-    RTE.map(H.successJson),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );

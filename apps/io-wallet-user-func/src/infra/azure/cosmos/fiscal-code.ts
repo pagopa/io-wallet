@@ -18,7 +18,9 @@ export class CosmosDbFiscalCodeRepository implements FiscalCodeRepository {
     this.#containerName = db.container("fiscal-codes");
   }
 
-  checkByFiscalCode(fiscalCode: NonEmptyString): TE.TaskEither<Error, boolean> {
+  isFiscalCodeWhitelisted(
+    fiscalCode: NonEmptyString,
+  ): TE.TaskEither<Error, boolean> {
     return TE.tryCatch(async () => {
       const { resources } = await this.#containerName.items
         .query({

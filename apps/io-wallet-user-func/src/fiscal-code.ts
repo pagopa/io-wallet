@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/lib/function";
 import { EntityNotFoundError } from "io-wallet-common/error";
 
 export interface FiscalCodeRepository {
-  checkByFiscalCode: (
+  isFiscalCodeWhitelisted: (
     fiscalCode: NonEmptyString,
   ) => TE.TaskEither<Error, boolean>;
 }
@@ -14,16 +14,16 @@ export interface FiscalCodeEnvironment {
   fiscalCodeRepository: FiscalCodeRepository;
 }
 
-export const checkFiscalCode: (
+export const isFiscalCodeWhitelisted: (
   fiscalCode: NonEmptyString,
-) => RTE.ReaderTaskEither<FiscalCodeEnvironment, Error, boolean> =
+) => RTE.ReaderTaskEither<FiscalCodeEnvironment, Error, void> =
   (fiscalCode) =>
   ({ fiscalCodeRepository }) =>
     pipe(
-      fiscalCodeRepository.checkByFiscalCode(fiscalCode),
+      fiscalCodeRepository.isFiscalCodeWhitelisted(fiscalCode),
       TE.chain((result) =>
         result
-          ? TE.right(true)
+          ? TE.right(void 0)
           : TE.left(new EntityNotFoundError("Fiscal code not found")),
       ),
     );

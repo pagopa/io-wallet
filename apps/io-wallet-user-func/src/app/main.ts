@@ -5,7 +5,6 @@ import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
-import { CheckFiscalCodeFunction } from "@/infra/azure/functions/check-fiscal-code";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletAttestationV2Function } from "@/infra/azure/functions/create-wallet-attestation-v2";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
@@ -15,6 +14,7 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/is-fiscal-code-whitelisted";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
@@ -320,13 +320,14 @@ app.http("createWalletAttestationV2", {
   route: "wallet-attestation",
 });
 
-app.http("checkFiscalCode", {
+app.http("IsFiscalCodeWhitelisted", {
   authLevel: "function",
   handler: withAppInsights(
-    CheckFiscalCodeFunction({
+    IsFiscalCodeWhitelistedFunction({
       fiscalCodeRepository,
+      telemetryClient: appInsightsClient,
     }),
   ),
   methods: ["GET"],
-  route: "fiscal-codes/{fiscalCode}/check",
+  route: "fiscal-codes/{fiscalCode}",
 });

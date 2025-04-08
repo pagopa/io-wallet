@@ -1,25 +1,30 @@
 import { FiscalCodeRepository } from "@/fiscal-code";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
+import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { EntityNotFoundError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
 
-import { CheckFiscalCodeHandler } from "../check-fiscal-code";
+import { IsFiscalCodeWhitelistedHandler } from "../is-fiscal-code-whitelisted";
 
-describe("CheckFiscalCodeHandler", () => {
+describe("IsFiscalCodeWhitelistedHandler", () => {
   const fiscalCodeRepositoryThatReturnsTrue: FiscalCodeRepository = {
-    checkByFiscalCode: () => TE.right(true),
+    isFiscalCodeWhitelisted: () => TE.right(true),
   };
 
   const fiscalCodeRepositoryThatReturnsFalse: FiscalCodeRepository = {
-    checkByFiscalCode: () =>
+    isFiscalCodeWhitelisted: () =>
       TE.left(new EntityNotFoundError("Fiscal code not found")),
   };
 
   const fiscalCodeRepositoryThatFails: FiscalCodeRepository = {
-    checkByFiscalCode: () => TE.left(new Error("generic error")),
+    isFiscalCodeWhitelisted: () => TE.left(new Error("generic error")),
   };
+
+  const telemetryClient: appInsights.TelemetryClient = {
+    trackException: () => void 0,
+  } as unknown as appInsights.TelemetryClient;
 
   const logger = {
     format: L.format.simple,
@@ -35,17 +40,18 @@ describe("CheckFiscalCodeHandler", () => {
   };
 
   it("should return a 200 HTTP response on success", async () => {
-    const handler = CheckFiscalCodeHandler({
+    const handler = IsFiscalCodeWhitelistedHandler({
       fiscalCodeRepository: fiscalCodeRepositoryThatReturnsTrue,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
-        body: {},
+        body: void 0,
         headers: expect.objectContaining({
           "Content-Type": "application/json",
         }),
@@ -54,12 +60,13 @@ describe("CheckFiscalCodeHandler", () => {
     });
   });
 
-  it("should return a 404 HTTP response when fiscalCodeRepository.checkByFiscalCode() returns false", async () => {
-    const handler = CheckFiscalCodeHandler({
+  it("should return a 404 HTTP response when fiscalCodeRepository.isFiscalCodeWhitelisted() returns false", async () => {
+    const handler = IsFiscalCodeWhitelistedHandler({
       fiscalCodeRepository: fiscalCodeRepositoryThatReturnsFalse,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -79,11 +86,12 @@ describe("CheckFiscalCodeHandler", () => {
   });
 
   it("should return a 500 HTTP response when getCosmosHealth and getPidIssuerHealth return an error", async () => {
-    const handler = CheckFiscalCodeHandler({
+    const handler = IsFiscalCodeWhitelistedHandler({
       fiscalCodeRepository: fiscalCodeRepositoryThatFails,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      telemetryClient,
     });
 
     await expect(handler()).resolves.toEqual({

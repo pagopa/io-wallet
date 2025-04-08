@@ -250,10 +250,10 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /fiscal-codes/{fiscalCode}/check:
+  /fiscal-codes/{fiscalCode}:
     get:
-      operationId: checkFiscalCode
-      summary: Used to check if the fiscal code exists into the db
+      operationId: IsFiscalCodeWhitelisted
+      summary: Used to check if the fiscal code is in the whitelist
       security:
         - FunctionsKey: []
       parameters:
