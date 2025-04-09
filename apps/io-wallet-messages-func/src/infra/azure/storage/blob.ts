@@ -5,22 +5,9 @@ import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import { v4 as uuidv4 } from "uuid";
 
-class StorageBlobError extends Error {
-  errorCode?: string;
-  name = "StorageBlobError";
-  constructor(errorCode?: string) {
-    super("Unable to upload the file.");
-    this.errorCode = errorCode;
-  }
-}
-
 export const uploadFile: (
   buffer: Buffer<ArrayBuffer>,
-) => RTE.ReaderTaskEither<
-  { containerClient: ContainerClient },
-  StorageBlobError,
-  void
-> =
+) => RTE.ReaderTaskEither<{ containerClient: ContainerClient }, never, void> =
   (buffer) =>
   ({ containerClient }) =>
     pipe(
@@ -31,9 +18,6 @@ export const uploadFile: (
             .uploadData(buffer),
         E.toError,
       ),
-      TE.filterOrElse(
-        (response) => response.errorCode === undefined,
-        (response) => new StorageBlobError(response.errorCode),
-      ),
       TE.map(() => undefined),
+      TE.orElse(() => TE.right(undefined)),
     );
