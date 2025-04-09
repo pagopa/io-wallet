@@ -3,23 +3,27 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
-import { EntityNotFoundError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
 
 import { IsFiscalCodeWhitelistedHandler } from "../is-fiscal-code-whitelisted";
 
 describe("IsFiscalCodeWhitelistedHandler", () => {
-  const fiscalCodeRepositoryThatReturnsTrue: FiscalCodeRepository = {
-    isFiscalCodeWhitelisted: () => TE.right(true),
-  };
+  const fiscalCodeRepositoryThatReturnsWhitelistedFiscalCode: FiscalCodeRepository =
+    {
+      getFiscalCodeWhitelisted: () =>
+        TE.right({
+          whitelisted: true,
+          whitelistedAt: new Date().toISOString(),
+        }),
+    };
 
-  const fiscalCodeRepositoryThatReturnsFalse: FiscalCodeRepository = {
-    isFiscalCodeWhitelisted: () =>
-      TE.left(new EntityNotFoundError("Fiscal code not found")),
-  };
+  const fiscalCodeRepositoryThatReturnsNonWhitelistedFiscalCode: FiscalCodeRepository =
+    {
+      getFiscalCodeWhitelisted: () => TE.right({ whitelisted: false }),
+    };
 
   const fiscalCodeRepositoryThatFails: FiscalCodeRepository = {
-    isFiscalCodeWhitelisted: () => TE.left(new Error("generic error")),
+    getFiscalCodeWhitelisted: () => TE.left(new Error("generic error")),
   };
 
   const telemetryClient: appInsights.TelemetryClient = {
@@ -39,30 +43,10 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
     },
   };
 
-  it("should return a 200 HTTP response on success", async () => {
+  it("should return a 200 HTTP response whit whitelisted = true", async () => {
     const handler = IsFiscalCodeWhitelistedHandler({
-      fiscalCodeRepository: fiscalCodeRepositoryThatReturnsTrue,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      telemetryClient,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: {
-        body: void 0,
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-        statusCode: 200,
-      },
-    });
-  });
-
-  it("should return a 404 HTTP response when fiscalCodeRepository.isFiscalCodeWhitelisted() returns false", async () => {
-    const handler = IsFiscalCodeWhitelistedHandler({
-      fiscalCodeRepository: fiscalCodeRepositoryThatReturnsFalse,
+      fiscalCodeRepository:
+        fiscalCodeRepositoryThatReturnsWhitelistedFiscalCode,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -73,14 +57,39 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       _tag: "Right",
       right: {
         body: {
-          detail: "Fiscal code not found",
-          status: 404,
-          title: "Not Found",
+          fiscalCode: "TEST_FISCAL_CODE",
+          whitelisted: true,
+          whitelistedAt: expect.any(String),
         },
         headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
+          "Content-Type": "application/json",
         }),
-        statusCode: 404,
+        statusCode: 200,
+      },
+    });
+  });
+
+  it("should return a 200 HTTP response when with whitelisted = false", async () => {
+    const handler = IsFiscalCodeWhitelistedHandler({
+      fiscalCodeRepository:
+        fiscalCodeRepositoryThatReturnsNonWhitelistedFiscalCode,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          fiscalCode: "TEST_FISCAL_CODE",
+          whitelisted: false,
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
       },
     });
   });

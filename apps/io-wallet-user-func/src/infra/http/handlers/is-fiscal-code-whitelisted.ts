@@ -1,4 +1,4 @@
-import { checkFiscalCodeWhitelist } from "@/fiscal-code";
+import { getFiscalCodeWhitelisted } from "@/fiscal-code";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
@@ -24,7 +24,16 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
   pipe(
     pipe(req, requireFiscalCode),
     RTE.fromEither,
-    RTE.chain(checkFiscalCodeWhitelist),
+    RTE.chain((fiscalCode) =>
+      pipe(
+        getFiscalCodeWhitelisted(fiscalCode),
+        RTE.map(({ whitelisted, whitelistedAt }) => ({
+          fiscalCode,
+          whitelisted,
+          ...(whitelisted ? { whitelistedAt } : {}),
+        })),
+      ),
+    ),
     RTE.map(H.successJson),
     RTE.orElseFirstW((error) =>
       pipe(

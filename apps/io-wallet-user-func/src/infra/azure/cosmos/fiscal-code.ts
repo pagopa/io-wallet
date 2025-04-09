@@ -18,14 +18,23 @@ export class CosmosDbFiscalCodeRepository implements FiscalCodeRepository {
     this.#containerName = db.container("whitelisted-fiscal-codes");
   }
 
-  isFiscalCodeWhitelisted(
+  getFiscalCodeWhitelisted(
     fiscalCode: NonEmptyString,
-  ): TE.TaskEither<Error, boolean> {
+  ): TE.TaskEither<Error, { whitelisted: boolean; whitelistedAt?: string }> {
     return TE.tryCatch(async () => {
       const { resource } = await this.#containerName
         .item(fiscalCode, fiscalCode)
         .read();
-      return resource !== undefined;
+      if (resource !== undefined) {
+        return {
+          whitelisted: true,
+          whitelistedAt: new Date(resource._ts * 1000).toISOString(),
+        };
+      } else {
+        return {
+          whitelisted: false,
+        };
+      }
     }, toError("Failed to check fiscal code"));
   }
 }
