@@ -3,27 +3,29 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 
-export interface FiscalCodeRepository {
-  getFiscalCodeWhitelisted: (
+export interface WhitelistedFiscalCodeRepository {
+  checkIfFiscalCodeIsWhitelisted: (
     fiscalCode: FiscalCode,
   ) => TE.TaskEither<Error, { whitelisted: boolean; whitelistedAt?: string }>;
 }
 
-export interface FiscalCodeEnvironment {
-  fiscalCodeRepository: FiscalCodeRepository;
+export interface WhitelistedFiscalCodeEnvironment {
+  whitelistedFiscalCodeRepository: WhitelistedFiscalCodeRepository;
 }
 
-export const getFiscalCodeWhitelisted: (
+export const checkIfFiscalCodeIsWhitelisted: (
   fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<
-  FiscalCodeEnvironment,
+  WhitelistedFiscalCodeEnvironment,
   Error,
   { whitelisted: boolean; whitelistedAt?: string }
 > =
   (fiscalCode) =>
-  ({ fiscalCodeRepository }) =>
+  ({ whitelistedFiscalCodeRepository }) =>
     pipe(
-      fiscalCodeRepository.getFiscalCodeWhitelisted(fiscalCode),
+      whitelistedFiscalCodeRepository.checkIfFiscalCodeIsWhitelisted(
+        fiscalCode,
+      ),
       TE.map(({ whitelisted, whitelistedAt }) => ({
         whitelisted,
         whitelistedAt,

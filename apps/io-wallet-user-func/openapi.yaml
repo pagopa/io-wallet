@@ -264,11 +264,13 @@ paths:
             type: string
       responses:
         "200":
-          description: Fiscal code is whitelisted
+          description: Returned when no issues were found in either case (fiscal code whitelisted, or not)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FiscalCodeWhitelistedData"
+                $ref: "#/components/schemas/FiscalCodeData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -489,8 +491,11 @@ components:
       x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
 
-    FiscalCodeWhitelistedData:
+    FiscalCodeData:
       type: object
+      required:
+        - whitelisted
+        - fiscalCode
       properties:
         whitelisted:
           type: boolean
@@ -500,6 +505,7 @@ components:
           type: string
           description: |-
             Date, expressed in ISO 8601 format, when the fiscal code was added to the whitelist.
+            Only present if the fiscal code is whitelisted.
         fiscalCode:
           type: string
           description: |-

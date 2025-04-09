@@ -1,6 +1,6 @@
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
-import { CosmosDbFiscalCodeRepository } from "@/infra/azure/cosmos/fiscal-code";
+import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/fiscal-code";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
@@ -90,7 +90,8 @@ const signer = new CryptoSigner(config.crypto);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const fiscalCodeRepository = new CosmosDbFiscalCodeRepository(database);
+const whitelistedFiscalCodeRepository =
+  new CosmosDbWhitelistedFiscalCodeRepository(database);
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
@@ -324,8 +325,8 @@ app.http("IsFiscalCodeWhitelisted", {
   authLevel: "function",
   handler: withAppInsights(
     IsFiscalCodeWhitelistedFunction({
-      fiscalCodeRepository,
       telemetryClient: appInsightsClient,
+      whitelistedFiscalCodeRepository,
     }),
   ),
   methods: ["GET"],

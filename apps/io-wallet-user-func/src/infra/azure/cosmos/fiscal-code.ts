@@ -1,4 +1,4 @@
-import { FiscalCodeRepository } from "@/fiscal-code";
+import { WhitelistedFiscalCodeRepository } from "@/fiscal-code";
 import { Container, Database } from "@azure/cosmos";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -11,14 +11,16 @@ const toError = (genericMessage: string) => (error: unknown) =>
       )
     : new Error(`${genericMessage}: ${error}`);
 
-export class CosmosDbFiscalCodeRepository implements FiscalCodeRepository {
+export class CosmosDbWhitelistedFiscalCodeRepository
+  implements WhitelistedFiscalCodeRepository
+{
   #containerName: Container;
 
   constructor(db: Database) {
     this.#containerName = db.container("whitelisted-fiscal-codes");
   }
 
-  getFiscalCodeWhitelisted(
+  checkIfFiscalCodeIsWhitelisted(
     fiscalCode: FiscalCode,
   ): TE.TaskEither<Error, { whitelisted: boolean; whitelistedAt?: string }> {
     return TE.tryCatch(async () => {
@@ -28,7 +30,7 @@ export class CosmosDbFiscalCodeRepository implements FiscalCodeRepository {
       if (resource !== undefined) {
         return {
           whitelisted: true,
-          whitelistedAt: new Date(resource._ts * 1000).toISOString(),
+          whitelistedAt: resource.whitelistedAt,
         };
       } else {
         return {
