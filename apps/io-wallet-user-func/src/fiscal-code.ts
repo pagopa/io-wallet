@@ -14,7 +14,7 @@ export interface FiscalCodeEnvironment {
   fiscalCodeRepository: FiscalCodeRepository;
 }
 
-export const isFiscalCodeWhitelisted: (
+export const checkFiscalCodeWhitelist: (
   fiscalCode: NonEmptyString,
 ) => RTE.ReaderTaskEither<FiscalCodeEnvironment, Error, void> =
   (fiscalCode) =>
