@@ -1,6 +1,6 @@
 import { getFiscalCodeWhitelisted } from "@/fiscal-code";
 import * as H from "@pagopa/handler-kit";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { lookup } from "fp-ts/Record";
@@ -10,14 +10,14 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 export const requireFiscalCode: (
   req: H.HttpRequest,
-) => E.Either<Error, NonEmptyString> = (req) =>
+) => E.Either<Error, FiscalCode> = (req) =>
   pipe(
     req.path,
     lookup("fiscalCode"),
     E.fromOption(
       () => new H.HttpBadRequestError(`Missing "fiscalCode" in path`),
     ),
-    E.chainW(H.parse(NonEmptyString, `Invalid "fiscalCode" supplied`)),
+    E.chainW(H.parse(FiscalCode, `The fiscal code is not a valid fiscal code`)),
   );
 
 export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>

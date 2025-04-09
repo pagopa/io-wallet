@@ -39,7 +39,15 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
     ...H.request("https://wallet-provider.example.org"),
     method: "GET",
     path: {
-      fiscalCode: "TEST_FISCAL_CODE",
+      fiscalCode: "RSSMRA85M01H501Z",
+    },
+  };
+
+  const reqWithInvalidFiscalCode = {
+    ...H.request("https://wallet-provider.example.org"),
+    method: "GET",
+    path: {
+      fiscalCode: "THIS_IS_AN_INVALID_FISCAL_CODE",
     },
   };
 
@@ -57,7 +65,7 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       _tag: "Right",
       right: {
         body: {
-          fiscalCode: "TEST_FISCAL_CODE",
+          fiscalCode: "RSSMRA85M01H501Z",
           whitelisted: true,
           whitelistedAt: expect.any(String),
         },
@@ -83,13 +91,40 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       _tag: "Right",
       right: {
         body: {
-          fiscalCode: "TEST_FISCAL_CODE",
+          fiscalCode: "RSSMRA85M01H501Z",
           whitelisted: false,
         },
         headers: expect.objectContaining({
           "Content-Type": "application/json",
         }),
         statusCode: 200,
+      },
+    });
+  });
+
+  it("should return a 422 HTTP response cause by an invalid fiscal code in the request", async () => {
+    const handler = IsFiscalCodeWhitelistedHandler({
+      fiscalCodeRepository: fiscalCodeRepositoryThatFails,
+      input: reqWithInvalidFiscalCode,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          detail: "Your request didn't validate",
+          status: 422,
+          title: "Validation Error",
+          type: "/problem/validation-error",
+          violations: expect.any(Array),
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 422,
       },
     });
   });

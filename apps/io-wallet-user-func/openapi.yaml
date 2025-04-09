@@ -269,6 +269,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FiscalCodeWhitelistedData"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -486,7 +488,7 @@ components:
       format: FiscalCode
       x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
-    
+
     FiscalCodeWhitelistedData:
       type: object
       properties:

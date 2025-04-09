@@ -1,11 +1,11 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/lib/function";
 
 export interface FiscalCodeRepository {
   getFiscalCodeWhitelisted: (
-    fiscalCode: NonEmptyString,
+    fiscalCode: FiscalCode,
   ) => TE.TaskEither<Error, { whitelisted: boolean; whitelistedAt?: string }>;
 }
 
@@ -14,7 +14,7 @@ export interface FiscalCodeEnvironment {
 }
 
 export const getFiscalCodeWhitelisted: (
-  fiscalCode: NonEmptyString,
+  fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<
   FiscalCodeEnvironment,
   Error,
