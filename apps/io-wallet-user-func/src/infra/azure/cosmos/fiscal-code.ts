@@ -22,13 +22,10 @@ export class CosmosDbFiscalCodeRepository implements FiscalCodeRepository {
     fiscalCode: NonEmptyString,
   ): TE.TaskEither<Error, boolean> {
     return TE.tryCatch(async () => {
-      const { resources } = await this.#containerName.items
-        .query({
-          parameters: [{ name: "@fiscalCode", value: fiscalCode }],
-          query: "SELECT COUNT(1) FROM c WHERE c.fiscalCode = @fiscalCode",
-        })
-        .fetchAll();
-      return resources[0]["$1"] > 0;
+      const { resource } = await this.#containerName
+        .item(fiscalCode, fiscalCode)
+        .read();
+      return resource !== undefined;
     }, toError("Failed to check fiscal code"));
   }
 }
