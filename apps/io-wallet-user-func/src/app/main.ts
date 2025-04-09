@@ -329,5 +329,5 @@ app.http("IsFiscalCodeWhitelisted", {
     }),
   ),
   methods: ["GET"],
-  route: "fiscal-codes/{fiscalCode}",
+  route: "whitelisted-fiscal-code/{fiscalCode}",
 });

@@ -24,7 +24,7 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
   pipe(
     pipe(req, requireFiscalCode),
     RTE.fromEither,
-    RTE.chain((fiscalCode) => isFiscalCodeWhitelisted(fiscalCode)),
+    RTE.chain(isFiscalCodeWhitelisted),
     RTE.map(H.successJson),
     RTE.orElseFirstW((error) =>
       pipe(

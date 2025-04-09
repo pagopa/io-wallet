@@ -15,7 +15,7 @@ export class CosmosDbFiscalCodeRepository implements FiscalCodeRepository {
   #containerName: Container;
 
   constructor(db: Database) {
-    this.#containerName = db.container("fiscal-codes");
+    this.#containerName = db.container("whitelisted-fiscal-codes");
   }
 
   isFiscalCodeWhitelisted(
