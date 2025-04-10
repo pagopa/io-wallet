@@ -30,7 +30,7 @@ export class CosmosDbWhitelistedFiscalCodeRepository
       if (resource !== undefined) {
         return {
           whitelisted: true,
-          whitelistedAt: resource.whitelistedAt,
+          whitelistedAt: resource.createdAt,
         };
       } else {
         return {

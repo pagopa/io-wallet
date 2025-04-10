@@ -268,7 +268,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FiscalCodeData"
+                $ref: "#/components/schemas/WhitelistedFiscalCodeData"
         "400":
           $ref: "#/components/responses/BadRequest"
         "422":
@@ -491,7 +491,7 @@ components:
       x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
 
-    FiscalCodeData:
+    WhitelistedFiscalCodeData:
       type: object
       required:
         - whitelisted
