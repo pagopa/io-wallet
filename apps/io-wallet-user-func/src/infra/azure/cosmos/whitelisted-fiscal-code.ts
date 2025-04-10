@@ -1,4 +1,4 @@
-import { WhitelistedFiscalCodeRepository } from "@/fiscal-code";
+import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 import { Container, Database } from "@azure/cosmos";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";

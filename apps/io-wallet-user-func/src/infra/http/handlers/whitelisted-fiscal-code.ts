@@ -1,11 +1,11 @@
-import { checkIfFiscalCodeIsWhitelisted } from "@/fiscal-code";
+import { checkIfFiscalCodeIsWhitelisted } from "@/whitelisted-fiscal-code";
 import * as H from "@pagopa/handler-kit";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { pipe } from "fp-ts/function";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import { requireFiscalCodeFromPath } from "../fiscal-code";
+import { requireFiscalCodeFromPath } from "../whitelisted-fiscal-code";
 
 export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
   pipe(

@@ -6,7 +6,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import { requireFiscalCodeFromHeader } from "../fiscal-code";
+import { requireFiscalCodeFromHeader } from "../whitelisted-fiscal-code";
 
 // delete wallet instances from `wallet-instances-user-id` collection
 export const DeleteWalletInstancesHandler = H.of((req: H.HttpRequest) =>

@@ -1,8 +1,8 @@
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
-import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/fiscal-code";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -14,11 +14,11 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
-import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/is-fiscal-code-whitelisted";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
+import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";

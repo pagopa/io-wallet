@@ -6,7 +6,7 @@ import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { WalletInstanceToStatusApiModel } from "../encoders/wallet-instance";
-import { requireFiscalCodeFromHeader } from "../fiscal-code";
+import { requireFiscalCodeFromHeader } from "../whitelisted-fiscal-code";
 
 export const GetCurrentWalletInstanceStatusHandler = H.of(
   (req: H.HttpRequest) =>
