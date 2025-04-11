@@ -250,6 +250,32 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /whitelisted-fiscal-code/{fiscalCode}:
+    get:
+      operationId: IsFiscalCodeWhitelisted
+      summary: Used to check if the fiscal code is in the whitelist
+      security:
+        - FunctionsKey: []
+      parameters:
+        - in: path
+          name: fiscalCode
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Returned when no issues were found in either case (fiscal code whitelisted, or not)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhitelistedFiscalCodeData"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
 components:
   securitySchemes:
     FunctionsKey:
@@ -464,3 +490,23 @@ components:
       format: FiscalCode
       x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
+
+    WhitelistedFiscalCodeData:
+      type: object
+      required:
+        - whitelisted
+        - fiscalCode
+      properties:
+        whitelisted:
+          type: boolean
+          description: |-
+            Boolean value that specifies whether the tax code is whitelisted or not.
+        whitelistedAt:
+          type: string
+          description: |-
+            Date, expressed in ISO 8601 format, when the fiscal code was added to the whitelist.
+            Only present if the fiscal code is whitelisted.
+        fiscalCode:
+          type: string
+          description: |-
+            The fiscal code, the same one passed in input.

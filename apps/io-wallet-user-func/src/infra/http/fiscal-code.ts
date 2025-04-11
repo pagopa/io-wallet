@@ -18,3 +18,20 @@ export const requireFiscalCodeFromHeader = (req: H.HttpRequest) =>
       ),
     ),
   );
+
+export const requireFiscalCodeFromPath: (
+  req: H.HttpRequest,
+) => E.Either<Error, FiscalCode> = (req) =>
+  pipe(
+    req.path,
+    lookup("fiscalCode"),
+    E.fromOption(
+      () => new H.HttpBadRequestError(`Missing "fiscalCode" in path`),
+    ),
+    E.chainW(
+      H.parse(
+        FiscalCode,
+        `The content of the path parameter is not a valid fiscal code`,
+      ),
+    ),
+  );
