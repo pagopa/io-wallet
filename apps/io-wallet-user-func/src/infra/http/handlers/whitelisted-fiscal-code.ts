@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import { requireFiscalCodeFromPath } from "../whitelisted-fiscal-code";
+import { requireFiscalCodeFromPath } from "../fiscal-code";
 
 export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
   pipe(

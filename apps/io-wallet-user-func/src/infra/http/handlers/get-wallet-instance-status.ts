@@ -9,7 +9,7 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { WalletInstanceToStatusApiModel } from "../encoders/wallet-instance";
 import { requireWalletInstanceId } from "../wallet-instance";
-import { requireFiscalCodeFromHeader } from "../whitelisted-fiscal-code";
+import { requireFiscalCodeFromHeader } from "../fiscal-code";
 
 export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
