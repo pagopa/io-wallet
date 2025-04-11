@@ -26,7 +26,7 @@ env:
 
 jobs:
   tf_apply:
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     name: Terraform Apply
     environment: opex-prod-cd
     permissions:
@@ -36,7 +36,6 @@ jobs:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
 
     steps:
-
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         name: Checkout
 
