@@ -113,6 +113,7 @@ module "repo" {
     infra_cd_policy_branches = local.repository.infra_cd_policy_branches
     opex_cd_policy_branches  = local.repository.opex_cd_policy_branches
     app_cd_policy_branches   = local.repository.app_cd_policy_branches
+    jira_boards_ids          = local.repository.jira_boards_ids
   }
 
   github_private_runner = {

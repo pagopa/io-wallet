@@ -47,6 +47,7 @@ locals {
     infra_cd_policy_branches = ["master"]
     opex_cd_policy_branches  = ["master"]
     app_cd_policy_branches   = ["master"]
+    jira_boards_ids          = ["CES", "SIW"]
   }
 
   key_vault = {
