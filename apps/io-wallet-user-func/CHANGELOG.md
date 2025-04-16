@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.2.0
+
+### Minor Changes
+
+- aa53fb6: Added endpoint to check if a fiscal code is in the whitelist or not
+
 ## 3.1.0
 
 ### Minor Changes
