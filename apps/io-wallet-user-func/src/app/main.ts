@@ -2,6 +2,7 @@ import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
@@ -17,6 +18,7 @@ import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functio
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
+import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
 import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
@@ -87,6 +89,9 @@ const nonceRepository = new CosmosDbNonceRepository(database);
 const signer = new CryptoSigner(config.crypto);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
+
+const whitelistedFiscalCodeRepository =
+  new CosmosDbWhitelistedFiscalCodeRepository(database);
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
@@ -314,4 +319,16 @@ app.http("createWalletAttestationV2", {
   ),
   methods: ["POST"],
   route: "wallet-attestation",
+});
+
+app.http("IsFiscalCodeWhitelisted", {
+  authLevel: "function",
+  handler: withAppInsights(
+    IsFiscalCodeWhitelistedFunction({
+      telemetryClient: appInsightsClient,
+      whitelistedFiscalCodeRepository,
+    }),
+  ),
+  methods: ["GET"],
+  route: "whitelisted-fiscal-code/{fiscalCode}",
 });
