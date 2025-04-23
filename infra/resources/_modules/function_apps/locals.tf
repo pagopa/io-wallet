@@ -14,6 +14,7 @@ locals {
     EntityConfigurationStorageAccount__serviceUri = "https://${var.storage_account_cdn_name}.blob.core.windows.net"
     EntityConfigurationStorageContainerName       = "well-known"
 
+    FederationEntityAuthorityHints   = "https://ta.wallet.ipzs.it"
     FederationEntityBasePath         = "https://wallet.io.pagopa.it"
     FederationEntityOrganizationName = "PagoPa S.p.A."
     FederationEntityHomepageUri      = "https://io.italia.it"

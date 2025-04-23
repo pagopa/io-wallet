@@ -28,6 +28,7 @@ import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
@@ -95,7 +96,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.federationEntity.basePath.href,
+  config.federationEntityMetadata.basePath.href,
 );
 
 const appInsightsClient = ai.defaultClient;
@@ -110,6 +111,14 @@ const emailNotificationService = new EmailNotificationServiceClient({
   authProfileApiConfig: config.authProfile,
   mailConfig: config.mail,
 });
+
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  config.azure.storage.entityConfiguration.connectionString,
+);
+
+const containerClient = blobServiceClient.getContainerClient(
+  config.azure.storage.entityConfiguration.containerName,
+);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
@@ -128,7 +137,7 @@ app.http("createWalletAttestation", {
   handler: withAppInsights(
     CreateWalletAttestationFunction({
       attestationService: mobileAttestationService,
-      federationEntityMetadata: config.federationEntity,
+      federationEntityMetadata: config.federationEntityMetadata,
       nonceRepository,
       signer,
       telemetryClient: appInsightsClient,
@@ -168,14 +177,12 @@ app.http("getNonce", {
 
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
-    federationEntityMetadata: config.federationEntity,
+    authorityHints: config.entityConfigurationAuthorityHints,
+    containerClient,
+    federationEntityMetadata: config.federationEntityMetadata,
     inputDecoder: t.unknown,
     signer,
     telemetryClient: appInsightsClient,
-  }),
-  return: output.storageBlob({
-    connection: "EntityConfigurationStorageAccount",
-    path: `${config.azure.storage.entityConfiguration.containerName}/openid-federation`,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -310,7 +317,7 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
-      federationEntityMetadata: config.federationEntity,
+      federationEntityMetadata: config.federationEntityMetadata,
       nonceRepository,
       signer,
       telemetryClient: appInsightsClient,

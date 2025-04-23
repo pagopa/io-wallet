@@ -5,7 +5,7 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 import { EntityConfigurationPayload } from "../entity-configuration";
 import { removeTrailingSlash } from "../url";
 
-export const EntityConfigurationJwtModel = t.type({
+const EntityConfigurationJwtModel = t.type({
   authority_hints: t.array(t.string),
   iss: t.string,
   jwks: t.type({
@@ -21,17 +21,14 @@ export const EntityConfigurationJwtModel = t.type({
     }),
     wallet_provider: t.type({
       aal_values_supported: t.array(t.string),
-      grant_types_supported: t.array(t.string),
       jwks: t.type({
         keys: t.array(JwkPublicKey),
       }),
-      token_endpoint: t.string,
-      token_endpoint_auth_methods_supported: t.array(t.string),
-      token_endpoint_auth_signing_alg_values_supported: t.array(t.string),
     }),
   }),
   sub: t.string,
 });
+
 export type EntityConfigurationJwtModel = t.TypeOf<
   typeof EntityConfigurationJwtModel
 >;
@@ -40,8 +37,17 @@ export const EntityConfigurationToJwtModel: E.Encoder<
   EntityConfigurationJwtModel,
   EntityConfigurationPayload
 > = {
-  encode: ({ federationEntity, iss, sub, walletProviderMetadata }) => ({
-    authority_hints: [],
+  encode: ({
+    authorityHints,
+    federationEntity,
+    iss,
+    sub,
+    walletProviderMetadata,
+  }) => ({
+    // authority_hints: authorityHints.map(({ href }) =>
+    //   removeTrailingSlash(href),
+    // ),
+    authority_hints: authorityHints.map(removeTrailingSlash),
     iss: removeTrailingSlash(iss.href),
     jwks: {
       keys: walletProviderMetadata.jwks,
@@ -56,15 +62,9 @@ export const EntityConfigurationToJwtModel: E.Encoder<
       },
       wallet_provider: {
         aal_values_supported: walletProviderMetadata.ascValues,
-        grant_types_supported: walletProviderMetadata.grantTypesSupported,
         jwks: {
           keys: walletProviderMetadata.jwks,
         },
-        token_endpoint: walletProviderMetadata.tokenEndpoint,
-        token_endpoint_auth_methods_supported:
-          walletProviderMetadata.tokenEndpointAuthMethodsSupported,
-        token_endpoint_auth_signing_alg_values_supported:
-          walletProviderMetadata.tokenEndpointAuthSigningAlgValuesSupported,
       },
     },
     sub: removeTrailingSlash(sub.href),

@@ -109,7 +109,10 @@ export type AttestationServiceConfiguration = t.TypeOf<
 >;
 
 const AzureStorageConfig = t.type({
-  entityConfiguration: t.type({ containerName: t.string }),
+  entityConfiguration: t.type({
+    connectionString: t.string,
+    containerName: t.string,
+  }),
   walletInstances: t.type({
     connectionString: t.string,
     queues: t.type({
@@ -162,7 +165,8 @@ export const Config = t.type({
   authProfile: AuthProfileApiConfig,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
-  federationEntity: FederationEntityMetadata,
+  entityConfigurationAuthorityHints: t.array(t.string),
+  federationEntityMetadata: FederationEntityMetadata,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
@@ -170,7 +174,7 @@ export const Config = t.type({
 
 export type Config = t.TypeOf<typeof Config>;
 
-const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
+const getFederationEntityMetadataFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   FederationEntityMetadata
@@ -283,6 +287,9 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   AzureStorageConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    entityConfigurationStorageAccountConnectionString: readFromEnvironment(
+      "EntityConfigurationStorageAccountConnectionString",
+    ),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
@@ -301,6 +308,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
+      entityConfigurationStorageAccountConnectionString,
       entityConfigurationStorageContainerName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
@@ -308,6 +316,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstanceRevocationEmailQueueName,
     }) => ({
       entityConfiguration: {
+        connectionString: entityConfigurationStorageAccountConnectionString,
         containerName: entityConfigurationStorageContainerName,
       },
       walletInstances: {
@@ -402,6 +411,15 @@ const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
   baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
 });
 
+const getEntityConfigurationAuthorityHints: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  string[] // ValidUrl[]
+> = pipe(
+  readFromEnvironment("FederationEntityAuthorityHints"),
+  RE.map((urls) => urls.split(",")),
+);
+
 export const getConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -412,7 +430,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     authProfile: getAuthProfileApiConfigFromEnvironment,
     azure: getAzureConfigFromEnvironment,
     crypto: getCryptoConfigFromEnvironment,
-    federationEntity: getFederationEntityConfigFromEnvironment,
+    entityConfigurationAuthorityHints: getEntityConfigurationAuthorityHints,
+    federationEntityMetadata: getFederationEntityMetadataFromEnvironment,
     httpRequestTimeout: pipe(
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
