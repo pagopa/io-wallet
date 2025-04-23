@@ -5,32 +5,26 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { Signer } from "./signer";
 
-// OIDC Federation standard entity metadata
 export const FederationEntityMetadata = t.type({
-  basePath: UrlFromString,
-  homePageUri: UrlFromString,
+  homepageUri: UrlFromString,
   logoUri: UrlFromString,
   organizationName: NonEmptyString,
   policyUri: UrlFromString,
   tosUri: UrlFromString,
 });
 
-export type FederationEntityMetadata = t.TypeOf<
-  typeof FederationEntityMetadata
->;
+type FederationEntityMetadata = t.TypeOf<typeof FederationEntityMetadata>;
 
-export interface EntityConfigurationEnvironment {
+export interface EntityConfiguration {
+  authorityHints: string[];
+  basePath: UrlFromString;
   federationEntityMetadata: FederationEntityMetadata;
-  signer: Signer;
 }
 
-export const FederationEntity = t.type({
-  homepageUri: UrlFromString,
-  logoUri: UrlFromString,
-  organizationName: t.string,
-  policyUri: UrlFromString,
-  tosUri: UrlFromString,
-});
+export interface EntityConfigurationEnvironment {
+  entityConfiguration: EntityConfiguration;
+  signer: Signer;
+}
 
 const WalletProviderMetadataPayload = t.type({
   ascValues: t.array(t.string),
@@ -39,7 +33,7 @@ const WalletProviderMetadataPayload = t.type({
 
 export const EntityConfigurationPayload = t.type({
   authorityHints: t.array(t.string), // t.array(UrlFromString),
-  federationEntity: FederationEntity,
+  federationEntityMetadata: FederationEntityMetadata,
   iss: UrlFromString,
   sub: UrlFromString,
   walletProviderMetadata: WalletProviderMetadataPayload,

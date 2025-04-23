@@ -39,7 +39,7 @@ export const EntityConfigurationToJwtModel: E.Encoder<
 > = {
   encode: ({
     authorityHints,
-    federationEntity,
+    federationEntityMetadata,
     iss,
     sub,
     walletProviderMetadata,
@@ -54,11 +54,15 @@ export const EntityConfigurationToJwtModel: E.Encoder<
     },
     metadata: {
       federation_entity: {
-        homepage_uri: removeTrailingSlash(federationEntity.homepageUri.href),
-        logo_uri: removeTrailingSlash(federationEntity.logoUri.href),
-        organization_name: federationEntity.organizationName,
-        policy_uri: removeTrailingSlash(federationEntity.policyUri.href),
-        tos_uri: removeTrailingSlash(federationEntity.tosUri.href),
+        homepage_uri: removeTrailingSlash(
+          federationEntityMetadata.homepageUri.href,
+        ),
+        logo_uri: removeTrailingSlash(federationEntityMetadata.logoUri.href),
+        organization_name: federationEntityMetadata.organizationName,
+        policy_uri: removeTrailingSlash(
+          federationEntityMetadata.policyUri.href,
+        ),
+        tos_uri: removeTrailingSlash(federationEntityMetadata.tosUri.href),
       },
       wallet_provider: {
         aal_values_supported: walletProviderMetadata.ascValues,

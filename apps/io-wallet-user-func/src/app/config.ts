@@ -1,6 +1,7 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -23,8 +24,6 @@ import {
   getSlackConfigFromEnvironment,
 } from "io-wallet-common/infra/slack/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
-
-import { FederationEntityMetadata } from "../entity-configuration";
 
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
@@ -160,40 +159,40 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const FederationEntityMetadataConfig = t.type({
+  homepageUri: UrlFromString,
+  logoUri: UrlFromString,
+  organizationName: NonEmptyString,
+  policyUri: UrlFromString,
+  tosUri: UrlFromString,
+});
+
+type FederationEntityMetadataConfig = t.TypeOf<
+  typeof FederationEntityMetadataConfig
+>;
+
+const EntityConfigurationConfig = t.type({
+  authorityHints: t.array(t.string),
+  basePath: UrlFromString,
+  federationEntityMetadata: FederationEntityMetadataConfig,
+});
+
+export type EntityConfigurationConfig = t.TypeOf<
+  typeof EntityConfigurationConfig
+>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   authProfile: AuthProfileApiConfig,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
-  entityConfigurationAuthorityHints: t.array(t.string),
-  federationEntityMetadata: FederationEntityMetadata,
+  entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
-
-const getFederationEntityMetadataFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  FederationEntityMetadata
-> = pipe(
-  sequenceS(RE.Apply)({
-    basePath: readFromEnvironment("FederationEntityBasePath"),
-    homePageUri: readFromEnvironment("FederationEntityHomepageUri"),
-    logoUri: readFromEnvironment("FederationEntityLogoUri"),
-    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
-    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
-    tosUri: readFromEnvironment("FederationEntityTosUri"),
-  }),
-  RE.chainEitherKW(
-    parse(
-      FederationEntityMetadata,
-      "Federation entity configuration is invalid",
-    ),
-  ),
-);
 
 export const getCryptoConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -411,13 +410,54 @@ const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
   baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
 });
 
-const getEntityConfigurationAuthorityHints: RE.ReaderEither<
+const getFederationEntityMetadataFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  string[] // ValidUrl[]
+  FederationEntityMetadataConfig
 > = pipe(
-  readFromEnvironment("FederationEntityAuthorityHints"),
-  RE.map((urls) => urls.split(",")),
+  sequenceS(RE.Apply)({
+    homepageUri: readFromEnvironment(
+      "EntityConfigurationFederationEntityMetadataHomepageUri",
+    ),
+    logoUri: readFromEnvironment(
+      "EntityConfigurationFederationEntityMetadataLogoUri",
+    ),
+    organizationName: readFromEnvironment(
+      "EntityConfigurationFederationEntityMetadataOrganizationName",
+    ),
+    policyUri: readFromEnvironment(
+      "EntityConfigurationFederationEntityMetadataPolicyUri",
+    ),
+    tosUri: readFromEnvironment(
+      "EntityConfigurationFederationEntityMetadataTosUri",
+    ),
+  }),
+  RE.chainEitherKW(
+    parse(
+      FederationEntityMetadataConfig,
+      "Federation entity configuration is invalid",
+    ),
+  ),
+);
+
+const getEntityConfigurationFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  EntityConfigurationConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    authorityHints: pipe(
+      readFromEnvironment("EntityConfigurationAuthorityHints"),
+      RE.map((urls) => urls.split(",")),
+    ),
+    basePath: pipe(
+      readFromEnvironment("EntityConfigurationBasePath"),
+      RE.chainEitherKW(
+        parse(UrlFromString, "EntityConfigurationBasePath is invalid"),
+      ),
+    ),
+    federationEntityMetadata: getFederationEntityMetadataFromEnvironment,
+  }),
 );
 
 export const getConfigFromEnvironment: RE.ReaderEither<
@@ -430,8 +470,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     authProfile: getAuthProfileApiConfigFromEnvironment,
     azure: getAzureConfigFromEnvironment,
     crypto: getCryptoConfigFromEnvironment,
-    entityConfigurationAuthorityHints: getEntityConfigurationAuthorityHints,
-    federationEntityMetadata: getFederationEntityMetadataFromEnvironment,
+    entityConfiguration: getEntityConfigurationFromEnvironment,
     httpRequestTimeout: pipe(
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),

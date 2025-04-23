@@ -81,7 +81,7 @@ export class PidIssuerClient
       requestTimeout,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
-    basePath: Config["federationEntityMetadata"]["basePath"]["href"],
+    basePath: Config["entityConfiguration"]["basePath"]["href"],
   ) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = removeTrailingSlash(basePath);

@@ -10,12 +10,17 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { validateJwkKid } from "io-wallet-common/jwk";
 
+import { uploadFile } from "../azure/storage/blob";
+
 // Create the JWT payload for the entity configuration metadata and return the signed JWT
 const createEntityConfiguration: RTE.ReaderTaskEither<
-  { authorityHints: string[] } & EntityConfigurationEnvironment,
+  EntityConfigurationEnvironment,
   Error,
   string
-> = ({ authorityHints, federationEntityMetadata, signer }) =>
+> = ({
+  entityConfiguration: { authorityHints, basePath, federationEntityMetadata },
+  signer,
+}) =>
   pipe(
     sequenceS(E.Apply)({
       jwks: signer.getPublicKeys(),
@@ -29,20 +34,20 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
       pipe(
         {
           authorityHints,
-          federationEntity: {
-            homepageUri: federationEntityMetadata.homePageUri,
+          federationEntityMetadata: {
+            homepageUri: federationEntityMetadata.homepageUri,
             logoUri: federationEntityMetadata.logoUri,
             organizationName: federationEntityMetadata.organizationName,
             policyUri: federationEntityMetadata.policyUri,
             tosUri: federationEntityMetadata.tosUri,
           },
-          iss: federationEntityMetadata.basePath,
-          sub: federationEntityMetadata.basePath,
+          iss: basePath,
+          sub: basePath,
           walletProviderMetadata: {
             ascValues: [
-              pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
-              pipe(federationEntityMetadata.basePath, getLoAUri(LoA.medium)),
-              pipe(federationEntityMetadata.basePath, getLoAUri(LoA.hight)),
+              pipe(basePath, getLoAUri(LoA.basic)),
+              pipe(basePath, getLoAUri(LoA.medium)),
+              pipe(basePath, getLoAUri(LoA.hight)),
             ],
             jwks,
           },
@@ -57,30 +62,6 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
       ),
     ),
   );
-
-import { ContainerClient } from "@azure/storage-blob";
-
-const uploadFile: (
-  // buffer: Buffer<ArrayBuffer>,
-  data: string,
-) => RTE.ReaderTaskEither<{ containerClient: ContainerClient }, never, void> =
-  (data) =>
-  ({ containerClient }) =>
-    pipe(
-      TE.tryCatch(
-        () =>
-          containerClient
-            .getBlockBlobClient("openid-federation")
-            .upload(data, data.length, {
-              blobHTTPHeaders: {
-                blobContentType: "application/entity-statement+jwt",
-              },
-            }),
-        E.toError,
-      ),
-      TE.map(() => undefined),
-      TE.orElse(() => TE.right(undefined)),
-    );
 
 export const GenerateEntityConfigurationHandler = H.of(() =>
   pipe(

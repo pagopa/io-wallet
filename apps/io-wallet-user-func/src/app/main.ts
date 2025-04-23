@@ -96,7 +96,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.federationEntityMetadata.basePath.href,
+  config.entityConfiguration.basePath.href,
 );
 
 const appInsightsClient = ai.defaultClient;
@@ -137,7 +137,7 @@ app.http("createWalletAttestation", {
   handler: withAppInsights(
     CreateWalletAttestationFunction({
       attestationService: mobileAttestationService,
-      federationEntityMetadata: config.federationEntityMetadata,
+      entityConfiguration: config.entityConfiguration,
       nonceRepository,
       signer,
       telemetryClient: appInsightsClient,
@@ -177,9 +177,8 @@ app.http("getNonce", {
 
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
-    authorityHints: config.entityConfigurationAuthorityHints,
     containerClient,
-    federationEntityMetadata: config.federationEntityMetadata,
+    entityConfiguration: config.entityConfiguration,
     inputDecoder: t.unknown,
     signer,
     telemetryClient: appInsightsClient,
@@ -317,7 +316,7 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
-      federationEntityMetadata: config.federationEntityMetadata,
+      entityConfiguration: config.entityConfiguration,
       nonceRepository,
       signer,
       telemetryClient: appInsightsClient,
