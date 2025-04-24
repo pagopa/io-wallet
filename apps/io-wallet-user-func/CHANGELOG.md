@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.2.1
+
+### Patch Changes
+
+- be09148: Fix OpenAPI Spec
+
 ## 3.2.0
 
 ### Minor Changes
