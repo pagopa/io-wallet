@@ -22,5 +22,5 @@ export const uploadFile: (
         E.toError,
       ),
       TE.map(() => undefined),
-      TE.orElse(() => TE.right(undefined)), // TODO. comunque se non riesce a fare upload lasciamo quello vecchio
+      TE.orElse(() => TE.right(undefined)), // TODO
     );
