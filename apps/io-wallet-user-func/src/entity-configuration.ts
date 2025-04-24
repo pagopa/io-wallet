@@ -15,7 +15,7 @@ export const FederationEntityMetadata = t.type({
 
 type FederationEntityMetadata = t.TypeOf<typeof FederationEntityMetadata>;
 
-export interface EntityConfiguration {
+interface EntityConfiguration {
   authorityHints: string[];
   basePath: UrlFromString;
   federationEntityMetadata: FederationEntityMetadata;

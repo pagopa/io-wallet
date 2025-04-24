@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { EntityConfiguration } from "@/entity-configuration";
 import { AttestationService } from "@/attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -42,7 +41,7 @@ const url = flow(
   }),
 );
 
-const entityConfiguration: EntityConfiguration = {
+const entityConfiguration = {
   authorityHints: ["https://ta.example.org"],
   basePath: url("https://wallet-provider.example.org"),
   federationEntityMetadata: {
