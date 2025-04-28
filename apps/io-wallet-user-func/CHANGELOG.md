@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.2.2
+
+### Patch Changes
+
+- be80822: Added 503 response to the GET /whitelisted-fiscal-code/{fiscalCode} API
+
 ## 3.2.1
 
 ### Patch Changes
