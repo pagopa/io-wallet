@@ -12,6 +12,7 @@ export enum LoA {
 export const getLoAUri = (level: LoA) => (basePath: UrlFromString) =>
   removeTrailingSlash(new URL(level, basePath.href).href);
 
+// to be removed
 export const GRANT_TYPE_KEY_ATTESTATION =
   "urn:ietf:params:oauth:grant-type:jwt-bearer";
 
