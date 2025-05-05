@@ -1,8 +1,8 @@
+/* eslint-disable max-lines-per-function */
 import { AttestationService } from "@/attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
-import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -16,7 +16,10 @@ import { flow } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
-import { CreateWalletAttestationV2Handler } from "../create-wallet-attestation-v2";
+import {
+  CreateWalletAttestationV2Handler,
+  WalletAttestations,
+} from "../create-wallet-attestation-v2";
 import { privateEcKey, publicEcKey, signer } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
@@ -104,7 +107,7 @@ const telemetryClient: appInsights.TelemetryClient = {
 describe("CreateWalletAttestationV2Handler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
-    challenge,
+    aud: "aud",
     cnf: {
       jwk: publicEcKey,
     },
@@ -112,12 +115,13 @@ describe("CreateWalletAttestationV2Handler", async () => {
     hardware_signature: signature.toString("base64"),
     integrity_assertion: authenticatorData.toString("base64"),
     iss: "demokey",
+    nonce: challenge, // TODO: rename challenge in nonce
     sub: "https://wallet-provider.example.org/",
   })
     .setProtectedHeader({
       alg: "ES256",
       kid: publicEcKey.kid,
-      typ: "war+jwt",
+      typ: "wp-war+jwt",
     })
     .setIssuedAt()
     .setExpirationTime("2h")
@@ -128,7 +132,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
     };
@@ -150,7 +153,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
       _tag: "Right",
       right: {
         body: expect.objectContaining({
-          wallet_attestation: expect.any(String),
+          wallet_attestations: expect.arrayContaining([
+            expect.objectContaining({
+              format: expect.any(String),
+              wallet_attestation: expect.any(String),
+            }),
+          ]),
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -161,12 +169,19 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     // check trailing slashes are removed
     if (E.isRight(result)) {
-      const body = result.right.body;
-      const walletAttestation = body.wallet_attestation;
-      if (typeof walletAttestation === "string") {
-        const decoded = jose.decodeJwt(walletAttestation);
-        expect((decoded.iss || "").endsWith("/")).toBe(false);
-        expect((decoded.sub || "").endsWith("/")).toBe(false);
+      const body = WalletAttestations.decode(result.right.body);
+      if (E.isRight(body)) {
+        const walletAttestations = body.right.wallet_attestations;
+        const walletAttestationJwt = walletAttestations.find(
+          (walletAttestation) => walletAttestation.format === "jwt",
+        );
+        if (walletAttestationJwt) {
+          const decoded = jose.decodeJwt(
+            walletAttestationJwt.wallet_attestation,
+          );
+          expect((decoded.iss || "").endsWith("/")).toBe(false);
+          expect((decoded.sub || "").endsWith("/")).toBe(false);
+        }
       }
     }
   });
@@ -175,8 +190,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
-        assertion: walletAttestationRequest,
-        grant_type: "foo",
+        assertion1: "foo",
       },
       method: "POST",
     };
@@ -223,7 +237,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
     };
@@ -265,7 +278,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
-        grant_type: GRANT_TYPE_KEY_ATTESTATION,
       },
       method: "POST",
     };

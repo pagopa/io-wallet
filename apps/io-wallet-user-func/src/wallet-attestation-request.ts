@@ -7,12 +7,16 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { getPublicKeyFromCnf, verifyJwtSignature } from "./verifier";
+import {
+  getPublicKeyFromCnf,
+  verifyAndDecodeJwt,
+  verifyJwtSignature,
+} from "./verifier";
 
 export const WalletAttestationRequestHeader = t.type({
   alg: t.string,
   kid: t.string,
-  typ: t.literal("war+jwt"),
+  typ: t.literal("war+jwt"), // TODO wp-war+jwt
 });
 
 export type WalletAttestationRequestHeader = t.TypeOf<
@@ -69,4 +73,46 @@ export const verifyWalletAttestationRequest = (
         ),
       }),
     ),
+  );
+
+const WalletAttestationRequestHeaderV2 = t.type({
+  alg: t.string,
+  kid: t.string,
+  typ: t.literal("wp-war+jwt"), // TODO: check
+});
+
+const WalletAttestationRequestPayloadV2 = t.type({
+  aud: NonEmptyString,
+  cnf: t.type({
+    jwk: JwkPublicKey,
+  }),
+  exp: t.number,
+  hardware_key_tag: NonEmptyString,
+  hardware_signature: NonEmptyString,
+  iat: t.number,
+  // key_attestation: NonEmptyString, TODO
+  integrity_assertion: NonEmptyString, // TODO: to be removed
+  iss: t.string,
+  nonce: NonEmptyString,
+});
+
+const WalletAttestationRequestV2 = t.type({
+  header: WalletAttestationRequestHeaderV2,
+  payload: WalletAttestationRequestPayloadV2,
+});
+
+export type WalletAttestationRequestV2 = t.TypeOf<
+  typeof WalletAttestationRequestV2
+>;
+
+// verify and decode the wallet instance request
+export const verifyAndDecodeWalletAttestationRequest = (
+  walletAttestationRequest: string,
+): TE.TaskEither<Error, WalletAttestationRequestV2> =>
+  pipe(
+    walletAttestationRequest,
+    getPublicKeyFromCnf,
+    TE.fromEither,
+    TE.chain(verifyAndDecodeJwt(walletAttestationRequest)),
+    TE.chainEitherKW(parse(WalletAttestationRequestV2)),
   );

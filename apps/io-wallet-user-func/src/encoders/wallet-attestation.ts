@@ -68,3 +68,91 @@ export const WalletAttestationToJwtModel: E.Encoder<
     },
   }),
 };
+
+// --------------------
+export const WalletAttestationJwtModelV2 = t.type({
+  aal: t.string,
+  cnf: t.type({
+    jwk: JwkPublicKey,
+  }),
+  iss: t.string,
+  sub: t.string,
+  wallet_name: t.string, //opzionale
+});
+
+export type WalletAttestationJwtModelV2 = t.TypeOf<
+  typeof WalletAttestationJwtModelV2
+>;
+
+// name
+const WalletAttestationJwtPayloadV2 = t.type({
+  aal: t.string,
+  iss: t.string,
+  sub: t.string,
+  walletInstancePublicKey: JwkPublicKey,
+});
+
+type WalletAttestationJwtPayloadV2 = t.TypeOf<
+  typeof WalletAttestationJwtPayloadV2
+>;
+
+export const WalletAttestationToJwtModelV2: E.Encoder<
+  WalletAttestationJwtModelV2,
+  WalletAttestationJwtPayloadV2
+> = {
+  encode: ({ aal, iss, sub, walletInstancePublicKey }) => ({
+    aal,
+    cnf: {
+      jwk: walletInstancePublicKey,
+    },
+    iss: removeTrailingSlash(iss),
+    sub: removeTrailingSlash(sub),
+    wallet_name: "Wallet Solution X by Wonderland State Department", // TODO
+  }),
+};
+
+// ------------------------- sdjwt
+export const WalletAttestationSdJwtModel = t.type({
+  aal: t.string,
+  cnf: t.type({
+    jwk: JwkPublicKey,
+  }),
+  iss: t.string,
+  sub: t.string,
+  vct: t.literal("wallet.attestation.example/v1.0"),
+  _sd: t.string,
+  sd_alg: t.array(t.string),
+});
+
+// name
+const WalletAttestationSdJwtPayload = t.type({
+  aal: t.string,
+  iss: t.string,
+  sub: t.string,
+  walletInstancePublicKey: JwkPublicKey,
+});
+
+type WalletAttestationSdJwtPayload = t.TypeOf<
+  typeof WalletAttestationSdJwtPayload
+>;
+
+export type WalletAttestationSdJwtModel = t.TypeOf<
+  typeof WalletAttestationSdJwtModel
+>;
+
+export const WalletAttestationToSdJwtModel: E.Encoder<
+  WalletAttestationSdJwtModel,
+  WalletAttestationSdJwtPayload
+> = {
+  encode: ({ aal, iss, sub, walletInstancePublicKey }) => ({
+    aal,
+    cnf: {
+      jwk: walletInstancePublicKey,
+    },
+    iss: removeTrailingSlash(iss),
+    sub: removeTrailingSlash(sub),
+    vct: "wallet.attestation.example/v1.0",
+    sd_alg: ["ES"],
+    _sd: "wa", // TODO
+  }),
+};
