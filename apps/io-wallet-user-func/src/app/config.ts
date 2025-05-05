@@ -192,6 +192,38 @@ export const Config = t.type({
 
 export type Config = t.TypeOf<typeof Config>;
 
+const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  FederationEntityConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    basePath: readFromEnvironment("FederationEntityBasePath"),
+    homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
+    logoUri: readFromEnvironment("FederationEntityLogoUri"),
+    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
+    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
+    tosUri: readFromEnvironment("FederationEntityTosUri"),
+  }),
+  RE.chainEitherKW(
+    parse(FederationEntityConfig, "Federation entity configuration is invalid"),
+  ),
+);
+
+const getEntityConfigurationFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  EntityConfigurationConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    authorityHints: pipe(
+      readFromEnvironment("EntityConfigurationAuthorityHints"),
+      RE.map((urls) => urls.split(",")),
+    ),
+    federationEntity: getFederationEntityConfigFromEnvironment,
+  }),
+);
+
 export const getCryptoConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -407,38 +439,6 @@ const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
   apiKey: readFromEnvironment("AuthProfileApiKey"),
   baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
 });
-
-const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  FederationEntityConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    basePath: readFromEnvironment("FederationEntityBasePath"),
-    homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
-    logoUri: readFromEnvironment("FederationEntityLogoUri"),
-    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
-    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
-    tosUri: readFromEnvironment("FederationEntityTosUri"),
-  }),
-  RE.chainEitherKW(
-    parse(FederationEntityConfig, "Federation entity configuration is invalid"),
-  ),
-);
-
-const getEntityConfigurationFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  EntityConfigurationConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    authorityHints: pipe(
-      readFromEnvironment("EntityConfigurationAuthorityHints"),
-      RE.map((urls) => urls.split(",")),
-    ),
-    federationEntity: getFederationEntityConfigFromEnvironment,
-  }),
-);
 
 export const getConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
