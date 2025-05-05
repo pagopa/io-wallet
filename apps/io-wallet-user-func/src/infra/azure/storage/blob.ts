@@ -6,7 +6,7 @@ import { pipe } from "fp-ts/function";
 
 export const uploadFile: (
   data: string,
-) => RTE.ReaderTaskEither<{ containerClient: ContainerClient }, never, void> =
+) => RTE.ReaderTaskEither<{ containerClient: ContainerClient }, Error, void> =
   (data) =>
   ({ containerClient }) =>
     pipe(
@@ -21,6 +21,9 @@ export const uploadFile: (
             }),
         E.toError,
       ),
+      TE.filterOrElse(
+        (response) => response.errorCode === undefined,
+        (response) => new Error(response.errorCode),
+      ),
       TE.map(() => undefined),
-      TE.orElse(() => TE.right(undefined)), // TODO
     );
