@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.2.3
+
+### Patch Changes
+
+- b7705ee: Updated wallet provider entity configuration
+
 ## 3.2.2
 
 ### Patch Changes
