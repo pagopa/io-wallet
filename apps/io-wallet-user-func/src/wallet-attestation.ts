@@ -32,7 +32,12 @@ export const createWalletAttestation =
   (
     attestationRequest: WalletAttestationRequest,
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
-  ({ entityConfiguration, signer }) =>
+  ({
+    entityConfiguration: {
+      federationEntity: { basePath, ...federationEntityMetadata },
+    },
+    signer,
+  }) =>
     pipe(
       sequenceS(TE.ApplicativePar)({
         publicJwk: pipe(
@@ -48,20 +53,16 @@ export const createWalletAttestation =
       TE.chain(({ publicJwk, supportedSignAlgorithms }) =>
         pipe(
           {
-            aal: pipe(
-              entityConfiguration.federationEntity.basePath,
-              getLoAUri(LoA.basic),
-            ),
+            aal: pipe(basePath, getLoAUri(LoA.basic)),
             algValueSupported: supportedSignAlgorithms,
             federationEntity: {
-              homepageUri: entityConfiguration.federationEntity.homepageUri,
-              logoUri: entityConfiguration.federationEntity.logoUri,
-              organizationName:
-                entityConfiguration.federationEntity.organizationName,
-              policyUri: entityConfiguration.federationEntity.policyUri,
-              tosUri: entityConfiguration.federationEntity.tosUri,
+              homepageUri: federationEntityMetadata.homepageUri,
+              logoUri: federationEntityMetadata.logoUri,
+              organizationName: federationEntityMetadata.organizationName,
+              policyUri: federationEntityMetadata.policyUri,
+              tosUri: federationEntityMetadata.tosUri,
             },
-            iss: entityConfiguration.federationEntity.basePath.href,
+            iss: basePath.href,
             sub: attestationRequest.header.kid,
             walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
           },
