@@ -416,21 +416,11 @@ const getFederationEntityMetadataFromEnvironment: RE.ReaderEither<
   FederationEntityMetadataConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    homepageUri: readFromEnvironment(
-      "EntityConfigurationFederationEntityMetadataHomepageUri",
-    ),
-    logoUri: readFromEnvironment(
-      "EntityConfigurationFederationEntityMetadataLogoUri",
-    ),
-    organizationName: readFromEnvironment(
-      "EntityConfigurationFederationEntityMetadataOrganizationName",
-    ),
-    policyUri: readFromEnvironment(
-      "EntityConfigurationFederationEntityMetadataPolicyUri",
-    ),
-    tosUri: readFromEnvironment(
-      "EntityConfigurationFederationEntityMetadataTosUri",
-    ),
+    homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
+    logoUri: readFromEnvironment("FederationEntityLogoUri"),
+    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
+    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
+    tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
   RE.chainEitherKW(
     parse(
@@ -451,9 +441,9 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
       RE.map((urls) => urls.split(",")),
     ),
     basePath: pipe(
-      readFromEnvironment("EntityConfigurationBasePath"),
+      readFromEnvironment("FederationEntityBasePath"),
       RE.chainEitherKW(
-        parse(UrlFromString, "EntityConfigurationBasePath is invalid"),
+        parse(UrlFromString, "FederationEntityBasePath is invalid"),
       ),
     ),
     federationEntityMetadata: getFederationEntityMetadataFromEnvironment,
