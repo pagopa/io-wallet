@@ -209,6 +209,10 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
+  RE.map(({ authorityHints, ...federationEntity }) => ({
+    authorityHints,
+    federationEntity,
+  })),
   RE.chainEitherKW(
     parse(EntityConfigurationConfig, "Entity configuration config is invalid"),
   ),
