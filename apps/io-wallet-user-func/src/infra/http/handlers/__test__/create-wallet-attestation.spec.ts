@@ -43,8 +43,8 @@ const url = flow(
 
 const entityConfiguration = {
   authorityHints: ["https://ta.example.org"],
-  basePath: url("https://wallet-provider.example.org"),
-  federationEntityMetadata: {
+  federationEntity: {
+    basePath: url("https://wallet-provider.example.org"),
     homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
     logoUri: url("https://wallet-provider.example.org/logo.svg"),
     organizationName: "wallet provider" as NonEmptyString,

@@ -159,7 +159,8 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
-const FederationEntityMetadataConfig = t.type({
+const FederationEntityConfig = t.type({
+  basePath: UrlFromString,
   homepageUri: UrlFromString,
   logoUri: UrlFromString,
   organizationName: NonEmptyString,
@@ -167,14 +168,11 @@ const FederationEntityMetadataConfig = t.type({
   tosUri: UrlFromString,
 });
 
-type FederationEntityMetadataConfig = t.TypeOf<
-  typeof FederationEntityMetadataConfig
->;
+type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
 
 const EntityConfigurationConfig = t.type({
   authorityHints: t.array(t.string),
-  basePath: UrlFromString,
-  federationEntityMetadata: FederationEntityMetadataConfig,
+  federationEntity: FederationEntityConfig,
 });
 
 export type EntityConfigurationConfig = t.TypeOf<
@@ -410,12 +408,13 @@ const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
   baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
 });
 
-const getFederationEntityMetadataFromEnvironment: RE.ReaderEither<
+const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  FederationEntityMetadataConfig
+  FederationEntityConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    basePath: readFromEnvironment("FederationEntityBasePath"),
     homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
@@ -423,10 +422,7 @@ const getFederationEntityMetadataFromEnvironment: RE.ReaderEither<
     tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
   RE.chainEitherKW(
-    parse(
-      FederationEntityMetadataConfig,
-      "Federation entity configuration is invalid",
-    ),
+    parse(FederationEntityConfig, "Federation entity configuration is invalid"),
   ),
 );
 
@@ -440,13 +436,7 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
       readFromEnvironment("EntityConfigurationAuthorityHints"),
       RE.map((urls) => urls.split(",")),
     ),
-    basePath: pipe(
-      readFromEnvironment("FederationEntityBasePath"),
-      RE.chainEitherKW(
-        parse(UrlFromString, "FederationEntityBasePath is invalid"),
-      ),
-    ),
-    federationEntityMetadata: getFederationEntityMetadataFromEnvironment,
+    federationEntity: getFederationEntityConfigFromEnvironment,
   }),
 );
 

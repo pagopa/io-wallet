@@ -48,18 +48,20 @@ export const createWalletAttestation =
       TE.chain(({ publicJwk, supportedSignAlgorithms }) =>
         pipe(
           {
-            aal: pipe(entityConfiguration.basePath, getLoAUri(LoA.basic)),
+            aal: pipe(
+              entityConfiguration.federationEntity.basePath,
+              getLoAUri(LoA.basic),
+            ),
             algValueSupported: supportedSignAlgorithms,
             federationEntity: {
-              homepageUri:
-                entityConfiguration.federationEntityMetadata.homepageUri,
-              logoUri: entityConfiguration.federationEntityMetadata.logoUri,
+              homepageUri: entityConfiguration.federationEntity.homepageUri,
+              logoUri: entityConfiguration.federationEntity.logoUri,
               organizationName:
-                entityConfiguration.federationEntityMetadata.organizationName,
-              policyUri: entityConfiguration.federationEntityMetadata.policyUri,
-              tosUri: entityConfiguration.federationEntityMetadata.tosUri,
+                entityConfiguration.federationEntity.organizationName,
+              policyUri: entityConfiguration.federationEntity.policyUri,
+              tosUri: entityConfiguration.federationEntity.tosUri,
             },
-            iss: entityConfiguration.basePath.href,
+            iss: entityConfiguration.federationEntity.basePath.href,
             sub: attestationRequest.header.kid,
             walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
           },

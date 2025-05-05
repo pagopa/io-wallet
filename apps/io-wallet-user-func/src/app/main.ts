@@ -96,7 +96,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.entityConfiguration.basePath.href,
+  config.entityConfiguration.federationEntity.basePath.href,
 );
 
 const appInsightsClient = ai.defaultClient;

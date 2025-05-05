@@ -18,7 +18,10 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   Error,
   string
 > = ({
-  entityConfiguration: { authorityHints, basePath, federationEntityMetadata },
+  entityConfiguration: {
+    authorityHints,
+    federationEntity: { basePath, ...federationEntityMetadata },
+  },
   signer,
 }) =>
   pipe(
