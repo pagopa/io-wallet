@@ -1,6 +1,7 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
@@ -23,8 +24,6 @@ import {
   getSlackConfigFromEnvironment,
 } from "io-wallet-common/infra/slack/config";
 import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
-
-import { FederationEntityMetadata } from "../entity-configuration";
 
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
@@ -109,7 +108,10 @@ export type AttestationServiceConfiguration = t.TypeOf<
 >;
 
 const AzureStorageConfig = t.type({
-  entityConfiguration: t.type({ containerName: t.string }),
+  entityConfiguration: t.type({
+    connectionString: t.string,
+    containerName: t.string,
+  }),
   walletInstances: t.type({
     connectionString: t.string,
     queues: t.type({
@@ -157,12 +159,32 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const FederationEntityConfig = t.type({
+  basePath: UrlFromString,
+  homepageUri: UrlFromString,
+  logoUri: UrlFromString,
+  organizationName: NonEmptyString,
+  policyUri: UrlFromString,
+  tosUri: UrlFromString,
+});
+
+type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
+
+const EntityConfigurationConfig = t.type({
+  authorityHints: t.array(UrlFromString),
+  federationEntity: FederationEntityConfig,
+});
+
+export type EntityConfigurationConfig = t.TypeOf<
+  typeof EntityConfigurationConfig
+>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   authProfile: AuthProfileApiConfig,
   azure: AzureConfig,
   crypto: CryptoConfiguration,
-  federationEntity: FederationEntityMetadata,
+  entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
@@ -170,24 +192,29 @@ export const Config = t.type({
 
 export type Config = t.TypeOf<typeof Config>;
 
-const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
+const getEntityConfigurationFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  FederationEntityMetadata
+  EntityConfigurationConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    authorityHints: pipe(
+      readFromEnvironment("EntityConfigurationAuthorityHints"),
+      RE.map((urls) => urls.split(",")),
+    ),
     basePath: readFromEnvironment("FederationEntityBasePath"),
-    homePageUri: readFromEnvironment("FederationEntityHomepageUri"),
+    homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
+  RE.map(({ authorityHints, ...federationEntity }) => ({
+    authorityHints,
+    federationEntity,
+  })),
   RE.chainEitherKW(
-    parse(
-      FederationEntityMetadata,
-      "Federation entity configuration is invalid",
-    ),
+    parse(EntityConfigurationConfig, "Entity configuration config is invalid"),
   ),
 );
 
@@ -283,6 +310,9 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   AzureStorageConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    entityConfigurationStorageAccountConnectionString: readFromEnvironment(
+      "EntityConfigurationStorageAccountConnectionString",
+    ),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
@@ -301,6 +331,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
+      entityConfigurationStorageAccountConnectionString,
       entityConfigurationStorageContainerName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
@@ -308,6 +339,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstanceRevocationEmailQueueName,
     }) => ({
       entityConfiguration: {
+        connectionString: entityConfigurationStorageAccountConnectionString,
         containerName: entityConfigurationStorageContainerName,
       },
       walletInstances: {
@@ -412,7 +444,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     authProfile: getAuthProfileApiConfigFromEnvironment,
     azure: getAzureConfigFromEnvironment,
     crypto: getCryptoConfigFromEnvironment,
-    federationEntity: getFederationEntityConfigFromEnvironment,
+    entityConfiguration: getEntityConfigurationFromEnvironment,
     httpRequestTimeout: pipe(
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),

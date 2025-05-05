@@ -6,17 +6,18 @@ import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as appInsights from "applicationinsights";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
+import { flow } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
 import { CreateWalletAttestationV2Handler } from "../create-wallet-attestation-v2";
 import { privateEcKey, publicEcKey, signer } from "./keys";
-import { federationEntityMetadata } from "./trust-anchor";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
@@ -30,6 +31,25 @@ const nonceRepository: NonceRepository = {
 const logger = {
   format: L.format.simple,
   log: () => () => void 0,
+};
+
+const url = flow(
+  UrlFromString.decode,
+  E.getOrElseW((_) => {
+    throw new Error(`Failed to parse url ${_[0].value}`);
+  }),
+);
+
+const entityConfiguration = {
+  authorityHints: [url("https://ta.example.org")],
+  federationEntity: {
+    basePath: url("https://wallet-provider.example.org"),
+    homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
+    logoUri: url("https://wallet-provider.example.org/logo.svg"),
+    organizationName: "wallet provider" as NonEmptyString,
+    policyUri: url("https://wallet-provider.example.org/info_policy"),
+    tosUri: url("https://wallet-provider.example.org/logo.svg"),
+  },
 };
 
 const mockAttestationService: AttestationService = {
@@ -114,7 +134,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      federationEntityMetadata,
+      entityConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -162,7 +182,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      federationEntityMetadata,
+      entityConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -209,7 +229,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      federationEntityMetadata,
+      entityConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -251,7 +271,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      federationEntityMetadata,
+      entityConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
