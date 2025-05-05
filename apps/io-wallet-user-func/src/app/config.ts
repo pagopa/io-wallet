@@ -171,7 +171,7 @@ const FederationEntityConfig = t.type({
 type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
 
 const EntityConfigurationConfig = t.type({
-  authorityHints: t.array(t.string),
+  authorityHints: t.array(UrlFromString),
   federationEntity: FederationEntityConfig,
 });
 
@@ -192,24 +192,6 @@ export const Config = t.type({
 
 export type Config = t.TypeOf<typeof Config>;
 
-const getFederationEntityConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  FederationEntityConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    basePath: readFromEnvironment("FederationEntityBasePath"),
-    homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
-    logoUri: readFromEnvironment("FederationEntityLogoUri"),
-    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
-    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
-    tosUri: readFromEnvironment("FederationEntityTosUri"),
-  }),
-  RE.chainEitherKW(
-    parse(FederationEntityConfig, "Federation entity configuration is invalid"),
-  ),
-);
-
 const getEntityConfigurationFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -220,8 +202,16 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
       readFromEnvironment("EntityConfigurationAuthorityHints"),
       RE.map((urls) => urls.split(",")),
     ),
-    federationEntity: getFederationEntityConfigFromEnvironment,
+    basePath: readFromEnvironment("FederationEntityBasePath"),
+    homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
+    logoUri: readFromEnvironment("FederationEntityLogoUri"),
+    organizationName: readFromEnvironment("FederationEntityOrganizationName"),
+    policyUri: readFromEnvironment("FederationEntityPolicyUri"),
+    tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
+  RE.chainEitherKW(
+    parse(EntityConfigurationConfig, "Entity configuration config is invalid"),
+  ),
 );
 
 export const getCryptoConfigFromEnvironment: RE.ReaderEither<

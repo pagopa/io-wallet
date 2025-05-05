@@ -44,10 +44,9 @@ export const EntityConfigurationToJwtModel: E.Encoder<
     sub,
     walletProviderMetadata,
   }) => ({
-    // authority_hints: authorityHints.map(({ href }) =>
-    //   removeTrailingSlash(href),
-    // ),
-    authority_hints: authorityHints.map(removeTrailingSlash),
+    authority_hints: authorityHints.map(({ href }) =>
+      removeTrailingSlash(href),
+    ),
     iss: removeTrailingSlash(iss.href),
     jwks: {
       keys: walletProviderMetadata.jwks,

@@ -23,7 +23,7 @@ export const FederationEntity = t.intersection([
 type FederationEntity = t.TypeOf<typeof FederationEntity>;
 
 interface EntityConfiguration {
-  authorityHints: string[];
+  authorityHints: UrlFromString[];
   federationEntity: FederationEntity;
 }
 
@@ -38,7 +38,7 @@ const WalletProviderMetadataPayload = t.type({
 });
 
 export const EntityConfigurationPayload = t.type({
-  authorityHints: t.array(t.string), // t.array(UrlFromString),
+  authorityHints: t.array(UrlFromString),
   federationEntityMetadata: FederationEntityMetadata,
   iss: UrlFromString,
   sub: UrlFromString,

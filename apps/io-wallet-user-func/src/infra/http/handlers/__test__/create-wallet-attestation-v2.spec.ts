@@ -41,7 +41,7 @@ const url = flow(
 );
 
 const entityConfiguration = {
-  authorityHints: ["https://ta.example.org"],
+  authorityHints: [url("https://ta.example.org")],
   federationEntity: {
     basePath: url("https://wallet-provider.example.org"),
     homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
