@@ -16,7 +16,7 @@ import {
 export const WalletAttestationRequestHeader = t.type({
   alg: t.string,
   kid: t.string,
-  typ: t.literal("war+jwt"), // TODO wp-war+jwt
+  typ: t.literal("war+jwt"),
 });
 
 export type WalletAttestationRequestHeader = t.TypeOf<
@@ -75,10 +75,11 @@ export const verifyWalletAttestationRequest = (
     ),
   );
 
+// ----- new wallet-attestation endpoint
 const WalletAttestationRequestHeaderV2 = t.type({
   alg: t.string,
   kid: t.string,
-  typ: t.literal("wp-war+jwt"), // TODO: check
+  typ: t.literal("wp-war+jwt"),
 });
 
 const WalletAttestationRequestPayloadV2 = t.type({
@@ -90,8 +91,7 @@ const WalletAttestationRequestPayloadV2 = t.type({
   hardware_key_tag: NonEmptyString,
   hardware_signature: NonEmptyString,
   iat: t.number,
-  // key_attestation: NonEmptyString, TODO
-  integrity_assertion: NonEmptyString, // TODO: to be removed
+  integrity_assertion: NonEmptyString,
   iss: t.string,
   nonce: NonEmptyString,
 });
