@@ -112,8 +112,9 @@ const emailNotificationService = new EmailNotificationServiceClient({
   mailConfig: config.mail,
 });
 
-const blobServiceClient = BlobServiceClient.fromConnectionString(
-  config.azure.storage.entityConfiguration.connectionString,
+const blobServiceClient = new BlobServiceClient(
+  `https://${config.azure.storage.entityConfiguration.accountName}.blob.core.windows.net`,
+  credential,
 );
 
 const containerClient = blobServiceClient.getContainerClient(

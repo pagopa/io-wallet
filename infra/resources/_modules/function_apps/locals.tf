@@ -11,8 +11,8 @@ locals {
     FETCH_KEEPALIVE_FREE_SOCKET_TIMEOUT = "30000"
     FETCH_KEEPALIVE_TIMEOUT             = "60000"
 
-    EntityConfigurationStorageAccountConnectionString = "https://${var.storage_account_cdn_name}.blob.core.windows.net"
-    EntityConfigurationStorageContainerName           = "well-known"
+    EntityConfigurationStorageAccountName   = var.storage_account_cdn_name
+    EntityConfigurationStorageContainerName = "well-known"
 
     EntityConfigurationAuthorityHints = "https://ta.wallet.ipzs.it"
     FederationEntityBasePath          = "https://wallet.io.pagopa.it"
