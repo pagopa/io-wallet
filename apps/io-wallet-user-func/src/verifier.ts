@@ -33,7 +33,7 @@ export const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
       pipe(
         TE.tryCatch(() => jose.jwtVerify(jwt, joseKey), E.toError),
         TE.map(({ payload, protectedHeader }) => ({
-          header: protectedHeader, // TODO. verifica differenza tra header e protected header
+          header: protectedHeader,
           payload,
         })),
       ),
