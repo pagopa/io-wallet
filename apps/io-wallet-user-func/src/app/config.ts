@@ -109,7 +109,7 @@ export type AttestationServiceConfiguration = t.TypeOf<
 
 const AzureStorageConfig = t.type({
   entityConfiguration: t.type({
-    connectionString: t.string,
+    accountName: t.string,
     containerName: t.string,
   }),
   walletInstances: t.type({
@@ -310,8 +310,8 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   AzureStorageConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    entityConfigurationStorageAccountConnectionString: readFromEnvironment(
-      "EntityConfigurationStorageAccountConnectionString",
+    entityConfigurationStorageAccountName: readFromEnvironment(
+      "EntityConfigurationStorageAccountName",
     ),
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
@@ -331,7 +331,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
-      entityConfigurationStorageAccountConnectionString,
+      entityConfigurationStorageAccountName,
       entityConfigurationStorageContainerName,
       storageAccountConnectionString,
       validateWalletInstanceCertificatesQueueName,
@@ -339,7 +339,7 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstanceRevocationEmailQueueName,
     }) => ({
       entityConfiguration: {
-        connectionString: entityConfigurationStorageAccountConnectionString,
+        accountName: entityConfigurationStorageAccountName,
         containerName: entityConfigurationStorageContainerName,
       },
       walletInstances: {
