@@ -27,8 +27,6 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-// marcare le funzioni che dovranno essere eliminate quando /token verrà dismesso
-
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,
 });
