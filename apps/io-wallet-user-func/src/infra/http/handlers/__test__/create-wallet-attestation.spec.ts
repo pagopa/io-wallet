@@ -3,7 +3,6 @@ import { AttestationService } from "@/attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
-import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -17,7 +16,10 @@ import { flow } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
-import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
+import {
+  CreateWalletAttestationHandler,
+  GRANT_TYPE_KEY_ATTESTATION,
+} from "../create-wallet-attestation";
 import { privateEcKey, publicEcKey, signer } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
