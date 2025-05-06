@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.2.4
+
+### Patch Changes
+
+- cecfe31: Migrated Azure Blob Storage authentication from connection string to Azure Identity credentials
+
 ## 3.2.3
 
 ### Patch Changes
