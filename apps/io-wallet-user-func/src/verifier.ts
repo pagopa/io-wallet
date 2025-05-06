@@ -6,13 +6,13 @@ import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
-const CnfWithJwk = t.type({
+const WithJwkCnf = t.type({
   cnf: t.type({
     jwk: JwkPublicKey,
   }),
 });
 
-type CnfWithJwk = t.TypeOf<typeof CnfWithJwk>;
+type WithJwkCnf = t.TypeOf<typeof WithJwkCnf>;
 
 const decodeJwt = (jwt: string) =>
   E.tryCatch(() => jose.decodeJwt(jwt), E.toError);
@@ -46,7 +46,7 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     decodeJwt,
     E.chainW(
       parse(
-        CnfWithJwk,
+        WithJwkCnf,
         "The jwt does not have the cnf attribute with the jwk public key.",
       ),
     ),
