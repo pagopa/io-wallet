@@ -43,16 +43,18 @@ const url = flow(
   }),
 );
 
-const entityConfiguration = {
-  authorityHints: [url("https://ta.example.org")],
-  federationEntity: {
-    basePath: url("https://wallet-provider.example.org"),
-    homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
-    logoUri: url("https://wallet-provider.example.org/logo.svg"),
-    organizationName: "wallet provider" as NonEmptyString,
-    policyUri: url("https://wallet-provider.example.org/info_policy"),
-    tosUri: url("https://wallet-provider.example.org/logo.svg"),
-  },
+const federationEntity = {
+  basePath: url("https://wallet-provider.example.org"),
+  homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
+  logoUri: url("https://wallet-provider.example.org/logo.svg"),
+  organizationName: "wallet provider" as NonEmptyString,
+  policyUri: url("https://wallet-provider.example.org/info_policy"),
+  tosUri: url("https://wallet-provider.example.org/logo.svg"),
+};
+
+const walletAttestationClaims = {
+  walletLink: "https://foo.com",
+  walletName: "Wallet name",
 };
 
 const mockAttestationService: AttestationService = {
@@ -137,7 +139,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      entityConfiguration,
+      federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -145,6 +147,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository,
+      walletProvider: walletAttestationClaims,
     });
 
     const result = await handler();
@@ -196,7 +199,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      entityConfiguration,
+      federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -204,6 +207,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository,
+      walletProvider: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -242,7 +246,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      entityConfiguration,
+      federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -250,6 +254,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
+      walletProvider: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -283,7 +288,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      entityConfiguration,
+      federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -291,6 +296,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
+      walletProvider: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({

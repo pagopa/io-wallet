@@ -1,12 +1,11 @@
 import { AttestationService, validateAssertionV2 } from "@/attestation-service";
-import { EntityConfigurationEnvironment } from "@/entity-configuration";
 import { NonceEnvironment } from "@/nonce";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
   createWalletAttestationAsJwt,
-  createWalletAttestationAsMdoc,
-  createWalletAttestationAsSdJwt,
+  // createWalletAttestationAsMdoc,
+  // createWalletAttestationAsSdJwt,
 } from "@/wallet-attestation";
 import {
   WalletAttestationRequestV2,
@@ -38,14 +37,14 @@ export const WalletAttestations = t.type({
       format: t.literal("jwt"),
       wallet_attestation: t.string,
     }),
-    t.type({
-      format: t.literal("dc+sd-jwt"),
-      wallet_attestation: t.string,
-    }),
-    t.type({
-      format: t.literal("mso_mdoc"),
-      wallet_attestation: t.string,
-    }),
+    // t.type({
+    //   format: t.literal("dc+sd-jwt"),
+    //   wallet_attestation: t.string,
+    // }),
+    // t.type({
+    //   format: t.literal("mso_mdoc"),
+    //   wallet_attestation: t.string,
+    // }),
   ]),
 });
 
@@ -57,14 +56,14 @@ const testWalletAttestations: WalletAttestations = {
       format: "jwt",
       wallet_attestation: "this_is_a_test_jwt_attestation",
     },
-    {
-      format: "dc+sd-jwt",
-      wallet_attestation: "this_is_a_test_sd_jwt_attestation",
-    },
-    {
-      format: "mso_mdoc",
-      wallet_attestation: "this_is_a_test_mdoc_attestation",
-    },
+    // {
+    //   format: "dc+sd-jwt",
+    //   wallet_attestation: "this_is_a_test_sd_jwt_attestation",
+    // },
+    // {
+    //   format: "mso_mdoc",
+    //   wallet_attestation: "this_is_a_test_mdoc_attestation",
+    // },
   ],
 };
 
@@ -142,16 +141,12 @@ const generateWalletAttestations = ({
 }: {
   assertion: WalletAttestationRequestV2;
   isTestUser: boolean;
-}): RTE.ReaderTaskEither<
-  EntityConfigurationEnvironment,
-  Error,
-  WalletAttestations
-> =>
+}) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
-      "dc+sd-jwt": createWalletAttestationAsSdJwt(assertion),
+      // "dc+sd-jwt": createWalletAttestationAsSdJwt(assertion),
       jwt: createWalletAttestationAsJwt(assertion),
-      mso_mdoc: createWalletAttestationAsMdoc(assertion),
+      // mso_mdoc: createWalletAttestationAsMdoc(assertion),
     }),
     RTE.map((results) =>
       isTestUser
@@ -162,14 +157,14 @@ const generateWalletAttestations = ({
                 format: "jwt",
                 wallet_attestation: results.jwt,
               },
-              {
-                format: "dc+sd-jwt",
-                wallet_attestation: results["dc+sd-jwt"],
-              },
-              {
-                format: "mso_mdoc",
-                wallet_attestation: results.mso_mdoc,
-              },
+              // {
+              //   format: "dc+sd-jwt",
+              //   wallet_attestation: results["dc+sd-jwt"],
+              // },
+              // {
+              //   format: "mso_mdoc",
+              //   wallet_attestation: results.mso_mdoc,
+              // },
             ],
           },
     ),
