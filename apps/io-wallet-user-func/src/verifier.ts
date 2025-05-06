@@ -25,7 +25,20 @@ export const verifyJwtSignature = (jwt: string) => (publicKey: JwkPublicKey) =>
     ),
   );
 
-// firma
+export const getPublicKeyFromCnf = (jwt: string) =>
+  pipe(
+    jwt,
+    decodeJwt,
+    E.chainW(
+      parse(
+        WithJwkCnf,
+        "The jwt does not have the cnf attribute with the jwk public key.",
+      ),
+    ),
+    E.map((payload) => payload.cnf.jwk),
+  );
+
+// ----- new wallet-attestation endpoint
 export const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
   pipe(
     TE.tryCatch(() => jose.importJWK(publicKey), E.toError),
@@ -38,17 +51,4 @@ export const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
         })),
       ),
     ),
-  );
-
-export const getPublicKeyFromCnf = (jwt: string) =>
-  pipe(
-    jwt,
-    decodeJwt,
-    E.chainW(
-      parse(
-        WithJwkCnf,
-        "The jwt does not have the cnf attribute with the jwk public key.",
-      ),
-    ),
-    E.map((payload) => payload.cnf.jwk),
   );

@@ -85,6 +85,7 @@ export const validateAssertion: (
       user,
     });
 
+// ----- new wallet-attestation endpoint
 export const validateAssertionV2: (
   walletAttestationRequest: WalletAttestationRequestV2,
   hardwareKey: JwkPublicKey,
