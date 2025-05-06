@@ -113,15 +113,15 @@ export const WalletAttestationToJwtModelV2: E.Encoder<
 
 // ------------------------- sdjwt
 export const WalletAttestationSdJwtModel = t.type({
+  _sd: t.array(t.string),
   aal: t.string,
   cnf: t.type({
     jwk: JwkPublicKey,
   }),
   iss: t.string,
+  sd_alg: t.array(t.string),
   sub: t.string,
   vct: t.literal("wallet.attestation.example/v1.0"),
-  _sd: t.string,
-  sd_alg: t.array(t.string),
 });
 
 // name
@@ -145,14 +145,14 @@ export const WalletAttestationToSdJwtModel: E.Encoder<
   WalletAttestationSdJwtPayload
 > = {
   encode: ({ aal, iss, sub, walletInstancePublicKey }) => ({
+    _sd: ["wa"], // TODO
     aal,
     cnf: {
       jwk: walletInstancePublicKey,
     },
     iss: removeTrailingSlash(iss),
+    sd_alg: ["ES"],
     sub: removeTrailingSlash(sub),
     vct: "wallet.attestation.example/v1.0",
-    sd_alg: ["ES"],
-    _sd: "wa", // TODO
   }),
 };
