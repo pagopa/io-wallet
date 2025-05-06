@@ -91,7 +91,12 @@ export const createWalletAttestationJwt =
   (
     attestationRequest: WalletAttestationRequestV2,
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
-  ({ federationEntityMetadata, signer }) =>
+  ({
+    entityConfiguration: {
+      federationEntity: { basePath, ...federationEntityMetadata },
+    },
+    signer,
+  }) =>
     pipe(
       sequenceS(TE.ApplicativePar)({
         publicJwk: pipe(
@@ -103,8 +108,8 @@ export const createWalletAttestationJwt =
       TE.chain(({ publicJwk }) =>
         pipe(
           {
-            aal: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)),
-            iss: federationEntityMetadata.basePath.href,
+            aal: pipe(basePath, getLoAUri(LoA.basic)),
+            iss: basePath.href,
             sub: attestationRequest.header.kid,
             walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
           },
@@ -126,7 +131,12 @@ export const createWalletAttestationSdJwt =
   (
     assertion: WalletAttestationRequestV2,
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
-  ({ federationEntityMetadata, signer }) =>
+  ({
+    entityConfiguration: {
+      federationEntity: { basePath, ...federationEntityMetadata },
+    },
+    signer,
+  }) =>
     pipe(
       sequenceS(TE.ApplicativePar)({
         publicJwk: pipe(
@@ -138,8 +148,8 @@ export const createWalletAttestationSdJwt =
       TE.chain(({ publicJwk }) =>
         pipe(
           {
-            aal: pipe(federationEntityMetadata.basePath, getLoAUri(LoA.basic)), // basic?
-            iss: federationEntityMetadata.basePath.href,
+            aal: pipe(basePath, getLoAUri(LoA.basic)), // basic?
+            iss: basePath.href,
             sub: assertion.header.kid,
             walletInstancePublicKey: assertion.payload.cnf.jwk,
           },
