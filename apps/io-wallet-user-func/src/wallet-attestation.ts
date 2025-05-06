@@ -86,14 +86,13 @@ export const createWalletAttestation =
       ),
     );
 
-// crea la wallet attestation in formato jwt
-export const createWalletAttestationJwt =
+export const createWalletAttestationAsJwt =
   (
-    attestationRequest: WalletAttestationRequestV2,
+    walletAttestationRequest: WalletAttestationRequestV2,
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({
     entityConfiguration: {
-      federationEntity: { basePath, ...federationEntityMetadata },
+      federationEntity: { basePath },
     },
     signer,
   }) =>
@@ -110,8 +109,8 @@ export const createWalletAttestationJwt =
           {
             aal: pipe(basePath, getLoAUri(LoA.basic)),
             iss: basePath.href,
-            sub: attestationRequest.header.kid,
-            walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
+            sub: walletAttestationRequest.header.kid,
+            walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
           },
           WalletAttestationToJwtModelV2.encode,
           signer.createJwtAndSign(
@@ -126,14 +125,13 @@ export const createWalletAttestationJwt =
       ),
     );
 
-// crea la wallet attestation in formato sd-jwt
-export const createWalletAttestationSdJwt =
+export const createWalletAttestationAsSdJwt =
   (
-    assertion: WalletAttestationRequestV2,
+    walletAttestationRequest: WalletAttestationRequestV2,
   ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
   ({
     entityConfiguration: {
-      federationEntity: { basePath, ...federationEntityMetadata },
+      federationEntity: { basePath },
     },
     signer,
   }) =>
@@ -150,8 +148,8 @@ export const createWalletAttestationSdJwt =
           {
             aal: pipe(basePath, getLoAUri(LoA.basic)), // basic?
             iss: basePath.href,
-            sub: assertion.header.kid,
-            walletInstancePublicKey: assertion.payload.cnf.jwk,
+            sub: walletAttestationRequest.header.kid,
+            walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
           },
           WalletAttestationToSdJwtModel.encode,
           signer.createJwtAndSign(
@@ -165,3 +163,7 @@ export const createWalletAttestationSdJwt =
         ),
       ),
     );
+
+export declare const createWalletAttestationAsMdoc: (
+  walletAttestationRequest: WalletAttestationRequestV2,
+) => RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string>;

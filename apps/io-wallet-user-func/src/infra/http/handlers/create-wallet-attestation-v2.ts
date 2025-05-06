@@ -4,8 +4,9 @@ import { NonceEnvironment } from "@/nonce";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
-  createWalletAttestationJwt,
-  createWalletAttestationSdJwt,
+  createWalletAttestationAsJwt,
+  createWalletAttestationAsMdoc,
+  createWalletAttestationAsSdJwt,
 } from "@/wallet-attestation";
 import {
   WalletAttestationRequestV2,
@@ -148,9 +149,9 @@ const generateWalletAttestations = ({
 > =>
   pipe(
     sequenceS(RTE.ApplyPar)({
-      jwt: createWalletAttestationJwt(assertion),
-      "dc+sd-jwt": createWalletAttestationSdJwt(assertion),
-      mso_mdoc: createWalletAttestationJwt(assertion), // TODO
+      "dc+sd-jwt": createWalletAttestationAsSdJwt(assertion),
+      jwt: createWalletAttestationAsJwt(assertion),
+      mso_mdoc: createWalletAttestationAsMdoc(assertion),
     }),
     RTE.map((results) =>
       isTestUser
