@@ -1,0 +1,43 @@
+{
+  "name": "whitelist-fiscal-code-script",
+  "version": "0.0.1-rc.1",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/main.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "format": "prettier --write ."
+  },
+  "engines": {
+    "node": ">=20.17.0",
+    "npm": ">=10.8.2"
+  },
+  "keywords": [],
+  "author": "Christian Alessandro Atzeni (chralex00 on GitHub)",
+  "license": "ISC",
+  "description": "This script is used to whitelist fiscal codes in the database.",
+  "devDependencies": {
+    "@eslint/js": "^9.26.0",
+    "@types/node": "^22.15.3",
+    "@vitest/coverage-v8": "^3.1.2",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.4.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1",
+    "vitest": "^3.1.2"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.3.0",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.5.0",
+    "i": "^0.3.7",
+    "joi": "^17.13.3",
+    "npm": "^11.3.0"
+  }
+}
