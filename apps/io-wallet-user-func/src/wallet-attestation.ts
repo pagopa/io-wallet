@@ -7,18 +7,15 @@ import * as t from "io-ts";
 import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 
 import {
-  WalletAttestationData,
   WalletAttestationToJwtModel,
   WalletAttestationToJwtModelV2,
   WalletAttestationToSdJwtModel,
-  // WalletAttestationToSdJwtModel,
 } from "./encoders/wallet-attestation";
 import {
   EntityConfigurationEnvironment,
   FederationEntity,
   FederationEntityMetadata,
 } from "./entity-configuration";
-import { Signer } from "./signer";
 import {
   WalletAttestationRequest,
   WalletAttestationRequestV2,
@@ -89,6 +86,88 @@ export const createWalletAttestation =
         ),
       ),
     );
+
+export const createWalletAttestationAsJwt =
+  (
+    walletAttestationRequest: WalletAttestationRequestV2,
+  ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
+  ({
+    entityConfiguration: {
+      federationEntity: { basePath },
+    },
+    signer,
+  }) =>
+    pipe(
+      sequenceS(TE.ApplicativePar)({
+        publicJwk: pipe(
+          signer.getFirstPublicKeyByKty("EC"),
+          E.chainW(validateJwkKid),
+          TE.fromEither,
+        ),
+      }),
+      TE.chain(({ publicJwk }) =>
+        pipe(
+          {
+            aal: pipe(basePath, getLoAUri(LoA.basic)),
+            iss: basePath.href,
+            sub: walletAttestationRequest.header.kid,
+            walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
+          },
+          WalletAttestationToJwtModelV2.encode,
+          signer.createJwtAndSign(
+            {
+              typ: "oauth-client-attestation+jwt",
+            },
+            publicJwk.kid,
+            "ES256",
+            "1h",
+          ),
+        ),
+      ),
+    );
+
+export const createWalletAttestationAsSdJwt =
+  (
+    walletAttestationRequest: WalletAttestationRequestV2,
+  ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
+  ({
+    entityConfiguration: {
+      federationEntity: { basePath },
+    },
+    signer,
+  }) =>
+    pipe(
+      sequenceS(TE.ApplicativePar)({
+        publicJwk: pipe(
+          signer.getFirstPublicKeyByKty("EC"),
+          E.chainW(validateJwkKid),
+          TE.fromEither,
+        ),
+      }),
+      TE.chain(({ publicJwk }) =>
+        pipe(
+          {
+            aal: pipe(basePath, getLoAUri(LoA.basic)), // basic?
+            iss: basePath.href,
+            sub: walletAttestationRequest.header.kid,
+            walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
+          },
+          WalletAttestationToSdJwtModel.encode,
+          signer.createJwtAndSign(
+            {
+              typ: "dc+sd-jwt",
+            },
+            publicJwk.kid,
+            "ES256",
+            "1h",
+          ),
+        ),
+      ),
+    );
+
+export declare const createWalletAttestationAsMdoc: (
+  walletAttestationRequest: WalletAttestationRequestV2,
+) => RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string>;
 
 // ----- new wallet-attestation endpoint
 interface WalletProvider {
