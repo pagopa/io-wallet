@@ -179,6 +179,15 @@ export type EntityConfigurationConfig = t.TypeOf<
   typeof EntityConfigurationConfig
 >;
 
+const WalletProviderConfig = t.type({
+  walletAttestation: t.type({
+    walletLink: t.string,
+    walletName: t.string,
+  }),
+});
+
+type WalletProviderConfig = t.TypeOf<typeof WalletProviderConfig>;
+
 export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   authProfile: AuthProfileApiConfig,
@@ -188,6 +197,7 @@ export const Config = t.type({
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
+  walletProvider: WalletProviderConfig,
 });
 
 export type Config = t.TypeOf<typeof Config>;
@@ -434,6 +444,27 @@ const getAuthProfileApiConfigFromEnvironment: RE.ReaderEither<
   baseURL: readFromEnvironment("AuthProfileApiBaseURL"),
 });
 
+const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  WalletProviderConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    walletAttestationWalletLink: readFromEnvironment(
+      "WalletAttestationWalletLink",
+    ),
+    walletAttestationWalletName: readFromEnvironment(
+      "WalletAttestationWalletName",
+    ),
+  }),
+  RE.map(({ walletAttestationWalletLink, walletAttestationWalletName }) => ({
+    walletAttestation: {
+      walletLink: walletAttestationWalletLink,
+      walletName: walletAttestationWalletName,
+    },
+  })),
+);
+
 export const getConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -452,6 +483,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
+    walletProvider: getWalletProviderConfigFromEnvironment,
   }),
   RE.map(
     ({

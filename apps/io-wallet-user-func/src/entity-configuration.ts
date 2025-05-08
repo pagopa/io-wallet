@@ -13,14 +13,14 @@ export const FederationEntityMetadata = t.type({
   tosUri: UrlFromString,
 });
 
-export const FederationEntity = t.intersection([
+const FederationEntity = t.intersection([
   t.type({
     basePath: UrlFromString,
   }),
   FederationEntityMetadata,
 ]);
 
-type FederationEntity = t.TypeOf<typeof FederationEntity>;
+export type FederationEntity = t.TypeOf<typeof FederationEntity>;
 
 interface EntityConfiguration {
   authorityHints: UrlFromString[];

@@ -317,11 +317,12 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
-      entityConfiguration: config.entityConfiguration,
+      federationEntity: config.entityConfiguration.federationEntity,
       nonceRepository,
       signer,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
+      walletProvider: config.walletProvider.walletAttestation,
     }),
   ),
   methods: ["POST"],
