@@ -7,7 +7,7 @@ const bootstrap = async () => {
   checkConfig();
 
   const fiscalCodes = await parseFiscalCodes(
-    '../../fiscalCodes/fiscalcodes.csv',
+    process.env.FISCAL_CODES_CSV_FILE_PATH as string,
   );
 
   const cosmosClient = getCosmosClient();

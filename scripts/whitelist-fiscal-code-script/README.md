@@ -10,7 +10,7 @@ This script is used to whitelist fiscal codes in the database.
 ### Quickstart
 
 **STEP 1**
-Make sure there is a CSV file under the `fiscalCodes/` directory. This directory is used to store the fiscal codes to be whitelisted and the file name must be `fiscalcodes.csv`. This CSV file must have a column named `fiscalCode` and the values must be the fiscal codes to be whitelisted, like this:
+Prepare a CSV file that contains all fiscal codes to add in the whitelist. The CSV file must have a column named `fiscalCode` and the values must be the fiscal codes to be whitelisted, like this:
 
 ```csv
 fiscalCode
@@ -21,11 +21,14 @@ TEST0000004
 TEST0000005
 ```
 
+To see a simple example, view the `fiscalcodes.csv.example` file, stored in the root directory of this script.
+
 **STEP 2**
 Make sure you have a `.env` file under the root directory with the following variables:
 
 ```bash
 DATABASE_CONNECTION_STRING          # (required) the connection string to the database, you can find it in the azure portal
+FISCAL_CODES_CSV_FILE_PATH          # (required) the path of the CSV file containing the fiscal codes
 SLEEP_TIME_BETWEEN_REQUESTS_MS      # (optional, default 500) the time to wait between requests to the database, in milliseconds
 REQUEST_TIMEOUT_MS                  # (optional, default 10000) the timeout for each request to the database, in milliseconds
 ```
@@ -37,6 +40,12 @@ So, you can run the script by running the following commands:
 yarn install                     # install all dependencies
 yarn start                       # run the script
 ```
+
+**STEP 4**
+After the script execution, you can see two output files:
+
+- `whitelisted_fiscal_code.csv`: a CSV file containing only fiscal codes added successfully to the whitelist.
+- `not_whitelisted_fiscal_code.csv`: a CSV file containing only fiscal codes not added (for some reason) to the whitelist.
 
 ### Useful commands
 

@@ -4,19 +4,16 @@ import * as Joi from 'joi';
 dotenv.config();
 
 const ConfigSchema = Joi.object({
-  DATABASE_CONNECTION_STRING: Joi.string()
-    .min(1)
-    .max(1024)
-    .required()
-    .messages({
-      'string.base': 'DATABASE_CONNECTION_STRING must be a string',
-      'string.empty': 'DATABASE_CONNECTION_STRING is not allowed to be empty',
-      'any.required': 'DATABASE_CONNECTION_STRING is required',
-      'string.min':
-        'DATABASE_CONNECTION_STRING must be at least 1 characters long',
-      'string.max':
-        'DATABASE_CONNECTION_STRING must be maximum 1024 characters long',
-    }),
+  DATABASE_CONNECTION_STRING: Joi.string().required().messages({
+    'string.base': 'DATABASE_CONNECTION_STRING must be a string',
+    'string.empty': 'DATABASE_CONNECTION_STRING is not allowed to be empty',
+    'any.required': 'DATABASE_CONNECTION_STRING is required',
+  }),
+  FISCAL_CODES_CSV_FILE_PATH: Joi.string().required().messages({
+    'string.base': 'FISCAL_CODES_CSV_FILE_PATH must be a string',
+    'string.empty': 'FISCAL_CODES_CSV_FILE_PATH is not allowed to be empty',
+    'any.required': 'FISCAL_CODES_CSV_FILE_PATH is required',
+  }),
   SLEEP_TIME_BETWEEN_REQUESTS_MS: Joi.number()
     .min(0)
     .max(1_000_000)

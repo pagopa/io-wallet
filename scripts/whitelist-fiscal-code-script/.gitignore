@@ -13,4 +13,7 @@ coverage/
 .env.*
 
 # fiscalCodes
-fiscalCodes/fiscalcodes.csv
+*.csv
+
+# logs and output files
+logs/**

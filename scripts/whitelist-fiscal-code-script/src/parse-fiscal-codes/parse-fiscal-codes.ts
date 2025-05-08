@@ -1,13 +1,10 @@
 import fs from 'fs';
 import * as csv from 'csv-parse';
-import path from 'path';
 
 export const parseFiscalCodes = async (
   csvFilePath: string,
 ): Promise<string[]> => {
   try {
-    const fullPath = path.join(__dirname, csvFilePath);
-
     const fiscalCodes: string[] = [];
 
     const parser = csv.parse({
@@ -16,12 +13,12 @@ export const parseFiscalCodes = async (
       trim: true,
     });
 
-    if (!fs.existsSync(fullPath)) {
+    if (!fs.existsSync(csvFilePath)) {
       throw new Error('file not found');
     }
 
     await new Promise((resolve, reject) => {
-      fs.createReadStream(fullPath)
+      fs.createReadStream(csvFilePath)
         .pipe(parser)
         .on('data', (row: string[]) => {
           fiscalCodes.push(row[0]);

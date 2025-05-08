@@ -7,7 +7,7 @@ vi.spyOn(console, 'warn').mockImplementation(() => {});
 
 describe('parseFiscalCode', () => {
   it('should correctly parse a valid fiscal code', async () => {
-    const fiscalCodes = await parseFiscalCodes('../../fiscalCodes/example.csv');
+    const fiscalCodes = await parseFiscalCodes('./fiscalcodes.csv.example');
 
     expect(fiscalCodes).toBeDefined();
     expect(fiscalCodes.length).toStrictEqual(5);
