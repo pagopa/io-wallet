@@ -44,9 +44,6 @@ locals {
 
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-func-02.azurewebsites.net"
 
-    WalletAttestationWalletLink = "https://wallet.io.pagopa.it"
-    WalletAttestationWalletName = "IT Wallet"
-
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
     WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
     },
