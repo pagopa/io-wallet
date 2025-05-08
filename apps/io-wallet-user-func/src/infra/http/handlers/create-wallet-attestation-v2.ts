@@ -148,18 +148,18 @@ const generateWalletAttestations = ({
       jwt: createWalletAttestationAsJwt(assertion),
       // mso_mdoc: createWalletAttestationAsMdoc(assertion),
     }),
-    RTE.map((results) =>
+    RTE.map(({ "dc+sd-jwt": sdJwt, jwt }) =>
       isTestUser
         ? testWalletAttestations
         : {
             wallet_attestations: [
               {
                 format: "jwt",
-                wallet_attestation: results.jwt,
+                wallet_attestation: jwt,
               },
               {
                 format: "dc+sd-jwt",
-                wallet_attestation: results["dc+sd-jwt"],
+                wallet_attestation: sdJwt,
               },
               // {
               //   format: "mso_mdoc",

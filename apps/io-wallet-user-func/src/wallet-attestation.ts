@@ -184,7 +184,10 @@ const getDisclosures = ({
   );
 
 const hashToBase64 = (input: string): string =>
-  crypto.createHash("sha256").update(input).digest("base64");
+  crypto
+    .createHash("sha256")
+    .update(Buffer.from(input, "base64"))
+    .digest("base64");
 
 export const createWalletAttestationAsSdJwt =
   (

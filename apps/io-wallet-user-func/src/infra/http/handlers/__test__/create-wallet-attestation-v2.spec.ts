@@ -9,6 +9,7 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as appInsights from "applicationinsights";
 import { decode } from "cbor-x";
+import * as crypto from "crypto";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
@@ -106,6 +107,10 @@ const telemetryClient: appInsights.TelemetryClient = {
   trackException: () => void 0,
 } as unknown as appInsights.TelemetryClient;
 
+function isStringArray(u: unknown): u is string[] {
+  return Array.isArray(u) && u.every((item) => typeof item === "string");
+}
+
 describe("CreateWalletAttestationV2Handler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const walletAttestationRequest = await new jose.SignJWT({
@@ -129,14 +134,15 @@ describe("CreateWalletAttestationV2Handler", async () => {
     .setExpirationTime("2h")
     .sign(josePrivateKey);
 
+  const req = {
+    ...H.request("https://wallet-provider.example.org"),
+    body: {
+      assertion: walletAttestationRequest,
+    },
+    method: "POST",
+  };
+
   it("should return a 200 HTTP response on success", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: {
-        assertion: walletAttestationRequest,
-      },
-      method: "POST",
-    };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntity,
@@ -150,9 +156,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       walletProvider: walletAttestationClaims,
     });
 
-    const result = await handler();
-    expect.assertions(3);
-    expect(result).toEqual({
+    await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: {
         body: expect.objectContaining({
@@ -169,8 +173,25 @@ describe("CreateWalletAttestationV2Handler", async () => {
         statusCode: 200,
       },
     });
+  });
 
-    // check trailing slashes are removed
+  it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
+    const handler = CreateWalletAttestationV2Handler({
+      attestationService: mockAttestationService,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletInstanceRepository,
+      walletProvider: walletAttestationClaims,
+    });
+
+    const result = await handler();
+    expect.assertions(4);
+
     if (E.isRight(result)) {
       const body = WalletAttestations.decode(result.right.body);
       if (E.isRight(body)) {
@@ -179,11 +200,101 @@ describe("CreateWalletAttestationV2Handler", async () => {
           (walletAttestation) => walletAttestation.format === "jwt",
         );
         if (walletAttestationJwt) {
-          const decoded = jose.decodeJwt(
+          const jwtHeader = jose.decodeProtectedHeader(
             walletAttestationJwt.wallet_attestation,
           );
-          expect((decoded.iss || "").endsWith("/")).toBe(false);
-          expect((decoded.sub || "").endsWith("/")).toBe(false);
+          expect(Object.keys(jwtHeader).sort()).toEqual(
+            ["alg", "typ", "kid", "trust_chain"].sort(),
+          );
+          const jwtPayload = jose.decodeJwt(
+            walletAttestationJwt.wallet_attestation,
+          );
+          expect(Object.keys(jwtPayload).sort()).toEqual(
+            [
+              "aal",
+              "exp",
+              "iat",
+              "cnf",
+              "iss",
+              "sub",
+              "wallet_name",
+              "wallet_link",
+            ].sort(),
+          );
+          // check trailing slashes are removed
+          expect((jwtPayload.iss || "").endsWith("/")).toBe(false);
+          expect((jwtPayload.sub || "").endsWith("/")).toBe(false);
+        }
+      }
+    }
+  });
+
+  it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
+    const handler = CreateWalletAttestationV2Handler({
+      attestationService: mockAttestationService,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletInstanceRepository,
+      walletProvider: walletAttestationClaims,
+    });
+
+    const result = await handler();
+    expect.assertions(6);
+
+    if (E.isRight(result)) {
+      const body = WalletAttestations.decode(result.right.body);
+      if (E.isRight(body)) {
+        const walletAttestations = body.right.wallet_attestations;
+        const walletAttestationDcSdJwt = walletAttestations.find(
+          (walletAttestation) => walletAttestation.format === "dc+sd-jwt",
+        );
+        if (walletAttestationDcSdJwt) {
+          const splittedVpToken =
+            walletAttestationDcSdJwt.wallet_attestation.split("~");
+          const sdJwt = splittedVpToken[0];
+          const disclosures = splittedVpToken.slice(1);
+
+          // check the properties of the header and payload
+          const jwtHeader = jose.decodeProtectedHeader(sdJwt);
+          expect(Object.keys(jwtHeader).sort()).toEqual(
+            ["alg", "typ", "kid", "trust_chain"].sort(),
+          );
+          const jwtPayload = jose.decodeJwt(sdJwt);
+          expect(Object.keys(jwtPayload).sort()).toEqual(
+            [
+              "aal",
+              "exp",
+              "iat",
+              "cnf",
+              "iss",
+              "sub",
+              "vct",
+              "_sd",
+              "sd_alg",
+            ].sort(),
+          );
+
+          // check that the hashed disclosures are included in _sd
+          const _sd = jwtPayload._sd;
+          if (isStringArray(_sd)) {
+            disclosures.forEach((disclosure) => {
+              const disclosureDigest = crypto
+                .createHash("sha256")
+                .update(Buffer.from(disclosure, "base64"))
+                .digest("base64");
+
+              expect(_sd.includes(disclosureDigest)).toBe(true);
+            });
+          }
+
+          // check trailing slashes are removed
+          expect((jwtPayload.iss || "").endsWith("/")).toBe(false);
+          expect((jwtPayload.sub || "").endsWith("/")).toBe(false);
         }
       }
     }
