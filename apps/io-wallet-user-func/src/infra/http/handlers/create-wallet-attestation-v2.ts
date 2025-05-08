@@ -1,16 +1,10 @@
-import {
-  AttestationService,
-  AttestationService,
-  validateAssertionV2V2,
-} from "@/attestation-service";
-import { EntityConfigurationEnvironment } from "@/entity-configuration";
-import { NonceEnvironment } from "@/nonce";
+import { AttestationService, validateAssertionV2 } from "@/attestation-service";
 import { NonceEnvironment } from "@/nonce";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
   createWalletAttestationAsJwt,
-  createWalletAttestationAsMdoc,
+  // createWalletAttestationAsMdoc,
   createWalletAttestationAsSdJwt,
 } from "@/wallet-attestation";
 import {
@@ -47,10 +41,10 @@ export const WalletAttestations = t.type({
       format: t.literal("dc+sd-jwt"),
       wallet_attestation: t.string,
     }),
-    t.type({
-      format: t.literal("mso_mdoc"),
-      wallet_attestation: t.string,
-    }),
+    // t.type({
+    //   format: t.literal("mso_mdoc"),
+    //   wallet_attestation: t.string,
+    // }),
   ]),
 });
 
@@ -66,10 +60,10 @@ const testWalletAttestations: WalletAttestations = {
       format: "dc+sd-jwt",
       wallet_attestation: "this_is_a_test_sd_jwt_attestation",
     },
-    {
-      format: "mso_mdoc",
-      wallet_attestation: "this_is_a_test_mdoc_attestation",
-    },
+    // {
+    //   format: "mso_mdoc",
+    //   wallet_attestation: "this_is_a_test_mdoc_attestation",
+    // },
   ],
 };
 
@@ -147,16 +141,12 @@ const generateWalletAttestations = ({
 }: {
   assertion: WalletAttestationRequestV2;
   isTestUser: boolean;
-}): RTE.ReaderTaskEither<
-  EntityConfigurationEnvironment,
-  Error,
-  WalletAttestations
-> =>
+}) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
       "dc+sd-jwt": createWalletAttestationAsSdJwt(assertion),
       jwt: createWalletAttestationAsJwt(assertion),
-      mso_mdoc: createWalletAttestationAsMdoc(assertion),
+      // mso_mdoc: createWalletAttestationAsMdoc(assertion),
     }),
     RTE.map((results) =>
       isTestUser
@@ -171,10 +161,10 @@ const generateWalletAttestations = ({
                 format: "dc+sd-jwt",
                 wallet_attestation: results["dc+sd-jwt"],
               },
-              {
-                format: "mso_mdoc",
-                wallet_attestation: results.mso_mdoc,
-              },
+              // {
+              //   format: "mso_mdoc",
+              //   wallet_attestation: results.mso_mdoc,
+              // },
             ],
           },
     ),

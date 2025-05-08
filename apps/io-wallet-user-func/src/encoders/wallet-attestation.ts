@@ -70,31 +70,29 @@ export const WalletAttestationToJwtModel: E.Encoder<
 };
 
 // ----- new wallet-attestation endpoint
-const WalletAttestationJwtModelV2 = t.type({
-  aal: t.string,
-  cnf: t.type({
-    jwk: JwkPublicKey,
-  }),
-  iss: t.string,
-  sub: t.string,
-  wallet_link: t.string,
-  wallet_name: t.string,
-  kid: t.string, // TODO
-});
+export interface WalletAttestationData {
+  aal: string;
+  iss: string;
+  kid: string;
+  sub: string;
+  trustChain: string[];
+  walletInstancePublicKey: JwkPublicKey;
+  walletLink: string;
+  walletName: string;
+}
 
-type WalletAttestationJwtModelV2 = t.TypeOf<typeof WalletAttestationJwtModelV2>;
-
-const WalletAttestationData = t.type({
-  aal: t.string,
-  iss: t.string,
-  sub: t.string,
-  walletInstancePublicKey: JwkPublicKey,
-  walletLink: t.string,
-  walletName: t.string,
-  kid: t.string, // TODO
-});
-
-export type WalletAttestationData = t.TypeOf<typeof WalletAttestationData>;
+interface WalletAttestationJwtModelV2 {
+  aal: string;
+  cnf: {
+    jwk: JwkPublicKey;
+  };
+  iss: string;
+  kid: string; // header
+  sub: string;
+  trust_chain: string[]; // header
+  wallet_link: string;
+  wallet_name: string;
+}
 
 export const WalletAttestationToJwtModelV2: E.Encoder<
   WalletAttestationJwtModelV2,
@@ -103,75 +101,22 @@ export const WalletAttestationToJwtModelV2: E.Encoder<
   encode: ({
     aal,
     iss,
+    kid,
     sub,
+    trustChain,
     walletInstancePublicKey,
     walletLink,
     walletName,
-    kid, // TODO
   }) => ({
-    kid,
     aal,
     cnf: {
       jwk: walletInstancePublicKey,
     },
     iss: removeTrailingSlash(iss),
-    sub: removeTrailingSlash(sub),
-    wallet_link: walletLink,
-    wallet_name: walletName,
-  }),
-};
-
-export const WalletAttestationSdJwtModel = t.type({
-  aal: t.string,
-  kid: t.string, // TODO
-  cnf: t.type({
-    jwk: JwkPublicKey,
-  }),
-  iss: t.string,
-  wallet_link: t.string,
-  wallet_name: t.string,
-  sub: t.string,
-  vct: t.literal("wallet.attestation.example/v1.0"), // differenza rispetto a WalletAttestationJwtModel
-});
-
-type WalletAttestationSdJwtModel = t.TypeOf<typeof WalletAttestationSdJwtModel>;
-
-const WalletAttestationSdJwtData = t.type({
-  walletName: t.string,
-  walletLink: t.string,
-  aal: t.string,
-  iss: t.string,
-  sub: t.string,
-  kid: t.string, // TODO
-  walletInstancePublicKey: JwkPublicKey,
-});
-
-type WalletAttestationSdJwtData = t.TypeOf<typeof WalletAttestationSdJwtData>;
-
-export const WalletAttestationToSdJwtModel: E.Encoder<
-  WalletAttestationSdJwtModel,
-  WalletAttestationSdJwtData
-> = {
-  encode: ({
-    aal,
-    iss,
-    sub,
-    walletInstancePublicKey,
-    walletLink,
-    walletName,
-    kid,
-  }) => ({
-    // _sd,
-    aal,
-    cnf: {
-      jwk: walletInstancePublicKey,
-    },
-    iss: removeTrailingSlash(iss),
-    // sd_alg,
-    wallet_link: walletLink,
-    wallet_name: walletName,
     kid,
     sub: removeTrailingSlash(sub),
-    vct: "wallet.attestation.example/v1.0",
+    trust_chain: trustChain,
+    wallet_link: walletLink,
+    wallet_name: walletName,
   }),
 };
