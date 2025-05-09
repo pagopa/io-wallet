@@ -34,7 +34,7 @@ const ConfigSchema = Joi.object({
       'number.min': 'REQUEST_TIMEOUT_MS must be at least 0',
       'number.max': 'REQUEST_TIMEOUT_MS must be maximum 1_000_000',
     }),
-}).unknown();
+});
 
 export const checkConfig = (): void => {
   try {
