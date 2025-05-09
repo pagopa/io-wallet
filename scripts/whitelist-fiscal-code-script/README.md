@@ -42,10 +42,10 @@ yarn start                       # run the script
 ```
 
 **STEP 4**
-After the script execution, you can see two output files:
+After the script execution, you can see two output files under the `logs/` directory:
 
-- `whitelisted_fiscal_code.csv`: a CSV file containing only fiscal codes added successfully to the whitelist.
-- `not_whitelisted_fiscal_code.csv`: a CSV file containing only fiscal codes not added (for some reason) to the whitelist.
+- `whitelisted_fiscal_codes.csv.csv`: a CSV file containing only fiscal codes added successfully to the whitelist.
+- `not_whitelisted_fiscal_codes.csv.csv`: a CSV file containing only fiscal codes not added (for some reason) to the whitelist.
 
 ### Useful commands
 

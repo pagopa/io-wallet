@@ -153,7 +153,9 @@ describe('Insert Fiscal Codes', () => {
 
     const cosmosClientMock = {
       database: vi.fn().mockReturnValue({
-        container: vi.fn().mockRejectedValue({}),
+        container: vi.fn().mockImplementation(() => {
+          throw new Error('container error');
+        }),
       }),
     };
 
