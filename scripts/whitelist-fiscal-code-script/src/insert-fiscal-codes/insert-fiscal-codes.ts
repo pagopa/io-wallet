@@ -1,5 +1,4 @@
 import { CosmosClient } from '@azure/cosmos';
-import { sleep } from '../utils/sleep';
 import * as CsvStringify from 'csv-stringify';
 import fs from 'fs';
 
@@ -16,7 +15,9 @@ const writeUpsertedFiscalCodes = async (
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
       fs.writeFileSync('logs/whitelisted_fiscal_codes.csv', output);
-      console.log("whitelisted fiscal codes written to logs/whitelisted_fiscal_codes.csv");
+      console.log(
+        'whitelisted fiscal codes written to logs/whitelisted_fiscal_codes.csv',
+      );
     } else {
       console.error('error creating CSV file for upserted fiscal codes');
       console.error(error);
@@ -48,7 +49,9 @@ const writeNotUpsertedFiscalCodes = async (
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
       fs.writeFileSync('logs/not_whitelisted_fiscal_codes.csv', output);
-      console.log("not whitelisted fiscal codes written to logs/not_whitelisted_fiscal_codes.csv");
+      console.log(
+        'not whitelisted fiscal codes written to logs/not_whitelisted_fiscal_codes.csv',
+      );
     } else {
       console.error('error creating CSV file for not upserted fiscal codes');
       console.error(error);
@@ -88,7 +91,9 @@ export const insertFiscalCodes = async (
 
         console.log(`${fiscalCode} upserted`);
 
-        await sleep(sleepTimeBetweenRequestsMs);
+        await new Promise((resolve) =>
+          setTimeout(resolve, sleepTimeBetweenRequestsMs),
+        );
       } catch (error) {
         console.error(`${fiscalCode} not upserted`);
         notUpsertedFiscalCodes.push({
