@@ -44,3 +44,8 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 ignore_features.tf
+
+# scripts
+scripts/whitelist-fiscal-code-script/*.csv
+scripts/whitelist-fiscal-code-script/logs/**
+scripts/whitelist-fiscal-code-script/.yarn/
