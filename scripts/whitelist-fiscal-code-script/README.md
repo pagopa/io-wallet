@@ -49,6 +49,7 @@ After the script execution, you can see two output files under the `logs/` direc
 ### Script Arguments
 
 This script accepts two arguments:
+
 - `input`: the CSV file containing the fiscal code to add in the whitelist. The default value is `fiscalcodes.csv`.
 - `outputDir`: the output directory containing the results of the script execution. The default value is `logs/`.
 

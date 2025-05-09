@@ -5,11 +5,11 @@ import { getArgvParam } from '../utils/get-argv-param';
 dotenv.config();
 
 const ArgumentsSchema = Joi.object({
-  input: Joi.string().optional().default("fiscalcodes.csv").messages({
+  input: Joi.string().optional().default('fiscalcodes.csv').messages({
     'string.base': 'input must be a string',
     'string.empty': 'input is not allowed to be empty',
   }),
-  outputDir: Joi.string().optional().default("logs/").default('logs').messages({
+  outputDir: Joi.string().optional().default('logs/').default('logs').messages({
     'string.base': 'outputDir must be a string',
     'string.empty': 'outputDir is not allowed to be empty',
   }),
