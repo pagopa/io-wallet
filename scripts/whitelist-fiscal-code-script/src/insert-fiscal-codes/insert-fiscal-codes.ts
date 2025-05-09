@@ -1,6 +1,7 @@
 import { CosmosClient } from '@azure/cosmos';
 import * as CsvStringify from 'csv-stringify';
 import fs from 'fs';
+import { getArgvParam } from '../utils/get-argv-param';
 
 const writeUpsertedFiscalCodes = async (
   upsertedFiscalcodes: string[],
@@ -14,7 +15,7 @@ const writeUpsertedFiscalCodes = async (
 
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
-      fs.writeFileSync('logs/whitelisted_fiscal_codes.csv', output);
+      fs.writeFileSync(`${getArgvParam("--outputDir") ?? "logs"}/whitelisted_fiscal_codes.csv`, output);
       console.log(
         'whitelisted fiscal codes written to logs/whitelisted_fiscal_codes.csv',
       );
@@ -48,7 +49,7 @@ const writeNotUpsertedFiscalCodes = async (
 
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
-      fs.writeFileSync('logs/not_whitelisted_fiscal_codes.csv', output);
+      fs.writeFileSync(`${getArgvParam("--outputDir") ?? "logs"}/not_whitelisted_fiscal_codes.csv`, output);
       console.log(
         'not whitelisted fiscal codes written to logs/not_whitelisted_fiscal_codes.csv',
       );

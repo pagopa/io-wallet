@@ -1,18 +1,25 @@
 import * as dotenv from 'dotenv';
 import * as Joi from 'joi';
+import { getArgvParam } from '../utils/get-argv-param';
 
 dotenv.config();
 
-const ConfigSchema = Joi.object({
+const ArgumentsSchema = Joi.object({
+  input: Joi.string().optional().default("fiscalcodes.csv").messages({
+    'string.base': 'input must be a string',
+    'string.empty': 'input is not allowed to be empty',
+  }),
+  outputDir: Joi.string().optional().default("logs/").default('logs').messages({
+    'string.base': 'outputDir must be a string',
+    'string.empty': 'outputDir is not allowed to be empty',
+  }),
+});
+
+const EnvSchema = Joi.object({
   DATABASE_CONNECTION_STRING: Joi.string().required().messages({
     'string.base': 'DATABASE_CONNECTION_STRING must be a string',
     'string.empty': 'DATABASE_CONNECTION_STRING is not allowed to be empty',
     'any.required': 'DATABASE_CONNECTION_STRING is required',
-  }),
-  FISCAL_CODES_CSV_FILE_PATH: Joi.string().required().messages({
-    'string.base': 'FISCAL_CODES_CSV_FILE_PATH must be a string',
-    'string.empty': 'FISCAL_CODES_CSV_FILE_PATH is not allowed to be empty',
-    'any.required': 'FISCAL_CODES_CSV_FILE_PATH is required',
   }),
   SLEEP_TIME_BETWEEN_REQUESTS_MS: Joi.number()
     .min(0)
@@ -36,9 +43,17 @@ const ConfigSchema = Joi.object({
     }),
 });
 
+const ConfigSchema = Joi.object({}).concat(EnvSchema).concat(ArgumentsSchema);
+
 export const checkConfig = (): void => {
   try {
-    const { error } = ConfigSchema.validate(process.env, {
+    const configs = {
+      ...process.env,
+      input: getArgvParam('--input'),
+      outputDir: getArgvParam('--outputDir'),
+    };
+
+    const { error } = ConfigSchema.validate(configs, {
       allowUnknown: true,
       abortEarly: false,
     });

@@ -17,7 +17,6 @@ console.error = vi.fn();
 describe('checkConfig()', () => {
   it('should pass validation when all env vars are valid', () => {
     process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
-    process.env.FISCAL_CODES_CSV_FILE_PATH = 'valid-fiscal-codes-file-path';
     process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '1000';
     process.env.REQUEST_TIMEOUT_MS = '10000';
 
@@ -26,7 +25,6 @@ describe('checkConfig()', () => {
 
   it('should fail validation when DATABASE_CONNECTION_STRING is missing', () => {
     delete process.env.DATABASE_CONNECTION_STRING;
-    process.env.FISCAL_CODES_CSV_FILE_PATH = 'valid-fiscal-codes-file-path';
     process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '1000';
     process.env.REQUEST_TIMEOUT_MS = '10000';
 
@@ -44,7 +42,6 @@ describe('checkConfig()', () => {
 
   it('should fail validation when DATABASE_CONNECTION_STRING is an empty string', () => {
     process.env.DATABASE_CONNECTION_STRING = '';
-    process.env.FISCAL_CODES_CSV_FILE_PATH = 'valid-fiscal-codes-file-path';
     process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '1000';
     process.env.REQUEST_TIMEOUT_MS = '10000';
 
@@ -60,27 +57,8 @@ describe('checkConfig()', () => {
     expect(true).toStrictEqual(false);
   });
 
-  it('should fail validation when FISCAL_CODES_CSV_FILE_PATH is an empty string', () => {
-    process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
-    process.env.FISCAL_CODES_CSV_FILE_PATH = ''; // wrong, empty string
-    process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '500';
-    process.env.REQUEST_TIMEOUT_MS = '10000';
-
-    try {
-      checkConfig();
-    } catch (error) {
-      expect((error as Error).message).toContain(
-        'FISCAL_CODES_CSV_FILE_PATH is not allowed to be empty',
-      );
-      return;
-    }
-
-    expect(true).toStrictEqual(false);
-  });
-
   it('should fail validation when SLEEP_TIME_BETWEEN_REQUESTS_MS is of another type', () => {
     process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
-    process.env.FISCAL_CODES_CSV_FILE_PATH = 'valid-fiscal-codes-file-path';
     process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = 'wrong-type'; // string, instead of number
     process.env.REQUEST_TIMEOUT_MS = '10000';
 
@@ -98,7 +76,6 @@ describe('checkConfig()', () => {
 
   it('should fail validation when REQUEST_TIMEOUT_MS is of another type', () => {
     process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
-    process.env.FISCAL_CODES_CSV_FILE_PATH = 'valid-fiscal-codes-file-path';
     process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '1000';
     process.env.REQUEST_TIMEOUT_MS = 'wrong-type'; // string, instead of number
 
