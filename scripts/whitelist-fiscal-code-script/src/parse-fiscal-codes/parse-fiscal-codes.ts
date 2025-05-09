@@ -27,6 +27,11 @@ export const parseFiscalCodes = async (
         .on('error', reject);
     });
 
+    if (fiscalCodes.length === 0) {
+      console.warn('the CSV file is empty or does not contain a header row.');
+      return [];
+    }
+
     fiscalCodes.shift();
 
     console.log(`Loaded ${fiscalCodes.length} fiscal codes from CSV file`);
