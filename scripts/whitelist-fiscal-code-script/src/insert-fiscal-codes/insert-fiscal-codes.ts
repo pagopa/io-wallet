@@ -35,8 +35,8 @@ const writeNotUpsertedFiscalCodes = async (
     ['fiscalCode', 'message', 'stack'],
     ...notUpsertedFiscalCodes.map((item) => [
       item.fiscalCode,
-      item.message.replaceAll('"', '"'),
-      item.stack.replaceAll('"', '"'),
+      item.message.replaceAll('"', ''),
+      item.stack.replaceAll('"', ''),
     ]),
   ];
 
