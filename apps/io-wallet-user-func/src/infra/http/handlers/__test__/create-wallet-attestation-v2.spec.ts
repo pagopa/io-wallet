@@ -153,7 +153,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository,
-      walletProvider: walletAttestationClaims,
+      walletAttestationConfig: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -186,7 +186,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository,
-      walletProvider: walletAttestationClaims,
+      walletAttestationConfig: walletAttestationClaims,
     });
 
     const result = await handler();
@@ -240,7 +240,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository,
-      walletProvider: walletAttestationClaims,
+      walletAttestationConfig: walletAttestationClaims,
     });
 
     const result = await handler();
@@ -318,7 +318,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository,
-      walletProvider: walletAttestationClaims,
+      walletAttestationConfig: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -365,7 +365,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
-      walletProvider: walletAttestationClaims,
+      walletAttestationConfig: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -407,7 +407,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signer,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
-      walletProvider: walletAttestationClaims,
+      walletAttestationConfig: walletAttestationClaims,
     });
 
     await expect(handler()).resolves.toEqual({
