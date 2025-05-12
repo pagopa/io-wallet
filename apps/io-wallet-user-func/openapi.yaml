@@ -118,7 +118,7 @@ paths:
               $ref: "#/components/schemas/CreateWalletAttestationV2Body"
       responses:
         "200":
-          description: Wallet Attestation generated
+          description: List of generated Wallet Attestations
           content:
             application/json:
               schema:
@@ -386,14 +386,17 @@ components:
       properties:
         wallet_attestations:
           type: array
+          minItems: 2
+          maxItems: 2
           items:
             type: object
+            required: [format, wallet_attestation]
             properties:
-              wallet_attestation:
-                type: string
               format:
                 type: string
-                enum: ["jwt", "dc+sd-jwt"]
+                enum: [jwt, "dc+sd-jwt"]
+              wallet_attestation:
+                type: string
       required:
         - wallet_attestations
 
