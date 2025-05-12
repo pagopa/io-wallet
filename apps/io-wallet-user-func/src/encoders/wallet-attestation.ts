@@ -68,3 +68,55 @@ export const WalletAttestationToJwtModel: E.Encoder<
     },
   }),
 };
+
+// ----- new wallet-attestation endpoint
+export interface WalletAttestationData {
+  aal: string;
+  iss: string;
+  kid: string;
+  sub: string;
+  trustChain: string[];
+  walletInstancePublicKey: JwkPublicKey;
+  walletLink: string;
+  walletName: string;
+}
+
+interface WalletAttestationJwtModelV2 {
+  aal: string;
+  cnf: {
+    jwk: JwkPublicKey;
+  };
+  iss: string;
+  kid: string;
+  sub: string;
+  trust_chain: string[];
+  wallet_link: string;
+  wallet_name: string;
+}
+
+export const WalletAttestationToJwtModelV2: E.Encoder<
+  WalletAttestationJwtModelV2,
+  WalletAttestationData
+> = {
+  encode: ({
+    aal,
+    iss,
+    kid,
+    sub,
+    trustChain,
+    walletInstancePublicKey,
+    walletLink,
+    walletName,
+  }) => ({
+    aal,
+    cnf: {
+      jwk: walletInstancePublicKey,
+    },
+    iss: removeTrailingSlash(iss),
+    kid,
+    sub: removeTrailingSlash(sub),
+    trust_chain: trustChain,
+    wallet_link: walletLink,
+    wallet_name: walletName,
+  }),
+};
