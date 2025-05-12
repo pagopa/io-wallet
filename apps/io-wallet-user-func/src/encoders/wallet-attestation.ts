@@ -87,9 +87,9 @@ interface WalletAttestationJwtModelV2 {
     jwk: JwkPublicKey;
   };
   iss: string;
-  kid: string; // header
+  kid: string;
   sub: string;
-  trust_chain: string[]; // header
+  trust_chain: string[];
   wallet_link: string;
   wallet_name: string;
 }
