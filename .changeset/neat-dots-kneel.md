@@ -2,4 +2,4 @@
 "io-wallet-user-func": minor
 ---
 
-Added wallet attestation SD-JWT format
+Updated /wallet-attestation endpoint to return JWT and SD-JWT format
