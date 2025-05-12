@@ -92,7 +92,7 @@ export const createWalletAttestation =
     );
 
 // ----- new wallet-attestation endpoint
-interface WalletProvider {
+interface WalletAttestationConfig {
   walletLink: string;
   walletName: string;
 }
@@ -100,7 +100,7 @@ interface WalletProvider {
 interface WalletAttestationEnvironment {
   federationEntity: FederationEntity;
   signer: Signer;
-  walletProvider: WalletProvider;
+  walletAttestationConfig: WalletAttestationConfig;
 }
 
 const getWalletAttestationData =
@@ -114,7 +114,7 @@ const getWalletAttestationData =
   ({
     federationEntity: { basePath },
     signer,
-    walletProvider: { walletLink, walletName },
+    walletAttestationConfig: { walletLink, walletName },
   }) =>
     pipe(
       "EC",
@@ -215,7 +215,6 @@ export const createWalletAttestationAsSdJwt =
           getDisclosures,
           TE.fromIOEither,
           TE.chain((disclosures) =>
-            // sdJwtModel: iss, sub, vct, cnf, aal, kid, trustChain, walletLink, walletName
             pipe(
               sdJwtModel,
               ({ aal, cnf, iss, sub, vct }) => ({

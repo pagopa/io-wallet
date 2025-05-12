@@ -322,7 +322,7 @@ app.http("createWalletAttestationV2", {
       signer,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
-      walletProvider: config.walletProvider.walletAttestation,
+      walletAttestationConfig: config.walletProvider.walletAttestation,
     }),
   ),
   methods: ["POST"],
