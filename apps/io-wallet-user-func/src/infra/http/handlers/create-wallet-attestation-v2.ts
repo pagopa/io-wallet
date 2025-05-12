@@ -128,7 +128,7 @@ const validateRequest: (input: {
     ),
   );
 
-const sendExpectionToAppInsights = (error: Error, requestBody: unknown) =>
+const sendExceptionToAppInsights = (error: Error, requestBody: unknown) =>
   sendExceptionWithBodyToAppInsights(
     error,
     requestBody,
@@ -179,7 +179,7 @@ export const CreateWalletAttestationV2Handler = H.of((req: H.HttpRequest) =>
     RTE.chainFirst(validateRequest),
     RTE.chainW(generateWalletAttestations),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) => sendExpectionToAppInsights(error, req.body)),
+    RTE.orElseFirstW((error) => sendExceptionToAppInsights(error, req.body)),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );
