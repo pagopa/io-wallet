@@ -65,7 +65,7 @@ export const createWalletAttestation =
       TE.chain(({ publicJwk, supportedSignAlgorithms }) =>
         pipe(
           {
-            aal: pipe(basePath, getLoAUri(LoA.basic)), // basic?
+            aal: pipe(basePath, getLoAUri(LoA.basic)),
             algValueSupported: supportedSignAlgorithms,
             federationEntity: {
               homepageUri: federationEntityMetadata.homepageUri,
