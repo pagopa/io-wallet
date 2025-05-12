@@ -152,8 +152,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletInstanceRepository,
       walletAttestationConfig: walletAttestationClaims,
+      walletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -185,8 +185,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletInstanceRepository,
       walletAttestationConfig: walletAttestationClaims,
+      walletInstanceRepository,
     });
 
     const result = await handler();
@@ -239,8 +239,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletInstanceRepository,
       walletAttestationConfig: walletAttestationClaims,
+      walletInstanceRepository,
     });
 
     const result = await handler();
@@ -317,8 +317,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletInstanceRepository,
       walletAttestationConfig: walletAttestationClaims,
+      walletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -364,8 +364,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
       walletAttestationConfig: walletAttestationClaims,
+      walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -406,8 +406,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
       walletAttestationConfig: walletAttestationClaims,
+      walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
     await expect(handler()).resolves.toEqual({
