@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.0
+
+### Minor Changes
+
+- 130ecca: Updated /wallet-attestation endpoint to return JWT and SD-JWT format
+
 ## 3.2.4
 
 ### Patch Changes
