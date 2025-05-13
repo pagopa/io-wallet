@@ -292,24 +292,25 @@ app.http("deleteWalletInstances", {
   route: "wallet-instances",
 });
 
-app.cosmosDB("addWalletInstanceUserId", {
-  connection: "CosmosDbEndpoint",
-  containerName: "wallet-instances",
-  databaseName: config.azure.cosmos.dbName,
-  handler: AddWalletInstanceUserIdFunction({
-    inputDecoder: t.array(WalletInstance),
-    telemetryClient: appInsightsClient,
-  }),
-  leaseContainerName: "leases-wallet-instances-user-id",
-  leaseContainerPrefix: "wallet-instances-user-id-",
-  return: output.cosmosDB({
-    connection: "CosmosDbEndpoint",
-    containerName: "wallet-instances-user-id",
-    createIfNotExists: false,
-    databaseName: config.azure.cosmos.dbName,
-  }),
-  startFromBeginning: true,
-});
+// TODO: add addWalletInstanceUserId to function_app_user_slot_disabled in infra/resources/_modules/function_apps/locals.tf
+// app.cosmosDB("addWalletInstanceUserId", {
+//   connection: "CosmosDbEndpoint",
+//   containerName: "wallet-instances",
+//   databaseName: config.azure.cosmos.dbName,
+//   handler: AddWalletInstanceUserIdFunction({
+//     inputDecoder: t.array(WalletInstance),
+//     telemetryClient: appInsightsClient,
+//   }),
+//   leaseContainerName: "leases-wallet-instances-user-id",
+//   leaseContainerPrefix: "wallet-instances-user-id-",
+//   return: output.cosmosDB({
+//     connection: "CosmosDbEndpoint",
+//     containerName: "wallet-instances-user-id",
+//     createIfNotExists: false,
+//     databaseName: config.azure.cosmos.dbName,
+//   }),
+//   startFromBeginning: true,
+// });
 
 // this will replace the token endpoint
 app.http("createWalletAttestationV2", {
