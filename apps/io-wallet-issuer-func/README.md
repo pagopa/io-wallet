@@ -34,7 +34,8 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 - (Planned) Nonce Endpoint, DPoP, etc.
 
 **Authentication** can be performed through:
-- An OAUTH2 server 
+
+- An OAUTH2 server
 - A simple username/password form (for testing purposes only)
 
 ---
@@ -43,13 +44,13 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 
 ### Supported Credential Formats
 
-| Credential/Attestation          | Format     |
-|---------------------------------|------------|
-| **PID**                         | SD-JWT-VC  |
-| **European Disability Card**    | SD-JWT-VC  |
-| **PID**    (Planned)            | mso_mdoc   |
-| **mDL**   (Planned)             | mso_mdoc   |
-| **(Q)EAA age-over-18 pseudonym** (Planned) | mso_mdoc   |
+| Credential/Attestation                     | Format    |
+| ------------------------------------------ | --------- |
+| **PID**                                    | SD-JWT-VC |
+| **European Disability Card**               | SD-JWT-VC |
+| **PID** (Planned)                          | mso_mdoc  |
+| **mDL** (Planned)                          | mso_mdoc  |
+| **(Q)EAA age-over-18 pseudonym** (Planned) | mso_mdoc  |
 
 ### Authentication Methods
 
@@ -58,27 +59,27 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 
 ### OpenID4VCI Coverage
 
-| Feature                                                   | Coverage                                                         |
-|-----------------------------------------------------------|------------------------------------------------------------------|
-| **Authorization Code flow**                               | ✅ Support for credential configuration ID, scope               |
-| **Credential Offer**                                      | ❌ Planned for a future release `authorization_code`,                 |
-| **Dynamic Credential Request**                            | ✅                                                              |
-| **mso_mdoc format**                                       | ❌                                                              |
-| **SD-JWT-VC format**                                      | ✅                                                              |
-| **W3C VC DM**                                             | ❌                                                              |
-| **Token Endpoint**                                        | ✅                                                              |
-| **Credential Endpoint**                                   | ✅ Includes proofs and repeatable invocations                   |
-| **Credential Issuer Metadata**                            | ✅ openid-federation                                            |
-| **Batch Endpoint**                                        | ❌                                                              |
-| **Deferred Endpoint**                                     | ❌                                                              |
-| **Proof**                                                 | ✅ JWT, ❌ CWT                                                   |
-| **Credential response encryption**                        | ❌                                                              |
-| **Notification Endpoint**                                 | ❌                                                              |
-| **Nonce Endpoint**                                        | ❌ Planned for a future release                                  |
-| **Pushed authorization request**                          | ✅                                                              |
-| **Wallet authentication**                                 | ✅ Public client                                                |
-| **Demonstrating Proof of Possession (DPoP)**              | ✅                                                              |
-| **PKCE**                                                  | ✅                                                              |
+| Feature                                      | Coverage                                              |
+| -------------------------------------------- | ----------------------------------------------------- |
+| **Authorization Code flow**                  | ✅ Support for credential configuration ID, scope     |
+| **Credential Offer**                         | ❌ Planned for a future release `authorization_code`, |
+| **Dynamic Credential Request**               | ✅                                                    |
+| **mso_mdoc format**                          | ❌                                                    |
+| **SD-JWT-VC format**                         | ✅                                                    |
+| **W3C VC DM**                                | ❌                                                    |
+| **Token Endpoint**                           | ✅                                                    |
+| **Credential Endpoint**                      | ✅ Includes proofs and repeatable invocations         |
+| **Credential Issuer Metadata**               | ✅ openid-federation                                  |
+| **Batch Endpoint**                           | ❌                                                    |
+| **Deferred Endpoint**                        | ❌                                                    |
+| **Proof**                                    | ✅ JWT, ❌ CWT                                        |
+| **Credential response encryption**           | ❌                                                    |
+| **Notification Endpoint**                    | ❌                                                    |
+| **Nonce Endpoint**                           | ❌ Planned for a future release                       |
+| **Pushed authorization request**             | ✅                                                    |
+| **Wallet authentication**                    | ✅ Public client                                      |
+| **Demonstrating Proof of Possession (DPoP)** | ✅                                                    |
+| **PKCE**                                     | ✅                                                    |
 
 ---
 
@@ -93,18 +94,24 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 ## Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/pagopa/io-eudiw-wpb.git
    cd credential-issuer
 
+   ```
 
 2. **Install dependencies**:
+
    ```bash
    yarn install
 
-2. **(Optional) Install Azure Function extensions if needed**:
+   ```
+
+3. **(Optional) Install Azure Function extensions if needed**:
    ```bash
    yarn run extensions:install
+   ```
 
 ## Usage
 
@@ -113,39 +120,41 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 - **Build** the project:
   ```bash
   yarn build
+  ```
 
 This command compiles your TypeScript code into the dist directory.
 
 - **Clean** the dist directory:
   ```bash
   yarn clean
+  ```
 
 ### Development
 
 During development, you can watch for file changes and rebuild automatically:
 
-  ```bash
-  yarn build:watch
-  ```
+```bash
+yarn build:watch
+```
 
 Then, to start the service locally:
 
-  ```bash
-  yarn start
-  ```
+```bash
+yarn start
+```
 
 By default, this will start the Azure Function runtime on port 7071. Refer to local.settings.json for additional configuration details and environment variables.
-
 
 ### Testing
 
 Run tests:
-  ```bash
-  yarn test
-  ```
+
+```bash
+yarn test
+```
 
 Test coverage:
 
-  ```bash
-  yarn test:coverage
-  ```
+```bash
+yarn test:coverage
+```

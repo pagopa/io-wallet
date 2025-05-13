@@ -1,16 +1,17 @@
-import { ECKey, ECPrivateKey, JwkPrivateKey, JwkPublicKey } from "./jwk";
-import { importJWK, CompactSign, JWK } from "jose";
 import { type SignCallback } from "@openid-federation/core";
+import { CompactSign, JWK, importJWK } from "jose";
+
+import { ECKey, ECPrivateKey, JwkPrivateKey, JwkPublicKey } from "./jwk";
 
 export interface JwksRepository {
   readonly get: () => JwkKeyPair<"EC">;
 }
 
 interface JwkKeyPair<A> {
-  readonly private: JwkPrivateKey &
-    Required<Pick<ECPrivateKey, "kid">> & { readonly kty: A };
-  readonly public: JwkPublicKey &
-    Required<Pick<ECKey, "kid">> & { readonly kty: A };
+  readonly private: { readonly kty: A } & JwkPrivateKey &
+    Required<Pick<ECPrivateKey, "kid">>;
+  readonly public: { readonly kty: A } & JwkPublicKey &
+    Required<Pick<ECKey, "kid">>;
 }
 
 /**
@@ -30,7 +31,7 @@ const base64urlToBase64 = (base64url: string): string =>
  * @param jwk - The JSON Web Key to use for signing
  * @returns A Buffer containing the raw signature bytes
  */
-export const signJwtCallback: SignCallback = async ({ toBeSigned, jwk }) => {
+export const signJwtCallback: SignCallback = async ({ jwk, toBeSigned }) => {
   const alg = jwk.alg ?? "ES256";
   const key = await importJWK(jwk as unknown as JWK, alg);
 
@@ -45,7 +46,6 @@ export const signJwtCallback: SignCallback = async ({ toBeSigned, jwk }) => {
     throw new Error("JWS compact format is not valid");
   }
   const signatureBase64Url = parts[2];
-
   const signatureBase64 = base64urlToBase64(signatureBase64Url);
   const signatureBytes = Buffer.from(signatureBase64, "base64");
 

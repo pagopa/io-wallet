@@ -1,7 +1,5 @@
 {
-  "exclude": [
-    "dist"
-  ],
+  "exclude": ["dist"],
   "compilerOptions": {
     "outDir": "dist",
     "module": "commonjs",

@@ -1,5 +1,5 @@
-import { JwksRepository } from "../../domain/signer";
 import { ECKey, ECPrivateKeyWithKid } from "../../domain/jwk";
+import { JwksRepository } from "../../domain/signer";
 
 export const makeJwksRepository = (
   jwks: readonly ECPrivateKeyWithKid[],
@@ -10,14 +10,14 @@ export const makeJwksRepository = (
     }
 
     const jwkKeyPair = {
-      public: { ...jwks[0], kty: "EC" } as ECKey & {
+      private: { ...jwks[0], kty: "EC" } as {
         kid: string;
         readonly kty: "EC";
-      },
-      private: { ...jwks[0], kty: "EC" } as ECPrivateKeyWithKid & {
+      } & ECPrivateKeyWithKid,
+      public: { ...jwks[0], kty: "EC" } as {
         kid: string;
         readonly kty: "EC";
-      },
+      } & ECKey,
     };
 
     return jwkKeyPair;

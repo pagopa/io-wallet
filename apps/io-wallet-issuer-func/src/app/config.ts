@@ -1,10 +1,11 @@
 import { z } from "zod";
+
 import { ECPrivateKeyWithKid } from "../domain/jwk";
 
 export interface Config {
   readonly cosmosdb: {
-    readonly endpoint: string;
     readonly databaseName: string;
+    readonly endpoint: string;
   };
   readonly signer: {
     readonly jwks: readonly ECPrivateKeyWithKid[];
@@ -12,8 +13,8 @@ export interface Config {
 }
 
 const EnvsCodec = z.object({
-  COSMOSDB_ENDPOINT: z.string(),
   COSMOSDB_DATABASE_NAME: z.string(),
+  COSMOSDB_ENDPOINT: z.string(),
   // jwks private keys
   SIGNER_JWK_LIST_BASE64: z.string(),
   isProduction: z.boolean(),
@@ -25,7 +26,7 @@ const EnvsCodec = z.object({
  * @returns either the configuration values or an Error
  */
 export const getConfigOrError = (
-  envs: Record<string, undefined | string>,
+  envs: Record<string, string | undefined>,
 ): Config => {
   const envCodec = EnvsCodec.parse({
     ...envs,
@@ -40,8 +41,8 @@ export const getConfigOrError = (
 
   return {
     cosmosdb: {
-      endpoint: envCodec.COSMOSDB_ENDPOINT,
       databaseName: envCodec.COSMOSDB_DATABASE_NAME,
+      endpoint: envCodec.COSMOSDB_ENDPOINT,
     },
     signer: {
       jwks: jwks,

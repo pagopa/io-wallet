@@ -6397,6 +6397,7 @@ __metadata:
     "@azure/identity": "npm:^4.5.0"
     "@openid-federation/core": "npm:^0.2.0"
     "@openid4vc/openid4vci": "npm:0.3.0-alpha-20250224151429"
+    "@pagopa/eslint-config": "npm:^4.0.1"
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@types/express": "npm:^4.17.12"
     "@types/node": "npm:~20.10.0"

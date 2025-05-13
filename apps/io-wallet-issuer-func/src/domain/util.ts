@@ -1,14 +1,14 @@
-import * as crypto from "node:crypto";
-import { decodeBase64, encodeToUtf8String } from "@openid4vc/utils";
-import * as jose from "jose";
 import {
   type CallbackContext,
-  type Jwk,
   HashAlgorithm,
+  type Jwk,
   type SignJwtCallback,
   calculateJwkThumbprint,
 } from "@openid4vc/oauth2";
 import { clientAuthenticationNone } from "@openid4vc/oauth2";
+import { decodeBase64, encodeToUtf8String } from "@openid4vc/utils";
+import * as jose from "jose";
+import * as crypto from "node:crypto";
 
 /**
  * Parses an application/x-www-form-urlencoded string into an object.
@@ -22,14 +22,9 @@ export function parseXwwwFormUrlEncoded(text: string) {
 
 export const callbacks = {
   /**
-   * Hashes data using the specified algorithm.
-   *
-   * @param data - The data to hash
-   * @param alg - The hashing algorithm to use
-   * @returns A Buffer containing the hash
+   * Provides client authentication callback (currently returns "none").
    */
-  hash: (data, alg) =>
-    crypto.createHash(alg.replace("-", "").toLowerCase()).update(data).digest(),
+  clientAuthentication: clientAuthenticationNone(),
 
   /**
    * Generates a cryptographically secure random byte buffer.
@@ -40,9 +35,14 @@ export const callbacks = {
   generateRandom: (bytes) => crypto.randomBytes(bytes),
 
   /**
-   * Provides client authentication callback (currently returns "none").
+   * Hashes data using the specified algorithm.
+   *
+   * @param data - The data to hash
+   * @param alg - The hashing algorithm to use
+   * @returns A Buffer containing the hash
    */
-  clientAuthentication: clientAuthenticationNone(),
+  hash: (data, alg) =>
+    crypto.createHash(alg.replace("-", "").toLowerCase()).update(data).digest(),
 
   /**
    * Verifies a JWT using the signer's public JWK.
@@ -66,7 +66,10 @@ export const callbacks = {
       throw new Error("Signer method not supported");
     }
 
-    const josePublicKey = await jose.importJWK(jwk as jose.JWK, signer.alg);
+    const josePublicKey = await jose.importJWK(
+      jwk as unknown as jose.JWK,
+      signer.alg,
+    );
     try {
       await jose.jwtVerify(compact, josePublicKey, {
         currentDate: payload.exp
@@ -74,8 +77,8 @@ export const callbacks = {
           : undefined,
       });
       return {
-        verified: true,
         signerJwk: jwk,
+        verified: true,
       };
     } catch (error) {
       return {
@@ -91,8 +94,9 @@ export const callbacks = {
  * @param privateJwks - Array of private JWKs to choose from for signing
  * @returns A SignJwtCallback function
  */
-export const getSignJwtCallback = (privateJwks: Jwk[]): SignJwtCallback => {
-  return async (signer, { header, payload }) => {
+export const getSignJwtCallback =
+  (privateJwks: Jwk[]): SignJwtCallback =>
+  async (signer, { header, payload }) => {
     let jwk: Jwk;
     if (signer.method === "did") {
       jwk = JSON.parse(
@@ -107,9 +111,9 @@ export const getSignJwtCallback = (privateJwks: Jwk[]): SignJwtCallback => {
     }
 
     const jwkThumprint = await calculateJwkThumbprint({
-      jwk,
       hashAlgorithm: HashAlgorithm.Sha256,
       hashCallback: callbacks.hash,
+      jwk,
     });
 
     const privateJwk = await Promise.all(
@@ -131,11 +135,11 @@ export const getSignJwtCallback = (privateJwks: Jwk[]): SignJwtCallback => {
     }
 
     const josePrivateKey = await jose.importJWK(
-      privateJwk as jose.JWK,
+      privateJwk as unknown as jose.JWK,
       signer.alg,
     );
     const jwt = await new jose.SignJWT(payload)
-      .setProtectedHeader(header)
+      .setProtectedHeader({ ...header, alg: signer.alg })
       .sign(josePrivateKey);
 
     return {
@@ -143,4 +147,3 @@ export const getSignJwtCallback = (privateJwks: Jwk[]): SignJwtCallback => {
       signerJwk: jwk,
     };
   };
-};

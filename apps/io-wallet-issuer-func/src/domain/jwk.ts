@@ -1,11 +1,11 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const ECKey = z.object({
   crv: z.string(),
-  kty: z.literal('EC'),
+  kid: z.string().optional(),
+  kty: z.literal("EC"),
   x: z.string(),
   y: z.string(),
-  kid: z.string().optional(),
 });
 export type ECKey = z.infer<typeof ECKey>;
 
@@ -15,11 +15,11 @@ export const ECPrivateKey = ECKey.extend({
 export type ECPrivateKey = z.infer<typeof ECPrivateKey>;
 
 export const RSAKey = z.object({
-  e: z.string(),
-  kty: z.literal('RSA'),
-  n: z.string(),
   alg: z.string().optional(),
+  e: z.string(),
   kid: z.string().optional(),
+  kty: z.literal("RSA"),
+  n: z.string(),
 });
 export type RSAKey = z.infer<typeof RSAKey>;
 
@@ -37,13 +37,13 @@ export type RSAPrivateKey = z.infer<typeof RSAPrivateKey>;
 /**
  * The Public Key JWK type. It could be either an ECKey or an RSAKey.
  */
-export const JwkPublicKey = z.discriminatedUnion('kty', [RSAKey, ECKey]);
+export const JwkPublicKey = z.discriminatedUnion("kty", [RSAKey, ECKey]);
 export type JwkPublicKey = z.infer<typeof JwkPublicKey>;
 
 /**
  * The Private Key JWK type. It could be either an ECPrivateKey or an RSAPrivateKey.
  */
-export const JwkPrivateKey = z.discriminatedUnion('kty', [
+export const JwkPrivateKey = z.discriminatedUnion("kty", [
   RSAPrivateKey,
   ECPrivateKey,
 ]);
