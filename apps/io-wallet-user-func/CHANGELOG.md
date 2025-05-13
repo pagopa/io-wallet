@@ -1,5 +1,23 @@
 # io-wallet-user-func
 
+## 3.3.2
+
+### Patch Changes
+
+- 88979fc: Removed addWalletInstanceUserId function
+
+## 3.3.1
+
+### Patch Changes
+
+- e22ca34: Fixed bug in /wallet-attestation endpoint
+
+## 3.3.0
+
+### Minor Changes
+
+- 130ecca: Updated /wallet-attestation endpoint to return JWT and SD-JWT format
+
 ## 3.2.4
 
 ### Patch Changes
