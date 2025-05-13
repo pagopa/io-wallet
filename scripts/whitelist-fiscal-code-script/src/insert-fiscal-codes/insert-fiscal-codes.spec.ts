@@ -127,28 +127,22 @@ describe('Insert Fiscal Codes', () => {
     });
   });
 
-  it('should throw an error, cosmosClient.database() throws an error', async () => {
+  it('should happen an error, cosmosClient.database() throws an error', async () => {
     const fiscalCodes = ['TEST0000001'];
 
     const cosmosClientMock = {
       database: vi.fn().mockRejectedValue({}),
     };
 
-    try {
-      await insertFiscalCodes(
-        cosmosClientMock as unknown as CosmosClient,
-        fiscalCodes,
-      );
-    } catch (error) {
-      expect(error).toBeDefined();
-      expect(cosmosClientMock.database).toHaveBeenCalledTimes(1);
-      return;
-    }
+    await insertFiscalCodes(
+      cosmosClientMock as unknown as CosmosClient,
+      fiscalCodes,
+    );
 
-    expect(true).toStrictEqual(false);
+    expect(cosmosClientMock.database).toHaveBeenCalledTimes(1);
   });
 
-  it('should throw an error, cosmosClient.database().container() throws an error', async () => {
+  it('should happen an error, cosmosClient.database().container() throws an error', async () => {
     const fiscalCodes = ['TEST0000001'];
 
     const cosmosClientMock = {
@@ -159,22 +153,15 @@ describe('Insert Fiscal Codes', () => {
       }),
     };
 
-    try {
-      await insertFiscalCodes(
-        cosmosClientMock as unknown as CosmosClient,
-        fiscalCodes,
-      );
-    } catch (error) {
-      expect(error).toBeDefined();
-      expect(cosmosClientMock.database).toHaveBeenCalledTimes(1);
-      expect(cosmosClientMock.database().container).toHaveBeenCalledTimes(1);
-      return;
-    }
+    await insertFiscalCodes(
+      cosmosClientMock as unknown as CosmosClient,
+      fiscalCodes,
+    );
 
-    expect(true).toStrictEqual(false);
+    expect(cosmosClientMock.database().container).toHaveBeenCalledTimes(1);
   });
 
-  it('should throw an error, cosmosClient.database().container().upsert() throws an error', async () => {
+  it('should happen an error, cosmosClient.database().container().upsert() throws an error', async () => {
     const fiscalCodes = ['TEST0000001'];
 
     const cosmosClientMock = {
@@ -187,21 +174,14 @@ describe('Insert Fiscal Codes', () => {
       }),
     };
 
-    try {
-      await insertFiscalCodes(
-        cosmosClientMock as unknown as CosmosClient,
-        fiscalCodes,
-      );
-    } catch (error) {
-      expect(error).toBeDefined();
-      expect(cosmosClientMock.database).toHaveBeenCalledTimes(1);
-      expect(cosmosClientMock.database().container).toHaveBeenCalledTimes(1);
-      expect(
-        cosmosClientMock.database().container().items.upsert,
-      ).toHaveBeenCalledTimes(1);
-      return;
-    }
+    await insertFiscalCodes(
+      cosmosClientMock as unknown as CosmosClient,
+      fiscalCodes,
+    );
 
-    expect(true).toStrictEqual(false);
+    expect(cosmosClientMock.database().container).toHaveBeenCalledTimes(1);
+    expect(
+      cosmosClientMock.database().container().items.upsert,
+    ).toHaveBeenCalledTimes(1);
   });
 });

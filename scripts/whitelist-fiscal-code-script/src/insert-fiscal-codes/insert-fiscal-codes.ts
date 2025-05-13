@@ -2,7 +2,7 @@ import { CosmosClient } from '@azure/cosmos';
 import * as CsvStringify from 'csv-stringify';
 import fs from 'fs';
 import { getArgvParam } from '../utils/get-argv-param';
-import * as CliProgress from "cli-progress";
+import * as CliProgress from 'cli-progress';
 
 const outputDir = getArgvParam('--outputDir') ?? 'logs';
 
@@ -18,10 +18,7 @@ const writeUpsertedFiscalCodes = async (
 
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
-      fs.writeFileSync(
-        `${outputDir}/whitelisted_fiscal_codes.csv`,
-        output,
-      );
+      fs.writeFileSync(`${outputDir}/whitelisted_fiscal_codes.csv`, output);
       console.log(
         `whitelisted fiscal codes written to ${outputDir}/whitelisted_fiscal_codes.csv`,
       );
@@ -55,10 +52,7 @@ const writeNotUpsertedFiscalCodes = async (
 
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
-      fs.writeFileSync(
-        `${outputDir}/not_whitelisted_fiscal_codes.csv`,
-        output,
-      );
+      fs.writeFileSync(`${outputDir}/not_whitelisted_fiscal_codes.csv`, output);
       console.log(
         `not whitelisted fiscal codes written to ${outputDir}/not_whitelisted_fiscal_codes.csv`,
       );
@@ -93,7 +87,10 @@ export const insertFiscalCodes = async (
     console.log(`upserting ${fiscalCodes.length} fiscal codes...\n`);
     const fiscalCodesSet = new Set(fiscalCodes);
 
-    const classicBar = new CliProgress.SingleBar({}, CliProgress.Presets.shades_classic);
+    const classicBar = new CliProgress.SingleBar(
+      {},
+      CliProgress.Presets.shades_classic,
+    );
     classicBar.start(fiscalCodesSet.size, 0);
 
     for (const fiscalCode of fiscalCodesSet) {
@@ -126,8 +123,6 @@ export const insertFiscalCodes = async (
 
     console.log(`\n${fiscalCodesSet.size} fiscal codes upserted`);
   } catch (error) {
-    console.error(
-      `Unexpected error during fiscal code whitelisting: ${error}`
-    );
+    console.error(`Unexpected error during fiscal code whitelisting: ${error}`);
   }
 };
