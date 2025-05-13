@@ -16,6 +16,10 @@
       "name": "io-wallet-messages-func"
     },
     {
+      "path": "apps/io-wallet-issuer-func",
+      "name": "io-wallet-issuer-func"
+    },
+    {
       "path": "packages/io-wallet-common",
       "name": "io-wallet-common"
     }

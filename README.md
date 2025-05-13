@@ -8,6 +8,7 @@ This is the `io-wallet` project mono-repository containing applications and pack
 
 - `apps/io-wallet-support-func`: Contains functionalities for assistance and support.
 - `apps/io-wallet-user-func`: Contains functionalities for end users.
+- `apps/io-wallet-issuer-func`: Contains functionalities for credential issuer.
 - `packages/io-wallet-common`: Contains shared code among the workspaces.
 - `infra`: Contains infrastructure code to deploy the IO Wallet app.
 
@@ -25,7 +26,7 @@ Changelog and versioning are managed with [Changesets](https://github.com/change
 
 ### Setting the Azure Subscription to Access the Dev CosmosDB
 
-To start the backend projects `io-wallet-support-func` and `io-wallet-user-func`, you must first log in with the correct user on Azure and set the subscription you want to use. Ensure you have the Azure `az-cli` package installed. If not, follow the instructions on the [official website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+To start the backend projects `io-wallet-support-func`, `io-wallet-user-func` and `io-wallet-issuer-func`, you must first log in with the correct user on Azure and set the subscription you want to use. Ensure you have the Azure `az-cli` package installed. If not, follow the instructions on the [official website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
 
 This process is necessary for backend applications started locally to connect to the development CosmosDB instance on Azure:
 
@@ -98,4 +99,5 @@ yarn workspace PROJECT_NAME run start # Not available for io-wallet-common
 
 - `io-wallet-support-func`
 - `io-wallet-user-func`
+- `io-wallet-issuer-func`
 - `io-wallet-common`
