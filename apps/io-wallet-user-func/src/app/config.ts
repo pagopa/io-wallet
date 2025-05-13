@@ -161,11 +161,12 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 
 const PdndInteropApiClientConfig = t.type({
   audience: t.string,
-  baseURL: t.string,
+  clientAssertionPrivateKey: t.string,
   clientId: t.string,
   kidId: t.string,
-  privateKey: t.string,
+  purposeId: t.string,
   requestTimeout: NumberFromString,
+  url: t.string,
 });
 
 export type PdndInteropApiClientConfig = t.TypeOf<
@@ -179,17 +180,18 @@ export const getPdndInteropConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     audience: readFromEnvironment("PdndInteropApiAudience"),
-    baseURL: readFromEnvironment("PdndInteropApiBaseURL"),
-    clientId: readFromEnvironment("PdndInteropApiClientId"),
-    kidId: readFromEnvironment("PdndInteropApiKidId"),
-    privateKey: pipe(
-      readFromEnvironment("PdndInteropApiPrivateKey"),
+    clientAssertionPrivateKey: pipe(
+      readFromEnvironment("PdndInteropClientAssertionPrivateKey"),
       RE.map(decodeBase64String),
     ),
+    clientId: readFromEnvironment("PdndInteropApiClientId"),
+    kidId: readFromEnvironment("PdndInteropApiKidId"),
+    purposeId: readFromEnvironment("PdndInteropPurposeId"),
     requestTimeout: pipe(
       readFromEnvironment("PdndInteropApiRequestTimeout"),
       RE.chainW(stringToNumberDecoderRE),
     ),
+    url: readFromEnvironment("PdndInteropApiURL"),
   }),
 );
 

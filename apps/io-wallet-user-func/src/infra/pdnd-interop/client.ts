@@ -12,11 +12,12 @@ export class PdndInteropClient implements VoucherRepository {
     "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
   static readonly GRANT_TYPE = "client_credentials";
   #audience: string;
-  #baseURL: string;
+  #clientAssertionPrivateKey: string;
   #clientId: string;
   #kidId: string;
-  #privateKey: string;
+  #purposeId: string;
   #requestTimeout: number;
+  #url: string;
   generateClientAssertion = () =>
     jwt.sign(
       {
@@ -24,10 +25,11 @@ export class PdndInteropClient implements VoucherRepository {
         exp: Math.floor(Date.now() / 1000) + 600,
         iat: Math.floor(Date.now() / 1000),
         iss: this.#clientId,
-        jti: "jti_" + uuidv4().toString(),
+        jti: uuidv4().toString(),
+        purposeId: this.#purposeId,
         sub: this.#clientId,
       },
-      this.#privateKey,
+      this.#clientAssertionPrivateKey,
       {
         algorithm: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
         header: {
@@ -41,7 +43,7 @@ export class PdndInteropClient implements VoucherRepository {
   requestVoucher = () =>
     TE.tryCatch(
       async () => {
-        const result = await fetch(new URL("/authorize", this.#baseURL), {
+        const result = await fetch(this.#url, {
           body: JSON.stringify({
             client_assertion: this.generateClientAssertion(),
             client_assertion_type: PdndInteropClient.CLIENT_ASSERTION_TYPE,
@@ -73,17 +75,19 @@ export class PdndInteropClient implements VoucherRepository {
     );
   constructor({
     audience,
-    baseURL,
+    clientAssertionPrivateKey,
     clientId,
     kidId,
-    privateKey,
+    purposeId,
     requestTimeout,
+    url,
   }: PdndInteropApiClientConfig) {
     this.#kidId = kidId;
-    this.#baseURL = baseURL;
+    this.#url = url;
     this.#audience = audience;
     this.#clientId = clientId;
-    this.#privateKey = privateKey;
+    this.#clientAssertionPrivateKey = clientAssertionPrivateKey;
     this.#requestTimeout = requestTimeout;
+    this.#purposeId = purposeId;
   }
 }

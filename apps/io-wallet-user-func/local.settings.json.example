@@ -53,10 +53,11 @@
     "WalletAttestationWalletName": "WALLET_ATTESTATION_WALLET_NAME",
     "AuthProfileApiBaseURL": "AUTH_PROFILE_API_BASE_URL",
     "PdndInteropApiAudience": "PDND_INTEROP_API_AUDIENCE",
-    "PdndInteropApiBaseURL": "PDND_INTEROP_API_BASE_URL",
+    "PdndInteropApiURL": "PDND_INTEROP_API_BASE_URL",
     "PdndInteropApiClientId": "PDND_INTEROP_API_CLIENT_ID",
     "PdndInteropApiKidId": "PDND_INTEROP_API_KID_ID",
-    "PdndInteropApiPrivateKey": "PDND_INTEROP_API_PRIVATE_KEY",
-    "PdndInteropApiRequestTimeout": "PDND_INTEROP_API_REQUEST_TIMEOUT"
+    "PdndInteropClientAssertionPrivateKey": "PDND_INTEROP_CLIENT_ASSERTION_PRIVATE_KEY",
+    "PdndInteropApiRequestTimeout": "PDND_INTEROP_API_REQUEST_TIMEOUT",
+    "PdndInteropPurposeId": "PDND_INTEROP_PURPOSE_ID"
   }
 }
