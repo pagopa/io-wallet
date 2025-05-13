@@ -45,6 +45,7 @@ After the script execution, you can see two output files under the `logs/` direc
 
 - `whitelisted_fiscal_codes.csv.csv`: a CSV file containing only fiscal codes added successfully to the whitelist.
 - `not_whitelisted_fiscal_codes.csv.csv`: a CSV file containing only fiscal codes not added (for some reason) to the whitelist.
+- `app.log`: here you can see all logs produced by the script execution.
 
 ### Script Arguments
 
