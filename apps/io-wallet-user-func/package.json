@@ -42,7 +42,8 @@
     "jose": "5.9.6",
     "jsonwebtoken": "^9.0.2",
     "pkijs": "^3.2.4",
-    "undici": "^7.2.1"
+    "undici": "^7.2.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",

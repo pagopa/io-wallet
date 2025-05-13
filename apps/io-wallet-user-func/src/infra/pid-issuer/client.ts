@@ -39,7 +39,7 @@ export class PidIssuerClient
         )
       : TE.of(true);
 
-  revokeAllCredentials = (fiscalCode: FiscalCode) =>
+  revokeAllCredentials = (fiscalCode: FiscalCode, accessToken: string) =>
     TE.tryCatch(
       async () => {
         const result = await fetch(new URL("/revokeAll", this.#baseURL), {
@@ -48,6 +48,10 @@ export class PidIssuerClient
             unique_id: `TINIT-${fiscalCode}`,
             wallet_provider: this.#walletProviderEntity,
           }),
+          headers: {
+            ...this.#init.headers,
+            Authorization: `Bearer ${accessToken}`,
+          },
           method: "POST",
           signal: AbortSignal.timeout(this.#requestTimeout),
           ...this.#init,
