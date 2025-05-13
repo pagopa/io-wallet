@@ -37,3 +37,18 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     ),
     E.map((payload) => payload.cnf.jwk),
   );
+
+// ----- new wallet-attestation endpoint
+export const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
+  pipe(
+    TE.tryCatch(() => jose.importJWK(publicKey), E.toError),
+    TE.chain((joseKey) =>
+      pipe(
+        TE.tryCatch(() => jose.jwtVerify(jwt, joseKey), E.toError),
+        TE.map(({ payload, protectedHeader }) => ({
+          header: protectedHeader,
+          payload,
+        })),
+      ),
+    ),
+  );

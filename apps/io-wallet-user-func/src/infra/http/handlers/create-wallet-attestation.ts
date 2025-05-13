@@ -5,7 +5,6 @@ import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
 import { getValidWalletInstanceByUserId } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
-import { GRANT_TYPE_KEY_ATTESTATION } from "@/wallet-provider";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
@@ -15,6 +14,9 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+export const GRANT_TYPE_KEY_ATTESTATION =
+  "urn:ietf:params:oauth:grant-type:jwt-bearer";
 
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,
