@@ -56,7 +56,6 @@
     "PdndInteropApiBaseURL": "PDND_INTEROP_API_BASE_URL",
     "PdndInteropApiClientId": "PDND_INTEROP_API_CLIENT_ID",
     "PdndInteropApiKidId": "PDND_INTEROP_API_KID_ID",
-    "PdndInteropApiPrivateKey": "PDND_INTEROP_API_PRIVATE_KEY",
-    "PdndInteropApiRequestTimeout": "PDND_INTEROP_API_REQUEST_TIMEOUT"
+    "PdndInteropApiPrivateKey": "PDND_INTEROP_API_PRIVATE_KEY"
   }
 }

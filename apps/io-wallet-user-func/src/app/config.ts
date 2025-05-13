@@ -165,7 +165,6 @@ const PdndInteropApiClientConfig = t.type({
   clientId: t.string,
   kidId: t.string,
   privateKey: t.string,
-  requestTimeout: NumberFromString,
 });
 
 export type PdndInteropApiClientConfig = t.TypeOf<
@@ -185,10 +184,6 @@ export const getPdndInteropConfigFromEnvironment: RE.ReaderEither<
     privateKey: pipe(
       readFromEnvironment("PdndInteropApiPrivateKey"),
       RE.map(decodeBase64String),
-    ),
-    requestTimeout: pipe(
-      readFromEnvironment("PdndInteropApiRequestTimeout"),
-      RE.chainW(stringToNumberDecoderRE),
     ),
   }),
 );
