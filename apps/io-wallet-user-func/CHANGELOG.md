@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.1
+
+### Patch Changes
+
+- e22ca34: Fixed bug in /wallet-attestation endpoint
+
 ## 3.3.0
 
 ### Minor Changes
