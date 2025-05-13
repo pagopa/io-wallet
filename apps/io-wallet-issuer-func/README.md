@@ -96,8 +96,8 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/pagopa/io-eudiw-wpb.git
-   cd credential-issuer
+   git clone https://github.com/pagopa/io-wallet.git
+   cd apps/io-wallet-issuer-func
 
    ```
 
@@ -115,18 +115,11 @@ By default, it supports credential formats based on `mso_mdoc` and `SD-JWT-VC`. 
 
 ## Usage
 
-### Build and Clean
+### Build
 
 - **Build** the project:
   ```bash
   yarn build
-  ```
-
-This command compiles your TypeScript code into the dist directory.
-
-- **Clean** the dist directory:
-  ```bash
-  yarn clean
   ```
 
 ### Development
