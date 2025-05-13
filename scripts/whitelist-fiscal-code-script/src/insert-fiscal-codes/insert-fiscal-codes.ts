@@ -84,9 +84,11 @@ export const insertFiscalCodes = async (
     const sleepTimeBetweenRequestsMs = Number(
       process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS ?? 500,
     );
+    const databaseName = process.env.DATABASE_NAME as string;
+    const containerName = process.env.DATABASE_CONTAINER_NAME as string;
 
-    const database = cosmosClient.database('wallet');
-    const container = database.container('whitelisted-fiscal-codes');
+    const database = cosmosClient.database(databaseName);
+    const container = database.container(containerName);
 
     console.log(`upserting ${fiscalCodes.length} fiscal codes...\n`);
     const fiscalCodesSet = new Set(fiscalCodes);
