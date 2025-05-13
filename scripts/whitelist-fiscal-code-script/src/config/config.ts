@@ -21,6 +21,16 @@ const EnvSchema = Joi.object({
     'string.empty': 'DATABASE_CONNECTION_STRING is not allowed to be empty',
     'any.required': 'DATABASE_CONNECTION_STRING is required',
   }),
+  DATABASE_NAME: Joi.string().required().messages({
+    'string.base': 'DATABASE_NAME must be a string',
+    'string.empty': 'DATABASE_NAME is not allowed to be empty',
+    'any.required': 'DATABASE_NAME is required',
+  }),
+  DATABASE_CONTAINER_NAME: Joi.string().required().messages({
+    'string.base': 'DATABASE_CONTAINER_NAME must be a string',
+    'string.empty': 'DATABASE_CONTAINER_NAME is not allowed to be empty',
+    'any.required': 'DATABASE_CONTAINER_NAME is required',
+  }),
   SLEEP_TIME_BETWEEN_REQUESTS_MS: Joi.number()
     .min(0)
     .max(1_000_000)

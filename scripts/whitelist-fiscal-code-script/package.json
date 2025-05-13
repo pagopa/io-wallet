@@ -14,12 +14,10 @@
     "node": ">=20.17.0",
     "npm": ">=10.8.2"
   },
-  "keywords": [],
-  "author": "Christian Alessandro Atzeni (chralex00 on GitHub)",
-  "license": "ISC",
   "description": "This script is used to whitelist fiscal codes in the database.",
   "devDependencies": {
     "@eslint/js": "^9.26.0",
+    "@types/cli-progress": "^3",
     "@types/node": "^22.15.3",
     "@vitest/coverage-v8": "^3.1.2",
     "eslint": "^9.26.0",
@@ -34,6 +32,7 @@
   },
   "dependencies": {
     "@azure/cosmos": "^4.3.0",
+    "cli-progress": "^3.12.0",
     "csv-parse": "^5.6.0",
     "csv-stringify": "^6.5.2",
     "dotenv": "^16.5.0",

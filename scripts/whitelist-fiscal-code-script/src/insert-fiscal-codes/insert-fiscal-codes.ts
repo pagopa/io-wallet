@@ -2,6 +2,9 @@ import { CosmosClient } from '@azure/cosmos';
 import * as CsvStringify from 'csv-stringify';
 import fs from 'fs';
 import { getArgvParam } from '../utils/get-argv-param';
+import * as CliProgress from "cli-progress";
+
+const outputDir = getArgvParam('--outputDir') ?? 'logs';
 
 const writeUpsertedFiscalCodes = async (
   upsertedFiscalcodes: string[],
@@ -16,11 +19,11 @@ const writeUpsertedFiscalCodes = async (
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
       fs.writeFileSync(
-        `${getArgvParam('--outputDir') ?? 'logs'}/whitelisted_fiscal_codes.csv`,
+        `${outputDir}/whitelisted_fiscal_codes.csv`,
         output,
       );
       console.log(
-        'whitelisted fiscal codes written to logs/whitelisted_fiscal_codes.csv',
+        `whitelisted fiscal codes written to ${outputDir}/whitelisted_fiscal_codes.csv`,
       );
     } else {
       console.error('error creating CSV file for upserted fiscal codes');
@@ -53,11 +56,11 @@ const writeNotUpsertedFiscalCodes = async (
   CsvStringify.stringify(data, options, (error, output) => {
     if (!error) {
       fs.writeFileSync(
-        `${getArgvParam('--outputDir') ?? 'logs'}/not_whitelisted_fiscal_codes.csv`,
+        `${outputDir}/not_whitelisted_fiscal_codes.csv`,
         output,
       );
       console.log(
-        'not whitelisted fiscal codes written to logs/not_whitelisted_fiscal_codes.csv',
+        `not whitelisted fiscal codes written to ${outputDir}/not_whitelisted_fiscal_codes.csv`,
       );
     } else {
       console.error('error creating CSV file for not upserted fiscal codes');
@@ -85,9 +88,13 @@ export const insertFiscalCodes = async (
     const database = cosmosClient.database('wallet');
     const container = database.container('whitelisted-fiscal-codes');
 
-    console.log(`upserting ${fiscalCodes.length} fiscal codes...`);
+    console.log(`upserting ${fiscalCodes.length} fiscal codes...\n`);
+    const fiscalCodesSet = new Set(fiscalCodes);
 
-    for (const fiscalCode of new Set(fiscalCodes)) {
+    const classicBar = new CliProgress.SingleBar({}, CliProgress.Presets.shades_classic);
+    classicBar.start(fiscalCodesSet.size, 0);
+
+    for (const fiscalCode of fiscalCodesSet) {
       try {
         await container.items.upsert({
           id: fiscalCode,
@@ -96,30 +103,29 @@ export const insertFiscalCodes = async (
 
         upsertedFiscalCodes.push(fiscalCode);
 
-        console.log(`${fiscalCode} upserted`);
-
         await new Promise((resolve) =>
           setTimeout(resolve, sleepTimeBetweenRequestsMs),
         );
       } catch (error) {
-        console.error(`${fiscalCode} not upserted`);
         notUpsertedFiscalCodes.push({
           fiscalCode,
           message: (error as Error).message,
           stack: (error as Error).stack ?? '',
         });
       }
+
+      classicBar.increment();
     }
+
+    classicBar.stop();
 
     await writeUpsertedFiscalCodes(upsertedFiscalCodes);
     await writeNotUpsertedFiscalCodes(notUpsertedFiscalCodes);
 
-    console.log(`${fiscalCodes.length} fiscal codes upserted`);
+    console.log(`\n${fiscalCodesSet.size} fiscal codes upserted`);
   } catch (error) {
     console.error(
-      'insert-fiscal-codes.ts: unexpected error during fiscal code whitelisting',
+      `Unexpected error during fiscal code whitelisting: ${error}`
     );
-    console.error(error);
-    throw error;
   }
 };

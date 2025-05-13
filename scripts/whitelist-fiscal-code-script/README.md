@@ -10,7 +10,7 @@ This script is used to whitelist fiscal codes in the database.
 ### Quickstart
 
 **STEP 1**
-Prepare a CSV file that contains all fiscal codes to add in the whitelist. The CSV file must have a column named `fiscalCode` and the values must be the fiscal codes to be whitelisted, like this:
+Prepare a CSV file that contains all fiscal codes to add in the whitelist. The CSV file must have a column named (preferably `fiscalCode`, but anything is fine) and the values must be the fiscal codes to be whitelisted, like this:
 
 ```csv
 fiscalCode

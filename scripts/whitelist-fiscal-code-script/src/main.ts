@@ -8,7 +8,7 @@ const bootstrap = async () => {
   checkConfig();
 
   const fiscalCodes = await parseFiscalCodes(
-    getArgvParam('--input') || 'fiscalcodes.csv',
+    getArgvParam('--input') ?? 'fiscalcodes.csv',
   );
 
   const cosmosClient = getCosmosClient();
