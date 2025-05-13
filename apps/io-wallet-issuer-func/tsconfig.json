@@ -11,6 +11,12 @@
     "rootDir": "src",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Don’t sweat 3rd-party .d.ts files */
+    "skipLibCheck": true
   }
 }
