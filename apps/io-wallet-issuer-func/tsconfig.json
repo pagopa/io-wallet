@@ -1,0 +1,18 @@
+{
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "commonjs",
+    "target": "ES2021",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "rootDir": "src",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
