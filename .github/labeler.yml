@@ -5,3 +5,7 @@ docs: docs/**/*
 ci: .github/workflows/**/*
 infra: infra/**/*
 changeset: .changeset/**/*
+
+Issuer Test:
+  - changed-files:
+      - any-glob-to-any-file: ["apps/io-wallet-issuer-func/**"]
