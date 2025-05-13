@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as Joi from 'joi';
 import { getArgvParam } from '../utils/get-argv-param';
+import { logger } from '../utils/get-logger';
 
 dotenv.config();
 
@@ -72,8 +73,8 @@ export const checkConfig = (): void => {
       throw error;
     }
   } catch (error) {
-    console.error('config.ts: configuration validation failed');
-    console.error(
+    logger.error('config.ts: configuration validation failed');
+    logger.error(
       JSON.stringify((error as Joi.ValidationError)?.details ?? {}, null, 2),
     );
     throw error;

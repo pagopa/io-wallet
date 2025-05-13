@@ -1,5 +1,6 @@
 import fs from 'fs';
 import * as csv from 'csv-parse';
+import { logger } from '../utils/get-logger';
 
 export const parseFiscalCodes = async (
   csvFilePath: string,
@@ -28,18 +29,18 @@ export const parseFiscalCodes = async (
     });
 
     if (fiscalCodes.length === 0) {
-      console.warn('the CSV file is empty or does not contain a header row.');
+      logger.warn('the CSV file is empty or does not contain a header row.');
       return [];
     }
 
     fiscalCodes.shift();
 
-    console.log(`Loaded ${fiscalCodes.length} fiscal codes from CSV file`);
+    logger.info(`Loaded ${fiscalCodes.length} fiscal codes from CSV file`);
 
     return fiscalCodes;
   } catch (error) {
-    console.error('parse-fiscal-code.ts: error parsing fiscal codes');
-    console.error(error);
+    logger.error('parse-fiscal-code.ts: error parsing fiscal codes');
+    logger.error(error);
     throw error;
   }
 };

@@ -1,9 +1,27 @@
 import { describe, it, expect, vi } from 'vitest';
 import { checkConfig } from './config';
 
-vi.spyOn(console, 'log').mockImplementation(() => {});
-vi.spyOn(console, 'error').mockImplementation(() => {});
-vi.spyOn(console, 'warn').mockImplementation(() => {});
+vi.mock('winston', () => {
+  return {
+    createLogger: vi.fn().mockImplementation(() => ({
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+      verbose: vi.fn(),
+    })),
+    format: {
+      combine: vi.fn(),
+      timestamp: vi.fn(),
+      simple: vi.fn(),
+      printf: vi.fn(),
+    },
+    transports: {
+      Console: vi.fn(),
+      File: vi.fn(),
+    },
+  };
+});
 
 vi.mock('dotenv', () => ({
   config: vi.fn(),
@@ -12,7 +30,6 @@ vi.mock('dotenv', () => ({
 process.exit = vi.fn() as unknown as (
   code?: string | number | null | undefined,
 ) => never;
-console.error = vi.fn();
 
 describe('checkConfig()', () => {
   it('should pass validation when all env vars are valid', () => {

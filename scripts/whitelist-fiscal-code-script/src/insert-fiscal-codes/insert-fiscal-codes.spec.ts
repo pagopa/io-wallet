@@ -2,11 +2,29 @@ import { CosmosClient } from '@azure/cosmos';
 import { vi, describe, it, expect } from 'vitest';
 import { insertFiscalCodes } from './insert-fiscal-codes';
 
-vi.spyOn(console, 'log').mockImplementation(() => {});
-vi.spyOn(console, 'error').mockImplementation(() => {});
-vi.spyOn(console, 'warn').mockImplementation(() => {});
-
 process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '0';
+
+vi.mock('winston', () => {
+  return {
+    createLogger: vi.fn().mockImplementation(() => ({
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+      verbose: vi.fn(),
+    })),
+    format: {
+      combine: vi.fn(),
+      timestamp: vi.fn(),
+      simple: vi.fn(),
+      printf: vi.fn(),
+    },
+    transports: {
+      Console: vi.fn(),
+      File: vi.fn(),
+    },
+  };
+});
 
 describe('Insert Fiscal Codes', () => {
   it('should upsert one fiscal code', async () => {

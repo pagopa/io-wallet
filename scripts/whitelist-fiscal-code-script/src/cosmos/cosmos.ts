@@ -1,4 +1,5 @@
 import { CosmosClient } from '@azure/cosmos';
+import { logger } from '../utils/get-logger';
 
 const DATABASE_CONNECTION_STRING = process.env
   .DATABASE_CONNECTION_STRING as string;
@@ -12,8 +13,8 @@ export const getCosmosClient = (): CosmosClient => {
       },
     });
   } catch (error) {
-    console.error('cosmos.ts: error getting cosmos client');
-    console.error(error);
+    logger.error('cosmos.ts: error getting cosmos client');
+    logger.error(error);
     throw error;
   }
 };
