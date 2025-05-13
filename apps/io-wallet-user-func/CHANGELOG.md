@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.2
+
+### Patch Changes
+
+- 88979fc: Removed addWalletInstanceUserId function
+
 ## 3.3.1
 
 ### Patch Changes
