@@ -110,8 +110,7 @@ export const getWalletInstanceUserId: (
   (id) =>
   ({ walletInstanceRepository }) =>
     pipe(
-      id,
-      walletInstanceRepository.getUserId,
+      walletInstanceRepository.getUserId(id),
       TE.chain(
         TE.fromOption(
           () => new EntityNotFoundError("Wallet instance not found"),
