@@ -110,7 +110,7 @@ export const getSignJwtCallback =
       throw new Error("Signer method not supported");
     }
 
-    const jwkThumprint = await calculateJwkThumbprint({
+    const jwkThumbprint = await calculateJwkThumbprint({
       hashAlgorithm: HashAlgorithm.Sha256,
       hashCallback: callbacks.hash,
       jwk,
@@ -122,7 +122,7 @@ export const getSignJwtCallback =
           hashAlgorithm: HashAlgorithm.Sha256,
           hashCallback: callbacks.hash,
           jwk,
-        })) === jwkThumprint
+        })) === jwkThumbprint
           ? jwk
           : undefined,
       ),

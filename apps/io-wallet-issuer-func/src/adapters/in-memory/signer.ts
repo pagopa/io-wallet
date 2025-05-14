@@ -14,7 +14,7 @@ export const makeJwksRepository = (
         kid: string;
         readonly kty: "EC";
       } & ECPrivateKeyWithKid,
-      public: { ...jwks[0], kty: "EC" } as {
+      public: { x: jwks[0].x, y: jwks[0].y, kid: jwks[0].kid, kty: "EC" } as {
         kid: string;
         readonly kty: "EC";
       } & ECKey,

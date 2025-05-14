@@ -33,11 +33,11 @@ export const getConfigOrError = (
     isProduction: envs.NODE_ENV === "production",
   });
 
-  const bynari = Buffer.from(
+  const binary = Buffer.from(
     envCodec.SIGNER_JWK_LIST_BASE64,
     "base64",
   ).toString("binary");
-  const jwks = JSON.parse(bynari);
+  const jwks = JSON.parse(binary);
 
   return {
     cosmosdb: {
