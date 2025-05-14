@@ -180,9 +180,8 @@ export const getPdndInteropConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     audience: readFromEnvironment("PdndInteropApiAudience"),
-    clientAssertionPrivateKey: pipe(
-      readFromEnvironment("PdndInteropClientAssertionPrivateKey"),
-      RE.map(decodeBase64String),
+    clientAssertionPrivateKey: readFromEnvironment(
+      "PdndInteropClientAssertionPrivateKey",
     ),
     clientId: readFromEnvironment("PdndInteropApiClientId"),
     kidId: readFromEnvironment("PdndInteropApiKidId"),
