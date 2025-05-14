@@ -50,6 +50,9 @@ export class PdndInteropClient implements VoucherRepository {
             client_id: this.#clientId,
             grant_type: PdndInteropClient.GRANT_TYPE,
           }),
+          headers: {
+            "Content-Type": "application/json",
+          },
           method: "POST",
           signal: AbortSignal.timeout(this.#requestTimeout),
         });
