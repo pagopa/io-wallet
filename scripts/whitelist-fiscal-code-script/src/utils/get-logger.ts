@@ -1,5 +1,6 @@
 import { createLogger, transports, format } from 'winston';
 import { getArgvParam } from './get-argv-param';
+import fs from 'fs';
 
 const outputDir = getArgvParam('--outputDir') ?? 'logs';
 
@@ -30,18 +31,28 @@ export const logger = createLogger({
   ],
 });
 
-export const fileLogger = createLogger({
+fs.truncateSync(outputDir + '/whitelisted-fiscal-codes.csv', 0);
+
+export const whitelistedFiscalCodeFileLogger = createLogger({
   level: 'info',
   transports: [
     new transports.File({
-      filename: outputDir + '/app.log',
+      filename: outputDir + '/whitelisted-fiscal-codes.csv',
       level: 'info',
-      format: format.combine(
-        format.timestamp(),
-        format.printf(({ timestamp, level, message }) => {
-          return `${timestamp} [${level}]: ${message}`;
-        }),
-      ),
+      format: format.printf(({ message }) => String(message)),
+    }),
+  ],
+});
+
+fs.truncateSync(outputDir + '/not-whitelisted-fiscal-codes.csv', 0);
+
+export const notWhitelistedFiscalCodeFileLogger = createLogger({
+  level: 'info',
+  transports: [
+    new transports.File({
+      filename: outputDir + '/not-whitelisted-fiscal-codes.csv',
+      level: 'info',
+      format: format.printf(({ message }) => String(message)),
     }),
   ],
 });
