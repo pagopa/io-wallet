@@ -346,29 +346,3 @@ app.http("IsFiscalCodeWhitelisted", {
   methods: ["GET"],
   route: "whitelisted-fiscal-code/{fiscalCode}",
 });
-
-app.http("testNewIpzsRevocationFlow", {
-  authLevel: "function",
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handler: async (): Promise<any> => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = (await pdndInteropClient.requestVoucher()()) as any;
-
-    const accessToken = result["right"];
-    const fiscalCode = "TEST00001";
-
-    const resultFromRevocation = await pidIssuerClient.revokeAllCredentials(
-      fiscalCode as FiscalCode,
-      accessToken,
-    )();
-
-    return {
-      body: JSON.stringify({
-        voucherRequestResult: resultFromRevocation,
-      }),
-      status: 200,
-    };
-  },
-  methods: ["GET"],
-  route: "test-new-ipzs-revocation-flow",
-});
