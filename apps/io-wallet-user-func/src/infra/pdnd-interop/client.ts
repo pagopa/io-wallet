@@ -1,7 +1,7 @@
 import { PdndInteropApiClientConfig } from "@/app/config";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import * as jwt from "jsonwebtoken";
+import * as jose from "jose";
 import { v4 as uuidv4 } from "uuid";
 
 import { VoucherRepository } from "../voucher";
@@ -18,34 +18,54 @@ export class PdndInteropClient implements VoucherRepository {
   #purposeId: string;
   #requestTimeout: number;
   #url: string;
-  generateClientAssertion = () =>
-    jwt.sign(
-      {
-        aud: this.#audience,
-        exp: Math.floor(Date.now() / 1000) + 600,
-        iat: Math.floor(Date.now() / 1000),
-        iss: this.#clientId,
-        jti: uuidv4().toString(),
-        purposeId: this.#purposeId,
-        sub: this.#clientId,
-      },
-      this.#clientAssertionPrivateKey,
-      {
-        algorithm: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
-        header: {
-          alg: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
-          kid: this.#kidId,
-          typ: PdndInteropClient.CLIENT_ASSERTION_JWT_TYPE,
-        },
-      },
-    );
+  generateClientAssertion = async () =>
+    new jose.SignJWT({
+      aud: this.#audience,
+      iss: this.#clientId,
+      jti: uuidv4().toString(),
+      purposeId: this.#purposeId,
+      sub: this.#clientId,
+    })
+      .setProtectedHeader({
+        alg: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+        kid: this.#kidId,
+        typ: PdndInteropClient.CLIENT_ASSERTION_JWT_TYPE,
+      })
+      .setIssuedAt()
+      .setExpirationTime("10 minutes")
+      .sign(
+        await jose.importPKCS8(
+          this.#clientAssertionPrivateKey,
+          PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+        ),
+      );
+  // jwt.sign(
+  //   {
+  //     aud: this.#audience,
+  //     exp: Math.floor(Date.now() / 1000) + 600,
+  //     iat: Math.floor(Date.now() / 1000),
+  //     iss: this.#clientId,
+  //     jti: uuidv4().toString(),
+  //     purposeId: this.#purposeId,
+  //     sub: this.#clientId,
+  //   },
+  //   this.#clientAssertionPrivateKey,
+  //   {
+  //     algorithm: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+  //     header: {
+  //       alg: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+  //       kid: this.#kidId,
+  //       typ: PdndInteropClient.CLIENT_ASSERTION_JWT_TYPE,
+  //     },
+  //   },
+  // );
 
   requestVoucher = () =>
     TE.tryCatch(
       async () => {
         const result = await fetch(this.#url, {
           body: JSON.stringify({
-            client_assertion: this.generateClientAssertion(),
+            client_assertion: await this.generateClientAssertion(),
             client_assertion_type: PdndInteropClient.CLIENT_ASSERTION_TYPE,
             client_id: this.#clientId,
             grant_type: PdndInteropClient.GRANT_TYPE,

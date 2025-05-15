@@ -40,7 +40,6 @@
     "io-ts": "^2.2.22",
     "io-wallet-common": "workspace:^",
     "jose": "5.9.6",
-    "jsonwebtoken": "^9.0.2",
     "pkijs": "^3.2.4",
     "undici": "^7.2.1",
     "uuid": "^11.1.0"
@@ -48,7 +47,6 @@
   "devDependencies": {
     "@pagopa/eslint-config": "^4.0.1",
     "@types/html-to-text": "9.0.4",
-    "@types/jsonwebtoken": "^9.0.7",
     "@vitest/coverage-v8": "^2.1.8",
     "azure-functions-core-tools": "^4.0.6821",
     "eslint": "9.14.0",

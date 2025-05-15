@@ -2626,23 +2626,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsonwebtoken@npm:^9.0.7":
-  version: 9.0.9
-  resolution: "@types/jsonwebtoken@npm:9.0.9"
-  dependencies:
-    "@types/ms": "npm:*"
-    "@types/node": "npm:*"
-  checksum: 10c0/d754a7b65fc021b298fc94e8d7a7d71f35dedf24296ac89286f80290abc5dbb0c7830a21440ee9ecbb340efc1b0a21f5609ea298a35b874cae5ad29a65440741
-  languageName: node
-  linkType: hard
-
-"@types/ms@npm:*":
-  version: 2.1.0
-  resolution: "@types/ms@npm:2.1.0"
-  checksum: 10c0/5ce692ffe1549e1b827d99ef8ff71187457e0eb44adbae38fdf7b9a74bae8d20642ee963c14516db1d35fa2652e65f47680fdf679dcbde52bbfadd021f497225
-  languageName: node
-  linkType: hard
-
 "@types/mysql@npm:2.15.26":
   version: 2.15.26
   resolution: "@types/mysql@npm:2.15.26"
@@ -5817,7 +5800,6 @@ __metadata:
     "@pagopa/ts-commons": "npm:^13.1.2"
     "@peculiar/asn1-android": "npm:^2.3.15"
     "@types/html-to-text": "npm:9.0.4"
-    "@types/jsonwebtoken": "npm:^9.0.7"
     "@vitest/coverage-v8": "npm:^2.1.8"
     applicationinsights: "npm:^3.4.0"
     asn1js: "npm:^3.0.5"
@@ -5831,7 +5813,6 @@ __metadata:
     io-ts: "npm:^2.2.22"
     io-wallet-common: "workspace:^"
     jose: "npm:5.9.6"
-    jsonwebtoken: "npm:^9.0.2"
     pkijs: "npm:^3.2.4"
     prettier: "npm:3.4.2"
     tsup: "npm:^8.3.5"
@@ -6268,7 +6249,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonwebtoken@npm:^9.0.0, jsonwebtoken@npm:^9.0.1, jsonwebtoken@npm:^9.0.2":
+"jsonwebtoken@npm:^9.0.0, jsonwebtoken@npm:^9.0.1":
   version: 9.0.2
   resolution: "jsonwebtoken@npm:9.0.2"
   dependencies:
