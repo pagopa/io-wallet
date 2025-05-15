@@ -159,6 +159,41 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const PdndInteropApiClientConfig = t.type({
+  audience: t.string,
+  clientAssertionPrivateKey: t.string,
+  clientId: t.string,
+  kidId: t.string,
+  purposeId: t.string,
+  requestTimeout: NumberFromString,
+  url: t.string,
+});
+
+export type PdndInteropApiClientConfig = t.TypeOf<
+  typeof PdndInteropApiClientConfig
+>;
+
+export const getPdndInteropConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  PdndInteropApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    audience: readFromEnvironment("PdndInteropApiAudience"),
+    clientAssertionPrivateKey: readFromEnvironment(
+      "PdndInteropClientAssertionPrivateKey",
+    ),
+    clientId: readFromEnvironment("PdndInteropApiClientId"),
+    kidId: readFromEnvironment("PdndInteropApiKidId"),
+    purposeId: readFromEnvironment("PdndInteropPurposeId"),
+    requestTimeout: pipe(
+      readFromEnvironment("PdndInteropApiRequestTimeout"),
+      RE.chainW(stringToNumberDecoderRE),
+    ),
+    url: readFromEnvironment("PdndInteropApiURL"),
+  }),
+);
+
 const FederationEntityConfig = t.type({
   basePath: UrlFromString,
   homepageUri: UrlFromString,
@@ -195,6 +230,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
+  pdndInteop: PdndInteropApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
   walletProvider: WalletProviderConfig,
@@ -481,6 +517,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     mail: getMailConfigFromEnvironment,
+    pdndInteop: getPdndInteropConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
