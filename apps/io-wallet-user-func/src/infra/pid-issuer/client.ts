@@ -12,6 +12,7 @@ export class PidIssuerClient
   implements CredentialRepository, PidIssuerHealthCheck
 {
   #baseURL: string;
+  #clientCertificate: string;
   #healthCheckEnabled: boolean;
   #init: RequestInit;
   #requestTimeout: number;
@@ -29,6 +30,10 @@ export class PidIssuerClient
               method: "POST",
               signal: AbortSignal.timeout(this.#requestTimeout),
               ...this.#init,
+              headers: {
+                ...this.#init.headers,
+                Authorization: `Bearer ${this.#clientCertificate}`,
+              },
             });
             return result.status === 404;
           },
@@ -42,19 +47,20 @@ export class PidIssuerClient
   revokeAllCredentials = (fiscalCode: FiscalCode, accessToken: string) =>
     TE.tryCatch(
       async () => {
-        const result = await fetch(new URL("/revokeAll", this.#baseURL), {
+        const result = await fetch(`${this.#baseURL}/revokeAll`, {
           body: JSON.stringify({
             // TINIT is the CF international format: TIN (Tax Identification Number) and IT (Italy). It is required by the endpoint
             unique_id: `TINIT-${fiscalCode}`,
             wallet_provider: this.#walletProviderEntity,
           }),
-          headers: {
-            ...this.#init.headers,
-            Authorization: `Bearer ${accessToken}`,
-          },
           method: "POST",
           signal: AbortSignal.timeout(this.#requestTimeout),
           ...this.#init,
+          headers: {
+            ...this.#init.headers,
+            Authorization: `Bearer ${accessToken}`,
+            "X-Client-Cert": btoa(this.#clientCertificate),
+          },
         });
         if (result.status === 404) {
           // the endpoint returns 404 if the credentials have already been revoked or do not exist
@@ -88,6 +94,7 @@ export class PidIssuerClient
     basePath: Config["entityConfiguration"]["federationEntity"]["basePath"]["href"],
   ) {
     this.#baseURL = baseURL;
+    this.#clientCertificate = clientCertificate;
     this.#walletProviderEntity = removeTrailingSlash(basePath);
     this.#healthCheckEnabled = healthCheckEnabled;
     this.#init = {
