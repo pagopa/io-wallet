@@ -10,7 +10,7 @@ const ArgumentsSchema = Joi.object({
     'string.base': 'input must be a string',
     'string.empty': 'input is not allowed to be empty',
   }),
-  outputDir: Joi.string().optional().default('logs/').default('logs').messages({
+  outputDir: Joi.string().optional().default('logs/').messages({
     'string.base': 'outputDir must be a string',
     'string.empty': 'outputDir is not allowed to be empty',
   }),
