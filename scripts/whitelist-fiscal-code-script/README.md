@@ -43,8 +43,7 @@ yarn start                       # run the script
 **STEP 4**
 After the script execution, you can see two output files under the `logs/` directory:
 
-- `whitelisted_fiscal_codes.csv.csv`: a CSV file containing only fiscal codes added successfully to the whitelist.
-- `not_whitelisted_fiscal_codes.csv.csv`: a CSV file containing only fiscal codes not added (for some reason) to the whitelist.
+- `fiscal_codes_statuses.csv`: a CSV file containing the status of each fiscal code. If the status is `OK`, the fiscal code was inserted successfully; if status is `NOT_OK` a problem occurred. See `app.log` for more details.
 - `app.log`: here you can see all logs produced by the script execution.
 
 ### Script Arguments

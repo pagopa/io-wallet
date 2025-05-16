@@ -1,10 +1,9 @@
 import { CosmosClient } from '@azure/cosmos';
 import * as CliProgress from 'cli-progress';
-import {
-  whitelistedFiscalCodeFileLogger,
-  notWhitelistedFiscalCodeFileLogger,
-  logger,
-} from '../utils/get-logger';
+import { logger, outputDir } from '../utils/get-logger';
+import fs from 'fs';
+
+const fiscalCodesStatuses = outputDir + '/fiscal-codes-statuses.csv';
 
 export const insertFiscalCodes = async (
   cosmosClient: CosmosClient,
@@ -29,8 +28,11 @@ export const insertFiscalCodes = async (
     );
     classicBar.start(fiscalCodesSet.size, 0);
 
-    whitelistedFiscalCodeFileLogger.info('fiscalCode');
-    notWhitelistedFiscalCodeFileLogger.info('fiscalCode;message;stack');
+    fs.appendFileSync(
+      outputDir + '/fiscal-codes-statuses.csv',
+      'timestamp;fiscalCode;status\n',
+      'utf8',
+    );
 
     for (const fiscalCode of fiscalCodesSet) {
       try {
@@ -39,7 +41,11 @@ export const insertFiscalCodes = async (
           createdAt: new Date(),
         });
 
-        whitelistedFiscalCodeFileLogger.info(fiscalCode);
+        fs.appendFileSync(
+          fiscalCodesStatuses,
+          `${new Date().toISOString()};${fiscalCode};OK\n`,
+          'utf8',
+        );
 
         await new Promise((resolve) =>
           setTimeout(resolve, sleepTimeBetweenRequestsMs),
@@ -47,8 +53,13 @@ export const insertFiscalCodes = async (
       } catch (error) {
         const errorMessage = (error as Error).message.replaceAll('"', '') ?? '';
         const errorStack = (error as Error).stack?.replaceAll('"', '') ?? '';
-        notWhitelistedFiscalCodeFileLogger.info(
-          `${fiscalCode};${errorMessage};${errorStack}`,
+        logger.error(
+          `error while inserting fiscal code ${fiscalCode}: ${errorMessage} ${errorStack}`,
+        );
+        fs.appendFileSync(
+          fiscalCodesStatuses,
+          `${new Date().toISOString()};${fiscalCode};NOT_OK\n`,
+          'utf8',
         );
       }
 
