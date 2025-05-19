@@ -47,7 +47,7 @@ export class PidIssuerClient
   revokeAllCredentials = (fiscalCode: FiscalCode, accessToken: string) =>
     TE.tryCatch(
       async () => {
-        const result = await fetch(`${this.#baseURL}/revokeAll`, {
+        const result = await fetch(new URL("/revokeAll", this.#baseURL), {
           body: JSON.stringify({
             // TINIT is the CF international format: TIN (Tax Identification Number) and IT (Italy). It is required by the endpoint
             unique_id: `TINIT-${fiscalCode}`,

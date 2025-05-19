@@ -39,26 +39,6 @@ export class PdndInteropClient implements VoucherRepository {
           PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
         ),
       );
-  // jwt.sign(
-  //   {
-  //     aud: this.#audience,
-  //     exp: Math.floor(Date.now() / 1000) + 600,
-  //     iat: Math.floor(Date.now() / 1000),
-  //     iss: this.#clientId,
-  //     jti: uuidv4().toString(),
-  //     purposeId: this.#purposeId,
-  //     sub: this.#clientId,
-  //   },
-  //   this.#clientAssertionPrivateKey,
-  //   {
-  //     algorithm: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
-  //     header: {
-  //       alg: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
-  //       kid: this.#kidId,
-  //       typ: PdndInteropClient.CLIENT_ASSERTION_JWT_TYPE,
-  //     },
-  //   },
-  // );
 
   requestVoucher = () =>
     TE.tryCatch(
