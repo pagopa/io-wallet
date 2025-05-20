@@ -68,6 +68,7 @@ export const createWalletAttestation =
             aal: pipe(basePath, getLoAUri(LoA.basic)),
             algValueSupported: supportedSignAlgorithms,
             federationEntity: {
+              contacts: federationEntityMetadata.contacts,
               homepageUri: federationEntityMetadata.homepageUri,
               logoUri: federationEntityMetadata.logoUri,
               organizationName: federationEntityMetadata.organizationName,

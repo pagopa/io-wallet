@@ -1,6 +1,6 @@
 import { parse } from "@pagopa/handler-kit";
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as RE from "fp-ts/lib/ReaderEither";
@@ -161,6 +161,7 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 
 const FederationEntityConfig = t.type({
   basePath: UrlFromString,
+  contacts: t.array(EmailString),
   homepageUri: UrlFromString,
   logoUri: UrlFromString,
   organizationName: NonEmptyString,
@@ -213,6 +214,10 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
       RE.map((urls) => urls.split(",")),
     ),
     basePath: readFromEnvironment("FederationEntityBasePath"),
+    contacts: pipe(
+      readFromEnvironment("FederationEntityContacts"),
+      RE.map((urls) => urls.split(",")),
+    ),
     homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
