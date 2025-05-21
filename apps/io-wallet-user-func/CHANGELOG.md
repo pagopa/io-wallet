@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.3
+
+### Patch Changes
+
+- 53c4ea2: Added in metadata.federation_entity.contacts field in EC
+
 ## 3.3.2
 
 ### Patch Changes
