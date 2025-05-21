@@ -5,7 +5,11 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import {
+  EmailString,
+  FiscalCode,
+  NonEmptyString,
+} from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as appInsights from "applicationinsights";
 import { decode } from "cbor-x";
@@ -43,10 +47,18 @@ const url = flow(
   }),
 );
 
+const email = flow(
+  EmailString.decode,
+  E.getOrElseW((_) => {
+    throw new Error(`Failed to parse url ${_[0].value}`);
+  }),
+);
+
 const entityConfiguration = {
   authorityHints: [url("https://ta.example.org")],
   federationEntity: {
     basePath: url("https://wallet-provider.example.org"),
+    contacts: [email("foo@pec.bar.it")],
     homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
     logoUri: url("https://wallet-provider.example.org/logo.svg"),
     organizationName: "wallet provider" as NonEmptyString,
