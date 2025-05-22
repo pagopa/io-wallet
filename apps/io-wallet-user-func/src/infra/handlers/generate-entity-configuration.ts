@@ -38,6 +38,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
         {
           authorityHints,
           federationEntityMetadata: {
+            contacts: federationEntityMetadata.contacts,
             homepageUri: federationEntityMetadata.homepageUri,
             logoUri: federationEntityMetadata.logoUri,
             organizationName: federationEntityMetadata.organizationName,

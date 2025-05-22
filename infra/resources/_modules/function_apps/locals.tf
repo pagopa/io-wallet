@@ -21,6 +21,7 @@ locals {
     FederationEntityPolicyUri         = "https://io.italia.it/privacy-policy/"
     FederationEntityTosUri            = "https://io.italia.it/privacy-policy/"
     FederationEntityLogoUri           = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
+    FederationEntityContacts          = "pagopaspa@pec.pagopa.it"
     IosBundleIdentifiers              = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet"
     IosTeamIdentifier                 = "M2X5YQ4BJ7"
     AndroidBundleIdentifiers          = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage"
