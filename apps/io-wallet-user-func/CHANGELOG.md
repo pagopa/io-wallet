@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.4
+
+### Patch Changes
+
+- 0543e2b: Removed collection `wallet-instances-user-id`
+
 ## 3.3.3
 
 ### Patch Changes
