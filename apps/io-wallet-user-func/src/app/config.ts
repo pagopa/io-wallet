@@ -487,14 +487,12 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
-    walletAttestationWalletName: readFromEnvironment(
-      "WalletAttestationWalletName",
-    ),
+    walletSolutionName: readFromEnvironment("WalletSolutionName"),
   }),
-  RE.map(({ walletAttestationWalletLink, walletAttestationWalletName }) => ({
+  RE.map(({ walletAttestationWalletLink, walletSolutionName }) => ({
     walletAttestation: {
       walletLink: walletAttestationWalletLink,
-      walletName: walletAttestationWalletName,
+      walletName: walletSolutionName,
     },
   })),
 );
