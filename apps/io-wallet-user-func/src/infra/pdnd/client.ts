@@ -1,11 +1,12 @@
-import { PdndInteropApiClientConfig } from "@/app/config";
+import { PdndApiClientConfig } from "@/app/config";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import * as jose from "jose";
 import { v4 as uuidv4 } from "uuid";
 
 import { VoucherRepository } from "../voucher";
-export class PdndInteropClient implements VoucherRepository {
+
+export class PdndClient implements VoucherRepository {
   static readonly CLIENT_ASSERTION_JWT_ALGORITHM = "RS256";
   static readonly CLIENT_ASSERTION_JWT_TYPE = "JWT";
   static readonly CLIENT_ASSERTION_TYPE =
@@ -27,16 +28,16 @@ export class PdndInteropClient implements VoucherRepository {
       sub: this.#clientId,
     })
       .setProtectedHeader({
-        alg: PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+        alg: PdndClient.CLIENT_ASSERTION_JWT_ALGORITHM,
         kid: this.#kidId,
-        typ: PdndInteropClient.CLIENT_ASSERTION_JWT_TYPE,
+        typ: PdndClient.CLIENT_ASSERTION_JWT_TYPE,
       })
       .setIssuedAt()
       .setExpirationTime("10 minutes")
       .sign(
         await jose.importPKCS8(
           this.#clientAssertionPrivateKey,
-          PdndInteropClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+          PdndClient.CLIENT_ASSERTION_JWT_ALGORITHM,
         ),
       );
 
@@ -46,9 +47,9 @@ export class PdndInteropClient implements VoucherRepository {
         const result = await fetch(this.#url, {
           body: JSON.stringify({
             client_assertion: await this.generateClientAssertion(),
-            client_assertion_type: PdndInteropClient.CLIENT_ASSERTION_TYPE,
+            client_assertion_type: PdndClient.CLIENT_ASSERTION_TYPE,
             client_id: this.#clientId,
-            grant_type: PdndInteropClient.GRANT_TYPE,
+            grant_type: PdndClient.GRANT_TYPE,
           }),
           headers: {
             "Content-Type": "application/json",
@@ -84,7 +85,7 @@ export class PdndInteropClient implements VoucherRepository {
     purposeId,
     requestTimeout,
     url,
-  }: PdndInteropApiClientConfig) {
+  }: PdndApiClientConfig) {
     this.#kidId = kidId;
     this.#url = url;
     this.#audience = audience;

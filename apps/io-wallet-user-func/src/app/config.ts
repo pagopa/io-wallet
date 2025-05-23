@@ -159,7 +159,7 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
-const PdndInteropApiClientConfig = t.type({
+const PdndApiClientConfig = t.type({
   audience: t.string,
   clientAssertionPrivateKey: t.string,
   clientId: t.string,
@@ -169,28 +169,26 @@ const PdndInteropApiClientConfig = t.type({
   url: t.string,
 });
 
-export type PdndInteropApiClientConfig = t.TypeOf<
-  typeof PdndInteropApiClientConfig
->;
+export type PdndApiClientConfig = t.TypeOf<typeof PdndApiClientConfig>;
 
-export const getPdndInteropConfigFromEnvironment: RE.ReaderEither<
+export const getPdndConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  PdndInteropApiClientConfig
+  PdndApiClientConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    audience: readFromEnvironment("PdndInteropApiAudience"),
+    audience: readFromEnvironment("PdndApiAudience"),
     clientAssertionPrivateKey: readFromEnvironment(
-      "PdndInteropClientAssertionPrivateKey",
+      "PdndClientAssertionPrivateKey",
     ),
-    clientId: readFromEnvironment("PdndInteropApiClientId"),
-    kidId: readFromEnvironment("PdndInteropApiKidId"),
-    purposeId: readFromEnvironment("PdndInteropPurposeId"),
+    clientId: readFromEnvironment("PdndApiClientId"),
+    kidId: readFromEnvironment("PdndApiKidId"),
+    purposeId: readFromEnvironment("PdndPurposeId"),
     requestTimeout: pipe(
-      readFromEnvironment("PdndInteropApiRequestTimeout"),
+      readFromEnvironment("PdndApiRequestTimeout"),
       RE.chainW(stringToNumberDecoderRE),
     ),
-    url: readFromEnvironment("PdndInteropApiURL"),
+    url: readFromEnvironment("PdndApiURL"),
   }),
 );
 
@@ -230,7 +228,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
-  pdndInteop: PdndInteropApiClientConfig,
+  pdndInteop: PdndApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
   walletProvider: WalletProviderConfig,
@@ -517,7 +515,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     mail: getMailConfigFromEnvironment,
-    pdndInteop: getPdndInteropConfigFromEnvironment,
+    pdndInteop: getPdndConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
