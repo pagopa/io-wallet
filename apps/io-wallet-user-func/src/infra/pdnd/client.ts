@@ -1,10 +1,21 @@
 import { PdndApiClientConfig } from "@/app/config";
+import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
+import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import * as jose from "jose";
 import { v4 as uuidv4 } from "uuid";
 
 import { VoucherRepository } from "../voucher";
+
+export const RequestVoucherResponseSchema = t.type({
+  access_token: NonEmptyString,
+});
+
+export type RequestVoucherResponseSchema = t.TypeOf<
+  typeof RequestVoucherResponseSchema
+>;
 
 export class PdndClient implements VoucherRepository {
   static readonly CLIENT_ASSERTION_JWT_ALGORITHM = "RS256";
@@ -60,7 +71,14 @@ export class PdndClient implements VoucherRepository {
         if (!result.ok) {
           throw new Error(JSON.stringify(await result.json()));
         }
+
         const response = await result.json();
+        const validation = RequestVoucherResponseSchema.decode(response);
+
+        if (!E.isRight(validation)) {
+          throw new Error("Invalid response format");
+        }
+
         if (typeof response.access_token !== "string") {
           throw new Error(
             "Invalid response: access_token is missing or not a string",
