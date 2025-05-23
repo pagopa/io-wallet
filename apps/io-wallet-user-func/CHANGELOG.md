@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.5
+
+### Patch Changes
+
+- 1bc95f4: Added AddWalletInstanceUserIdFunction to populate wallet-instances-user-id collection
+
 ## 3.3.4
 
 ### Patch Changes
