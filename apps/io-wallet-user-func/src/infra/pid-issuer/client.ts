@@ -1,4 +1,8 @@
-import { Config, PidIssuerApiClientConfig } from "@/app/config";
+import {
+  Config,
+  PidIssuerApiClientConfig,
+  decodeBase64String,
+} from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { removeTrailingSlash } from "@/url";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -32,7 +36,7 @@ export class PidIssuerClient
               ...this.#init,
               headers: {
                 ...this.#init.headers,
-                Authorization: `Bearer ${this.#clientCertificate}`,
+                Authorization: `Bearer ${decodeBase64String(this.#clientCertificate)}`,
               },
             });
             return result.status === 404;
@@ -59,7 +63,7 @@ export class PidIssuerClient
           headers: {
             ...this.#init.headers,
             Authorization: `Bearer ${accessToken}`,
-            "X-Client-Cert": btoa(this.#clientCertificate),
+            "X-Client-Cert": this.#clientCertificate,
           },
         });
         if (result.status === 404) {

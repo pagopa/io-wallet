@@ -442,9 +442,8 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
-    pidIssuerApiClientCertificate: pipe(
-      readFromEnvironment("PidIssuerApiClientCertificate"),
-      RE.map(decodeBase64String),
+    pidIssuerApiClientCertificate: readFromEnvironment(
+      "PidIssuerApiClientCertificate",
     ),
     pidIssuerApiClientPrivateKey: pipe(
       readFromEnvironment("PidIssuerApiClientPrivateKey"),
