@@ -1,4 +1,4 @@
-import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
@@ -6,6 +6,7 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 import { Signer } from "./signer";
 
 export const FederationEntityMetadata = t.type({
+  contacts: t.array(EmailString),
   homepageUri: UrlFromString,
   logoUri: UrlFromString,
   organizationName: NonEmptyString,

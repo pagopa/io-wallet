@@ -1,5 +1,23 @@
 # io-wallet-user-func
 
+## 3.3.5
+
+### Patch Changes
+
+- 1bc95f4: Added AddWalletInstanceUserIdFunction to populate wallet-instances-user-id collection
+
+## 3.3.4
+
+### Patch Changes
+
+- 0543e2b: Removed collection `wallet-instances-user-id`
+
+## 3.3.3
+
+### Patch Changes
+
+- 53c4ea2: Added in metadata.federation_entity.contacts field in EC
+
 ## 3.3.2
 
 ### Patch Changes

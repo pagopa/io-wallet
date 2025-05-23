@@ -13,6 +13,7 @@ const EntityConfigurationJwtModel = t.type({
   }),
   metadata: t.type({
     federation_entity: t.type({
+      contacts: t.array(t.string),
       homepage_uri: t.string,
       logo_uri: t.string,
       organization_name: t.string,
@@ -53,6 +54,7 @@ export const EntityConfigurationToJwtModel: E.Encoder<
     },
     metadata: {
       federation_entity: {
+        contacts: federationEntityMetadata.contacts,
         homepage_uri: removeTrailingSlash(
           federationEntityMetadata.homepageUri.href,
         ),

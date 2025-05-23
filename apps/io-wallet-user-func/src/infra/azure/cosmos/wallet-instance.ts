@@ -249,10 +249,10 @@ export class CosmosDbWalletInstanceRepository
     return TE.tryCatch(async () => {
       await this.#userIdKeyedContainer.items.create(walletInstance);
       // TODO
-      await this.#idKeyedContainer.items.create({
-        id: walletInstance.id,
-        userId: walletInstance.userId,
-      });
+      // await this.#idKeyedContainer.items.create({
+      //   id: walletInstance.id,
+      //   userId: walletInstance.userId,
+      // });
     }, toError("Error inserting wallet instance"));
   }
 }
