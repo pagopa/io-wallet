@@ -28,6 +28,12 @@ import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
 
+export const PDND_API_AUDIENCE_DEFAULT =
+  "auth.uat.interop.pagopa.it/client-assertion";
+
+export const PDND_API_URL_DEFAULT =
+  "https://auth.uat.interop.pagopa.it/token.oauth2";
+
 export const APPLE_APP_ATTESTATION_ROOT_CA =
   "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t";
 
@@ -159,6 +165,47 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const PdndApiClientConfig = t.type({
+  audience: t.string,
+  clientAssertionPrivateKey: t.string,
+  clientId: t.string,
+  kidId: t.string,
+  purposeId: t.string,
+  requestTimeout: NumberFromString,
+  url: t.string,
+});
+
+export type PdndApiClientConfig = t.TypeOf<typeof PdndApiClientConfig>;
+
+export const getPdndConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  PdndApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    audience: pipe(
+      readFromEnvironment("PdndApiAudience"),
+      RE.orElse(() => RE.right(PDND_API_AUDIENCE_DEFAULT)),
+    ),
+    clientAssertionPrivateKey: pipe(
+      readFromEnvironment("PdndClientAssertionPrivateKey"),
+      RE.map(decodeBase64String),
+    ),
+    clientId: readFromEnvironment("PdndApiClientId"),
+    kidId: readFromEnvironment("PdndApiKidId"),
+    purposeId: readFromEnvironment("PdndPurposeId"),
+    requestTimeout: pipe(
+      readFromEnvironment("PdndApiRequestTimeout"),
+      RE.chainW(stringToNumberDecoderRE),
+      RE.orElse(() => RE.right(10000)),
+    ),
+    url: pipe(
+      readFromEnvironment("PdndApiURL"),
+      RE.orElse(() => RE.right(PDND_API_URL_DEFAULT)),
+    ),
+  }),
+);
+
 const FederationEntityConfig = t.type({
   basePath: UrlFromString,
   contacts: t.array(EmailString),
@@ -196,6 +243,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
+  pdndInteop: PdndApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
   walletProvider: WalletProviderConfig,
@@ -399,9 +447,8 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
-    pidIssuerApiClientCertificate: pipe(
-      readFromEnvironment("PidIssuerApiClientCertificate"),
-      RE.map(decodeBase64String),
+    pidIssuerApiClientCertificate: readFromEnvironment(
+      "PidIssuerApiClientCertificate",
     ),
     pidIssuerApiClientPrivateKey: pipe(
       readFromEnvironment("PidIssuerApiClientPrivateKey"),
@@ -458,14 +505,12 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
-    walletAttestationWalletName: readFromEnvironment(
-      "WalletAttestationWalletName",
-    ),
+    walletSolutionName: readFromEnvironment("WalletSolutionName"),
   }),
-  RE.map(({ walletAttestationWalletLink, walletAttestationWalletName }) => ({
+  RE.map(({ walletAttestationWalletLink, walletSolutionName }) => ({
     walletAttestation: {
       walletLink: walletAttestationWalletLink,
-      walletName: walletAttestationWalletName,
+      walletName: walletSolutionName,
     },
   })),
 );
@@ -486,6 +531,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     mail: getMailConfigFromEnvironment,
+    pdndInteop: getPdndConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
