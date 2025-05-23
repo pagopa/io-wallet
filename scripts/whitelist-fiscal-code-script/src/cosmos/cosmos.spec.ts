@@ -1,28 +1,27 @@
-import { vi, describe, expect, it } from 'vitest';
-import { getCosmosClient } from './cosmos';
 import { CosmosClient } from '@azure/cosmos';
+import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('winston', () => {
-  return {
-    createLogger: vi.fn().mockImplementation(() => ({
-      info: vi.fn(),
-      error: vi.fn(),
-      warn: vi.fn(),
-      debug: vi.fn(),
-      verbose: vi.fn(),
-    })),
-    format: {
-      combine: vi.fn(),
-      timestamp: vi.fn(),
-      simple: vi.fn(),
-      printf: vi.fn(),
-    },
-    transports: {
-      Console: vi.fn(),
-      File: vi.fn(),
-    },
-  };
-});
+import { getCosmosClient } from './cosmos';
+
+vi.mock('winston', () => ({
+  createLogger: vi.fn().mockImplementation(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    verbose: vi.fn(),
+    warn: vi.fn(),
+  })),
+  format: {
+    combine: vi.fn(),
+    printf: vi.fn(),
+    simple: vi.fn(),
+    timestamp: vi.fn(),
+  },
+  transports: {
+    Console: vi.fn(),
+    File: vi.fn(),
+  },
+}));
 
 vi.mock('@azure/cosmos', () => ({
   CosmosClient: vi.fn().mockImplementation(() => ({})),

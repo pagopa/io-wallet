@@ -1,5 +1,6 @@
-import fs from 'fs';
 import * as csv from 'csv-parse';
+import fs from 'fs';
+
 import { logger } from '../utils/get-logger';
 
 export const parseFiscalCodes = async (

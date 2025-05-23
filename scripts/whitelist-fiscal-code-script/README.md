@@ -1,6 +1,6 @@
 # Whitelist Fiscal Code Script
 
-This script is used to whitelist fiscal codes in the database.
+This script adds fiscal codes to the whitelist in the database.
 
 ### Prerequisites
 
@@ -23,13 +23,29 @@ TEST0000005
 
 To see a simple example, view the `fiscalcodes.csv.example` file, stored in the root directory of this script.
 
+You can create a simple CSV file for testing by the following command:
+
+```bash
+cp fiscalcodes.csv.example fiscalcodes.csv
+```
+
+By default, the script considers a file called `fiscalcodes.csv` under the root directory of the script (`scripts/whitelist-fiscal-code-script`).
+
 **STEP 2**
 Make sure you have a `.env` file under the root directory with the following variables:
 
 ```bash
 DATABASE_CONNECTION_STRING          # (required) the connection string to the database, you can find it in the azure portal
+DATABASE_NAME                       # (required) the database name
+DATABASE_CONTAINER_NAME             # (required) the container name of the database
 SLEEP_TIME_BETWEEN_REQUESTS_MS      # (optional, default 500) the time to wait between requests to the database, in milliseconds
 REQUEST_TIMEOUT_MS                  # (optional, default 10000) the timeout for each request to the database, in milliseconds
+```
+
+You can easily create the `.env` file by copying the `.env.example` with this command:
+
+```bash
+cp .env.example .env
 ```
 
 **STEP 3**
@@ -57,7 +73,7 @@ For example, you can run this script in the following ways:
 
 ```bash
 # using the default values
-yasn start
+yarn start
 
 # specifying the input file only
 yarn start --input=fiscalcodes.csv
@@ -79,5 +95,4 @@ yarn test                        # run tests
 yarn test:coverage               # run tests and generate coverage report
 yarn install                     # install all dependencies
 yarn start                       # run the script
-yarn build                       # build the script
 ```

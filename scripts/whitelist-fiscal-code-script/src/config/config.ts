@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import * as Joi from 'joi';
+
 import { getArgvParam } from '../utils/get-argv-param';
 import { logger } from '../utils/get-logger';
 
@@ -18,30 +19,20 @@ const ArgumentsSchema = Joi.object({
 
 const EnvSchema = Joi.object({
   DATABASE_CONNECTION_STRING: Joi.string().required().messages({
+    'any.required': 'DATABASE_CONNECTION_STRING is required',
     'string.base': 'DATABASE_CONNECTION_STRING must be a string',
     'string.empty': 'DATABASE_CONNECTION_STRING is not allowed to be empty',
-    'any.required': 'DATABASE_CONNECTION_STRING is required',
-  }),
-  DATABASE_NAME: Joi.string().required().messages({
-    'string.base': 'DATABASE_NAME must be a string',
-    'string.empty': 'DATABASE_NAME is not allowed to be empty',
-    'any.required': 'DATABASE_NAME is required',
   }),
   DATABASE_CONTAINER_NAME: Joi.string().required().messages({
+    'any.required': 'DATABASE_CONTAINER_NAME is required',
     'string.base': 'DATABASE_CONTAINER_NAME must be a string',
     'string.empty': 'DATABASE_CONTAINER_NAME is not allowed to be empty',
-    'any.required': 'DATABASE_CONTAINER_NAME is required',
   }),
-  SLEEP_TIME_BETWEEN_REQUESTS_MS: Joi.number()
-    .min(0)
-    .max(1_000_000)
-    .optional()
-    .default(500)
-    .messages({
-      'number.base': 'SLEEP_TIME_BETWEEN_REQUESTS_MS must be a number',
-      'number.min': 'SLEEP_TIME_BETWEEN_REQUESTS_MS must be at least 0',
-      'number.max': 'SLEEP_TIME_BETWEEN_REQUESTS_MS must be maximum 1_000_000',
-    }),
+  DATABASE_NAME: Joi.string().required().messages({
+    'any.required': 'DATABASE_NAME is required',
+    'string.base': 'DATABASE_NAME must be a string',
+    'string.empty': 'DATABASE_NAME is not allowed to be empty',
+  }),
   REQUEST_TIMEOUT_MS: Joi.number()
     .min(0)
     .max(1_000_000)
@@ -49,8 +40,18 @@ const EnvSchema = Joi.object({
     .default(10_000)
     .messages({
       'number.base': 'REQUEST_TIMEOUT_MS must be a number',
-      'number.min': 'REQUEST_TIMEOUT_MS must be at least 0',
       'number.max': 'REQUEST_TIMEOUT_MS must be maximum 1_000_000',
+      'number.min': 'REQUEST_TIMEOUT_MS must be at least 0',
+    }),
+  SLEEP_TIME_BETWEEN_REQUESTS_MS: Joi.number()
+    .min(0)
+    .max(1_000_000)
+    .optional()
+    .default(500)
+    .messages({
+      'number.base': 'SLEEP_TIME_BETWEEN_REQUESTS_MS must be a number',
+      'number.max': 'SLEEP_TIME_BETWEEN_REQUESTS_MS must be maximum 1_000_000',
+      'number.min': 'SLEEP_TIME_BETWEEN_REQUESTS_MS must be at least 0',
     }),
 });
 
@@ -65,8 +66,8 @@ export const checkConfig = (): void => {
     };
 
     const { error } = ConfigSchema.validate(configs, {
-      allowUnknown: true,
       abortEarly: false,
+      allowUnknown: true,
     });
 
     if (error) {

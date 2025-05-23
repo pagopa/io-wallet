@@ -1,34 +1,33 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
 import { checkConfig } from './config';
 
-vi.mock('winston', () => {
-  return {
-    createLogger: vi.fn().mockImplementation(() => ({
-      info: vi.fn(),
-      error: vi.fn(),
-      warn: vi.fn(),
-      debug: vi.fn(),
-      verbose: vi.fn(),
-    })),
-    format: {
-      combine: vi.fn(),
-      timestamp: vi.fn(),
-      simple: vi.fn(),
-      printf: vi.fn(),
-    },
-    transports: {
-      Console: vi.fn(),
-      File: vi.fn(),
-    },
-  };
-});
+vi.mock('winston', () => ({
+  createLogger: vi.fn().mockImplementation(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    verbose: vi.fn(),
+    warn: vi.fn(),
+  })),
+  format: {
+    combine: vi.fn(),
+    printf: vi.fn(),
+    simple: vi.fn(),
+    timestamp: vi.fn(),
+  },
+  transports: {
+    Console: vi.fn(),
+    File: vi.fn(),
+  },
+}));
 
 vi.mock('dotenv', () => ({
   config: vi.fn(),
 }));
 
 process.exit = vi.fn() as unknown as (
-  code?: string | number | null | undefined,
+  code?: null | number | string | undefined,
 ) => never;
 
 describe('checkConfig()', () => {

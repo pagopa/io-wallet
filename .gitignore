@@ -1,7 +1,7 @@
 dist
 .eslintcache
 local.settings.json
-.env*
+.env
 .DS_Store
 coverage
 bin

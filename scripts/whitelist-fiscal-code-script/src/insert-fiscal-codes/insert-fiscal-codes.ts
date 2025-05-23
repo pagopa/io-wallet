@@ -1,7 +1,8 @@
 import { CosmosClient } from '@azure/cosmos';
 import * as CliProgress from 'cli-progress';
-import { logger, outputDir } from '../utils/get-logger';
 import fs from 'fs';
+
+import { logger, outputDir } from '../utils/get-logger';
 
 const fiscalCodesStatuses = outputDir + '/fiscal-codes-statuses.csv';
 
@@ -37,8 +38,8 @@ export const insertFiscalCodes = async (
     for (const fiscalCode of fiscalCodesSet) {
       try {
         await container.items.upsert({
-          id: fiscalCode,
           createdAt: new Date(),
+          id: fiscalCode,
         });
 
         fs.appendFileSync(

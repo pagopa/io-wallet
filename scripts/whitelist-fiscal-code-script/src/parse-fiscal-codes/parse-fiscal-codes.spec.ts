@@ -1,27 +1,26 @@
-import { vi, describe, it, expect } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
 import { parseFiscalCodes } from './parse-fiscal-codes';
 
-vi.mock('winston', () => {
-  return {
-    createLogger: vi.fn().mockImplementation(() => ({
-      info: vi.fn(),
-      error: vi.fn(),
-      warn: vi.fn(),
-      debug: vi.fn(),
-      verbose: vi.fn(),
-    })),
-    format: {
-      combine: vi.fn(),
-      timestamp: vi.fn(),
-      simple: vi.fn(),
-      printf: vi.fn(),
-    },
-    transports: {
-      Console: vi.fn(),
-      File: vi.fn(),
-    },
-  };
-});
+vi.mock('winston', () => ({
+  createLogger: vi.fn().mockImplementation(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    verbose: vi.fn(),
+    warn: vi.fn(),
+  })),
+  format: {
+    combine: vi.fn(),
+    printf: vi.fn(),
+    simple: vi.fn(),
+    timestamp: vi.fn(),
+  },
+  transports: {
+    Console: vi.fn(),
+    File: vi.fn(),
+  },
+}));
 
 describe('parseFiscalCode', () => {
   it('should correctly parse a valid fiscal code', async () => {

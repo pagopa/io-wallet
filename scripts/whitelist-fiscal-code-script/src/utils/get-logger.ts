@@ -1,4 +1,5 @@
-import { createLogger, transports, format } from 'winston';
+import { createLogger, format, transports } from 'winston';
+
 import { getArgvParam } from './get-argv-param';
 
 export const outputDir = getArgvParam('--outputDir') ?? 'logs';
@@ -12,20 +13,21 @@ export const logger = createLogger({
           format: 'YYYY-MM-DD HH:mm:ss',
         }),
         format.printf(
-          ({ timestamp, level, message, stack }) =>
+          ({ level, message, stack, timestamp }) =>
             `${timestamp} [${level}]: ${message} ${stack || ''}`,
         ),
       ),
     }),
     new transports.File({
       filename: outputDir + '/app.log',
-      level: 'info',
       format: format.combine(
         format.timestamp(),
-        format.printf(({ timestamp, level, message }) => {
-          return `${timestamp} [${level}]: ${message}`;
-        }),
+        format.printf(
+          ({ level, message, timestamp }) =>
+            `${timestamp} [${level}]: ${message}`,
+        ),
       ),
+      level: 'info',
     }),
   ],
 });

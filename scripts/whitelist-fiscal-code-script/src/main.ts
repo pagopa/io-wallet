@@ -1,7 +1,7 @@
 import { checkConfig } from './config/config';
-import { parseFiscalCodes } from './parse-fiscal-codes/parse-fiscal-codes';
 import { getCosmosClient } from './cosmos/cosmos';
 import { insertFiscalCodes } from './insert-fiscal-codes/insert-fiscal-codes';
+import { parseFiscalCodes } from './parse-fiscal-codes/parse-fiscal-codes';
 import { getArgvParam } from './utils/get-argv-param';
 
 const bootstrap = async () => {

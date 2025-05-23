@@ -1,30 +1,29 @@
 import { CosmosClient } from '@azure/cosmos';
-import { vi, describe, it, expect } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
 import { insertFiscalCodes } from './insert-fiscal-codes';
 
 process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '0';
 
-vi.mock('winston', () => {
-  return {
-    createLogger: vi.fn().mockImplementation(() => ({
-      info: vi.fn(),
-      error: vi.fn(),
-      warn: vi.fn(),
-      debug: vi.fn(),
-      verbose: vi.fn(),
-    })),
-    format: {
-      combine: vi.fn(),
-      timestamp: vi.fn(),
-      simple: vi.fn(),
-      printf: vi.fn(),
-    },
-    transports: {
-      Console: vi.fn(),
-      File: vi.fn(),
-    },
-  };
-});
+vi.mock('winston', () => ({
+  createLogger: vi.fn().mockImplementation(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    verbose: vi.fn(),
+    warn: vi.fn(),
+  })),
+  format: {
+    combine: vi.fn(),
+    printf: vi.fn(),
+    simple: vi.fn(),
+    timestamp: vi.fn(),
+  },
+  transports: {
+    Console: vi.fn(),
+    File: vi.fn(),
+  },
+}));
 
 describe('Insert Fiscal Codes', () => {
   it('should upsert one fiscal code', async () => {
@@ -53,8 +52,8 @@ describe('Insert Fiscal Codes', () => {
     expect(
       cosmosClientMock.database().container().items.upsert,
     ).toHaveBeenCalledWith({
-      id: 'TEST0000001',
       createdAt: expect.any(Date),
+      id: 'TEST0000001',
     });
   });
 
@@ -85,14 +84,14 @@ describe('Insert Fiscal Codes', () => {
     expect(
       cosmosClientMock.database().container().items.upsert,
     ).toHaveBeenCalledWith({
-      id: 'TEST0000001',
       createdAt: expect.any(Date),
+      id: 'TEST0000001',
     });
     expect(
       cosmosClientMock.database().container().items.upsert,
     ).toHaveBeenCalledWith({
-      id: 'TEST0000002',
       createdAt: expect.any(Date),
+      id: 'TEST0000002',
     });
   });
 
@@ -134,14 +133,14 @@ describe('Insert Fiscal Codes', () => {
     expect(
       cosmosClientMock.database().container().items.upsert,
     ).toHaveBeenCalledWith({
-      id: 'TEST0000001',
       createdAt: expect.any(Date),
+      id: 'TEST0000001',
     });
     expect(
       cosmosClientMock.database().container().items.upsert,
     ).toHaveBeenCalledWith({
-      id: 'TEST0000010',
       createdAt: expect.any(Date),
+      id: 'TEST0000010',
     });
   });
 
