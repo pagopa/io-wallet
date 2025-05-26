@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
 import * as Joi from 'joi';
 
-import { getArgvParam } from '../utils/get-argv-param';
-import { logger } from '../utils/get-logger';
+import { getArgvParam } from '../get-argv-param';
+import { logger } from '../get-logger';
 
 dotenv.config();
 

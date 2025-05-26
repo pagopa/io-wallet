@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { parseFiscalCodes } from './parse-fiscal-codes';
+import { parseFiscalCodes } from '../parse-fiscal-codes';
 
 vi.mock('winston', () => ({
   createLogger: vi.fn().mockImplementation(() => ({
@@ -38,13 +38,6 @@ describe('parseFiscalCode', () => {
   });
 
   it('should throw an error, wrong fiscalcodes.csv path', async () => {
-    try {
-      await parseFiscalCodes('../../wrong/path.csv');
-    } catch (error) {
-      expect(error).toBeDefined();
-      return;
-    }
-
-    expect(true).toStrictEqual(false);
+    await expect(parseFiscalCodes('../../wrong/path.csv')).rejects.toThrow();
   });
 });

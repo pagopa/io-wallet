@@ -2,7 +2,7 @@ import { CosmosClient } from '@azure/cosmos';
 import * as CliProgress from 'cli-progress';
 import fs from 'fs';
 
-import { logger, outputDir } from '../utils/get-logger';
+import { logger, outputDir } from './get-logger';
 
 const fiscalCodesStatuses = outputDir + '/fiscal-codes-statuses.csv';
 

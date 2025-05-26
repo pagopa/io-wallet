@@ -1,7 +1,7 @@
 import { CosmosClient } from '@azure/cosmos';
 import { describe, expect, it, vi } from 'vitest';
 
-import { insertFiscalCodes } from './insert-fiscal-codes';
+import { insertFiscalCodes } from '../insert-fiscal-codes';
 
 process.env.SLEEP_TIME_BETWEEN_REQUESTS_MS = '0';
 

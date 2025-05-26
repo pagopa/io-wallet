@@ -1,6 +1,6 @@
 import { CosmosClient } from '@azure/cosmos';
 
-import { logger } from '../utils/get-logger';
+import { logger } from '../../../get-logger';
 
 const DATABASE_CONNECTION_STRING = process.env
   .DATABASE_CONNECTION_STRING as string;

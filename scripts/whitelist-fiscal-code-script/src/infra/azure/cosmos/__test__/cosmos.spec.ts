@@ -1,7 +1,7 @@
 import { CosmosClient } from '@azure/cosmos';
 import { describe, expect, it, vi } from 'vitest';
 
-import { getCosmosClient } from './cosmos';
+import { getCosmosClient } from '../cosmos';
 
 vi.mock('winston', () => ({
   createLogger: vi.fn().mockImplementation(() => ({
@@ -43,13 +43,6 @@ describe('Cosmos Module', () => {
 
     process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
 
-    try {
-      getCosmosClient();
-    } catch (error) {
-      expect(error).toBeDefined();
-      return;
-    }
-
-    expect(true).toStrictEqual(false);
+    expect(async () => await getCosmosClient()).rejects.toThrow();
   });
 });
