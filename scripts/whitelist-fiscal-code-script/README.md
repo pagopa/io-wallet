@@ -2,11 +2,6 @@
 
 This script adds fiscal codes to the whitelist in the database.
 
-### Prerequisites
-
-- NodeJS ^22.15.0
-- NPM ^10.9.2
-
 ### Quickstart
 
 **STEP 1**
