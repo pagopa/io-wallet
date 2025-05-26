@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 
-import { parseFiscalCodes } from '../parse-fiscal-codes';
+import { parseFiscalCodes } from "../parse-fiscal-codes";
 
-vi.mock('winston', () => ({
+vi.mock("winston", () => ({
   createLogger: vi.fn().mockImplementation(() => ({
     debug: vi.fn(),
     error: vi.fn(),
@@ -22,22 +22,22 @@ vi.mock('winston', () => ({
   },
 }));
 
-describe('parseFiscalCode', () => {
-  it('should correctly parse a valid fiscal code', async () => {
-    const fiscalCodes = await parseFiscalCodes('./fiscalcodes.csv.example');
+describe("parseFiscalCode", () => {
+  it("should correctly parse a valid fiscal code", async () => {
+    const fiscalCodes = await parseFiscalCodes("./fiscalcodes.csv.example");
 
     expect(fiscalCodes).toBeDefined();
     expect(fiscalCodes.length).toStrictEqual(5);
     expect(fiscalCodes).toMatchObject([
-      'TEST0000001',
-      'TEST0000002',
-      'TEST0000003',
-      'TEST0000004',
-      'TEST0000005',
+      "TEST0000001",
+      "TEST0000002",
+      "TEST0000003",
+      "TEST0000004",
+      "TEST0000005",
     ]);
   });
 
-  it('should throw an error, wrong fiscalcodes.csv path', async () => {
-    await expect(parseFiscalCodes('../../wrong/path.csv')).rejects.toThrow();
+  it("should throw an error, wrong fiscalcodes.csv path", async () => {
+    await expect(parseFiscalCodes("../../wrong/path.csv")).rejects.toThrow();
   });
 });

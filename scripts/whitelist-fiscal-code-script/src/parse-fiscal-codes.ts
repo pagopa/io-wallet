@@ -1,7 +1,7 @@
-import * as csv from 'csv-parse';
-import fs from 'fs';
+import * as csv from "csv-parse";
+import fs from "fs";
 
-import { logger } from './get-logger';
+import { logger } from "./get-logger";
 
 export const parseFiscalCodes = async (
   csvFilePath: string,
@@ -10,27 +10,27 @@ export const parseFiscalCodes = async (
     const fiscalCodes: string[] = [];
 
     const parser = csv.parse({
-      delimiter: ',',
+      delimiter: ",",
       skip_empty_lines: true,
       trim: true,
     });
 
     if (!fs.existsSync(csvFilePath)) {
-      throw new Error('file not found');
+      throw new Error("file not found");
     }
 
     await new Promise((resolve, reject) => {
       fs.createReadStream(csvFilePath)
         .pipe(parser)
-        .on('data', (row: string[]) => {
+        .on("data", (row: string[]) => {
           fiscalCodes.push(row[0]);
         })
-        .on('end', resolve)
-        .on('error', reject);
+        .on("end", resolve)
+        .on("error", reject);
     });
 
     if (fiscalCodes.length === 0) {
-      logger.warn('the CSV file is empty or does not contain a header row.');
+      logger.warn("the CSV file is empty or does not contain a header row.");
       return [];
     }
 
@@ -40,7 +40,7 @@ export const parseFiscalCodes = async (
 
     return fiscalCodes;
   } catch (error) {
-    logger.error('parse-fiscal-code.ts: error parsing fiscal codes');
+    logger.error("parse-fiscal-code.ts: error parsing fiscal codes");
     logger.error(error);
     throw error;
   }

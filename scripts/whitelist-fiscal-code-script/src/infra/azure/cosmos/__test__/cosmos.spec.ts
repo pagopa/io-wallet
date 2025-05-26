@@ -1,9 +1,9 @@
-import { CosmosClient } from '@azure/cosmos';
-import { describe, expect, it, vi } from 'vitest';
+import { CosmosClient } from "@azure/cosmos";
+import { describe, expect, it, vi } from "vitest";
 
-import { getCosmosClient } from '../cosmos';
+import { getCosmosClient } from "../cosmos";
 
-vi.mock('winston', () => ({
+vi.mock("winston", () => ({
   createLogger: vi.fn().mockImplementation(() => ({
     debug: vi.fn(),
     error: vi.fn(),
@@ -23,25 +23,25 @@ vi.mock('winston', () => ({
   },
 }));
 
-vi.mock('@azure/cosmos', () => ({
+vi.mock("@azure/cosmos", () => ({
   CosmosClient: vi.fn().mockImplementation(() => ({})),
 }));
 
-describe('Cosmos Module', () => {
-  it('should return a cosmos client', () => {
-    process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
+describe("Cosmos Module", () => {
+  it("should return a cosmos client", () => {
+    process.env.DATABASE_CONNECTION_STRING = "valid-connection-string";
 
     const cosmosClient = getCosmosClient();
 
     expect(cosmosClient).toBeDefined();
   });
 
-  it('should throw an error', () => {
+  it("should throw an error", () => {
     vi.mocked(CosmosClient).mockImplementation(() => {
-      throw new Error('failed to create cosmos client');
+      throw new Error("failed to create cosmos client");
     });
 
-    process.env.DATABASE_CONNECTION_STRING = 'valid-connection-string';
+    process.env.DATABASE_CONNECTION_STRING = "valid-connection-string";
 
     expect(async () => await getCosmosClient()).rejects.toThrow();
   });

@@ -1,25 +1,25 @@
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports } from "winston";
 
-import { getArgvParam } from './get-argv-param';
+import { getArgvParam } from "./get-argv-param";
 
-export const outputDir = getArgvParam('--outputDir') ?? 'logs';
+export const outputDir = getArgvParam("--outputDir") ?? "logs";
 
 export const logger = createLogger({
-  level: 'info',
+  level: "info",
   transports: [
     new transports.Console({
       format: format.combine(
         format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss',
+          format: "YYYY-MM-DD HH:mm:ss",
         }),
         format.printf(
           ({ level, message, stack, timestamp }) =>
-            `${timestamp} [${level}]: ${message} ${stack || ''}`,
+            `${timestamp} [${level}]: ${message} ${stack || ""}`,
         ),
       ),
     }),
     new transports.File({
-      filename: outputDir + '/app.log',
+      filename: outputDir + "/app.log",
       format: format.combine(
         format.timestamp(),
         format.printf(
@@ -27,7 +27,7 @@ export const logger = createLogger({
             `${timestamp} [${level}]: ${message}`,
         ),
       ),
-      level: 'info',
+      level: "info",
     }),
   ],
 });
