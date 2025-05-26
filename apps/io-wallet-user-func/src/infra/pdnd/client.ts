@@ -26,7 +26,7 @@ export class PdndClient implements VoucherRepository {
   #audience: string;
   #clientAssertionPrivateKey: string;
   #clientId: string;
-  #kidId: string;
+  #kid: string;
   #purposeId: string;
   #requestTimeout: number;
   #url: string;
@@ -40,7 +40,7 @@ export class PdndClient implements VoucherRepository {
     })
       .setProtectedHeader({
         alg: PdndClient.CLIENT_ASSERTION_JWT_ALGORITHM,
-        kid: this.#kidId,
+        kid: this.#kid,
         typ: PdndClient.CLIENT_ASSERTION_JWT_TYPE,
       })
       .setIssuedAt()
@@ -99,12 +99,12 @@ export class PdndClient implements VoucherRepository {
     audience,
     clientAssertionPrivateKey,
     clientId,
-    kidId,
+    kid,
     purposeId,
     requestTimeout,
     url,
   }: PdndApiClientConfig) {
-    this.#kidId = kidId;
+    this.#kid = kid;
     this.#url = url;
     this.#audience = audience;
     this.#clientId = clientId;

@@ -169,7 +169,7 @@ const PdndApiClientConfig = t.type({
   audience: t.string,
   clientAssertionPrivateKey: t.string,
   clientId: t.string,
-  kidId: t.string,
+  kid: t.string,
   purposeId: t.string,
   requestTimeout: NumberFromString,
   url: t.string,
@@ -177,7 +177,7 @@ const PdndApiClientConfig = t.type({
 
 export type PdndApiClientConfig = t.TypeOf<typeof PdndApiClientConfig>;
 
-export const getPdndConfigFromEnvironment: RE.ReaderEither<
+const getPdndConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   PdndApiClientConfig
@@ -192,7 +192,7 @@ export const getPdndConfigFromEnvironment: RE.ReaderEither<
       RE.map(decodeBase64String),
     ),
     clientId: readFromEnvironment("PdndApiClientId"),
-    kidId: readFromEnvironment("PdndApiKidId"),
+    kid: readFromEnvironment("PdndApiKid"),
     purposeId: readFromEnvironment("PdndPurposeId"),
     requestTimeout: pipe(
       readFromEnvironment("PdndApiRequestTimeout"),
@@ -505,12 +505,14 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
-    walletSolutionName: readFromEnvironment("WalletSolutionName"),
+    walletAttestationWalletName: readFromEnvironment(
+      "WalletAttestationWalletName",
+    ),
   }),
-  RE.map(({ walletAttestationWalletLink, walletSolutionName }) => ({
+  RE.map(({ walletAttestationWalletLink, walletAttestationWalletName }) => ({
     walletAttestation: {
       walletLink: walletAttestationWalletLink,
-      walletName: walletSolutionName,
+      walletName: walletAttestationWalletName,
     },
   })),
 );
