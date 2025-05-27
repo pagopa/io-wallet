@@ -7,7 +7,7 @@ import { ServiceUnavailableError } from "io-wallet-common/error";
 import * as jose from "jose";
 import { v4 as uuidv4 } from "uuid";
 
-import { VoucherRepository } from "../voucher";
+import { VoucherRepository } from "../../voucher";
 
 export const RequestVoucherResponseSchema = t.type({
   access_token: NonEmptyString,

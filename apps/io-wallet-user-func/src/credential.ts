@@ -3,7 +3,7 @@ import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 
-import { VoucherRepository } from "./infra/voucher";
+import { VoucherRepository } from "./voucher";
 
 export interface CredentialRepository {
   revokeAllCredentials: (

@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { CredentialRepository } from "@/credential";
-import { VoucherRepository } from "@/infra/voucher";
+import { VoucherRepository } from "@/voucher";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";

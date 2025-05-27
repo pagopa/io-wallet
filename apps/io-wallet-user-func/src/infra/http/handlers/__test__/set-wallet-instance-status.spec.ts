@@ -1,5 +1,5 @@
 import { CredentialRepository } from "@/credential";
-import { VoucherRepository } from "@/infra/voucher";
+import { VoucherRepository } from "@/voucher";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
