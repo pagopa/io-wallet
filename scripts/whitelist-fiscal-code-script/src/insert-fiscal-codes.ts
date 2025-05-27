@@ -1,10 +1,10 @@
-import { CosmosClient } from '@azure/cosmos';
-import * as CliProgress from 'cli-progress';
-import fs from 'fs';
+import { CosmosClient } from "@azure/cosmos";
+import * as CliProgress from "cli-progress";
+import fs from "fs";
 
-import { logger, outputDir } from './get-logger';
+import { logger, outputDir } from "./get-logger";
 
-const fiscalCodesStatuses = outputDir + '/fiscal-codes-statuses.csv';
+const fiscalCodesStatuses = outputDir + "/fiscal-codes-statuses.csv";
 
 export const insertFiscalCodes = async (
   cosmosClient: CosmosClient,
@@ -30,9 +30,9 @@ export const insertFiscalCodes = async (
     classicBar.start(fiscalCodesSet.size, 0);
 
     fs.appendFileSync(
-      outputDir + '/fiscal-codes-statuses.csv',
-      'timestamp;fiscalCode;status\n',
-      'utf8',
+      outputDir + "/fiscal-codes-statuses.csv",
+      "timestamp;fiscalCode;status\n",
+      "utf8",
     );
 
     for (const fiscalCode of fiscalCodesSet) {
@@ -45,7 +45,7 @@ export const insertFiscalCodes = async (
         fs.appendFileSync(
           fiscalCodesStatuses,
           `${new Date().toISOString()};${fiscalCode};OK\n`,
-          'utf8',
+          "utf8",
         );
 
         await new Promise((resolve) =>
@@ -56,15 +56,15 @@ export const insertFiscalCodes = async (
           `error while inserting the fiscal code ${fiscalCode}: ${error}`,
         );
         if (error instanceof Error) {
-          const errorMessage = error.message.replaceAll('"', '') ?? '';
-          const errorStack = error.stack?.replaceAll('"', '') ?? '';
+          const errorMessage = error.message.replaceAll('"', "") ?? "";
+          const errorStack = error.stack?.replaceAll('"', "") ?? "";
           logger.error(errorMessage);
           logger.error(errorStack);
         }
         fs.appendFileSync(
           fiscalCodesStatuses,
           `${new Date().toISOString()};${fiscalCode};NOT_OK\n`,
-          'utf8',
+          "utf8",
         );
       }
 
