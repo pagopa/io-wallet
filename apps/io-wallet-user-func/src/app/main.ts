@@ -100,7 +100,7 @@ const pidIssuerClient = new PidIssuerClient(
   config.entityConfiguration.federationEntity.basePath.href,
 );
 
-const pdndClient = new PdndClient(config.pdndInteop);
+const pdndClient = new PdndClient(config.pdndInterop);
 
 const appInsightsClient = ai.defaultClient;
 
