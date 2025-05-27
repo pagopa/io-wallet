@@ -1,4 +1,5 @@
 import { revokeAllCredentials } from "@/credential";
+import { VoucherRepository } from "@/voucher";
 import { deleteUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { pipe } from "fp-ts/function";
@@ -7,6 +8,17 @@ import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { requireFiscalCodeFromHeader } from "../fiscal-code";
+
+const requestVoucher: () => RTE.ReaderTaskEither<
+  {
+    voucherRepository: VoucherRepository;
+  },
+  Error,
+  string
+> =
+  () =>
+  ({ voucherRepository }) =>
+    voucherRepository.requestVoucher();
 
 // delete wallet instances from `wallet-instances-user-id` collection
 export const DeleteWalletInstancesHandler = H.of((req: H.HttpRequest) =>
@@ -18,7 +30,10 @@ export const DeleteWalletInstancesHandler = H.of((req: H.HttpRequest) =>
       pipe(
         fiscalCode,
         deleteUserWalletInstances,
-        RTE.chainW(() => revokeAllCredentials(fiscalCode)),
+        RTE.chainW(() => requestVoucher()),
+        RTE.chainW((accessToken) =>
+          revokeAllCredentials(fiscalCode, accessToken),
+        ),
         RTE.map(() => H.empty),
         RTE.orElseFirstW((error) =>
           pipe(

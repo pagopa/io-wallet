@@ -1,5 +1,6 @@
 import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
+import { VoucherRepository } from "@/voucher";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -25,6 +26,17 @@ const requireSetWalletInstanceStatusBody: (
 ) => E.Either<Error, SetWalletInstanceStatusBody> = (req) =>
   pipe(req.body, H.parse(SetWalletInstanceStatusBody, "Invalid body supplied"));
 
+const requestVoucher: () => RTE.ReaderTaskEither<
+  {
+    voucherRepository: VoucherRepository;
+  },
+  Error,
+  string
+> =
+  () =>
+  ({ voucherRepository }) =>
+    voucherRepository.requestVoucher();
+
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
@@ -39,7 +51,10 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
     RTE.chain(({ fiscalCode, walletInstanceId }) =>
       pipe(
         // invoke PID issuer services to revoke all credentials for that user
-        revokeAllCredentials(fiscalCode),
+        requestVoucher(),
+        RTE.chainW((accessToken) =>
+          revokeAllCredentials(fiscalCode, accessToken),
+        ),
         RTE.chainW(() =>
           pipe(
             // access our database to revoke the wallet instance
