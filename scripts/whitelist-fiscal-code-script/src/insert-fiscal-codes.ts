@@ -1,10 +1,10 @@
-import { CosmosClient } from "@azure/cosmos";
-import * as CliProgress from "cli-progress";
-import fs from "fs";
+import { CosmosClient } from '@azure/cosmos';
+import * as CliProgress from 'cli-progress';
+import fs from 'fs';
 
-import { logger, outputDir } from "./get-logger";
+import { logger, outputDir } from './get-logger';
 
-const fiscalCodesStatuses = outputDir + "/fiscal-codes-statuses.csv";
+const fiscalCodesStatuses = outputDir + '/fiscal-codes-statuses.csv';
 
 export const insertFiscalCodes = async (
   cosmosClient: CosmosClient,
@@ -30,9 +30,9 @@ export const insertFiscalCodes = async (
     classicBar.start(fiscalCodesSet.size, 0);
 
     fs.appendFileSync(
-      outputDir + "/fiscal-codes-statuses.csv",
-      "timestamp;fiscalCode;status\n",
-      "utf8",
+      outputDir + '/fiscal-codes-statuses.csv',
+      'timestamp;fiscalCode;status\n',
+      'utf8',
     );
 
     for (const fiscalCode of fiscalCodesSet) {
@@ -45,22 +45,26 @@ export const insertFiscalCodes = async (
         fs.appendFileSync(
           fiscalCodesStatuses,
           `${new Date().toISOString()};${fiscalCode};OK\n`,
-          "utf8",
+          'utf8',
         );
 
         await new Promise((resolve) =>
           setTimeout(resolve, sleepTimeBetweenRequestsMs),
         );
       } catch (error) {
-        const errorMessage = (error as Error).message.replaceAll('"', "") ?? "";
-        const errorStack = (error as Error).stack?.replaceAll('"', "") ?? "";
         logger.error(
-          `error while inserting fiscal code ${fiscalCode}: ${errorMessage} ${errorStack}`,
+          `error while inserting the fiscal code ${fiscalCode}: ${error}`,
         );
+        if (error instanceof Error) {
+          const errorMessage = error.message.replaceAll('"', '') ?? '';
+          const errorStack = error.stack?.replaceAll('"', '') ?? '';
+          logger.error(errorMessage);
+          logger.error(errorStack);
+        }
         fs.appendFileSync(
           fiscalCodesStatuses,
           `${new Date().toISOString()};${fiscalCode};NOT_OK\n`,
-          "utf8",
+          'utf8',
         );
       }
 
@@ -72,7 +76,9 @@ export const insertFiscalCodes = async (
     logger.info(`${fiscalCodesSet.size} fiscal codes upserted`);
   } catch (error) {
     logger.error(`Unexpected error during fiscal code whitelisting: ${error}`);
-    logger.error((error as Error).message);
-    logger.error((error as Error).stack);
+    if (error instanceof Error) {
+      logger.error(error.message);
+      logger.error(error.stack);
+    }
   }
 };
