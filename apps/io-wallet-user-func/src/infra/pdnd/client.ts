@@ -1,6 +1,5 @@
 import { PdndApiClientConfig } from "@/app/config";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
@@ -75,7 +74,7 @@ export class PdndServicesClient implements VoucherRepository {
         const response = await result.json();
         const validation = RequestVoucherResponseSchema.decode(response);
 
-        if (!E.isRight(validation)) {
+        if (validation._tag === "Left") {
           throw new Error("Invalid response format");
         }
 
