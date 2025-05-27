@@ -24,7 +24,7 @@ import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import { MobileAttestationService } from "@/infra/mobile-attestation-service";
-import { PdndClient } from "@/infra/pdnd/client";
+import { PdndServicesClient } from "@/infra/pdnd/client";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
@@ -100,7 +100,7 @@ const pidIssuerClient = new PidIssuerClient(
   config.entityConfiguration.federationEntity.basePath.href,
 );
 
-const pdndClient = new PdndClient(config.pdndInterop);
+const pdndServicesClient = new PdndServicesClient(config.pdndInterop);
 
 const appInsightsClient = ai.defaultClient;
 
@@ -221,7 +221,7 @@ app.http("setWalletInstanceStatus", {
       credentialRepository: pidIssuerClient,
       queueClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     }),
   ),
@@ -289,7 +289,7 @@ app.http("deleteWalletInstances", {
     DeleteWalletInstancesFunction({
       credentialRepository: pidIssuerClient,
       telemetryClient: appInsightsClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     }),
   ),

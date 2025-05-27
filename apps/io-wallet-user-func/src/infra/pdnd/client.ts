@@ -17,7 +17,7 @@ export type RequestVoucherResponseSchema = t.TypeOf<
   typeof RequestVoucherResponseSchema
 >;
 
-export class PdndClient implements VoucherRepository {
+export class PdndServicesClient implements VoucherRepository {
   static readonly CLIENT_ASSERTION_JWT_ALGORITHM = "RS256";
   static readonly CLIENT_ASSERTION_JWT_TYPE = "JWT";
   static readonly CLIENT_ASSERTION_TYPE =
@@ -39,16 +39,16 @@ export class PdndClient implements VoucherRepository {
       sub: this.#clientId,
     })
       .setProtectedHeader({
-        alg: PdndClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+        alg: PdndServicesClient.CLIENT_ASSERTION_JWT_ALGORITHM,
         kid: this.#kid,
-        typ: PdndClient.CLIENT_ASSERTION_JWT_TYPE,
+        typ: PdndServicesClient.CLIENT_ASSERTION_JWT_TYPE,
       })
       .setIssuedAt()
       .setExpirationTime("10 minutes")
       .sign(
         await jose.importPKCS8(
           this.#clientAssertionPrivateKey,
-          PdndClient.CLIENT_ASSERTION_JWT_ALGORITHM,
+          PdndServicesClient.CLIENT_ASSERTION_JWT_ALGORITHM,
         ),
       );
 
@@ -58,9 +58,9 @@ export class PdndClient implements VoucherRepository {
         const result = await fetch(this.#url, {
           body: JSON.stringify({
             client_assertion: await this.generateClientAssertion(),
-            client_assertion_type: PdndClient.CLIENT_ASSERTION_TYPE,
+            client_assertion_type: PdndServicesClient.CLIENT_ASSERTION_TYPE,
             client_id: this.#clientId,
-            grant_type: PdndClient.GRANT_TYPE,
+            grant_type: PdndServicesClient.GRANT_TYPE,
           }),
           headers: {
             "Content-Type": "application/json",

@@ -39,7 +39,7 @@ describe("DeleteWalletInstancesHandler", () => {
     revokeAllCredentials: () => TE.right(undefined),
   };
 
-  const pdndClient: VoucherRepository = {
+  const pdndServicesClient: VoucherRepository = {
     requestVoucher: () => TE.right(""),
   };
 
@@ -54,7 +54,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -81,7 +81,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -111,7 +111,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -145,7 +145,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
@@ -171,7 +171,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -204,7 +204,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
@@ -229,7 +229,7 @@ describe("DeleteWalletInstancesHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 

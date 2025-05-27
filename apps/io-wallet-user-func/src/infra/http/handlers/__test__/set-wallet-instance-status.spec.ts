@@ -29,7 +29,7 @@ describe("SetWalletInstanceStatusHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
-  const pdndClient: VoucherRepository = {
+  const pdndServicesClient: VoucherRepository = {
     requestVoucher: () => TE.right(""),
   };
 
@@ -66,7 +66,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -97,7 +97,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -124,7 +124,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -158,7 +158,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
-      voucherRepository: pdndClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
