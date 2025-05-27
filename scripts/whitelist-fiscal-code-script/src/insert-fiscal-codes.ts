@@ -72,5 +72,7 @@ export const insertFiscalCodes = async (
     logger.info(`${fiscalCodesSet.size} fiscal codes upserted`);
   } catch (error) {
     logger.error(`Unexpected error during fiscal code whitelisting: ${error}`);
+    logger.error((error as Error).message);
+    logger.error((error as Error).stack);
   }
 };

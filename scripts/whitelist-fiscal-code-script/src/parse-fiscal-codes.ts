@@ -41,7 +41,8 @@ export const parseFiscalCodes = async (
     return fiscalCodes;
   } catch (error) {
     logger.error("parse-fiscal-code.ts: error parsing fiscal codes");
-    logger.error(error);
+    logger.error((error as Error).message);
+    logger.error((error as Error).stack);
     throw error;
   }
 };

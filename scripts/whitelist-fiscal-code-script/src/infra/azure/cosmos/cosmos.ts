@@ -12,7 +12,8 @@ export const getCosmosClient = (): CosmosClient => {
     });
   } catch (error) {
     logger.error("cosmos.ts: error getting cosmos client");
-    logger.error(error);
+    logger.error((error as Error).message);
+    logger.error((error as Error).stack);
     throw error;
   }
 };
