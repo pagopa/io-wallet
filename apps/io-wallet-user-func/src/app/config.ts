@@ -28,12 +28,6 @@ import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
 
-export const PDND_API_AUDIENCE_DEFAULT =
-  "auth.uat.interop.pagopa.it/client-assertion";
-
-export const PDND_API_URL_DEFAULT =
-  "https://auth.uat.interop.pagopa.it/token.oauth2";
-
 export const APPLE_APP_ATTESTATION_ROOT_CA =
   "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t";
 
@@ -183,10 +177,7 @@ const getPdndConfigFromEnvironment: RE.ReaderEither<
   PdndApiClientConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    audience: pipe(
-      readFromEnvironment("PdndApiAudience"),
-      RE.orElse(() => RE.right(PDND_API_AUDIENCE_DEFAULT)),
-    ),
+    audience: readFromEnvironment("PdndApiAudience"),
     clientAssertionPrivateKey: pipe(
       readFromEnvironment("PdndClientAssertionPrivateKey"),
       RE.map(decodeBase64String),
@@ -199,10 +190,7 @@ const getPdndConfigFromEnvironment: RE.ReaderEither<
       RE.chainW(stringToNumberDecoderRE),
       RE.orElse(() => RE.right(10000)),
     ),
-    url: pipe(
-      readFromEnvironment("PdndApiURL"),
-      RE.orElse(() => RE.right(PDND_API_URL_DEFAULT)),
-    ),
+    url: readFromEnvironment("PdndApiURL"),
   }),
 );
 
