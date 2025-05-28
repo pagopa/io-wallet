@@ -1,6 +1,8 @@
 import { PdndApiClientConfig } from "@/app/config";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
+import { pipe } from "fp-ts/lib/function";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import * as jose from "jose";
@@ -51,49 +53,72 @@ export class PdndServicesClient implements VoucherRepository {
         ),
       );
 
-  requestVoucher = () =>
-    TE.tryCatch(
-      async () => {
-        const result = await fetch(this.#url, {
-          body: JSON.stringify({
-            client_assertion: await this.generateClientAssertion(),
-            client_assertion_type: PdndServicesClient.CLIENT_ASSERTION_TYPE,
-            client_id: this.#clientId,
-            grant_type: PdndServicesClient.GRANT_TYPE,
+  requestVoucher = (): TE.TaskEither<Error, string> =>
+    pipe(
+      TE.tryCatch(
+        async () =>
+          fetch(this.#url, {
+            body: JSON.stringify({
+              client_assertion: await this.generateClientAssertion(),
+              client_assertion_type: PdndServicesClient.CLIENT_ASSERTION_TYPE,
+              client_id: this.#clientId,
+              grant_type: PdndServicesClient.GRANT_TYPE,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            method: "POST",
+            signal: AbortSignal.timeout(this.#requestTimeout),
           }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          signal: AbortSignal.timeout(this.#requestTimeout),
-        });
-        if (!result.ok) {
-          throw new Error(JSON.stringify(await result.json()));
-        }
-
-        const response = await result.json();
-        const validation = RequestVoucherResponseSchema.decode(response);
-
-        if (validation._tag === "Left") {
-          throw new Error("Invalid response format");
-        }
-
-        if (typeof response.access_token !== "string") {
-          throw new Error(
-            "Invalid response: access_token is missing or not a string",
-          );
-        }
-        return response.access_token;
-      },
-      (error) =>
-        error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(
-              `The request to the PDND Interop Service has timed out: ${error.message}`,
-            )
-          : new Error(
-              `Error occurred while making a request to the PDND Interop Service: ${error}`,
+        (error) =>
+          error instanceof Error && error.name === "TimeoutError"
+            ? new ServiceUnavailableError(
+                `The request to the PDND Interop Service has timed out: ${error.message}`,
+              )
+            : new Error(
+                `Error occurred while making a request to the PDND Interop Service: ${String(error)}`,
+              ),
+      ),
+      TE.chain((res) =>
+        res.ok
+          ? TE.right(res)
+          : TE.tryCatch(
+              () =>
+                res
+                  .json()
+                  .then((err) =>
+                    Promise.reject(new Error(JSON.stringify(err))),
+                  ),
+              (error) =>
+                error instanceof Error ? error : new Error(String(error)),
             ),
+      ),
+      TE.chain((res) =>
+        TE.tryCatch(
+          () => res.json(),
+          (error) =>
+            new Error(`Failed to parse response JSON: ${String(error)}`),
+        ),
+      ),
+      TE.chain((json) =>
+        pipe(
+          RequestVoucherResponseSchema.decode(json as unknown),
+          E.mapLeft(() => new Error("Invalid response format")),
+          TE.fromEither,
+        ),
+      ),
+      TE.chain((decoded) =>
+        typeof (decoded as RequestVoucherResponseSchema).access_token ===
+        "string"
+          ? TE.right((decoded as RequestVoucherResponseSchema).access_token)
+          : TE.left(
+              new Error(
+                "Invalid response: access_token is missing or not a string",
+              ),
+            ),
+      ),
     );
+
   constructor({
     audience,
     clientAssertionPrivateKey,
