@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.3.6
+
+### Patch Changes
+
+- 0e14c2c: Fix CRL
+
 ## 3.3.5
 
 ### Patch Changes
