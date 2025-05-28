@@ -3,16 +3,22 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 
 export interface CredentialRepository {
-  revokeAllCredentials: (fiscalCode: FiscalCode) => TE.TaskEither<Error, void>;
+  revokeAllCredentials: (
+    fiscalCode: FiscalCode,
+    accessToken: string,
+  ) => TE.TaskEither<Error, void>;
 }
 
 export const revokeAllCredentials: (
   fiscalCode: FiscalCode,
+  accessToken: string,
 ) => RTE.ReaderTaskEither<
-  { credentialRepository: CredentialRepository },
+  {
+    credentialRepository: CredentialRepository;
+  },
   Error,
   void
 > =
-  (fiscalCode) =>
+  (fiscalCode, accessToken) =>
   ({ credentialRepository }) =>
-    credentialRepository.revokeAllCredentials(fiscalCode);
+    credentialRepository.revokeAllCredentials(fiscalCode, accessToken);
