@@ -32,3 +32,8 @@ variable "action_group_io_id" {
   type        = string
   description = "Id of the Action Group shared among all IO teams"
 }
+
+variable "key_vault_cerificates_secret_id" {
+  type        = string
+  description = "TDB"
+}

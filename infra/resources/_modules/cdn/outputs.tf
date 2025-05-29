@@ -9,3 +9,7 @@ output "storage_account_cdn" {
 output "cdn_endpoint_id" {
   value = azurerm_cdn_endpoint.this.id
 }
+
+output "cdn_principal_id" {
+  value = azurerm_cdn_profile.this.identity[0].principal_id
+}
