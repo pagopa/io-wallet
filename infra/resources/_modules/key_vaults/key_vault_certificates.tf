@@ -7,7 +7,7 @@ module "key_vault_role_assignments" {
 
   subscription_id = data.azurerm_subscription.current.id
 
-  key_vault = {
+  key_vault = [{
     name                = var.key_vault_certificates.name
     resource_group_name = var.key_vault_certificates.resource_group_name
     description         = "It is required so the CDN can get the certificates stored in the key vault"
@@ -15,5 +15,5 @@ module "key_vault_role_assignments" {
     roles = {
       certificates = "reader"
     }
-  }
+  }]
 }
