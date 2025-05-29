@@ -29,3 +29,7 @@ variable "key_vault_certificates" {
     resource_group_name = string
   })
 }
+
+variable "cdn_principal_id" {
+  type = string
+}
