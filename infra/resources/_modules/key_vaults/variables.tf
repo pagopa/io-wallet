@@ -22,3 +22,14 @@ variable "tenant_id" {
   type        = string
   description = "Tenant Id"
 }
+
+# variable "key_vault_certificates" {
+#   type = object({
+#     name                = string
+#     resource_group_name = string
+#   })
+# }
+
+# variable "cdn_principal_id" {
+#   type = string
+# }

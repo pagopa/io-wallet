@@ -88,3 +88,17 @@ data "azurerm_dns_zone" "wallet_io_pagopa_it" {
   name                = local.wallet_dns_zone.name
   resource_group_name = local.wallet_dns_zone.resource_group_name
 }
+
+data "azurerm_resource_group" "weu_sec" {
+  name = "${local.project_legacy}-sec-rg"
+}
+
+data "azurerm_key_vault" "certificates" {
+  name                = "${local.project_legacy}-kv"
+  resource_group_name = data.azurerm_resource_group.weu_sec.name
+}
+
+# data "azurerm_key_vault_certificate" "foo" {
+#   name         = "wallet-io-pagopa-it"                  // todo
+#   key_vault_id = data.azurerm_key_vault.certificates.id // todo
+# }

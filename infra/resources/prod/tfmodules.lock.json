@@ -1,15 +1,12 @@
 {
-  "function_apps.function_app_support.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4",
-  "function_apps.function_app_user_02.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4",
-  "storage_accounts.storage_account.naming_convention": "5b1d21788783dcf33e17a9842f9f7c874c8c5f736c82e70979eb9c8785a74ce4",
-  "function_apps.function_app_support": "65752c8749a035e65ca3471951c32c03cad2ea02a16176ae3ec57b030d07ac03",
-  "function_apps.function_app_support_autoscaler": "b1b16764fc57ccf0d91a2375a11719e3dac5fd2a7bf77e12cbc290866deac044",
-  "function_apps.function_app_user_02": "65752c8749a035e65ca3471951c32c03cad2ea02a16176ae3ec57b030d07ac03",
-  "function_apps.function_app_user_autoscaler_02": "b1b16764fc57ccf0d91a2375a11719e3dac5fd2a7bf77e12cbc290866deac044",
-  "iam.admins_roles": "52ca57b72bdf639846a472014cb2113d519bdc00dc4a642e925b97ad6b99d25c",
-  "iam.func_app_support": "52ca57b72bdf639846a472014cb2113d519bdc00dc4a642e925b97ad6b99d25c",
-  "iam.func_app_support_slot": "52ca57b72bdf639846a472014cb2113d519bdc00dc4a642e925b97ad6b99d25c",
-  "iam.func_app_user_02": "52ca57b72bdf639846a472014cb2113d519bdc00dc4a642e925b97ad6b99d25c",
-  "iam.func_app_user_slot_02": "52ca57b72bdf639846a472014cb2113d519bdc00dc4a642e925b97ad6b99d25c",
-  "storage_accounts.storage_account": "c073e41130034acebff0c22a7cffc22a1533ef46b64752789d472116abc21eee"
+  "function_apps.function_app_support": "2277ce75e9b22c9e0f7eb03a0e3523ff8c48f67f69690d599b2976ee9d11a575",
+  "function_apps.function_app_support_autoscaler": "9a5ab46c90653f2a0f19273132cb00561575e40eb365449e60ec6ec512ac0da3",
+  "function_apps.function_app_user_02": "2277ce75e9b22c9e0f7eb03a0e3523ff8c48f67f69690d599b2976ee9d11a575",
+  "function_apps.function_app_user_autoscaler_02": "9a5ab46c90653f2a0f19273132cb00561575e40eb365449e60ec6ec512ac0da3",
+  "iam.admins_roles": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
+  "iam.func_app_support": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
+  "iam.func_app_support_slot": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
+  "iam.func_app_user_02": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
+  "iam.func_app_user_slot_02": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
+  "storage_accounts.storage_account": "272762abcb226603e330dc8a3e48feb8356caff72c896946ab32e1efb6421bac"
 }

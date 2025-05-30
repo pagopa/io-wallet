@@ -7,6 +7,17 @@ resource "azurerm_cdn_profile" "this" {
   tags = var.tags
 }
 
+# Workaround to export the principal id of the CDN profile
+# as azurerm_cdn_profile does not support it directly
+data "azapi_resource" "cdn_profile" {
+  type        = "Microsoft.Cdn/profiles@2025-04-15"
+  resource_id = azurerm_cdn_profile.this.id
+
+  response_export_values = ["identity.principalId"]
+
+  depends_on = [azurerm_cdn_profile.this]
+}
+
 resource "azurerm_cdn_endpoint" "this" {
   name                = "${var.project}-wallet-cdne-01"
   resource_group_name = var.resource_group_name

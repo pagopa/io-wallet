@@ -9,6 +9,7 @@ No requirements.
 
 | Name | Version |
 |------|---------|
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | n/a |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | n/a |
 
 ## Modules
@@ -30,6 +31,7 @@ No modules.
 | [azurerm_storage_container.hub-spid-login](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.pdnd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.well_known](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azapi_resource.cdn_profile](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/resource) | data source |
 
 ## Inputs
 
@@ -37,6 +39,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_action_group_io_id"></a> [action\_group\_io\_id](#input\_action\_group\_io\_id) | Id of the Action Group shared among all IO teams | `string` | n/a | yes |
 | <a name="input_action_group_wallet_id"></a> [action\_group\_wallet\_id](#input\_action\_group\_wallet\_id) | Id of the Action Group owned by the Wallet team | `string` | n/a | yes |
+| <a name="input_key_vault_cerificates_secret_id"></a> [key\_vault\_cerificates\_secret\_id](#input\_key\_vault\_cerificates\_secret\_id) | TDB | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Log Analytics Workspace id | `string` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | IO prefix and short environment | `string` | n/a | yes |
@@ -48,5 +51,6 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#output\_cdn\_endpoint\_id) | n/a |
+| <a name="output_cdn_principal_id"></a> [cdn\_principal\_id](#output\_cdn\_principal\_id) | n/a |
 | <a name="output_storage_account_cdn"></a> [storage\_account\_cdn](#output\_storage\_account\_cdn) | n/a |
 <!-- END_TF_DOCS -->
