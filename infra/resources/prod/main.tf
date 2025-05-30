@@ -57,12 +57,12 @@ module "key_vaults" {
 
   tenant_id = data.azurerm_client_config.current.tenant_id
 
-  key_vault_certificates = {
-    name                = data.azurerm_key_vault.certificates.name
-    resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-  }
+  # key_vault_certificates = {
+  #   name                = data.azurerm_key_vault.certificates.name
+  #   resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
+  # }
 
-  cdn_principal_id = module.cdn.cdn_principal_id
+  # cdn_principal_id = module.cdn.cdn_principal_id
 
   tags = local.tags
 }
@@ -155,7 +155,7 @@ module "cdn" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
-  key_vault_cerificates_secret_id = data.azurerm_key_vault_certificate.foo.id
+  # key_vault_cerificates_secret_id = data.azurerm_key_vault_certificate.foo.id
 
   tags = local.tags
 }
