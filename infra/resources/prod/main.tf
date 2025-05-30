@@ -178,7 +178,7 @@ module "iam" {
     }
   }
 
-  key_vault_certificates_id = data.azurerm_key_vault_certificate.foo.id
+  key_vault_certificates_id = data.azurerm_key_vault.certificates.id
 
   cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id
