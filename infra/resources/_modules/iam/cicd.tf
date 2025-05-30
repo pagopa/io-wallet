@@ -6,7 +6,7 @@ resource "azurerm_role_assignment" "infra_cd_subscription_rbac_admin" {
 }
 
 resource "azurerm_role_assignment" "certificates_user" {
-  scope                = azurerm_key_vault_certificate.foo.id // var
+  scope                = var.key_vault_certificates_id
   role_definition_name = "Key Vault Certificate User"
   principal_id         = var.cicd_principal_ids.infra.ci
 }
