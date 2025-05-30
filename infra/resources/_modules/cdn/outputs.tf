@@ -11,5 +11,5 @@ output "cdn_endpoint_id" {
 }
 
 output "cdn_principal_id" {
-  value = azurerm_cdn_profile.this.identity[0].principal_id
+  value = data.azapi_resource.cdn_profile.output.identity.principalId
 }

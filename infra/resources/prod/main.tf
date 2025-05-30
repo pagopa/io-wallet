@@ -10,6 +10,11 @@ terraform {
       source  = "hashicorp/azuread"
       version = "<= 2.50.0"
     }
+
+    azapi = {
+      source  = "azure/azapi"
+      version = "~> 2.0"
+    }
   }
 
   backend "azurerm" {
@@ -24,6 +29,9 @@ terraform {
 provider "azurerm" {
   features {}
   storage_use_azuread = true
+}
+
+provider "azapi" {
 }
 
 data "azurerm_resource_group" "wallet" {
