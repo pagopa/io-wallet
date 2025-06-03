@@ -160,7 +160,7 @@ module "cdn" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
-  key_vault_certificates_id = data.azurerm_key_vault_certificate.foo.id
+  key_vault_certificates_id = data.azurerm_key_vault_certificate.wallet_certificate.id
 
   tags = local.tags
 }
