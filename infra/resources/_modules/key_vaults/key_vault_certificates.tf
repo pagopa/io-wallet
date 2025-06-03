@@ -22,6 +22,10 @@ resource "azurerm_key_vault_access_policy" "certificate_access" {
   tenant_id = var.tenant_id
   object_id = var.ci_infra_principal_id
 
+  certificate_permissions = [
+    "Get"
+  ]
+
   secret_permissions = [
     "Get"
   ]
