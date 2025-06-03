@@ -67,7 +67,7 @@ module "key_vaults" {
 
   ci_infra_principal_id = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
 
-  subscription_id = data.azurerm_subscription.current.id
+  subscription_id = data.azurerm_subscription.current.subscription_id
 
   tags = local.tags
 }
