@@ -67,7 +67,7 @@ module "key_vaults" {
 
   ci_infra_principal_id = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
 
-  subscription_id = data.azurerm_subscription.current.id
+  subscription_id = data.azurerm_subscription.current.subscription_id
 
   tags = local.tags
 }
@@ -182,6 +182,8 @@ module "iam" {
       cd = data.azurerm_user_assigned_identity.app_cd_id.principal_id
     }
   }
+
+  key_vault_certificates_id = data.azurerm_key_vault.certificates.id // to be deleted
 
   cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id
