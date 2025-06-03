@@ -98,7 +98,7 @@ data "azurerm_key_vault" "certificates" {
   resource_group_name = data.azurerm_resource_group.weu_sec.name
 }
 
-# data "azurerm_key_vault_certificate" "foo" {
-#   name         = "wallet-io-pagopa-it"                  // todo
-#   key_vault_id = data.azurerm_key_vault.certificates.id // todo
-# }
+data "azurerm_key_vault_certificate" "wallet_certificate" {
+  name         = "wallet-io-pagopa-it"
+  key_vault_id = data.azurerm_key_vault.certificates.id
+}

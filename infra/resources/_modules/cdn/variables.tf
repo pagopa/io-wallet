@@ -33,7 +33,7 @@ variable "action_group_io_id" {
   description = "Id of the Action Group shared among all IO teams"
 }
 
-# variable "key_vault_cerificates_secret_id" {
-#   type        = string
-#   description = "TDB" // TODO
-# }
+variable "key_vault_certificates_id" {
+  type        = string
+  description = "Id of the key vault that contains the CDN certificate"
+}
