@@ -35,5 +35,5 @@ variable "action_group_io_id" {
 
 # variable "key_vault_cerificates_secret_id" {
 #   type        = string
-#   description = "TDB"
+#   description = "TDB" // TODO
 # }

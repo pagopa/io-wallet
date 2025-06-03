@@ -57,12 +57,15 @@ module "key_vaults" {
 
   tenant_id = data.azurerm_client_config.current.tenant_id
 
-  # key_vault_certificates = {
-  #   name                = data.azurerm_key_vault.certificates.name
-  #   resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-  # }
+  key_vault_certificates = {
+    id = data.azurerm_key_vault.certificates.id
+    #   name                = data.azurerm_key_vault.certificates.name
+    #   resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
+  }
 
   # cdn_principal_id = module.cdn.cdn_principal_id
+
+  ci_infra_principal_id = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
 
   tags = local.tags
 }
@@ -177,8 +180,6 @@ module "iam" {
       cd = data.azurerm_user_assigned_identity.app_cd_id.principal_id
     }
   }
-
-  key_vault_certificates_id = data.azurerm_key_vault.certificates.id
 
   cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id

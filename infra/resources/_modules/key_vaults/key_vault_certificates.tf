@@ -1,4 +1,4 @@
-# data "azurerm_subscription" "current" {}
+# data "azurerm_subscription" "current" {} // todo
 
 # module "key_vault_role_assignments" {
 #   source = "github.com/pagopa-dx/terraform-azurerm-azure-role-assignments//modules/key_vault"
@@ -17,3 +17,14 @@
 #     }
 #   }]
 # }
+
+resource "azurerm_key_vault_access_policy" "certificate_access" {
+  key_vault_id = var.key_vault_certificates.id
+
+  tenant_id = var.tenant_id
+  object_id = var.ci_infra_principal_id
+
+  certificate_permissions = [
+    "Get"
+  ]
+}
