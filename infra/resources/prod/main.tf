@@ -57,10 +57,11 @@ module "key_vaults" {
 
   tenant_id = data.azurerm_client_config.current.tenant_id
 
-  # key_vault_certificates = {
-  #   name                = data.azurerm_key_vault.certificates.name
-  #   resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-  # }
+  key_vault_certificates = {
+    id = data.azurerm_key_vault.certificates.id
+    #   name                = data.azurerm_key_vault.certificates.name
+    #   resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
+  }
 
   # cdn_principal_id = module.cdn.cdn_principal_id
 
