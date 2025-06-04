@@ -220,10 +220,10 @@ export const createWalletAttestationAsSdJwt =
               sdJwtModel,
               ({ aal, cnf, iss, sub, vct }) => ({
                 _sd: disclosures.map(hashToBase64),
+                _sd_alg: "sha-256",
                 aal,
                 cnf,
                 iss,
-                _sd_alg: "sha-256",
                 sub,
                 vct,
               }),
