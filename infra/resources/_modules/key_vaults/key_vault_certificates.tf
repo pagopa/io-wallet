@@ -25,4 +25,8 @@ resource "azurerm_key_vault_access_policy" "certificate_access" {
   certificate_permissions = [
     "Get"
   ]
+
+  secret_permissions = [
+    "Get"
+  ]
 }
