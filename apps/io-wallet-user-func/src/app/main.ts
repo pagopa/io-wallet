@@ -4,7 +4,7 @@ import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
-import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
+// import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletAttestationV2Function } from "@/infra/azure/functions/create-wallet-attestation-v2";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
@@ -292,24 +292,24 @@ app.http("deleteWalletInstances", {
   route: "wallet-instances",
 });
 
-app.cosmosDB("addWalletInstanceUserId", {
-  connection: "CosmosDbEndpoint",
-  containerName: "wallet-instances",
-  databaseName: config.azure.cosmos.dbName,
-  handler: AddWalletInstanceUserIdFunction({
-    inputDecoder: t.array(WalletInstance),
-    telemetryClient: appInsightsClient,
-  }),
-  leaseContainerName: "leases-wallet-instances-user-id",
-  leaseContainerPrefix: "wallet-instances-user-id-",
-  return: output.cosmosDB({
-    connection: "CosmosDbEndpoint",
-    containerName: "wallet-instances-user-id",
-    createIfNotExists: false,
-    databaseName: config.azure.cosmos.dbName,
-  }),
-  startFromBeginning: true,
-});
+// app.cosmosDB("addWalletInstanceUserId", {
+//   connection: "CosmosDbEndpoint",
+//   containerName: "wallet-instances",
+//   databaseName: config.azure.cosmos.dbName,
+//   handler: AddWalletInstanceUserIdFunction({
+//     inputDecoder: t.array(WalletInstance),
+//     telemetryClient: appInsightsClient,
+//   }),
+//   leaseContainerName: "leases-wallet-instances-user-id",
+//   leaseContainerPrefix: "wallet-instances-user-id-",
+//   return: output.cosmosDB({
+//     connection: "CosmosDbEndpoint",
+//     containerName: "wallet-instances-user-id",
+//     createIfNotExists: false,
+//     databaseName: config.azure.cosmos.dbName,
+//   }),
+//   startFromBeginning: true,
+// });
 
 // this will replace the token endpoint
 app.http("createWalletAttestationV2", {
@@ -326,7 +326,7 @@ app.http("createWalletAttestationV2", {
     }),
   ),
   methods: ["POST"],
-  route: "wallet-attestation",
+  route: "wallet-attestations",
 });
 
 app.http("IsFiscalCodeWhitelisted", {

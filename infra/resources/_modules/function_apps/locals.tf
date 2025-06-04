@@ -60,7 +60,7 @@ locals {
 
   function_app_user_slot_disabled = [
     "addWalletInstanceToValidationQueue",
-    "addWalletInstanceUserId",
+    # "addWalletInstanceUserId",
     "validateWalletInstance",
     "generateEntityConfiguration",
     "sendEmailOnWalletInstanceCreation",

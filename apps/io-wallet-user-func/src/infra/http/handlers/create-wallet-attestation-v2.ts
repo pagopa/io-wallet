@@ -14,7 +14,7 @@ import {
 import {
   WalletInstanceEnvironment,
   getValidWalletInstanceByUserId,
-  getWalletInstanceUserId,
+  // getWalletInstanceUserId,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
@@ -27,9 +27,9 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-const WalletAttestationRequestPayload = t.type({
-  assertion: NonEmptyString,
-});
+// const WalletAttestationRequestPayload = t.type({
+//   assertion: NonEmptyString,
+// });
 
 export const WalletAttestations = t.type({
   wallet_attestations: t.tuple([
@@ -67,27 +67,27 @@ const testWalletAttestations: WalletAttestations = {
   ],
 };
 
-const getAssertionFromRequest = flow(
-  H.parse(WalletAttestationRequestPayload),
-  E.map(({ assertion }) => assertion),
-  TE.fromEither,
-  TE.chain(verifyAndDecodeWalletAttestationRequest),
-);
+// const getAssertionFromRequest = flow(
+//   H.parse(WalletAttestationRequestPayload),
+//   E.map(({ assertion }) => assertion),
+//   TE.fromEither,
+//   TE.chain(verifyAndDecodeWalletAttestationRequest),
+// );
 
-const enrichAssertionWithUserContext = (
-  assertion: WalletAttestationRequestV2,
-) =>
-  pipe(
-    RTE.of(assertion),
-    RTE.bindTo("assertion"),
-    RTE.bind("userId", ({ assertion }) =>
-      pipe(
-        getWalletInstanceUserId(assertion.payload.hardware_key_tag),
-        RTE.map(({ userId }) => userId),
-      ),
-    ),
-    RTE.bind("isTestUser", ({ userId }) => RTE.of(isLoadTestUser(userId))),
-  );
+// const enrichAssertionWithUserContext = (
+//   assertion: WalletAttestationRequestV2,
+// ) =>
+//   pipe(
+//     RTE.of(assertion),
+//     RTE.bindTo("assertion"),
+//     RTE.bind("userId", ({ assertion }) =>
+//       pipe(
+//         getWalletInstanceUserId(assertion.payload.hardware_key_tag),
+//         RTE.map(({ userId }) => userId),
+//       ),
+//     ),
+//     RTE.bind("isTestUser", ({ userId }) => RTE.of(isLoadTestUser(userId))),
+//   );
 
 /**
  * Validates the wallet attestation request by performing the following steps:
@@ -170,12 +170,75 @@ const generateWalletAttestations = ({
     ),
   );
 
+// export const CreateWalletAttestationV2Handler = H.of((req: H.HttpRequest) =>
+//   pipe(
+//     req.body,
+//     getAssertionFromRequest,
+//     RTE.fromTaskEither,
+//     RTE.chainW(enrichAssertionWithUserContext),
+//     RTE.chainFirst(validateRequest),
+//     RTE.chainW(generateWalletAttestations),
+//     RTE.map(H.successJson),
+//     RTE.orElseFirstW((error) => sendExceptionToAppInsights(error, req.body)),
+//     RTE.orElseW(logErrorAndReturnResponse),
+//   ),
+// );
+
+const WalletAttestationRequestPayload = t.type({
+  assertion: NonEmptyString,
+  fiscal_code: FiscalCode,
+});
+
+type WalletAttestationRequestPayload = t.TypeOf<
+  typeof WalletAttestationRequestPayload
+>;
+
+const requireWalletAttestationRequest = flow(
+  H.parse(WalletAttestationRequestPayload),
+  E.chain(({ assertion, fiscal_code }) =>
+    sequenceS(E.Apply)({
+      assertion: E.right(assertion),
+      fiscalCode: E.right(fiscal_code),
+    }),
+  ),
+);
+
+const verifyAssertion = ({
+  assertion,
+  fiscalCode,
+}: {
+  assertion: string;
+  fiscalCode: FiscalCode;
+}) =>
+  pipe(
+    assertion,
+    verifyAndDecodeWalletAttestationRequest,
+    TE.map((validatedAssertion) => ({
+      assertion: validatedAssertion,
+      userId: fiscalCode,
+    })),
+  );
+
+const addIsTestUser = ({
+  assertion,
+  userId,
+}: {
+  assertion: WalletAttestationRequestV2;
+  userId: FiscalCode;
+}) => ({
+  assertion,
+  isTestUser: isLoadTestUser(userId),
+  userId,
+});
+
 export const CreateWalletAttestationV2Handler = H.of((req: H.HttpRequest) =>
   pipe(
     req.body,
-    getAssertionFromRequest,
+    requireWalletAttestationRequest,
+    TE.fromEither,
+    TE.chain(verifyAssertion),
+    TE.map(addIsTestUser),
     RTE.fromTaskEither,
-    RTE.chainW(enrichAssertionWithUserContext),
     RTE.chainFirst(validateRequest),
     RTE.chainW(generateWalletAttestations),
     RTE.map(H.successJson),

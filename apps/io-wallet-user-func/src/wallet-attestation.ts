@@ -223,7 +223,7 @@ export const createWalletAttestationAsSdJwt =
                 aal,
                 cnf,
                 iss,
-                sd_alg: "sha-256",
+                _sd_alg: "sha-256",
                 sub,
                 vct,
               }),
