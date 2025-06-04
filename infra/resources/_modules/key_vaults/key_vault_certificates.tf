@@ -16,13 +16,13 @@ module "key_vault_role_assignments" {
   }]
 }
 
-# resource "azurerm_key_vault_access_policy" "certificate_access" {
-#   key_vault_id = var.key_vault_certificates.id
+resource "azurerm_key_vault_access_policy" "certificate_access" {
+  key_vault_id = var.key_vault_certificates.id
 
-#   tenant_id = var.tenant_id
-#   object_id = var.ci_infra_principal_id
+  tenant_id = var.tenant_id
+  object_id = var.ci_infra_principal_id
 
-#   certificate_permissions = [
-#     "Get"
-#   ]
-# }
+  certificate_permissions = [
+    "Get"
+  ]
+}
