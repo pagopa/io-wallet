@@ -10,6 +10,11 @@ terraform {
       source  = "hashicorp/azuread"
       version = "<= 2.50.0"
     }
+
+    azapi = {
+      source  = "azure/azapi"
+      version = "~> 2.0"
+    }
   }
 
   backend "azurerm" {
@@ -24,6 +29,9 @@ terraform {
 provider "azurerm" {
   features {}
   storage_use_azuread = true
+}
+
+provider "azapi" {
 }
 
 data "azurerm_resource_group" "wallet" {
@@ -48,6 +56,18 @@ module "key_vaults" {
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   tenant_id = data.azurerm_client_config.current.tenant_id
+
+  key_vault_certificates = {
+    id                  = data.azurerm_key_vault.certificates.id
+    name                = data.azurerm_key_vault.certificates.name
+    resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
+  }
+
+  cdn_principal_id = module.cdn.cdn_principal_id
+
+  ci_infra_principal_id = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
+
+  subscription_id = data.azurerm_subscription.current.subscription_id
 
   tags = local.tags
 }
@@ -140,6 +160,8 @@ module "cdn" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
+  key_vault_certificate_secret_id = data.azurerm_key_vault_certificate.wallet_certificate.versionless_secret_id
+
   tags = local.tags
 }
 
@@ -160,6 +182,8 @@ module "iam" {
       cd = data.azurerm_user_assigned_identity.app_cd_id.principal_id
     }
   }
+
+  key_vault_certificates_id = data.azurerm_key_vault.certificates.id // to be deleted
 
   cosmos_db_02 = {
     id                  = module.cosmos.cosmos_account_wallet.id

@@ -9,3 +9,7 @@ output "storage_account_cdn" {
 output "cdn_endpoint_id" {
   value = azurerm_cdn_endpoint.this.id
 }
+
+output "cdn_principal_id" {
+  value = data.azapi_resource.cdn_profile.output.identity.principalId
+}

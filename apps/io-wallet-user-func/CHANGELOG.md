@@ -1,5 +1,23 @@
 # io-wallet-user-func
 
+## 3.4.1
+
+### Patch Changes
+
+- da599d1: Revert temp CRL fix
+
+## 3.4.0
+
+### Minor Changes
+
+- 06ff9d0: Renamed endpoint /wallet-attestation in /wallet-attestations and updated createWalletAttestationV2 handler
+
+## 3.3.6
+
+### Patch Changes
+
+- 0e14c2c: Fix CRL
+
 ## 3.3.5
 
 ### Patch Changes

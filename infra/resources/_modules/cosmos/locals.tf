@@ -19,14 +19,14 @@ locals {
       }
       default_ttl = 300
     },
-    {
-      name               = "wallet-instances-user-id"
-      partition_key_path = "/id"
-      autoscale_settings = {
-        max_throughput = 8000
-      }
-      default_ttl = null
-    },
+    # {
+    #   name               = "wallet-instances-user-id"
+    #   partition_key_path = "/id"
+    #   autoscale_settings = {
+    #     max_throughput = 8000
+    #   }
+    #   default_ttl = null
+    # },
     {
       name               = "leases-revoke-wallet-instance"
       partition_key_path = "/id"
@@ -35,19 +35,19 @@ locals {
       }
       default_ttl = null
     },
-    {
-      name               = "leases-wallet-instances-user-id"
-      partition_key_path = "/id"
-      autoscale_settings = {
-        max_throughput = 1000
-      }
-      default_ttl = null
-    },
+    # {
+    #   name               = "leases-wallet-instances-user-id"
+    #   partition_key_path = "/id"
+    #   autoscale_settings = {
+    #     max_throughput = 1000
+    #   }
+    #   default_ttl = null
+    # },
     {
       name               = "whitelisted-fiscal-codes"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 1000
+        max_throughput = 8000
       }
       default_ttl = null
     },
