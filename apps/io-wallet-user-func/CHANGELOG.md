@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.4.2
+
+### Patch Changes
+
+- c53ec5a: Temporarily removed `trust_chain` from wallet attestation header
+
 ## 3.4.1
 
 ### Patch Changes
