@@ -150,6 +150,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     ...H.request("https://wallet-provider.example.org"),
     body: {
       assertion: walletAttestationRequest,
+      fiscal_code: mockFiscalCode,
     },
     method: "POST",
   };
@@ -287,7 +288,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
               "sub",
               "vct",
               "_sd",
-              "sd_alg",
+              "_sd_alg",
             ].sort(),
           );
 
@@ -364,6 +365,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: mockFiscalCode,
       },
       method: "POST",
     };
@@ -406,6 +408,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         assertion: walletAttestationRequest,
+        fiscal_code: mockFiscalCode,
       },
       method: "POST",
     };
