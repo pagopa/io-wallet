@@ -73,8 +73,3 @@ variable "wallet_dns_zone_id" {
   type        = string
   description = "wallet.io.pagopa.it DNS zone id"
 }
-
-// to be deleted
-variable "key_vault_certificates_id" {
-  type = string
-}
