@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ValidationResult } from "@/attestation-service";
 import { KeyObject, X509Certificate } from "crypto";
 import * as RR from "fp-ts/ReadonlyRecord";
