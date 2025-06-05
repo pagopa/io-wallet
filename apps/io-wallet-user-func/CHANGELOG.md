@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.4.0
+
+### Minor Changes
+
+- 06ff9d0: Renamed endpoint /wallet-attestation in /wallet-attestations and updated createWalletAttestationV2 handler
+
 ## 3.3.6
 
 ### Patch Changes
