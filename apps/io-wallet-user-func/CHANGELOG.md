@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.4.1
+
+### Patch Changes
+
+- da599d1: Revert temp CRL fix
+
 ## 3.4.0
 
 ### Minor Changes
