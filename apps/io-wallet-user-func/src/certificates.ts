@@ -1,5 +1,3 @@
-/* eslint-disable perfectionist/sort-objects */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ValidationResult } from "@/attestation-service";
 import { KeyObject, X509Certificate } from "crypto";
 import * as RR from "fp-ts/ReadonlyRecord";
@@ -146,21 +144,8 @@ export const getCrlFromUrls = (
   httpRequestTimeout = 4000,
 ): TE.TaskEither<Error, CRL> =>
   pipe(
-    {
-      entries: {
-        "41a055c6e51e312cbb081139f0831db4801796cf": {
-          status: "REVOKED",
-          reason: "KEY_COMPROMISE",
-        },
-        "6e5998d0c8e7a361c662166c8c5f8105": {
-          status: "REVOKED",
-          reason: "KEY_COMPROMISE",
-        },
-        "87829f49654c1fa220a027c31c90b037": {
-          status: "REVOKED",
-          reason: "KEY_COMPROMISE",
-        },
-      },
-    },
-    TE.of,
+    crlUrls,
+    RA.map(getCrlFromUrl(httpRequestTimeout)),
+    RA.sequence(TE.ApplicativePar),
+    TE.map(mergeCRL),
   );
