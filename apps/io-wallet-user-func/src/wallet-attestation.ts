@@ -164,9 +164,9 @@ const generateSalt: IOE.IOEither<Error, string> = IOE.tryCatch(
   (error) => new Error(`Failed to generate salt: ${error}`),
 );
 
-const disclosureToBase64 = (disclosure: [string, string, unknown]): string =>
+const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
   pipe(disclosure, JSON.stringify, (str) =>
-    Buffer.from(str).toString("base64"),
+    Buffer.from(str).toString("base64url"),
   );
 
 const getDisclosures = ({
@@ -179,16 +179,13 @@ const getDisclosures = ({
   pipe(
     sequenceT(IOE.ApplicativePar)(generateSalt, generateSalt),
     IOE.map(([nameSalt, linkSalt]) => [
-      disclosureToBase64([nameSalt, "wallet_name", walletName]),
-      disclosureToBase64([linkSalt, "wallet_link", walletLink]),
+      disclosureToBase64Url([nameSalt, "wallet_name", walletName]),
+      disclosureToBase64Url([linkSalt, "wallet_link", walletLink]),
     ]),
   );
 
-const hashToBase64 = (input: string): string =>
-  crypto
-    .createHash("sha256")
-    .update(Buffer.from(input, "base64"))
-    .digest("base64");
+const sha256Base64url = (input: string): string =>
+  crypto.createHash("sha256").update(input).digest("base64url");
 
 export const createWalletAttestationAsSdJwt =
   (
@@ -219,7 +216,7 @@ export const createWalletAttestationAsSdJwt =
             pipe(
               sdJwtModel,
               ({ aal, cnf, iss, sub, vct }) => ({
-                _sd: disclosures.map(hashToBase64),
+                _sd: disclosures.map(sha256Base64url),
                 _sd_alg: "sha-256",
                 aal,
                 cnf,
