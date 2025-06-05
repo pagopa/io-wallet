@@ -298,8 +298,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
             disclosures.forEach((disclosure) => {
               const disclosureDigest = crypto
                 .createHash("sha256")
-                .update(Buffer.from(disclosure, "base64"))
-                .digest("base64");
+                .update(disclosure)
+                .digest("base64url");
 
               expect(_sd.includes(disclosureDigest)).toBe(true);
             });
