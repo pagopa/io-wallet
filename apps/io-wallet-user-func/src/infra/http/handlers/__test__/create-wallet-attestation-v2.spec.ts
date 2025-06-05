@@ -217,7 +217,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
             walletAttestationJwt.wallet_attestation,
           );
           expect(Object.keys(jwtHeader).sort()).toEqual(
-            ["alg", "typ", "kid", "trust_chain"].sort(),
+            // ["alg", "typ", "kid", "trust_chain"].sort(),
+            ["alg", "typ", "kid"].sort(),
           );
           const jwtPayload = jose.decodeJwt(
             walletAttestationJwt.wallet_attestation,
@@ -275,7 +276,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
           // check the properties of the header and payload
           const jwtHeader = jose.decodeProtectedHeader(sdJwt);
           expect(Object.keys(jwtHeader).sort()).toEqual(
-            ["alg", "typ", "kid", "trust_chain"].sort(),
+            // ["alg", "typ", "kid", "trust_chain"].sort(),
+            ["alg", "typ", "kid"].sort(),
           );
           const jwtPayload = jose.decodeJwt(sdJwt);
           expect(Object.keys(jwtPayload).sort()).toEqual(
