@@ -127,7 +127,7 @@ const getWalletAttestationData =
         iss: basePath.href,
         kid,
         sub: walletAttestationRequest.header.kid,
-        trustChain: [],
+        // trustChain: [],
         walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
         walletLink,
         walletName,
@@ -145,10 +145,11 @@ export const createWalletAttestationAsJwt =
       TE.chain(
         flow(
           WalletAttestationToJwtModelV2.encode,
-          ({ kid, trust_chain, ...payload }) =>
+          // ({ kid, trust_chain, ...payload }) =>
+          ({ kid, ...payload }) =>
             dep.signer.createJwtAndSign(
               {
-                trust_chain,
+                // trust_chain,
                 typ: "oauth-client-attestation+jwt",
               },
               kid,
@@ -226,7 +227,7 @@ export const createWalletAttestationAsSdJwt =
               }),
               environment.signer.createJwtAndSign(
                 {
-                  trust_chain: sdJwtModel.trustChain,
+                  // trust_chain: sdJwtModel.trustChain,
                   typ: "oauth-client-attestation+jwt",
                 },
                 sdJwtModel.kid,
