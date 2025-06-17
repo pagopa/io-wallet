@@ -203,7 +203,7 @@ const createIssuerAuthPayload = ({
       validityInfo: {
         signed: new Date(),
         validFrom: new Date(),
-        validUntil: new Date(Date.now() + 1000 * 60 * 60),
+        validUntil: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
       },
       valueDigests,
       version: domesticNameSpace,
