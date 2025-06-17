@@ -145,3 +145,8 @@ variable "validate_wallet_instance_certificates_queue_name" {
   type        = string
   description = "Wallet Instance Certificates Validation Queue Name"
 }
+
+variable "cidr_subnet_user_pre_prod_func" {
+  type        = string
+  description = "CIDR block for user pre prod function app subnet"
+}
