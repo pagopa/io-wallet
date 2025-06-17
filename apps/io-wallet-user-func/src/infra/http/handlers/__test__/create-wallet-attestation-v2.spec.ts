@@ -422,7 +422,10 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     assert.ok(walletAttestationMdoc);
 
-    const buffer = Buffer.from(walletAttestationMdoc.wallet_attestation, "hex");
+    const buffer = Buffer.from(
+      walletAttestationMdoc.wallet_attestation,
+      "base64",
+    );
 
     const cborDecoded = cbor.decode(buffer);
 

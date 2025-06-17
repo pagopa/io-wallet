@@ -339,5 +339,5 @@ export const createWalletAttestationAsMdoc: (
 ) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> = flow(
   getWalletAttestationData,
   RTE.chainW(createCborEncodedMDoc),
-  RTE.map((uint8) => Buffer.from(uint8).toString("hex")),
+  RTE.map((uint8) => Buffer.from(uint8).toString("base64")),
 );
