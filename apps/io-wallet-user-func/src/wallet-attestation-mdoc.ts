@@ -22,10 +22,6 @@ const docType = "org.iso.18013.5.1.it.WalletAttestation";
 
 const domesticNameSpace = "org.iso.18013.5.1.it";
 
-const issuerAuthDocType = "org.iso.18013.5.1.it.WalletAttestation";
-
-const issuerAuthVersion = "org.iso.18013.5.1.it";
-
 type NameSpacesMapping<T> = {
   [K in typeof domesticNameSpace]: T[];
 };
@@ -203,14 +199,14 @@ const createIssuerAuthPayload = ({
         deviceKey: getDeviceKey(walletInstancePublicKey),
       },
       digestAlgorithm: "SHA-256",
-      docType: issuerAuthDocType,
+      docType,
       validityInfo: {
         signed: new Date(),
         validFrom: new Date(),
         validUntil: new Date(Date.now() + 1000 * 60 * 60),
       },
       valueDigests,
-      version: issuerAuthVersion,
+      version: domesticNameSpace,
     })),
     E.chain(cborEncode),
     E.chain((encodedPayload) =>
