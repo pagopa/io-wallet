@@ -43,20 +43,20 @@ type NameSpaces = NameSpacesMapping<cbor.Tag>;
 
 interface DeviceKeyBase {
   1: number; // kty
-  3: number; // alg
 }
 
 interface EC2DeviceKey extends DeviceKeyBase {
   "-1": number; // crv
   "-2": Uint8Array; // x
   "-3": Uint8Array; // y
-  1: 2; // 2 = EC2
+  1: 2; // 2 = EC
 }
 
 interface RSADeviceKey extends DeviceKeyBase {
   "-1": Uint8Array; // n
   "-2": Uint8Array; // e
   1: 3; // 3 = RSA
+  3: number; // alg
 }
 
 type DeviceKey = EC2DeviceKey | RSADeviceKey;
@@ -153,7 +153,7 @@ const ecKeyToCose = (publicKey: ECKey) => ({
   "-2": Buffer.from(publicKey.x, "base64url"),
   "-3": Buffer.from(publicKey.y, "base64url"),
   1: 2 as const,
-  3: -7,
+  // 3: -7,
 });
 
 const rsaKeyToCose = (publicKey: RSAKey) => ({
@@ -207,7 +207,7 @@ const createIssuerAuthPayload = ({
       validityInfo: {
         signed: new Date(),
         validFrom: new Date(),
-        validUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        validUntil: new Date(Date.now() + 1000 * 60 * 60),
       },
       valueDigests,
       version: issuerAuthVersion,
