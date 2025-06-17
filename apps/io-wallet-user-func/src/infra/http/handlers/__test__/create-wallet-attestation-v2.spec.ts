@@ -107,6 +107,7 @@ const DecodedNameSpaceSchema = t.array(
 const IssuerAuthPayloadSchema = t.type({
   deviceKeyInfo: t.type({
     deviceKey: t.type({
+      // since it is an EC key
       "-1": t.number,
       "-2": BufferData,
       "-3": BufferData,
