@@ -7,7 +7,7 @@ module "function_app_user_pre" {
     env_short       = var.env_short
     location        = "italynorth"
     domain          = "wallet"
-    app_name        = "userpre"
+    app_name        = "pre"
     instance_number = "01"
   }
 
