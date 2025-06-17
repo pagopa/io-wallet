@@ -113,9 +113,9 @@ module "function_apps" {
   project             = local.project
   resource_group_name = data.azurerm_resource_group.wallet.name
 
-  cidr_subnet_user_func_02       = "10.20.19.0/24"
-  cidr_subnet_support_func       = "10.20.13.0/24"
-  cidr_subnet_user_pre_prod_func = "10.20.12.0/26"
+  cidr_subnet_user_func_02  = "10.20.19.0/24"
+  cidr_subnet_support_func  = "10.20.13.0/24"
+  cidr_subnet_user_pre_func = "10.20.12.0/26"
 
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name

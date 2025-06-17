@@ -1,4 +1,4 @@
-module "function_app_user_pre_prod" {
+module "function_app_user_pre" {
   source  = "pagopa-dx/azure-function-app/azurerm"
   version = "~> 0.0"
 
@@ -7,7 +7,7 @@ module "function_app_user_pre_prod" {
     env_short       = var.env_short
     location        = "italynorth"
     domain          = "wallet"
-    app_name        = "user-pre-prod"
+    app_name        = "userpre"
     instance_number = "01"
   }
 
@@ -15,7 +15,7 @@ module "function_app_user_pre_prod" {
   health_check_path   = "/api/v1/wallet/health"
   node_version        = 20
 
-  subnet_cidr                          = var.cidr_subnet_user_pre_prod_func
+  subnet_cidr                          = var.cidr_subnet_user_pre_func
   subnet_pep_id                        = var.private_endpoint_subnet_id
   private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
   virtual_network = {
