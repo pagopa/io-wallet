@@ -14,6 +14,7 @@
     "start": "func start"
   },
   "dependencies": {
+    "@auth0/mdl": "^2.2.0",
     "@azure/cosmos": "^4.2.0",
     "@azure/functions": "^4.6.0",
     "@azure/functions-opentelemetry-instrumentation": "^0.1.0",
