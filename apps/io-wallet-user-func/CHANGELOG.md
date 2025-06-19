@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.4.3
+
+### Patch Changes
+
+- e90742e: Fix: changed wallet attestation SD-JWT typ header in `dc+sd-jwt`
+
 ## 3.4.2
 
 ### Patch Changes
