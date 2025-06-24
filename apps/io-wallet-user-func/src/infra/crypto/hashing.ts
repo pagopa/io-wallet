@@ -12,7 +12,7 @@ const calculateSha256Hash = (input: ArrayBuffer | string): crypto.Hash => {
 
 // TODO
 export const createHash = (buffer: Uint8Array<ArrayBufferLike>) =>
-  crypto.createHash("sha256").update(buffer).digest();
+  new Uint8Array(crypto.createHash("sha256").update(buffer).digest());
 
 export const createHashBase64url = (input: ArrayBuffer | string): string =>
   calculateSha256Hash(input).digest("base64url");

@@ -3,9 +3,10 @@ import { AttestationService } from "@/attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { UtcOnlyIsoDateFromString } from "@pagopa/ts-commons/lib/dates";
+// import { UtcOnlyIsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import {
   EmailString,
   FiscalCode,
@@ -16,7 +17,6 @@ import * as appInsights from "applicationinsights";
 import * as assert from "assert";
 import { decode } from "cbor-x";
 import * as cbor from "cbor2";
-import cose from "cose-js";
 import * as crypto from "crypto";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
@@ -31,7 +31,6 @@ import {
   WalletAttestations,
 } from "../create-wallet-attestation-v2";
 import { privateEcKey, publicEcKey, signer } from "./keys";
-import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
@@ -61,11 +60,6 @@ const email = flow(
   }),
 );
 
-const BufferData = t.type({
-  data: t.array(t.number),
-  type: t.literal("Buffer"),
-});
-
 const Uint8ArrayType = new t.Type<Uint8Array, Uint8Array, unknown>(
   "Uint8Array",
   (u): u is Uint8Array => u instanceof Uint8Array,
@@ -77,10 +71,54 @@ const Uint8ArrayType = new t.Type<Uint8Array, Uint8Array, unknown>(
 );
 
 // TODO
-export const BufferFrom = new t.Type<Buffer, Buffer, unknown>(
+const BufferFrom = new t.Type<Buffer, Buffer, unknown>(
   "BufferFrom",
   (u): u is Buffer => Buffer.isBuffer(u),
   (u, c) => (Buffer.isBuffer(u) ? t.success(u) : t.failure(u, c)),
+  t.identity,
+);
+
+const MapNumberBuffer = new t.Type<
+  Map<number, Buffer>,
+  Map<number, Buffer>,
+  unknown
+>(
+  "MapNumberBuffer",
+  (u): u is Map<number, Buffer> =>
+    u instanceof Map &&
+    [...u.entries()].every(
+      ([k, v]) => typeof k === "number" && Buffer.isBuffer(v),
+    ),
+  (u, c) =>
+    u instanceof Map &&
+    [...u.entries()].every(
+      ([k, v]) => typeof k === "number" && Buffer.isBuffer(v),
+    )
+      ? t.success(u as Map<number, Buffer>)
+      : t.failure(u, c),
+  t.identity,
+);
+
+const MapNumberBufferOrNumber = new t.Type<
+  Map<number, Buffer | number>,
+  Map<number, Buffer | number>,
+  unknown
+>(
+  "MapNumberBufferOrNumber",
+  (u): u is Map<number, Buffer | number> =>
+    u instanceof Map &&
+    [...u.entries()].every(
+      ([k, v]) =>
+        typeof k === "number" && (typeof v === "number" || Buffer.isBuffer(v)),
+    ),
+  (u, c) =>
+    u instanceof Map &&
+    [...u.entries()].every(
+      ([k, v]) =>
+        typeof k === "number" && (typeof v === "number" || Buffer.isBuffer(v)),
+    )
+      ? t.success(u as Map<number, Buffer | number>)
+      : t.failure(u, c),
   t.identity,
 );
 
@@ -89,25 +127,24 @@ const Tag24WithUint8Array = t.type({
   tag: t.literal(24),
 });
 
+// const WalletAttestationMdocSchema = t.type({
+//   docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
+//   issuerSigned: t.type({
+//     issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
+//     nameSpaces: t.type({
+//       "org.iso.18013.5.1.it": t.tuple([
+//         Tag24WithUint8Array,
+//         Tag24WithUint8Array,
+//         Tag24WithUint8Array,
+//         Tag24WithUint8Array,
+//       ]),
+//     }),
+//   }),
+// });
 const WalletAttestationMdocSchema = t.type({
   docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
   issuerSigned: t.type({
-    issuerAuth: BufferData,
-    nameSpaces: t.type({
-      "org.iso.18013.5.1.it": t.tuple([
-        Tag24WithUint8Array,
-        Tag24WithUint8Array,
-        Tag24WithUint8Array,
-        Tag24WithUint8Array,
-      ]),
-    }),
-  }),
-});
-
-const WalletAttestationMdocSchema1 = t.type({
-  docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
-  issuerSigned: t.type({
-    issuerAuth: t.tuple([BufferFrom, t.any, BufferFrom, BufferFrom]), // TODO: t.any
+    issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
     nameSpaces: t.type({
       "org.iso.18013.5.1.it": t.tuple([
         Tag24WithUint8Array,
@@ -130,28 +167,32 @@ const DecodedNameSpaceSchema = t.array(
 
 const IssuerAuthPayloadSchema = t.type({
   deviceKeyInfo: t.type({
-    deviceKey: t.type({
-      // since it is an EC key
-      "-1": t.number,
-      "-2": BufferData,
-      "-3": BufferData,
-      "1": t.number,
-    }),
+    // deviceKey: t.type({
+    //   // since it is an EC key
+    //   "-1": t.number,
+    //   "-2": Uint8ArrayType,
+    //   "-3": Uint8ArrayType,
+    //   "1": t.number,
+    // }),
+    deviceKey: MapNumberBufferOrNumber,
   }),
   digestAlgorithm: t.literal("SHA-256"),
   docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
   validityInfo: t.type({
-    signed: UtcOnlyIsoDateFromString,
-    validFrom: UtcOnlyIsoDateFromString,
-    validUntil: UtcOnlyIsoDateFromString,
+    signed: t.string, // UtcOnlyIsoDateFromString,
+    validFrom: t.string,
+    // UtcOnlyIsoDateFromString,
+    validUntil: t.string,
+    // UtcOnlyIsoDateFromString,
   }),
   valueDigests: t.type({
-    "org.iso.18013.5.1.it": t.type({
-      "0": BufferData,
-      "1": BufferData,
-      "2": BufferData,
-      "3": BufferData,
-    }),
+    // "org.iso.18013.5.1.it": t.type({
+    //   "0": Uint8ArrayType,
+    //   "1": Uint8ArrayType,
+    //   "2": Uint8ArrayType,
+    //   "3": Uint8ArrayType,
+    // }),
+    "org.iso.18013.5.1.it": MapNumberBuffer,
   }),
   version: t.literal("org.iso.18013.5.1.it"),
 });
@@ -166,9 +207,14 @@ const federationEntity = {
   tosUri: url("https://wallet-provider.example.org/logo.svg"),
 };
 
+// const walletAttestationClaims = {
+//   walletLink: "https://foo.com",
+//   walletName: "Wallet name",
+// };
+
 const walletAttestationClaims = {
-  walletLink: "https://foo.com",
-  walletName: "Wallet name",
+  walletLink: "https://wallet.io.pagopa.it",
+  walletName: "IT Wallet",
 };
 
 const mockAttestationService: AttestationService = {
@@ -416,7 +462,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     }
   });
 
-  it("test", async () => {
+  it("should return a correctly encoded mdoc cbor on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntity,
@@ -431,6 +477,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
     });
 
     const result = await handler();
+
+    expect.assertions(5);
 
     assert.ok(E.isRight(result));
 
@@ -453,7 +501,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     const cborDecoded = cbor.decode(buffer);
 
     const decodedWalletAttestationMdoc =
-      WalletAttestationMdocSchema1.decode(cborDecoded);
+      WalletAttestationMdocSchema.decode(cborDecoded);
 
     // test cborDecoded has expected structure and specific docType
     assert.ok(E.isRight(decodedWalletAttestationMdoc));
@@ -502,7 +550,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     const decodedIssuerAuthBytes = cbor.decode(payload);
 
-    // change?
     if (
       decodedIssuerAuthBytes instanceof cbor.Tag &&
       decodedIssuerAuthBytes.tag === 24 && // CBOR tag 24 is for a byte string containing encoded CBOR
@@ -526,7 +573,8 @@ describe("CreateWalletAttestationV2Handler", async () => {
       signature,
     );
 
-    console.log(await newIssuerAuth.verify(publicKey)); // test that is true
+    // test issuerAuth signature is correct
+    await expect(newIssuerAuth.verify(publicKey)).resolves.toBe(true);
   });
 
   it.skip("should return a 422 HTTP response on invalid body", async () => {

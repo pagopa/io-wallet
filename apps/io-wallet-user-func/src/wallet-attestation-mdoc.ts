@@ -1,14 +1,14 @@
+import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 import * as cbor from "cbor2";
-// import * as cose from "cose-js";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
-import * as jose from "jose";
 import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import { ECKey, RSAKey } from "io-wallet-common/jwk";
+import * as jose from "jose";
 
 import { WalletAttestationData } from "./encoders/wallet-attestation";
 import { createHash } from "./infra/crypto/hashing";
@@ -18,7 +18,6 @@ import {
   getWalletAttestationData,
 } from "./wallet-attestation";
 import { WalletAttestationRequestV2 } from "./wallet-attestation-request";
-import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 
 const docType = "org.iso.18013.5.1.it.WalletAttestation";
 
@@ -39,30 +38,32 @@ type DecodedNameSpaces = NameSpacesMapping<DecodedNameSpace>;
 
 type NameSpaces = NameSpacesMapping<cbor.Tag>;
 
-interface DeviceKeyBase {
-  1: number; // kty
-}
+// interface DeviceKeyBase {
+//   1: number; // kty
+// }
 
-interface EC2DeviceKey extends DeviceKeyBase {
-  "-1": number; // crv
-  "-2": Uint8Array; // x
-  "-3": Uint8Array; // y
-  1: 2; // 2 = EC
-}
+// interface EC2DeviceKey extends DeviceKeyBase {
+//   "-1": number; // crv
+//   "-2": Uint8Array; // x
+//   "-3": Uint8Array; // y
+//   1: 2; // 2 = EC
+// }
 
-interface RSADeviceKey extends DeviceKeyBase {
-  "-1": Uint8Array; // n
-  "-2": Uint8Array; // e
-  1: 3; // 3 = RSA
-  3: number; // alg
-}
+// interface RSADeviceKey extends DeviceKeyBase {
+//   "-1": Uint8Array; // n
+//   "-2": Uint8Array; // e
+//   1: 3; // 3 = RSA
+//   3: number; // alg
+// }
 
-type DeviceKey = EC2DeviceKey | RSADeviceKey;
+// type DeviceKey1 = EC2DeviceKey | RSADeviceKey;
+
+type DeviceKey = Map<number, Uint8Array | number>;
 
 interface Mdoc {
   docType: string;
   issuerSigned: {
-    issuerAuth: IssuerAuth; //  Buffer;
+    issuerAuth: IssuerAuth;
     nameSpaces: Record<string, cbor.Tag[]>;
   };
 }
@@ -146,27 +147,46 @@ const algMap: Record<string, number> = {
   RS512: -259,
 };
 
-const ecKeyToCose = (publicKey: ECKey) => ({
-  "-1": crvMap[publicKey.crv] ?? 1,
-  "-2": Buffer.from(publicKey.x, "base64url"),
-  "-3": Buffer.from(publicKey.y, "base64url"),
-  1: 2 as const,
-  // 3: -7,
-});
+// da buffer a Uint8Array. sia buf: Buffer
+// const xBytes = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+// const ecKeyToCose1 = (publicKey: ECKey) => ({
+//   "-1": crvMap[publicKey.crv] ?? 1,
+//   "-2": new Uint8Array(Buffer.from(publicKey.x, "base64url")),
+//   "-3": new Uint8Array(Buffer.from(publicKey.y, "base64url")),
+//   1: 2 as const,
+//   // 3: -7,
+// });
 
-const rsaKeyToCose = (publicKey: RSAKey) => ({
-  "-1": Buffer.from(publicKey.n, "base64url"),
-  "-2": Buffer.from(publicKey.e, "base64url"),
-  1: 3 as const,
-  3: publicKey.alg ? (algMap[publicKey.alg] ?? -257) : -257,
-});
+const ecKeyToCose = (publicKey: ECKey): DeviceKey =>
+  new Map<number, Uint8Array | number>([
+    [-1, crvMap[publicKey.crv] ?? 1],
+    [-2, new Uint8Array(Buffer.from(publicKey.x, "base64url"))],
+    [-3, new Uint8Array(Buffer.from(publicKey.y, "base64url"))],
+    [1, 2],
+  ]);
+
+// const rsaKeyToCose = (publicKey: RSAKey) => ({
+//   "-1": new Uint8Array(Buffer.from(publicKey.n, "base64url")),
+//   "-2": new Uint8Array(Buffer.from(publicKey.e, "base64url")),
+//   1: 3 as const,
+//   3: publicKey.alg ? (algMap[publicKey.alg] ?? -257) : -257,
+// });
+const rsaKeyToCose = (publicKey: RSAKey): DeviceKey =>
+  new Map<number, Uint8Array | number>([
+    [-1, new Uint8Array(Buffer.from(publicKey.n, "base64url"))],
+    [-2, new Uint8Array(Buffer.from(publicKey.e, "base64url"))],
+    [1, 3],
+    [3, publicKey.alg ? (algMap[publicKey.alg] ?? -257) : -257],
+  ]);
 
 const getDeviceKey: (
   publicKey: WalletAttestationData["walletInstancePublicKey"],
 ) => DeviceKey = (publicKey) =>
   publicKey.kty === "EC" ? ecKeyToCose(publicKey) : rsaKeyToCose(publicKey);
 
-const createNameSpaceHash = (ns: DecodedNameSpace): E.Either<Error, Buffer> =>
+const createNameSpaceHash = (
+  ns: DecodedNameSpace,
+): E.Either<Error, Uint8Array> =>
   E.tryCatch(
     () =>
       pipe(
@@ -183,15 +203,30 @@ const computeValueDigests = (
   decodedNameSpaces: DecodedNameSpaces,
 ): E.Either<
   Error,
-  { [K in typeof domesticNameSpace]: Record<number, Buffer<ArrayBuffer>> }
+  { [K in typeof domesticNameSpace]: Map<number, Uint8Array<ArrayBufferLike>> }
 > =>
   pipe(
     decodedNameSpaces[domesticNameSpace],
     A.traverse(E.Applicative)(createNameSpaceHash),
-    E.map((hashes) => ({
-      [domesticNameSpace]: Object.fromEntries(hashes.map((buf, i) => [i, buf])),
+    E.map((hashes) => new Map(hashes.map((buf, i) => [i, buf]))),
+    E.map((map) => ({
+      [domesticNameSpace]: map,
     })),
   );
+// pipe(
+//   decodedNameSpaces[domesticNameSpace],
+//   A.traverse(E.Applicative)(createNameSpaceHash),
+//   E.map((hashes) => ({
+//     [domesticNameSpace]: Object.fromEntries(hashes.map((buf, i) => [i, buf])),
+//   })),
+// );
+
+const getTimestamp = (t?: number) => {
+  if (t) {
+    return new Date(t).toISOString().split(".")[0] + "Z";
+  }
+  return new Date().toISOString().split(".")[0] + "Z";
+};
 
 const createIssuerAuthPayload = ({
   decodedNameSpaces,
@@ -210,9 +245,10 @@ const createIssuerAuthPayload = ({
       digestAlgorithm: "SHA-256",
       docType,
       validityInfo: {
-        signed: new Date(),
-        validFrom: new Date(),
-        validUntil: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
+        signed: getTimestamp(),
+        validFrom: getTimestamp(),
+        validUntil: getTimestamp(Date.now() + 1000 * 60 * 60), // 1 hour
+        // new Date(Date.now() + 1000 * 60 * 60), // 1 hour
       },
       valueDigests,
       version: domesticNameSpace,
@@ -239,7 +275,6 @@ const signCose: (input: {
     pipe(
       kid,
       dep.signer.getPrivateKeyByKid,
-      // O.map(({ d }) => d),
       O.match(
         () =>
           TE.left(
@@ -247,8 +282,8 @@ const signCose: (input: {
               "Failed to retrieve private key while generating mDoc wallet attestation",
             ),
           ),
-        (privateKey) => {
-          return TE.tryCatch(
+        (privateKey) =>
+          TE.tryCatch(
             async () => {
               const issuerPrivateKey = await jose.importJWK(privateKey);
               const issuerAuth = await IssuerAuth.sign(
@@ -261,61 +296,14 @@ const signCose: (input: {
             },
             (reason) =>
               reason instanceof Error ? reason : new Error(String(reason)),
-          );
-        },
+          ),
       ),
     );
-// const signCose: (input: {
-//   kid: string;
-//   payload: Uint8Array<ArrayBufferLike>;
-// }) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, Buffer> =
-//   ({ kid, payload }) =>
-//   (dep) =>
-//     pipe(
-//       kid,
-//       dep.signer.getPrivateKeyByKid,
-//       O.map(({ d }) => d),
-//       O.match(
-//         () =>
-//           TE.left(
-//             new Error(
-//               "Failed to retrieve private key while generating mDoc wallet attestation",
-//             ),
-//           ),
-//         (privateKey) =>
-//           TE.tryCatch(
-//             async () =>
-//               cose.sign.create(
-//                 {
-//                   p: {
-//                     alg: "ES256",
-//                   },
-//                   u: {
-//                     kid,
-//                   },
-//                 },
-//                 payload,
-//                 {
-//                   key: {
-//                     d: Buffer.from(privateKey, "base64url"),
-//                   },
-//                 },
-//               ),
-//             (reason) =>
-//               reason instanceof Error ? reason : new Error(String(reason)),
-//           ),
-//       ),
-//     );
 
 const createIssuerAuth: (input: {
   decodedNameSpaces: DecodedNameSpaces;
   walletAttestationData: WalletAttestationData;
-}) => RTE.ReaderTaskEither<
-  WalletAttestationEnvironment,
-  Error,
-  IssuerAuth
-  // Buffer<ArrayBufferLike>
-> = ({
+}) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, IssuerAuth> = ({
   decodedNameSpaces,
   walletAttestationData: { kid, walletInstancePublicKey },
 }) =>
@@ -329,15 +317,15 @@ const createIssuerAuth: (input: {
     RTE.chainW((encodedTaggedPayload) =>
       signCose({ kid, payload: encodedTaggedPayload }),
     ),
-    RTE.map((payload) => {
-      // TODO: it does not compile
-      payload.encodedProtectedHeaders = new Uint8Array(
-        payload.encodedProtectedHeaders,
-      );
-      payload.signature = new Uint8Array(payload.signature);
-
-      return payload;
-    }),
+    RTE.map(
+      (payload) =>
+        new IssuerAuth(
+          new Uint8Array(cbor.encode(payload.protectedHeaders)),
+          payload.unprotectedHeaders,
+          payload.payload,
+          new Uint8Array(payload.signature),
+        ),
+    ),
   );
 
 const createMdoc: (
@@ -375,9 +363,24 @@ const cborEncode = (
     (reason) => (reason instanceof Error ? reason : new Error(String(reason))),
   );
 
-const cborEncode1 = (obj: unknown) => {
-  return cbor.encode(obj);
-};
+const createDocMap = (document: Mdoc) =>
+  new Map<
+    string,
+    | {
+        issuerAuth: (Map<number, unknown> | Uint8Array | undefined)[];
+        nameSpaces: Record<string, cbor.Tag[]>;
+      }
+    | string
+  >([
+    ["docType", document.docType],
+    [
+      "issuerSigned",
+      {
+        issuerAuth: document.issuerSigned.issuerAuth.getContentForEncoding(),
+        nameSpaces: document.issuerSigned.nameSpaces,
+      },
+    ],
+  ]);
 
 // this function returns the credential encoded as binary data in CBOR format
 const createCborEncodedMDoc: (
@@ -388,27 +391,15 @@ const createCborEncodedMDoc: (
   Uint8Array<ArrayBufferLike>
 > = flow(
   createMdoc,
-  RTE.map((document) => {
-    const docMap = new Map<
-      string,
-      | string
-      | {
-          nameSpaces: Record<string, cbor.Tag[]>;
-          issuerAuth: any;
-        }
-    >();
-    docMap.set("docType", document.docType);
-    docMap.set("issuerSigned", {
-      nameSpaces: document.issuerSigned.nameSpaces,
-      issuerAuth: document.issuerSigned.issuerAuth.getContentForEncoding(),
-    });
-    return docMap;
-  }),
-  RTE.map((docMap) =>
-    cborEncode1({
-      docType: docMap.get("docType"),
-      issuerSigned: docMap.get("issuerSigned"),
-    }),
+  RTE.map(createDocMap),
+  RTE.chainW((docMap) =>
+    pipe(
+      cborEncode({
+        docType: docMap.get("docType"),
+        issuerSigned: docMap.get("issuerSigned"),
+      }),
+      RTE.fromEither,
+    ),
   ),
 );
 
