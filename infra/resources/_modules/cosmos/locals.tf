@@ -52,4 +52,23 @@ locals {
       default_ttl = null
     },
   ]
+
+  wallet_cosmosdb_pre_prod_containers = [
+    {
+      name               = "wallet-instances"
+      partition_key_path = "/userId"
+      autoscale_settings = {
+        max_throughput = 1000
+      }
+      default_ttl = null
+    },
+    {
+      name               = "nonces"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 1000
+      }
+      default_ttl = 300
+    }
+  ]
 }

@@ -150,3 +150,8 @@ variable "cidr_subnet_user_pre_func" {
   type        = string
   description = "CIDR block for user pre prod function app subnet"
 }
+
+variable "cosmos_database_name_pre" {
+  type        = string
+  description = "Pre prod Wallet Cosmos DB database name"
+}
