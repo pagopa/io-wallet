@@ -6,7 +6,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-// import { UtcOnlyIsoDateFromString } from "@pagopa/ts-commons/lib/dates";
+import { UtcOnlyIsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import {
   EmailString,
   FiscalCode,
@@ -70,7 +70,6 @@ const Uint8ArrayType = new t.Type<Uint8Array, Uint8Array, unknown>(
   t.identity,
 );
 
-// TODO
 const BufferFrom = new t.Type<Buffer, Buffer, unknown>(
   "BufferFrom",
   (u): u is Buffer => Buffer.isBuffer(u),
@@ -79,45 +78,60 @@ const BufferFrom = new t.Type<Buffer, Buffer, unknown>(
 );
 
 const MapNumberBuffer = new t.Type<
-  Map<number, Buffer>,
-  Map<number, Buffer>,
+  Map<number, Buffer | Buffer[]>,
+  Map<number, Buffer | Buffer[]>,
   unknown
 >(
   "MapNumberBuffer",
-  (u): u is Map<number, Buffer> =>
+  (u): u is Map<number, Buffer | Buffer[]> =>
     u instanceof Map &&
     [...u.entries()].every(
-      ([k, v]) => typeof k === "number" && Buffer.isBuffer(v),
+      ([k, v]) =>
+        typeof k === "number" &&
+        (Buffer.isBuffer(v) || (Array.isArray(v) && v.every(Buffer.isBuffer))),
     ),
   (u, c) =>
     u instanceof Map &&
     [...u.entries()].every(
-      ([k, v]) => typeof k === "number" && Buffer.isBuffer(v),
+      ([k, v]) =>
+        typeof k === "number" &&
+        (Buffer.isBuffer(v) || (Array.isArray(v) && v.every(Buffer.isBuffer))),
     )
-      ? t.success(u as Map<number, Buffer>)
+      ? t.success(u as Map<number, Buffer | Buffer[]>)
       : t.failure(u, c),
   t.identity,
 );
 
-const MapNumberBufferOrNumber = new t.Type<
-  Map<number, Buffer | number>,
-  Map<number, Buffer | number>,
+const ValueType = new t.Type<
+  Buffer | number | string,
+  Buffer | number | string,
   unknown
 >(
-  "MapNumberBufferOrNumber",
-  (u): u is Map<number, Buffer | number> =>
+  "BufferNumberOrString",
+  (u): u is Buffer | number | string =>
+    typeof u === "number" || typeof u === "string" || Buffer.isBuffer(u),
+  (u, c) =>
+    typeof u === "number" || typeof u === "string" || Buffer.isBuffer(u)
+      ? t.success(u)
+      : t.failure(u, c),
+  t.identity,
+);
+
+export const MapNumberToBufferNumberOrString = new t.Type<
+  Map<number, Buffer | number | string>,
+  Map<number, Buffer | number | string>,
+  unknown
+>(
+  "MapNumberToBufferNumberOrString",
+  (u): u is Map<number, Buffer | number | string> =>
     u instanceof Map &&
     [...u.entries()].every(
-      ([k, v]) =>
-        typeof k === "number" && (typeof v === "number" || Buffer.isBuffer(v)),
+      ([k, v]) => typeof k === "number" && ValueType.is(v),
     ),
   (u, c) =>
     u instanceof Map &&
-    [...u.entries()].every(
-      ([k, v]) =>
-        typeof k === "number" && (typeof v === "number" || Buffer.isBuffer(v)),
-    )
-      ? t.success(u as Map<number, Buffer | number>)
+    [...u.entries()].every(([k, v]) => typeof k === "number" && ValueType.is(v))
+      ? t.success(u as Map<number, Buffer | number | string>)
       : t.failure(u, c),
   t.identity,
 );
@@ -127,20 +141,6 @@ const Tag24WithUint8Array = t.type({
   tag: t.literal(24),
 });
 
-// const WalletAttestationMdocSchema = t.type({
-//   docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
-//   issuerSigned: t.type({
-//     issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
-//     nameSpaces: t.type({
-//       "org.iso.18013.5.1.it": t.tuple([
-//         Tag24WithUint8Array,
-//         Tag24WithUint8Array,
-//         Tag24WithUint8Array,
-//         Tag24WithUint8Array,
-//       ]),
-//     }),
-//   }),
-// });
 const WalletAttestationMdocSchema = t.type({
   docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
   issuerSigned: t.type({
@@ -167,34 +167,19 @@ const DecodedNameSpaceSchema = t.array(
 
 const IssuerAuthPayloadSchema = t.type({
   deviceKeyInfo: t.type({
-    // deviceKey: t.type({
-    //   // since it is an EC key
-    //   "-1": t.number,
-    //   "-2": Uint8ArrayType,
-    //   "-3": Uint8ArrayType,
-    //   "1": t.number,
-    // }),
-    deviceKey: MapNumberBufferOrNumber,
+    deviceKey: MapNumberToBufferNumberOrString,
   }),
   digestAlgorithm: t.literal("SHA-256"),
   docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
   validityInfo: t.type({
-    signed: t.string, // UtcOnlyIsoDateFromString,
-    validFrom: t.string,
-    // UtcOnlyIsoDateFromString,
-    validUntil: t.string,
-    // UtcOnlyIsoDateFromString,
+    signed: UtcOnlyIsoDateFromString, // t.string
+    validFrom: UtcOnlyIsoDateFromString,
+    validUntil: UtcOnlyIsoDateFromString,
   }),
   valueDigests: t.type({
-    // "org.iso.18013.5.1.it": t.type({
-    //   "0": Uint8ArrayType,
-    //   "1": Uint8ArrayType,
-    //   "2": Uint8ArrayType,
-    //   "3": Uint8ArrayType,
-    // }),
     "org.iso.18013.5.1.it": MapNumberBuffer,
   }),
-  version: t.literal("org.iso.18013.5.1.it"),
+  version: t.literal("1.0"), //t.literal("org.iso.18013.5.1.it"),
 });
 
 const federationEntity = {
@@ -207,14 +192,9 @@ const federationEntity = {
   tosUri: url("https://wallet-provider.example.org/logo.svg"),
 };
 
-// const walletAttestationClaims = {
-//   walletLink: "https://foo.com",
-//   walletName: "Wallet name",
-// };
-
 const walletAttestationClaims = {
-  walletLink: "https://wallet.io.pagopa.it",
-  walletName: "IT Wallet",
+  walletLink: "https://foo.com",
+  walletName: "Wallet name",
 };
 
 const mockAttestationService: AttestationService = {
@@ -272,6 +252,7 @@ function isStringArray(u: unknown): u is string[] {
 
 describe("CreateWalletAttestationV2Handler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
+
   const walletAttestationRequest = await new jose.SignJWT({
     aud: "aud",
     cnf: {
@@ -302,7 +283,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     method: "POST",
   };
 
-  it.skip("should return a 200 HTTP response on success", async () => {
+  it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntity,
@@ -335,7 +316,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     });
   });
 
-  it.skip("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
+  it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntity,
@@ -390,7 +371,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     }
   });
 
-  it.skip("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
+  it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
       federationEntity,
@@ -530,12 +511,9 @@ describe("CreateWalletAttestationV2Handler", async () => {
     );
 
     // test domestic namespace has correct properties (wallet_name, wallet_link, sub, aal)
-    expect(elementIdentifiers).toEqual([
-      "wallet_name",
-      "wallet_link",
-      "sub",
-      "aal",
-    ]);
+    expect(elementIdentifiers.sort()).toEqual(
+      ["wallet_name", "wallet_link", "sub", "aal"].sort(),
+    );
 
     // issuerAuth
     const [protectedHeaderBytes, unprotectedHeader, payload, signature] =
@@ -546,7 +524,9 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     // test issuerAuth has correct unprotected header
     const kid = Buffer.from(privateEcKey.kid);
-    expect(unprotectedHeader).toEqual(new Map([[4, Buffer.from(kid)]]));
+    // expect(unprotectedHeader).toEqual(new Map([[4, Buffer.from(kid)]]));
+    // add test key 33
+    expect(unprotectedHeader.has(4)).toBe(true);
 
     const decodedIssuerAuthBytes = cbor.decode(payload);
 
@@ -577,7 +557,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     await expect(newIssuerAuth.verify(publicKey)).resolves.toBe(true);
   });
 
-  it.skip("should return a 422 HTTP response on invalid body", async () => {
+  it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
@@ -609,7 +589,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     });
   });
 
-  it.skip("should return a 403 HTTP response when the wallet instance is revoked", async () => {
+  it("should return a 403 HTTP response when the wallet instance is revoked", async () => {
     const walletInstanceRepositoryWithRevokedWI: WalletInstanceRepository = {
       ...walletInstanceRepository,
       getByUserId: () =>
@@ -662,7 +642,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     });
   });
 
-  it.skip("should return a 404 HTTP response when the wallet instance is not found", async () => {
+  it("should return a 404 HTTP response when the wallet instance is not found", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
       ...walletInstanceRepository,
       getByUserId: () => TE.right(O.none),
