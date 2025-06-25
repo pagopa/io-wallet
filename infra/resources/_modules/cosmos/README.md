@@ -21,7 +21,9 @@ No modules.
 |------|------|
 | [azurerm_cosmosdb_account.wallet_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_account) | resource |
 | [azurerm_cosmosdb_sql_container.containers_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_container) | resource |
+| [azurerm_cosmosdb_sql_container.containers_pre_prod](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_container) | resource |
 | [azurerm_cosmosdb_sql_database.db_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_database) | resource |
+| [azurerm_cosmosdb_sql_database.pre_prod_db](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cosmosdb_sql_database) | resource |
 | [azurerm_monitor_metric_alert.cosmos_db_provisioned_throughput_exceeded_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_private_endpoint.sql_02](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 

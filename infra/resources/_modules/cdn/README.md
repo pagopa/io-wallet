@@ -39,7 +39,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_action_group_io_id"></a> [action\_group\_io\_id](#input\_action\_group\_io\_id) | Id of the Action Group shared among all IO teams | `string` | n/a | yes |
 | <a name="input_action_group_wallet_id"></a> [action\_group\_wallet\_id](#input\_action\_group\_wallet\_id) | Id of the Action Group owned by the Wallet team | `string` | n/a | yes |
-| <a name="input_key_vault_cerificates_secret_id"></a> [key\_vault\_cerificates\_secret\_id](#input\_key\_vault\_cerificates\_secret\_id) | TDB | `string` | n/a | yes |
+| <a name="input_key_vault_certificate_secret_id"></a> [key\_vault\_certificate\_secret\_id](#input\_key\_vault\_certificate\_secret\_id) | Secret Id of the key vault that contains the CDN certificate | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Log Analytics Workspace id | `string` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | IO prefix and short environment | `string` | n/a | yes |

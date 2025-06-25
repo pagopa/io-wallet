@@ -8,5 +8,6 @@
   "iam.func_app_support_slot": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
   "iam.func_app_user_02": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
   "iam.func_app_user_slot_02": "91c32d031eb30c578358853b76e1c658610bb537e47e0209fc4e3fd3cbe74385",
-  "storage_accounts.storage_account": "272762abcb226603e330dc8a3e48feb8356caff72c896946ab32e1efb6421bac"
+  "storage_accounts.storage_account": "272762abcb226603e330dc8a3e48feb8356caff72c896946ab32e1efb6421bac",
+  "function_apps.function_app_user_pre": "2277ce75e9b22c9e0f7eb03a0e3523ff8c48f67f69690d599b2976ee9d11a575"
 }
