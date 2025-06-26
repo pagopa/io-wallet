@@ -259,6 +259,7 @@ module "storage_accounts" {
 
   prefix          = local.prefix
   env_short       = local.env_short
+  u_env_short     = local.u_env_short
   location        = local.location
   domain          = ""
   app_name        = local.domain

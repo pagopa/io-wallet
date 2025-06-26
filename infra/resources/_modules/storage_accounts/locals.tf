@@ -7,4 +7,10 @@ locals {
     app_name        = var.app_name
     instance_number = var.instance_number
   }
+
+  u_environment = merge(
+    local.environment,
+    {
+      env_short = var.u_env_short
+  })
 }
