@@ -109,13 +109,14 @@ module "function_apps" {
 
   prefix              = local.prefix
   env_short           = local.env_short
+  u_env_short         = local.u_env_short
   location            = local.location
   project             = local.project
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   cidr_subnet_user_func_02  = "10.20.19.0/24"
   cidr_subnet_support_func  = "10.20.13.0/24"
-  cidr_subnet_user_pre_func = "10.20.12.0/26"
+  cidr_subnet_user_uat_func = "10.20.12.0/26"
 
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
@@ -127,7 +128,7 @@ module "function_apps" {
   cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
   cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
 
-  cosmos_database_name_pre = module.cosmos.cosmos_account_wallet.database_name_pre
+  cosmos_database_name_uat = module.cosmos.cosmos_account_wallet.database_name_uat
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 

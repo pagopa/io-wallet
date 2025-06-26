@@ -53,7 +53,7 @@ locals {
     },
   ]
 
-  wallet_cosmosdb_pre_prod_containers = [
+  wallet_cosmosdb_uat_containers = [
     {
       name               = "wallet-instances"
       partition_key_path = "/userId"

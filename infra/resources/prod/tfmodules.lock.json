@@ -59,13 +59,13 @@
     "name": "azure_storage_account",
     "source": "https://registry.terraform.io/modules/pagopa-dx/azure-storage-account/azurerm/0.1.1"
   },
-  "function_apps.function_app_user_pre": {
+  "function_apps.function_app_user_uat": {
     "hash": "367548c5df2a42f5273583c0de4181c865bd419a4d0aca3cffa2ba19a90c210a",
     "version": "0.3.1",
     "name": "azure_function_app",
     "source": "https://registry.terraform.io/modules/pagopa-dx/azure-function-app/azurerm/0.3.1"
   },
-  "storage_accounts.storage_account_pre": {
+  "storage_accounts.storage_account_uat": {
     "hash": "c8f3a9453b41bff1302fc625d524b8539d42ce46aac154df5270bc7d33769a6c",
     "version": "0.1.1",
     "name": "azure_storage_account",

@@ -1,5 +1,5 @@
 locals {
-  # app settings shared across both the user-pre and user-prod Function Apps
+  # app settings shared across both the user-uat and user-prod Function Apps
   function_app_user_envs_shared_app_settings = merge({
     FUNCTIONS_WORKER_RUNTIME = "node"
     NODE_ENV                 = "production"
@@ -89,8 +89,8 @@ locals {
     )
   }
 
-  # user pre app settings
-  function_app_user_pre = {
+  # user uat app settings
+  function_app_user_uat = {
     app_settings = merge(
       local.function_app_user_envs_shared_app_settings,
       {
@@ -105,7 +105,7 @@ locals {
         PidIssuerHealthCheckEnabled       = false
         WalletAttestationWalletLink       = "https://foo11.blob.core.windows.net"
         CosmosDbEndpoint__accountEndpoint = var.cosmos_db_endpoint
-        CosmosDbDatabaseName              = var.cosmos_database_name_pre
+        CosmosDbDatabaseName              = var.cosmos_database_name_uat
         CosmosDbRequestTimeout            = "5000"
         PidIssuerApiRequestTimeout        = "10000"
         HttpRequestTimeout                = "5000"

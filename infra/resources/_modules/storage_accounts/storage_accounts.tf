@@ -28,7 +28,7 @@ resource "azurerm_key_vault_secret" "st_connection_string" {
   content_type = "connection string"
 }
 
-module "storage_account_pre" {
+module "storage_account_uat" {
   source  = "pagopa-dx/azure-storage-account/azurerm"
   version = "~> 0.0"
 
