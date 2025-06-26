@@ -221,7 +221,7 @@ export const createWalletAttestationAsSdJwt =
               environment.signer.createJwtAndSign(
                 {
                   // trust_chain: sdJwtModel.trustChain,
-                  typ: "oauth-client-attestation+jwt",
+                  typ: "dc+sd-jwt",
                 },
                 sdJwtModel.kid,
                 "ES256",
