@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pagopa/dx
-    rev: pre_commit_scripts@0.0.1
+    rev: pre_commit_scripts@0.1.0
     hooks:
       - id: lock_modules
         exclude: ^.*/(_modules|modules|\.terraform)(/.*)?$
