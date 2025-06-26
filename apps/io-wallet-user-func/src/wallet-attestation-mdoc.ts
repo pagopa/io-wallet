@@ -1,3 +1,5 @@
+import { Document, IssuerSignedDocument } from "@auth0/mdl";
+import { cborEncode as encode } from "@auth0/mdl/lib/cbor";
 import * as E from "fp-ts/Either";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -11,9 +13,6 @@ import {
   getWalletAttestationData,
 } from "./wallet-attestation";
 import { WalletAttestationRequestV2 } from "./wallet-attestation-request";
-
-import { Document, IssuerSignedDocument } from "../../../../mymdl"; // TODO
-import { cborEncode as encode } from "../../../../mymdl/lib/cbor";
 
 const docType = "org.iso.18013.5.1.it.WalletAttestation";
 

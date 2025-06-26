@@ -15,9 +15,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@auth0/mdl@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "@auth0/mdl@npm:2.2.0"
+"@auth0/mdl@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@auth0/mdl@npm:2.3.0"
   dependencies:
     "@noble/curves": "npm:^1.2.0"
     "@panva/hkdf": "npm:^1.1.1"
@@ -29,7 +29,7 @@ __metadata:
     debug: "npm:^4.3.4"
     jose: "npm:^4.15.5"
     uncrypto: "npm:^0.1.3"
-  checksum: 10c0/04e02993da7c1ca5d61425db33579e6b745ae41e222b2e484dfd3cab6fb31ceb2418515bc7854f1e8deb7b3aa1386236f9cfb8cfcf2cb2924888c7e41edea657
+  checksum: 10c0/37350c32445ed1b7532b439bd2f1e7d350a4bf20fe1d465efcc269ce58a7e49b4b4270abae2d36a0936561385143f04b74427d81ab02777d5d959d55d60c71ca
   languageName: node
   linkType: hard
 
@@ -2802,15 +2802,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cose-js@npm:^0.8.3":
-  version: 0.8.3
-  resolution: "@types/cose-js@npm:0.8.3"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10c0/f36805920c07788d78cf8ec46af94081e0bb91ea97d4af749d059f9dfc44d6380299540468b651935def37748219456d84b5249b76567d8b85ec196d0fcf4a44
-  languageName: node
-  linkType: hard
-
 "@types/estree@npm:1.0.7, @types/estree@npm:^1.0.0, @types/estree@npm:^1.0.6":
   version: 1.0.7
   resolution: "@types/estree@npm:1.0.7"
@@ -3312,13 +3303,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"aes-cbc-mac@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "aes-cbc-mac@npm:1.0.1"
-  checksum: 10c0/b37b35d2beeb499c9a0bf0aa254ec81853b8e79677ba188213f6b6c7358db0a10cab03e05dc90e83094da24afdee98a1a6e273891752e2180a113505b721470d
-  languageName: node
-  linkType: hard
-
 "agent-base@npm:6":
   version: 6.0.2
   resolution: "agent-base@npm:6.0.2"
@@ -3402,7 +3386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"any-promise@npm:^1.0.0, any-promise@npm:^1.3.0":
+"any-promise@npm:^1.0.0":
   version: 1.3.0
   resolution: "any-promise@npm:1.3.0"
   checksum: 10c0/60f0298ed34c74fef50daab88e8dab786036ed5a7fad02e012ab57e376e0a0b4b29e83b95ea9b5e7d89df762f5f25119b83e00706ecaccb22cfbacee98d74889
@@ -3499,7 +3483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"asn1@npm:^0.2.4, asn1@npm:~0.2.3":
+"asn1@npm:~0.2.3":
   version: 0.2.6
   resolution: "asn1@npm:0.2.6"
   dependencies:
@@ -3671,13 +3655,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bn.js@npm:^4.11.9":
-  version: 4.12.2
-  resolution: "bn.js@npm:4.12.2"
-  checksum: 10c0/09a249faa416a9a1ce68b5f5ec8bbca87fe54e5dd4ef8b1cc8a4969147b80035592bddcb1e9cc814c3ba79e573503d5c5178664b722b509fb36d93620dba9b57
-  languageName: node
-  linkType: hard
-
 "bottleneck@npm:^2.19.5":
   version: 2.19.5
   resolution: "bottleneck@npm:2.19.5"
@@ -3717,13 +3694,6 @@ __metadata:
   dependencies:
     fill-range: "npm:^7.1.1"
   checksum: 10c0/7c6dfd30c338d2997ba77500539227b9d1f85e388a5f43220865201e407e076783d0881f2d297b9f80951b4c957fcf0b51c1d2d24227631643c3f7c284b0aa04
-  languageName: node
-  linkType: hard
-
-"brorand@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "brorand@npm:1.1.0"
-  checksum: 10c0/6f366d7c4990f82c366e3878492ba9a372a73163c09871e80d82fb4ae0d23f9f8924cb8a662330308206e6b3b76ba1d528b4601c9ef73c2166b440b2ea3b7571
   languageName: node
   linkType: hard
 
@@ -3913,15 +3883,6 @@ __metadata:
   dependencies:
     "@cto.af/wtf8": "npm:0.0.2"
   checksum: 10c0/f53654663e23ac0c35d2406706869119a48b384ce3ef458da3b65d270495da8191f6150c1b99cb538947e38ae334684a9f8dd8b2ec1f1aa177ad7c498427be26
-  languageName: node
-  linkType: hard
-
-"cbor@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "cbor@npm:8.1.0"
-  dependencies:
-    nofilter: "npm:^3.1.0"
-  checksum: 10c0/a836e2e7ea0efb1b9c4e5a4be906c57113d730cc42293a34072e0164ed110bb8ac035dc7dca2e3ebb641bd4b37e00fdbbf09c951aa864b3d4888a6ed8c6243f7
   languageName: node
   linkType: hard
 
@@ -4249,20 +4210,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cose-js@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "cose-js@npm:0.9.0"
-  dependencies:
-    aes-cbc-mac: "npm:^1.0.1"
-    any-promise: "npm:^1.3.0"
-    cbor: "npm:^8.1.0"
-    elliptic: "npm:^6.4.0"
-    node-hkdf-sync: "npm:^1.0.0"
-    node-rsa: "npm:^1.1.1"
-  checksum: 10c0/64a3eccb759693f7f90363c3b31341e617532726e20fba7a41ffa2eb1cc5b4727c0ad33b12f5d48e4c3d64f201c3be07498946c8a9566f36e325ecb60981b898
-  languageName: node
-  linkType: hard
-
 "cose-kit@npm:^1.7.1":
   version: 1.7.1
   resolution: "cose-kit@npm:1.7.1"
@@ -4495,21 +4442,6 @@ __metadata:
   dependencies:
     safe-buffer: "npm:^5.0.1"
   checksum: 10c0/ebfbf19d4b8be938f4dd4a83b8788385da353d63307ede301a9252f9f7f88672e76f2191618fd8edfc2f24679236064176fab0b78131b161ee73daa37125408c
-  languageName: node
-  linkType: hard
-
-"elliptic@npm:^6.4.0":
-  version: 6.6.1
-  resolution: "elliptic@npm:6.6.1"
-  dependencies:
-    bn.js: "npm:^4.11.9"
-    brorand: "npm:^1.1.0"
-    hash.js: "npm:^1.0.0"
-    hmac-drbg: "npm:^1.0.1"
-    inherits: "npm:^2.0.4"
-    minimalistic-assert: "npm:^1.0.1"
-    minimalistic-crypto-utils: "npm:^1.0.1"
-  checksum: 10c0/8b24ef782eec8b472053793ea1e91ae6bee41afffdfcb78a81c0a53b191e715cbe1292aa07165958a9bbe675bd0955142560b1a007ffce7d6c765bcaf951a867
   languageName: node
   linkType: hard
 
@@ -5209,13 +5141,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eyes@npm:>=0.1.6":
-  version: 0.1.8
-  resolution: "eyes@npm:0.1.8"
-  checksum: 10c0/4c79a9cbf45746d8c9f48cc957e35ad8ea336add1c7b8d5a0e002efc791a7a62b27b2188184ef1a1eea7bc3cd06b161791421e0e6c5fe78309705a162c53eea8
-  languageName: node
-  linkType: hard
-
 "fast-deep-equal@npm:^3.1.1, fast-deep-equal@npm:^3.1.3":
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
@@ -5794,16 +5719,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hash.js@npm:^1.0.0, hash.js@npm:^1.0.3":
-  version: 1.1.7
-  resolution: "hash.js@npm:1.1.7"
-  dependencies:
-    inherits: "npm:^2.0.3"
-    minimalistic-assert: "npm:^1.0.1"
-  checksum: 10c0/41ada59494eac5332cfc1ce6b7ebdd7b88a3864a6d6b08a3ea8ef261332ed60f37f10877e0c825aaa4bddebf164fbffa618286aeeec5296675e2671cbfa746c4
-  languageName: node
-  linkType: hard
-
 "hasown@npm:^2.0.2":
   version: 2.0.2
   resolution: "hasown@npm:2.0.2"
@@ -5862,17 +5777,6 @@ __metadata:
   version: 4.6.0
   resolution: "helmet@npm:4.6.0"
   checksum: 10c0/fe0d986fc465be0f652e67dd1feab576d9b08b797846fdac5719d5ca857977d6b1712327223a7c25695104dfde118fdf303f4a18efca7cddf0159821bf36b7f8
-  languageName: node
-  linkType: hard
-
-"hmac-drbg@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "hmac-drbg@npm:1.0.1"
-  dependencies:
-    hash.js: "npm:^1.0.3"
-    minimalistic-assert: "npm:^1.0.0"
-    minimalistic-crypto-utils: "npm:^1.0.1"
-  checksum: 10c0/f3d9ba31b40257a573f162176ac5930109816036c59a09f901eb2ffd7e5e705c6832bedfff507957125f2086a0ab8f853c0df225642a88bf1fcaea945f20600d
   languageName: node
   linkType: hard
 
@@ -6137,7 +6041,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "io-wallet-user-func@workspace:apps/io-wallet-user-func"
   dependencies:
-    "@auth0/mdl": "npm:^2.2.0"
+    "@auth0/mdl": "npm:^2.3.0"
     "@azure/cosmos": "npm:^4.2.0"
     "@azure/functions": "npm:^4.6.0"
     "@azure/functions-opentelemetry-instrumentation": "npm:^0.1.0"
@@ -6155,7 +6059,6 @@ __metadata:
     "@pagopa/io-functions-commons": "npm:^29.3.0"
     "@pagopa/ts-commons": "npm:^13.1.2"
     "@peculiar/asn1-android": "npm:^2.3.15"
-    "@types/cose-js": "npm:^0.8.3"
     "@types/html-to-text": "npm:9.0.4"
     "@types/jsonwebtoken": "npm:^9.0.7"
     "@vitest/coverage-v8": "npm:^2.1.8"
@@ -6164,7 +6067,6 @@ __metadata:
     azure-functions-core-tools: "npm:^4.0.6821"
     cbor-x: "npm:^1.6.0"
     cbor2: "npm:^2.0.1"
-    cose-js: "npm:^0.9.0"
     dayjs: "npm:^1.11.13"
     eslint: "npm:9.14.0"
     fp-ts: "npm:^2.16.9"
@@ -7053,20 +6955,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimalistic-assert@npm:^1.0.0, minimalistic-assert@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "minimalistic-assert@npm:1.0.1"
-  checksum: 10c0/96730e5601cd31457f81a296f521eb56036e6f69133c0b18c13fe941109d53ad23a4204d946a0d638d7f3099482a0cec8c9bb6d642604612ce43ee536be3dddd
-  languageName: node
-  linkType: hard
-
-"minimalistic-crypto-utils@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "minimalistic-crypto-utils@npm:1.0.1"
-  checksum: 10c0/790ecec8c5c73973a4fbf2c663d911033e8494d5fb0960a4500634766ab05d6107d20af896ca2132e7031741f19888154d44b2408ada0852446705441383e9f8
-  languageName: node
-  linkType: hard
-
 "minimatch@npm:^3.1.2":
   version: 3.1.2
   resolution: "minimatch@npm:3.1.2"
@@ -7311,24 +7199,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-hkdf-sync@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "node-hkdf-sync@npm:1.0.0"
-  dependencies:
-    vows: "npm:0.5.13"
-  checksum: 10c0/ee8e3d1eabdfa6b9572c2c030e1b6e45b1d4e1acec10fc548a1b79807561560024d545860236109f3b9c464de28a1b6d2588b96436ed073b8319ac6a89189632
-  languageName: node
-  linkType: hard
-
-"node-rsa@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "node-rsa@npm:1.1.1"
-  dependencies:
-    asn1: "npm:^0.2.4"
-  checksum: 10c0/af3b6534844dfeaa8290a7bc20d5e4d1a134f05d456725e56d75b7661d4d63cd63914ce335ee8889adc2458112b996d4ba8a83ba105bde744a26e61d9160f639
-  languageName: node
-  linkType: hard
-
 "nodemailer-sendgrid@npm:^1.0.3":
   version: 1.0.3
   resolution: "nodemailer-sendgrid@npm:1.0.3"
@@ -7342,13 +7212,6 @@ __metadata:
   version: 6.10.1
   resolution: "nodemailer@npm:6.10.1"
   checksum: 10c0/e81fde258ea4f4e5646e9e3eebe89294d007939999d2d1a8c96c5488fa00bf659e46cf76fccb2697e9aa6ef9807a1ed47ff2aef6ad30b795e3849b6997066d16
-  languageName: node
-  linkType: hard
-
-"nofilter@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "nofilter@npm:3.1.0"
-  checksum: 10c0/92459f3864a067b347032263f0b536223cbfc98153913b5dce350cb39c8470bc1813366e41993f22c33cc6400c0f392aa324a4b51e24c22040635c1cdb046499
   languageName: node
   linkType: hard
 
@@ -9892,17 +9755,6 @@ __metadata:
   bin:
     vitest: vitest.mjs
   checksum: 10c0/14b9c99812282d88b6e1dafde8cca22b07dcefa0a00d240145cf5cb95b082c287807bd884f417a046992bc74246aaf64662fd07179e60547c9277fbc8986439b
-  languageName: node
-  linkType: hard
-
-"vows@npm:0.5.13":
-  version: 0.5.13
-  resolution: "vows@npm:0.5.13"
-  dependencies:
-    eyes: "npm:>=0.1.6"
-  bin:
-    vows: ./bin/vows
-  checksum: 10c0/d51c183394879300f5b5580b6388b6095f7fd3d4a6c1d775d125bbd7488a166583e5fe7b45a3ce290addab534661ebbcc8d28869b952de79aec9fefc33097591
   languageName: node
   linkType: hard
 
