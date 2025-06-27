@@ -117,7 +117,7 @@ const ValueType = new t.Type<
   t.identity,
 );
 
-export const MapNumberToBufferNumberOrString = new t.Type<
+const MapNumberToBufferNumberOrString = new t.Type<
   Map<number, Buffer | number | string>,
   Map<number, Buffer | number | string>,
   unknown
@@ -142,11 +142,11 @@ const Tag24WithUint8Array = t.type({
 });
 
 const WalletAttestationMdocSchema = t.type({
-  docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
+  docType: t.literal("org.iso.18013.5.1.IT.WalletAttestation"),
   issuerSigned: t.type({
     issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
     nameSpaces: t.type({
-      "org.iso.18013.5.1.it": t.tuple([
+      "org.iso.18013.5.1.IT": t.tuple([
         Tag24WithUint8Array,
         Tag24WithUint8Array,
         Tag24WithUint8Array,
@@ -170,16 +170,16 @@ const IssuerAuthPayloadSchema = t.type({
     deviceKey: MapNumberToBufferNumberOrString,
   }),
   digestAlgorithm: t.literal("SHA-256"),
-  docType: t.literal("org.iso.18013.5.1.it.WalletAttestation"),
+  docType: t.literal("org.iso.18013.5.1.IT.WalletAttestation"),
   validityInfo: t.type({
-    signed: UtcOnlyIsoDateFromString, // t.string
+    signed: UtcOnlyIsoDateFromString,
     validFrom: UtcOnlyIsoDateFromString,
     validUntil: UtcOnlyIsoDateFromString,
   }),
   valueDigests: t.type({
-    "org.iso.18013.5.1.it": MapNumberBuffer,
+    "org.iso.18013.5.1.IT": MapNumberBuffer,
   }),
-  version: t.literal("1.0"), //t.literal("org.iso.18013.5.1.it"),
+  version: t.literal("1.0"),
 });
 
 const federationEntity = {
@@ -459,7 +459,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     const result = await handler();
 
-    expect.assertions(5);
+    expect.assertions(6);
 
     assert.ok(E.isRight(result));
 
@@ -489,7 +489,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     const {
       issuerAuth,
-      nameSpaces: { "org.iso.18013.5.1.it": encodedDomesticNameSpace },
+      nameSpaces: { "org.iso.18013.5.1.IT": encodedDomesticNameSpace },
     } = decodedWalletAttestationMdoc.right.issuerSigned;
 
     // nameSpaces
@@ -524,9 +524,9 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     // test issuerAuth has correct unprotected header
     const kid = Buffer.from(privateEcKey.kid);
-    // expect(unprotectedHeader).toEqual(new Map([[4, Buffer.from(kid)]]));
-    // add test key 33
     expect(unprotectedHeader.has(4)).toBe(true);
+    expect(unprotectedHeader.get(4)).toEqual(Buffer.from(kid));
+    // TODO: add test for key 33
 
     const decodedIssuerAuthBytes = cbor.decode(payload);
 

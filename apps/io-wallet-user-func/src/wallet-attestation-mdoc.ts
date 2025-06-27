@@ -14,9 +14,9 @@ import {
 } from "./wallet-attestation";
 import { WalletAttestationRequestV2 } from "./wallet-attestation-request";
 
-const docType = "org.iso.18013.5.1.it.WalletAttestation";
+const docType = "org.iso.18013.5.1.IT.WalletAttestation";
 
-const domesticNameSpace = "org.iso.18013.5.1.it";
+const domesticNameSpace = "org.iso.18013.5.1.IT";
 
 const cborEncode = (
   document: IssuerSignedDocument,
@@ -61,7 +61,7 @@ const createDocument: ({
         })
         .sign({
           alg: "ES256",
-          issuerCertificate: [], // TODO
+          issuerCertificate: ``, // TODO
           issuerPrivateKey,
           kid: issuerPrivateKey.kid,
         }),
@@ -99,5 +99,5 @@ export const createWalletAttestationAsMdoc: (
 ) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> = flow(
   getWalletAttestationData,
   RTE.chainW(createCborEncodedMDoc),
-  RTE.map((uint8) => Buffer.from(uint8).toString("base64")),
+  RTE.map((buf) => Buffer.from(buf).toString("base64")),
 );
