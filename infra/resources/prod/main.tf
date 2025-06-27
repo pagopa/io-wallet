@@ -195,6 +195,13 @@ module "iam" {
     database_name       = module.cosmos.cosmos_account_wallet.database_name
   }
 
+  cosmos_db_uat = {
+    id                  = module.cosmos.cosmos_account_wallet.id
+    name                = module.cosmos.cosmos_account_wallet.name
+    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
+    database_name       = module.cosmos.cosmos_account_wallet.database_name_uat
+  }
+
   function_app = {
     user_func_02 = {
       principal_id         = module.function_apps.function_app_user_02.principal_id
@@ -203,6 +210,10 @@ module "iam" {
     support_func = {
       principal_id         = module.function_apps.function_app_support.principal_id
       staging_principal_id = module.function_apps.function_app_support.staging_principal_id
+    }
+    user_func_uat = {
+      principal_id         = module.function_apps.function_app_user_02.principal_id
+      staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
     }
   }
 

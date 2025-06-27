@@ -17,6 +17,10 @@ variable "function_app" {
       principal_id         = string
       staging_principal_id = string
     })
+    user_func_uat = object({
+      principal_id         = string
+      staging_principal_id = string
+    })
   })
 
   description = "Function App system assigned identities"
@@ -72,4 +76,13 @@ variable "cicd_principal_ids" {
 variable "wallet_dns_zone_id" {
   type        = string
   description = "wallet.io.pagopa.it DNS zone id"
+}
+
+variable "cosmos_db_uat" {
+  type = object({
+    id                  = string
+    name                = string
+    resource_group_name = string
+    database_name       = string
+  })
 }
