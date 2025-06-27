@@ -124,6 +124,8 @@ module "func_app_support_slot" {
   ]
 }
 
+### Function User Uat
+
 module "func_app_user_uat" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 0.0"
@@ -151,7 +153,7 @@ module "func_app_user_uat" {
 }
 
 module "func_app_user_uat_slot" {
-  count = var.function_app.user_func_02.staging_principal_id != null ? 1 : 0
+  count = var.function_app.user_func_uat.staging_principal_id != null ? 1 : 0
 
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 0.0"
