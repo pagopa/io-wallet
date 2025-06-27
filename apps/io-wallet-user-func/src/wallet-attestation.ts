@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import * as E from "fp-ts/Either";
 import * as IOE from "fp-ts/IOEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -18,6 +17,8 @@ import {
   FederationEntity,
   FederationEntityMetadata,
 } from "./entity-configuration";
+import { createHashBase64url } from "./infra/crypto/hashing";
+import { generateRandomHex } from "./infra/crypto/random";
 import { Signer } from "./signer";
 import { removeTrailingSlash } from "./url";
 import {
@@ -25,6 +26,11 @@ import {
   WalletAttestationRequestV2,
 } from "./wallet-attestation-request";
 import { LoA, getLoAUri } from "./wallet-provider";
+
+const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
+  pipe(disclosure, JSON.stringify, (str) =>
+    Buffer.from(str).toString("base64url"),
+  );
 
 export const WalletAttestationPayload = t.type({
   aal: t.string,
@@ -98,13 +104,13 @@ interface WalletAttestationConfig {
   walletName: string;
 }
 
-interface WalletAttestationEnvironment {
+export interface WalletAttestationEnvironment {
   federationEntity: FederationEntity;
   signer: Signer;
   walletAttestationConfig: WalletAttestationConfig;
 }
 
-const getWalletAttestationData =
+export const getWalletAttestationData =
   (
     walletAttestationRequest: WalletAttestationRequestV2,
   ): RTE.ReaderTaskEither<
@@ -160,16 +166,6 @@ export const createWalletAttestationAsJwt =
       ),
     );
 
-const generateSalt: IOE.IOEither<Error, string> = IOE.tryCatch(
-  () => crypto.randomBytes(16).toString("hex"),
-  (error) => new Error(`Failed to generate salt: ${error}`),
-);
-
-const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
-  pipe(disclosure, JSON.stringify, (str) =>
-    Buffer.from(str).toString("base64url"),
-  );
-
 const getDisclosures = ({
   walletLink,
   walletName,
@@ -178,15 +174,12 @@ const getDisclosures = ({
   walletName: string;
 }): IOE.IOEither<Error, [string, string]> =>
   pipe(
-    sequenceT(IOE.ApplicativePar)(generateSalt, generateSalt),
+    sequenceT(IOE.ApplicativePar)(generateRandomHex, generateRandomHex),
     IOE.map(([nameSalt, linkSalt]) => [
       disclosureToBase64Url([nameSalt, "wallet_name", walletName]),
       disclosureToBase64Url([linkSalt, "wallet_link", walletLink]),
     ]),
   );
-
-const sha256Base64url = (input: string): string =>
-  crypto.createHash("sha256").update(input).digest("base64url");
 
 export const createWalletAttestationAsSdJwt =
   (
@@ -203,7 +196,7 @@ export const createWalletAttestationAsSdJwt =
         },
         iss: removeTrailingSlash(iss),
         sub: removeTrailingSlash(sub),
-        vct: "wallet.attestation.example/v1.0",
+        vct: "wallet.io.pagopa.it/wallet-attestation/v1.0.0",
       })),
       TE.chain((sdJwtModel) =>
         pipe(
@@ -217,7 +210,7 @@ export const createWalletAttestationAsSdJwt =
             pipe(
               sdJwtModel,
               ({ aal, cnf, iss, sub, vct }) => ({
-                _sd: disclosures.map(sha256Base64url),
+                _sd: disclosures.map(createHashBase64url),
                 _sd_alg: "sha-256",
                 aal,
                 cnf,
@@ -244,7 +237,3 @@ export const createWalletAttestationAsSdJwt =
         ),
       ),
     );
-
-// export declare const createWalletAttestationAsMdoc: (
-//   walletAttestationRequest: WalletAttestationRequestV2,
-// ) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string>;

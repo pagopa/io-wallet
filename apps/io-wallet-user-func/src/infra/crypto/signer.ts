@@ -5,7 +5,7 @@ import * as E from "fp-ts/lib/Either";
 import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { ECKey, Jwk, RSAKey } from "io-wallet-common/jwk";
+import { ECKey, Jwk, JwkPrivateKey, RSAKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
 import { CryptoConfiguration } from "../../app/config";
@@ -72,6 +72,18 @@ export class CryptoSigner implements Signer {
           E.fromOption(
             () => new Error(`First public key with kty ${kty} not found`),
           ),
+        ),
+      ),
+    );
+
+  getPrivateKeyByKid = (kid: string): O.Option<JwkPrivateKey> =>
+    pipe(
+      this.#configuration.jwks,
+      A.findFirst((key) => key.kid === kid),
+      O.flatMap(
+        flow(
+          parse(JwkPrivateKey),
+          E.match(() => O.none, O.some),
         ),
       ),
     );
