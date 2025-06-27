@@ -212,8 +212,8 @@ module "iam" {
       staging_principal_id = module.function_apps.function_app_support.staging_principal_id
     }
     user_func_uat = {
-      principal_id         = module.function_apps.function_app_user_02.principal_id
-      staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
+      principal_id         = module.function_apps.function_app_user_uat.principal_id
+      staging_principal_id = module.function_apps.function_app_user_uat.staging_principal_id
     }
   }
 
