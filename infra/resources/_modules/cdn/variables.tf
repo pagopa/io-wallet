@@ -35,5 +35,5 @@ variable "action_group_io_id" {
 
 variable "key_vault_certificate_secret_id" {
   type        = string
-  description = "Secret d of the key vault that contains the CDN certificate"
+  description = "Secret Id of the key vault that contains the CDN certificate"
 }

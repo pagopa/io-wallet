@@ -8,6 +8,11 @@ variable "env_short" {
   description = "Short environment"
 }
 
+variable "u_env_short" {
+  type        = string
+  description = "IO uat env_short"
+}
+
 variable "project" {
   type        = string
   description = "IO prefix and short environment"
@@ -144,4 +149,14 @@ variable "wallet_instance_revocation_email_queue_name" {
 variable "validate_wallet_instance_certificates_queue_name" {
   type        = string
   description = "Wallet Instance Certificates Validation Queue Name"
+}
+
+variable "cidr_subnet_user_uat_func" {
+  type        = string
+  description = "CIDR block for user uat function app subnet"
+}
+
+variable "cosmos_database_name_uat" {
+  type        = string
+  description = "uat Wallet Cosmos DB database name"
 }

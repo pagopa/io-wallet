@@ -16,6 +16,7 @@ No requirements.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_storage_account"></a> [storage\_account](#module\_storage\_account) | pagopa-dx/azure-storage-account/azurerm | ~> 0.0 |
+| <a name="module_storage_account_uat"></a> [storage\_account\_uat](#module\_storage\_account\_uat) | pagopa-dx/azure-storage-account/azurerm | ~> 0.0 |
 
 ## Resources
 
@@ -44,6 +45,7 @@ No requirements.
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
 | <a name="input_subnet_pep_id"></a> [subnet\_pep\_id](#input\_subnet\_pep\_id) | Id of the private endpoints' subnet | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
+| <a name="input_u_env_short"></a> [u\_env\_short](#input\_u\_env\_short) | IO uat env\_short | `string` | n/a | yes |
 
 ## Outputs
 
