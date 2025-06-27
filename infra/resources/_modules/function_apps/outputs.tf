@@ -18,3 +18,10 @@ output "function_app_support" {
     default_hostname     = module.function_app_support.function_app.function_app.default_hostname
   }
 }
+
+output "function_app_user_uat" {
+  value = {
+    principal_id         = module.function_app_user_uat.function_app.function_app.principal_id
+    staging_principal_id = module.function_app_user_uat.function_app.function_app.slot.principal_id
+  }
+}
