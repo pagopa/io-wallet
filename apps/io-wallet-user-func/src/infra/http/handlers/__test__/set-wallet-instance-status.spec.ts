@@ -1,4 +1,5 @@
 import { CredentialRepository } from "@/credential";
+import { VoucherRepository } from "@/voucher";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
@@ -26,6 +27,10 @@ describe("SetWalletInstanceStatusHandler", () => {
     getUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
+  };
+
+  const pdndServicesClient: VoucherRepository = {
+    requestVoucher: () => TE.right(""),
   };
 
   const logger = {
@@ -61,6 +66,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -91,6 +97,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -117,6 +124,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository,
     });
 
@@ -150,6 +158,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       logger,
       queueClient,
       telemetryClient,
+      voucherRepository: pdndServicesClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 

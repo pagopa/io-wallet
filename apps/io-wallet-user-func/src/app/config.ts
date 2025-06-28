@@ -159,6 +159,41 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
+const PdndApiClientConfig = t.type({
+  audience: t.string,
+  clientAssertionPrivateKey: t.string,
+  clientId: t.string,
+  kid: t.string,
+  purposeId: t.string,
+  requestTimeout: NumberFromString,
+  url: t.string,
+});
+
+export type PdndApiClientConfig = t.TypeOf<typeof PdndApiClientConfig>;
+
+const getPdndConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  PdndApiClientConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    audience: readFromEnvironment("PdndApiAudience"),
+    clientAssertionPrivateKey: pipe(
+      readFromEnvironment("PdndClientAssertionPrivateKey"),
+      RE.map(decodeBase64String),
+    ),
+    clientId: readFromEnvironment("PdndApiClientId"),
+    kid: readFromEnvironment("PdndApiKid"),
+    purposeId: readFromEnvironment("PdndPurposeId"),
+    requestTimeout: pipe(
+      readFromEnvironment("PdndApiRequestTimeout"),
+      RE.chainW(stringToNumberDecoderRE),
+      RE.orElse(() => RE.right(10000)),
+    ),
+    url: readFromEnvironment("PdndApiURL"),
+  }),
+);
+
 const FederationEntityConfig = t.type({
   basePath: UrlFromString,
   contacts: t.array(EmailString),
@@ -196,6 +231,7 @@ export const Config = t.type({
   crypto: CryptoConfiguration,
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
+  pdndInterop: PdndApiClientConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
   walletProvider: WalletProviderConfig,
@@ -399,9 +435,8 @@ const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
 > = pipe(
   sequenceS(RE.Apply)({
     pidIssuerApiBaseURL: readFromEnvironment("PidIssuerApiBaseURL"),
-    pidIssuerApiClientCertificate: pipe(
-      readFromEnvironment("PidIssuerApiClientCertificate"),
-      RE.map(decodeBase64String),
+    pidIssuerApiClientCertificate: readFromEnvironment(
+      "PidIssuerApiClientCertificate",
     ),
     pidIssuerApiClientPrivateKey: pipe(
       readFromEnvironment("PidIssuerApiClientPrivateKey"),
@@ -486,6 +521,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       RE.map(({ timeout }) => timeout),
     ),
     mail: getMailConfigFromEnvironment,
+    pdndInterop: getPdndConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,

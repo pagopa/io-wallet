@@ -1,4 +1,8 @@
-import { Config, PidIssuerApiClientConfig } from "@/app/config";
+import {
+  Config,
+  PidIssuerApiClientConfig,
+  decodeBase64String,
+} from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { removeTrailingSlash } from "@/url";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -12,6 +16,7 @@ export class PidIssuerClient
   implements CredentialRepository, PidIssuerHealthCheck
 {
   #baseURL: string;
+  #clientCertificate: string;
   #healthCheckEnabled: boolean;
   #init: RequestInit;
   #requestTimeout: number;
@@ -29,6 +34,10 @@ export class PidIssuerClient
               method: "POST",
               signal: AbortSignal.timeout(this.#requestTimeout),
               ...this.#init,
+              headers: {
+                ...this.#init.headers,
+                Authorization: `Bearer ${decodeBase64String(this.#clientCertificate)}`,
+              },
             });
             return result.status === 404;
           },
@@ -39,7 +48,7 @@ export class PidIssuerClient
         )
       : TE.of(true);
 
-  revokeAllCredentials = (fiscalCode: FiscalCode) =>
+  revokeAllCredentials = (fiscalCode: FiscalCode, accessToken: string) =>
     TE.tryCatch(
       async () => {
         const result = await fetch(new URL("/revokeAll", this.#baseURL), {
@@ -51,6 +60,11 @@ export class PidIssuerClient
           method: "POST",
           signal: AbortSignal.timeout(this.#requestTimeout),
           ...this.#init,
+          headers: {
+            ...this.#init.headers,
+            Authorization: `Bearer ${accessToken}`,
+            "X-Client-Cert": this.#clientCertificate,
+          },
         });
         if (result.status === 404) {
           // the endpoint returns 404 if the credentials have already been revoked or do not exist
@@ -84,6 +98,7 @@ export class PidIssuerClient
     basePath: Config["entityConfiguration"]["federationEntity"]["basePath"]["href"],
   ) {
     this.#baseURL = baseURL;
+    this.#clientCertificate = clientCertificate;
     this.#walletProviderEntity = removeTrailingSlash(basePath);
     this.#healthCheckEnabled = healthCheckEnabled;
     this.#init = {
