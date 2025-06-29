@@ -50,3 +50,10 @@ module "storage_account_uat" {
 
   tags = var.tags
 }
+
+resource "azurerm_key_vault_secret" "st_uat_connection_string" {
+  name         = "StorageUatConnectionString"
+  value        = module.storage_account_uat.primary_connection_string
+  key_vault_id = var.key_vault_wallet_id
+  content_type = "connection string"
+}
