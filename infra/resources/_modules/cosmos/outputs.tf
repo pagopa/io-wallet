@@ -5,5 +5,6 @@ output "cosmos_account_wallet" {
     resource_group_name = azurerm_cosmosdb_account.wallet_02.resource_group_name
     endpoint            = azurerm_cosmosdb_account.wallet_02.endpoint
     database_name       = azurerm_cosmosdb_sql_database.db_02.name
+    database_name_uat   = azurerm_cosmosdb_sql_database.db_uat.name
   }
 }

@@ -109,12 +109,15 @@ module "function_apps" {
 
   prefix              = local.prefix
   env_short           = local.env_short
+  u_env_short         = local.u_env_short
   location            = local.location
   project             = local.project
   resource_group_name = data.azurerm_resource_group.wallet.name
 
-  cidr_subnet_user_func_02             = "10.20.19.0/24"
-  cidr_subnet_support_func             = "10.20.13.0/24"
+  cidr_subnet_user_func_02  = "10.20.19.0/24"
+  cidr_subnet_support_func  = "10.20.13.0/24"
+  cidr_subnet_user_uat_func = "10.20.12.0/26"
+
   private_endpoint_subnet_id           = data.azurerm_subnet.pep.id
   private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
   virtual_network = {
@@ -124,6 +127,8 @@ module "function_apps" {
 
   cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
   cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
+
+  cosmos_database_name_uat = module.cosmos.cosmos_account_wallet.database_name_uat
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
@@ -190,6 +195,13 @@ module "iam" {
     database_name       = module.cosmos.cosmos_account_wallet.database_name
   }
 
+  cosmos_db_uat = {
+    id                  = module.cosmos.cosmos_account_wallet.id
+    name                = module.cosmos.cosmos_account_wallet.name
+    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
+    database_name       = module.cosmos.cosmos_account_wallet.database_name_uat
+  }
+
   function_app = {
     user_func_02 = {
       principal_id         = module.function_apps.function_app_user_02.principal_id
@@ -198,6 +210,10 @@ module "iam" {
     support_func = {
       principal_id         = module.function_apps.function_app_support.principal_id
       staging_principal_id = module.function_apps.function_app_support.staging_principal_id
+    }
+    user_func_uat = {
+      principal_id         = module.function_apps.function_app_user_uat.principal_id
+      staging_principal_id = module.function_apps.function_app_user_uat.staging_principal_id
     }
   }
 
@@ -255,6 +271,7 @@ module "storage_accounts" {
 
   prefix          = local.prefix
   env_short       = local.env_short
+  u_env_short     = local.u_env_short
   location        = local.location
   domain          = ""
   app_name        = local.domain

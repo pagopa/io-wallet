@@ -1,6 +1,7 @@
 locals {
   prefix         = "io"
   env_short      = "p"
+  u_env_short    = "u"
   location_short = "itn"
   domain         = "wallet"
   # the project on which the resources will be created

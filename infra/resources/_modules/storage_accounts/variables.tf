@@ -9,6 +9,11 @@ variable "env_short" {
   description = "IO env_short"
 }
 
+variable "u_env_short" {
+  type        = string
+  description = "IO uat env_short"
+}
+
 variable "location" {
   type        = string
   description = "Azure region"
