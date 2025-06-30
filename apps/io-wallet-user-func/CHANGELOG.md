@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.5.0
+
+### Minor Changes
+
+- a74d443: Added wallet attestation mdoc cbor format
+
 ## 3.4.3
 
 ### Patch Changes

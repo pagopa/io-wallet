@@ -1,6 +1,7 @@
 import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { Jwk, JwkPublicKey } from "io-wallet-common/jwk";
+import { Jwk, JwkPrivateKey, JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
 export interface JwtHeader {
@@ -17,6 +18,7 @@ export interface Signer {
     jwtDuration?: string,
   ) => (payload: jose.JWTPayload) => TE.TaskEither<Error, string>;
   getFirstPublicKeyByKty: (kty: Jwk["kty"]) => E.Either<Error, JwkPublicKey>;
+  getPrivateKeyByKid: (kid: string) => O.Option<JwkPrivateKey>;
   getPublicKeys: () => E.Either<Error, JwkPublicKey[]>;
   getSupportedSignAlgorithms: () => E.Either<Error, string[]>;
   isAlgorithmSupported: (alg: string) => boolean;

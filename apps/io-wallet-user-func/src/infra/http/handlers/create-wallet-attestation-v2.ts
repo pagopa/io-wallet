@@ -4,9 +4,9 @@ import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
   createWalletAttestationAsJwt,
-  // createWalletAttestationAsMdoc,
   createWalletAttestationAsSdJwt,
 } from "@/wallet-attestation";
+import { createWalletAttestationAsMdoc } from "@/wallet-attestation-mdoc";
 import {
   WalletAttestationRequestV2,
   verifyAndDecodeWalletAttestationRequest,
@@ -41,10 +41,10 @@ export const WalletAttestations = t.type({
       format: t.literal("dc+sd-jwt"),
       wallet_attestation: t.string,
     }),
-    // t.type({
-    //   format: t.literal("mso_mdoc"),
-    //   wallet_attestation: t.string,
-    // }),
+    t.type({
+      format: t.literal("mso_mdoc"),
+      wallet_attestation: t.string,
+    }),
   ]),
 });
 
@@ -60,10 +60,10 @@ const testWalletAttestations: WalletAttestations = {
       format: "dc+sd-jwt",
       wallet_attestation: "this_is_a_test_sd_jwt_attestation",
     },
-    // {
-    //   format: "mso_mdoc",
-    //   wallet_attestation: "this_is_a_test_mdoc_attestation",
-    // },
+    {
+      format: "mso_mdoc",
+      wallet_attestation: "this_is_a_test_mdoc_attestation",
+    },
   ],
 };
 
@@ -144,11 +144,11 @@ const generateWalletAttestations = ({
 }) =>
   pipe(
     sequenceS(RTE.ApplyPar)({
-      "dc+sd-jwt": createWalletAttestationAsSdJwt(assertion),
       jwt: createWalletAttestationAsJwt(assertion),
-      // mso_mdoc: createWalletAttestationAsMdoc(assertion),
+      msoMdoc: createWalletAttestationAsMdoc(assertion),
+      sdJwt: createWalletAttestationAsSdJwt(assertion),
     }),
-    RTE.map(({ "dc+sd-jwt": sdJwt, jwt }) =>
+    RTE.map(({ jwt, msoMdoc, sdJwt }) =>
       isTestUser
         ? testWalletAttestations
         : {
@@ -161,10 +161,10 @@ const generateWalletAttestations = ({
                 format: "dc+sd-jwt",
                 wallet_attestation: sdJwt,
               },
-              // {
-              //   format: "mso_mdoc",
-              //   wallet_attestation: results.mso_mdoc,
-              // },
+              {
+                format: "mso_mdoc",
+                wallet_attestation: msoMdoc,
+              },
             ],
           },
     ),
