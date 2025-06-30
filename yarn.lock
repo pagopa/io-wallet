@@ -15,6 +15,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@auth0/mdl@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@auth0/mdl@npm:2.3.0"
+  dependencies:
+    "@noble/curves": "npm:^1.2.0"
+    "@panva/hkdf": "npm:^1.1.1"
+    "@peculiar/x509": "npm:^1.9.5"
+    buffer: "npm:^6.0.3"
+    cbor-x: "npm:^1.5.9"
+    compare-versions: "npm:^6.0.0"
+    cose-kit: "npm:^1.7.1"
+    debug: "npm:^4.3.4"
+    jose: "npm:^4.15.5"
+    uncrypto: "npm:^0.1.3"
+  checksum: 10c0/37350c32445ed1b7532b439bd2f1e7d350a4bf20fe1d465efcc269ce58a7e49b4b4270abae2d36a0936561385143f04b74427d81ab02777d5d959d55d60c71ca
+  languageName: node
+  linkType: hard
+
 "@azure/abort-controller@npm:^2.0.0, @azure/abort-controller@npm:^2.1.2":
   version: 2.1.2
   resolution: "@azure/abort-controller@npm:2.1.2"
@@ -756,6 +774,13 @@ __metadata:
   version: 1.6.0
   resolution: "@colors/colors@npm:1.6.0"
   checksum: 10c0/9328a0778a5b0db243af54455b79a69e3fb21122d6c15ef9e9fcc94881d8d17352d8b2b2590f9bdd46fac5c2d6c1636dcfc14358a20c70e22daf89e1a759b629
+  languageName: node
+  linkType: hard
+
+"@cto.af/wtf8@npm:0.0.2":
+  version: 0.0.2
+  resolution: "@cto.af/wtf8@npm:0.0.2"
+  checksum: 10c0/f28f75dc6f6bb23d92793aae139ae5d4fa2d9e34e294e9d5b198d198797fc16f3e09bb6d2b081602a166b749e6246316b05af8c926b5d741b47c86904e11676e
   languageName: node
   linkType: hard
 
@@ -1541,7 +1566,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:^1.4.0":
+"@noble/curves@npm:^1.2.0":
+  version: 1.9.2
+  resolution: "@noble/curves@npm:1.9.2"
+  dependencies:
+    "@noble/hashes": "npm:1.8.0"
+  checksum: 10c0/21d049ae4558beedbf5da0004407b72db84360fa29d64822d82dc9e80251e1ecb46023590cc4b20e70eed697d1b87279b4911dc39f8694c51c874289cfc8e9a7
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:1.8.0, @noble/hashes@npm:^1.4.0":
   version: 1.8.0
   resolution: "@noble/hashes@npm:1.8.0"
   checksum: 10c0/06a0b52c81a6fa7f04d67762e08b2c476a00285858150caeaaff4037356dd5e119f45b2a530f638b77a5eeca013168ec1b655db41bae3236cb2e9d511484fc77
@@ -2299,6 +2333,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@panva/hkdf@npm:^1.1.1":
+  version: 1.2.1
+  resolution: "@panva/hkdf@npm:1.2.1"
+  checksum: 10c0/1fabdec9bd2c19b8e88a3fa6fd0c25e25823c5000d9efdf4b6dfe32e9f370f8b9603cf776d120d160bec15fba17e079974cc34f0f52cebb24602cd832dfde19c
+  languageName: node
+  linkType: hard
+
 "@peculiar/asn1-android@npm:^2.3.15":
   version: 2.3.16
   resolution: "@peculiar/asn1-android@npm:2.3.16"
@@ -2310,7 +2351,98 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-schema@npm:^2.3.15":
+"@peculiar/asn1-cms@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-cms@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    "@peculiar/asn1-x509-attr": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/767f984d75c3ed19e1fbb9dd93034646764e84cdf93567deff4aa4876d4d1d205543c5c606c1870c3a3fc641af76a85a5f017369a42269bed7164bd9f5ea8f9f
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-csr@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-csr@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/8fd76813b31fc179d41ce33b7ede56f399561f6850d5794ffff2f5b8633cdf96d80847333eb3699ac463a7f3883e2e789702fdc653eb00f90f2872c5577b79f7
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-ecc@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-ecc@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/410aee8742616bee2abe01a46fc054c5b8d5e4c81446adf2ebbae7a76e8e6eafd0acac360255d927ed08643633382fc7439d3b7a8395eb2245683d9ae4be8f84
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pfx@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-pfx@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.3.15"
+    "@peculiar/asn1-pkcs8": "npm:^2.3.15"
+    "@peculiar/asn1-rsa": "npm:^2.3.15"
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/9db67a2aa673e9461076fe106d92cc31cd06c34e55abddcb906b6f3c6dc53af27763423ac5560474b4cab213853d363165f570ee8cf07fd3b343bed8b35697bc
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs8@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-pkcs8@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/672cbb67f4ce54197bd2fd28cdf898c3f3b1486b453102387c90db618446fb1bcd0a5ac58140115cd276a7cb920b2a6700ea6d9b8b928c8ffdf0479f45941a9f
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs9@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-pkcs9@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.3.15"
+    "@peculiar/asn1-pfx": "npm:^2.3.15"
+    "@peculiar/asn1-pkcs8": "npm:^2.3.15"
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    "@peculiar/asn1-x509-attr": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/ffae63b07857648c9ba7395932f45c9b56061aa9e44ba9b28145a88d481fe822669ddd2bbd89509a037f8aaaa5c28c24f1e7dd9f83eaccfad1fe1feb0da3b6fd
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-rsa@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-rsa@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/38f29c5ae6d6303832733536c58b2aa01bbf1fcdc22b4fc913669ef2601f67db76b9c3cac3971c337c84234ae3adf2ebb93593623d27728b713124eada03add4
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-schema@npm:^2.3.13, @peculiar/asn1-schema@npm:^2.3.15, @peculiar/asn1-schema@npm:^2.3.8":
   version: 2.3.15
   resolution: "@peculiar/asn1-schema@npm:2.3.15"
   dependencies:
@@ -2318,6 +2450,71 @@ __metadata:
     pvtsutils: "npm:^1.3.6"
     tslib: "npm:^2.8.1"
   checksum: 10c0/0e73e292a17d00a8770825a9504ceaf0994481a39126317ca0ca5d3dc742087f2b71a4d086bb5613bf19ac57f001d42f594683797d43137702db3ee2b42736a0
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509-attr@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-x509-attr@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/5460e46b33e4771b8e4117be83b24a6d97f118bd4f4044233c5fab9c28c90d10d6be041a4ef274e4688d2f37a661ff210c45acfc4591c212c6703620c074fad2
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509@npm:^2.3.15":
+  version: 2.3.15
+  resolution: "@peculiar/asn1-x509@npm:2.3.15"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    asn1js: "npm:^3.0.5"
+    pvtsutils: "npm:^1.3.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10c0/a97b5f26d6ce4ebfa2e5102ac076802839e3008571c672f02fda78a047dbf786042b62fd9fd6f6ee615de9b7d32a92433ff1a71ba203447b8a16eedaa89d3e11
+  languageName: node
+  linkType: hard
+
+"@peculiar/json-schema@npm:^1.1.12":
+  version: 1.1.12
+  resolution: "@peculiar/json-schema@npm:1.1.12"
+  dependencies:
+    tslib: "npm:^2.0.0"
+  checksum: 10c0/202132c66dcc6b6aca5d0af971c015be2e163da2f7f992910783c5d39c8a7db59b6ec4f4ce419459a1f954b7e1d17b6b253f0e60072c1b3d254079f4eaebc311
+  languageName: node
+  linkType: hard
+
+"@peculiar/webcrypto@npm:^1.4.3":
+  version: 1.5.0
+  resolution: "@peculiar/webcrypto@npm:1.5.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.8"
+    "@peculiar/json-schema": "npm:^1.1.12"
+    pvtsutils: "npm:^1.3.5"
+    tslib: "npm:^2.6.2"
+    webcrypto-core: "npm:^1.8.0"
+  checksum: 10c0/4f6f24b2c52c2155b9c569b6eb1d57954cb5f7bd2764a50cdaed7aea17a6dcf304b75b87b57ba318756ffec8179a07d9a76534aaf77855912b838543e5ff8983
+  languageName: node
+  linkType: hard
+
+"@peculiar/x509@npm:^1.9.5":
+  version: 1.12.4
+  resolution: "@peculiar/x509@npm:1.12.4"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.3.15"
+    "@peculiar/asn1-csr": "npm:^2.3.15"
+    "@peculiar/asn1-ecc": "npm:^2.3.15"
+    "@peculiar/asn1-pkcs9": "npm:^2.3.15"
+    "@peculiar/asn1-rsa": "npm:^2.3.15"
+    "@peculiar/asn1-schema": "npm:^2.3.15"
+    "@peculiar/asn1-x509": "npm:^2.3.15"
+    pvtsutils: "npm:^1.3.6"
+    reflect-metadata: "npm:^0.2.2"
+    tslib: "npm:^2.8.1"
+    tsyringe: "npm:^4.10.0"
+  checksum: 10c0/d85da2a8d21024817fe163e2e64abeb0a0a02693c2fe9f96c9d65812a9eff25ff679eecac4579a76f09f5d2e4e9a6dfb1642f26a9fca209003d77d70db861c5b
   languageName: node
   linkType: hard
 
@@ -3419,7 +3616,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-js@npm:^1.3.0":
+"base64-js@npm:^1.3.0, base64-js@npm:^1.3.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 10c0/f23823513b63173a001030fae4f2dabe283b99a9d324ade3ad3d148e218134676f1ee8568c877cd79ec1c53158dcf2d2ba527a97c606618928ba99dd930102bf
@@ -3518,6 +3715,16 @@ __metadata:
   version: 1.0.1
   resolution: "buffer-equal-constant-time@npm:1.0.1"
   checksum: 10c0/fb2294e64d23c573d0dd1f1e7a466c3e978fe94a4e0f8183937912ca374619773bef8e2aceb854129d2efecbbc515bbd0cc78d2734a3e3031edb0888531bbc8e
+  languageName: node
+  linkType: hard
+
+"buffer@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: "npm:^1.3.1"
+    ieee754: "npm:^1.2.1"
+  checksum: 10c0/2a905fbbcde73cc5d8bd18d1caa23715d5f83a5935867c2329f0ac06104204ba7947be098fe1317fbd8830e26090ff8e764f08cd14fefc977bb248c3487bcbd0
   languageName: node
   linkType: hard
 
@@ -3658,7 +3865,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cbor-x@npm:^1.6.0":
+"cbor-x@npm:^1.5.4, cbor-x@npm:^1.5.9, cbor-x@npm:^1.6.0":
   version: 1.6.0
   resolution: "cbor-x@npm:1.6.0"
   dependencies:
@@ -3667,6 +3874,15 @@ __metadata:
     cbor-extract:
       optional: true
   checksum: 10c0/c6ab391e935a60c8a768080806f2c9aee01b2b124de68997e3e4cb700753757286860186094a92f510b595d7f8c77b3023d9125a05247afcbfea08cae45a0615
+  languageName: node
+  linkType: hard
+
+"cbor2@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "cbor2@npm:2.0.1"
+  dependencies:
+    "@cto.af/wtf8": "npm:0.0.2"
+  checksum: 10c0/f53654663e23ac0c35d2406706869119a48b384ce3ef458da3b65d270495da8191f6150c1b99cb538947e38ae334684a9f8dd8b2ec1f1aa177ad7c498427be26
   languageName: node
   linkType: hard
 
@@ -3935,6 +4151,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"compare-versions@npm:^6.0.0":
+  version: 6.1.1
+  resolution: "compare-versions@npm:6.1.1"
+  checksum: 10c0/415205c7627f9e4f358f571266422980c9fe2d99086be0c9a48008ef7c771f32b0fbe8e97a441ffedc3910872f917a0675fe0fe3c3b6d331cda6d8690be06338
+  languageName: node
+  linkType: hard
+
 "concat-map@npm:0.0.1":
   version: 0.0.1
   resolution: "concat-map@npm:0.0.1"
@@ -3984,6 +4207,18 @@ __metadata:
   version: 1.0.3
   resolution: "core-util-is@npm:1.0.3"
   checksum: 10c0/90a0e40abbddfd7618f8ccd63a74d88deea94e77d0e8dbbea059fa7ebebb8fbb4e2909667fe26f3a467073de1a542ebe6ae4c73a73745ac5833786759cd906c9
+  languageName: node
+  linkType: hard
+
+"cose-kit@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "cose-kit@npm:1.7.1"
+  dependencies:
+    "@peculiar/webcrypto": "npm:^1.4.3"
+    cbor-x: "npm:^1.5.4"
+    jose: "npm:^4.14.6"
+    pkijs: "npm:^3.0.15"
+  checksum: 10c0/adf560a80e49d8143183a3d3bcb1a9f3c9714a5a9494fd1be6e47127b9255a0f10e5357f90d41d0c35c57bb176b6c5ab9cb461a9d1a92a0667e8e1c9212fe448
   languageName: node
   linkType: hard
 
@@ -5675,6 +5910,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ieee754@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "ieee754@npm:1.2.1"
+  checksum: 10c0/b0782ef5e0935b9f12883a2e2aa37baa75da6e66ce6515c168697b42160807d9330de9a32ec1ed73149aea02e0d822e572bca6f1e22bdcbd2149e13b050b17bb
+  languageName: node
+  linkType: hard
+
 "ignore@npm:^5.2.0, ignore@npm:^5.3.1":
   version: 5.3.2
   resolution: "ignore@npm:5.3.2"
@@ -5799,6 +6041,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "io-wallet-user-func@workspace:apps/io-wallet-user-func"
   dependencies:
+    "@auth0/mdl": "npm:^2.3.0"
     "@azure/cosmos": "npm:^4.2.0"
     "@azure/functions": "npm:^4.6.0"
     "@azure/functions-opentelemetry-instrumentation": "npm:^0.1.0"
@@ -5823,6 +6066,7 @@ __metadata:
     asn1js: "npm:^3.0.5"
     azure-functions-core-tools: "npm:^4.0.6821"
     cbor-x: "npm:^1.6.0"
+    cbor2: "npm:^2.0.1"
     dayjs: "npm:^1.11.13"
     eslint: "npm:9.14.0"
     fp-ts: "npm:^2.16.9"
@@ -6130,7 +6374,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^4.15.5":
+"jose@npm:^4.14.6, jose@npm:^4.15.5":
   version: 4.15.9
   resolution: "jose@npm:4.15.9"
   checksum: 10c0/4ed4ddf4a029db04bd167f2215f65d7245e4dc5f36d7ac3c0126aab38d66309a9e692f52df88975d99429e357e5fd8bab340ff20baab544d17684dd1d940a0f4
@@ -7379,7 +7623,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pkijs@npm:^3.2.4":
+"pkijs@npm:^3.0.15, pkijs@npm:^3.2.4":
   version: 3.2.5
   resolution: "pkijs@npm:3.2.5"
   dependencies:
@@ -7646,7 +7890,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pvtsutils@npm:^1.3.2, pvtsutils@npm:^1.3.6":
+"pvtsutils@npm:^1.3.2, pvtsutils@npm:^1.3.5, pvtsutils@npm:^1.3.6":
   version: 1.3.6
   resolution: "pvtsutils@npm:1.3.6"
   dependencies:
@@ -7750,6 +7994,13 @@ __metadata:
   version: 1.2.0
   resolution: "referrer-policy@npm:1.2.0"
   checksum: 10c0/533bd698a8bd5a2112ea78f63ea1142a524c21fd2843744b4c85b771a6f86684564e678de37449d8b45da139bb980edc7c91b59c1d816d119b0f1be8d4af7869
+  languageName: node
+  linkType: hard
+
+"reflect-metadata@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "reflect-metadata@npm:0.2.2"
+  checksum: 10c0/1cd93a15ea291e420204955544637c264c216e7aac527470e393d54b4bb075f10a17e60d8168ec96600c7e0b9fcc0cb0bb6e91c3fbf5b0d8c9056f04e6ac1ec2
   languageName: node
   linkType: hard
 
@@ -8729,7 +8980,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.2.0, tslib@npm:^2.6.2, tslib@npm:^2.6.3, tslib@npm:^2.7.0, tslib@npm:^2.8.1":
+"tslib@npm:^1.9.3":
+  version: 1.14.1
+  resolution: "tslib@npm:1.14.1"
+  checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.0.0, tslib@npm:^2.2.0, tslib@npm:^2.6.2, tslib@npm:^2.6.3, tslib@npm:^2.7.0, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
@@ -8810,6 +9068,15 @@ __metadata:
     tsup: dist/cli-default.js
     tsup-node: dist/cli-node.js
   checksum: 10c0/c6636ffd6ade59d3544cd424c7115449f8712eb5c872e1e36d25817436f9ea9424d8ee8f1b6244ac7c9a887b0fcf6cc42c102baa55a9080236afc18ba73871e6
+  languageName: node
+  linkType: hard
+
+"tsyringe@npm:^4.10.0":
+  version: 4.10.0
+  resolution: "tsyringe@npm:4.10.0"
+  dependencies:
+    tslib: "npm:^1.9.3"
+  checksum: 10c0/918594b4dfac97beb8be2c041c6ec45f078ef3768ed4edfe35ae2c709ab503e2e6b454b2b37e692c658572d1972a428fbfdbc0a2b42fee727a83c1c685fbe5e1
   languageName: node
   linkType: hard
 
@@ -8991,6 +9258,13 @@ __metadata:
   bin:
     ulid: bin/cli.js
   checksum: 10c0/96f7597a2f09dadd380707a0755753d85717059deae54a9e28b6cbc34c02ef211dd1d1dcbfa8bd557d12309f174b87f3ba5f45d6b67573d1a2da202b5a0c9319
+  languageName: node
+  linkType: hard
+
+"uncrypto@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "uncrypto@npm:0.1.3"
+  checksum: 10c0/74a29afefd76d5b77bedc983559ceb33f5bbc8dada84ff33755d1e3355da55a4e03a10e7ce717918c436b4dfafde1782e799ebaf2aadd775612b49f7b5b2998e
   languageName: node
   linkType: hard
 
@@ -9481,6 +9755,19 @@ __metadata:
   bin:
     vitest: vitest.mjs
   checksum: 10c0/14b9c99812282d88b6e1dafde8cca22b07dcefa0a00d240145cf5cb95b082c287807bd884f417a046992bc74246aaf64662fd07179e60547c9277fbc8986439b
+  languageName: node
+  linkType: hard
+
+"webcrypto-core@npm:^1.8.0":
+  version: 1.8.1
+  resolution: "webcrypto-core@npm:1.8.1"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.3.13"
+    "@peculiar/json-schema": "npm:^1.1.12"
+    asn1js: "npm:^3.0.5"
+    pvtsutils: "npm:^1.3.5"
+    tslib: "npm:^2.7.0"
+  checksum: 10c0/b85a986b4f73e8505ec5eaafe8e4f1ff02574a3b655793aca91f913d02822c8b79168ad6961eaab86ae00fec00bf780ec4cef7535f64879fb866649bc2a723fa
   languageName: node
   linkType: hard
 
