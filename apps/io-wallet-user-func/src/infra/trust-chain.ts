@@ -86,8 +86,8 @@ export const getTrustChainApi =
                 walletProviderEntityConfiguration,
               ]) => ({
                 trustAnchorEntityConfiguration,
-                walletProviderEntityConfiguration,
                 trustAnchorSubordinateStatement,
+                walletProviderEntityConfiguration,
               }),
             ),
           ),
@@ -95,8 +95,8 @@ export const getTrustChainApi =
       TE.map(
         ({
           trustAnchorEntityConfiguration,
-          walletProviderEntityConfiguration,
           trustAnchorSubordinateStatement,
+          walletProviderEntityConfiguration,
         }) => [
           walletProviderEntityConfiguration,
           trustAnchorSubordinateStatement,
