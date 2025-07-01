@@ -25,6 +25,7 @@ import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import { MobileAttestationService } from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
+import { getTrustChainApi } from "@/infra/trust-chain";
 import { CosmosClient } from "@azure/cosmos";
 import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -318,6 +319,11 @@ app.http("createWalletAttestationV2", {
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
       federationEntity: config.entityConfiguration.federationEntity,
+      getTrustChain: getTrustChainApi({
+        ECTAURL: "https://pre.ta.wallet.ipzs.it/.well-known/openid-federation",
+        ECWPURL:
+          "https://foo11.blob.core.windows.net/foo/.well-known/openid-federation",
+      }),
       nonceRepository,
       signer,
       telemetryClient: appInsightsClient,

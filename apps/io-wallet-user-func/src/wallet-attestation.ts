@@ -2,7 +2,7 @@ import * as E from "fp-ts/Either";
 import * as IOE from "fp-ts/IOEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
@@ -106,6 +106,7 @@ interface WalletAttestationConfig {
 
 export interface WalletAttestationEnvironment {
   federationEntity: FederationEntity;
+  getTrustChain: () => TE.TaskEither<Error, string[]>;
   signer: Signer;
   walletAttestationConfig: WalletAttestationConfig;
 }
@@ -120,6 +121,7 @@ export const getWalletAttestationData =
   > =>
   ({
     federationEntity: { basePath },
+    getTrustChain,
     signer,
     walletAttestationConfig: { walletLink, walletName },
   }) =>
@@ -128,42 +130,44 @@ export const getWalletAttestationData =
       signer.getFirstPublicKeyByKty,
       E.chainW(validateJwkKid),
       TE.fromEither,
-      TE.map(({ kid }) => ({
+      TE.chain((kid) =>
+        pipe(
+          getTrustChain(),
+          TE.map((trustChain) => ({
+            ...kid,
+            trustChain,
+          })),
+        ),
+      ),
+      TE.map(({ kid, trustChain }) => ({
         aal: pipe(basePath, getLoAUri(LoA.basic)),
         iss: basePath.href,
         kid,
         sub: walletAttestationRequest.header.kid,
-        // trustChain: [],
+        trustChain,
         walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
         walletLink,
         walletName,
       })),
     );
 
-export const createWalletAttestationAsJwt =
-  (
-    walletAttestationRequest: WalletAttestationRequestV2,
-  ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  (dep) =>
+export const createWalletAttestationAsJwt: (
+  walletAttestationData: WalletAttestationData,
+) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =
+  (walletAttestationData) => (dep) =>
     pipe(
-      dep,
-      getWalletAttestationData(walletAttestationRequest),
-      TE.chain(
-        flow(
-          WalletAttestationToJwtModelV2.encode,
-          // ({ kid, trust_chain, ...payload }) =>
-          ({ kid, ...payload }) =>
-            dep.signer.createJwtAndSign(
-              {
-                // trust_chain,
-                typ: "oauth-client-attestation+jwt",
-              },
-              kid,
-              "ES256",
-              "1h",
-            )(payload),
-        ),
-      ),
+      walletAttestationData,
+      WalletAttestationToJwtModelV2.encode,
+      ({ kid, trust_chain, ...payload }) =>
+        dep.signer.createJwtAndSign(
+          {
+            trust_chain,
+            typ: "oauth-client-attestation+jwt",
+          },
+          kid,
+          "ES256",
+          "1h",
+        )(payload),
     );
 
 const getDisclosures = ({
@@ -181,24 +185,23 @@ const getDisclosures = ({
     ]),
   );
 
-export const createWalletAttestationAsSdJwt =
-  (
-    walletAttestationRequest: WalletAttestationRequestV2,
-  ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  (environment) =>
+export const createWalletAttestationAsSdJwt: (
+  walletAttestationData: WalletAttestationData,
+) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =
+  (walletAttestationData) => (environment) =>
     pipe(
-      environment,
-      getWalletAttestationData(walletAttestationRequest),
-      TE.map(({ iss, sub, walletInstancePublicKey, ...rest }) => ({
+      walletAttestationData,
+      ({ iss, sub, trustChain, walletInstancePublicKey, ...rest }) => ({
         ...rest,
         cnf: {
           jwk: walletInstancePublicKey,
         },
         iss: removeTrailingSlash(iss),
         sub: removeTrailingSlash(sub),
+        trustChain,
         vct: "wallet.io.pagopa.it/wallet-attestation/v1.0.0",
-      })),
-      TE.chain((sdJwtModel) =>
+      }),
+      (sdJwtModel) =>
         pipe(
           {
             walletLink: sdJwtModel.walletLink,
@@ -220,7 +223,7 @@ export const createWalletAttestationAsSdJwt =
               }),
               environment.signer.createJwtAndSign(
                 {
-                  // trust_chain: sdJwtModel.trustChain,
+                  trust_chain: sdJwtModel.trustChain,
                   typ: "dc+sd-jwt",
                 },
                 sdJwtModel.kid,
@@ -235,5 +238,4 @@ export const createWalletAttestationAsSdJwt =
             ),
           ),
         ),
-      ),
     );
