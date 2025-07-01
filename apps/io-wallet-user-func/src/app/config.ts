@@ -181,6 +181,7 @@ export type EntityConfigurationConfig = t.TypeOf<
 >;
 
 const WalletProviderConfig = t.type({
+  trustAnchorUrl: UrlFromString,
   walletAttestation: t.type({
     walletLink: t.string,
     walletName: t.string,
@@ -455,6 +456,10 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   WalletProviderConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    trustAnchorUrl: pipe(
+      readFromEnvironment("TrustAnchorUrl"),
+      RE.chainEitherKW(parse(UrlFromString, "Invalid Trust Anchor URL")),
+    ),
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
@@ -462,12 +467,19 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       "WalletAttestationWalletName",
     ),
   }),
-  RE.map(({ walletAttestationWalletLink, walletAttestationWalletName }) => ({
-    walletAttestation: {
-      walletLink: walletAttestationWalletLink,
-      walletName: walletAttestationWalletName,
-    },
-  })),
+  RE.map(
+    ({
+      trustAnchorUrl,
+      walletAttestationWalletLink,
+      walletAttestationWalletName,
+    }) => ({
+      trustAnchorUrl,
+      walletAttestation: {
+        walletLink: walletAttestationWalletLink,
+        walletName: walletAttestationWalletName,
+      },
+    }),
+  ),
 );
 
 export const getConfigFromEnvironment: RE.ReaderEither<

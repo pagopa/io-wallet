@@ -1,4 +1,5 @@
 import { WalletAttestationEnvironment } from "@/wallet-attestation";
+import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { sequenceT } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
@@ -7,11 +8,11 @@ import * as t from "io-ts";
 import * as jose from "jose";
 
 interface TrustChainServiceConfig {
-  ECTAURL: string;
-  ECWPURL: string;
+  trustAnchorURL: ValidUrl;
+  walletProviderURL: ValidUrl;
 }
 
-const ECTAJwtPayload = t.type({
+const EntityConfigurationTrustAnchor = t.type({
   metadata: t.type({
     federation_entity: t.type({
       federation_fetch_endpoint: t.string,
@@ -19,26 +20,36 @@ const ECTAJwtPayload = t.type({
   }),
 });
 
+const fetchEndpoint = (url: string): TE.TaskEither<Error, string> =>
+  TE.tryCatch(
+    () => fetch(url).then((res) => res.text()),
+    (reason) => (reason instanceof Error ? reason : new Error(String(reason))),
+  );
+
 export const getTrustChainApi =
   ({
-    ECTAURL,
-    ECWPURL,
+    trustAnchorURL,
+    walletProviderURL,
   }: TrustChainServiceConfig): WalletAttestationEnvironment["getTrustChain"] =>
   () =>
     pipe(
-      TE.tryCatch(
-        () => fetch(ECTAURL).then((res) => res.text()),
-        (reason) =>
-          reason instanceof Error ? reason : new Error(String(reason)),
-      ),
-      TE.chain((ECTA) =>
+      // get the trust anchor entity configuration
+      fetchEndpoint(`${trustAnchorURL}/.well-known/openid-federation`),
+      // get `federation_fetch_endpoint` from the entity configuration jwt
+      TE.chain((trustAnchorEntityConfiguration) =>
         pipe(
           E.tryCatch(
-            () => jose.decodeJwt(ECTA),
+            () => jose.decodeJwt(trustAnchorEntityConfiguration),
             (reason) =>
               reason instanceof Error ? reason : new Error(String(reason)),
           ),
-          E.chainW(ECTAJwtPayload.decode),
+          E.chainW(EntityConfigurationTrustAnchor.decode),
+          E.mapLeft(
+            () =>
+              new Error(
+                "Invalid Trust Anchor entity configuration: federation_fetch_endpoint is missing or malformed",
+              ),
+          ),
           E.map(
             ({
               metadata: {
@@ -46,39 +57,50 @@ export const getTrustChainApi =
               },
             }) => federation_fetch_endpoint,
           ),
-          E.map((federationFetchEndpoint) => ({
-            ECTA,
-            federationFetchEndpoint,
+          E.map((trustAnchorFederationFetchEndpoint) => ({
+            trustAnchorEntityConfiguration,
+            trustAnchorFederationFetchEndpoint,
           })),
           TE.fromEither,
         ),
       ),
-      TE.chainW(({ ECTA, federationFetchEndpoint }) =>
-        pipe(
-          sequenceT(TE.ApplyPar)(
-            TE.tryCatch(
-              () =>
-                fetch(
-                  // TODO
-                  `${federationFetchEndpoint}?sub=https://foo11.blob.core.windows.net/foo`,
-                ).then((res) => res.text()),
-              (reason) =>
-                // TODO. return 200 or else
-                reason instanceof Error ? reason : new Error(String(reason)),
+      TE.chainW(
+        ({
+          trustAnchorEntityConfiguration,
+          trustAnchorFederationFetchEndpoint,
+        }) =>
+          pipe(
+            sequenceT(TE.ApplyPar)(
+              // get the trust anchor subordinate statement for the wallet provider
+              fetchEndpoint(
+                `${trustAnchorFederationFetchEndpoint}?sub=${walletProviderURL}`,
+              ),
+              // get the wallet provider entity configuration
+              fetchEndpoint(
+                `${walletProviderURL}/.well-known/openid-federation`,
+              ),
             ),
-            TE.tryCatch(
-              () => fetch(ECWPURL).then((res) => res.text()),
-              (reason) =>
-                reason instanceof Error ? reason : new Error(String(reason)),
+            TE.map(
+              ([
+                trustAnchorSubordinateStatement,
+                walletProviderEntityConfiguration,
+              ]) => ({
+                trustAnchorEntityConfiguration,
+                walletProviderEntityConfiguration,
+                trustAnchorSubordinateStatement,
+              }),
             ),
           ),
-          TE.map(([SS, ECWP]) => ({
-            ECTA,
-            ECWP,
-            SS,
-          })),
-        ),
       ),
-      TE.map(({ ECTA, ECWP, SS }) => [ECWP, SS, ECTA]),
-      TE.mapLeft(() => new Error("error")), // TODO
+      TE.map(
+        ({
+          trustAnchorEntityConfiguration,
+          walletProviderEntityConfiguration,
+          trustAnchorSubordinateStatement,
+        }) => [
+          walletProviderEntityConfiguration,
+          trustAnchorSubordinateStatement,
+          trustAnchorEntityConfiguration,
+        ],
+      ),
     );

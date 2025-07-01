@@ -320,9 +320,8 @@ app.http("createWalletAttestationV2", {
       attestationService: mobileAttestationService,
       federationEntity: config.entityConfiguration.federationEntity,
       getTrustChain: getTrustChainApi({
-        ECTAURL: "https://pre.ta.wallet.ipzs.it/.well-known/openid-federation",
-        ECWPURL:
-          "https://foo11.blob.core.windows.net/foo/.well-known/openid-federation",
+        trustAnchorURL: config.walletProvider.trustAnchorUrl,
+        walletProviderURL: config.entityConfiguration.federationEntity.basePath,
       }),
       nonceRepository,
       signer,

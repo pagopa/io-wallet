@@ -58,6 +58,7 @@ locals {
       PidIssuerHealthCheckEnabled       = false
       WalletAttestationWalletLink       = "https://wallet.io.pagopa.it"
       EntityConfigurationAuthorityHints = "https://ta.wallet.ipzs.it"
+      TrustAnchorUrl                    = "https://ta.wallet.ipzs.it"
     },
     {
       for s in var.user_func.app_settings :
@@ -105,6 +106,7 @@ locals {
         PidIssuerHealthCheckEnabled       = false
         WalletAttestationWalletLink       = "https://foo11.blob.core.windows.net/foo"
         EntityConfigurationAuthorityHints = "https://pre.ta.wallet.ipzs.it"
+        TrustAnchorUrl                    = "https://pre.ta.wallet.ipzs.it"
         CosmosDbEndpoint__accountEndpoint = var.cosmos_db_endpoint
         CosmosDbDatabaseName              = var.cosmos_database_name_uat
         CosmosDbRequestTimeout            = "5000"
