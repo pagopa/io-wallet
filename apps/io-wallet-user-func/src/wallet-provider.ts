@@ -5,7 +5,7 @@ import { removeTrailingSlash } from "./url";
 // Level of Agreement
 export enum LoA {
   basic = "LoA/basic",
-  hight = "LoA/hight",
+  high = "LoA/high",
   medium = "LoA/medium",
 }
 
