@@ -2,7 +2,7 @@ import * as E from "fp-ts/Either";
 import * as IOE from "fp-ts/IOEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
@@ -133,7 +133,6 @@ export const getWalletAttestationData =
         iss: basePath.href,
         kid,
         sub: walletAttestationRequest.header.kid,
-        // trustChain: [],
         walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
         walletLink,
         walletName,
@@ -142,28 +141,21 @@ export const getWalletAttestationData =
 
 export const createWalletAttestationAsJwt =
   (
-    walletAttestationRequest: WalletAttestationRequestV2,
+    walletAttestationData: WalletAttestationData,
   ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
   (dep) =>
     pipe(
-      dep,
-      getWalletAttestationData(walletAttestationRequest),
-      TE.chain(
-        flow(
-          WalletAttestationToJwtModelV2.encode,
-          // ({ kid, trust_chain, ...payload }) =>
-          ({ kid, ...payload }) =>
-            dep.signer.createJwtAndSign(
-              {
-                // trust_chain,
-                typ: "oauth-client-attestation+jwt",
-              },
-              kid,
-              "ES256",
-              "1h",
-            )(payload),
-        ),
-      ),
+      walletAttestationData,
+      WalletAttestationToJwtModelV2.encode,
+      ({ kid, ...payload }) =>
+        dep.signer.createJwtAndSign(
+          {
+            typ: "oauth-client-attestation+jwt",
+          },
+          kid,
+          "ES256",
+          "1h",
+        )(payload),
     );
 
 const getDisclosures = ({
@@ -183,13 +175,12 @@ const getDisclosures = ({
 
 export const createWalletAttestationAsSdJwt =
   (
-    walletAttestationRequest: WalletAttestationRequestV2,
+    walletAttestationData: WalletAttestationData,
   ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
   (environment) =>
     pipe(
-      environment,
-      getWalletAttestationData(walletAttestationRequest),
-      TE.map(({ iss, sub, walletInstancePublicKey, ...rest }) => ({
+      walletAttestationData,
+      ({ iss, sub, walletInstancePublicKey, ...rest }) => ({
         ...rest,
         cnf: {
           jwk: walletInstancePublicKey,
@@ -197,8 +188,8 @@ export const createWalletAttestationAsSdJwt =
         iss: removeTrailingSlash(iss),
         sub: removeTrailingSlash(sub),
         vct: "wallet.io.pagopa.it/wallet-attestation/v1.0.0",
-      })),
-      TE.chain((sdJwtModel) =>
+      }),
+      (sdJwtModel) =>
         pipe(
           {
             walletLink: sdJwtModel.walletLink,
@@ -220,7 +211,6 @@ export const createWalletAttestationAsSdJwt =
               }),
               environment.signer.createJwtAndSign(
                 {
-                  // trust_chain: sdJwtModel.trustChain,
                   typ: "dc+sd-jwt",
                 },
                 sdJwtModel.kid,
@@ -235,5 +225,4 @@ export const createWalletAttestationAsSdJwt =
             ),
           ),
         ),
-      ),
     );
