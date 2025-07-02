@@ -1,5 +1,12 @@
 # io-wallet-user-func
 
+## 3.5.1
+
+### Patch Changes
+
+- 2a8ddc0: Fix typo
+- 604a930: Removed trust_chain in wallet attestation header
+
 ## 3.5.0
 
 ### Minor Changes
