@@ -8,11 +8,7 @@ import { flow, pipe } from "fp-ts/function";
 import { JwkPrivateKey } from "io-wallet-common/jwk";
 
 import { WalletAttestationData } from "./encoders/wallet-attestation";
-import {
-  WalletAttestationEnvironment,
-  getWalletAttestationData,
-} from "./wallet-attestation";
-import { WalletAttestationRequestV2 } from "./wallet-attestation-request";
+import { WalletAttestationEnvironment } from "./wallet-attestation";
 
 const docType = "org.iso.18013.5.1.IT.WalletAttestation";
 
@@ -95,9 +91,8 @@ const createCborEncodedMDoc =
     );
 
 export const createWalletAttestationAsMdoc: (
-  walletAttestationRequest: WalletAttestationRequestV2,
+  walletAttestationData: WalletAttestationData,
 ) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> = flow(
-  getWalletAttestationData,
-  RTE.chainW(createCborEncodedMDoc),
+  createCborEncodedMDoc,
   RTE.map((buf) => Buffer.from(buf).toString("base64")),
 );

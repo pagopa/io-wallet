@@ -5,6 +5,7 @@ import { isLoadTestUser } from "@/user";
 import {
   createWalletAttestationAsJwt,
   createWalletAttestationAsSdJwt,
+  getWalletAttestationData,
 } from "@/wallet-attestation";
 import { createWalletAttestationAsMdoc } from "@/wallet-attestation-mdoc";
 import {
@@ -143,30 +144,36 @@ const generateWalletAttestations = ({
   isTestUser: boolean;
 }) =>
   pipe(
-    sequenceS(RTE.ApplyPar)({
-      jwt: createWalletAttestationAsJwt(assertion),
-      msoMdoc: createWalletAttestationAsMdoc(assertion),
-      sdJwt: createWalletAttestationAsSdJwt(assertion),
-    }),
-    RTE.map(({ jwt, msoMdoc, sdJwt }) =>
-      isTestUser
-        ? testWalletAttestations
-        : {
-            wallet_attestations: [
-              {
-                format: "jwt",
-                wallet_attestation: jwt,
+    assertion,
+    getWalletAttestationData,
+    RTE.chainW((walletAttestationData) =>
+      pipe(
+        sequenceS(RTE.ApplyPar)({
+          jwt: createWalletAttestationAsJwt(walletAttestationData),
+          msoMdoc: createWalletAttestationAsMdoc(walletAttestationData),
+          sdJwt: createWalletAttestationAsSdJwt(walletAttestationData),
+        }),
+        RTE.map(({ jwt, msoMdoc, sdJwt }) =>
+          isTestUser
+            ? testWalletAttestations
+            : {
+                wallet_attestations: [
+                  {
+                    format: "jwt",
+                    wallet_attestation: jwt,
+                  },
+                  {
+                    format: "dc+sd-jwt",
+                    wallet_attestation: sdJwt,
+                  },
+                  {
+                    format: "mso_mdoc",
+                    wallet_attestation: msoMdoc,
+                  },
+                ],
               },
-              {
-                format: "dc+sd-jwt",
-                wallet_attestation: sdJwt,
-              },
-              {
-                format: "mso_mdoc",
-                wallet_attestation: msoMdoc,
-              },
-            ],
-          },
+        ),
+      ),
     ),
   );
 
