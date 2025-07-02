@@ -183,7 +183,7 @@ const IssuerAuthPayloadSchema = t.type({
 });
 
 const federationEntity = {
-  basePath: url("https://wallet-provider.example.org"),
+  basePath: url("https://wallet-provider.example.org/foo/"),
   contacts: [email("foo@pec.bar.it")],
   homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
   logoUri: url("https://wallet-provider.example.org/logo.svg"),
