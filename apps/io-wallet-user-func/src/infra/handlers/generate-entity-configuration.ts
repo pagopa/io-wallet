@@ -51,7 +51,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
             ascValues: [
               pipe(basePath, getLoAUri(LoA.basic)),
               pipe(basePath, getLoAUri(LoA.medium)),
-              pipe(basePath, getLoAUri(LoA.hight)),
+              pipe(basePath, getLoAUri(LoA.high)),
             ],
             jwks,
           },
