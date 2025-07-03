@@ -54,17 +54,17 @@ export const createWalletAttestation =
     entityConfiguration: {
       federationEntity: { basePath, ...federationEntityMetadata },
     },
-    signer,
+    walletAttestationSigner,
   }) =>
     pipe(
       sequenceS(TE.ApplicativePar)({
         publicJwk: pipe(
-          signer.getFirstPublicKeyByKty("EC"),
+          walletAttestationSigner.getFirstPublicKeyByKty("EC"),
           E.chainW(validateJwkKid),
           TE.fromEither,
         ),
         supportedSignAlgorithms: pipe(
-          signer.getSupportedSignAlgorithms(),
+          walletAttestationSigner.getSupportedSignAlgorithms(),
           TE.fromEither,
         ),
       }),
@@ -86,7 +86,7 @@ export const createWalletAttestation =
             walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
           },
           WalletAttestationToJwtModel.encode,
-          signer.createJwtAndSign(
+          walletAttestationSigner.createJwtAndSign(
             {
               typ: "wallet-attestation+jwt",
             },
@@ -216,6 +216,7 @@ export const createWalletAttestationAsSdJwt =
                 sdJwtModel.kid,
                 "ES256",
                 "1h",
+                // TODO: SIW-2656. env var are not used
               ),
               TE.map((jwt) =>
                 pipe(disclosures, (base64Disclosures) =>

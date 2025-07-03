@@ -163,6 +163,7 @@ const FederationEntityConfig = t.type({
   basePath: UrlFromString,
   contacts: t.array(EmailString),
   homepageUri: UrlFromString,
+  jwtSigningConfig: CryptoConfiguration,
   logoUri: UrlFromString,
   organizationName: NonEmptyString,
   policyUri: UrlFromString,
@@ -181,6 +182,7 @@ export type EntityConfigurationConfig = t.TypeOf<
 >;
 
 const WalletProviderConfig = t.type({
+  jwtSigningConfig: CryptoConfiguration,
   walletAttestation: t.type({
     walletLink: t.string,
     walletName: t.string,
@@ -193,7 +195,6 @@ export const Config = t.type({
   attestationService: AttestationServiceConfiguration,
   authProfile: AuthProfileApiConfig,
   azure: AzureConfig,
-  crypto: CryptoConfiguration,
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
@@ -219,42 +220,48 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
       RE.map((urls) => urls.split(",")),
     ),
     homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
+    jwks: pipe(
+      readFromEnvironment("FederationEntitySigningKeys"),
+      RE.chainEitherKW(fromBase64ToJwks),
+    ),
+    jwtDefaultAlg: pipe(
+      readFromEnvironment("EntityConfigurationJwtDefaultAlg"),
+      RE.orElse(() => RE.right("ES256")),
+    ),
+    jwtDefaultDuration: pipe(
+      readFromEnvironment("EntityConfigurationJwtDefaultDuration"),
+      RE.orElse(() => RE.right("24h")),
+    ),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
-  RE.map(({ authorityHints, ...federationEntity }) => ({
-    authorityHints,
-    federationEntity,
-  })),
+  RE.map(
+    ({
+      authorityHints,
+      jwks,
+      jwtDefaultAlg,
+      jwtDefaultDuration,
+      ...federationEntity
+    }) => ({
+      authorityHints,
+      federationEntity: {
+        ...federationEntity,
+        jwtSigningConfig: {
+          jwks,
+          jwtDefaultAlg,
+          jwtDefaultDuration,
+        },
+      },
+    }),
+  ),
   RE.chainEitherKW(
     parse(EntityConfigurationConfig, "Entity configuration config is invalid"),
   ),
 );
 
-export const getCryptoConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  CryptoConfiguration
-> = pipe(
-  sequenceS(RE.Apply)({
-    jwks: pipe(
-      readFromEnvironment("WalletKeys"),
-      RE.chainEitherKW(fromBase64ToJwks),
-    ),
-    jwtDefaultAlg: pipe(
-      readFromEnvironment("JwtDefaultAlg"),
-      RE.orElse(() => RE.right("ES256")),
-    ),
-    jwtDefaultDuration: pipe(
-      readFromEnvironment("JwtDefaultDuration"),
-      RE.orElse(() => RE.right("1h")),
-    ),
-  }),
-);
-
-export const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
+const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   Omit<AttestationServiceConfiguration, "httpRequestTimeout">
@@ -455,6 +462,18 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   WalletProviderConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    jwks: pipe(
+      readFromEnvironment("WalletProviderSigningKeys"),
+      RE.chainEitherKW(fromBase64ToJwks),
+    ),
+    jwtDefaultAlg: pipe(
+      readFromEnvironment("WalletAttestationJwtDefaultAlg"),
+      RE.orElse(() => RE.right("ES256")),
+    ),
+    jwtDefaultDuration: pipe(
+      readFromEnvironment("WalletAttestationJwtDefaultDuration"),
+      RE.orElse(() => RE.right("1h")),
+    ),
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
@@ -462,12 +481,19 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       "WalletAttestationWalletName",
     ),
   }),
-  RE.map(({ walletAttestationWalletLink, walletAttestationWalletName }) => ({
-    walletAttestation: {
-      walletLink: walletAttestationWalletLink,
-      walletName: walletAttestationWalletName,
-    },
-  })),
+  RE.map(
+    ({
+      walletAttestationWalletLink,
+      walletAttestationWalletName,
+      ...jwtSigningConfig
+    }) => ({
+      jwtSigningConfig,
+      walletAttestation: {
+        walletLink: walletAttestationWalletLink,
+        walletName: walletAttestationWalletName,
+      },
+    }),
+  ),
 );
 
 export const getConfigFromEnvironment: RE.ReaderEither<
@@ -479,7 +505,6 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     attestationService: getAttestationServiceConfigFromEnvironment,
     authProfile: getAuthProfileApiConfigFromEnvironment,
     azure: getAzureConfigFromEnvironment,
-    crypto: getCryptoConfigFromEnvironment,
     entityConfiguration: getEntityConfigurationFromEnvironment,
     httpRequestTimeout: pipe(
       getHttpRequestConfigFromEnvironment,

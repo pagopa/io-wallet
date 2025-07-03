@@ -145,12 +145,13 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       entityConfiguration,
+      entityConfigurationSigner: signer,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       telemetryClient,
+      walletAttestationSigner: signer,
       walletInstanceRepository,
     });
 
@@ -193,12 +194,13 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       entityConfiguration,
+      entityConfigurationSigner: signer,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       telemetryClient,
+      walletAttestationSigner: signer,
       walletInstanceRepository,
     });
 
@@ -246,12 +248,13 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       entityConfiguration,
+      entityConfigurationSigner: signer,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       telemetryClient,
+      walletAttestationSigner: signer,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -293,12 +296,13 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       entityConfiguration,
+      entityConfigurationSigner: signer,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       telemetryClient,
+      walletAttestationSigner: signer,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 

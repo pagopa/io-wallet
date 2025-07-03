@@ -42,6 +42,7 @@ export const EntityConfigurationToJwtModel: E.Encoder<
     authorityHints,
     federationEntityMetadata,
     iss,
+    jwks,
     sub,
     walletProviderMetadata,
   }) => ({
@@ -50,7 +51,7 @@ export const EntityConfigurationToJwtModel: E.Encoder<
     ),
     iss: removeTrailingSlash(iss.href),
     jwks: {
-      keys: walletProviderMetadata.jwks,
+      keys: jwks,
     },
     metadata: {
       federation_entity: {

@@ -87,7 +87,13 @@ const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const nonceRepository = new CosmosDbNonceRepository(database);
 
-const signer = new CryptoSigner(config.crypto);
+const entityConfigurationSigner = new CryptoSigner(
+  config.entityConfiguration.federationEntity.jwtSigningConfig,
+);
+
+const walletAttestationSigner = new CryptoSigner(
+  config.walletProvider.jwtSigningConfig,
+);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
@@ -139,9 +145,10 @@ app.http("createWalletAttestation", {
     CreateWalletAttestationFunction({
       attestationService: mobileAttestationService,
       entityConfiguration: config.entityConfiguration,
+      entityConfigurationSigner,
       nonceRepository,
-      signer,
       telemetryClient: appInsightsClient,
+      walletAttestationSigner,
       walletInstanceRepository,
     }),
   ),
@@ -180,9 +187,10 @@ app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
     containerClient,
     entityConfiguration: config.entityConfiguration,
+    entityConfigurationSigner,
     inputDecoder: t.unknown,
-    signer,
     telemetryClient: appInsightsClient,
+    walletAttestationSigner,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -319,7 +327,7 @@ app.http("createWalletAttestationV2", {
       attestationService: mobileAttestationService,
       federationEntity: config.entityConfiguration.federationEntity,
       nonceRepository,
-      signer,
+      signer: walletAttestationSigner,
       telemetryClient: appInsightsClient,
       walletAttestationConfig: config.walletProvider.walletAttestation,
       walletInstanceRepository,

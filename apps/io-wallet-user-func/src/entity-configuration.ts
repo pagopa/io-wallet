@@ -30,7 +30,8 @@ interface EntityConfiguration {
 
 export interface EntityConfigurationEnvironment {
   entityConfiguration: EntityConfiguration;
-  signer: Signer;
+  entityConfigurationSigner: Signer;
+  walletAttestationSigner: Signer;
 }
 
 const WalletProviderMetadataPayload = t.type({
@@ -42,6 +43,7 @@ export const EntityConfigurationPayload = t.type({
   authorityHints: t.array(UrlFromString),
   federationEntityMetadata: FederationEntityMetadata,
   iss: UrlFromString,
+  jwks: t.array(JwkPublicKey),
   sub: UrlFromString,
   walletProviderMetadata: WalletProviderMetadataPayload,
 });

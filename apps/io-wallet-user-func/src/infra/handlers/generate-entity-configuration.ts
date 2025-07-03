@@ -22,48 +22,57 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     authorityHints,
     federationEntity: { basePath, ...federationEntityMetadata },
   },
-  signer,
+  entityConfigurationSigner,
+  walletAttestationSigner,
 }) =>
   pipe(
     sequenceS(E.Apply)({
-      jwks: signer.getPublicKeys(),
-      publicJwk: pipe(
-        signer.getFirstPublicKeyByKty("EC"),
+      entityConfigurationPublicJwk: pipe(
+        entityConfigurationSigner.getFirstPublicKeyByKty("EC"),
         E.chainW(validateJwkKid),
       ),
+      federationEntityJwks: entityConfigurationSigner.getPublicKeys(),
+      walletProviderJwks: walletAttestationSigner.getPublicKeys(),
     }),
     TE.fromEither,
-    TE.chain(({ jwks, publicJwk }) =>
-      pipe(
-        {
-          authorityHints,
-          federationEntityMetadata: {
-            contacts: federationEntityMetadata.contacts,
-            homepageUri: federationEntityMetadata.homepageUri,
-            logoUri: federationEntityMetadata.logoUri,
-            organizationName: federationEntityMetadata.organizationName,
-            policyUri: federationEntityMetadata.policyUri,
-            tosUri: federationEntityMetadata.tosUri,
+    TE.chain(
+      ({
+        entityConfigurationPublicJwk,
+        federationEntityJwks,
+        walletProviderJwks,
+      }) =>
+        pipe(
+          {
+            authorityHints,
+            federationEntityMetadata: {
+              contacts: federationEntityMetadata.contacts,
+              homepageUri: federationEntityMetadata.homepageUri,
+              logoUri: federationEntityMetadata.logoUri,
+              organizationName: federationEntityMetadata.organizationName,
+              policyUri: federationEntityMetadata.policyUri,
+              tosUri: federationEntityMetadata.tosUri,
+            },
+            iss: basePath,
+            jwks: federationEntityJwks,
+            sub: basePath,
+            walletProviderMetadata: {
+              ascValues: [
+                pipe(basePath, getLoAUri(LoA.basic)),
+                pipe(basePath, getLoAUri(LoA.medium)),
+                pipe(basePath, getLoAUri(LoA.high)),
+              ],
+              jwks: walletProviderJwks,
+            },
           },
-          iss: basePath,
-          sub: basePath,
-          walletProviderMetadata: {
-            ascValues: [
-              pipe(basePath, getLoAUri(LoA.basic)),
-              pipe(basePath, getLoAUri(LoA.medium)),
-              pipe(basePath, getLoAUri(LoA.high)),
-            ],
-            jwks,
-          },
-        },
-        EntityConfigurationToJwtModel.encode,
-        signer.createJwtAndSign(
-          { typ: "entity-statement+jwt" },
-          publicJwk.kid,
-          "ES256",
-          "24h",
+          EntityConfigurationToJwtModel.encode,
+          entityConfigurationSigner.createJwtAndSign(
+            { typ: "entity-statement+jwt" },
+            entityConfigurationPublicJwk.kid,
+            "ES256",
+            "24h",
+            // TODO: SIW-2656. env var are not used
+          ),
         ),
-      ),
     ),
   );
 
