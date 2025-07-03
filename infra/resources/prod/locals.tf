@@ -47,9 +47,18 @@ locals {
         name                  = "GoogleAppCredentialsEncoded"
         key_vault_secret_name = "GoogleAppCredentialsEncoded"
       },
+      # to be deleted
       {
         name                  = "WalletKeys"
         key_vault_secret_name = "WalletKeys"
+      },
+      {
+        name                  = "FederationEntitySigningKeys"
+        key_vault_secret_name = "FederationEntitySigningKeys"
+      },
+      {
+        name                  = "WalletProviderSigningKeys"
+        key_vault_secret_name = "WalletProviderSigningKeys"
       },
       {
         name                  = "TrialSystemApiKey"

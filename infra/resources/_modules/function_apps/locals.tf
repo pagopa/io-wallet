@@ -116,7 +116,9 @@ locals {
         s.name => "foo"
       },
       {
-        WalletKeys                   = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletKeysPre)"
+        WalletKeys                   = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletKeysPre)" # to be deleted
+        FederationEntitySigningKeys  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=FederationEntitySigningKeysPre)"
+        WalletProviderSigningKeys    = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletProviderSigningKeysPre)"
         PidIssuerApiClientPrivateKey = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
         GoogleAppCredentialsEncoded  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
         AppInsightsConnectionString  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AppInsightsConnectionString)"
