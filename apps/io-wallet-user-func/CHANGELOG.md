@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.5.2
+
+### Patch Changes
+
+- 901f649: Added support for using separate keys for the federation entity and the wallet provider
+
 ## 3.5.1
 
 ### Patch Changes
