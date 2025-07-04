@@ -21,8 +21,8 @@ const cborEncode = (
     () => {
       const issuerSigned = document.prepare().get("issuerSigned");
       return encode({
-        nameSpaces: issuerSigned["nameSpaces"],
         issuerAuth: issuerSigned["issuerAuth"],
+        nameSpaces: issuerSigned["nameSpaces"],
       });
     },
     (reason) => (reason instanceof Error ? reason : new Error(String(reason))),
