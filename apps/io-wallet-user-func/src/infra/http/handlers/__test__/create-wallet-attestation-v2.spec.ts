@@ -142,17 +142,14 @@ const Tag24WithUint8Array = t.type({
 });
 
 const WalletAttestationMdocSchema = t.type({
-  docType: t.literal("org.iso.18013.5.1.IT.WalletAttestation"),
-  issuerSigned: t.type({
-    issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
-    nameSpaces: t.type({
-      "org.iso.18013.5.1.IT": t.tuple([
-        Tag24WithUint8Array,
-        Tag24WithUint8Array,
-        Tag24WithUint8Array,
-        Tag24WithUint8Array,
-      ]),
-    }),
+  issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
+  nameSpaces: t.type({
+    "org.iso.18013.5.1.IT": t.tuple([
+      Tag24WithUint8Array,
+      Tag24WithUint8Array,
+      Tag24WithUint8Array,
+      Tag24WithUint8Array,
+    ]),
   }),
 });
 
@@ -488,7 +485,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     const {
       issuerAuth,
       nameSpaces: { "org.iso.18013.5.1.IT": encodedDomesticNameSpace },
-    } = decodedWalletAttestationMdoc.right.issuerSigned;
+    } = decodedWalletAttestationMdoc.right;
 
     // nameSpaces
     const decodedDomesticNameSpace = encodedDomesticNameSpace.map(
