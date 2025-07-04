@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.5.3
+
+### Patch Changes
+
+- b4e56f0: Fix wallet attestation as mdoc cbor
+
 ## 3.5.2
 
 ### Patch Changes
