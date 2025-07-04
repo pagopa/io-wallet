@@ -19,10 +19,10 @@ const cborEncode = (
 ): E.Either<Error, Buffer<ArrayBufferLike>> =>
   E.tryCatch(
     () => {
-      const docMap = document.prepare();
+      const issuerSigned = document.prepare().get("issuerSigned");
       return encode({
-        docType: docMap.get("docType"),
-        issuerSigned: docMap.get("issuerSigned"),
+        issuerAuth: issuerSigned["issuerAuth"],
+        nameSpaces: issuerSigned["nameSpaces"],
       });
     },
     (reason) => (reason instanceof Error ? reason : new Error(String(reason))),
