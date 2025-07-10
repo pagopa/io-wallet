@@ -149,6 +149,7 @@ const createCertificateChain: (input: {
         (certs) => RTE.right(certs),
       ),
     ),
+    // TODO [SIW-2719]: add certificate chain validation
     RTE.map((certs) => [certificate, ...certs]),
     RTE.chainFirstW((certificates) =>
       insertCertificateChain({

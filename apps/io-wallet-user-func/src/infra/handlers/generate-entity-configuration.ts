@@ -77,6 +77,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
             pipe(
               federationEntityJwks,
               TE.traverseArray((jwk) =>
+                // TODO [SIW-2719]: Add certificate chain validation and ensure the system handles any issues appropriately
                 pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
               ),
             ),
