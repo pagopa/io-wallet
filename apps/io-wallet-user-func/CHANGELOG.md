@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.5.4
+
+### Patch Changes
+
+- 47905db: Added x5c generation for federation entity and wallet provider keys
+
 ## 3.5.3
 
 ### Patch Changes
