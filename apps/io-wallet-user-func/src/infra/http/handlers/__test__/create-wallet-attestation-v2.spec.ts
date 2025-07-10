@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { AttestationService } from "@/attestation-service";
+// import { CertificateRepository } from "@/certificates";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -236,6 +237,10 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
+// const certificateRepository: CertificateRepository = {
+//   getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
+// };
+
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
@@ -283,6 +288,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -316,6 +322,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -370,6 +377,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -441,6 +449,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded mdoc cbor on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -562,6 +571,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -610,6 +620,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -653,6 +664,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
+      // certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,

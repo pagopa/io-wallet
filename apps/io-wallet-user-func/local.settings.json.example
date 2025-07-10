@@ -52,6 +52,9 @@
     "AuthProfileApiKey": "AUTH_PROFILE_API_KEY",
     "AuthProfileApiBaseURL": "AUTH_PROFILE_API_BASE_URL",
     "WalletAttestationWalletLink": "WALLET_ATTESTATION_WALLET_LINK",
-    "WalletAttestationWalletName": "WALLET_ATTESTATION_WALLET_NAME"
+    "WalletAttestationWalletName": "WALLET_ATTESTATION_WALLET_NAME",
+    "WalletProviderCertificateCountry": "WALLET_PROVIDER_CERTIFICATE_COUNTRY",
+    "WalletProviderCertificateState": "WALLET_PROVIDER_CERTIFICATE_STATE",
+    "WalletProviderCertificateLocality": "WALLET_PROVIDER_CERTIFICATE_LOCALITY"
   }
 }

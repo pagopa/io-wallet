@@ -7,6 +7,7 @@ import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 
+// import { CertificateRepository } from "./certificates";
 import {
   WalletAttestationData,
   WalletAttestationToJwtModel,
@@ -105,6 +106,7 @@ interface WalletAttestationConfig {
 }
 
 export interface WalletAttestationEnvironment {
+  // certificateRepository: CertificateRepository;
   federationEntity: FederationEntity;
   signer: Signer;
   walletAttestationConfig: WalletAttestationConfig;

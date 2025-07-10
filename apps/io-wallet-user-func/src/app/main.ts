@@ -1,5 +1,6 @@
 import ai from "@/infra/azure/appinsights/start";
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
+import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
@@ -9,6 +10,7 @@ import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-
 import { CreateWalletAttestationV2Function } from "@/infra/azure/functions/create-wallet-attestation-v2";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { DeleteWalletInstancesFunction } from "@/infra/azure/functions/delete-wallet-instances";
+import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
@@ -31,6 +33,7 @@ import { DefaultAzureCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -127,6 +130,10 @@ const containerClient = blobServiceClient.getContainerClient(
   config.azure.storage.entityConfiguration.containerName,
 );
 
+const certificateRepository = new CosmosDbCertificateRepository(database);
+
+const certificateIssuerAndSubject = `C=${config.walletProvider.certificate.country}, ST=${config.walletProvider.certificate.state}, L=${config.walletProvider.certificate.locality}, O=${config.entityConfiguration.federationEntity.organizationName}, CN=${config.entityConfiguration.federationEntity.basePath.hostname}`;
+
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: withAppInsights(
@@ -144,6 +151,7 @@ app.http("createWalletAttestation", {
   handler: withAppInsights(
     CreateWalletAttestationFunction({
       attestationService: mobileAttestationService,
+      certificateRepository,
       entityConfiguration: config.entityConfiguration,
       entityConfigurationSigner,
       nonceRepository,
@@ -185,6 +193,7 @@ app.http("getNonce", {
 
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
+    certificateRepository,
     containerClient,
     entityConfiguration: config.entityConfiguration,
     entityConfigurationSigner,
@@ -325,6 +334,7 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
+      // certificateRepository,
       federationEntity: config.entityConfiguration.federationEntity,
       nonceRepository,
       signer: walletAttestationSigner,
@@ -347,4 +357,23 @@ app.http("IsFiscalCodeWhitelisted", {
   ),
   methods: ["GET"],
   route: "whitelisted-fiscal-code/{fiscalCode}",
+});
+
+app.http("generateCertificateChain", {
+  authLevel: "function",
+  handler: withAppInsights(
+    GenerateCertificateChainFunction({
+      certificate: {
+        crypto: new Crypto(),
+        issuer: certificateIssuerAndSubject,
+        subject: certificateIssuerAndSubject,
+      },
+      certificateRepository,
+      federationEntitySigningKeys:
+        config.entityConfiguration.federationEntity.jwtSigningConfig.jwks,
+      telemetryClient: appInsightsClient,
+    }),
+  ),
+  methods: ["POST"],
+  route: "certificate-chain",
 });
