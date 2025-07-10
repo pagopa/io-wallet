@@ -571,22 +571,16 @@ components:
         kty:
           type: string
           enum: [EC]
-          description: Key type (only EC is supported).
         use:
           type: string
-          description: Public key use (e.g., sig, enc).
         kid:
           type: string
-          description: Key ID.
         crv:
           type: string
-          description: Elliptic curve identifier.
         x:
           type: string
-          description: x coordinate, base64url-encoded.
         y:
           type: string
-          description: y coordinate, base64url-encoded.
       required:
         - kty
         - crv
