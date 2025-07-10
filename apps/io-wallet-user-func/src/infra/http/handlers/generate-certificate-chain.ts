@@ -82,6 +82,7 @@ const issueX509Certificate: (input: {
         X509CertificateGenerator.create(
           {
             issuer,
+            // certificate is valid starting 1 minute before and expires in 1 year
             notAfter: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
             notBefore: new Date(Date.now() - 60000),
             publicKey,
