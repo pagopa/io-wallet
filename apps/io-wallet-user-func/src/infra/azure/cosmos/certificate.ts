@@ -47,10 +47,19 @@ export class CosmosDbCertificateRepository implements CertificateRepository {
     );
   }
 
-  insertCertificateChain(input: { certificateChain: string[]; kid: string }) {
+  insertCertificateChain({
+    certificateChain,
+    kid,
+  }: {
+    certificateChain: string[];
+    kid: string;
+  }) {
     return TE.tryCatch(
       async () => {
-        await this.#container.items.create(input);
+        await this.#container.items.create({
+          certificateChain,
+          id: kid,
+        });
       },
       (error) =>
         error instanceof Error && error.name === "TimeoutError"

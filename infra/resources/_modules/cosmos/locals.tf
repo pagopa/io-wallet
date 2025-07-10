@@ -51,6 +51,14 @@ locals {
       }
       default_ttl = null
     },
+    {
+      name               = "certificates"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 8000
+      }
+      default_ttl = null
+    },
   ]
 
   wallet_cosmosdb_uat_containers = [
@@ -69,6 +77,14 @@ locals {
         max_throughput = 1000
       }
       default_ttl = 300
-    }
+    },
+    {
+      name               = "certificates"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = 1000
+      }
+      default_ttl = null
+    },
   ]
 }
