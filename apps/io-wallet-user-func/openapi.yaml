@@ -233,6 +233,28 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
+  /certificate-chain:
+    post:
+      operationId: generateCertificateChain
+      summary: Create a certificate chain
+      security:
+        - FunctionsKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateCertificateChainBody"
+      responses:
+        "204":
+          description: Wallet instance successfully created
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
   /health:
     get:
       operationId: healthCheck
@@ -454,6 +476,17 @@ components:
         - assertion
         - fiscal_code
 
+    GenerateCertificateChainBody:
+      type: object
+      properties:
+        issuer_key_id:
+          type: string
+        subject_key:
+          $ref: "#/components/schemas/JWK"
+      required:
+        - issuer_key_id
+        - subject_key
+
     RevocationReason:
       type: string
       enum:
@@ -530,3 +563,33 @@ components:
           type: string
           description: |-
             The fiscal code, the same one passed in input.
+
+    JWK:
+      type: object
+      description: A JSON Web Key representation (public EC keys only)
+      properties:
+        kty:
+          type: string
+          enum: [EC]
+          description: Key type (only EC is supported).
+        use:
+          type: string
+          description: Public key use (e.g., sig, enc).
+        kid:
+          type: string
+          description: Key ID.
+        crv:
+          type: string
+          description: Elliptic curve identifier.
+        x:
+          type: string
+          description: x coordinate, base64url-encoded.
+        y:
+          type: string
+          description: y coordinate, base64url-encoded.
+      required:
+        - kty
+        - crv
+        - x
+        - y
+        - kid
