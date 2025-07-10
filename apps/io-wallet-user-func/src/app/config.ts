@@ -23,7 +23,7 @@ import {
   SlackConfig,
   getSlackConfigFromEnvironment,
 } from "io-wallet-common/infra/slack/config";
-import { Jwk, fromBase64ToJwks } from "io-wallet-common/jwk";
+import { JwkPrivateKey, fromBase64ToJwks } from "io-wallet-common/jwk";
 
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
@@ -80,7 +80,7 @@ export const getMailConfigFromEnvironment: RE.ReaderEither<
 );
 
 export const CryptoConfiguration = t.type({
-  jwks: t.array(Jwk),
+  jwks: t.array(JwkPrivateKey),
   jwtDefaultAlg: t.string,
   jwtDefaultDuration: t.string,
 });
@@ -182,6 +182,11 @@ export type EntityConfigurationConfig = t.TypeOf<
 >;
 
 const WalletProviderConfig = t.type({
+  certificate: t.type({
+    country: t.string,
+    locality: t.string,
+    state: t.string,
+  }),
   jwtSigningConfig: CryptoConfiguration,
   walletAttestation: t.type({
     walletLink: t.string,
@@ -462,9 +467,15 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   WalletProviderConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    certificateCountry: readFromEnvironment("WalletProviderCertificateCountry"),
+    certificateLocality: readFromEnvironment(
+      "WalletProviderCertificateLocality",
+    ),
+    certificateState: readFromEnvironment("WalletProviderCertificateState"),
     jwks: pipe(
       readFromEnvironment("WalletProviderSigningKeys"),
       RE.chainEitherKW(fromBase64ToJwks),
+      RE.chainEitherKW(parse(t.array(JwkPrivateKey))),
     ),
     jwtDefaultAlg: pipe(
       readFromEnvironment("WalletAttestationJwtDefaultAlg"),
@@ -483,10 +494,18 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
+      certificateCountry,
+      certificateLocality,
+      certificateState,
       walletAttestationWalletLink,
       walletAttestationWalletName,
       ...jwtSigningConfig
     }) => ({
+      certificate: {
+        country: certificateCountry,
+        locality: certificateLocality,
+        state: certificateState,
+      },
       jwtSigningConfig,
       walletAttestation: {
         walletLink: walletAttestationWalletLink,

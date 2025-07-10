@@ -3,6 +3,7 @@ import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
+import { CertificateRepository } from "./certificates";
 import { Signer } from "./signer";
 
 export const FederationEntityMetadata = t.type({
@@ -29,6 +30,7 @@ interface EntityConfiguration {
 }
 
 export interface EntityConfigurationEnvironment {
+  certificateRepository: CertificateRepository;
   entityConfiguration: EntityConfiguration;
   entityConfigurationSigner: Signer;
   walletAttestationSigner: Signer;

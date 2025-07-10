@@ -41,6 +41,10 @@ locals {
 
     WalletAttestationWalletName = "IT Wallet"
 
+    WalletProviderCertificateCountry  = "IT"
+    WalletProviderCertificateState    = "Lazio"
+    WalletProviderCertificateLocality = "Roma"
+
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
     WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
     },

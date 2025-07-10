@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { AttestationService } from "@/attestation-service";
+import { CertificateRepository } from "@/certificates";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -103,6 +104,11 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
+const certificateRepository: CertificateRepository = {
+  getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
+  insertCertificateChain: () => TE.right(undefined),
+};
+
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
@@ -144,6 +150,7 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
+      certificateRepository,
       entityConfiguration,
       entityConfigurationSigner: signer,
       input: req,
@@ -193,6 +200,7 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
+      certificateRepository,
       entityConfiguration,
       entityConfigurationSigner: signer,
       input: req,
@@ -247,6 +255,7 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
+      certificateRepository,
       entityConfiguration,
       entityConfigurationSigner: signer,
       input: req,
@@ -295,6 +304,7 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
+      certificateRepository,
       entityConfiguration,
       entityConfigurationSigner: signer,
       input: req,
