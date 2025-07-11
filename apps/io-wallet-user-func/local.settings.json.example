@@ -9,7 +9,6 @@
     "CosmosDbEndpoint__accountEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
-    "EntityConfigurationAuthorityHints": "ENTITY_CONFIGURATION_AUTHORITY_HINTS",
     "FederationEntityBasePath": "FEDERATION_ENTITY_BASE_PATH",
     "FederationEntityOrganizationName": "FEDERATION_ENTITY_ORGANIZATION_NAME",
     "FederationEntityHomepageUri": "FEDERATION_ENTITY_HOMEPAGE_URI",
@@ -55,6 +54,7 @@
     "WalletAttestationWalletName": "WALLET_ATTESTATION_WALLET_NAME",
     "WalletProviderCertificateCountry": "WALLET_PROVIDER_CERTIFICATE_COUNTRY",
     "WalletProviderCertificateState": "WALLET_PROVIDER_CERTIFICATE_STATE",
-    "WalletProviderCertificateLocality": "WALLET_PROVIDER_CERTIFICATE_LOCALITY"
+    "WalletProviderCertificateLocality": "WALLET_PROVIDER_CERTIFICATE_LOCALITY",
+    "TrustAnchorUrl": "TRUST_ANCHOR_URL"
   }
 }

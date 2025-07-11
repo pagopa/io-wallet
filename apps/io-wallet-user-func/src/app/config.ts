@@ -173,8 +173,8 @@ const FederationEntityConfig = t.type({
 type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
 
 const EntityConfigurationConfig = t.type({
-  authorityHints: t.array(UrlFromString),
   federationEntity: FederationEntityConfig,
+  trustAnchorUrl: UrlFromString,
 });
 
 export type EntityConfigurationConfig = t.TypeOf<
@@ -215,10 +215,6 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
   EntityConfigurationConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    authorityHints: pipe(
-      readFromEnvironment("EntityConfigurationAuthorityHints"),
-      RE.map((urls) => urls.split(",")),
-    ),
     basePath: readFromEnvironment("FederationEntityBasePath"),
     contacts: pipe(
       readFromEnvironment("FederationEntityContacts"),
@@ -241,16 +237,19 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
+    trustAnchorUrl: pipe(
+      readFromEnvironment("TrustAnchorUrl"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
   }),
   RE.map(
     ({
-      authorityHints,
       jwks,
       jwtDefaultAlg,
       jwtDefaultDuration,
+      trustAnchorUrl,
       ...federationEntity
     }) => ({
-      authorityHints,
       federationEntity: {
         ...federationEntity,
         jwtSigningConfig: {
@@ -259,6 +258,7 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
           jwtDefaultDuration,
         },
       },
+      trustAnchorUrl,
     }),
   ),
   RE.chainEitherKW(

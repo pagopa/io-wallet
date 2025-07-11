@@ -152,7 +152,10 @@ app.http("createWalletAttestation", {
     CreateWalletAttestationFunction({
       attestationService: mobileAttestationService,
       certificateRepository,
-      entityConfiguration: config.entityConfiguration,
+      entityConfiguration: {
+        ...config.entityConfiguration,
+        authorityHints: [config.entityConfiguration.trustAnchorUrl],
+      },
       entityConfigurationSigner,
       nonceRepository,
       telemetryClient: appInsightsClient,
@@ -195,7 +198,10 @@ app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
     certificateRepository,
     containerClient,
-    entityConfiguration: config.entityConfiguration,
+    entityConfiguration: {
+      ...config.entityConfiguration,
+      authorityHints: [config.entityConfiguration.trustAnchorUrl],
+    },
     entityConfigurationSigner,
     inputDecoder: t.unknown,
     telemetryClient: appInsightsClient,
@@ -339,7 +345,10 @@ app.http("createWalletAttestationV2", {
       nonceRepository,
       signer: walletAttestationSigner,
       telemetryClient: appInsightsClient,
-      walletAttestationConfig: config.walletProvider.walletAttestation,
+      walletAttestationConfig: {
+        ...config.walletProvider.walletAttestation,
+        trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
+      },
       walletInstanceRepository,
     }),
   ),
