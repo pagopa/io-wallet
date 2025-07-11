@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.5.5
+
+### Patch Changes
+
+- d72846d: Fixed `vct` value in wallet attestation SD-jWT
+
 ## 3.5.4
 
 ### Patch Changes
