@@ -173,8 +173,8 @@ const FederationEntityConfig = t.type({
 type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
 
 const EntityConfigurationConfig = t.type({
-  authorityHints: t.array(UrlFromString),
   federationEntity: FederationEntityConfig,
+  taURL: UrlFromString,
 });
 
 export type EntityConfigurationConfig = t.TypeOf<
@@ -189,7 +189,6 @@ const WalletProviderConfig = t.type({
   }),
   jwtSigningConfig: CryptoConfiguration,
   walletAttestation: t.type({
-    taURL: UrlFromString,
     walletLink: t.string,
     walletName: t.string,
   }),
@@ -216,10 +215,6 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
   EntityConfigurationConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    authorityHints: pipe(
-      readFromEnvironment("EntityConfigurationAuthorityHints"),
-      RE.map((urls) => urls.split(",")),
-    ),
     basePath: readFromEnvironment("FederationEntityBasePath"),
     contacts: pipe(
       readFromEnvironment("FederationEntityContacts"),
@@ -241,17 +236,21 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
+    taURL: pipe(
+      readFromEnvironment("TrustAnchorURL"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
   RE.map(
     ({
-      authorityHints,
       jwks,
       jwtDefaultAlg,
+      taURL,
       jwtDefaultDuration,
       ...federationEntity
     }) => ({
-      authorityHints,
+      taURL,
       federationEntity: {
         ...federationEntity,
         jwtSigningConfig: {
@@ -486,10 +485,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("WalletAttestationJwtDefaultDuration"),
       RE.orElse(() => RE.right("1h")),
     ),
-    taURL: pipe(
-      readFromEnvironment("TrustAnchorURL"),
-      RE.chainEitherKW(parse(UrlFromString)),
-    ),
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
@@ -502,7 +497,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       certificateCountry,
       certificateLocality,
       certificateState,
-      taURL,
       walletAttestationWalletLink,
       walletAttestationWalletName,
       ...jwtSigningConfig
@@ -514,7 +508,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       },
       jwtSigningConfig,
       walletAttestation: {
-        taURL,
         walletLink: walletAttestationWalletLink,
         walletName: walletAttestationWalletName,
       },
