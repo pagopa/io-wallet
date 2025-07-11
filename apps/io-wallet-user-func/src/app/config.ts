@@ -246,11 +246,10 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
     ({
       jwks,
       jwtDefaultAlg,
-      taURL,
       jwtDefaultDuration,
+      taURL,
       ...federationEntity
     }) => ({
-      taURL,
       federationEntity: {
         ...federationEntity,
         jwtSigningConfig: {
@@ -259,6 +258,7 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
           jwtDefaultDuration,
         },
       },
+      taURL,
     }),
   ),
   RE.chainEitherKW(
