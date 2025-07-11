@@ -239,8 +239,8 @@ const walletInstanceRepository: WalletInstanceRepository = {
 };
 
 const certificateRepository: CertificateRepository = {
-  insertCertificateChain: () => TE.right(undefined),
   getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
+  insertCertificateChain: () => TE.right(undefined),
 };
 
 const data = Buffer.from(assertion, "base64");
