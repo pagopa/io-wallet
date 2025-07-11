@@ -174,7 +174,7 @@ type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
 
 const EntityConfigurationConfig = t.type({
   federationEntity: FederationEntityConfig,
-  taURL: UrlFromString,
+  trustAnchorUrl: UrlFromString,
 });
 
 export type EntityConfigurationConfig = t.TypeOf<
@@ -236,18 +236,18 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
-    taURL: pipe(
-      readFromEnvironment("TrustAnchorURL"),
+    tosUri: readFromEnvironment("FederationEntityTosUri"),
+    trustAnchorUrl: pipe(
+      readFromEnvironment("TrustAnchorUrl"),
       RE.chainEitherKW(parse(UrlFromString)),
     ),
-    tosUri: readFromEnvironment("FederationEntityTosUri"),
   }),
   RE.map(
     ({
       jwks,
       jwtDefaultAlg,
       jwtDefaultDuration,
-      taURL,
+      trustAnchorUrl,
       ...federationEntity
     }) => ({
       federationEntity: {
@@ -258,7 +258,7 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
           jwtDefaultDuration,
         },
       },
-      taURL,
+      trustAnchorUrl,
     }),
   ),
   RE.chainEitherKW(

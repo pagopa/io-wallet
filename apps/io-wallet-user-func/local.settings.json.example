@@ -55,6 +55,6 @@
     "WalletProviderCertificateCountry": "WALLET_PROVIDER_CERTIFICATE_COUNTRY",
     "WalletProviderCertificateState": "WALLET_PROVIDER_CERTIFICATE_STATE",
     "WalletProviderCertificateLocality": "WALLET_PROVIDER_CERTIFICATE_LOCALITY",
-    "TrustAnchorURL": "TRUST_ANCHOR_URL"
+    "TrustAnchorUrl": "TRUST_ANCHOR_URL"
   }
 }

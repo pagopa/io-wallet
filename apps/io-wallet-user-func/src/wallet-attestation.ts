@@ -102,7 +102,7 @@ export const createWalletAttestation =
 
 // ----- new wallet-attestation endpoint
 interface WalletAttestationConfig {
-  taURL: ValidUrl;
+  trustAnchorUrl: ValidUrl;
   walletLink: string;
   walletName: string;
 }
@@ -181,7 +181,7 @@ export const createWalletAttestationAsSdJwt =
   (
     walletAttestationData: WalletAttestationData,
   ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  ({ signer, walletAttestationConfig: { taURL } }) =>
+  ({ signer, walletAttestationConfig: { trustAnchorUrl } }) =>
     pipe(
       walletAttestationData,
       ({ iss, sub, walletInstancePublicKey, ...rest }) => ({
@@ -191,7 +191,7 @@ export const createWalletAttestationAsSdJwt =
         },
         iss: removeTrailingSlash(iss),
         sub: removeTrailingSlash(sub),
-        vct: `${taURL.href}v1.0/WalletAttestation`,
+        vct: `${trustAnchorUrl.href}v1.0/WalletAttestation`,
       }),
       (sdJwtModel) =>
         pipe(

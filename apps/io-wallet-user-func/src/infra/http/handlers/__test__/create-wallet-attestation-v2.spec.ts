@@ -191,7 +191,7 @@ const federationEntity = {
 };
 
 const walletAttestationConfig = {
-  taURL: url("https://foo.com"),
+  trustAnchorUrl: url("https://foo.com"),
   walletLink: "https://foo.com",
   walletName: "Wallet name",
 };
