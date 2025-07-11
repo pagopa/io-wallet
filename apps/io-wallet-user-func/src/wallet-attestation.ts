@@ -1,3 +1,4 @@
+import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import * as E from "fp-ts/Either";
 import * as IOE from "fp-ts/IOEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -101,6 +102,7 @@ export const createWalletAttestation =
 
 // ----- new wallet-attestation endpoint
 interface WalletAttestationConfig {
+  taURL: ValidUrl;
   walletLink: string;
   walletName: string;
 }
@@ -179,7 +181,7 @@ export const createWalletAttestationAsSdJwt =
   (
     walletAttestationData: WalletAttestationData,
   ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  (environment) =>
+  ({ signer, walletAttestationConfig: { taURL } }) =>
     pipe(
       walletAttestationData,
       ({ iss, sub, walletInstancePublicKey, ...rest }) => ({
@@ -189,7 +191,7 @@ export const createWalletAttestationAsSdJwt =
         },
         iss: removeTrailingSlash(iss),
         sub: removeTrailingSlash(sub),
-        vct: "wallet.io.pagopa.it/wallet-attestation/v1.0.0",
+        vct: `${taURL.href}v1.0/WalletAttestation`,
       }),
       (sdJwtModel) =>
         pipe(
@@ -211,7 +213,7 @@ export const createWalletAttestationAsSdJwt =
                 sub,
                 vct,
               }),
-              environment.signer.createJwtAndSign(
+              signer.createJwtAndSign(
                 {
                   typ: "dc+sd-jwt",
                 },

@@ -190,7 +190,8 @@ const federationEntity = {
   tosUri: url("https://wallet-provider.example.org/logo.svg"),
 };
 
-const walletAttestationClaims = {
+const walletAttestationConfig = {
+  taURL: url("https://foo.com"),
   walletLink: "https://foo.com",
   walletName: "Wallet name",
 };
@@ -296,7 +297,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository,
     });
 
@@ -330,7 +331,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository,
     });
 
@@ -385,7 +386,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository,
     });
 
@@ -457,7 +458,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository,
     });
 
@@ -579,7 +580,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository,
     });
 
@@ -628,7 +629,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -672,7 +673,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       nonceRepository,
       signer,
       telemetryClient,
-      walletAttestationConfig: walletAttestationClaims,
+      walletAttestationConfig,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
