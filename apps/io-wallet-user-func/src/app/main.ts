@@ -340,7 +340,7 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity: config.entityConfiguration.federationEntity,
       nonceRepository,
       signer: walletAttestationSigner,

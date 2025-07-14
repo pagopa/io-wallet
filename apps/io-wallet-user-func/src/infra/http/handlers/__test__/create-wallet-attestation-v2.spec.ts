@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { AttestationService } from "@/attestation-service";
-// import { CertificateRepository } from "@/certificates";
+import { CertificateRepository } from "@/certificates";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -238,9 +238,10 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
-// const certificateRepository: CertificateRepository = {
-//   getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
-// };
+const certificateRepository: CertificateRepository = {
+  getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
+  insertCertificateChain: () => TE.right(undefined),
+};
 
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
@@ -289,7 +290,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -323,7 +324,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -378,7 +379,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -450,7 +451,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded mdoc cbor on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -562,6 +563,68 @@ describe("CreateWalletAttestationV2Handler", async () => {
     await expect(newIssuerAuth.verify(publicKey)).resolves.toBe(true);
   });
 
+  it("should return a 500 HTTP response when getCertificateChainByKid returns an error", async () => {
+    const certificateRepositoryError: CertificateRepository = {
+      getCertificateChainByKid: () => TE.left(new Error()),
+      insertCertificateChain: () => TE.right(undefined),
+    };
+
+    const handler = CreateWalletAttestationV2Handler({
+      attestationService: mockAttestationService,
+      certificateRepository: certificateRepositoryError,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response when getCertificateChainByKid returns an O.none", async () => {
+    const certificateRepositoryNone: CertificateRepository = {
+      getCertificateChainByKid: () => TE.right(O.none),
+      insertCertificateChain: () => TE.right(undefined),
+    };
+
+    const handler = CreateWalletAttestationV2Handler({
+      attestationService: mockAttestationService,
+      certificateRepository: certificateRepositoryNone,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
   it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -572,7 +635,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -621,7 +684,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -665,7 +728,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      // certificateRepository,
+      certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,

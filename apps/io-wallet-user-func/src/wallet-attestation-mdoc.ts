@@ -5,7 +5,7 @@ import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
-// import { sequenceS } from "fp-ts/lib/Apply";
+import { sequenceS } from "fp-ts/lib/Apply";
 import { JwkPrivateKey } from "io-wallet-common/jwk";
 
 import { WalletAttestationData } from "./encoders/wallet-attestation";
@@ -30,15 +30,15 @@ const cborEncode = (
   );
 
 const createDocument: ({
-  // issuerCertificate,
+  issuerCertificate,
   issuerPrivateKey,
   walletAttestationData,
 }: {
-  // issuerCertificate: string[];
+  issuerCertificate: string[];
   issuerPrivateKey: JwkPrivateKey;
   walletAttestationData: WalletAttestationData;
 }) => TE.TaskEither<Error, IssuerSignedDocument> = ({
-  // issuerCertificate,
+  issuerCertificate,
   issuerPrivateKey,
   walletAttestationData,
 }) =>
@@ -61,61 +61,15 @@ const createDocument: ({
         })
         .sign({
           alg: "ES256",
-          // issuerCertificate: issuerCertificate.map(
-          //   (x) => `-----BEGIN CERTIFICATE-----${x}-----END CERTIFICATE-----`,
-          // ),
-          issuerCertificate: ``, // TODO
+          issuerCertificate: issuerCertificate.map(
+            (base64Cert) =>
+              `-----BEGIN CERTIFICATE-----${base64Cert}-----END CERTIFICATE-----`,
+          ),
           issuerPrivateKey,
           kid: issuerPrivateKey.kid,
         }),
     (reason) => (reason instanceof Error ? reason : new Error(String(reason))),
   );
-
-// const createCborEncodedMDoc =
-//   (
-//     walletAttestationData: WalletAttestationData,
-//   ): ((
-//     dep: WalletAttestationEnvironment,
-//   ) => TE.TaskEither<Error, Buffer<ArrayBufferLike>>) =>
-//   ({
-//     certificateRepository: { getCertificateChainByKid },
-//     signer: { getPrivateKeyByKid },
-//   }) =>
-//     pipe(
-//       sequenceS(TE.ApplyPar)({
-//         maybeCert: getCertificateChainByKid(walletAttestationData.kid),
-//         maybePrivateKey: pipe(
-//           getPrivateKeyByKid(walletAttestationData.kid),
-//           TE.right,
-//         ),
-//       }),
-//       TE.chain(({ maybeCert, maybePrivateKey }) =>
-//         pipe(
-//           sequenceS(O.Apply)({
-//             issuerCertificate: maybeCert,
-//             issuerPrivateKey: maybePrivateKey,
-//           }),
-//           O.match(
-//             () =>
-//               TE.left(
-//                 new Error(
-//                   "Missing private key or certificate for the given KID",
-//                 ),
-//               ),
-//             ({ issuerCertificate, issuerPrivateKey }) =>
-//               pipe(
-//                 {
-//                   issuerCertificate,
-//                   issuerPrivateKey,
-//                   walletAttestationData,
-//                 },
-//                 createDocument,
-//                 TE.chain(flow(cborEncode, TE.fromEither)),
-//               ),
-//           ),
-//         ),
-//       ),
-//     );
 
 const createCborEncodedMDoc =
   (
@@ -123,23 +77,42 @@ const createCborEncodedMDoc =
   ): ((
     dep: WalletAttestationEnvironment,
   ) => TE.TaskEither<Error, Buffer<ArrayBufferLike>>) =>
-  (dep) =>
+  ({ certificateRepository, signer }) =>
     pipe(
-      walletAttestationData.kid,
-      dep.signer.getPrivateKeyByKid,
-      O.match(
-        () =>
-          TE.left(
-            new Error(
-              "Failed to retrieve private key while generating mDoc wallet attestation",
-            ),
+      sequenceS(TE.ApplyPar)({
+        maybeCert: certificateRepository.getCertificateChainByKid(
+          walletAttestationData.kid,
+        ),
+        maybePrivateKey: pipe(
+          signer.getPrivateKeyByKid(walletAttestationData.kid),
+          TE.right,
+        ),
+      }),
+      TE.chain(({ maybeCert, maybePrivateKey }) =>
+        pipe(
+          sequenceS(O.Apply)({
+            issuerCertificate: maybeCert,
+            issuerPrivateKey: maybePrivateKey,
+          }),
+          O.match(
+            () =>
+              TE.left(
+                new Error(
+                  "Missing private key or certificate for the given KID",
+                ),
+              ),
+            ({ issuerCertificate, issuerPrivateKey }) =>
+              pipe(
+                {
+                  issuerCertificate,
+                  issuerPrivateKey,
+                  walletAttestationData,
+                },
+                createDocument,
+                TE.chain(flow(cborEncode, TE.fromEither)),
+              ),
           ),
-        (issuerPrivateKey) =>
-          pipe(
-            { issuerPrivateKey, walletAttestationData },
-            createDocument,
-            TE.chain(flow(cborEncode, TE.fromEither)),
-          ),
+        ),
       ),
     );
 
