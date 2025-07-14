@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.6.0
+
+### Minor Changes
+
+- 16ee9ce: Added x5c in wallet attestation mdoc cbor
+
 ## 3.5.5
 
 ### Patch Changes
