@@ -563,6 +563,37 @@ describe("CreateWalletAttestationV2Handler", async () => {
     await expect(newIssuerAuth.verify(publicKey)).resolves.toBe(true);
   });
 
+  it("should return a 500 HTTP response when getCertificateChainByKid returns an error", async () => {
+    const certificateRepositoryError: CertificateRepository = {
+      getCertificateChainByKid: () => TE.left(new Error()),
+      insertCertificateChain: () => TE.right(undefined),
+    };
+
+    const handler = CreateWalletAttestationV2Handler({
+      attestationService: mockAttestationService,
+      certificateRepository: certificateRepositoryError,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      telemetryClient,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
   it("should return a 422 HTTP response on invalid body", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
