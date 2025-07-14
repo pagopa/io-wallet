@@ -77,15 +77,14 @@ const createCborEncodedMDoc =
   ): ((
     dep: WalletAttestationEnvironment,
   ) => TE.TaskEither<Error, Buffer<ArrayBufferLike>>) =>
-  ({
-    certificateRepository: { getCertificateChainByKid },
-    signer: { getPrivateKeyByKid },
-  }) =>
+  ({ certificateRepository, signer }) =>
     pipe(
       sequenceS(TE.ApplyPar)({
-        maybeCert: getCertificateChainByKid(walletAttestationData.kid),
+        maybeCert: certificateRepository.getCertificateChainByKid(
+          walletAttestationData.kid,
+        ),
         maybePrivateKey: pipe(
-          getPrivateKeyByKid(walletAttestationData.kid),
+          signer.getPrivateKeyByKid(walletAttestationData.kid),
           TE.right,
         ),
       }),
