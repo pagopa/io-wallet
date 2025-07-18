@@ -1,8 +1,8 @@
 import * as H from "@pagopa/handler-kit";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
-import * as O from "fp-ts/Option";
 import * as J from "fp-ts/Json";
+import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
