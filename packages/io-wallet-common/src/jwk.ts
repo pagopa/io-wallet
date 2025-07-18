@@ -2,6 +2,7 @@ import * as H from "@pagopa/handler-kit";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import * as J from "fp-ts/Json";
+import * as O from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
@@ -93,11 +94,13 @@ export const fromBase64ToJwks = (b64: string) =>
     E.chainW(H.parse(t.array(Jwk), "Invalid JWKs")),
   );
 
-export const getKeyByKid = (kid: string) => (jwks: JwkPublicKey[]) =>
-  pipe(
-    jwks,
-    A.findFirst((key) => key.kid === kid),
-  );
+export const getKeyByKid =
+  (kid: string) =>
+  (jwks: JwkPublicKey[]): O.Option<JwkPublicKey> =>
+    pipe(
+      jwks,
+      A.findFirst((key) => key.kid === kid),
+    );
 
 export const validateJwkKid: (
   jwk: JwkPublicKey,
