@@ -27,6 +27,8 @@ module "function_app_support" {
   app_settings      = local.function_app_support.app_settings
   slot_app_settings = local.function_app_support.app_settings
 
+  action_group_id = var.action_group_wallet_id
+
   tier = "l"
 
   tags = var.tags

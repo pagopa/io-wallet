@@ -30,6 +30,8 @@ module "function_app_user_02" {
     format("AzureWebJobs.%s.Disabled", to_disable)
   ]
 
+  action_group_id = var.action_group_wallet_id
+
   tier = "xxl"
 
   tags = var.tags
