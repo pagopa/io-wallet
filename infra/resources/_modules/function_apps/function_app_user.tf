@@ -1,6 +1,6 @@
 module "function_app_user_02" {
   source  = "pagopa-dx/azure-function-app/azurerm"
-  version = "~> 0.0"
+  version = "2.0.2"
 
   environment = {
     prefix          = var.prefix
