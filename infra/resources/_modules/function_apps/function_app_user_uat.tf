@@ -1,6 +1,6 @@
 module "function_app_user_uat" {
   source  = "pagopa-dx/azure-function-app/azurerm"
-  version = "2.0.2"
+  version = "~> 3.0"
 
   environment = {
     prefix          = var.prefix
@@ -26,7 +26,9 @@ module "function_app_user_uat" {
   app_settings      = local.function_app_user_uat.app_settings
   slot_app_settings = local.function_app_user_uat.app_settings
 
-  action_group_id = var.action_group_wallet_id
+  action_group_ids = [
+    var.action_group_wallet_id
+  ]
 
   tier = "l"
 
