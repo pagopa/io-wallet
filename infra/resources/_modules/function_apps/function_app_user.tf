@@ -1,6 +1,6 @@
 module "function_app_user_02" {
   source  = "pagopa-dx/azure-function-app/azurerm"
-  version = "~> 0.0"
+  version = "~> 3.0"
 
   environment = {
     prefix          = var.prefix
@@ -30,7 +30,9 @@ module "function_app_user_02" {
     format("AzureWebJobs.%s.Disabled", to_disable)
   ]
 
-  action_group_id = var.action_group_wallet_id
+  action_group_ids = [
+    var.action_group_wallet_id
+  ]
 
   tier = "xxl"
 

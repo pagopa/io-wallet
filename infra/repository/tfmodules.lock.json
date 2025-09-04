@@ -6,9 +6,9 @@
     "source": "https://registry.terraform.io/modules/pagopa-dx/azure-github-environment-bootstrap/azurerm/1.5.2"
   },
   "repo.github_runner": {
-    "hash": "a6c1125496888723daa6871b07c7b315548cac6dcc22b28bd67f758df6f01e3c",
-    "version": "1.0.10",
+    "hash": "fe5740c89e2c59f323b070dff0e4340cb0349655c6bf7c9e52238175641acad4",
+    "version": "1.1.2",
     "name": "github_selfhosted_runner_on_container_app_jobs",
-    "source": "https://registry.terraform.io/modules/pagopa-dx/github-selfhosted-runner-on-container-app-jobs/azurerm/1.0.10"
+    "source": "https://registry.terraform.io/modules/pagopa-dx/github-selfhosted-runner-on-container-app-jobs/azurerm/1.1.2"
   }
 }
