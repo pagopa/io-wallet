@@ -3,7 +3,6 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
@@ -50,16 +49,11 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
     method: "GET",
   };
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   it("should return a 200 HTTP response on success", async () => {
     const handler = GetCurrentWalletInstanceStatusHandler({
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -91,7 +85,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -119,7 +112,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -148,7 +140,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -179,7 +170,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });
@@ -211,7 +201,6 @@ describe("GetCurrentWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository:
         walletInstanceRepositoryThatFailsOnGetLastByUserId,
     });

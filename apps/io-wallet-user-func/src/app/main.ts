@@ -226,7 +226,6 @@ app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     GetCurrentWalletInstanceStatusFunction({
-      telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
   ),
