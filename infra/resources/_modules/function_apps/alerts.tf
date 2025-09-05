@@ -49,9 +49,28 @@ resource "azurerm_monitor_metric_alert" "function_app_support_response_time" {
     action_group_id = var.action_group_wallet_id
   }
 
-  action {
-    action_group_id = var.action_group_io_id
+  tags = var.tags
+}
+
+resource "azurerm_monitor_metric_alert" "app_service_plan_cpu_alert" {
+  name                = "[${module.function_app_user_02.function_app.plan.name}] High CPU Usage"
+  resource_group_name = var.resource_group_name
+  scopes              = ["/subscriptions/ec285037-c673-4f58-b594-d7c480da4e8b/resourceGroups/io-p-itn-wallet-rg-01/providers/Microsoft.Web/serverfarms/io-p-itn-wallet-user-asp-02"]
+  description         = "Critically high CPU usage detected on user App Service Plan"
+  severity            = 0
+  window_size         = "PT5M"
+  frequency           = "PT1M"
+  # alert checks CPU average over the last 5 minutes every 1 minute
+
+  criteria {
+    metric_namespace = "Microsoft.Web/serverFarms"
+    metric_name      = "CpuPercentage"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 70
   }
 
-  tags = var.tags
+  action {
+    action_group_id = var.action_group_wallet_id
+  }
 }

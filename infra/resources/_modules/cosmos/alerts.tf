@@ -2,7 +2,7 @@ resource "azurerm_monitor_metric_alert" "cosmos_db_provisioned_throughput_exceed
   name                = "[${azurerm_cosmosdb_account.wallet_02.name}] Provisioned Throughput Exceeded"
   resource_group_name = var.resource_group_name
   scopes              = [azurerm_cosmosdb_account.wallet_02.id]
-  description         = "A collection throughput (RU/s) exceed provisioned throughput, and it's raising 429 errors. Please, consider to increase RU. Runbook: https://pagopa.atlassian.net/wiki/spaces/SIW/pages/1311735955/Runbook"
+  description         = "A collection throughput (RU/s) exceed provisioned throughput, and it's raising 429 errors. Please, consider to increase RU"
   severity            = 0
   window_size         = "PT5M"
   frequency           = "PT5M"

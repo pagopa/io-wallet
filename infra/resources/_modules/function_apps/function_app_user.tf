@@ -31,7 +31,8 @@ module "function_app_user_02" {
   ]
 
   action_group_ids = [
-    var.action_group_wallet_id
+    var.action_group_wallet_id,
+    var.action_group_io_id
   ]
 
   tier = "xxl"
