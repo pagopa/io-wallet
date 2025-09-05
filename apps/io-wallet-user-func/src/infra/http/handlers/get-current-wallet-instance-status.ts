@@ -19,15 +19,15 @@ export const GetCurrentWalletInstanceStatusHandler = H.of(
           getCurrentWalletInstance(fiscalCode),
           RTE.map(WalletInstanceToStatusApiModel.encode),
           RTE.map(H.successJson),
-          RTE.orElseFirstW((error) =>
-            pipe(
-              sendTelemetryException(error, {
-                fiscalCode,
-                functionName: "getCurrentWalletInstanceStatus",
-              }),
-              RTE.fromReader,
-            ),
-          ),
+          // RTE.orElseFirstW((error) =>
+          //   pipe(
+          //     sendTelemetryException(error, {
+          //       fiscalCode,
+          //       functionName: "getCurrentWalletInstanceStatus",
+          //     }),
+          //     RTE.fromReader,
+          //   ),
+          // ),
         ),
       ),
       RTE.orElseW(logErrorAndReturnResponse),
