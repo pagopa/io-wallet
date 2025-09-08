@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.6.2
+
+### Patch Changes
+
+- 9b9ec04: Updated vct Wallet Attestation
+
 ## 3.6.1
 
 ### Patch Changes
