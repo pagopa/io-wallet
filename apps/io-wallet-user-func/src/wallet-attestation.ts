@@ -191,7 +191,7 @@ export const createWalletAttestationAsSdJwt =
         },
         iss: removeTrailingSlash(iss),
         sub: removeTrailingSlash(sub),
-        vct: `${trustAnchorUrl.href}v1.0/WalletAttestation`,
+        vct: `${trustAnchorUrl.href}vct/v1.0.0/WalletAttestation`,
       }),
       (sdJwtModel) =>
         pipe(
