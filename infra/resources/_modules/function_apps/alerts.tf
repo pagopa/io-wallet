@@ -59,8 +59,8 @@ resource "azurerm_monitor_metric_alert" "app_service_plan_cpu_alert" {
   description         = "Critically high CPU usage detected on user App Service Plan"
   severity            = 0
   window_size         = "PT5M"
-  frequency           = "PT1M"
-  # alert checks CPU average over the last 5 minutes every 1 minute
+  frequency           = "PT5M"
+  # alert checks CPU average over the last 5 minutes every 5 minutes
 
   criteria {
     metric_namespace = "Microsoft.Web/serverFarms"
