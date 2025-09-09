@@ -6,7 +6,6 @@ resource "azurerm_key_vault" "wallet" {
   sku_name            = "standard"
 
   enabled_for_disk_encryption   = true
-  enable_rbac_authorization     = true
   soft_delete_retention_days    = 90
   purge_protection_enabled      = true
   public_network_access_enabled = true

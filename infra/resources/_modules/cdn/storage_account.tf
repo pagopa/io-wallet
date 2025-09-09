@@ -25,32 +25,32 @@ resource "azurerm_storage_account_static_website" "cdn_website" {
 }
 
 resource "azurerm_storage_container" "well_known" {
-  name                 = "well-known"
-  storage_account_name = azurerm_storage_account.this.name
+  name               = "well-known"
+  storage_account_id = azurerm_storage_account.this.id
 
   # tfsec:ignore:azure-storage-no-public-access
   container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "exchange" {
-  name                 = "exchange"
-  storage_account_name = azurerm_storage_account.this.name
+  name               = "exchange"
+  storage_account_id = azurerm_storage_account.this.id
 
   # tfsec:ignore:azure-storage-no-public-access
   container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "hub-spid-login" {
-  name                 = "hub-spid-login"
-  storage_account_name = azurerm_storage_account.this.name
+  name               = "hub-spid-login"
+  storage_account_id = azurerm_storage_account.this.id
 
   # tfsec:ignore:azure-storage-no-public-access
   container_access_type = "container"
 }
 
 resource "azurerm_storage_container" "pdnd" {
-  name                 = "pdnd"
-  storage_account_name = azurerm_storage_account.this.name
+  name               = "pdnd"
+  storage_account_id = azurerm_storage_account.this.id
 
   # tfsec:ignore:azure-storage-no-public-access
   container_access_type = "container"

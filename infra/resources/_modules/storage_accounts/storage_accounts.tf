@@ -30,10 +30,10 @@ resource "azurerm_key_vault_secret" "st_connection_string" {
 
 module "storage_account_uat" {
   source  = "pagopa-dx/azure-storage-account/azurerm"
-  version = "~> 0.0"
+  version = "~> 1.0"
 
   environment         = local.u_environment
-  tier                = "l"
+  tier                = "s"
   resource_group_name = var.resource_group_name
 
   subnet_pep_id                        = var.subnet_pep_id
