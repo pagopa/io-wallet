@@ -55,7 +55,7 @@ resource "azurerm_monitor_metric_alert" "function_app_support_response_time" {
 resource "azurerm_monitor_metric_alert" "app_service_plan_cpu_alert" {
   name                = "[${module.function_app_user_02.function_app.plan.name}] High CPU Usage"
   resource_group_name = var.resource_group_name
-  scopes              = ["/subscriptions/ec285037-c673-4f58-b594-d7c480da4e8b/resourceGroups/io-p-itn-wallet-rg-01/providers/Microsoft.Web/serverfarms/io-p-itn-wallet-user-asp-02"]
+  scopes              = [module.function_app_user_02.function_app.plan.id]
   description         = "Critically high CPU usage detected on user App Service Plan"
   severity            = 0
   window_size         = "PT5M"
