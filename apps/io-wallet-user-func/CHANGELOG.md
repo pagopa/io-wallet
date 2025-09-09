@@ -1,5 +1,17 @@
 # io-wallet-user-func
 
+## 3.6.2
+
+### Patch Changes
+
+- 9b9ec04: Updated vct Wallet Attestation
+
+## 3.6.1
+
+### Patch Changes
+
+- d6017fd: Removed manual tracking of EntityNotFound exceptions in getCurrentWalletInstanceStatus
+
 ## 3.6.0
 
 ### Minor Changes
