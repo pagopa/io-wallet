@@ -86,7 +86,7 @@ resource "azurerm_monitor_diagnostic_setting" "cdn_profile" {
     category_group = "allLogs"
   }
 
-  metric {
+  enabled_metric {
     category = "AllMetrics"
   }
 }
