@@ -27,7 +27,8 @@ module "function_app_user_uat" {
   slot_app_settings = local.function_app_user_uat.app_settings
 
   action_group_ids = [
-    var.action_group_wallet_id
+    var.action_group_wallet_id,
+    var.action_group_io_id
   ]
 
   tier = "l"
