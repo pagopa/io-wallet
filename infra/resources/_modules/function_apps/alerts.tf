@@ -57,7 +57,7 @@ resource "azurerm_monitor_metric_alert" "app_service_plan_cpu_alert" {
   resource_group_name = var.resource_group_name
   scopes              = [module.function_app_user_02.function_app.plan.id]
   description         = "Critically high CPU usage detected on user App Service Plan"
-  severity            = 0
+  severity            = 1
   window_size         = "PT5M"
   frequency           = "PT5M"
   # alert checks CPU average over the last 5 minutes every 5 minutes

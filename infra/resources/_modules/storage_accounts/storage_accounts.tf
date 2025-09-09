@@ -1,6 +1,6 @@
 module "storage_account" {
   source  = "pagopa-dx/azure-storage-account/azurerm"
-  version = "~> 0.0"
+  version = "~> 1.0"
 
   environment         = local.environment
   tier                = "l"
