@@ -8,6 +8,10 @@ on:
     paths:
       - "apps/io-wallet-user-func/CHANGELOG.md"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@main
