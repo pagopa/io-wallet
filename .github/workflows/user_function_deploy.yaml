@@ -8,13 +8,17 @@ on:
     paths:
       - "apps/io-wallet-user-func/CHANGELOG.md"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
+    uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@main
     name: Deploy
-    uses: pagopa/dx/.github/workflows/web_app_deploy.yaml@main
-    secrets: inherit
     with:
       workspace_name: io-wallet-user-func
       environment: app-prod
       resource_group_name: io-p-itn-wallet-rg-01
       web_app_name: io-p-itn-wallet-user-func-02
+      disable_auto_staging_deploy: true
