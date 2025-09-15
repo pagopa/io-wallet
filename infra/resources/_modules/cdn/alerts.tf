@@ -31,11 +31,12 @@ resource "azurerm_monitor_metric_alert" "storage_account_low_availability" {
 }
 
 resource "azurerm_monitor_scheduled_query_rules_alert" "cdn_requests_error_alert" {
-  name                = "[${azurerm_cdn_profile.this.name}] Request Errors"
-  location            = var.location_legacy
-  resource_group_name = var.resource_group_name
-  severity            = 0
-  description         = "Elevated rate of 4xx and 5xx errors from the CDN"
+  name                    = "[${azurerm_cdn_profile.this.name}] Request Errors"
+  location                = var.location_legacy
+  resource_group_name     = var.resource_group_name
+  severity                = 0
+  description             = "Elevated rate of 4xx and 5xx errors from the CDN"
+  auto_mitigation_enabled = true
 
   action {
     action_group = [var.action_group_wallet_id, var.action_group_io_id]
