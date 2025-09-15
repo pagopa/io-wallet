@@ -15,6 +15,7 @@ locals {
   project_legacy = "${local.prefix}-${local.env_short}"
 
   location           = "italynorth"
+  location_legacy    = "westeurope"
   secondary_location = "spaincentral"
 
   wallet_dns_zone = {
