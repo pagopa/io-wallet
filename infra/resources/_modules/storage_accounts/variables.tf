@@ -63,3 +63,8 @@ variable "key_vault_wallet_id" {
   type        = string
   description = "Id of the wallet Key Vault where storage account saves secrets"
 }
+
+variable "action_group_wallet_id" {
+  type        = string
+  description = "Id of the Action Group owned by the Wallet team"
+}

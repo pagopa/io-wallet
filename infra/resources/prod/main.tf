@@ -156,8 +156,10 @@ module "function_apps" {
 module "cdn" {
   source = "../_modules/cdn"
 
-  project             = local.project
-  location            = local.location
+  project         = local.project
+  location        = local.location
+  location_legacy = local.location_legacy
+
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.law.id
@@ -284,6 +286,8 @@ module "storage_accounts" {
   action_group_id                      = module.monitoring.action_group_wallet.id
 
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
+  action_group_wallet_id = module.monitoring.action_group_wallet.id
 
   tags = local.tags
 }

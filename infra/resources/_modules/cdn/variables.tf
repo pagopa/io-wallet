@@ -37,3 +37,8 @@ variable "key_vault_certificate_secret_id" {
   type        = string
   description = "Secret Id of the key vault that contains the CDN certificate"
 }
+
+variable "location_legacy" {
+  type        = string
+  description = "Azure region"
+}
