@@ -1,7 +1,3 @@
-import { BufferDecoder } from "@/decoders/buffer";
-import { InsertFiscalCodesInQueueFunction } from "@/infra/azure/functions/insert-fiscal-codes-in-queue";
-import { SendMessagesFunction } from "@/infra/azure/functions/send-messages";
-import { sendMessageApi } from "@/infra/io-messages-api";
 import { app } from "@azure/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
@@ -9,6 +5,11 @@ import Bottleneck from "bottleneck";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
+
+import { BufferDecoder } from "@/decoders/buffer";
+import { InsertFiscalCodesInQueueFunction } from "@/infra/azure/functions/insert-fiscal-codes-in-queue";
+import { SendMessagesFunction } from "@/infra/azure/functions/send-messages";
+import { sendMessageApi } from "@/infra/io-messages-api";
 
 import { getConfigFromEnvironment } from "./config";
 

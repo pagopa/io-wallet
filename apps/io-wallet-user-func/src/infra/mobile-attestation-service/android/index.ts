@@ -1,14 +1,15 @@
-import { getCrlFromUrls } from "@/certificates";
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
-import * as J from "fp-ts/Json";
-import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
+import * as J from "fp-ts/Json";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as S from "fp-ts/lib/string";
+import * as TE from "fp-ts/TaskEither";
 import { JwkPublicKey } from "io-wallet-common/jwk";
+
+import { getCrlFromUrls } from "@/certificates";
 
 import { ValidatedAttestation } from "../../mobile-attestation-service";
 import { AndroidAssertionError, AndroidAttestationError } from "../errors";

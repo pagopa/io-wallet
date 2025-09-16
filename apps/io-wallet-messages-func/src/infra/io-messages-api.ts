@@ -1,11 +1,12 @@
-import { MessagesServiceConfig } from "@/app/config";
-import { CodeError, Message } from "@/message";
 import Bottleneck from "bottleneck";
 import fetchRetry from "fetch-retry";
 import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
+
+import { MessagesServiceConfig } from "@/app/config";
+import { CodeError, Message } from "@/message";
 
 export const sendMessageApi: ({
   config,

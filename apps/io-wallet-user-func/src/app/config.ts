@@ -3,8 +3,8 @@ import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { sequenceS } from "fp-ts/lib/Apply";
-import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
+import * as RE from "fp-ts/lib/ReaderEither";
 import * as t from "io-ts";
 import {
   AzureAppInsightsConfig,
@@ -20,10 +20,10 @@ import {
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
 import {
-  SlackConfig,
   getSlackConfigFromEnvironment,
+  SlackConfig,
 } from "io-wallet-common/infra/slack/config";
-import { JwkPrivateKey, fromBase64ToJwks } from "io-wallet-common/jwk";
+import { fromBase64ToJwks, JwkPrivateKey } from "io-wallet-common/jwk";
 
 const booleanFromString = (input: string) =>
   input === "true" || input === "1" || input === "yes";
@@ -98,8 +98,8 @@ export const AttestationServiceConfiguration = t.type({
   googlePublicKey: t.string,
   hardwarePublicTestKey: t.string,
   httpRequestTimeout: NumberFromString,
-  iOsTeamIdentifier: t.string,
   iosBundleIdentifiers: t.array(t.string),
+  iOsTeamIdentifier: t.string,
   skipSignatureValidation: t.boolean,
 });
 
@@ -314,14 +314,14 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.orElse(() => RE.right(HARDWARE_PUBLIC_TEST_KEY)),
       RE.map(decodeBase64String),
     ),
-    iOsTeamIdentifier: pipe(
-      readFromEnvironment("IosTeamIdentifier"),
-      RE.orElse(() => RE.right("DSEVY6MV9G")),
-    ),
     iosBundleIdentifiers: pipe(
       readFromEnvironment("IosBundleIdentifiers"),
       RE.map((identifiers) => identifiers.split(",")),
       RE.orElse(() => RE.right(["it.pagopa.app.io"])),
+    ),
+    iOsTeamIdentifier: pipe(
+      readFromEnvironment("IosTeamIdentifier"),
+      RE.orElse(() => RE.right("DSEVY6MV9G")),
     ),
     skipSignatureValidation: pipe(
       readFromEnvironment("SkipSignatureValidation"),

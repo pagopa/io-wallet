@@ -1,4 +1,22 @@
+/* eslint-disable perfectionist/sort-imports */
 import ai from "@/infra/azure/appinsights/start";
+
+import { CosmosClient } from "@azure/cosmos";
+import { app, output } from "@azure/functions";
+import { DefaultAzureCredential } from "@azure/identity";
+import { BlobServiceClient } from "@azure/storage-blob";
+import { QueueServiceClient } from "@azure/storage-queue";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { Crypto } from "@peculiar/webcrypto";
+import * as E from "fp-ts/Either";
+import { identity, pipe } from "fp-ts/function";
+import * as t from "io-ts";
+import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
+import {
+  WalletInstance,
+  WalletInstanceValidWithAndroidCertificatesChain,
+} from "io-wallet-common/wallet-instance";
+
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
@@ -27,21 +45,6 @@ import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import { MobileAttestationService } from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
-import { CosmosClient } from "@azure/cosmos";
-import { app, output } from "@azure/functions";
-import { DefaultAzureCredential } from "@azure/identity";
-import { BlobServiceClient } from "@azure/storage-blob";
-import { QueueServiceClient } from "@azure/storage-queue";
-import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import { Crypto } from "@peculiar/webcrypto";
-import * as E from "fp-ts/Either";
-import { identity, pipe } from "fp-ts/function";
-import * as t from "io-ts";
-import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
-import {
-  WalletInstance,
-  WalletInstanceValidWithAndroidCertificatesChain,
-} from "io-wallet-common/wallet-instance";
 
 import { getConfigFromEnvironment } from "./config";
 

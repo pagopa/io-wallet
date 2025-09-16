@@ -22,18 +22,18 @@ const FederationEntity = t.intersection([
   FederationEntityMetadata,
 ]);
 
-export type FederationEntity = t.TypeOf<typeof FederationEntity>;
-
-interface EntityConfiguration {
-  authorityHints: UrlFromString[];
-  federationEntity: FederationEntity;
-}
-
 export interface EntityConfigurationEnvironment {
   certificateRepository: CertificateRepository;
   entityConfiguration: EntityConfiguration;
   entityConfigurationSigner: Signer;
   walletAttestationSigner: Signer;
+}
+
+export type FederationEntity = t.TypeOf<typeof FederationEntity>;
+
+interface EntityConfiguration {
+  authorityHints: UrlFromString[];
+  federationEntity: FederationEntity;
 }
 
 const WalletProviderMetadataPayload = t.type({

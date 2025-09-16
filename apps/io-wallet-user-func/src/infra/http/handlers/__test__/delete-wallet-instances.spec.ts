@@ -1,12 +1,13 @@
 /* eslint-disable max-lines-per-function */
-import { CredentialRepository } from "@/credential";
-import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
+
+import { CredentialRepository } from "@/credential";
+import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { DeleteWalletInstancesHandler } from "../delete-wallet-instances";
 

@@ -1,9 +1,9 @@
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
+import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
@@ -37,14 +37,14 @@ export const WalletAttestationRequestPayload = t.type({
   sub: t.string,
 });
 
-export type WalletAttestationRequestPayload = t.TypeOf<
-  typeof WalletAttestationRequestPayload
->;
-
 export interface WalletAttestationRequest {
   header: WalletAttestationRequestHeader;
   payload: WalletAttestationRequestPayload;
 }
+
+export type WalletAttestationRequestPayload = t.TypeOf<
+  typeof WalletAttestationRequestPayload
+>;
 
 // Verify and extract header and payload from Wallet Attestation Request
 export const verifyWalletAttestationRequest = (

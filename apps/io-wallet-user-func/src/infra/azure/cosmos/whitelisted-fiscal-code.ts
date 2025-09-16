@@ -1,8 +1,9 @@
-import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 import { Container, Database } from "@azure/cosmos";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
+
+import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 const toError = (genericMessage: string) => (error: unknown) =>
   error instanceof Error && error.name === "TimeoutError"

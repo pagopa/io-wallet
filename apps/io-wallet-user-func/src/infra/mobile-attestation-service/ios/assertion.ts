@@ -1,7 +1,8 @@
-import { ValidationResult } from "@/attestation-service";
 import { createHash, createVerify } from "crypto";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
+
+import { ValidationResult } from "@/attestation-service";
 
 import { iOsAssertion } from ".";
 

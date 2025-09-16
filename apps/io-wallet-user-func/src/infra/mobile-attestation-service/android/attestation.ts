@@ -1,14 +1,15 @@
-import { CRL, validateIssuance, validateRevocation } from "@/certificates";
 import {
   AttestationApplicationId,
   NonStandardKeyDescription,
 } from "@peculiar/asn1-android";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
-import { X509Certificate, createPublicKey } from "crypto";
+import { createPublicKey, X509Certificate } from "crypto";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
+
+import { CRL, validateIssuance, validateRevocation } from "@/certificates";
 
 /**
  * Key attestation extension data schema OID

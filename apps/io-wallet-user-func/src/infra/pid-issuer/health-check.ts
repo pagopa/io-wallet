@@ -1,6 +1,6 @@
+import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
-import { pipe } from "fp-ts/lib/function";
 
 export interface PidIssuerHealthCheck {
   healthCheck: () => TE.TaskEither<Error, boolean>;

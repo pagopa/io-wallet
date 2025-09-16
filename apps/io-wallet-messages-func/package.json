@@ -14,8 +14,8 @@
     "start": "func start"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^4.0.1",
-    "eslint": "9.14.0",
+    "@pagopa/eslint-config": "^5.0.0",
+    "eslint": "9.35.0",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.3",

@@ -1,10 +1,10 @@
 import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { readableReportSimplified } from "@pagopa/ts-commons/lib/reporters";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RE from "fp-ts/ReaderEither";
 import { lookup } from "fp-ts/Record";
-import { pipe } from "fp-ts/function";
 
 export const readFromEnvironment =
   (variableName: string) => (env: NodeJS.ProcessEnv) =>

@@ -1,10 +1,3 @@
-import { validateAssertion } from "@/attestation-service";
-import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
-import { isLoadTestUser } from "@/user";
-import { createWalletAttestation } from "@/wallet-attestation";
-import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
-import { getValidWalletInstanceByUserId } from "@/wallet-instance";
-import { consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
@@ -14,6 +7,14 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+import { validateAssertion } from "@/attestation-service";
+import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
+import { isLoadTestUser } from "@/user";
+import { createWalletAttestation } from "@/wallet-attestation";
+import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
+import { getValidWalletInstanceByUserId } from "@/wallet-instance";
+import { consumeNonce } from "@/wallet-instance-request";
 
 export const GRANT_TYPE_KEY_ATTESTATION =
   "urn:ietf:params:oauth:grant-type:jwt-bearer";

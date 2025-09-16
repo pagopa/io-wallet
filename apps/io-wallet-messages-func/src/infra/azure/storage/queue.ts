@@ -1,10 +1,10 @@
 // TODO [SIW-1995]: this code is shared between user and messages functions
 import { QueueClient } from "@azure/storage-queue";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as TE from "fp-ts/TaskEither";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import { stringify } from "fp-ts/lib/Json";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import * as TE from "fp-ts/TaskEither";
 
 class StorageQueueError extends Error {
   errorCode?: string;

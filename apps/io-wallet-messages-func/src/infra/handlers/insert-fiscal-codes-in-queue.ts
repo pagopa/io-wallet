@@ -1,10 +1,10 @@
 import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
+import { pipe } from "fp-ts/function";
 import * as R from "fp-ts/Reader";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/function";
 
 import { enqueue } from "../azure/storage/queue";
 

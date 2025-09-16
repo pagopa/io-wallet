@@ -3,13 +3,13 @@ import * as IOE from "fp-ts/IOEither";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 
+export interface NonceEnvironment {
+  nonceRepository: NonceRepository;
+}
+
 export interface NonceRepository {
   delete: (nonce: string) => TE.TaskEither<Error, void>;
   insert: (nonce: string) => TE.TaskEither<Error, void>;
-}
-
-export interface NonceEnvironment {
-  nonceRepository: NonceRepository;
 }
 
 export const generateNonce: IOE.IOEither<Error, string> = IOE.tryCatch(

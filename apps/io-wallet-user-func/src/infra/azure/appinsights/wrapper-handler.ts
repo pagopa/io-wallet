@@ -1,13 +1,13 @@
 import { HttpHandler, HttpRequest, InvocationContext } from "@azure/functions";
 import {
   Attributes,
+  context,
   SpanContext,
   SpanKind,
   SpanOptions,
   SpanStatusCode,
-  TraceFlags,
-  context,
   trace,
+  TraceFlags,
 } from "@opentelemetry/api";
 
 // this wrapper enables logging of requests to Application Insights
@@ -28,7 +28,7 @@ export default function withAppInsights(func: HttpHandler) {
       // - parts[1]: traceId (32 characters, 16 bytes, hexadecimal)
       // - parts[2]: spanId (16 characters, 8 bytes, hexadecimal)
       // - parts[3]: traceFlags (indicates whether the trace is sampled)
-      const parentSpanContext: SpanContext | null =
+      const parentSpanContext: null | SpanContext =
         parts &&
         parts.length === 4 &&
         parts[1].length === 32 &&
@@ -61,7 +61,7 @@ export default function withAppInsights(func: HttpHandler) {
       span = trace
         .getTracer("ApplicationInsightsTracer")
         .startSpan(`${req.method} ${req.url}`, options, parentContext);
-    } catch (error) {
+    } catch {
       // If there is an error creating the span, just execute the function
       return await func(req, invocationContext);
     }

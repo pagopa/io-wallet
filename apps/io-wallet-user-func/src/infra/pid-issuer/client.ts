@@ -1,10 +1,11 @@
-import { Config, PidIssuerApiClientConfig } from "@/app/config";
-import { CredentialRepository } from "@/credential";
-import { removeTrailingSlash } from "@/url";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { Agent, RequestInit, fetch } from "undici";
+import { Agent, fetch, RequestInit } from "undici";
+
+import { Config, PidIssuerApiClientConfig } from "@/app/config";
+import { CredentialRepository } from "@/credential";
+import { removeTrailingSlash } from "@/url";
 
 import { PidIssuerHealthCheck } from "./health-check";
 
@@ -16,6 +17,36 @@ export class PidIssuerClient
   #init: RequestInit;
   #requestTimeout: number;
   #walletProviderEntity: string;
+
+  constructor(
+    {
+      baseURL,
+      clientCertificate,
+      clientPrivateKey,
+      healthCheckEnabled,
+      requestTimeout,
+      rootCACertificate,
+    }: PidIssuerApiClientConfig,
+    basePath: Config["entityConfiguration"]["federationEntity"]["basePath"]["href"],
+  ) {
+    this.#baseURL = baseURL;
+    this.#walletProviderEntity = removeTrailingSlash(basePath);
+    this.#healthCheckEnabled = healthCheckEnabled;
+    this.#init = {
+      dispatcher: new Agent({
+        connect: {
+          ca: rootCACertificate,
+          cert: clientCertificate,
+          key: clientPrivateKey,
+          rejectUnauthorized: true,
+        },
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    this.#requestTimeout = requestTimeout;
+  }
 
   healthCheck = () =>
     this.#healthCheckEnabled
@@ -71,34 +102,4 @@ export class PidIssuerClient
               `Error occurred while making a request to the PID issuer: ${error}`,
             ),
     );
-
-  constructor(
-    {
-      baseURL,
-      clientCertificate,
-      clientPrivateKey,
-      healthCheckEnabled,
-      requestTimeout,
-      rootCACertificate,
-    }: PidIssuerApiClientConfig,
-    basePath: Config["entityConfiguration"]["federationEntity"]["basePath"]["href"],
-  ) {
-    this.#baseURL = baseURL;
-    this.#walletProviderEntity = removeTrailingSlash(basePath);
-    this.#healthCheckEnabled = healthCheckEnabled;
-    this.#init = {
-      dispatcher: new Agent({
-        connect: {
-          ca: rootCACertificate,
-          cert: clientCertificate,
-          key: clientPrivateKey,
-          rejectUnauthorized: true,
-        },
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    this.#requestTimeout = requestTimeout;
-  }
 }

@@ -1,25 +1,26 @@
-import {
-  CertificateRepository,
-  getCertificateChainByKid,
-  insertCertificateChain,
-} from "@/certificates";
-import { pemCertificateToBase64 } from "@/infra/crypto/certificate";
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { Crypto } from "@peculiar/webcrypto";
 import { X509Certificate, X509CertificateGenerator } from "@peculiar/x509";
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
+import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RE from "fp-ts/ReaderEither";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { Jwk, JwkPrivateKey, JwkPublicKey } from "io-wallet-common/jwk";
+
+import {
+  CertificateRepository,
+  getCertificateChainByKid,
+  insertCertificateChain,
+} from "@/certificates";
+import { pemCertificateToBase64 } from "@/infra/crypto/certificate";
 
 interface CertificateEnvironment {
   certificate: { crypto: Crypto; issuer: string; subject: string };

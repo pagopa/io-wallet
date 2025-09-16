@@ -1,5 +1,5 @@
-import * as RE from "fp-ts/lib/ReaderEither";
 import { pipe } from "fp-ts/lib/function";
+import * as RE from "fp-ts/lib/ReaderEither";
 import * as t from "io-ts";
 
 import { readFromEnvironment } from "../env";

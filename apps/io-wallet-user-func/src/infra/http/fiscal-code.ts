@@ -1,8 +1,8 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import { lookup } from "fp-ts/Record";
 import * as E from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { lookup } from "fp-ts/Record";
 
 export const requireFiscalCodeFromHeader = (req: H.HttpRequest) =>
   pipe(

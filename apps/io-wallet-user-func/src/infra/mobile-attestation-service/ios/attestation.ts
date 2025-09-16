@@ -1,9 +1,10 @@
-import { validateIssuance } from "@/certificates";
 import * as asn1js from "asn1js";
-import { X509Certificate, createHash } from "crypto";
+import { createHash, X509Certificate } from "crypto";
 import { IosDeviceDetails } from "io-wallet-common/device-details";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
+
+import { validateIssuance } from "@/certificates";
 
 import { iOsAttestation } from ".";
 

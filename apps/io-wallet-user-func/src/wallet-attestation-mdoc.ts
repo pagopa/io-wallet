@@ -1,11 +1,11 @@
 import { Document, IssuerSignedDocument } from "@auth0/mdl";
 import { cborEncode as encode } from "@auth0/mdl/lib/cbor";
 import * as E from "fp-ts/Either";
+import { flow, pipe } from "fp-ts/function";
+import { sequenceS } from "fp-ts/lib/Apply";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
 import { JwkPrivateKey } from "io-wallet-common/jwk";
 
 import { WalletAttestationData } from "./encoders/wallet-attestation";

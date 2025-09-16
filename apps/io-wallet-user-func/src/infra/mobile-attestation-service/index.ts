@@ -1,23 +1,24 @@
+import { ValidationError } from "@pagopa/handler-kit";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { createPublicKey } from "crypto";
+import * as E from "fp-ts/Either";
+import { identity, pipe } from "fp-ts/function";
+import * as J from "fp-ts/Json";
+import { Separated } from "fp-ts/lib/Separated";
+import * as O from "fp-ts/Option";
+import * as RA from "fp-ts/ReadonlyArray";
+import * as T from "fp-ts/Task";
+import * as TE from "fp-ts/TaskEither";
+import { JwkPublicKey } from "io-wallet-common/jwk";
+import { calculateJwkThumbprint } from "jose";
+import * as jose from "jose";
+
 import { AttestationServiceConfiguration } from "@/app/config";
 import {
   AttestationService,
   ValidateAssertionRequest,
   ValidatedAttestation,
 } from "@/attestation-service";
-import { ValidationError } from "@pagopa/handler-kit";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { createPublicKey } from "crypto";
-import * as E from "fp-ts/Either";
-import * as J from "fp-ts/Json";
-import * as O from "fp-ts/Option";
-import * as RA from "fp-ts/ReadonlyArray";
-import * as T from "fp-ts/Task";
-import * as TE from "fp-ts/TaskEither";
-import { identity, pipe } from "fp-ts/function";
-import { Separated } from "fp-ts/lib/Separated";
-import { JwkPublicKey } from "io-wallet-common/jwk";
-import { calculateJwkThumbprint } from "jose";
-import * as jose from "jose";
 
 import {
   validateAndroidAssertion,
@@ -46,6 +47,10 @@ const getErrorsOrFirstValidValue = (
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
+
+  constructor(cnf: AttestationServiceConfiguration) {
+    this.#configuration = cnf;
+  }
 
   allowDevelopmentEnvironmentForUser = (user: FiscalCode) =>
     pipe(
@@ -157,9 +162,5 @@ export class MobileAttestationService implements AttestationService {
         ),
       ),
     );
-
-  constructor(cnf: AttestationServiceConfiguration) {
-    this.#configuration = cnf;
-  }
 }
 export { ValidatedAttestation };

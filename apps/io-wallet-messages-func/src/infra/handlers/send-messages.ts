@@ -1,10 +1,11 @@
-import { CodeError, sendMessage } from "@/message";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as A from "fp-ts/Array";
+import { flow, pipe } from "fp-ts/function";
 import * as RT from "fp-ts/ReaderTask";
 import * as RTE from "fp-ts/ReaderTaskEither";
-import { flow, pipe } from "fp-ts/function";
+
+import { CodeError, sendMessage } from "@/message";
 
 import { uploadFile } from "../azure/storage/blob";
 

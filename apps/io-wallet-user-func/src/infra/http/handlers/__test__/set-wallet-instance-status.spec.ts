@@ -1,11 +1,12 @@
-import { CredentialRepository } from "@/credential";
-import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
+
+import { CredentialRepository } from "@/credential";
+import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 

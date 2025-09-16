@@ -15,25 +15,6 @@ export enum OperatingSystem {
   iOS = "Apple iOS",
 }
 
-export type ValidationResult =
-  | { reason: string; success: false }
-  | { success: true };
-
-export interface ValidatedAttestation {
-  deviceDetails: DeviceDetails;
-  hardwareKey: JwkPublicKey;
-}
-
-export interface ValidateAssertionRequest {
-  hardwareKey: JwkPublicKey;
-  hardwareSignature: NonEmptyString;
-  integrityAssertion: NonEmptyString;
-  jwk: JwkPublicKey;
-  nonce: NonEmptyString;
-  signCount: number;
-  user: FiscalCode;
-}
-
 export interface AttestationService {
   getHardwarePublicTestKey: () => TE.TaskEither<Error, JwkPublicKey>;
   validateAssertion: (
@@ -46,6 +27,25 @@ export interface AttestationService {
     user: FiscalCode,
   ) => TE.TaskEither<Error, ValidatedAttestation>;
 }
+
+export interface ValidateAssertionRequest {
+  hardwareKey: JwkPublicKey;
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+  jwk: JwkPublicKey;
+  nonce: NonEmptyString;
+  signCount: number;
+  user: FiscalCode;
+}
+
+export interface ValidatedAttestation {
+  deviceDetails: DeviceDetails;
+  hardwareKey: JwkPublicKey;
+}
+
+export type ValidationResult =
+  | { reason: string; success: false }
+  | { success: true };
 
 export const validateAttestation: (
   walletInstanceRequest: WalletInstanceRequest,

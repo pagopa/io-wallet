@@ -1,12 +1,15 @@
+/* eslint-disable perfectionist/sort-imports */
 import ai from "@/infra/azure/appinsights/start";
-import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
-import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/functions/get-current-wallet-instance-by-fiscal-code";
-import { HealthFunction } from "@/infra/azure/functions/health";
+
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
+
+import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
+import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/functions/get-current-wallet-instance-by-fiscal-code";
+import { HealthFunction } from "@/infra/azure/functions/health";
 
 import { getConfigFromEnvironment } from "./config";
 

@@ -1,8 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { AttestationService } from "@/attestation-service";
-import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
-import { NonceRepository } from "@/nonce";
-import { WalletInstanceRepository } from "@/wallet-instance";
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -11,6 +7,11 @@ import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
+
+import { AttestationService } from "@/attestation-service";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
+import { NonceRepository } from "@/nonce";
+import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 

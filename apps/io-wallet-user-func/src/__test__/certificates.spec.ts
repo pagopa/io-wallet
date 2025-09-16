@@ -1,7 +1,10 @@
+import { createPublicKey, X509Certificate } from "crypto";
+import { describe, expect, it } from "vitest";
+
 import {
+  decodeBase64String,
   GOOGLE_PUBLIC_KEY,
   HARDWARE_PUBLIC_TEST_KEY,
-  decodeBase64String,
 } from "@/app/config";
 import {
   CRL,
@@ -9,8 +12,6 @@ import {
   validateIssuance,
   validateRevocation,
 } from "@/certificates";
-import { X509Certificate, createPublicKey } from "crypto";
-import { describe, expect, it } from "vitest";
 
 const revokedX509Chain = [
   "-----BEGIN CERTIFICATE-----\nMIICLDCCAbKgAwIBAgIKCXAxRHdzOYI5BjAKBggqhkjOPQQDAjAbMRkwFwYDVQQF\nExA4N2Y0NTE0NDc1YmEwYTJiMB4XDTE2MDUyNjE3MjAxNVoXDTI2MDUyNDE3MjAx\nNVowGzEZMBcGA1UEBRMQYjQxMDMwMWU1MWU0N2NmYjBZMBMGByqGSM49AgEGCCqG\nSM49AwEHA0IABA4z026cOo4gtJWwmMHC35v3tlvkl/WK6CdzM1/GeDVJVg5tw9Yi\nLfZMZ1pNa5hMNhiCjJTo/gDSimYQ0l8aqQGjgd0wgdowHQYDVR0OBBYEFDW8sdJy\ntohf7ksdrcYtMQmKmu4eMB8GA1UdIwQYMBaAFDBEI+Wi9gbhUKt3XxYWu5HMY8ZZ\nMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMCQGA1UdHgQdMBugGTAXghVp\nbnZhbGlkO2VtYWlsOmludmFsaWQwVAYDVR0fBE0wSzBJoEegRYZDaHR0cHM6Ly9h\nbmRyb2lkLmdvb2dsZWFwaXMuY29tL2F0dGVzdGF0aW9uL2NybC8wOTcwMzE0NDc3\nNzMzOTgyMzkwNjAKBggqhkjOPQQDAgNoADBlAjEA/KjXz483n538K3zxx+GPfXJo\n8RTKNcqMAJu1joME/eux0IZ8BVtGPj+r1P6NwWtHAjAf/IkoTdgJ/N1uqjFIN/N6\nVHVXEEBZ3T6LaEnzv2jWuvSag13qGyJ2K2RYyCFCjnk=\n-----END CERTIFICATE-----\n",

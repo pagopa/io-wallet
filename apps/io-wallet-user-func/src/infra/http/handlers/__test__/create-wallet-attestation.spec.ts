@@ -1,9 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { AttestationService } from "@/attestation-service";
-import { CertificateRepository } from "@/certificates";
-import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
-import { NonceRepository } from "@/nonce";
-import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import {
@@ -15,11 +10,17 @@ import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as appInsights from "applicationinsights";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
+import { flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { flow } from "fp-ts/lib/function";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
+
+import { AttestationService } from "@/attestation-service";
+import { CertificateRepository } from "@/certificates";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
+import { NonceRepository } from "@/nonce";
+import { WalletInstanceRepository } from "@/wallet-instance";
 
 import {
   CreateWalletAttestationHandler,
