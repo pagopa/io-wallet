@@ -23,18 +23,18 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.2.0",
+    "@azure/cosmos": "^4.5.1",
     "@pagopa/handler-kit": "^1.1.0",
     "@pagopa/logger": "^1.0.1",
     "@pagopa/ts-commons": "^13.1.2",
-    "applicationinsights": "^3.4.0",
-    "fp-ts": "^2.16.9",
+    "applicationinsights": "^3.9.0",
+    "fp-ts": "^2.16.11",
     "io-ts": "^2.2.22"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^5.0.0",
     "eslint": "9.35.0",
-    "prettier": "3.4.2",
+    "prettier": "^3.6.2",
     "typescript": "5.7.3",
     "vitest": "^3.2.4"
   },

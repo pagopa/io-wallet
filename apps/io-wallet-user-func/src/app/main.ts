@@ -358,7 +358,7 @@ app.http("createWalletAttestationV2", {
   route: "wallet-attestations",
 });
 
-app.http("IsFiscalCodeWhitelisted", {
+app.http("isFiscalCodeWhitelisted", {
   authLevel: "function",
   handler: withAppInsights(
     IsFiscalCodeWhitelistedFunction({
