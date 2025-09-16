@@ -1,3 +1,4 @@
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -25,7 +26,6 @@ import {
   checkIfFiscalCodeIsWhitelisted,
   WhitelistedFiscalCodeEnvironment,
 } from "@/whitelisted-fiscal-code";
-import { QueueClient } from "@azure/storage-queue";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,

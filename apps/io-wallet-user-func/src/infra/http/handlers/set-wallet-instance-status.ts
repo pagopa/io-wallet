@@ -1,3 +1,4 @@
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -11,13 +12,12 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
 import { revokeUserWalletInstances } from "@/wallet-instance";
-
-import { requireWalletInstanceId } from "../wallet-instance";
 import {
   checkIfFiscalCodeIsWhitelisted,
   WhitelistedFiscalCodeEnvironment,
 } from "@/whitelisted-fiscal-code";
-import { QueueClient } from "@azure/storage-queue";
+
+import { requireWalletInstanceId } from "../wallet-instance";
 
 const SetWalletInstanceStatusBody = t.type({
   fiscal_code: FiscalCode,

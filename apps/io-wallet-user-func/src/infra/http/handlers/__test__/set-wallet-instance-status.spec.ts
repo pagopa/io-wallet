@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
+import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 import { SetWalletInstanceStatusHandler } from "../set-wallet-instance-status";
 
@@ -54,6 +55,14 @@ describe("SetWalletInstanceStatusHandler", () => {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
 
+  const whitelistedFiscalCodeRepositoryTrue: WhitelistedFiscalCodeRepository = {
+    checkIfFiscalCodeIsWhitelisted: () =>
+      TE.right({
+        whitelisted: true,
+        whitelistedAt: "2025-09-16T14:20:51.359Z",
+      }),
+  };
+
   it("should return a 204 HTTP response on success", async () => {
     const handler = SetWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClient,
@@ -63,6 +72,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -93,6 +103,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -119,6 +130,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -152,6 +164,7 @@ describe("SetWalletInstanceStatusHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
