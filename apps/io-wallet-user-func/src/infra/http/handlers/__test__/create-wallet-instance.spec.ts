@@ -14,6 +14,7 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
+import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -75,6 +76,14 @@ describe("CreateWalletInstanceHandler", () => {
     trackException: () => void 0,
   } as unknown as appInsights.TelemetryClient;
 
+  const whitelistedFiscalCodeRepositoryTrue: WhitelistedFiscalCodeRepository = {
+    checkIfFiscalCodeIsWhitelisted: () =>
+      TE.right({
+        whitelisted: true,
+        whitelistedAt: "2025-09-16T14:20:51.359Z",
+      }),
+  };
+
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -90,6 +99,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -117,6 +127,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -149,6 +160,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -188,6 +200,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -226,6 +239,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -265,6 +279,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
 
     await expect(handler()).resolves.toEqual({
