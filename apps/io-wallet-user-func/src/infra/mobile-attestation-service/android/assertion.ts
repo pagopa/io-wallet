@@ -1,10 +1,11 @@
-import { ValidationResult } from "@/attestation-service";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { createHash, createVerify } from "crypto";
 import { google, playintegrity_v1 } from "googleapis";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
+
+import { ValidationResult } from "@/attestation-service";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 

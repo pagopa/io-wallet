@@ -1,19 +1,20 @@
+import * as H from "@pagopa/handler-kit";
+import * as E from "fp-ts/Either";
+import { flow, pipe } from "fp-ts/function";
+import { sequenceS } from "fp-ts/lib/Apply";
+import * as O from "fp-ts/Option";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import * as TE from "fp-ts/TaskEither";
+import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
+import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
+
 import {
   CertificateRepository,
   getCertificateChainByKid,
 } from "@/certificates";
 import { EntityConfigurationToJwtModel } from "@/encoders/entity-configuration";
 import { EntityConfigurationEnvironment } from "@/entity-configuration";
-import { LoA, getLoAUri } from "@/wallet-provider";
-import * as H from "@pagopa/handler-kit";
-import * as E from "fp-ts/Either";
-import * as O from "fp-ts/Option";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
-import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
+import { getLoAUri, LoA } from "@/wallet-provider";
 
 import { uploadFile } from "../azure/storage/blob";
 

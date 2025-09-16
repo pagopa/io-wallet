@@ -1,15 +1,20 @@
-import { IWalletInstanceRevocationStorageQueue } from "@/wallet-instance-revocation-process";
 import { QueueClient } from "@azure/storage-queue";
 import * as E from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 import * as J from "fp-ts/lib/Json";
 import * as TE from "fp-ts/lib/TaskEither";
-import { pipe } from "fp-ts/lib/function";
 import { WalletInstanceValidWithAndroidCertificatesChain } from "io-wallet-common/wallet-instance";
+
+import { IWalletInstanceRevocationStorageQueue } from "@/wallet-instance-revocation-process";
 
 export class WalletInstanceRevocationStorageQueue
   implements IWalletInstanceRevocationStorageQueue
 {
   #client: QueueClient;
+
+  constructor(client: QueueClient) {
+    this.#client = client;
+  }
 
   insert = (walletInstance: WalletInstanceValidWithAndroidCertificatesChain) =>
     pipe(
@@ -31,8 +36,4 @@ export class WalletInstanceRevocationStorageQueue
       ),
       TE.map(() => undefined),
     );
-
-  constructor(client: QueueClient) {
-    this.#client = client;
-  }
 }

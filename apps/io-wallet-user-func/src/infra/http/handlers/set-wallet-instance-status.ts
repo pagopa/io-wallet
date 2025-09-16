@@ -1,15 +1,16 @@
-import { revokeAllCredentials } from "@/credential";
-import { enqueue } from "@/infra/azure/storage/queue";
-import { revokeUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/lib/Either";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+import { revokeAllCredentials } from "@/credential";
+import { enqueue } from "@/infra/azure/storage/queue";
+import { revokeUserWalletInstances } from "@/wallet-instance";
 
 import { requireWalletInstanceId } from "../wallet-instance";
 

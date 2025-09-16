@@ -11,16 +11,16 @@ const SendEmailNotificationParams = t.type({
   to: t.string,
 });
 
-export type SendEmailNotificationParams = t.TypeOf<
-  typeof SendEmailNotificationParams
->;
-
 export interface EmailNotificationService {
   getUserEmail: (fiscalCode: FiscalCode) => TE.TaskEither<Error, EmailString>;
   sendEmail: (
     params: SendEmailNotificationParams,
   ) => TE.TaskEither<Error, void>;
 }
+
+export type SendEmailNotificationParams = t.TypeOf<
+  typeof SendEmailNotificationParams
+>;
 
 export const sendEmailToUser: (
   params: SendEmailNotificationParams,

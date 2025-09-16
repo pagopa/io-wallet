@@ -1,9 +1,10 @@
-import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
+
+import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 import { IsFiscalCodeWhitelistedHandler } from "../whitelisted-fiscal-code";
 

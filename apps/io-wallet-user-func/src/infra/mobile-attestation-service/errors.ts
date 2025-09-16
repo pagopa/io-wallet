@@ -1,16 +1,16 @@
+export class AndroidAssertionError extends Error {
+  name = "AndroidAssertionError";
+  constructor(message: string) {
+    super(`[Android Assertion Error] ${message}`);
+  }
+}
+
 export class AndroidAttestationError extends Error {
   name = "AndroidAttestationError";
   constructor(message: string) {
     const finalMessage = `[Android Attestation Error] ${message}`;
 
     super(finalMessage);
-  }
-}
-
-export class AndroidAssertionError extends Error {
-  name = "AndroidAssertionError";
-  constructor(message: string) {
-    super(`[Android Assertion Error] ${message}`);
   }
 }
 

@@ -1,10 +1,10 @@
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
+import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { EntityNotFoundError } from "io-wallet-common/error";
 import {
@@ -26,7 +26,9 @@ export const WalletInstanceUserId = t.type({
   userId: FiscalCode,
 });
 
-export type WalletInstanceUserId = t.TypeOf<typeof WalletInstanceUserId>;
+export interface WalletInstanceEnvironment {
+  walletInstanceRepository: WalletInstanceRepository;
+}
 
 export interface WalletInstanceRepository {
   batchPatch: (
@@ -60,9 +62,7 @@ export interface WalletInstanceRepository {
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
 
-export interface WalletInstanceEnvironment {
-  walletInstanceRepository: WalletInstanceRepository;
-}
+export type WalletInstanceUserId = t.TypeOf<typeof WalletInstanceUserId>;
 
 export const getWalletInstanceByUserId: (
   id: WalletInstance["id"],

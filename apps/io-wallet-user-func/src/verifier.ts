@@ -1,7 +1,7 @@
 import { parse } from "@pagopa/handler-kit";
 import * as E from "fp-ts/Either";
-import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
+import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";

@@ -16,6 +16,10 @@ const supportedSignAlgorithms = ["ES256"];
 export class CryptoSigner implements Signer {
   #configuration: CryptoConfiguration;
 
+  constructor(cnf: CryptoConfiguration) {
+    this.#configuration = cnf;
+  }
+
   // TODO: [SIW-260] Make algorithm management separate and not hard-coded
   createJwtAndSign =
     (
@@ -105,10 +109,6 @@ export class CryptoSigner implements Signer {
       A.findFirst((supportedAlg) => supportedAlg === alg),
       O.isSome,
     );
-
-  constructor(cnf: CryptoConfiguration) {
-    this.#configuration = cnf;
-  }
 }
 
 const getPrivateKeyByKid = (jwks: CryptoConfiguration["jwks"], kid: string) =>

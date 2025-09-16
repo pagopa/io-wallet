@@ -1,8 +1,8 @@
 import { ContainerClient } from "@azure/storage-blob";
-import * as RTE from "fp-ts/ReaderTaskEither";
-import * as TE from "fp-ts/TaskEither";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
+import * as RTE from "fp-ts/ReaderTaskEither";
+import * as TE from "fp-ts/TaskEither";
 import { v4 as uuidv4 } from "uuid";
 
 export const uploadFile: (

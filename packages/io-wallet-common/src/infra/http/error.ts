@@ -1,7 +1,7 @@
 import * as H from "@pagopa/handler-kit";
 import { errorRTE } from "@pagopa/logger";
-import * as RTE from "fp-ts/ReaderTaskEither";
 import { flow } from "fp-ts/function";
+import * as RTE from "fp-ts/ReaderTaskEither";
 
 class HttpUnauthorizedError extends H.HttpError {
   status = 401 as const;
@@ -16,19 +16,19 @@ const toHttpError = (e: Error): Error => {
   switch (e.name) {
     case "EntityNotFoundError":
       return new H.HttpNotFoundError(e.message);
-    case "HealthCheckError":
-      return new H.HttpError(e.message);
-    case "WalletInstanceRevoked":
-      return new H.HttpForbiddenError(e.message);
-    case "UnauthorizedError":
-      return new HttpUnauthorizedError(e.message);
     case "ForbiddenError":
       return new H.HttpForbiddenError(e.message);
+    case "HealthCheckError":
+      return new H.HttpError(e.message);
     // TODO SIW-1482
     case "IntegrityCheckError":
       return new H.HttpConflictError(e.message);
     case "ServiceUnavailable":
       return new H.HttpServiceUnavailableError(e.message);
+    case "UnauthorizedError":
+      return new HttpUnauthorizedError(e.message);
+    case "WalletInstanceRevoked":
+      return new H.HttpForbiddenError(e.message);
   }
   return e;
 };

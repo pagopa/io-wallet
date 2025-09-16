@@ -1,5 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { WalletInstanceRepository } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
@@ -8,6 +7,8 @@ import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
+
+import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { GetWalletInstanceStatusHandler } from "../get-wallet-instance-status";
 

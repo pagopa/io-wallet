@@ -1,20 +1,21 @@
-import {
-  WalletInstanceRepository,
-  WalletInstanceUserId,
-} from "@/wallet-instance";
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
+import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { flow, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import {
   WalletInstance,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
+
+import {
+  WalletInstanceRepository,
+  WalletInstanceUserId,
+} from "@/wallet-instance";
 
 const toError = (genericMessage: string) => (error: unknown) =>
   error instanceof Error && error.name === "TimeoutError"
@@ -32,42 +33,6 @@ export class CosmosDbWalletInstanceRepository
   constructor(db: Database) {
     this.#idKeyedContainer = db.container("wallet-instances-user-id");
     this.#userIdKeyedContainer = db.container("wallet-instances");
-  }
-
-  private delete(
-    id: WalletInstance["id"],
-    userId: WalletInstance["userId"],
-  ): TE.TaskEither<Error, void> {
-    return TE.tryCatch(async () => {
-      await this.#userIdKeyedContainer.item(id, userId).delete();
-    }, toError("Error deleting wallet instance"));
-  }
-
-  private getAllByUserId(
-    userId: WalletInstance["userId"],
-  ): TE.TaskEither<Error, WalletInstance[]> {
-    return pipe(
-      TE.tryCatch(async () => {
-        const { resources: items } = await this.#userIdKeyedContainer.items
-          .readAll({
-            partitionKey: userId,
-          })
-          .fetchAll();
-        return items;
-      }, toError("Error getting wallet instances by user id")),
-      TE.chainW(
-        flow(
-          t.array(WalletInstance).decode,
-          E.mapLeft(
-            () =>
-              new Error(
-                "Error getting wallet instances: invalid result format",
-              ),
-          ),
-          TE.fromEither,
-        ),
-      ),
-    );
   }
 
   batchPatch(
@@ -254,5 +219,41 @@ export class CosmosDbWalletInstanceRepository
       //   userId: walletInstance.userId,
       // });
     }, toError("Error inserting wallet instance"));
+  }
+
+  private delete(
+    id: WalletInstance["id"],
+    userId: WalletInstance["userId"],
+  ): TE.TaskEither<Error, void> {
+    return TE.tryCatch(async () => {
+      await this.#userIdKeyedContainer.item(id, userId).delete();
+    }, toError("Error deleting wallet instance"));
+  }
+
+  private getAllByUserId(
+    userId: WalletInstance["userId"],
+  ): TE.TaskEither<Error, WalletInstance[]> {
+    return pipe(
+      TE.tryCatch(async () => {
+        const { resources: items } = await this.#userIdKeyedContainer.items
+          .readAll({
+            partitionKey: userId,
+          })
+          .fetchAll();
+        return items;
+      }, toError("Error getting wallet instances by user id")),
+      TE.chainW(
+        flow(
+          t.array(WalletInstance).decode,
+          E.mapLeft(
+            () =>
+              new Error(
+                "Error getting wallet instances: invalid result format",
+              ),
+          ),
+          TE.fromEither,
+        ),
+      ),
+    );
   }
 }

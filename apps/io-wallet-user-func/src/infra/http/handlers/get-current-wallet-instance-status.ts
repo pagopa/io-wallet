@@ -1,8 +1,9 @@
-import { getCurrentWalletInstance } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+import { getCurrentWalletInstance } from "@/wallet-instance";
 
 import { WalletInstanceToStatusApiModel } from "../encoders/wallet-instance";
 import { requireFiscalCodeFromHeader } from "../fiscal-code";

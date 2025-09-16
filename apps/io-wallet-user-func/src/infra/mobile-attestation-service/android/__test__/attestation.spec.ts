@@ -1,6 +1,7 @@
-import { GOOGLE_PUBLIC_KEY, decodeBase64String } from "@/app/config";
 import { X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
+
+import { decodeBase64String, GOOGLE_PUBLIC_KEY } from "@/app/config";
 
 import { base64ToPem } from "..";
 import { verifyAttestation } from "../attestation";

@@ -1,8 +1,8 @@
 import * as H from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { lookup } from "fp-ts/Record";
 import * as E from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
+import { lookup } from "fp-ts/Record";
 
 export const requireWalletInstanceId: (
   req: H.HttpRequest,

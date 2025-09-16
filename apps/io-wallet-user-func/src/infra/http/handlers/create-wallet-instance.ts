@@ -1,16 +1,3 @@
-import {
-  AttestationService,
-  ValidatedAttestation,
-  validateAttestation,
-} from "@/attestation-service";
-import { enqueue } from "@/infra/azure/storage/queue";
-import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
-import { isLoadTestUser } from "@/user";
-import {
-  insertWalletInstance,
-  revokeUserValidWalletInstancesExceptOne,
-} from "@/wallet-instance";
-import { WalletInstanceRequest, consumeNonce } from "@/wallet-instance-request";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -20,6 +7,20 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+import {
+  AttestationService,
+  validateAttestation,
+  ValidatedAttestation,
+} from "@/attestation-service";
+import { enqueue } from "@/infra/azure/storage/queue";
+import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
+import { isLoadTestUser } from "@/user";
+import {
+  insertWalletInstance,
+  revokeUserValidWalletInstancesExceptOne,
+} from "@/wallet-instance";
+import { consumeNonce, WalletInstanceRequest } from "@/wallet-instance-request";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,

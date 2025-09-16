@@ -1,5 +1,3 @@
-import { AuthProfileApiConfig, MailConfig } from "@/app/config";
-import { EmailNotificationService, SendEmailNotificationParams } from "@/email";
 import {
   getMailerTransporter,
   sendMail,
@@ -10,11 +8,25 @@ import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 
+import { AuthProfileApiConfig, MailConfig } from "@/app/config";
+import { EmailNotificationService, SendEmailNotificationParams } from "@/email";
+
 export class EmailNotificationServiceClient
   implements EmailNotificationService
 {
   #authProfileApiConfig: AuthProfileApiConfig;
   #mailConfig: MailConfig;
+
+  constructor({
+    authProfileApiConfig,
+    mailConfig,
+  }: {
+    authProfileApiConfig: AuthProfileApiConfig;
+    mailConfig: MailConfig;
+  }) {
+    this.#authProfileApiConfig = authProfileApiConfig;
+    this.#mailConfig = mailConfig;
+  }
 
   getUserEmail = (fiscalCode: FiscalCode) =>
     pipe(
@@ -81,15 +93,4 @@ export class EmailNotificationServiceClient
           to: params.to,
         }),
     );
-
-  constructor({
-    authProfileApiConfig,
-    mailConfig,
-  }: {
-    authProfileApiConfig: AuthProfileApiConfig;
-    mailConfig: MailConfig;
-  }) {
-    this.#authProfileApiConfig = authProfileApiConfig;
-    this.#mailConfig = mailConfig;
-  }
 }

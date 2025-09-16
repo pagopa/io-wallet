@@ -1,3 +1,13 @@
+import * as H from "@pagopa/handler-kit";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { flow, pipe } from "fp-ts/function";
+import { sequenceS } from "fp-ts/lib/Apply";
+import * as E from "fp-ts/lib/Either";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as TE from "fp-ts/lib/TaskEither";
+import * as t from "io-ts";
+import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
 import { AttestationService, validateAssertionV2 } from "@/attestation-service";
 import { NonceEnvironment } from "@/nonce";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
@@ -9,24 +19,15 @@ import {
 } from "@/wallet-attestation";
 import { createWalletAttestationAsMdoc } from "@/wallet-attestation-mdoc";
 import {
-  WalletAttestationRequestV2,
   verifyAndDecodeWalletAttestationRequest,
+  WalletAttestationRequestV2,
 } from "@/wallet-attestation-request";
 import {
-  WalletInstanceEnvironment,
   getValidWalletInstanceByUserId,
+  WalletInstanceEnvironment,
   // getWalletInstanceUserId,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
-import * as H from "@pagopa/handler-kit";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { flow, pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
-import * as E from "fp-ts/lib/Either";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as TE from "fp-ts/lib/TaskEither";
-import * as t from "io-ts";
-import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 // const WalletAttestationRequestPayload = t.type({
 //   assertion: NonEmptyString,
@@ -101,10 +102,10 @@ const validateRequest: (input: {
   isTestUser: boolean;
   userId: FiscalCode;
 }) => RTE.ReaderTaskEither<
-  {
-    attestationService: AttestationService;
-  } & NonceEnvironment &
-    WalletInstanceEnvironment,
+  NonceEnvironment &
+    WalletInstanceEnvironment & {
+      attestationService: AttestationService;
+    },
   Error,
   void
 > = ({ assertion, isTestUser, userId }) =>

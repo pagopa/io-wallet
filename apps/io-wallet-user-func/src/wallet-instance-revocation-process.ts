@@ -1,10 +1,10 @@
 import * as appInsights from "applicationinsights";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
-import { pipe } from "fp-ts/lib/function";
 import { NotificationService } from "io-wallet-common/notification";
 import {
   RevocationReason,
@@ -16,9 +16,9 @@ import { getCrlFromUrls, validateRevocation } from "./certificates";
 import { WalletInstanceRevocationStorageQueue } from "./infra/azure/storage/wallet-instance-revocation";
 import { obfuscatedUserId } from "./user";
 import {
-  WalletInstanceRepository,
   getValidWalletInstanceWithAndroidCertificatesChain,
   revokeUserWalletInstances,
+  WalletInstanceRepository,
 } from "./wallet-instance";
 
 export type ValidationCertificatesResult =

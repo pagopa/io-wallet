@@ -1,5 +1,3 @@
-import { DEFAULT_TIMEZONE, formatDate } from "@/datetime";
-import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
@@ -10,6 +8,9 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import * as t from "io-ts";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
+
+import { DEFAULT_TIMEZONE, formatDate } from "@/datetime";
+import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 
 export const WalletInstanceRevocationQueueItem = t.type({
   fiscalCode: FiscalCode,

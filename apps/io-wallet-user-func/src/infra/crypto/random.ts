@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import * as IOE from "fp-ts/IOEither";
 import { pipe } from "fp-ts/function";
+import * as IOE from "fp-ts/IOEither";
 
 const generateRandomBytes: IOE.IOEither<Error, Buffer> = IOE.tryCatch(
   () => crypto.randomBytes(16),

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  fromBase64ToJwks,
   JwkPrivateKey,
   JwkPublicKey,
-  fromBase64ToJwks,
   validateJwkKid,
 } from "../jwk";
 

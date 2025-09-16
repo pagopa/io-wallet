@@ -1,5 +1,6 @@
-import { CRL } from "@/certificates";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+
+import { CRL } from "@/certificates";
 
 const challenge = "randomvalue";
 const attestation =

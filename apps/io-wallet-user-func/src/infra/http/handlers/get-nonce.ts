@@ -1,9 +1,10 @@
-import { generateNonce, insertNonce } from "@/nonce";
 import * as H from "@pagopa/handler-kit";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { pipe } from "fp-ts/lib/function";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+import { generateNonce, insertNonce } from "@/nonce";
 
 export const GetNonceHandler = H.of(() =>
   pipe(

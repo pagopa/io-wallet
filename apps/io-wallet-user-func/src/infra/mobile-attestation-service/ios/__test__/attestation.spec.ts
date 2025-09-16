@@ -1,9 +1,10 @@
+import { decode } from "cbor-x";
+import { describe, expect, it } from "vitest";
+
 import {
   APPLE_APP_ATTESTATION_ROOT_CA,
   decodeBase64String,
 } from "@/app/config";
-import { decode } from "cbor-x";
-import { describe, expect, it } from "vitest";
 
 import { verifyAttestation } from "../attestation";
 import { iOSMockData } from "./config";

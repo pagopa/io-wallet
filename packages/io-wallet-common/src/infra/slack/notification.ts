@@ -8,6 +8,10 @@ import { SlackConfig } from "./config";
 export class SlackNotificationService implements NotificationService {
   #configuration: SlackConfig;
 
+  constructor(cnf: SlackConfig) {
+    this.#configuration = cnf;
+  }
+
   sendMessage = (message: string) =>
     pipe(
       TE.tryCatch(
@@ -23,7 +27,4 @@ export class SlackNotificationService implements NotificationService {
       ),
       TE.map(() => undefined),
     );
-  constructor(cnf: SlackConfig) {
-    this.#configuration = cnf;
-  }
 }

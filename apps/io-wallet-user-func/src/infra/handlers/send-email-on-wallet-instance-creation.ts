@@ -1,4 +1,3 @@
-import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceCreation/index";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
@@ -7,6 +6,8 @@ import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
+
+import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
 
 const WALLET_ACTIVATION_EMAIL_TITLE =
   "Documenti su IO - Aggiungi i tuoi documenti al Portafoglio";

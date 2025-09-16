@@ -2,13 +2,6 @@ export class EntityNotFoundError extends Error {
   name = "EntityNotFoundError";
 }
 
-export class UnauthorizedError extends Error {
-  name = "UnauthorizedError";
-  constructor() {
-    super("You are not authorized to perform this operation");
-  }
-}
-
 export class ForbiddenError extends Error {
   name = "ForbiddenError";
   constructor() {
@@ -27,5 +20,12 @@ export class ServiceUnavailableError extends Error {
   name = "ServiceUnavailable";
   constructor(cause?: string) {
     super(`Service Unavailable. Please try again later. ${cause}`);
+  }
+}
+
+export class UnauthorizedError extends Error {
+  name = "UnauthorizedError";
+  constructor() {
+    super("You are not authorized to perform this operation");
   }
 }

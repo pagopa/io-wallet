@@ -1,4 +1,3 @@
-import { CertificateRepository } from "@/certificates";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { Crypto } from "@peculiar/webcrypto";
@@ -6,6 +5,8 @@ import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
+
+import { CertificateRepository } from "@/certificates";
 
 import { GenerateCertificateChainHandler } from "../generate-certificate-chain";
 

@@ -1,10 +1,10 @@
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import * as E from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 import * as IOE from "fp-ts/IOEither";
+import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/function";
-import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
 import * as t from "io-ts";
 import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 
@@ -27,7 +27,7 @@ import {
   WalletAttestationRequest,
   WalletAttestationRequestV2,
 } from "./wallet-attestation-request";
-import { LoA, getLoAUri } from "./wallet-provider";
+import { getLoAUri, LoA } from "./wallet-provider";
 
 const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
   pipe(disclosure, JSON.stringify, (str) =>
@@ -101,17 +101,18 @@ export const createWalletAttestation =
     );
 
 // ----- new wallet-attestation endpoint
-interface WalletAttestationConfig {
-  trustAnchorUrl: ValidUrl;
-  walletLink: string;
-  walletName: string;
-}
 
 export interface WalletAttestationEnvironment {
   certificateRepository: CertificateRepository;
   federationEntity: FederationEntity;
   signer: Signer;
   walletAttestationConfig: WalletAttestationConfig;
+}
+
+interface WalletAttestationConfig {
+  trustAnchorUrl: ValidUrl;
+  walletLink: string;
+  walletName: string;
 }
 
 export const getWalletAttestationData =

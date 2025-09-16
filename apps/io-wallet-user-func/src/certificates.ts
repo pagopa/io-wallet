@@ -1,13 +1,14 @@
-import { ValidationResult } from "@/attestation-service";
 import { KeyObject, X509Certificate } from "crypto";
-import * as O from "fp-ts/Option";
-import * as RR from "fp-ts/ReadonlyRecord";
 import * as E from "fp-ts/lib/Either";
+import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
-import { pipe } from "fp-ts/lib/function";
+import * as O from "fp-ts/Option";
+import * as RR from "fp-ts/ReadonlyRecord";
 import * as t from "io-ts";
+
+import { ValidationResult } from "@/attestation-service";
 
 /**
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.

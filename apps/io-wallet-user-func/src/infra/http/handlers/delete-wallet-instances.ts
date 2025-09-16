@@ -1,10 +1,11 @@
-import { revokeAllCredentials } from "@/credential";
-import { deleteUserWalletInstances } from "@/wallet-instance";
 import * as H from "@pagopa/handler-kit";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+
+import { revokeAllCredentials } from "@/credential";
+import { deleteUserWalletInstances } from "@/wallet-instance";
 
 import { requireFiscalCodeFromHeader } from "../fiscal-code";
 

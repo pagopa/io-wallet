@@ -1,7 +1,13 @@
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { pipe } from "fp-ts/function";
+
+export interface Message {
+  sendMessage: (
+    content: MessageContent,
+  ) => (fiscalCode: FiscalCode) => TE.TaskEither<CodeError, string>;
+}
 
 interface MessageContent {
   markdown: string;
@@ -14,12 +20,6 @@ export class CodeError extends Error {
     super();
     this.code = code;
   }
-}
-
-export interface Message {
-  sendMessage: (
-    content: MessageContent,
-  ) => (fiscalCode: FiscalCode) => TE.TaskEither<CodeError, string>;
 }
 
 // TODO [SIW-1995]: set as env variables
