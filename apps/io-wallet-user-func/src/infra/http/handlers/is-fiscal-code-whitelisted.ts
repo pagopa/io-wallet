@@ -16,6 +16,10 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
     RTE.chain((fiscalCode) =>
       pipe(
         checkIfFiscalCodeIsWhitelisted(fiscalCode),
+        // RTE.map((x) => {
+        //   console.log("res of checkIfFiscalCodeIsWhitelisted ", x);
+        //   return x;
+        // }),
         RTE.map(({ whitelisted, whitelistedAt }) => ({
           fiscalCode,
           whitelisted,
@@ -27,7 +31,7 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
     RTE.orElseFirstW((error) =>
       pipe(
         sendTelemetryException(error, {
-          functionName: "IsFiscalCodeWhitelisted",
+          functionName: "isFiscalCodeWhitelisted",
         }),
         RTE.fromReader,
       ),
