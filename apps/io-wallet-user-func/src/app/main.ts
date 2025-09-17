@@ -179,6 +179,7 @@ app.http("createWalletInstance", {
       queueClient: walletInstanceCreationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository,
     }),
   ),
   methods: ["POST"],
@@ -244,6 +245,7 @@ app.http("setWalletInstanceStatus", {
       queueClient: walletInstanceRevocationEmailQueueClient,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
+      whitelistedFiscalCodeRepository,
     }),
   ),
   methods: ["PUT"],
@@ -358,7 +360,7 @@ app.http("createWalletAttestationV2", {
   route: "wallet-attestations",
 });
 
-app.http("IsFiscalCodeWhitelisted", {
+app.http("isFiscalCodeWhitelisted", {
   authLevel: "function",
   handler: withAppInsights(
     IsFiscalCodeWhitelistedFunction({

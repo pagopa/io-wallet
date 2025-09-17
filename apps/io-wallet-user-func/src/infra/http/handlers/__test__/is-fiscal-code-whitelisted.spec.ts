@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
-import { IsFiscalCodeWhitelistedHandler } from "../whitelisted-fiscal-code";
+import { IsFiscalCodeWhitelistedHandler } from "../is-fiscal-code-whitelisted";
 
 describe("IsFiscalCodeWhitelistedHandler", () => {
   const whitelistedFiscalCodeRepositoryThatReturnsWhitelistedFiscalCode: WhitelistedFiscalCodeRepository =

@@ -1,3 +1,4 @@
+import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
@@ -11,6 +12,10 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
 import { revokeUserWalletInstances } from "@/wallet-instance";
+import {
+  checkIfFiscalCodeIsWhitelisted,
+  WhitelistedFiscalCodeEnvironment,
+} from "@/whitelisted-fiscal-code";
 
 import { requireWalletInstanceId } from "../wallet-instance";
 
@@ -25,6 +30,27 @@ const requireSetWalletInstanceStatusBody: (
   req: H.HttpRequest,
 ) => E.Either<Error, SetWalletInstanceStatusBody> = (req) =>
   pipe(req.body, H.parse(SetWalletInstanceStatusBody, "Invalid body supplied"));
+
+// this function sends the email only if the user is NOT whitelisted
+const sendEmail: (
+  fiscalCode: FiscalCode,
+) => RTE.ReaderTaskEither<
+  WhitelistedFiscalCodeEnvironment & { queueClient: QueueClient },
+  Error,
+  void
+> = (fiscalCode) =>
+  pipe(
+    fiscalCode,
+    checkIfFiscalCodeIsWhitelisted,
+    RTE.chain(({ whitelisted }) =>
+      whitelisted
+        ? RTE.of(undefined)
+        : enqueue({
+            fiscalCode,
+            revokedAt: new Date(),
+          }),
+    ),
+  );
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -49,12 +75,7 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
               [walletInstanceId],
               "REVOKED_BY_USER",
             ),
-            RTE.chainW(() =>
-              enqueue({
-                fiscalCode,
-                revokedAt: new Date(),
-              }),
-            ),
+            RTE.chainW(() => sendEmail(fiscalCode)),
           ),
         ),
         RTE.orElseFirstW((error) =>
