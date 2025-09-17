@@ -20,10 +20,6 @@ resource "azurerm_monitor_metric_alert" "function_app_user_response_time" {
     action_group_id = var.action_group_wallet_id
   }
 
-  action {
-    action_group_id = var.action_group_io_id
-  }
-
   tags = var.tags
 }
 
