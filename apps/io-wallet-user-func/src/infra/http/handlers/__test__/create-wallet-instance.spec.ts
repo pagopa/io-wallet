@@ -6,7 +6,7 @@ import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
@@ -84,6 +84,11 @@ describe("CreateWalletInstanceHandler", () => {
       }),
   };
 
+  const whitelistedFiscalCodeRepositoryFalse: WhitelistedFiscalCodeRepository =
+    {
+      checkIfFiscalCodeIsWhitelisted: () => TE.right({ whitelisted: false }),
+    };
+
   it("should return a 204 HTTP response on success", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -99,7 +104,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -127,7 +132,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -160,7 +165,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -200,7 +205,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -239,7 +244,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -279,7 +284,7 @@ describe("CreateWalletInstanceHandler", () => {
       queueClient,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -291,5 +296,67 @@ describe("CreateWalletInstanceHandler", () => {
         statusCode: 500,
       }),
     });
+  });
+
+  it("should call queueClient.sendMessage when fiscal code is not whitelisted", async () => {
+    const queueClientMock: QueueClient = {
+      sendMessage: vi.fn(() =>
+        Promise.resolve({
+          errorCode: undefined,
+          messageId: "messageId",
+        } as QueueSendMessageResponse),
+      ),
+    } as unknown as QueueClient;
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient: queueClientMock,
+      telemetryClient,
+      walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
+    });
+
+    await handler();
+
+    expect(queueClientMock.sendMessage).toHaveBeenCalledOnce();
+  });
+
+  it("should not call queueClient.sendMessage when fiscal code is whitelisted", async () => {
+    const queueClientMock: QueueClient = {
+      sendMessage: vi.fn(() =>
+        Promise.resolve({
+          errorCode: undefined,
+          messageId: "messageId",
+        } as QueueSendMessageResponse),
+      ),
+    } as unknown as QueueClient;
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient: queueClientMock,
+      telemetryClient,
+      walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
+    });
+
+    await handler();
+
+    expect(queueClientMock.sendMessage).not.toHaveBeenCalled();
   });
 });
