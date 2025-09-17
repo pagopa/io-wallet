@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
