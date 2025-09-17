@@ -27,7 +27,7 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
     RTE.orElseFirstW((error) =>
       pipe(
         sendTelemetryException(error, {
-          functionName: "IsFiscalCodeWhitelisted",
+          functionName: "isFiscalCodeWhitelisted",
         }),
         RTE.fromReader,
       ),
