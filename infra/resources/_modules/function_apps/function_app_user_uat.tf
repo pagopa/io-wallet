@@ -28,7 +28,6 @@ module "function_app_user_uat" {
 
   action_group_ids = [
     var.action_group_wallet_id,
-    var.action_group_io_id
   ]
 
   tier = "l"
