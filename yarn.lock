@@ -578,9 +578,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/storage-blob@npm:^12.29.0":
-  version: 12.29.0
-  resolution: "@azure/storage-blob@npm:12.29.0"
+"@azure/storage-blob@npm:12.28.0":
+  version: 12.28.0
+  resolution: "@azure/storage-blob@npm:12.28.0"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.9.0"
@@ -593,14 +593,14 @@ __metadata:
     "@azure/core-util": "npm:^1.11.0"
     "@azure/core-xml": "npm:^1.4.5"
     "@azure/logger": "npm:^1.1.4"
-    "@azure/storage-common": "npm:^12.1.0"
+    "@azure/storage-common": "npm:^12.0.0-beta.2"
     events: "npm:^3.0.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/9e05101dc277c12d26351c97384df9add7bd9567ad998b9b66434464a4dede83cc4eeec280dc812f42d475192def24b4d5ed2ba15ecfb2bb6a697fe37ca34828
+  checksum: 10c0/a97f43193da9c5fbb58492156ad6dd3f0c9f1bf2fdf72cbc5a1fdfe16a586b0a4bb7bfaa7e24de63d689927c2a606d4ca65332594e0f2278c55d48f7c90d1a54
   languageName: node
   linkType: hard
 
-"@azure/storage-common@npm:^12.1.0":
+"@azure/storage-common@npm:^12.0.0, @azure/storage-common@npm:^12.0.0-beta.2":
   version: 12.1.0
   resolution: "@azure/storage-common@npm:12.1.0"
   dependencies:
@@ -617,9 +617,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@azure/storage-queue@npm:^12.28.0":
-  version: 12.28.0
-  resolution: "@azure/storage-queue@npm:12.28.0"
+"@azure/storage-queue@npm:12.27.0":
+  version: 12.27.0
+  resolution: "@azure/storage-queue@npm:12.27.0"
   dependencies:
     "@azure/abort-controller": "npm:^2.1.2"
     "@azure/core-auth": "npm:^1.9.0"
@@ -631,9 +631,9 @@ __metadata:
     "@azure/core-util": "npm:^1.11.0"
     "@azure/core-xml": "npm:^1.4.3"
     "@azure/logger": "npm:^1.1.4"
-    "@azure/storage-common": "npm:^12.1.0"
+    "@azure/storage-common": "npm:^12.0.0"
     tslib: "npm:^2.8.1"
-  checksum: 10c0/90a740ff505ba4a01f12fd6ed85d7a52a143a5771a2b3bb80c2d36993b959e24e51e2635335f6a41d8cc767a170524823df1aca0a8366bacee4b800c15cc7c56
+  checksum: 10c0/027698dbf2ef7950b9a40f9e61b9ef0c969ea1db8bd01ffc1c677e25c820e9c0a8b4873ccb4fb9b6d6b91740cc652c9360d5dfd521983744ffecf91b29337930
   languageName: node
   linkType: hard
 
@@ -6452,8 +6452,8 @@ __metadata:
   resolution: "io-wallet-messages-func@workspace:apps/io-wallet-messages-func"
   dependencies:
     "@azure/functions": "npm:^4.8.0"
-    "@azure/storage-blob": "npm:^12.29.0"
-    "@azure/storage-queue": "npm:^12.28.0"
+    "@azure/storage-blob": "npm:12.28.0"
+    "@azure/storage-queue": "npm:12.27.0"
     "@pagopa/eslint-config": "npm:^5.0.0"
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
@@ -6505,8 +6505,8 @@ __metadata:
     "@azure/functions": "npm:^4.8.0"
     "@azure/functions-opentelemetry-instrumentation": "npm:^0.2.0"
     "@azure/identity": "npm:^4.12.0"
-    "@azure/storage-blob": "npm:^12.29.0"
-    "@azure/storage-queue": "npm:^12.28.0"
+    "@azure/storage-blob": "npm:12.28.0"
+    "@azure/storage-queue": "npm:12.27.0"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/instrumentation": "npm:^0.205.0"
     "@opentelemetry/instrumentation-undici": "npm:^0.16.0"
