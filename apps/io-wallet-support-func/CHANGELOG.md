@@ -1,5 +1,16 @@
 # io-wallet-support-func
 
+## 1.5.0
+
+### Minor Changes
+
+- 1a07166: Updated dependencies
+
+### Patch Changes
+
+- Updated dependencies [1a07166]
+  - io-wallet-common@1.4.0
+
 ## 1.4.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.4.0
+
+### Minor Changes
+
+- 1a07166: Updated dependencies
+
 ## 1.3.2
 
 ### Patch Changes

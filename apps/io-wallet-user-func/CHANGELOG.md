@@ -1,5 +1,18 @@
 # io-wallet-user-func
 
+## 3.7.0
+
+### Minor Changes
+
+- 8c7c0cb: Updated @azure/storage-blob and @azure/storage-queue dependencies"
+- 1a07166: Updated dependencies
+
+### Patch Changes
+
+- 6c16860: Disabled email sending for fiscal codes in the whitelist
+- Updated dependencies [1a07166]
+  - io-wallet-common@1.4.0
+
 ## 3.6.2
 
 ### Patch Changes

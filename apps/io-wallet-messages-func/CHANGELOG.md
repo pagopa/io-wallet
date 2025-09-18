@@ -1,5 +1,17 @@
 # io-wallet-messages-func
 
+## 1.1.0
+
+### Minor Changes
+
+- 8c7c0cb: Updated @azure/storage-blob and @azure/storage-queue dependencies"
+- 1a07166: Updated dependencies
+
+### Patch Changes
+
+- Updated dependencies [1a07166]
+  - io-wallet-common@1.4.0
+
 ## 1.0.2
 
 ### Patch Changes
