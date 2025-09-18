@@ -3414,7 +3414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"applicationinsights@npm:^3.9.0":
+"applicationinsights@npm:^3.10.0":
   version: 3.10.0
   resolution: "applicationinsights@npm:3.10.0"
   dependencies:
@@ -5881,7 +5881,7 @@ __metadata:
     "@pagopa/handler-kit": "npm:^1.1.0"
     "@pagopa/logger": "npm:^1.0.1"
     "@pagopa/ts-commons": "npm:^13.1.2"
-    applicationinsights: "npm:^3.9.0"
+    applicationinsights: "npm:^3.10.0"
     eslint: "npm:9.35.0"
     fp-ts: "npm:^2.16.11"
     io-ts: "npm:^2.2.22"
@@ -5927,7 +5927,7 @@ __metadata:
     "@pagopa/handler-kit-azure-func": "npm:^2.0.7"
     "@pagopa/ts-commons": "npm:^13.1.2"
     "@vitest/coverage-v8": "npm:^3.2.4"
-    applicationinsights: "npm:^3.9.0"
+    applicationinsights: "npm:^3.10.0"
     azure-functions-core-tools: "npm:^4.2.2"
     eslint: "npm:9.35.0"
     fp-ts: "npm:^2.16.11"
@@ -5965,7 +5965,7 @@ __metadata:
     "@types/html-to-text": "npm:9.0.4"
     "@types/jsonwebtoken": "npm:^9.0.10"
     "@vitest/coverage-v8": "npm:^3.2.4"
-    applicationinsights: "npm:^3.9.0"
+    applicationinsights: "npm:^3.10.0"
     asn1js: "npm:^3.0.6"
     azure-functions-core-tools: "npm:^4.2.2"
     cbor-x: "npm:^1.6.0"

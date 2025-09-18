@@ -39,7 +39,7 @@ const dispatchToQueue: (
     );
 
 const insertFiscalCodesInQueue: (
-  buffer: Buffer<ArrayBuffer>,
+  buffer: Buffer<ArrayBufferLike>,
 ) => RTE.ReaderTaskEither<Queue, Error, void> = (buffer) =>
   pipe(
     buffer.toString(),
