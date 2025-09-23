@@ -6,6 +6,7 @@ import * as ai from "applicationinsights";
 
 ai.setup(process.env["AppInsightsConnectionString"])
   .setUseDiskRetryCaching(true)
+  .setAutoCollectConsole(false)
   .start();
 
 registerInstrumentations({
