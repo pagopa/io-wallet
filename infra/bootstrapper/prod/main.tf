@@ -104,7 +104,7 @@ module "repo" {
     resource_group_name = local.tf_storage_account.resource_group_name
   }
 
-    repository = {
+  repository = {
     owner = "pagopa"
     name  = local.repository.name
   }
