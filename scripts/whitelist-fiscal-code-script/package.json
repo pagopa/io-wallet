@@ -2,31 +2,27 @@
   "name": "whitelist-fiscal-code-script",
   "version": "1.0.0",
   "scripts": {
-    "start": "ts-node src/app/main.ts",
+    "start": "ts-node src/main.ts",
     "lint": "eslint \"src/**\"",
     "lint:fix": "eslint --fix \"src/**\"",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "typecheck": "tsc"
   },
   "description": "This script adds fiscal codes to the whitelist in the database.",
   "devDependencies": {
-    "@types/cli-progress": "^3",
-    "@types/node": "^22.15.3",
-    "@vitest/coverage-v8": "^3.1.2",
-    "eslint": "9.14.0",
+    "@pagopa/eslint-config": "^5.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "eslint": "^9.36.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.2"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.3.0",
-    "@pagopa/eslint-config": "^4.0.4",
-    "cli-progress": "^3.12.0",
-    "csv-parse": "^5.6.0",
-    "dotenv": "^16.5.0",
-    "joi": "^17.13.3",
-    "prettier": "3.4.2",
-    "winston": "^3.17.0"
+    "@azure/cosmos": "^4.5.1",
+    "dotenv": "^17.2.2",
+    "prettier": "^3.6.2",
+    "zod": "^4.1.11"
   }
 }
