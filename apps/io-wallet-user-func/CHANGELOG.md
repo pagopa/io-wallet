@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.7.4
+
+### Patch Changes
+
+- ead85d6: Updated AI configuration
+
 ## 3.7.3
 
 ### Patch Changes
