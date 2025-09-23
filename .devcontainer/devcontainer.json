@@ -18,7 +18,7 @@
       "pnpmVersion": "none",
       "nvmInstallPath": "/opt/nvm"
     },
-    "ghcr.io/devcontainers-extra/features/act:1": {},
+    "ghcr.io/devcontainers-extra/features/act:1": {}
   },
   "postStartCommand": {
     "set-workspace-as-safe-dir": "git config --global --add safe.directory ${containerWorkspaceFolder}"
