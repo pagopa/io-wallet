@@ -1,5 +1,11 @@
 # io-wallet-support-func
 
+## 1.5.1
+
+### Patch Changes
+
+- 56ea851: Updated host.json file
+
 ## 1.5.0
 
 ### Minor Changes
