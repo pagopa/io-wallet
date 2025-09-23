@@ -13,5 +13,12 @@
       "batchSize": 16,
       "maxDequeueCount": 5
     }
+  },
+  "logging": {
+    "logLevel": {
+      "default": "Error",
+      "Host.Aggregator": "Information",
+      "Host.Results": "Information"
+    }
   }
 }

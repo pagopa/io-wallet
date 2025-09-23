@@ -8,5 +8,12 @@
     "http": {
       "routePrefix": "api/v1/wallet"
     }
+  },
+  "logging": {
+    "logLevel": {
+      "default": "Error",
+      "Host.Aggregator": "Information",
+      "Host.Results": "Information"
+    }
   }
 }
