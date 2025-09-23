@@ -81,7 +81,7 @@ data "azuread_group" "developers" {
 
 module "repo" {
   source  = "pagopa-dx/azure-github-environment-bootstrap/azurerm"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   environment = {
     prefix          = local.prefix
