@@ -41,10 +41,6 @@ resource "azurerm_monitor_metric_alert" "function_app_support_response_time" {
     threshold        = 5
   }
 
-  action {
-    action_group_id = var.action_group_wallet_id
-  }
-
   tags = var.tags
 }
 
