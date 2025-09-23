@@ -5,15 +5,15 @@ module "github_repository" {
   version = "~> 1.0"
 
   repository = {
-    name            = local.repository.name
-    description     = local.repository.description
-    topics          = local.repository.topics
-    reviewers_teams = local.repository.reviewers_teams
-    default_branch_name = local.repository.default_branch_name
-    jira_boards_ids = local.repository.jira_boards_ids
+    name                     = local.repository.name
+    description              = local.repository.description
+    topics                   = local.repository.topics
+    reviewers_teams          = local.repository.reviewers_teams
+    default_branch_name      = local.repository.default_branch_name
+    jira_boards_ids          = local.repository.jira_boards_ids
     infra_cd_policy_branches = local.repository.infra_cd_policy_branches
-    opex_cd_policy_branches = local.repository.opex_cd_policy_branches
-    app_cd_policy_branches = local.repository.app_cd_policy_branches
-    environments    = ["prod"]
+    opex_cd_policy_branches  = local.repository.opex_cd_policy_branches
+    app_cd_policy_branches   = local.repository.app_cd_policy_branches
+    environments             = ["prod"]
   }
 }
