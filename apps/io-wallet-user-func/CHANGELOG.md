@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.7.3
+
+### Patch Changes
+
+- 3581ee7: Updated user host.json file
+
 ## 3.7.2
 
 ### Patch Changes
