@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.7.2
+
+### Patch Changes
+
+- ef49aaa: Udpated host.json file
+
 ## 3.7.1
 
 ### Patch Changes
