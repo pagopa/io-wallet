@@ -31,7 +31,7 @@ export const DeviceDetails = t.union([AndroidDeviceDetails, IosDeviceDetails]);
 
 export type DeviceDetails = t.TypeOf<typeof DeviceDetails>;
 
-const AndroidDeviceDetailsStringOsPatchLevel = t.intersection([
+export const AndroidDeviceDetailsStringOsPatchLevel = t.intersection([
   t.type({
     attestationSecurityLevel: t.number,
     attestationVersion: t.number,
