@@ -9,13 +9,13 @@ import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
+import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
-import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
