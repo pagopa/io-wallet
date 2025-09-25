@@ -5,7 +5,7 @@ import * as t from "io-ts";
 import {
   AndroidDeviceDetails,
   DeviceDetails,
-  DeviceDetailsRevokedWI,
+  DeviceDetailsStringOsPatchLevel,
 } from "./device-details";
 import { JwkPublicKey } from "./jwk";
 
@@ -36,6 +36,8 @@ export const RevocationReason = t.union([
 ]);
 export type RevocationReason = t.TypeOf<typeof RevocationReason>;
 
+// Some revoked wallet instances in the database have `osPatchLevel` stored as a string,
+// so we allow `osPatchLevel` to be either a number or a string for revoked instances only
 const WalletInstanceRevoked = t.intersection([
   WalletInstanceBase,
   t.type({
@@ -43,7 +45,7 @@ const WalletInstanceRevoked = t.intersection([
     revokedAt: IsoDateFromString,
   }),
   t.partial({
-    deviceDetails: DeviceDetailsRevokedWI,
+    deviceDetails: DeviceDetailsStringOsPatchLevel,
     revocationReason: RevocationReason,
   }),
 ]);
