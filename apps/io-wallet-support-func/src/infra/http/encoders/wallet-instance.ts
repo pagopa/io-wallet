@@ -3,6 +3,7 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 import {
   AndroidDeviceDetails,
+  AndroidDeviceDetailsRevokedWI,
   IosDeviceDetails,
 } from "io-wallet-common/device-details";
 import {
@@ -14,6 +15,9 @@ const androidDevicePlatform = AndroidDeviceDetails.types[0].props.platform;
 
 const androidDeviceOptionalFields = AndroidDeviceDetails.types[1].props;
 
+const androidDeviceRevokedWIOptionalFields =
+  AndroidDeviceDetailsRevokedWI.types[1].props;
+
 const DeviceDetails = t.union([
   IosDeviceDetails,
   t.intersection([
@@ -21,7 +25,10 @@ const DeviceDetails = t.union([
       platform: androidDevicePlatform,
     }),
     t.partial({
-      os_patch_level: androidDeviceOptionalFields.osPatchLevel,
+      os_patch_level: t.union([
+        androidDeviceOptionalFields.osPatchLevel,
+        androidDeviceRevokedWIOptionalFields.osPatchLevel,
+      ]),
       os_version: androidDeviceOptionalFields.osVersion,
     }),
   ]),

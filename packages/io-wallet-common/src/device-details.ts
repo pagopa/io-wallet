@@ -30,3 +30,29 @@ export type AndroidDeviceDetails = t.TypeOf<typeof AndroidDeviceDetails>;
 export const DeviceDetails = t.union([AndroidDeviceDetails, IosDeviceDetails]);
 
 export type DeviceDetails = t.TypeOf<typeof DeviceDetails>;
+
+// Some revoked wallet instances in the database have `osPatchLevel` stored as a string,
+// so we allow `osPatchLevel` to be either a number or a string for revoked instances only
+export const AndroidDeviceDetailsRevokedWI = t.intersection([
+  t.type({
+    attestationSecurityLevel: t.number,
+    attestationVersion: t.number,
+    keymasterSecurityLevel: t.number,
+    keymasterVersion: t.number,
+    platform: t.literal("android"),
+  }),
+  t.partial({
+    bootPatchLevel: t.string,
+    deviceLocked: t.boolean,
+    osPatchLevel: t.union([t.number, t.string]),
+    osVersion: t.number,
+    vendorPatchLevel: t.string,
+    verifiedBootState: t.number,
+    x509Chain: t.array(t.string),
+  }),
+]);
+
+export const DeviceDetailsRevokedWI = t.union([
+  AndroidDeviceDetailsRevokedWI,
+  IosDeviceDetails,
+]);

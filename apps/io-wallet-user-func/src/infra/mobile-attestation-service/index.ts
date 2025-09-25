@@ -33,6 +33,9 @@ class IntegrityCheckError extends Error {
   }
 }
 
+const toIntegrityError = (e: Error | ValidationError): Error =>
+  e instanceof ValidationError ? new IntegrityCheckError(e.violations) : e;
+
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validated: Separated<readonly Error[], readonly any[]>,
@@ -147,14 +150,17 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.appleRootCertificate,
               this.allowDevelopmentEnvironmentForUser(user),
             ),
-            validateAndroidAttestation(
-              data,
-              nonce,
-              hardwareKeyTag,
-              this.#configuration.androidBundleIdentifiers,
-              this.#configuration.googlePublicKey,
-              this.#configuration.androidCrlUrls,
-              this.#configuration.httpRequestTimeout,
+            pipe(
+              validateAndroidAttestation(
+                data,
+                nonce,
+                hardwareKeyTag,
+                this.#configuration.androidBundleIdentifiers,
+                this.#configuration.googlePublicKey,
+                this.#configuration.androidCrlUrls,
+                this.#configuration.httpRequestTimeout,
+              ),
+              TE.mapLeft(toIntegrityError),
             ),
           ],
           RA.wilt(T.ApplicativeSeq)(identity),
