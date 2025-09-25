@@ -15,6 +15,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
+import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -358,5 +359,38 @@ describe("CreateWalletInstanceHandler", () => {
     await handler();
 
     expect(queueClientMock.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it("should return a 409 HTTP response when AttestationService.validateAttestation returns an integrity check error", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: {
+        ...mockAttestationService,
+        validateAttestation: () =>
+          TE.left(new IntegrityCheckError(["foo", "bar"])),
+      },
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      telemetryClient,
+      walletInstanceRepository,
+      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 409,
+      }),
+    });
   });
 });
