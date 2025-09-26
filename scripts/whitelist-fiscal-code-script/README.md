@@ -46,8 +46,8 @@ cp .env.example .env
 So, you can run the script by running the following commands:
 
 ```bash
-yarn install                     # install all dependencies
-yarn start                       # run the script
+pnpm install                     # install all dependencies
+pnpm start                       # run the script
 ```
 
 **STEP 4**
@@ -67,26 +67,26 @@ For example, you can run this script in the following ways:
 
 ```bash
 # using the default values
-yarn start
+pnpm start
 
 # specifying the input file only
-yarn start --input=fiscalcodes.csv
+pnpm start --input=fiscalcodes.csv
 
 # specifying the outputDir only
-yarn start --outputDir=logs/
+pnpm start --outputDir=logs/
 
 # specifying both input file and outputDir
-yarn start --input=fiscalcodes.csv --outputDir=logs/
+pnpm start --input=fiscalcodes.csv --outputDir=logs/
 ```
 
 ### Useful commands
 
 ```bash
-yarn format                      # format the code
-yarn lint                        # run linting
-yarn lint:fix                    # fix linting errors
-yarn test                        # run tests
-yarn test:coverage               # run tests and generate coverage report
-yarn install                     # install all dependencies
-yarn start                       # run the script
+pnpm format                      # format the code
+pnpm lint                        # run linting
+pnpm lint:fix                    # fix linting errors
+pnpm test                        # run tests
+pnpm test:coverage               # run tests and generate coverage report
+pnpm install                     # install all dependencies
+pnpm start                       # run the script
 ```
