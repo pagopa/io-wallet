@@ -14,26 +14,26 @@
     "start": "func start"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^5.0.0",
-    "eslint": "9.35.0",
-    "prettier": "^3.6.2",
-    "tsup": "^8.5.0",
+    "@pagopa/eslint-config": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "tsup": "catalog:",
     "typescript": "^5.7.3",
-    "vitest": "^3.2.4"
+    "vitest": "catalog:"
   },
   "dependencies": {
-    "@azure/functions": "^4.8.0",
-    "@azure/storage-blob": "12.28.0",
-    "@azure/storage-queue": "12.27.0",
-    "@pagopa/handler-kit": "^1.1.0",
-    "@pagopa/handler-kit-azure-func": "^2.0.7",
-    "@pagopa/ts-commons": "^13.1.2",
-    "bottleneck": "^2.19.5",
-    "fetch-retry": "^6.0.0",
-    "fp-ts": "^2.16.11",
-    "io-ts": "^2.2.22",
+    "@azure/functions": "catalog:",
+    "@azure/storage-blob": "catalog:",
+    "@azure/storage-queue": "catalog:",
+    "@pagopa/handler-kit": "catalog:",
+    "@pagopa/handler-kit-azure-func": "catalog:",
+    "@pagopa/ts-commons": "catalog:",
+    "bottleneck": "catalog:",
+    "fetch-retry": "catalog:",
+    "fp-ts": "catalog:",
+    "io-ts": "catalog:",
     "io-wallet-common": "workspace:^",
-    "uuid": "^11.1.0"
+    "uuid": "catalog:"
   },
   "resolutions": {
     "cookie": "^0.7.0",
