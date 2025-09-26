@@ -14,7 +14,7 @@ To set up and run the `io-wallet-support-func` project, follow these steps:
 2. Run the following command to start the application:
 
 ```bash
-yarn workspace io-wallet-support-func run start
+pnpm --filter io-wallet-support-func run start
 ```
 
 3. Verify the function is running by visiting the health check API at:

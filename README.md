@@ -17,7 +17,7 @@ This project is built with [NodeJS](https://nodejs.org/) and deployed on [Azure 
 
 It leverages [TypeScript](https://www.typescriptlang.org/), [fp-ts](https://gcanti.github.io/fp-ts/), and several [Azure SDKs](https://azure.github.io/azure-sdk/#javascript).
 
-We use [Yarn](https://classic.yarnpkg.com/) as the dependencies manager and [Turborepo](https://turbo.build/repo/docs) as the monorepo manager.
+We use [pnpm](https://pnpm.io/) as the dependencies manager and [Turborepo](https://turbo.build/repo/docs) as the monorepo manager.
 
 Infrastructure is managed with [Terraform](https://www.terraform.io/).
 
@@ -47,7 +47,7 @@ az cosmosdb sql role assignment create
 ### Installation
 
 ```bash
-yarn install
+pnpm install
 ```
 
 ### Tasks
@@ -55,43 +55,43 @@ yarn install
 At the root level, you can run the following commands:
 
 ```bash
-yarn test           # Run all unit tests (performed by vitest) for all projects and packages.
+pnpm test           # Run all unit tests (performed by vitest) for all projects and packages.
 
-yarn format         # Run code formatting (performed by prettier) for all projects and packages.
+pnpm format         # Run code formatting (performed by prettier) for all projects and packages.
 
-yarn lint           # Run code linting (performed by ESLint) for all projects and packages without fixing errors or warnings.
+pnpm lint           # Run code linting (performed by ESLint) for all projects and packages without fixing errors or warnings.
 
-yarn lint:fix       # Run code linting (performed by ESLint) for all projects and packages, attempting to fix correctable errors/warnings.
+pnpm lint:fix       # Run code linting (performed by ESLint) for all projects and packages, attempting to fix correctable errors/warnings.
 
-yarn build          # Run a build (performed by tsup-node) for all projects and packages. Build results are stored under the dist/ directory.
+pnpm build          # Run a build (performed by tsup-node) for all projects and packages. Build results are stored under the dist/ directory.
 
-yarn version        # Update all packages in the package.json file using @changesets/cli.
+pnpm version        # Update all packages in the package.json file using @changesets/cli.
 
-yarn release        # Generate consistent versions of your packages using @changesets/cli.
+pnpm release        # Generate consistent versions of your packages using @changesets/cli.
 
-yarn code-review    # Run typechecking, code linting, and unit testing for each project and package. This command ensures code quality in PRs.
+pnpm code-review    # Run typechecking, code linting, and unit testing for each project and package. This command ensures code quality in PRs.
 ```
 
-You can also run specific commands using `yarn workspace` for a specific project or package. Replace `PROJECT_NAME` with the actual project name:
+You can also run specific commands using `pnpm --filter <package-selector>` for a specific project or package. Replace `PROJECT_NAME` with the actual project name:
 
 ```bash
 # Typecheck
 
 # Linting and formatting
-yarn workspace PROJECT_NAME run lint
-yarn workspace PROJECT_NAME run lint:fix
-yarn workspace PROJECT_NAME run format
+pnpm --filter PROJECT_NAME run lint
+pnpm --filter PROJECT_NAME run lint:fix
+pnpm --filter PROJECT_NAME run format
 
 # Unit testing
-yarn workspace PROJECT_NAME run test
-yarn workspace PROJECT_NAME run test:coverage # Not available for io-wallet-common
+pnpm --filter PROJECT_NAME run test
+pnpm --filter PROJECT_NAME run test:coverage # Not available for io-wallet-common
 
 # Build
-yarn workspace PROJECT_NAME run build
-yarn workspace PROJECT_NAME run build:watch # Not available for io-wallet-common
+pnpm --filter PROJECT_NAME run build
+pnpm --filter PROJECT_NAME run build:watch # Not available for io-wallet-common
 
 # Start
-yarn workspace PROJECT_NAME run start # Not available for io-wallet-common
+pnpm --filter PROJECT_NAME run start # Not available for io-wallet-common
 ```
 
 `PROJECT_NAME` can be one of the following:
