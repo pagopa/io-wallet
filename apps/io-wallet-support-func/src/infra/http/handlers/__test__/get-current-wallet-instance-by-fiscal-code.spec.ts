@@ -360,4 +360,68 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       }),
     });
   });
+
+  it("should return a 200 HTTP response on success and revoked wallet instance with string os_patch_level in device_details", async () => {
+    const walletInstanceRepository: WalletInstanceRepository = {
+      getLastByUserId: () =>
+        TE.right(
+          O.some({
+            createdAt: mockDate,
+            deviceDetails: {
+              attestationSecurityLevel: 1,
+              attestationVersion: 4,
+              deviceLocked: true,
+              keymasterSecurityLevel: 1,
+              keymasterVersion: 41,
+              osPatchLevel: "20250805",
+              osVersion: 140000,
+              platform: "android",
+              verifiedBootState: 0,
+              x509Chain: ["a"],
+            },
+            hardwareKey: {
+              crv: "P-256",
+              kty: "EC",
+              x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
+              y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
+            },
+            id: "123" as NonEmptyString,
+            isRevoked: true,
+            revocationReason: "CERTIFICATE_REVOKED_BY_ISSUER",
+            revokedAt: mockDate,
+            signCount: 0,
+            userId: "AAACCCZ55H501P" as FiscalCode,
+          }),
+        ),
+    };
+    const handler = GetCurrentWalletInstanceByFiscalCodeHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          created_at: mockDate,
+          device_details: {
+            os_patch_level: "20250805",
+            os_version: 140000,
+            platform: "android",
+          },
+          id: "123",
+          is_revoked: true,
+          revocation_reason: "CERTIFICATE_REVOKED_BY_ISSUER",
+          revoked_at: mockDate,
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      },
+    });
+  });
 });
