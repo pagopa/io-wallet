@@ -1,9 +1,7 @@
-/* eslint-disable perfectionist/sort-imports */
-import ai from "@/infra/azure/appinsights/start";
-
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { registerAzureFunctionHooks } from "@pagopa/azure-tracing/azure-functions";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 
@@ -12,6 +10,8 @@ import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/func
 import { HealthFunction } from "@/infra/azure/functions/health";
 
 import { getConfigFromEnvironment } from "./config";
+
+registerAzureFunctionHooks(app);
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -38,8 +38,6 @@ const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
-const appInsightsClient = ai.defaultClient;
-
 app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
@@ -52,7 +50,6 @@ app.http("healthCheck", {
 app.http("getCurrentWalletInstanceByFiscalCode", {
   authLevel: "function",
   handler: GetCurrentWalletInstanceByFiscalCodeFunction({
-    telemetryClient: appInsightsClient,
     walletInstanceRepository,
   }),
   methods: ["POST"],
