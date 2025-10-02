@@ -3,7 +3,6 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 
 import {
-  AndroidDeviceDetails,
   DeviceDetails,
   DeviceDetailsStringOsPatchLevel,
 } from "./device-details";
@@ -56,19 +55,3 @@ export const WalletInstance = t.union([
 ]);
 
 export type WalletInstance = t.TypeOf<typeof WalletInstance>;
-
-export const WalletInstanceValidWithAndroidCertificatesChain = t.intersection([
-  WalletInstanceValid,
-  t.type({
-    deviceDetails: t.intersection([
-      AndroidDeviceDetails,
-      t.type({
-        x509Chain: t.array(t.string),
-      }),
-    ]),
-  }),
-]);
-
-export type WalletInstanceValidWithAndroidCertificatesChain = t.TypeOf<
-  typeof WalletInstanceValidWithAndroidCertificatesChain
->;

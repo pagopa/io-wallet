@@ -25,13 +25,8 @@ import {
 import {
   getValidWalletInstanceByUserId,
   WalletInstanceEnvironment,
-  // getWalletInstanceUserId,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
-
-// const WalletAttestationRequestPayload = t.type({
-//   assertion: NonEmptyString,
-// });
 
 export const WalletAttestations = t.type({
   wallet_attestations: t.tuple([
@@ -69,33 +64,12 @@ const testWalletAttestations: WalletAttestations = {
   ],
 };
 
-// const getAssertionFromRequest = flow(
-//   H.parse(WalletAttestationRequestPayload),
-//   E.map(({ assertion }) => assertion),
-//   TE.fromEither,
-//   TE.chain(verifyAndDecodeWalletAttestationRequest),
-// );
-
-// const enrichAssertionWithUserContext = (
-//   assertion: WalletAttestationRequestV2,
-// ) =>
-//   pipe(
-//     RTE.of(assertion),
-//     RTE.bindTo("assertion"),
-//     RTE.bind("userId", ({ assertion }) =>
-//       pipe(
-//         getWalletInstanceUserId(assertion.payload.hardware_key_tag),
-//         RTE.map(({ userId }) => userId),
-//       ),
-//     ),
-//     RTE.bind("isTestUser", ({ userId }) => RTE.of(isLoadTestUser(userId))),
-//   );
-
 /**
  * Validates the wallet attestation request by performing the following steps:
  * 1. Consumes the nonce from the request
  * 2. Retrieves the wallet instance associated with the attestation request and verifies it hasn't been revoked
  * 3. For non-test users, validates the assertion in the request
+ * 4.
  */
 const validateRequest: (input: {
   assertion: WalletAttestationRequestV2;
@@ -128,6 +102,7 @@ const validateRequest: (input: {
             userId,
           ),
     ),
+    // CRL google
   );
 
 const sendExceptionToAppInsights = (error: Error, requestBody: unknown) =>
@@ -177,20 +152,6 @@ const generateWalletAttestations = ({
       ),
     ),
   );
-
-// export const CreateWalletAttestationV2Handler = H.of((req: H.HttpRequest) =>
-//   pipe(
-//     req.body,
-//     getAssertionFromRequest,
-//     RTE.fromTaskEither,
-//     RTE.chainW(enrichAssertionWithUserContext),
-//     RTE.chainFirst(validateRequest),
-//     RTE.chainW(generateWalletAttestations),
-//     RTE.map(H.successJson),
-//     RTE.orElseFirstW((error) => sendExceptionToAppInsights(error, req.body)),
-//     RTE.orElseW(logErrorAndReturnResponse),
-//   ),
-// );
 
 const WalletAttestationRequestPayload = t.type({
   assertion: NonEmptyString,

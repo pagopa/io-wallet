@@ -1,5 +1,4 @@
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -11,7 +10,6 @@ import {
   RevocationReason,
   WalletInstance,
   WalletInstanceValid,
-  WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
 
 class RevokedWalletInstance extends Error {
@@ -142,29 +140,6 @@ export const getValidWalletInstanceByUserId: (
       ),
     );
 
-export const getValidWalletInstanceWithAndroidCertificatesChain: (
-  id: WalletInstance["id"],
-  userId: WalletInstance["userId"],
-) => RTE.ReaderTaskEither<
-  WalletInstanceEnvironment,
-  Error,
-  WalletInstanceValidWithAndroidCertificatesChain
-> = (id, userId) =>
-  pipe(
-    getValidWalletInstanceByUserId(id, userId),
-    RTE.chainEitherK(
-      flow(
-        WalletInstanceValidWithAndroidCertificatesChain.decode,
-        E.mapLeft(
-          () =>
-            new Error(
-              "Wallet Instance does not have a certificate chain for android",
-            ),
-        ),
-      ),
-    ),
-  );
-
 export const revokeUserWalletInstances: (
   userId: WalletInstance["userId"],
   walletInstancesId: readonly WalletInstance["id"][],
@@ -235,21 +210,6 @@ export const revokeUserValidWalletInstancesExceptOne: (
     RTE.chain((validWalletInstances) =>
       revokeUserWalletInstances(userId, validWalletInstances, reason),
     ),
-  );
-
-export const filterValidWithAndroidCertificatesChain = (
-  walletInstances: WalletInstance[],
-): RTE.ReaderTaskEither<
-  void,
-  Error,
-  readonly WalletInstanceValidWithAndroidCertificatesChain[]
-> =>
-  pipe(
-    walletInstances,
-    RA.filterMap(
-      flow(WalletInstanceValidWithAndroidCertificatesChain.decode, O.getRight),
-    ),
-    RTE.of,
   );
 
 export const deleteUserWalletInstances: (
