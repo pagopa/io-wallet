@@ -17,9 +17,9 @@
     "@azure/cosmos": "^4.5.1",
     "@azure/functions": "^4.8.0",
     "@azure/identity": "^4.12.0",
+    "@pagopa/azure-tracing": "^0.4.8",
     "@pagopa/handler-kit-azure-func": "^2.0.7",
     "@pagopa/ts-commons": "^13.1.2",
-    "applicationinsights": "^3.10.0",
     "fp-ts": "^2.16.11",
     "io-ts": "^2.2.22",
     "io-wallet-common": "workspace:^"
