@@ -14,25 +14,25 @@
     "start": "func start --port 7072"
   },
   "dependencies": {
-    "@azure/cosmos": "catalog:",
-    "@azure/functions": "catalog:",
-    "@azure/identity": "catalog:",
-    "@pagopa/handler-kit-azure-func": "catalog:",
-    "@pagopa/ts-commons": "catalog:",
-    "applicationinsights": "catalog:",
-    "fp-ts": "catalog:",
-    "io-ts": "catalog:",
+    "@azure/cosmos": "^4.5.1",
+    "@azure/functions": "^4.8.0",
+    "@azure/identity": "^4.12.0",
+    "@pagopa/handler-kit-azure-func": "^2.0.7",
+    "@pagopa/ts-commons": "^13.1.2",
+    "applicationinsights": "^3.10.0",
+    "fp-ts": "^2.16.11",
+    "io-ts": "^2.2.22",
     "io-wallet-common": "workspace:^"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "azure-functions-core-tools": "catalog:",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
-    "tsup": "catalog:",
+    "@pagopa/eslint-config": "^5.0.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "azure-functions-core-tools": "^4.2.2",
+    "eslint": "9.35.0",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
     "typescript": "5.7.3",
-    "vitest": "catalog:"
+    "vitest": "^3.2.4"
   },
   "resolutions": {
     "cookie": "^0.7.0",
