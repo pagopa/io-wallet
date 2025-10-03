@@ -178,7 +178,9 @@ components:
           type: string
           enum: ["android"]
         os_patch_level:
-          type: number
+          oneOf:
+            - type: string
+            - type: number
         os_version:
           type: number
       required:

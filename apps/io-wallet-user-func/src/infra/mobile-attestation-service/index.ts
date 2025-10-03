@@ -26,12 +26,15 @@ import {
 } from "./android";
 import { validateiOSAssertion, validateiOSAttestation } from "./ios";
 
-class IntegrityCheckError extends Error {
+export class IntegrityCheckError extends Error {
   name = "IntegrityCheckError";
   constructor(msg: string[]) {
     super(msg.join(" | "));
   }
 }
+
+const toIntegrityCheckError = (e: Error | ValidationError): Error =>
+  e instanceof ValidationError ? new IntegrityCheckError(e.violations) : e;
 
 const getErrorsOrFirstValidValue = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -128,7 +131,7 @@ export class MobileAttestationService implements AttestationService {
     nonce: NonEmptyString,
     hardwareKeyTag: NonEmptyString,
     user: FiscalCode,
-  ): TE.TaskEither<Error, ValidatedAttestation> =>
+  ): TE.TaskEither<Error | IntegrityCheckError, ValidatedAttestation> =>
     pipe(
       E.tryCatch(
         () => Buffer.from(attestation, "base64"),
@@ -147,14 +150,17 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.appleRootCertificate,
               this.allowDevelopmentEnvironmentForUser(user),
             ),
-            validateAndroidAttestation(
-              data,
-              nonce,
-              hardwareKeyTag,
-              this.#configuration.androidBundleIdentifiers,
-              this.#configuration.googlePublicKey,
-              this.#configuration.androidCrlUrls,
-              this.#configuration.httpRequestTimeout,
+            pipe(
+              validateAndroidAttestation(
+                data,
+                nonce,
+                hardwareKeyTag,
+                this.#configuration.androidBundleIdentifiers,
+                this.#configuration.googlePublicKey,
+                this.#configuration.androidCrlUrls,
+                this.#configuration.httpRequestTimeout,
+              ),
+              TE.mapLeft(toIntegrityCheckError),
             ),
           ],
           RA.wilt(T.ApplicativeSeq)(identity),
