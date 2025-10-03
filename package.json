@@ -12,8 +12,8 @@
     "release": "changeset tag"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.29.7",
-    "turbo": "^2.5.6"
+    "@changesets/cli": "catalog:",
+    "turbo": "catalog:"
   },
   "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
 }
