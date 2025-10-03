@@ -49,3 +49,6 @@ ignore_features.tf
 scripts/whitelist-fiscal-code-script/*.csv
 scripts/whitelist-fiscal-code-script/logs/**
 scripts/whitelist-fiscal-code-script/.yarn/
+
+# PNPM
+.pnpm-store
