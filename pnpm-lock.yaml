@@ -34,6 +34,9 @@ importers:
       '@pagopa/handler-kit-azure-func':
         specifier: ^2.0.7
         version: 2.0.7(postcss@8.5.6)(typescript@5.9.2)
+      '@pagopa/logger':
+        specifier: ^1.0.1
+        version: 1.0.1
       '@pagopa/ts-commons':
         specifier: ^13.1.2
         version: 13.1.2(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
