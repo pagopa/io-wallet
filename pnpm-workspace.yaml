@@ -1,0 +1,6 @@
+packages:
+  - apps/*
+  - packages/*
+
+configDependencies:
+  pnpm-plugin-pagopa: 1.0.0+sha512-fWP4sdK5yH3OXi1oZeMEcMzBtjINfXx6woFOuzWtdlvuF7Co3vFJ3UIFLrOAolbYrXi4b3r2pIMESJt7vilizA==
