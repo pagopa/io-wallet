@@ -23,13 +23,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.5.1",
-    "@pagopa/handler-kit": "^1.1.0",
-    "@pagopa/logger": "^1.0.1",
-    "@pagopa/ts-commons": "^13.1.2",
-    "applicationinsights": "^3.10.0",
-    "fp-ts": "^2.16.11",
-    "io-ts": "^2.2.22"
+    "@azure/cosmos": "catalog:",
+    "@pagopa/handler-kit": "catalog:",
+    "@pagopa/logger": "catalog:",
+    "@pagopa/ts-commons": "catalog:",
+    "applicationinsights": "catalog:",
+    "fp-ts": "catalog:",
+    "io-ts": "catalog:"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^5.0.0",
