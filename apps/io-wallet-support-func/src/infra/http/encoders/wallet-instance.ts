@@ -3,7 +3,6 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as t from "io-ts";
 import {
   AndroidDeviceDetails,
-  AndroidDeviceDetailsStringOsPatchLevel,
   IosDeviceDetails,
 } from "io-wallet-common/device-details";
 import {
@@ -13,10 +12,7 @@ import {
 
 const androidDevicePlatform = AndroidDeviceDetails.types[0].props.platform;
 
-const androidDeviceFields = AndroidDeviceDetails.types[1].props;
-
-const androidDeviceStringOsPatchLevelFields =
-  AndroidDeviceDetailsStringOsPatchLevel.types[1].props;
+const androidDeviceOptionalFields = AndroidDeviceDetails.types[1].props;
 
 const DeviceDetails = t.union([
   IosDeviceDetails,
@@ -25,11 +21,8 @@ const DeviceDetails = t.union([
       platform: androidDevicePlatform,
     }),
     t.partial({
-      os_patch_level: t.union([
-        androidDeviceFields.osPatchLevel,
-        androidDeviceStringOsPatchLevelFields.osPatchLevel,
-      ]),
-      os_version: androidDeviceFields.osVersion,
+      os_patch_level: androidDeviceOptionalFields.osPatchLevel,
+      os_version: androidDeviceOptionalFields.osVersion,
     }),
   ]),
 ]);

@@ -1,13 +1,5 @@
 # io-wallet-user-func
 
-## 3.7.5
-
-### Patch Changes
-
-- f7f674d: Strengthened data validation in createWalletInstance and updated WalletInstance schema to allow string osPatchLevel for revoked instances
-- Updated dependencies [f7f674d]
-  - io-wallet-common@1.4.1
-
 ## 3.7.4
 
 ### Patch Changes

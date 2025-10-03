@@ -9,7 +9,6 @@ import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
-import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -359,38 +358,5 @@ describe("CreateWalletInstanceHandler", () => {
     await handler();
 
     expect(queueClientMock.sendMessage).not.toHaveBeenCalled();
-  });
-
-  it("should return a 409 HTTP response when AttestationService.validateAttestation returns an integrity check error", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: walletInstanceRequest,
-      method: "POST",
-    };
-    const handler = CreateWalletInstanceHandler({
-      attestationService: {
-        ...mockAttestationService,
-        validateAttestation: () =>
-          TE.left(new IntegrityCheckError(["foo", "bar"])),
-      },
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      queueClient,
-      telemetryClient,
-      walletInstanceRepository,
-      whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 409,
-      }),
-    });
   });
 });

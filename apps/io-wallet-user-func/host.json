@@ -16,9 +16,11 @@
   },
   "logging": {
     "logLevel": {
-      "default": "Warning",
+      "default": "Error",
       "Host.Aggregator": "Information",
-      "Host.Results": "Information"
+      "Host.Results": "Information",
+      "Microsoft": "Information",
+      "Function.HttpTrigger": "Error"
     }
   }
 }
