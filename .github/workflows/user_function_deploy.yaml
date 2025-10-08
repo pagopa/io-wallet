@@ -16,7 +16,7 @@ permissions:
 jobs:
   deploy:
     name: Deploy
-    uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@db4c4b1748daf1ec0d8731a374c3fd6ef0804c99
+    uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@a56b81505af10f20e8d392f275922b32cf7687f2
     secrets: inherit
     with:
       workspace_name: io-wallet-user-func
