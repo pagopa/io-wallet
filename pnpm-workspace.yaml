@@ -28,6 +28,6 @@ catalog:
   io-ts: ^2.2.22
 
 packageExtensions:
-  "@azure/functions-opentelemetry-instrumentations":
+  "@azure/functions-opentelemetry-instrumentation":
     dependencies:
       "@opentelemetry/api-logs": "0.52.1"
