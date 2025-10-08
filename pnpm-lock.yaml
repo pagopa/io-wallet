@@ -44,6 +44,8 @@ catalogs:
       specifier: ^2.2.22
       version: 2.2.22
 
+packageExtensionsChecksum: sha256-gzX59jnxPpDiBYB3JtfDw4BUrsjgdVI/AIXX/wGqw0c=
+
 pnpmfileChecksum: sha256-FMjTmt1bCo0SOOG7o/y8rRzputl19yL2BTfTrVHFYS4=
 
 importers:
