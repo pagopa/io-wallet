@@ -11,6 +11,8 @@ onlyBuiltDependencies:
   - esbuild
   - protobufjs
 
+injectWorkspacePackages: true
+
 catalog:
   "@azure/cosmos": ^4.5.1
   "@azure/functions": ^4.8.0
