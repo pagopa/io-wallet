@@ -3,6 +3,7 @@ lockfileVersion: '9.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
+  injectWorkspacePackages: true
 
 catalogs:
   default:
@@ -93,7 +94,7 @@ importers:
         version: 2.2.22(fp-ts@2.16.11)
       io-wallet-common:
         specifier: workspace:^
-        version: link:../../packages/io-wallet-common
+        version: file:packages/io-wallet-common(postcss@8.5.6)(typescript@5.9.2)
       uuid:
         specifier: ^11.1.0
         version: 11.1.0
@@ -2761,6 +2762,9 @@ packages:
     resolution: {integrity: sha512-FHCCztTkHoV9mdBsHpocLpdTAfh956ZQcIkWQxxS0U5HT53vtrcuYdQneEJKH6xILaLNzXVl2Cvwtoy8XNN0AA==}
     peerDependencies:
       fp-ts: ^2.5.0
+
+  io-wallet-common@file:packages/io-wallet-common:
+    resolution: {directory: packages/io-wallet-common, type: directory}
 
   ip6addr@0.2.5:
     resolution: {integrity: sha512-9RGGSB6Zc9Ox5DpDGFnJdIeF0AsqXzdH+FspCfPPaU/L/4tI6P+5lIoFUFm9JXs9IrJv1boqAaNCQmoDADTSKQ==}
@@ -7255,6 +7259,24 @@ snapshots:
   io-ts@2.2.22(fp-ts@2.16.11):
     dependencies:
       fp-ts: 2.16.11
+
+  io-wallet-common@file:packages/io-wallet-common(postcss@8.5.6)(typescript@5.9.2):
+    dependencies:
+      '@azure/cosmos': 4.5.1
+      '@pagopa/handler-kit': 1.1.0(postcss@8.5.6)(typescript@5.9.2)
+      '@pagopa/logger': 1.0.1
+      '@pagopa/ts-commons': 13.1.2(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
+      applicationinsights: 3.10.0
+      fp-ts: 2.16.11
+      io-ts: 2.2.22(fp-ts@2.16.11)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - applicationinsights-native-metrics
+      - encoding
+      - postcss
+      - supports-color
+      - ts-node
+      - typescript
 
   ip6addr@0.2.5:
     dependencies:
