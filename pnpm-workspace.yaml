@@ -26,3 +26,8 @@ catalog:
   "applicationinsights": ^3.10.0
   fp-ts: ^2.16.11
   io-ts: ^2.2.22
+
+packageExtensions:
+  "@azure/functions-opentelemetry-instrumentations":
+    dependencies:
+      "@opentelemetry/api-logs": "0.52.1"
