@@ -10,7 +10,7 @@ terraform {
     resource_group_name  = "terraform-state-rg"
     storage_account_name = "iopitntfst001"
     container_name       = "terraform-state"
-    key                  = "local.repository.name.repository.bootstrapper.prod.tfstate"
+    key                  = "io-wallet.repository.tfstate"
   }
 }
 
