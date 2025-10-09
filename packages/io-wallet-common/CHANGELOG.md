@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.4.2
+
+### Patch Changes
+
+- c8e7082: Updated node version and migrated from yarn to pnpm
+
 ## 1.4.1
 
 ### Patch Changes

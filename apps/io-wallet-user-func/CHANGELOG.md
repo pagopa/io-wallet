@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 3.7.6
+
+### Patch Changes
+
+- c8e7082: Updated node version and migrated from yarn to pnpm
+- Updated dependencies [c8e7082]
+  - io-wallet-common@1.4.2
+
 ## 3.7.5
 
 ### Patch Changes
