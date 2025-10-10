@@ -1,14 +1,25 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as appInsights from "applicationinsights";
+import { X509Certificate } from "crypto";
 import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { NotificationService } from "io-wallet-common/notification";
+import {
+  WalletInstanceValid,
+  WalletInstanceValidWithAndroidCertificatesChain,
+} from "io-wallet-common/wallet-instance";
 
+import { AttestationServiceConfiguration } from "@/app/config";
 import { AttestationService, validateAssertionV2 } from "@/attestation-service";
+import { validateRevocation } from "@/certificates";
+import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { NonceEnvironment } from "@/nonce";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -64,6 +75,87 @@ const testWalletAttestations: WalletAttestations = {
   ],
 };
 
+const decodeAndroidChain = (
+  walletInstance: WalletInstanceValid,
+): E.Either<Error, readonly string[]> =>
+  pipe(
+    WalletInstanceValidWithAndroidCertificatesChain.decode(walletInstance),
+    E.mapLeft(
+      () =>
+        new Error(
+          "Invalid wallet instance: missing Android certificates chain",
+        ),
+    ),
+    E.map((wi) => wi.deviceDetails.x509Chain),
+  );
+
+const parseCertificates = (
+  chain: readonly string[],
+): E.Either<Error, { x509Chain: readonly X509Certificate[] }> =>
+  pipe(
+    chain,
+    RA.traverse(E.Applicative)((cert) =>
+      E.tryCatch(() => new X509Certificate(cert), E.toError),
+    ),
+    E.map((x509Chain) => ({ x509Chain })),
+  );
+
+const checkCertificateRevocation = ({
+  googleCrl,
+  x509Chain,
+}: {
+  googleCrl: {
+    entries: Record<
+      string,
+      {
+        reason?: string | undefined;
+        status?: string | undefined;
+      }
+    >;
+  };
+  x509Chain: readonly X509Certificate[];
+}) =>
+  pipe(
+    TE.tryCatch(() => validateRevocation(x509Chain, googleCrl), E.toError),
+    TE.chain(
+      (validationResult) =>
+        validationResult.success
+          ? TE.right(undefined)
+          : TE.left(new IntegrityCheckError([])),
+      // If revocation validation fails, the Wallet Instance is revoked, telemetry is sent to App Insights, a Slack alert is triggered, and an IntegrityCheckError is thrown.
+    ),
+  );
+
+declare const getCrl: RTE.ReaderTaskEither<
+  { attestationServiceConfiguration: AttestationServiceConfiguration },
+  Error,
+  {
+    entries: Record<
+      string,
+      {
+        reason?: string | undefined; // ?
+        status?: string | undefined;
+      }
+    >;
+  }
+>;
+
+const foo: (walletInstance: WalletInstanceValid) => RTE.ReaderTaskEither<
+  {
+    attestationServiceConfiguration: AttestationServiceConfiguration;
+    notificationService: NotificationService;
+    telemetryClient: appInsights.TelemetryClient;
+  },
+  IntegrityCheckError, // only IntegrityCheckError is relevant; other failures are ignored
+  void
+> = flow(
+  decodeAndroidChain,
+  E.chain(parseCertificates),
+  RTE.fromEither,
+  RTE.bind("googleCrl", () => getCrl),
+  RTE.chainW(flow(checkCertificateRevocation, RTE.fromTaskEither)),
+);
+
 /**
  * Validates the wallet attestation request by performing the following steps:
  * 1. Consumes the nonce from the request
@@ -79,6 +171,10 @@ const validateRequest: (input: {
   NonceEnvironment &
     WalletInstanceEnvironment & {
       attestationService: AttestationService;
+    } & {
+      attestationServiceConfiguration: AttestationServiceConfiguration;
+      notificationService: NotificationService;
+      telemetryClient: appInsights.TelemetryClient;
     },
   Error,
   void
@@ -92,7 +188,7 @@ const validateRequest: (input: {
         userId,
       ),
     ),
-    RTE.chain((walletInstance) =>
+    RTE.chainFirstW((walletInstance) =>
       isTestUser
         ? RTE.right(undefined)
         : validateAssertionV2(
@@ -102,7 +198,7 @@ const validateRequest: (input: {
             userId,
           ),
     ),
-    // CRL google
+    RTE.chainW(foo),
   );
 
 const sendExceptionToAppInsights = (error: Error, requestBody: unknown) =>

@@ -11,7 +11,7 @@ import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-// import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
+import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
 
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
@@ -104,7 +104,7 @@ const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
 
-// const slackNotificationService = new SlackNotificationService(config.slack);
+const slackNotificationService = new SlackNotificationService(config.slack);
 
 const emailNotificationService = new EmailNotificationServiceClient({
   authProfileApiConfig: config.authProfile,
@@ -298,9 +298,11 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
+      attestationServiceConfiguration: config.attestationService,
       certificateRepository,
       federationEntity: config.entityConfiguration.federationEntity,
       nonceRepository,
+      notificationService: slackNotificationService,
       signer: walletAttestationSigner,
       telemetryClient: appInsightsClient,
       walletAttestationConfig: {
