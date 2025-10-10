@@ -55,6 +55,10 @@
     "WalletProviderCertificateCountry": "WALLET_PROVIDER_CERTIFICATE_COUNTRY",
     "WalletProviderCertificateState": "WALLET_PROVIDER_CERTIFICATE_STATE",
     "WalletProviderCertificateLocality": "WALLET_PROVIDER_CERTIFICATE_LOCALITY",
-    "TrustAnchorUrl": "TRUST_ANCHOR_URL"
+    "TrustAnchorUrl": "TRUST_ANCHOR_URL",
+    "AzureSubscriptionId": "AZURE_SUBSCRIPTION_ID",
+    "AzureResourceGroupName": "AZURE_RESOURCE_GROUP_NAME",
+    "FrontDoorProfileName": "FRONT_DOOR_PROFILE_NAME",
+    "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME"
   }
 }
