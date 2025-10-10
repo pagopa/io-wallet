@@ -4,7 +4,8 @@
     "build": {
       "inputs": ["src/**/*.ts"],
       "outputs": ["dist/**"],
-      "outputLogs": "errors-only"
+      "outputLogs": "errors-only",
+      "dependsOn": ["^build"]
     },
     "typecheck": {
       "inputs": ["src/**/*.ts"],
