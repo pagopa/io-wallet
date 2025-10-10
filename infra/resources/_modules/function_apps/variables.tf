@@ -169,7 +169,6 @@ variable "front_door_profile_name" {
 variable "front_door_endpoint_name" {
   type        = string
   description = "Front Door endpoint name"
-
 }
 
 variable "subscription_id" {
