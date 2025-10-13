@@ -127,9 +127,25 @@ const AzureStorageConfig = t.type({
 
 type AzureStorageConfig = t.TypeOf<typeof AzureStorageConfig>;
 
+const AzureGenericConfig = t.type({
+  resourceGroupName: NonEmptyString,
+  subscriptionId: NonEmptyString,
+});
+
+type AzureGenericConfig = t.TypeOf<typeof AzureGenericConfig>;
+
+const AzureFrontDoorConfig = t.type({
+  endpointName: NonEmptyString,
+  profileName: NonEmptyString,
+});
+
+type AzureFrontDoorConfig = t.TypeOf<typeof AzureFrontDoorConfig>;
+
 const AzureConfig = t.type({
   appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
+  frontDoor: AzureFrontDoorConfig,
+  generic: AzureGenericConfig,
   storage: AzureStorageConfig,
 });
 
@@ -328,7 +344,7 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
   }),
 );
 
-export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
+const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   AzureStorageConfig
@@ -377,6 +393,30 @@ export const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   ),
 );
 
+const getAzureFrontDoorConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureFrontDoorConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    endpointName: readFromEnvironment("FrontDoorEndpointName"),
+    profileName: readFromEnvironment("FrontDoorProfileName"),
+  }),
+  RE.chainEitherKW(parse(AzureFrontDoorConfig)),
+);
+
+const getAzureGenericConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureGenericConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    resourceGroupName: readFromEnvironment("AzureResourceGroupName"),
+    subscriptionId: readFromEnvironment("AzureSubscriptionId"),
+  }),
+  RE.chainEitherKW(parse(AzureGenericConfig)),
+);
+
 export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -385,13 +425,10 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   sequenceS(RE.Apply)({
     appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
+    frontDoor: getAzureFrontDoorConfigFromEnvironment,
+    generic: getAzureGenericConfigFromEnvironment,
     storage: getAzureStorageConfigFromEnvironment,
   }),
-  RE.map(({ appInsights, cosmos, storage }) => ({
-    appInsights,
-    cosmos,
-    storage,
-  })),
 );
 
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<

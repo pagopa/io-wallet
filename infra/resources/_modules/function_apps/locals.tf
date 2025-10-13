@@ -44,6 +44,12 @@ locals {
     WalletProviderCertificateState    = "Lazio"
     WalletProviderCertificateLocality = "Roma"
 
+    FrontDoorProfileName  = var.front_door_profile_name
+    FrontDoorEndpointName = var.front_door_endpoint_name
+
+    AzureResourceGroupName = var.resource_group_name
+    AzureSubscriptionId    = var.subscription_id
+
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
     WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
     },

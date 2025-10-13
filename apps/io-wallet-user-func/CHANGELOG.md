@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.7.7
+
+### Patch Changes
+
+- 8b81b21: Added endpoint CDN purge after uploading a new file
+
 ## 3.7.6
 
 ### Patch Changes

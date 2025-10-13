@@ -39,6 +39,7 @@ import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-o
 import { MobileAttestationService } from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 
+import { CdnManagementClient } from "@azure/arm-cdn";
 import { getConfigFromEnvironment } from "./config";
 
 const configOrError = pipe(
@@ -61,6 +62,10 @@ const cosmosClient = new CosmosClient({
   },
   endpoint: config.azure.cosmos.endpoint,
 });
+
+const subscriptionId = config.azure.generic.subscriptionId;
+
+const cdnManagementClient = new CdnManagementClient(credential, subscriptionId);
 
 const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.storage.walletInstances.connectionString,
@@ -187,14 +192,18 @@ app.http("getNonce", {
 
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
+    cdnManagementClient,
     certificateRepository,
     containerClient,
+    endpointName: config.azure.frontDoor.endpointName,
     entityConfiguration: {
       ...config.entityConfiguration,
       authorityHints: [config.entityConfiguration.trustAnchorUrl],
     },
     entityConfigurationSigner,
     inputDecoder: t.unknown,
+    profileName: config.azure.frontDoor.profileName,
+    resourceGroupName: config.azure.generic.resourceGroupName,
     telemetryClient: appInsightsClient,
     walletAttestationSigner,
   }),
