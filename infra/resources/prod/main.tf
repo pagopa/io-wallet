@@ -144,6 +144,11 @@ module "function_apps" {
   user_func    = local.user_func
   support_func = local.support_func
 
+  front_door_profile_name  = module.cdn.cdn_profile_name
+  front_door_endpoint_name = module.cdn.cdn_endpoint_name
+
+  subscription_id = data.azurerm_subscription.current.subscription_id
+
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
 
   action_group_wallet_id = module.monitoring.action_group_wallet.id

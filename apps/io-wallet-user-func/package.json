@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "3.7.6",
+  "version": "3.7.7",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@auth0/mdl": "^3.0.0",
+    "@azure/arm-cdn": "^9.1.0",
     "@azure/cosmos": "catalog:",
     "@azure/functions": "catalog:",
     "@azure/functions-opentelemetry-instrumentation": "^0.2.0",
