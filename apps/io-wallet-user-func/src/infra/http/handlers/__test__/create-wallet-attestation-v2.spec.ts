@@ -19,6 +19,7 @@ import { flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
+import { NotificationService } from "io-wallet-common/notification";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
@@ -271,6 +272,10 @@ const attestationServiceConfiguration = {
   skipSignatureValidation: true,
 };
 
+const notificationService: NotificationService = {
+  sendMessage: () => TE.right(void 0),
+};
+
 describe("CreateWalletAttestationV2Handler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
 
@@ -314,7 +319,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -350,7 +355,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -407,7 +412,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -481,7 +486,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -603,7 +608,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -636,7 +641,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -671,7 +676,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -722,7 +727,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -768,7 +773,7 @@ describe("CreateWalletAttestationV2Handler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService: {},
+      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,

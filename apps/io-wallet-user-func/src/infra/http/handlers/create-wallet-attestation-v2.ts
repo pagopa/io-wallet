@@ -17,12 +17,16 @@ import {
 } from "io-wallet-common/wallet-instance";
 
 import { AttestationServiceConfiguration } from "@/app/config";
-import { AttestationService, validateAssertionV2 } from "@/attestation-service";
-import { validateRevocation } from "@/certificates";
+import {
+  AttestationService,
+  validateAssertionV2,
+  ValidationResult,
+} from "@/attestation-service";
+import { CRL, getCrlFromUrls, validateRevocation } from "@/certificates";
 import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { NonceEnvironment } from "@/nonce";
 import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
-import { isLoadTestUser } from "@/user";
+import { isLoadTestUser, obfuscatedUserId } from "@/user";
 import {
   createWalletAttestationAsJwt,
   createWalletAttestationAsSdJwt,
@@ -35,7 +39,9 @@ import {
 } from "@/wallet-attestation-request";
 import {
   getValidWalletInstanceByUserId,
+  revokeUserWalletInstances,
   WalletInstanceEnvironment,
+  WalletInstanceRepository,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 
@@ -89,6 +95,7 @@ const decodeAndroidChain = (
     E.map((wi) => wi.deviceDetails.x509Chain),
   );
 
+// name
 const parseCertificates = (
   chain: readonly string[],
 ): E.Either<Error, { x509Chain: readonly X509Certificate[] }> =>
@@ -100,61 +107,122 @@ const parseCertificates = (
     E.map((x509Chain) => ({ x509Chain })),
   );
 
-const checkCertificateRevocation = ({
+const validateCertificateChainRevocation = ({
   googleCrl,
   x509Chain,
 }: {
-  googleCrl: {
-    entries: Record<
-      string,
-      {
-        reason?: string | undefined;
-        status?: string | undefined;
-      }
-    >;
-  };
+  googleCrl: CRL;
   x509Chain: readonly X509Certificate[];
-}) =>
-  pipe(
-    TE.tryCatch(() => validateRevocation(x509Chain, googleCrl), E.toError),
-    TE.chain(
-      (validationResult) =>
-        validationResult.success
-          ? TE.right(undefined)
-          : TE.left(new IntegrityCheckError([])),
-      // If revocation validation fails, the Wallet Instance is revoked, telemetry is sent to App Insights, a Slack alert is triggered, and an IntegrityCheckError is thrown.
-    ),
-  );
+}): TE.TaskEither<Error, ValidationResult> =>
+  TE.tryCatch(() => validateRevocation(x509Chain, googleCrl), E.toError);
 
-declare const getCrl: RTE.ReaderTaskEither<
-  { attestationServiceConfiguration: AttestationServiceConfiguration },
+const getX509ChainFromWalletInstance: (
+  walletInstance: WalletInstanceValid,
+) => E.Either<
   Error,
   {
-    entries: Record<
-      string,
-      {
-        reason?: string | undefined; // ?
-        status?: string | undefined;
-      }
-    >;
+    x509Chain: readonly X509Certificate[];
   }
->;
+> = flow(decodeAndroidChain, E.chain(parseCertificates));
+
+const getCrl: RTE.ReaderTaskEither<
+  { attestationServiceConfiguration: AttestationServiceConfiguration },
+  Error,
+  CRL
+> = ({
+  attestationServiceConfiguration: { androidCrlUrls, httpRequestTimeout },
+}) => getCrlFromUrls(androidCrlUrls, httpRequestTimeout);
 
 const foo: (walletInstance: WalletInstanceValid) => RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
     notificationService: NotificationService;
     telemetryClient: appInsights.TelemetryClient;
+    walletInstanceRepository: WalletInstanceRepository;
   },
-  IntegrityCheckError, // only IntegrityCheckError is relevant; other failures are ignored
+  IntegrityCheckError, // only IntegrityCheckError is relevant; other failures are ignored. IntegrityCheckError?
   void
-> = flow(
-  decodeAndroidChain,
-  E.chain(parseCertificates),
-  RTE.fromEither,
-  RTE.bind("googleCrl", () => getCrl),
-  RTE.chainW(flow(checkCertificateRevocation, RTE.fromTaskEither)),
-);
+> = (walletInstance) =>
+  pipe(
+    walletInstance,
+    getX509ChainFromWalletInstance,
+    RTE.fromEither,
+    RTE.bind("googleCrl", () => getCrl),
+    RTE.chainW(flow(validateCertificateChainRevocation, RTE.fromTaskEither)),
+    // If anything fails, just ignore the error
+    // If validation was skipped or successful, do nothing.
+    // If validation failed (not skipped), trigger the revocation flow.
+    RTE.orElseW(() => RTE.right(undefined)),
+    RTE.chain((result) =>
+      result === undefined || result.success
+        ? RTE.right(undefined)
+        : pipe(
+            walletInstance,
+            revokeWalletInstanceAndNotify,
+            RTE.mapLeft(() => new IntegrityCheckError([])),
+          ),
+    ),
+  );
+
+// If revocation validation fails, the Wallet Instance is revoked, telemetry is sent to App Insights, a Slack alert is triggered
+const revokeWalletInstanceAndNotify: (
+  walletInstance: WalletInstanceValid,
+) => RTE.ReaderTaskEither<
+  {
+    notificationService: NotificationService;
+    telemetryClient: appInsights.TelemetryClient;
+    walletInstanceRepository: WalletInstanceRepository;
+  },
+  Error,
+  void
+> =
+  (walletInstance) =>
+  ({ notificationService, telemetryClient, walletInstanceRepository }) =>
+    pipe(
+      revokeUserWalletInstances(
+        walletInstance.userId,
+        [walletInstance.id],
+        "CERTIFICATE_REVOKED_BY_ISSUER", // centralize
+      )({
+        walletInstanceRepository,
+      }),
+      TE.chainW(() =>
+        pipe(
+          E.tryCatch(
+            () =>
+              telemetryClient.trackEvent({
+                name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
+                properties: {
+                  fiscalCode: walletInstance.userId,
+                  reason: "CERTIFICATE_REVOKED_BY_ISSUER",
+                  walletInstanceId: walletInstance.id,
+                },
+              }),
+            E.toError,
+          ),
+          // fire and forget
+          E.fold(
+            () => E.right(undefined),
+            () => E.right(undefined),
+          ),
+          TE.fromEither,
+        ),
+      ),
+      TE.chainW(() =>
+        pipe(
+          notificationService.sendMessage(
+            `Revoked Wallet Instance with id: *${walletInstance.id}*.\n
+            UserId: ${obfuscatedUserId(walletInstance.userId)}.\n
+            Reason: CERTIFICATE_REVOKED_BY_ISSUER`,
+          ),
+          // fire and forget
+          TE.fold(
+            () => TE.right(undefined),
+            () => TE.right(undefined),
+          ),
+        ),
+      ),
+    );
 
 /**
  * Validates the wallet attestation request by performing the following steps:
