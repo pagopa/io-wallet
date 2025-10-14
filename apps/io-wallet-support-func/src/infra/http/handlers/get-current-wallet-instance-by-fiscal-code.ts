@@ -1,10 +1,10 @@
+import { emitCustomEvent } from "@pagopa/azure-tracing/logger";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { getCurrentWalletInstance } from "@/wallet-instance";
@@ -32,9 +32,15 @@ export const GetCurrentWalletInstanceByFiscalCodeHandler = H.of(
       RTE.map(WalletInstanceToApiModel.encode),
       RTE.map(H.successJson),
       RTE.orElseFirstW((error) =>
-        pipe(
-          sendTelemetryException(error, { payload: req.body }),
-          RTE.fromReader,
+        RTE.fromIO(
+          emitCustomEvent("exceptions", {
+            error: JSON.stringify({
+              message: error.message,
+              name: error.name,
+            }),
+            functionName: "getCurrentWalletInstanceByFiscalCode",
+            payload: JSON.stringify(req.body),
+          }),
         ),
       ),
       RTE.orElseW(logErrorAndReturnResponse),
