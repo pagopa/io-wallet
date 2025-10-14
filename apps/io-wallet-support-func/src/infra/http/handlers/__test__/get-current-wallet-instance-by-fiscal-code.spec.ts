@@ -384,7 +384,6 @@ describe("GetCurrentWalletInstanceByFiscalCodeHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
