@@ -131,6 +131,9 @@ importers:
       '@azure/identity':
         specifier: 'catalog:'
         version: 4.13.0
+      '@pagopa/azure-tracing':
+        specifier: ^0.4.8
+        version: 0.4.8(typescript@5.7.3)
       '@pagopa/handler-kit':
         specifier: 'catalog:'
         version: 1.1.0(postcss@8.5.6)(typescript@5.7.3)
@@ -143,9 +146,6 @@ importers:
       '@pagopa/ts-commons':
         specifier: 'catalog:'
         version: 13.1.2(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
-      applicationinsights:
-        specifier: 'catalog:'
-        version: 3.12.0
       fp-ts:
         specifier: 'catalog:'
         version: 2.16.11
@@ -1351,6 +1351,9 @@ packages:
     resolution: {integrity: sha512-2i4A/Alevdtc4j/vAqOxbb+P48BOHNl9b0mcleq9h1ie9wQ768KmT3Z3TFzUHA8MWs8CrdDerySXtcvhn8jCSA==}
     engines: {node: ^18.19.0 || >=20.6.0}
 
+  '@pagopa/azure-tracing@0.4.8':
+    resolution: {integrity: sha512-MmuCgkqeC/5OCfl3+yksEYCAVIz65BXh5wboZlxnZkwtGBzm0j/rlipmm0zlsjT3Pbwlz12g4Qmebi0TKenEqA==}
+
   '@pagopa/eslint-config@5.1.0':
     resolution: {integrity: sha512-SmzKJtW/gdh1dwQV9k0jPAxGGEv4dm/lPWnY2epvQwKbgMUkKZ/QEICRNU5JjUcAGHCcW6XotU8DtJOS17YIug==}
     peerDependencies:
@@ -1594,6 +1597,23 @@ packages:
 
   '@so-ric/colorspace@1.1.6':
     resolution: {integrity: sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw==}
+
+  '@t3-oss/env-core@0.13.8':
+    resolution: {integrity: sha512-L1inmpzLQyYu4+Q1DyrXsGJYCXbtXjC4cICw1uAKv0ppYPQv656lhZPU91Qd1VS6SO/bou1/q5ufVzBGbNsUpw==}
+    peerDependencies:
+      arktype: ^2.1.0
+      typescript: '>=5.0.0'
+      valibot: ^1.0.0-beta.7 || ^1.0.0
+      zod: ^3.24.0 || ^4.0.0-beta.0
+    peerDependenciesMeta:
+      arktype:
+        optional: true
+      typescript:
+        optional: true
+      valibot:
+        optional: true
+      zod:
+        optional: true
 
   '@types/bunyan@1.8.11':
     resolution: {integrity: sha512-758fRH7umIMk5qt5ELmRMff4mLDlN+xyYzC+dkPTdKwbSkJFvz6xwyScrytPU0QIBbRRwbiE8/BIg8bpajerNQ==}
@@ -4299,6 +4319,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -5568,6 +5591,24 @@ snapshots:
       '@opentelemetry/api-logs': 0.204.0
       winston-transport: 4.9.0
 
+  '@pagopa/azure-tracing@0.4.8(typescript@5.7.3)':
+    dependencies:
+      '@azure/functions': 4.8.0
+      '@azure/monitor-opentelemetry': 1.14.0
+      '@azure/monitor-opentelemetry-exporter': 1.0.0-beta.35
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/api-logs': 0.205.0
+      '@opentelemetry/instrumentation': 0.205.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation-undici': 0.16.2(@opentelemetry/api@1.9.0)
+      '@t3-oss/env-core': 0.13.8(typescript@5.7.3)(zod@3.25.76)
+      import-in-the-middle: 1.14.4
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - arktype
+      - supports-color
+      - typescript
+      - valibot
+
   '@pagopa/eslint-config@5.1.0(eslint@9.35.0)(prettier@3.6.2)(vitest@3.2.4(@types/node@24.7.1))':
     dependencies:
       '@eslint/js': 9.37.0
@@ -5907,6 +5948,11 @@ snapshots:
     dependencies:
       color: 5.0.2
       text-hex: 1.0.0
+
+  '@t3-oss/env-core@0.13.8(typescript@5.7.3)(zod@3.25.76)':
+    optionalDependencies:
+      typescript: 5.7.3
+      zod: 3.25.76
 
   '@types/bunyan@1.8.11':
     dependencies:
@@ -8842,3 +8888,5 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  zod@3.25.76: {}
