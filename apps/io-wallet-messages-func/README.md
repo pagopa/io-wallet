@@ -17,5 +17,5 @@ To set up and run the `io-wallet-messages-func` project, follow these steps:
 2. Run the following command to start the application:
 
 ```bash
-yarn workspace io-wallet-messages-func run start
+pnpm --filter io-wallet-messages-func run start
 ```

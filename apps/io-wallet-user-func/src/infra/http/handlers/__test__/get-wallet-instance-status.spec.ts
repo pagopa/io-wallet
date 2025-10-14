@@ -316,4 +316,60 @@ describe("GetWalletInstanceStatusHandler", () => {
       }),
     });
   });
+
+  it("should return a 200 HTTP response and revoked wallet instance with string os_patch_level in device_details", async () => {
+    walletInstanceRepository.getByUserId = () =>
+      TE.right(
+        O.some({
+          createdAt: new Date(),
+          deviceDetails: {
+            attestationSecurityLevel: 1,
+            attestationVersion: 4,
+            deviceLocked: true,
+            keymasterSecurityLevel: 1,
+            keymasterVersion: 41,
+            osPatchLevel: "20250805",
+            osVersion: 140000,
+            platform: "android",
+            verifiedBootState: 0,
+            x509Chain: ["a"],
+          },
+          hardwareKey: {
+            crv: "P-256",
+            kty: "EC",
+            x: "z3PTdkV20dwTADp2Xur5AXqLbQz7stUbvRNghMQu1rY",
+            y: "Z7MC2EHmlPuoYDRVfy-upr_06-lBYobEk_TCwuSb2ho",
+          },
+          id: "123" as NonEmptyString,
+          isRevoked: true,
+          revocationReason: "CERTIFICATE_REVOKED_BY_ISSUER",
+          revokedAt: new Date(),
+          signCount: 0,
+          userId: "AAACCCZ55H501P" as FiscalCode,
+        }),
+      );
+
+    const handler = GetWalletInstanceStatusHandler({
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      telemetryClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          id: "123",
+          is_revoked: true,
+          revocation_reason: "CERTIFICATE_REVOKED_BY_ISSUER",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      },
+    });
+  });
 });

@@ -1,4 +1,4 @@
-name: Deploy Function App (support-func)
+name: Deploy Function App (user-uat-func)
 
 on:
   workflow_dispatch: {}
@@ -6,7 +6,7 @@ on:
     branches:
       - master
     paths:
-      - "apps/io-wallet-support-func/CHANGELOG.md"
+      - "apps/io-wallet-user-func/CHANGELOG.md"
 
 permissions:
   attestations: write
@@ -19,8 +19,8 @@ jobs:
     uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@a56b81505af10f20e8d392f275922b32cf7687f2
     secrets: inherit
     with:
-      workspace_name: io-wallet-support-func
+      workspace_name: io-wallet-user-func
       environment: app-prod
       resource_group_name: io-p-itn-wallet-rg-01
-      web_app_name: io-p-itn-wallet-supp-func-01
+      web_app_name: io-u-itn-wallet-user-func-01
       disable_auto_staging_deploy: true

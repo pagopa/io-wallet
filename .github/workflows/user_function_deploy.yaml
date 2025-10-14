@@ -9,13 +9,14 @@ on:
       - "apps/io-wallet-user-func/CHANGELOG.md"
 
 permissions:
+  attestations: write
   id-token: write
   contents: read
 
 jobs:
   deploy:
     name: Deploy
-    uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@main
+    uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@a56b81505af10f20e8d392f275922b32cf7687f2
     secrets: inherit
     with:
       workspace_name: io-wallet-user-func

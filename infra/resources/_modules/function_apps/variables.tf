@@ -160,3 +160,18 @@ variable "cosmos_database_name_uat" {
   type        = string
   description = "uat Wallet Cosmos DB database name"
 }
+
+variable "front_door_profile_name" {
+  type        = string
+  description = "Front Door profile name"
+}
+
+variable "front_door_endpoint_name" {
+  type        = string
+  description = "Front Door endpoint name"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription ID"
+}

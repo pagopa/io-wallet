@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-support-func",
-  "version": "1.5.1",
+  "version": "1.5.3",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -14,30 +14,26 @@
     "start": "func start --port 7072"
   },
   "dependencies": {
-    "@azure/cosmos": "^4.5.1",
-    "@azure/functions": "^4.8.0",
-    "@azure/identity": "^4.12.0",
-    "@pagopa/azure-tracing": "^0.4.8",
-    "@pagopa/handler-kit-azure-func": "^2.0.7",
-    "@pagopa/ts-commons": "^13.1.2",
-    "fp-ts": "^2.16.11",
-    "io-ts": "^2.2.22",
+    "@azure/cosmos": "catalog:",
+    "@azure/functions": "catalog:",
+    "@azure/identity": "catalog:",
+    "@pagopa/handler-kit": "catalog:",
+    "@pagopa/handler-kit-azure-func": "catalog:",
+    "@pagopa/logger": "catalog:",
+    "@pagopa/ts-commons": "catalog:",
+    "applicationinsights": "catalog:",
+    "fp-ts": "catalog:",
+    "io-ts": "catalog:",
     "io-wallet-common": "workspace:^"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^5.0.0",
     "@vitest/coverage-v8": "^3.2.4",
-    "azure-functions-core-tools": "^4.2.2",
     "eslint": "9.35.0",
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
     "typescript": "5.7.3",
     "vitest": "^3.2.4"
-  },
-  "resolutions": {
-    "cookie": "^0.7.0",
-    "rollup": "^4.22.4",
-    "vite": "^5.4.19"
   },
   "main": "dist/main.js",
   "files": [

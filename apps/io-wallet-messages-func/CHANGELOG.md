@@ -1,5 +1,13 @@
 # io-wallet-messages-func
 
+## 1.1.1
+
+### Patch Changes
+
+- c8e7082: Updated node version and migrated from yarn to pnpm
+- Updated dependencies [c8e7082]
+  - io-wallet-common@1.4.2
+
 ## 1.1.0
 
 ### Minor Changes

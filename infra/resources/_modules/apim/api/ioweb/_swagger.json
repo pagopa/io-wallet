@@ -85,6 +85,39 @@
           }
         }
       }
+    },
+    "/whitelisted-fiscal-code": {
+      "get": {
+        "summary": "Check if the fiscal code is whitelisted",
+        "operationId": "isFiscalCodeWhitelisted",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhitelistedFiscalCodeData"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -155,6 +188,16 @@
             }
           }
         }
+      },
+      "ServiceUnavailable": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -174,6 +217,16 @@
           }
         },
         "required": ["id", "is_revoked"]
+      },
+      "WhitelistedFiscalCodeData": {
+        "description": "Describes if the fiscal code is whitelisted.",
+        "type": "object",
+        "properties": {
+          "is_whitelisted": {
+            "type": "boolean"
+          }
+        },
+        "required": ["is_whitelisted"]
       },
       "ProblemJson": {
         "type": "object",

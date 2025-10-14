@@ -1,3 +1,4 @@
+import { CdnManagementClient } from "@azure/arm-cdn";
 import * as H from "@pagopa/handler-kit";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
@@ -130,10 +131,39 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     ),
   );
 
+const purgeContent: () => RTE.ReaderTaskEither<
+  {
+    cdnManagementClient: CdnManagementClient;
+    endpointName: string;
+    profileName: string;
+    resourceGroupName: string;
+  },
+  Error,
+  void
+> =
+  () =>
+  ({ cdnManagementClient, endpointName, profileName, resourceGroupName }) =>
+    pipe(
+      TE.tryCatch(
+        () =>
+          cdnManagementClient.endpoints.beginPurgeContent(
+            resourceGroupName,
+            profileName,
+            endpointName,
+            {
+              contentPaths: ["/*"],
+            },
+          ),
+        E.toError,
+      ),
+      TE.map(() => void 0),
+    );
+
 export const GenerateEntityConfigurationHandler = H.of(() =>
   pipe(
     createEntityConfiguration,
     RTE.chainW(uploadFile),
+    RTE.chainW(purgeContent),
     RTE.orElseFirstW((error) =>
       pipe(
         sendTelemetryException(error, {

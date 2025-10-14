@@ -1,5 +1,21 @@
 # io-wallet-support-func
 
+## 1.5.3
+
+### Patch Changes
+
+- c8e7082: Updated node version and migrated from yarn to pnpm
+- Updated dependencies [c8e7082]
+  - io-wallet-common@1.4.2
+
+## 1.5.2
+
+### Patch Changes
+
+- f7f674d: Strengthened data validation in createWalletInstance and updated WalletInstance schema to allow string osPatchLevel for revoked instances
+- Updated dependencies [f7f674d]
+  - io-wallet-common@1.4.1
+
 ## 1.5.1
 
 ### Patch Changes

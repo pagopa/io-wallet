@@ -1,5 +1,27 @@
 # io-wallet-user-func
 
+## 3.7.7
+
+### Patch Changes
+
+- 8b81b21: Added endpoint CDN purge after uploading a new file
+
+## 3.7.6
+
+### Patch Changes
+
+- c8e7082: Updated node version and migrated from yarn to pnpm
+- Updated dependencies [c8e7082]
+  - io-wallet-common@1.4.2
+
+## 3.7.5
+
+### Patch Changes
+
+- f7f674d: Strengthened data validation in createWalletInstance and updated WalletInstance schema to allow string osPatchLevel for revoked instances
+- Updated dependencies [f7f674d]
+  - io-wallet-common@1.4.1
+
 ## 3.7.4
 
 ### Patch Changes

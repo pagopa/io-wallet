@@ -1,4 +1,4 @@
-import { parse } from "@pagopa/handler-kit";
+import { parse, ValidationError } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
@@ -7,6 +7,8 @@ import * as J from "fp-ts/Json";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as S from "fp-ts/lib/string";
 import * as TE from "fp-ts/TaskEither";
+import * as t from "io-ts";
+import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { getCrlFromUrls } from "@/certificates";
@@ -19,6 +21,11 @@ import { verifyAttestation } from "./attestation";
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
 
+const DeviceDetailsWithKey = t.type({
+  deviceDetails: AndroidDeviceDetails,
+  hardwareKey: JwkPublicKey,
+});
+
 // TODO: [SIW-944] Add Android integrity check. This is a mock
 export const validateAndroidAttestation = (
   data: Buffer,
@@ -28,7 +35,7 @@ export const validateAndroidAttestation = (
   googlePublicKey: string,
   androidCrlUrls: string[],
   httpRequestTimeout: number,
-): TE.TaskEither<Error, ValidatedAttestation> =>
+): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(
     data.toString("utf-8"),
     S.split(","),
@@ -66,14 +73,7 @@ export const validateAndroidAttestation = (
                 new AndroidAttestationError(attestationValidationResult.reason),
               ),
         ),
-        TE.chainW(({ deviceDetails, hardwareKey }) =>
-          pipe(
-            hardwareKey,
-            parse(JwkPublicKey, "Invalid JWK Public Key"),
-            E.map((hardwareKey) => ({ deviceDetails, hardwareKey })),
-            TE.fromEither,
-          ),
-        ),
+        TE.chainW(flow(parse(DeviceDetailsWithKey), TE.fromEither)),
       ),
     ),
   );
