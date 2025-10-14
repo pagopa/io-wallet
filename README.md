@@ -9,7 +9,7 @@ This is the `io-wallet` project mono-repository containing applications and pack
 - `apps/io-wallet-support-func`: Contains functionalities for assistance and support.
 - `apps/io-wallet-user-func`: Contains functionalities for end users.
 - `packages/io-wallet-common`: Contains shared code among the workspaces.
-- `infra`: Contains infrastructure code to deploy the IO Wallet app.
+- `infra`: Contains Terraform code for provisioning and managing the IO Wallet infrastructure on Azure.
 
 ## Technologies
 
@@ -25,16 +25,16 @@ Changelog and versioning are managed with [Changesets](https://github.com/change
 
 ### Setting the Azure Subscription to Access the Dev CosmosDB
 
-To start the backend projects `io-wallet-support-func` and `io-wallet-user-func`, you must first log in with the correct user on Azure and set the subscription you want to use. Ensure you have the Azure `az-cli` package installed. If not, follow the instructions on the [official website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+To start the function apps `io-wallet-support-func` and `io-wallet-user-func`, you must first log in on Azure and set the subscription you want to use. Ensure you have the Azure `az-cli` package installed. If not, follow the instructions on the [official website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
 
-This process is necessary for backend applications started locally to connect to the development CosmosDB instance on Azure:
+This process is necessary for local function apps to connect to the development CosmosDB instance on Azure:
 
 ```bash
 az login                                        # Redirects to your main browser for login.
 
 az account set --subscription DEV-IO            # Sets the DEV-IO subscription for backend apps to connect to the dev CosmosDB.
 
-az ad user show --id YOUR_EMAIL                 # Retrieves user info by email. Store the Principal ID for the next command.
+az ad user show --id YOUR_EMAIL                 # Retrieves user info by email. Copy the "id" value from the output and use it as PRINCIPAL_ID in the next command.
 
 az cosmosdb sql role assignment create
     --account-name io-d-itn-common-cosno-01
@@ -43,6 +43,13 @@ az cosmosdb sql role assignment create
     --role-definition-id
         00000000-0000-0000-0000-000000000002    # Grants read and write access to the dev CosmosDB.
 ```
+
+### Install the Azure Functions Core Tools
+
+To run Azure Functions locally, you need to install the Azure Functions Core Tools.
+Please follow the official instructions here:
+
+https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=macos%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-javascript#install-the-azure-functions-core-tools
 
 ### Installation
 
@@ -64,10 +71,6 @@ pnpm lint           # Run code linting (performed by ESLint) for all projects an
 pnpm lint:fix       # Run code linting (performed by ESLint) for all projects and packages, attempting to fix correctable errors/warnings.
 
 pnpm build          # Run a build (performed by tsup-node) for all projects and packages. Build results are stored under the dist/ directory.
-
-pnpm version        # Update all packages in the package.json file using @changesets/cli.
-
-pnpm release        # Generate consistent versions of your packages using @changesets/cli.
 
 pnpm code-review    # Run typechecking, code linting, and unit testing for each project and package. This command ensures code quality in PRs.
 ```
