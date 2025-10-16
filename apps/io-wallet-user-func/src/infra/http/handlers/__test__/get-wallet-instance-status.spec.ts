@@ -6,11 +6,32 @@ import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
+import { NotificationService } from "io-wallet-common/notification";
 import { describe, expect, it } from "vitest";
 
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { GetWalletInstanceStatusHandler } from "../get-wallet-instance-status";
+
+const attestationServiceConfiguration = {
+  allowedDeveloperUsers: [],
+  androidBundleIdentifiers: [],
+  androidCrlUrls: [],
+  androidPlayIntegrityUrl: "",
+  androidPlayStoreCertificateHash: "",
+  appleRootCertificate: "",
+  googleAppCredentialsEncoded: "",
+  googlePublicKey: "",
+  hardwarePublicTestKey: "",
+  httpRequestTimeout: 1,
+  iosBundleIdentifiers: [],
+  iOsTeamIdentifier: "",
+  skipSignatureValidation: true,
+};
+
+const notificationService: NotificationService = {
+  sendMessage: () => TE.right(void 0),
+};
 
 describe("GetWalletInstanceStatusHandler", () => {
   const logger = {
@@ -60,9 +81,11 @@ describe("GetWalletInstanceStatusHandler", () => {
 
   it("should return a 200 HTTP response and not revoked wallet instance on success", async () => {
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -103,9 +126,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       );
 
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -146,9 +171,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       );
 
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -181,9 +208,11 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -210,9 +239,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -241,9 +272,11 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -270,9 +303,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnGet,
     });
@@ -299,9 +334,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnGet,
     });
@@ -350,9 +387,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       );
 
     const handler = GetWalletInstanceStatusHandler({
+      attestationServiceConfiguration,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
+      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });

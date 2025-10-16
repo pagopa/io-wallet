@@ -214,6 +214,8 @@ app.http("getWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     GetWalletInstanceStatusFunction({
+      attestationServiceConfiguration: config.attestationService,
+      notificationService: slackNotificationService,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -307,11 +309,9 @@ app.http("createWalletAttestationV2", {
   handler: withAppInsights(
     CreateWalletAttestationV2Function({
       attestationService: mobileAttestationService,
-      attestationServiceConfiguration: config.attestationService,
       certificateRepository,
       federationEntity: config.entityConfiguration.federationEntity,
       nonceRepository,
-      notificationService: slackNotificationService,
       signer: walletAttestationSigner,
       telemetryClient: appInsightsClient,
       walletAttestationConfig: {

@@ -19,7 +19,6 @@ import { flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
-import { NotificationService } from "io-wallet-common/notification";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
@@ -256,26 +255,6 @@ function isStringArray(u: unknown): u is string[] {
   return Array.isArray(u) && u.every((item) => typeof item === "string");
 }
 
-const attestationServiceConfiguration = {
-  allowedDeveloperUsers: [],
-  androidBundleIdentifiers: [],
-  androidCrlUrls: [],
-  androidPlayIntegrityUrl: "",
-  androidPlayStoreCertificateHash: "",
-  appleRootCertificate: "",
-  googleAppCredentialsEncoded: "",
-  googlePublicKey: "",
-  hardwarePublicTestKey: "",
-  httpRequestTimeout: 1,
-  iosBundleIdentifiers: [],
-  iOsTeamIdentifier: "",
-  skipSignatureValidation: true,
-};
-
-const notificationService: NotificationService = {
-  sendMessage: () => TE.right(void 0),
-};
-
 describe("CreateWalletAttestationV2Handler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
 
@@ -312,14 +291,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -348,14 +325,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -405,14 +380,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -479,14 +452,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
   it("should return a correctly encoded mdoc cbor on success", async () => {
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -601,14 +572,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository: certificateRepositoryError,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -634,14 +603,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
 
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository: certificateRepositoryNone,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -669,14 +636,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -720,14 +685,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
@@ -766,14 +729,12 @@ describe("CreateWalletAttestationV2Handler", async () => {
     };
     const handler = CreateWalletAttestationV2Handler({
       attestationService: mockAttestationService,
-      attestationServiceConfiguration,
       certificateRepository,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      notificationService,
       signer,
       telemetryClient,
       walletAttestationConfig,
