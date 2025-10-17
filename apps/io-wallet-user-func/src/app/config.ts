@@ -121,9 +121,6 @@ const AzureStorageConfig = t.type({
       revocationSendEmail: t.type({
         name: t.string,
       }),
-      validateCertificates: t.type({
-        name: t.string,
-      }),
     }),
   }),
 });
@@ -362,9 +359,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
     ),
-    validateWalletInstanceCertificatesQueueName: readFromEnvironment(
-      "ValidateWalletInstanceCertificatesQueueName",
-    ),
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
@@ -377,7 +371,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       entityConfigurationStorageAccountName,
       entityConfigurationStorageContainerName,
       storageAccountConnectionString,
-      validateWalletInstanceCertificatesQueueName,
       walletInstanceCreationEmailQueueName,
       walletInstanceRevocationEmailQueueName,
     }) => ({
@@ -393,9 +386,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
           },
           revocationSendEmail: {
             name: walletInstanceRevocationEmailQueueName,
-          },
-          validateCertificates: {
-            name: validateWalletInstanceCertificatesQueueName,
           },
         },
       },
