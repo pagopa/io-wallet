@@ -69,7 +69,6 @@ const testWalletAttestations: WalletAttestations = {
  * 1. Consumes the nonce from the request
  * 2. Retrieves the wallet instance associated with the attestation request and verifies it hasn't been revoked
  * 3. For non-test users, validates the assertion in the request
- * 4.
  */
 const validateRequest: (input: {
   assertion: WalletAttestationRequestV2;
