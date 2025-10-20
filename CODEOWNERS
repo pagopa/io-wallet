@@ -1,9 +1,4 @@
 # see https://help.github.com/en/articles/about-code-owners#example-of-a-codeowners-file
 
 * @pagopa/io-wallet
-
-# engineering-team-cloud-eng
-/infra/ @pagopa/engineering-team-cloud-eng
-/.github/ @pagopa/engineering-team-cloud-eng
-/.terraform-version @pagopa/engineering-team-cloud-eng
-/.pre-commit-config.yaml @pagopa/engineering-team-cloud-eng
+/infra/bootstrapper @pagopa/io-wallet @pagopa/engineering-team-devex
