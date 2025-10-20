@@ -6,7 +6,6 @@ import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { NotificationService } from "io-wallet-common/notification";
 import { describe, expect, it } from "vitest";
 
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -27,10 +26,6 @@ const attestationServiceConfiguration = {
   iosBundleIdentifiers: [],
   iOsTeamIdentifier: "",
   skipSignatureValidation: true,
-};
-
-const notificationService: NotificationService = {
-  sendMessage: () => TE.right(void 0),
 };
 
 describe("GetWalletInstanceStatusHandler", () => {
@@ -85,7 +80,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -130,7 +124,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -175,7 +168,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -212,7 +204,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -243,7 +234,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -276,7 +266,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });
@@ -307,7 +296,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnGet,
     });
@@ -338,7 +326,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnGet,
     });
@@ -391,7 +378,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      notificationService,
       telemetryClient,
       walletInstanceRepository,
     });

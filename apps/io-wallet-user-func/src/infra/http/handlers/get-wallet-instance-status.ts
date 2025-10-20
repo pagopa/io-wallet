@@ -8,9 +8,11 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as RE from "fp-ts/ReaderEither";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
+import {
+  sendTelemetryEvent,
+  sendTelemetryException,
+} from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { NotificationService } from "io-wallet-common/notification";
 import {
   WalletInstance,
   WalletInstanceValid,
@@ -20,16 +22,17 @@ import {
 import { AttestationServiceConfiguration } from "@/app/config";
 import { ValidationResult } from "@/attestation-service";
 import { CRL, getCrlFromUrls, validateRevocation } from "@/certificates";
-import { obfuscatedUserId } from "@/user";
-import { getWalletInstanceByUserId } from "@/wallet-instance";
 import {
-  revokeUserWalletInstances,
+  getWalletInstanceByUserId,
+  revokeWalletInstance,
   WalletInstanceRepository,
 } from "@/wallet-instance";
 
 import { WalletInstanceToStatusApiModel } from "../encoders/wallet-instance";
 import { requireFiscalCodeFromHeader } from "../fiscal-code";
 import { requireWalletInstanceId } from "../wallet-instance";
+
+const revocationReason = "CERTIFICATE_REVOKED_BY_ISSUER";
 
 const getAndroidCertificateChain = (
   walletInstance: WalletInstanceValid,
@@ -77,73 +80,41 @@ const getCrl: RTE.ReaderTaskEither<
   attestationServiceConfiguration: { androidCrlUrls, httpRequestTimeout },
 }) => getCrlFromUrls(androidCrlUrls, httpRequestTimeout);
 
-const revocationReason = "CERTIFICATE_REVOKED_BY_ISSUER";
-
-const revokeWalletInstance: (
-  userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"],
-) => RTE.ReaderTaskEither<
-  { walletInstanceRepository: WalletInstanceRepository },
-  Error,
-  void
-> =
-  (userId, id) =>
-  ({ walletInstanceRepository }) =>
-    pipe(
-      revokeUserWalletInstances(
-        userId,
-        [id],
-        revocationReason,
-      )({
-        walletInstanceRepository,
-      }),
-    );
-
-const trackEvent: (
+const sendCustomEvent: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
 ) => RE.ReaderEither<
   { telemetryClient: appInsights.TelemetryClient },
-  Error,
+  never,
   void
 > =
   (userId, walletInstanceId) =>
   ({ telemetryClient }) =>
-    E.tryCatch(
-      () =>
-        telemetryClient.trackEvent({
-          name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
-          properties: {
-            fiscalCode: userId,
-            reason: revocationReason,
-            walletInstanceId,
-          },
-        }),
-      E.toError,
-    );
-
-const sendMessage: (
-  userId: WalletInstance["userId"],
-  walletInstanceId: WalletInstance["id"],
-) => RTE.ReaderTaskEither<
-  { notificationService: NotificationService },
-  Error,
-  void
-> =
-  (userId, walletInstanceId) =>
-  ({ notificationService }) =>
-    notificationService.sendMessage(
-      `Revoked Wallet Instance with id: *${walletInstanceId}*.\n
-        UserId: ${obfuscatedUserId(userId)}.\n
-        Reason: ${revocationReason}`,
+    pipe(
+      E.tryCatch(
+        () =>
+          sendTelemetryEvent({
+            name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
+            properties: {
+              fiscalCode: userId,
+              reason: revocationReason,
+              walletInstanceId: walletInstanceId,
+            },
+          })({ telemetryClient }),
+        E.toError,
+      ),
+      // fire and forget
+      E.fold(
+        () => E.right(undefined),
+        () => E.right(undefined),
+      ),
     );
 
 // If revocation validation fails, the Wallet Instance is revoked, telemetry is sent to App Insights, a Slack alert is triggered
-const revokeWalletInstanceAndNotify: (
+const revokeWalletInstanceAndSendEvent: (
   walletInstance: WalletInstanceValid,
 ) => RTE.ReaderTaskEither<
   {
-    notificationService: NotificationService;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
@@ -151,33 +122,22 @@ const revokeWalletInstanceAndNotify: (
   void
 > =
   (walletInstance) =>
-  ({ notificationService, telemetryClient, walletInstanceRepository }) =>
+  ({ telemetryClient, walletInstanceRepository }) =>
     pipe(
-      {
+      revokeWalletInstance({
+        reason: revocationReason,
+        userId: walletInstance.userId,
+        walletInstanceId: walletInstance.id,
+      })({
         walletInstanceRepository,
-      },
-      revokeWalletInstance(walletInstance.userId, walletInstance.id),
+      }),
       TE.chainW(() =>
         pipe(
-          { telemetryClient },
-          trackEvent(walletInstance.userId, walletInstance.id),
-          // fire and forget
-          E.fold(
-            () => E.right(undefined),
-            () => E.right(undefined),
-          ),
+          sendCustomEvent(
+            walletInstance.userId,
+            walletInstance.id,
+          )({ telemetryClient }),
           TE.fromEither,
-        ),
-      ),
-      TE.chainW(() =>
-        pipe(
-          { notificationService },
-          sendMessage(walletInstance.userId, walletInstance.id),
-          // fire and forget
-          TE.fold(
-            () => TE.right(undefined),
-            () => TE.right(undefined),
-          ),
         ),
       ),
     );
@@ -187,7 +147,6 @@ const revokeWalletInstanceIfCertificateRevoked: (
 ) => RTE.ReaderTaskEither<
   {
     attestationServiceConfiguration: AttestationServiceConfiguration;
-    notificationService: NotificationService;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
@@ -203,7 +162,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
     RTE.chainW((result) =>
       result.success
         ? RTE.right(undefined)
-        : pipe(walletInstance, revokeWalletInstanceAndNotify),
+        : pipe(walletInstance, revokeWalletInstanceAndSendEvent),
     ),
     RTE.chain(() =>
       RTE.right({

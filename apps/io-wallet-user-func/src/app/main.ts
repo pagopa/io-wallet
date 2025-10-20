@@ -11,7 +11,6 @@ import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
 
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
@@ -108,8 +107,6 @@ const appInsightsClient = ai.defaultClient;
 const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
-
-const slackNotificationService = new SlackNotificationService(config.slack);
 
 const emailNotificationService = new EmailNotificationServiceClient({
   authProfileApiConfig: config.authProfile,
@@ -215,7 +212,6 @@ app.http("getWalletInstanceStatus", {
   handler: withAppInsights(
     GetWalletInstanceStatusFunction({
       attestationServiceConfiguration: config.attestationService,
-      notificationService: slackNotificationService,
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
