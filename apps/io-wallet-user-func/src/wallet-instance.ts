@@ -9,6 +9,7 @@ import { EntityNotFoundError } from "io-wallet-common/error";
 import {
   RevocationReason,
   WalletInstance,
+  WalletInstanceRevoked,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 
@@ -59,6 +60,11 @@ export interface WalletInstanceRepository {
   ) => TE.TaskEither<Error, O.Option<WalletInstanceValid[]>>;
   insert: (walletInstance: WalletInstanceValid) => TE.TaskEither<Error, void>;
 }
+
+export type WalletInstanceRevocationDetails = Pick<
+  WalletInstanceRevoked,
+  "id" | "isRevoked" | "revocationReason"
+>;
 
 export type WalletInstanceUserId = t.TypeOf<typeof WalletInstanceUserId>;
 
@@ -180,7 +186,7 @@ export const revokeWalletInstance: (input: {
 }) => RTE.ReaderTaskEither<
   { walletInstanceRepository: WalletInstanceRepository },
   Error,
-  void
+  WalletInstanceRevocationDetails
 > =
   ({ reason, userId, walletInstanceId }) =>
   ({ walletInstanceRepository }) =>
@@ -192,6 +198,11 @@ export const revokeWalletInstance: (input: {
       )({
         walletInstanceRepository,
       }),
+      TE.map(() => ({
+        id: walletInstanceId,
+        isRevoked: true as const,
+        revocationReason: reason,
+      })),
     );
 
 const getUserValidWalletInstancesIdExceptOne: (

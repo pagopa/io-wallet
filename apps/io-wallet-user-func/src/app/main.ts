@@ -40,6 +40,7 @@ import { PidIssuerClient } from "@/infra/pid-issuer/client";
 
 import { CdnManagementClient } from "@azure/arm-cdn";
 import { getConfigFromEnvironment } from "./config";
+import { getCrlFromUrls } from "@/certificates";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -211,7 +212,11 @@ app.http("getWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     GetWalletInstanceStatusFunction({
-      attestationServiceConfiguration: config.attestationService,
+      getAndroidAttestationCrl: () =>
+        getCrlFromUrls(
+          config.attestationService.androidCrlUrls,
+          config.attestationService.httpRequestTimeout,
+        ),
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
