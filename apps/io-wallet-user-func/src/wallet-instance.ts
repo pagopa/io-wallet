@@ -192,15 +192,13 @@ export const revokeWalletInstance: ({
 > =
   ({ id: walletInstanceId, revocationReason, userId }) =>
   ({ walletInstanceRepository }) =>
-    pipe(
-      revokeUserWalletInstances(
-        userId,
-        [walletInstanceId],
-        revocationReason,
-      )({
-        walletInstanceRepository,
-      }),
-    );
+    revokeUserWalletInstances(
+      userId,
+      [walletInstanceId],
+      revocationReason,
+    )({
+      walletInstanceRepository,
+    });
 
 const getUserValidWalletInstancesIdExceptOne: (
   userId: WalletInstance["userId"],
