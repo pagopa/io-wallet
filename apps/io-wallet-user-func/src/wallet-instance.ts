@@ -179,30 +179,27 @@ export const revokeUserWalletInstances: (
         )
       : TE.right(void 0);
 
-export const revokeWalletInstance: (input: {
-  reason: RevocationReason;
-  userId: WalletInstance["userId"];
-  walletInstanceId: WalletInstance["id"];
+export const revokeWalletInstance: ({
+  id,
+  revocationReason,
+  userId,
+}: WalletInstanceValid & {
+  revocationReason: RevocationReason;
 }) => RTE.ReaderTaskEither<
   { walletInstanceRepository: WalletInstanceRepository },
   Error,
-  WalletInstanceRevocationDetails
+  void
 > =
-  ({ reason, userId, walletInstanceId }) =>
+  ({ id: walletInstanceId, revocationReason, userId }) =>
   ({ walletInstanceRepository }) =>
     pipe(
       revokeUserWalletInstances(
         userId,
         [walletInstanceId],
-        reason,
+        revocationReason,
       )({
         walletInstanceRepository,
       }),
-      TE.map(() => ({
-        id: walletInstanceId,
-        isRevoked: true as const,
-        revocationReason: reason,
-      })),
     );
 
 const getUserValidWalletInstancesIdExceptOne: (

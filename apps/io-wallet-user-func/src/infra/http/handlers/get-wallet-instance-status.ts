@@ -19,7 +19,6 @@ import {
   WalletInstanceValidWithAndroidCertificatesChain,
 } from "io-wallet-common/wallet-instance";
 
-import { AttestationServiceConfiguration } from "@/app/config";
 import { ValidationResult } from "@/attestation-service";
 import { CRL, validateRevocation } from "@/certificates";
 import {
@@ -32,12 +31,10 @@ import {
 import { requireFiscalCodeFromHeader } from "../fiscal-code";
 import { requireWalletInstanceId } from "../wallet-instance";
 
-const revocationReason = "CERTIFICATE_REVOKED_BY_ISSUER";
+const certificateRevokedByIssuerReason =
+  "CERTIFICATE_REVOKED_BY_ISSUER" as const;
 
-export type AndroidCrlConfiguration = Pick<
-  AttestationServiceConfiguration,
-  "androidCrlUrls" | "httpRequestTimeout"
->;
+type WalletInstanceValidId = Pick<WalletInstanceValid, "id" | "isRevoked">;
 
 const getAndroidCertificateChain = (
   walletInstance: WalletInstanceValid,
@@ -93,7 +90,7 @@ const sendCustomEvent: (
   walletInstanceId: WalletInstance["id"],
 ) => RE.ReaderEither<
   { telemetryClient: appInsights.TelemetryClient },
-  never,
+  Error,
   void
 > =
   (userId, walletInstanceId) =>
@@ -105,20 +102,14 @@ const sendCustomEvent: (
             name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
             properties: {
               fiscalCode: userId,
-              reason: revocationReason,
+              reason: certificateRevokedByIssuerReason,
               walletInstanceId: walletInstanceId,
             },
           })({ telemetryClient }),
         E.toError,
       ),
-      // fire and forget
-      E.fold(
-        () => E.right(undefined),
-        () => E.right(undefined),
-      ),
     );
 
-// If revocation validation fails, the Wallet Instance is revoked, telemetry is sent to App Insights, a Slack alert is triggered
 const revokeWalletInstanceAndSendEvent: (
   walletInstance: WalletInstanceValid,
 ) => RTE.ReaderTaskEither<
@@ -127,15 +118,14 @@ const revokeWalletInstanceAndSendEvent: (
     walletInstanceRepository: WalletInstanceRepository;
   },
   Error,
-  WalletInstanceRevocationDetails
+  void
 > =
   (walletInstance) =>
   ({ telemetryClient, walletInstanceRepository }) =>
     pipe(
       revokeWalletInstance({
-        reason: revocationReason,
-        userId: walletInstance.userId,
-        walletInstanceId: walletInstance.id,
+        revocationReason: certificateRevokedByIssuerReason,
+        ...walletInstance,
       })({
         walletInstanceRepository,
       }),
@@ -145,6 +135,11 @@ const revokeWalletInstanceAndSendEvent: (
             walletInstance.userId,
             walletInstance.id,
           )({ telemetryClient }),
+          // fire and forget
+          E.fold(
+            () => E.right(undefined),
+            () => E.right(undefined),
+          ),
           TE.fromEither,
         ),
       ),
@@ -159,8 +154,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
     walletInstanceRepository: WalletInstanceRepository;
   },
   never,
-  | Pick<WalletInstanceValid, "id" | "isRevoked">
-  | WalletInstanceRevocationDetails
+  WalletInstanceRevocationDetails | WalletInstanceValidId
 > = (walletInstance) =>
   pipe(
     walletInstance,
@@ -171,11 +165,33 @@ const revokeWalletInstanceIfCertificateRevoked: (
     RTE.chainW((result) =>
       result.success
         ? RTE.right({ id: walletInstance.id, isRevoked: false })
-        : pipe(walletInstance, revokeWalletInstanceAndSendEvent),
+        : pipe(
+            walletInstance,
+            revokeWalletInstanceAndSendEvent,
+            RTE.map(() => ({
+              id: walletInstance.id,
+              isRevoked: true as const,
+              revocationReason: certificateRevokedByIssuerReason,
+            })),
+          ),
     ),
     // If anything fails, just ignore the error
-    RTE.orElseW(() => RTE.right(walletInstance)),
+    RTE.orElseW(() =>
+      RTE.right({ id: walletInstance.id, isRevoked: walletInstance.isRevoked }),
+    ),
   );
+
+const toWalletInstanceStatusApiModel = (
+  walletInstanceRevocationDetails:
+    | WalletInstanceRevocationDetails
+    | WalletInstanceValidId,
+) => ({
+  id: walletInstanceRevocationDetails.id,
+  is_revoked: walletInstanceRevocationDetails.isRevoked,
+  ...("revocationReason" in walletInstanceRevocationDetails
+    ? { revocation_reason: walletInstanceRevocationDetails.revocationReason }
+    : {}),
+});
 
 export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -189,17 +205,14 @@ export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
         getWalletInstanceByUserId(walletInstanceId, fiscalCode),
         RTE.chain((walletInstance) =>
           walletInstance.isRevoked
-            ? RTE.right(walletInstance)
+            ? RTE.right({
+                id: walletInstance.id,
+                isRevoked: walletInstance.isRevoked,
+                revocationReason: walletInstance.revocationReason,
+              })
             : revokeWalletInstanceIfCertificateRevoked(walletInstance),
         ),
-        // new encoder
-        RTE.map((walletInstance) => ({
-          id: walletInstance.id,
-          is_revoked: walletInstance.isRevoked,
-          ...("revocationReason" in walletInstance
-            ? { revocation_reason: walletInstance.revocationReason }
-            : {}),
-        })),
+        RTE.map(toWalletInstanceStatusApiModel),
         RTE.map(H.successJson),
         RTE.orElseFirstW((error) =>
           pipe(
