@@ -485,9 +485,24 @@ describe("GetWalletInstanceStatusHandler", () => {
       walletInstanceRepository: walletInstanceRepositoryRevokedWI,
     });
 
-    await handler();
+    const result = await handler();
 
     expect(getAndroidAttestationCrlMock).toHaveBeenCalledTimes(0);
+
+    expect(result).toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          id: "123",
+          is_revoked: true,
+          revocation_reason: "NEW_WALLET_INSTANCE_CREATED",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      },
+    });
   });
 
   it("should not call getAndroidAttestationCrl and should return a 200 response with is_revoked = false when there is no x509 chain", async () => {
@@ -525,9 +540,11 @@ describe("GetWalletInstanceStatusHandler", () => {
       walletInstanceRepository: walletInstanceRepositoryIosWI,
     });
 
+    const result = await handler();
+
     expect(getAndroidAttestationCrlMock).toHaveBeenCalledTimes(0);
 
-    await expect(handler()).resolves.toEqual({
+    expect(result).toEqual({
       _tag: "Right",
       right: {
         body: {
