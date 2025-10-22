@@ -57,13 +57,16 @@ const toX509Certificates = (
   );
 
 const validateCertificateChainRevocation = ({
-  googleCrl,
+  attestationStatusList,
   x509Chain,
 }: {
-  googleCrl: CRL;
+  attestationStatusList: CRL;
   x509Chain: readonly X509Certificate[];
 }): E.Either<Error, ValidationResult> =>
-  E.tryCatch(() => validateRevocation(x509Chain, googleCrl), E.toError);
+  E.tryCatch(
+    () => validateRevocation(x509Chain, attestationStatusList),
+    E.toError,
+  );
 
 const getX509ChainFromWalletInstance: (
   walletInstance: WalletInstanceValid,
@@ -74,16 +77,16 @@ const getX509ChainFromWalletInstance: (
   }
 > = flow(getAndroidCertificateChain, E.chain(toX509Certificates));
 
-type GetAndroidAttestationCrl = () => TE.TaskEither<Error, CRL>;
+type GetAttestationStatusList = () => TE.TaskEither<Error, CRL>;
 
-const getAndroidAttestationCrl: () => RTE.ReaderTaskEither<
-  { getAndroidAttestationCrl: GetAndroidAttestationCrl },
+const getAttestationStatusList: () => RTE.ReaderTaskEither<
+  { getAttestationStatusList: GetAttestationStatusList },
   Error,
   CRL
 > =
   () =>
-  ({ getAndroidAttestationCrl }) =>
-    getAndroidAttestationCrl();
+  ({ getAttestationStatusList }) =>
+    getAttestationStatusList();
 
 const sendCustomEvent: (
   userId: WalletInstance["userId"],
@@ -149,7 +152,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
   walletInstance: WalletInstanceValid,
 ) => RTE.ReaderTaskEither<
   {
-    getAndroidAttestationCrl: GetAndroidAttestationCrl;
+    getAttestationStatusList: GetAttestationStatusList;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
@@ -160,7 +163,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
     walletInstance,
     getX509ChainFromWalletInstance,
     RTE.fromEither,
-    RTE.bind("googleCrl", getAndroidAttestationCrl),
+    RTE.bind("attestationStatusList", getAttestationStatusList),
     RTE.chainW(flow(validateCertificateChainRevocation, RTE.fromEither)),
     RTE.chainW((result) =>
       result.success

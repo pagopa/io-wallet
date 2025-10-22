@@ -18,7 +18,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     vi.clearAllMocks();
   });
 
-  const getAndroidAttestationCrl = () =>
+  const getAttestationStatusList = () =>
     TE.right({
       entries: {
         a2f4506fa644a4b3: {
@@ -87,7 +87,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   } as unknown as appInsights.TelemetryClient;
 
   it("should return a 200 HTTP response and not revoked wallet instance on success", async () => {
-    const getAndroidAttestationCrl = () =>
+    const getAttestationStatusList = () =>
       TE.right({
         entries: {
           aaa: {
@@ -98,7 +98,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -150,7 +150,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -202,7 +202,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -238,7 +238,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -268,7 +268,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -300,7 +300,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -330,7 +330,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -360,7 +360,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -415,7 +415,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -439,7 +439,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should not call getAndroidAttestationCrl when the wallet instance is already revoked", async () => {
+  it("should not call getAttestationStatusList when the wallet instance is already revoked", async () => {
     const walletInstanceRepositoryRevokedWI = {
       ...walletInstanceRepository,
       getByUserId: () =>
@@ -474,10 +474,10 @@ describe("GetWalletInstanceStatusHandler", () => {
         ),
     };
 
-    const getAndroidAttestationCrlMock = vi.fn(() => TE.right({ entries: {} }));
+    const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl: getAndroidAttestationCrlMock,
+      getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -487,7 +487,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
     const result = await handler();
 
-    expect(getAndroidAttestationCrlMock).toHaveBeenCalledTimes(0);
+    expect(getAttestationStatusListMock).toHaveBeenCalledTimes(0);
 
     expect(result).toEqual({
       _tag: "Right",
@@ -505,7 +505,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should not call getAndroidAttestationCrl and should return a 200 response with is_revoked = false when there is no x509 chain", async () => {
+  it("should not call getAttestationStatusList and should return a 200 response with is_revoked = false when there is no x509 chain", async () => {
     const walletInstanceRepositoryIosWI = {
       ...walletInstanceRepository,
       getByUserId: () =>
@@ -529,10 +529,10 @@ describe("GetWalletInstanceStatusHandler", () => {
         ),
     };
 
-    const getAndroidAttestationCrlMock = vi.fn(() => TE.right({ entries: {} }));
+    const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl: getAndroidAttestationCrlMock,
+      getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -542,7 +542,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
     const result = await handler();
 
-    expect(getAndroidAttestationCrlMock).toHaveBeenCalledTimes(0);
+    expect(getAttestationStatusListMock).toHaveBeenCalledTimes(0);
 
     expect(result).toEqual({
       _tag: "Right",
@@ -561,7 +561,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
   it("should return a 200 response with is_revoked = true and revocation_reason = CERTIFICATE_REVOKED_BY_ISSUER when certificate has been revoked", async () => {
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -586,7 +586,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 200 response with is_revoked = false when certificate has not been revoked", async () => {
-    const getAndroidAttestationCrl = () =>
+    const getAttestationStatusList = () =>
       TE.right({
         entries: {
           aaa: {
@@ -597,7 +597,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -621,11 +621,11 @@ describe("GetWalletInstanceStatusHandler", () => {
   });
 
   it("should return a 200 response with is_revoked = false when CRL request fails", async () => {
-    const getAndroidAttestationCrl = () =>
+    const getAttestationStatusList = () =>
       TE.left(new Error("Failed to get CRL"));
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -655,7 +655,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -678,7 +678,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should call getAndroidAttestationCrl when the wallet instance is not revoked", async () => {
+  it("should call getAttestationStatusList when the wallet instance is not revoked", async () => {
     const walletInstanceRepositoryNotRevokedWI = {
       ...walletInstanceRepository,
       getByUserId: () =>
@@ -711,10 +711,10 @@ describe("GetWalletInstanceStatusHandler", () => {
         ),
     };
 
-    const getAndroidAttestationCrlMock = vi.fn(() => TE.right({ entries: {} }));
+    const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl: getAndroidAttestationCrlMock,
+      getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -724,7 +724,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
     await handler();
 
-    expect(getAndroidAttestationCrlMock).toHaveBeenCalledTimes(1);
+    expect(getAttestationStatusListMock).toHaveBeenCalledTimes(1);
   });
 
   it("should return a 200 response with is_revoked = true when certificate has been revoked and telemetryClient.trackEvent fails", async () => {
@@ -736,7 +736,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     } as unknown as appInsights.TelemetryClient;
 
     const handler = GetWalletInstanceStatusHandler({
-      getAndroidAttestationCrl,
+      getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

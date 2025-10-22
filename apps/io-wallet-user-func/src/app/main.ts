@@ -212,7 +212,7 @@ app.http("getWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     GetWalletInstanceStatusFunction({
-      getAndroidAttestationCrl: () =>
+      getAttestationStatusList: () =>
         getCrlFromUrls(
           config.attestationService.androidCrlUrls,
           config.attestationService.httpRequestTimeout,
