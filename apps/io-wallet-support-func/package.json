@@ -17,11 +17,11 @@
     "@azure/cosmos": "catalog:",
     "@azure/functions": "catalog:",
     "@azure/identity": "catalog:",
+    "@pagopa/azure-tracing": "^0.4.8",
     "@pagopa/handler-kit": "catalog:",
     "@pagopa/handler-kit-azure-func": "catalog:",
     "@pagopa/logger": "catalog:",
     "@pagopa/ts-commons": "catalog:",
-    "applicationinsights": "catalog:",
     "fp-ts": "catalog:",
     "io-ts": "catalog:",
     "io-wallet-common": "workspace:^"
