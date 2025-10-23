@@ -36,6 +36,8 @@ const certificateRevokedByIssuerReason =
 
 type WalletInstanceValidId = Pick<WalletInstanceValid, "id" | "isRevoked">;
 
+type GetAttestationStatusList = () => TE.TaskEither<Error, CRL>;
+
 const getAndroidCertificateChain = (
   walletInstance: WalletInstanceValid,
 ): E.Either<Error, readonly string[]> =>
@@ -56,7 +58,30 @@ const toX509Certificates = (
     E.map((x509Chain) => ({ x509Chain })),
   );
 
-const validateCertificateChainRevocation = ({
+const getX509ChainFromWalletInstance: (
+  walletInstance: WalletInstanceValid,
+) => E.Either<
+  Error,
+  {
+    x509Chain: readonly X509Certificate[];
+  }
+> = flow(getAndroidCertificateChain, E.chain(toX509Certificates));
+
+const getAttestationStatusList: () => RTE.ReaderTaskEither<
+  { getAttestationStatusList: GetAttestationStatusList },
+  Error,
+  CRL
+> =
+  () =>
+  ({ getAttestationStatusList }) =>
+    getAttestationStatusList();
+
+/**
+ * Checks whether any certificate in the provided attestation X.509 chain
+ * has been revoked according to Google's attestation status list.
+ * Returns { success: true } if none are revoked.
+ */
+const checkAttestationChainRevocation = ({
   attestationStatusList,
   x509Chain,
 }: {
@@ -67,26 +92,6 @@ const validateCertificateChainRevocation = ({
     () => validateRevocation(x509Chain, attestationStatusList),
     E.toError,
   );
-
-const getX509ChainFromWalletInstance: (
-  walletInstance: WalletInstanceValid,
-) => E.Either<
-  Error,
-  {
-    x509Chain: readonly X509Certificate[];
-  }
-> = flow(getAndroidCertificateChain, E.chain(toX509Certificates));
-
-type GetAttestationStatusList = () => TE.TaskEither<Error, CRL>;
-
-const getAttestationStatusList: () => RTE.ReaderTaskEither<
-  { getAttestationStatusList: GetAttestationStatusList },
-  Error,
-  CRL
-> =
-  () =>
-  ({ getAttestationStatusList }) =>
-    getAttestationStatusList();
 
 const sendCustomEvent: (
   userId: WalletInstance["userId"],
@@ -164,7 +169,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
     getX509ChainFromWalletInstance,
     RTE.fromEither,
     RTE.bind("attestationStatusList", getAttestationStatusList),
-    RTE.chainW(flow(validateCertificateChainRevocation, RTE.fromEither)),
+    RTE.chainW(flow(checkAttestationChainRevocation, RTE.fromEither)),
     RTE.chainW((result) =>
       result.success
         ? RTE.right({ id: walletInstance.id, isRevoked: false })
