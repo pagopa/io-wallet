@@ -439,7 +439,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should not call getAttestationStatusList when the wallet instance is already revoked", async () => {
+  it("should not call getAttestationStatusList and should return is_revoked = true when the wallet instance is already revoked", async () => {
     const walletInstanceRepositoryRevokedWI = {
       ...walletInstanceRepository,
       getByUserId: () =>

@@ -103,19 +103,17 @@ const sendCustomEvent: (
 > =
   (userId, walletInstanceId) =>
   ({ telemetryClient }) =>
-    pipe(
-      E.tryCatch(
-        () =>
-          sendTelemetryEvent({
-            name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
-            properties: {
-              fiscalCode: userId,
-              reason: certificateRevokedByIssuerReason,
-              walletInstanceId: walletInstanceId,
-            },
-          })({ telemetryClient }),
-        E.toError,
-      ),
+    E.tryCatch(
+      () =>
+        sendTelemetryEvent({
+          name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
+          properties: {
+            fiscalCode: userId,
+            reason: certificateRevokedByIssuerReason,
+            walletInstanceId: walletInstanceId,
+          },
+        })({ telemetryClient }),
+      E.toError,
     );
 
 const revokeWalletInstanceAndSendEvent: (
