@@ -34,9 +34,9 @@ import { requireWalletInstanceId } from "../wallet-instance";
 const certificateRevokedByIssuerReason =
   "CERTIFICATE_REVOKED_BY_ISSUER" as const;
 
-type WalletInstanceValidId = Pick<WalletInstanceValid, "id" | "isRevoked">;
-
 type GetAttestationStatusList = () => TE.TaskEither<Error, CRL>;
+
+type WalletInstanceValidId = Pick<WalletInstanceValid, "id" | "isRevoked">;
 
 const getAndroidCertificateChain = (
   walletInstance: WalletInstanceValid,
@@ -81,7 +81,7 @@ const getAttestationStatusList: () => RTE.ReaderTaskEither<
  * has been revoked according to Google's attestation status list.
  * Returns { success: true } if none are revoked.
  */
-const checkAttestationChainRevocation = ({
+const checkAttestationRevocation = ({
   attestationStatusList,
   x509Chain,
 }: {
@@ -125,17 +125,18 @@ const revokeWalletInstanceAndSendEvent: (
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
-  Error,
-  void
+  never,
+  WalletInstanceRevocationDetails | WalletInstanceValidId
 > =
   (walletInstance) =>
   ({ telemetryClient, walletInstanceRepository }) =>
     pipe(
+      {
+        walletInstanceRepository,
+      },
       revokeWalletInstance({
         revocationReason: certificateRevokedByIssuerReason,
         ...walletInstance,
-      })({
-        walletInstanceRepository,
       }),
       TE.chainFirstW(() =>
         pipe(
@@ -150,6 +151,18 @@ const revokeWalletInstanceAndSendEvent: (
           ),
           TE.fromEither,
         ),
+      ),
+      TE.map(() => ({
+        id: walletInstance.id,
+        isRevoked: true as const,
+        revocationReason: certificateRevokedByIssuerReason,
+      })),
+      // If revokeWalletInstance fails, just ignore the error
+      TE.orElseW(() =>
+        TE.right({
+          id: walletInstance.id,
+          isRevoked: false,
+        }),
       ),
     );
 
@@ -169,23 +182,18 @@ const revokeWalletInstanceIfCertificateRevoked: (
     getX509ChainFromWalletInstance,
     RTE.fromEither,
     RTE.bind("attestationStatusList", getAttestationStatusList),
-    RTE.chainW(flow(checkAttestationChainRevocation, RTE.fromEither)),
+    RTE.chainW(flow(checkAttestationRevocation, RTE.fromEither)),
     RTE.chainW((result) =>
       result.success
         ? RTE.right({ id: walletInstance.id, isRevoked: false })
-        : pipe(
-            walletInstance,
-            revokeWalletInstanceAndSendEvent,
-            RTE.map(() => ({
-              id: walletInstance.id,
-              isRevoked: true as const,
-              revocationReason: certificateRevokedByIssuerReason,
-            })),
-          ),
+        : revokeWalletInstanceAndSendEvent(walletInstance),
     ),
     // If anything fails, just ignore the error
     RTE.orElseW(() =>
-      RTE.right({ id: walletInstance.id, isRevoked: walletInstance.isRevoked }),
+      RTE.right({
+        id: walletInstance.id,
+        isRevoked: false,
+      }),
     ),
   );
 
