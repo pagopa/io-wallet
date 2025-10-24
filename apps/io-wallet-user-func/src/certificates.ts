@@ -82,10 +82,10 @@ export type CRL = t.TypeOf<typeof CRL>;
  * @param crl - The certificates revocation list.
  * @param httpRequestTimeout - The timeout for CRL fetch request in ms.
  */
-export const validateRevocation = async (
+export const validateRevocation = (
   x509Chain: readonly X509Certificate[],
   crl: CRL,
-): Promise<ValidationResult> => {
+): ValidationResult => {
   const revokedSerials = Object.keys(crl.entries).map((key) =>
     key.toLowerCase(),
   );

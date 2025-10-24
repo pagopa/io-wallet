@@ -7,3 +7,10 @@ export const sendTelemetryException =
       exception: error,
       properties,
     });
+
+export const sendTelemetryEvent: (
+  event: appInsights.Contracts.EventTelemetry,
+) => (r: { telemetryClient: appInsights.TelemetryClient }) => void =
+  (event) =>
+  ({ telemetryClient }) =>
+    telemetryClient.trackEvent(event);
