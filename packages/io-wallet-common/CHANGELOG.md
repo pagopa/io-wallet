@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.5.0
+
+### Minor Changes
+
+- 35a8477: Added `sendTelemetryEvent` function
+
 ## 1.4.2
 
 ### Patch Changes
