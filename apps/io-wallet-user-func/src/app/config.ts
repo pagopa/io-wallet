@@ -89,6 +89,7 @@ export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
   allowedDeveloperUsers: t.array(t.string),
+  androidAttestationStatusListCheckFF: t.boolean,
   androidBundleIdentifiers: t.array(t.string),
   androidCrlUrls: t.array(t.string),
   androidPlayIntegrityUrl: t.string,
@@ -291,6 +292,10 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.orElse(
         (): RE.ReaderEither<NodeJS.ProcessEnv, Error, string[]> => RE.right([]),
       ),
+    ),
+    androidAttestationStatusListCheckFF: pipe(
+      readFromEnvironment("AndroidAttestationStatusListCheckFF"),
+      RE.map(booleanFromString),
     ),
     androidBundleIdentifiers: pipe(
       readFromEnvironment("AndroidBundleIdentifiers"),

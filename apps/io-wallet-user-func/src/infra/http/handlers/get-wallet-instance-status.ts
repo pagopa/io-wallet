@@ -164,6 +164,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
   walletInstance: WalletInstanceValid,
 ) => RT.ReaderTask<
   {
+    androidAttestationStatusListCheckFF: boolean;
     getAttestationStatusList: GetAttestationStatusList;
     telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
@@ -199,6 +200,28 @@ const toWalletInstanceStatusApiModel = (
     : {}),
 });
 
+const androidRevocationCheckFF: (
+  walletInstance: WalletInstanceValid,
+) => RTE.ReaderTaskEither<
+  {
+    androidAttestationStatusListCheckFF: boolean;
+    getAttestationStatusList: GetAttestationStatusList;
+    telemetryClient: appInsights.TelemetryClient;
+    walletInstanceRepository: WalletInstanceRepository;
+  },
+  Error,
+  WalletInstanceRevocationDetails | WalletInstanceValidId
+> = (walletInstance) => (dep) =>
+  dep.androidAttestationStatusListCheckFF
+    ? pipe(
+        revokeWalletInstanceIfCertificateRevoked,
+        RTE.fromReaderTaskK,
+      )(walletInstance)(dep)
+    : TE.right({
+        id: walletInstance.id,
+        isRevoked: false,
+      });
+
 export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
     sequenceS(E.Apply)({
@@ -216,10 +239,7 @@ export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
                 isRevoked: walletInstance.isRevoked,
                 revocationReason: walletInstance.revocationReason,
               })
-            : pipe(
-                revokeWalletInstanceIfCertificateRevoked,
-                RTE.fromReaderTaskK,
-              )(walletInstance),
+            : androidRevocationCheckFF(walletInstance),
         ),
         RTE.map(toWalletInstanceStatusApiModel),
         RTE.map(H.successJson),
