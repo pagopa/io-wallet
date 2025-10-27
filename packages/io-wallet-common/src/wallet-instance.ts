@@ -50,6 +50,8 @@ const WalletInstanceRevoked = t.intersection([
   }),
 ]);
 
+export type WalletInstanceRevoked = t.TypeOf<typeof WalletInstanceRevoked>;
+
 export const WalletInstance = t.union([
   WalletInstanceValid,
   WalletInstanceRevoked,

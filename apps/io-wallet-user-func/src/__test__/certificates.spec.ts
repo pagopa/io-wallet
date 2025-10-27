@@ -39,27 +39,28 @@ const mockCrl: CRL = {
 };
 
 describe("CertificatesValidation", () => {
-  it("should return a revocation verification without errors", async () => {
+  it("should return a revocation verification without errors", () => {
     const validChain = validX509Chain.map((c) => new X509Certificate(c));
-    const validation = await validateRevocation(validChain, mockCrl);
+    const validation = validateRevocation(validChain, mockCrl);
     expect(validation).toHaveProperty("success", true);
   });
 
-  it("should return an issuance verification without errors", async () => {
+  it("should return an issuance verification without errors", () => {
     const validChain = validX509Chain.map((c) => new X509Certificate(c));
     const googlePublicKey = createPublicKey(
       decodeBase64String(GOOGLE_PUBLIC_KEY),
     );
-    const validation = await validateIssuance(validChain, googlePublicKey);
+    const validation = validateIssuance(validChain, googlePublicKey);
     expect(validation).toHaveProperty("success", true);
   });
 
-  it("should return a revocation verification with errors", async () => {
+  it("should return a revocation verification with errors", () => {
     const invalidChain = revokedX509Chain.map((c) => new X509Certificate(c));
 
-    await expect(
-      validateRevocation(invalidChain, mockCrl),
-    ).resolves.toHaveProperty("success", false);
+    expect(validateRevocation(invalidChain, mockCrl)).toHaveProperty(
+      "success",
+      false,
+    );
   });
 
   it("should return an issuance verification with errors", async () => {
