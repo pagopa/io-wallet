@@ -5,7 +5,7 @@ import { WalletInstance } from "io-wallet-common/wallet-instance";
 const WalletInstanceStatusApiModel = t.intersection([
   t.type({ id: NonEmptyString, is_revoked: t.boolean }),
   t.partial({
-    revocationReason: t.string,
+    revocation_reason: t.string,
   }),
 ]);
 

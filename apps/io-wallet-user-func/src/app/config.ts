@@ -89,6 +89,7 @@ export type CryptoConfiguration = t.TypeOf<typeof CryptoConfiguration>;
 
 export const AttestationServiceConfiguration = t.type({
   allowedDeveloperUsers: t.array(t.string),
+  androidAttestationStatusListCheckFF: t.boolean,
   androidBundleIdentifiers: t.array(t.string),
   androidCrlUrls: t.array(t.string),
   androidPlayIntegrityUrl: t.string,
@@ -119,9 +120,6 @@ const AzureStorageConfig = t.type({
         name: t.string,
       }),
       revocationSendEmail: t.type({
-        name: t.string,
-      }),
-      validateCertificates: t.type({
         name: t.string,
       }),
     }),
@@ -295,6 +293,10 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
         (): RE.ReaderEither<NodeJS.ProcessEnv, Error, string[]> => RE.right([]),
       ),
     ),
+    androidAttestationStatusListCheckFF: pipe(
+      readFromEnvironment("AndroidAttestationStatusListCheckFF"),
+      RE.map(booleanFromString),
+    ),
     androidBundleIdentifiers: pipe(
       readFromEnvironment("AndroidBundleIdentifiers"),
       RE.map((identifiers) => identifiers.split(",")),
@@ -362,9 +364,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     storageAccountConnectionString: readFromEnvironment(
       "StorageConnectionString",
     ),
-    validateWalletInstanceCertificatesQueueName: readFromEnvironment(
-      "ValidateWalletInstanceCertificatesQueueName",
-    ),
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
@@ -377,7 +376,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       entityConfigurationStorageAccountName,
       entityConfigurationStorageContainerName,
       storageAccountConnectionString,
-      validateWalletInstanceCertificatesQueueName,
       walletInstanceCreationEmailQueueName,
       walletInstanceRevocationEmailQueueName,
     }) => ({
@@ -393,9 +391,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
           },
           revocationSendEmail: {
             name: walletInstanceRevocationEmailQueueName,
-          },
-          validateCertificates: {
-            name: validateWalletInstanceCertificatesQueueName,
           },
         },
       },

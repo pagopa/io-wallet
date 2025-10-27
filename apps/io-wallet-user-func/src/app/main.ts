@@ -2,7 +2,7 @@
 import ai from "@/infra/azure/appinsights/start";
 
 import { CosmosClient } from "@azure/cosmos";
-import { app, output } from "@azure/functions";
+import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
@@ -11,18 +11,12 @@ import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
-import {
-  WalletInstance,
-  WalletInstanceValidWithAndroidCertificatesChain,
-} from "io-wallet-common/wallet-instance";
 
 import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
-import { AddWalletInstanceToValidationQueueFunction } from "@/infra/azure/functions/add-wallet-instance-to-validation-queue";
 // import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletAttestationV2Function } from "@/infra/azure/functions/create-wallet-attestation-v2";
@@ -37,9 +31,7 @@ import { HealthFunction } from "@/infra/azure/functions/health";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
-import { ValidateWalletInstanceAttestedKeyFunction } from "@/infra/azure/functions/validate-wallet-instance-attested-key";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
-import { WalletInstanceRevocationStorageQueue } from "@/infra/azure/storage/wallet-instance-revocation";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
@@ -48,6 +40,7 @@ import { PidIssuerClient } from "@/infra/pid-issuer/client";
 
 import { CdnManagementClient } from "@azure/arm-cdn";
 import { getConfigFromEnvironment } from "./config";
+import { getCrlFromUrls } from "@/certificates";
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -76,12 +69,6 @@ const cdnManagementClient = new CdnManagementClient(credential, subscriptionId);
 
 const queueServiceClient = QueueServiceClient.fromConnectionString(
   config.azure.storage.walletInstances.connectionString,
-);
-
-const walletInstanceRevocationQueue = new WalletInstanceRevocationStorageQueue(
-  queueServiceClient.getQueueClient(
-    config.azure.storage.walletInstances.queues.validateCertificates.name,
-  ),
 );
 
 const walletInstanceCreationEmailQueueClient =
@@ -121,8 +108,6 @@ const appInsightsClient = ai.defaultClient;
 const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
-
-const slackNotificationService = new SlackNotificationService(config.slack);
 
 const emailNotificationService = new EmailNotificationServiceClient({
   authProfileApiConfig: config.authProfile,
@@ -227,6 +212,13 @@ app.http("getWalletInstanceStatus", {
   authLevel: "function",
   handler: withAppInsights(
     GetWalletInstanceStatusFunction({
+      androidAttestationStatusListCheckFF:
+        config.attestationService.androidAttestationStatusListCheckFF,
+      getAttestationStatusList: () =>
+        getCrlFromUrls(
+          config.attestationService.androidCrlUrls,
+          config.attestationService.httpRequestTimeout,
+        ),
       telemetryClient: appInsightsClient,
       walletInstanceRepository,
     }),
@@ -259,39 +251,6 @@ app.http("setWalletInstanceStatus", {
   ),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
-});
-
-app.cosmosDB("addWalletInstanceToValidationQueue", {
-  connection: "CosmosDbEndpoint",
-  containerName: "wallet-instances",
-  databaseName: config.azure.cosmos.dbName,
-  handler: AddWalletInstanceToValidationQueueFunction({
-    inputDecoder: t.array(WalletInstance),
-    telemetryClient: appInsightsClient,
-  }),
-  leaseContainerName: "leases-revoke-wallet-instance",
-  leaseContainerPrefix: "wallet-instances-consumer-",
-  maxItemsPerInvocation: 50,
-  return: output.storageQueue({
-    connection: "StorageConnectionString",
-    queueName:
-      config.azure.storage.walletInstances.queues.validateCertificates.name,
-  }),
-  startFromBeginning: true,
-});
-
-app.storageQueue("validateWalletInstance", {
-  connection: "StorageConnectionString",
-  handler: ValidateWalletInstanceAttestedKeyFunction({
-    attestationServiceConfiguration: config.attestationService,
-    inputDecoder: WalletInstanceValidWithAndroidCertificatesChain,
-    notificationService: slackNotificationService,
-    revocationQueue: walletInstanceRevocationQueue,
-    telemetryClient: appInsightsClient,
-    walletInstanceRepository,
-  }),
-  queueName:
-    config.azure.storage.walletInstances.queues.validateCertificates.name,
 });
 
 app.storageQueue("sendEmailOnWalletInstanceCreation", {
