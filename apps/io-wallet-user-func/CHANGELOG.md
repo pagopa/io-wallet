@@ -1,5 +1,16 @@
 # io-wallet-user-func
 
+## 3.8.0
+
+### Minor Changes
+
+- 35a8477: Added wallet instance revocation by wallet provider in `getWalletInstanceStatus` function
+
+### Patch Changes
+
+- Updated dependencies [35a8477]
+  - io-wallet-common@1.5.0
+
 ## 3.7.7
 
 ### Patch Changes
