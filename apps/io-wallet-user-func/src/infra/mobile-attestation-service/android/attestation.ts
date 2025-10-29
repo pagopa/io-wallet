@@ -33,6 +33,11 @@ type AndroidAttestationValidationResult =
     }
   | { reason: string; success: false };
 
+interface CertWithExtension {
+  certificate: X509Certificate;
+  extension: pkijs.Extension;
+}
+
 export const verifyAttestation = async (
   params: VerifyAttestationParams,
 ): Promise<AndroidAttestationValidationResult> => {
@@ -65,7 +70,7 @@ export const verifyAttestation = async (
     return revocationValidationResult;
   }
 
-  const certWithExtension = validateKeyAttestationExtension(x509Chain);
+  const certWithExtension = validateKeyAttestationExtension(x509Chain, KEY_OID);
 
   const validationExcentionResult = await validateExtension(
     certWithExtension,
@@ -99,28 +104,30 @@ export const verifyAttestation = async (
  * @throws {Error} - If no key attestation extension is found.
 
  */
-const validateKeyAttestationExtension = (
+
+/**
+ * Parse the attestation record that is closest to the root. This prevents an adversary from
+ * attesting an attestation record of their choice with an otherwise trusted chain using the
+ * following attack:
+ * 1) having the TEE attest a key under the adversary's control,
+ * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
+ * 3) appending that certificate to the original certificate chain.
+ */
+function validateKeyAttestationExtension(
   x509Chain: readonly X509Certificate[],
-) => {
-  /**
-   * Parse the attestation record that is closest to the root. This prevents an adversary from
-   * attesting an attestation record of their choice with an otherwise trusted chain using the
-   * following attack:
-   * 1) having the TEE attest a key under the adversary's control,
-   * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
-   * 3) appending that certificate to the original certificate chain.
-   */
-  const certWithExtension = x509Chain.findLast((certificate) => {
-    const ext = extractExtension(certificate, KEY_OID);
-    return ext ?? false;
-  });
-
-  if (certWithExtension) {
-    return certWithExtension;
+  keyOid: string,
+): CertWithExtension {
+  for (let i = x509Chain.length - 1; i >= 0; i--) {
+    const extension = extractExtension(x509Chain[i], keyOid);
+    if (extension) {
+      return {
+        certificate: x509Chain[i],
+        extension,
+      };
+    }
   }
-
   throw new Error("No key attestation extension found");
-};
+}
 
 const extractExtension = (certificate: X509Certificate, oid: string) => {
   const asn1 = asn1js.fromBER(certificate.raw);
@@ -136,18 +143,12 @@ const extractExtension = (certificate: X509Certificate, oid: string) => {
  * @param attestationParams - The verify attestation {@link VerifyAttestationParams} params.
  */
 const validateExtension = async (
-  certWithExtension: X509Certificate,
+  certWithExtension: CertWithExtension,
   attestationParams: VerifyAttestationParams,
 ): Promise<AndroidAttestationValidationResult> => {
   const { bundleIdentifiers, challenge } = attestationParams;
 
-  const extension = extractExtension(certWithExtension, KEY_OID);
-  if (!extension) {
-    return {
-      reason: `Unable to extract extension from certificate: ${certWithExtension}`,
-      success: false,
-    };
-  }
+  const extension = certWithExtension.extension;
 
   const extensionBerEncoded = extension.extnValue.getValue();
 
@@ -318,7 +319,9 @@ const validateExtension = async (
     };
   }
 
-  const hardwareKey = await jose.exportJWK(certWithExtension.publicKey);
+  const hardwareKey = await jose.exportJWK(
+    certWithExtension.certificate.publicKey,
+  );
 
   return {
     deviceDetails,
