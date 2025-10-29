@@ -154,7 +154,6 @@ export class MobileAttestationService implements AttestationService {
               validateAndroidAttestation(
                 data,
                 nonce,
-                hardwareKeyTag,
                 this.#configuration.androidBundleIdentifiers,
                 this.#configuration.googlePublicKey,
                 this.#configuration.androidCrlUrls,

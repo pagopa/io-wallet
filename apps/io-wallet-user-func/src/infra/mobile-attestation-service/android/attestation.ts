@@ -33,6 +33,17 @@ type AndroidAttestationValidationResult =
     }
   | { reason: string; success: false };
 
+interface CertWithExtension {
+  certificate: X509Certificate;
+  extension: pkijs.Extension;
+}
+
+/**
+ * Verifies Android key attestation by validating the certificate chain,
+ * checking revocation status, and examining the key attestation extension.
+ * @param params - The attestation verification parameters
+ * @returns A promise that resolves to the validation result containing device details and hardware key if successful
+ */
 export const verifyAttestation = async (
   params: VerifyAttestationParams,
 ): Promise<AndroidAttestationValidationResult> => {
@@ -56,7 +67,7 @@ export const verifyAttestation = async (
   }
 
   // 4. Check each certificate's revocation status to ensure that none of the certificates have been revoked.
-  const revocationValidationResult = await validateRevocation(
+  const revocationValidationResult = validateRevocation(
     x509Chain,
     attestationCrl,
   );
@@ -65,63 +76,67 @@ export const verifyAttestation = async (
     return revocationValidationResult;
   }
 
-  const certWithExtension = validateKeyAttestationExtension(x509Chain);
+  const certWithExtension = validateKeyAttestationExtension(x509Chain, KEY_OID);
 
-  const validationExcentionResult = await validateExtension(
+  const validateExtensionResult = await validateExtension(
     certWithExtension,
     params,
   );
 
-  if (!validationExcentionResult.success) {
-    return validationExcentionResult;
+  if (!validateExtensionResult.success) {
+    return validateExtensionResult;
   }
 
   const deviceDetails = {
-    ...validationExcentionResult.deviceDetails,
+    ...validateExtensionResult.deviceDetails,
     x509Chain: x509Chain.map((x509) => x509.toString()),
   };
 
   return {
     deviceDetails,
-    hardwareKey: validationExcentionResult.hardwareKey,
-
+    hardwareKey: validateExtensionResult.hardwareKey,
     success: true,
   };
 };
 
 /**
- * 6.
- * Obtain a reference to the ASN.1 parser library that is most appropriate for your toolset.
- * Find the nearest certificate to the root that contains the key attestation certificate extension.
- *  If the provisioning information certificate extension was present, the key attestation certificate extension must be in the immediately subsequent certificate.
- *  Use the parser to extract the key attestation certificate extension data from that certificate.
- * @param x509Chain - The chain of {@link X509Certificate} certificates.
- * @throws {Error} - If no key attestation extension is found.
-
+ * Finds the nearest certificate to the root that contains the key attestation certificate extension.
+ * Parse the attestation record that is closest to the root. This prevents an adversary from
+ * attesting an attestation record of their choice with an otherwise trusted chain using the
+ * following attack:
+ * 1) having the TEE attest a key under the adversary's control,
+ * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
+ * 3) appending that certificate to the original certificate chain.
+ *
+ * If the provisioning information certificate extension was present, the key attestation certificate extension must be in the immediately subsequent certificate.
+ * Use the parser to extract the key attestation certificate extension data from that certificate.
+ * @param x509Chain - The chain of X509Certificate certificates
+ * @param keyOid - The OID of the key attestation extension
+ * @returns The certificate with the key attestation extension
+ * @throws {Error} If no key attestation extension is found
  */
-const validateKeyAttestationExtension = (
+function validateKeyAttestationExtension(
   x509Chain: readonly X509Certificate[],
-) => {
-  /**
-   * Parse the attestation record that is closest to the root. This prevents an adversary from
-   * attesting an attestation record of their choice with an otherwise trusted chain using the
-   * following attack:
-   * 1) having the TEE attest a key under the adversary's control,
-   * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
-   * 3) appending that certificate to the original certificate chain.
-   */
-  const certWithExtension = x509Chain.findLast((certificate) => {
-    const ext = extractExtension(certificate, KEY_OID);
-    return ext ?? false;
-  });
-
-  if (certWithExtension) {
-    return certWithExtension;
+  keyOid: string,
+): CertWithExtension {
+  for (let i = x509Chain.length - 1; i >= 0; i--) {
+    const extension = extractExtension(x509Chain[i], keyOid);
+    if (extension) {
+      return {
+        certificate: x509Chain[i],
+        extension,
+      };
+    }
   }
-
   throw new Error("No key attestation extension found");
-};
+}
 
+/**
+ * Extracts a specific extension from an X509 certificate by OID.
+ * @param certificate - The X509Certificate to extract the extension from
+ * @param oid - The OID of the extension to extract
+ * @returns The extension if found, undefined otherwise
+ */
 const extractExtension = (certificate: X509Certificate, oid: string) => {
   const asn1 = asn1js.fromBER(certificate.raw);
   const parsedCertificate = new pkijs.Certificate({ schema: asn1.result });
@@ -129,25 +144,19 @@ const extractExtension = (certificate: X509Certificate, oid: string) => {
 };
 
 /**
- * 7.
- * Check the extension data that you've retrieved in the previous steps for consistency and compare with the set of
- * values that you expect the hardware-backed key to contain.
- * @param extension - The 1.3.6.1.4.1.11129.2.1.17 {@link pkijs.Extension} extension.
- * @param attestationParams - The verify attestation {@link VerifyAttestationParams} params.
+ * Validates the key attestation extension data for consistency and compares with the set of
+ * values that are expected for the hardware-backed key to contain.
+ * @param certWithExtension - The certificate containing the key attestation extension
+ * @param attestationParams - The verify attestation parameters
+ * @returns A promise that resolves to the validation result
  */
 const validateExtension = async (
-  certWithExtension: X509Certificate,
+  certWithExtension: CertWithExtension,
   attestationParams: VerifyAttestationParams,
 ): Promise<AndroidAttestationValidationResult> => {
   const { bundleIdentifiers, challenge } = attestationParams;
 
-  const extension = extractExtension(certWithExtension, KEY_OID);
-  if (!extension) {
-    return {
-      reason: `Unable to extract extension from certificate: ${certWithExtension}`,
-      success: false,
-    };
-  }
+  const extension = certWithExtension.extension;
 
   const extensionBerEncoded = extension.extnValue.getValue();
 
@@ -318,7 +327,9 @@ const validateExtension = async (
     };
   }
 
-  const hardwareKey = await jose.exportJWK(certWithExtension.publicKey);
+  const hardwareKey = await jose.exportJWK(
+    certWithExtension.certificate.publicKey,
+  );
 
   return {
     deviceDetails,
