@@ -61,7 +61,7 @@ export const verifyAttestation = async (
   }
 
   // 4. Check each certificate's revocation status to ensure that none of the certificates have been revoked.
-  const revocationValidationResult = await validateRevocation(
+  const revocationValidationResult = validateRevocation(
     x509Chain,
     attestationCrl,
   );
@@ -72,24 +72,23 @@ export const verifyAttestation = async (
 
   const certWithExtension = validateKeyAttestationExtension(x509Chain, KEY_OID);
 
-  const validationExcentionResult = await validateExtension(
+  const validateExtensionResult = await validateExtension(
     certWithExtension,
     params,
   );
 
-  if (!validationExcentionResult.success) {
-    return validationExcentionResult;
+  if (!validateExtensionResult.success) {
+    return validateExtensionResult;
   }
 
   const deviceDetails = {
-    ...validationExcentionResult.deviceDetails,
+    ...validateExtensionResult.deviceDetails,
     x509Chain: x509Chain.map((x509) => x509.toString()),
   };
 
   return {
     deviceDetails,
-    hardwareKey: validationExcentionResult.hardwareKey,
-
+    hardwareKey: validateExtensionResult.hardwareKey,
     success: true,
   };
 };
