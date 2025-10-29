@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.8.1
+
+### Patch Changes
+
+- da5d5bd: Fix ext extraction from certificate
+
 ## 3.8.0
 
 ### Minor Changes
