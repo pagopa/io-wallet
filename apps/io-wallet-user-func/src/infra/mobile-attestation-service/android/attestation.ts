@@ -67,24 +67,23 @@ export const verifyAttestation = async (
 
   const certWithExtension = validateKeyAttestationExtension(x509Chain);
 
-  const validationExcentionResult = await validateExtension(
+  const validateExtensionResult = await validateExtension(
     certWithExtension,
     params,
   );
 
-  if (!validationExcentionResult.success) {
-    return validationExcentionResult;
+  if (!validateExtensionResult.success) {
+    return validateExtensionResult;
   }
 
   const deviceDetails = {
-    ...validationExcentionResult.deviceDetails,
+    ...validateExtensionResult.deviceDetails,
     x509Chain: x509Chain.map((x509) => x509.toString()),
   };
 
   return {
     deviceDetails,
-    hardwareKey: validationExcentionResult.hardwareKey,
-
+    hardwareKey: validateExtensionResult.hardwareKey,
     success: true,
   };
 };
