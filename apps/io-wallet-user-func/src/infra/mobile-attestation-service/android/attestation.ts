@@ -56,7 +56,7 @@ export const verifyAttestation = async (
   }
 
   // 4. Check each certificate's revocation status to ensure that none of the certificates have been revoked.
-  const revocationValidationResult = await validateRevocation(
+  const revocationValidationResult = validateRevocation(
     x509Chain,
     attestationCrl,
   );

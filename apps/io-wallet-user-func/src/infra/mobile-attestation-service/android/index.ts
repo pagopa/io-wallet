@@ -26,11 +26,9 @@ const DeviceDetailsWithKey = t.type({
   hardwareKey: JwkPublicKey,
 });
 
-// TODO: [SIW-944] Add Android integrity check. This is a mock
 export const validateAndroidAttestation = (
   data: Buffer,
   nonce: NonEmptyString,
-  hardwareKeyTag: NonEmptyString,
   bundleIdentifiers: string[],
   googlePublicKey: string,
   androidCrlUrls: string[],
