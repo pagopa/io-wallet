@@ -143,9 +143,6 @@ importers:
       '@pagopa/ts-commons':
         specifier: 'catalog:'
         version: 13.1.2(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
-      applicationinsights:
-        specifier: 'catalog:'
-        version: 3.12.0
       fp-ts:
         specifier: 'catalog:'
         version: 2.16.11

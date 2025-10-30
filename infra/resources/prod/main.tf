@@ -141,8 +141,7 @@ module "function_apps" {
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
 
-  user_func    = local.user_func
-  support_func = local.support_func
+  user_func = local.user_func
 
   front_door_profile_name  = module.cdn.cdn_profile_name
   front_door_endpoint_name = module.cdn.cdn_endpoint_name

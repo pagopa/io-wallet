@@ -152,11 +152,7 @@ locals {
       WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
       WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
       },
-      local.function_apps.common_app_settings,
-      {
-        for s in var.support_func.app_settings :
-        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=${s.key_vault_secret_name})" : s.value
-      }
+      local.function_apps.common_app_settings
     )
   }
 
