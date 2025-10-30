@@ -94,13 +94,4 @@ locals {
       }
     ]
   }
-
-  support_func = {
-    app_settings = [
-      {
-        name                  = "AppInsightsConnectionString"
-        key_vault_secret_name = "AppInsightsConnectionString"
-      }
-    ]
-  }
 }

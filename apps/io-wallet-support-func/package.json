@@ -17,7 +17,6 @@
     "@azure/cosmos": "catalog:",
     "@azure/functions": "catalog:",
     "@azure/identity": "catalog:",
-    "@pagopa/azure-tracing": "^0.4.8",
     "@pagopa/handler-kit": "catalog:",
     "@pagopa/handler-kit-azure-func": "catalog:",
     "@pagopa/logger": "catalog:",

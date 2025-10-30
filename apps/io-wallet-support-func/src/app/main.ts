@@ -1,7 +1,6 @@
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
-import { registerAzureFunctionHooks } from "@pagopa/azure-tracing/azure-functions";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 
@@ -10,8 +9,6 @@ import { GetCurrentWalletInstanceByFiscalCodeFunction } from "@/infra/azure/func
 import { HealthFunction } from "@/infra/azure/functions/health";
 
 import { getConfigFromEnvironment } from "./config";
-
-registerAzureFunctionHooks(app);
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
