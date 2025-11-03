@@ -7,10 +7,6 @@ import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
 import * as t from "io-ts";
 import {
-  AzureAppInsightsConfig,
-  getAzureAppInsightsConfigFromEnvironment,
-} from "io-wallet-common/infra/azure/appinsights/config";
-import {
   AzureCosmosConfig,
   getAzureCosmosConfigFromEnvironment,
 } from "io-wallet-common/infra/azure/cosmos/config";
@@ -143,7 +139,6 @@ const AzureFrontDoorConfig = t.type({
 type AzureFrontDoorConfig = t.TypeOf<typeof AzureFrontDoorConfig>;
 
 const AzureConfig = t.type({
-  appInsights: AzureAppInsightsConfig,
   cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
@@ -428,7 +423,6 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   AzureConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    appInsights: getAzureAppInsightsConfigFromEnvironment,
     cosmos: getAzureCosmosConfigFromEnvironment,
     frontDoor: getAzureFrontDoorConfigFromEnvironment,
     generic: getAzureGenericConfigFromEnvironment,

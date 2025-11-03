@@ -10,7 +10,7 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { AttestationService, validateAssertionV2 } from "@/attestation-service";
 import { NonceEnvironment } from "@/nonce";
-import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
+import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
   createWalletAttestationAsJwt,
@@ -101,13 +101,6 @@ const validateRequest: (input: {
             userId,
           ),
     ),
-  );
-
-const sendExceptionToAppInsights = (error: Error, requestBody: unknown) =>
-  sendExceptionWithBodyToAppInsights(
-    error,
-    requestBody,
-    "createWalletAttestationV2",
   );
 
 const generateWalletAttestations = ({
@@ -209,7 +202,17 @@ export const CreateWalletAttestationV2Handler = H.of((req: H.HttpRequest) =>
     RTE.chainFirst(validateRequest),
     RTE.chainW(generateWalletAttestations),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) => sendExceptionToAppInsights(error, req.body)),
+    RTE.orElseFirstW((error) =>
+      RTE.fromIO(
+        pipe(
+          error,
+          sendTelemetryExceptionWithBody({
+            body: req.body,
+            functionName: "createWalletAttestationV2",
+          }),
+        ),
+      ),
+    ),
     RTE.orElseW(logErrorAndReturnResponse),
   ),
 );

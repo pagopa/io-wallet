@@ -3,7 +3,6 @@ import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
-import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
@@ -73,10 +72,6 @@ describe("CreateWalletInstanceHandler", () => {
       } as QueueSendMessageResponse),
   } as unknown as QueueClient;
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   const whitelistedFiscalCodeRepositoryTrue: WhitelistedFiscalCodeRepository = {
     checkIfFiscalCodeIsWhitelisted: () =>
       TE.right({
@@ -103,7 +98,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -131,7 +125,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -164,7 +157,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -204,7 +196,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -243,7 +234,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -283,7 +273,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -320,7 +309,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient: queueClientMock,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -351,7 +339,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient: queueClientMock,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });
@@ -378,7 +365,6 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });

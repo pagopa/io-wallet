@@ -9,7 +9,7 @@ import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { validateAssertion } from "@/attestation-service";
-import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
+import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { createWalletAttestation } from "@/wallet-attestation";
 import { verifyWalletAttestationRequest } from "@/wallet-attestation-request";
@@ -84,10 +84,14 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
     RTE.map((wallet_attestation) => ({ wallet_attestation })),
     RTE.map(H.successJson),
     RTE.orElseFirstW((error) =>
-      sendExceptionWithBodyToAppInsights(
-        error,
-        req.body,
-        "createWalletAttestation",
+      RTE.fromIO(
+        pipe(
+          error,
+          sendTelemetryExceptionWithBody({
+            body: req.body,
+            functionName: "createWalletAttestation",
+          }),
+        ),
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),

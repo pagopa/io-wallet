@@ -6,18 +6,17 @@ import * as E from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
+import { requireWalletInstanceId } from "@/infra/http/wallet-instance";
+import { sendTelemetryException } from "@/infra/telemetry";
 import { revokeUserWalletInstances } from "@/wallet-instance";
 import {
   checkIfFiscalCodeIsWhitelisted,
   WhitelistedFiscalCodeEnvironment,
 } from "@/whitelisted-fiscal-code";
-
-import { requireWalletInstanceId } from "../wallet-instance";
 
 const SetWalletInstanceStatusBody = t.type({
   fiscal_code: FiscalCode,
@@ -79,14 +78,16 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
           ),
         ),
         RTE.orElseFirstW((error) =>
-          pipe(
-            sendTelemetryException(error, {
-              fiscalCode,
-              functionName: "setWalletInstanceStatus",
-              pathParameter: req.path,
-              payload: req.body,
-            }),
-            RTE.fromReader,
+          RTE.fromIO(
+            pipe(
+              error,
+              sendTelemetryException({
+                fiscalCode,
+                functionName: "setWalletInstanceStatus",
+                pathParameter: req.path,
+                payload: req.body,
+              }),
+            ),
           ),
         ),
       ),

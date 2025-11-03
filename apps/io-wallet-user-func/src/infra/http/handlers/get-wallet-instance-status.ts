@@ -1,18 +1,13 @@
 import * as H from "@pagopa/handler-kit";
-import * as appInsights from "applicationinsights";
 import { X509Certificate } from "crypto";
 import { sequenceS } from "fp-ts/Apply";
+import * as IO from "fp-ts/IO";
 import * as E from "fp-ts/lib/Either";
 import { flow, identity, pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
-import * as RE from "fp-ts/ReaderEither";
 import * as RT from "fp-ts/ReaderTask";
-import {
-  sendTelemetryEvent,
-  sendTelemetryException,
-} from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import {
   WalletInstance,
@@ -22,15 +17,18 @@ import {
 
 import { ValidationResult } from "@/attestation-service";
 import { CRL, validateRevocation } from "@/certificates";
+import { requireFiscalCodeFromHeader } from "@/infra/http/fiscal-code";
+import { requireWalletInstanceId } from "@/infra/http/wallet-instance";
+import {
+  sendTelemetryCustomEvent,
+  sendTelemetryException,
+} from "@/infra/telemetry";
 import {
   getWalletInstanceByUserId,
   revokeWalletInstance,
   WalletInstanceRepository,
   WalletInstanceRevocationDetails,
 } from "@/wallet-instance";
-
-import { requireFiscalCodeFromHeader } from "../fiscal-code";
-import { requireWalletInstanceId } from "../wallet-instance";
 
 const certificateRevokedByIssuerReason =
   "CERTIFICATE_REVOKED_BY_ISSUER" as const;
@@ -97,37 +95,26 @@ const checkAttestationRevocation = ({
 const sendCustomEvent: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
-) => RE.ReaderEither<
-  { telemetryClient: appInsights.TelemetryClient },
-  Error,
-  void
-> =
-  (userId, walletInstanceId) =>
-  ({ telemetryClient }) =>
-    E.tryCatch(
-      () =>
-        sendTelemetryEvent({
-          name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
-          properties: {
-            fiscalCode: userId,
-            reason: certificateRevokedByIssuerReason,
-            walletInstanceId: walletInstanceId,
-          },
-        })({ telemetryClient }),
-      E.toError,
-    );
+) => IO.IO<void> = (userId, walletInstanceId) => () =>
+  sendTelemetryCustomEvent({
+    name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
+    properties: {
+      fiscalCode: userId,
+      reason: certificateRevokedByIssuerReason,
+      walletInstanceId: walletInstanceId,
+    },
+  });
 
 const revokeWalletInstanceAndSendEvent: (
   walletInstance: WalletInstanceValid,
 ) => RT.ReaderTask<
   {
-    telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
   WalletInstanceRevocationDetails | WalletInstanceValidId
 > =
   (walletInstance) =>
-  ({ telemetryClient, walletInstanceRepository }) =>
+  ({ walletInstanceRepository }) =>
     pipe(
       {
         walletInstanceRepository,
@@ -138,16 +125,11 @@ const revokeWalletInstanceAndSendEvent: (
       }),
       TE.chainFirstW(() =>
         pipe(
-          sendCustomEvent(
-            walletInstance.userId,
-            walletInstance.id,
-          )({ telemetryClient }),
-          // fire and forget
-          E.fold(
-            () => E.right(undefined),
-            () => E.right(undefined),
+          TE.fromIO(sendCustomEvent(walletInstance.userId, walletInstance.id)),
+          TE.fold(
+            () => TE.right(undefined),
+            () => TE.right(undefined),
           ),
-          TE.fromEither,
         ),
       ),
       TE.matchW(
@@ -166,7 +148,6 @@ const revokeWalletInstanceIfCertificateRevoked: (
   {
     androidAttestationStatusListCheckFF: boolean;
     getAttestationStatusList: GetAttestationStatusList;
-    telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
   WalletInstanceRevocationDetails | WalletInstanceValidId
@@ -206,7 +187,6 @@ const androidRevocationCheckFF: (
   {
     androidAttestationStatusListCheckFF: boolean;
     getAttestationStatusList: GetAttestationStatusList;
-    telemetryClient: appInsights.TelemetryClient;
     walletInstanceRepository: WalletInstanceRepository;
   },
   Error,
@@ -244,12 +224,14 @@ export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
         RTE.map(toWalletInstanceStatusApiModel),
         RTE.map(H.successJson),
         RTE.orElseFirstW((error) =>
-          pipe(
-            sendTelemetryException(error, {
-              fiscalCode,
-              functionName: "getWalletInstanceStatus",
-            }),
-            RTE.fromReader,
+          RTE.fromIO(
+            pipe(
+              error,
+              sendTelemetryException({
+                fiscalCode,
+                functionName: "getWalletInstanceStatus",
+              }),
+            ),
           ),
         ),
       ),

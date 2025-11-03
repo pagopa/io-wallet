@@ -6,7 +6,6 @@ import { sequenceS } from "fp-ts/lib/Apply";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
 
 import {
@@ -15,9 +14,9 @@ import {
 } from "@/certificates";
 import { EntityConfigurationToJwtModel } from "@/encoders/entity-configuration";
 import { EntityConfigurationEnvironment } from "@/entity-configuration";
+import { uploadFile } from "@/infra/azure/storage/blob";
+import { sendTelemetryException } from "@/infra/telemetry";
 import { getLoAUri, LoA } from "@/wallet-provider";
-
-import { uploadFile } from "../azure/storage/blob";
 
 const addCertificateChainToJwk = (
   jwk: JwkPublicKey,
@@ -165,11 +164,13 @@ export const GenerateEntityConfigurationHandler = H.of(() =>
     RTE.chainW(uploadFile),
     RTE.chainW(purgeContent),
     RTE.orElseFirstW((error) =>
-      pipe(
-        sendTelemetryException(error, {
-          functionName: "generateEntityConfiguration",
-        }),
-        RTE.fromReader,
+      RTE.fromIO(
+        pipe(
+          error,
+          sendTelemetryException({
+            functionName: "generateEntityConfiguration",
+          }),
+        ),
       ),
     ),
   ),

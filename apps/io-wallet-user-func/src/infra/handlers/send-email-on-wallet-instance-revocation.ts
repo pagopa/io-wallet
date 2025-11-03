@@ -7,10 +7,10 @@ import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import * as t from "io-ts";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 
 import { DEFAULT_TIMEZONE, formatDate } from "@/datetime";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
+import { sendTelemetryException } from "@/infra/telemetry";
 
 export const WalletInstanceRevocationQueueItem = t.type({
   fiscalCode: FiscalCode,
@@ -57,13 +57,14 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
         ),
       ),
       RTE.orElseFirstW((error) =>
-        pipe(
-          sendTelemetryException(error, {
-            fiscalCode,
-            functionName: "sendEmailOnWalletInstanceRevocation",
-            revokedAt,
-          }),
-          RTE.fromReader,
+        RTE.fromIO(
+          pipe(
+            error,
+            sendTelemetryException({
+              fiscalCode,
+              functionName: "sendEmailOnWalletInstanceRevocation",
+            }),
+          ),
         ),
       ),
     ),

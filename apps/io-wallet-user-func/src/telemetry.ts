@@ -1,9 +1,10 @@
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
+import * as IO from "fp-ts/IO";
 import * as E from "fp-ts/lib/Either";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as t from "io-ts";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
+
+import { sendTelemetryException } from "@/infra/telemetry";
 
 const getFiscalCode: (input: unknown) => FiscalCode | undefined = (input) =>
   pipe(
@@ -16,17 +17,14 @@ const getFiscalCode: (input: unknown) => FiscalCode | undefined = (input) =>
 
 // it sends an exception to the Application Insights logs along with the request body
 // if the fiscal_code is present in the body, it is sent separately for better query on logs
-export const sendExceptionWithBodyToAppInsights = (
-  error: Error,
-  body: unknown,
-  functionName: string,
-) =>
-  pipe(
-    body,
-    getFiscalCode,
-    (fiscalCode) =>
+export const sendTelemetryExceptionWithBody: (input: {
+  body: unknown;
+  functionName: string;
+}) => (error: Error) => IO.IO<void> =
+  ({ body, functionName }) =>
+  (error) =>
+    pipe(body, getFiscalCode, (fiscalCode) =>
       fiscalCode
-        ? sendTelemetryException(error, { body, fiscalCode, functionName })
-        : sendTelemetryException(error, { body, functionName }),
-    RTE.fromReader,
-  );
+        ? sendTelemetryException({ body, fiscalCode, functionName })(error)
+        : sendTelemetryException({ body, functionName })(error),
+    );

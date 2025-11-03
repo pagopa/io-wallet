@@ -15,7 +15,7 @@ import {
   ValidatedAttestation,
 } from "@/attestation-service";
 import { enqueue } from "@/infra/azure/storage/queue";
-import { sendExceptionWithBodyToAppInsights } from "@/telemetry";
+import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
   insertWalletInstance,
@@ -109,10 +109,14 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     ),
     RTE.map(() => H.empty),
     RTE.orElseFirstW((error) =>
-      sendExceptionWithBodyToAppInsights(
-        error,
-        req.body,
-        "createWalletInstance",
+      RTE.fromIO(
+        pipe(
+          error,
+          sendTelemetryExceptionWithBody({
+            body: req.body,
+            functionName: "createWalletInstance",
+          }),
+        ),
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),
