@@ -7,6 +7,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as RT from "fp-ts/ReaderTask";
+import { EntityNotFoundError } from "io-wallet-common/error";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import {
   WalletInstance,
@@ -224,14 +225,16 @@ export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
         RTE.map(toWalletInstanceStatusApiModel),
         RTE.map(H.successJson),
         RTE.orElseFirstW((error) =>
-          pipe(
-            error,
-            sendTelemetryException({
-              fiscalCode,
-              functionName: "getWalletInstanceStatus",
-            }),
-            RTE.fromEither,
-          ),
+          error instanceof EntityNotFoundError
+            ? RTE.of(void 0)
+            : pipe(
+                error,
+                sendTelemetryException({
+                  fiscalCode,
+                  functionName: "getWalletInstanceStatus",
+                }),
+                RTE.fromEither,
+              ),
         ),
       ),
     ),
