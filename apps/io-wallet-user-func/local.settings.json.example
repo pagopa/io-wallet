@@ -58,6 +58,8 @@
     "AzureSubscriptionId": "AZURE_SUBSCRIPTION_ID",
     "AzureResourceGroupName": "AZURE_RESOURCE_GROUP_NAME",
     "FrontDoorProfileName": "FRONT_DOOR_PROFILE_NAME",
-    "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME"
+    "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "NODE_OPTIONS": "--import @pagopa/azure-tracing"
   }
 }
