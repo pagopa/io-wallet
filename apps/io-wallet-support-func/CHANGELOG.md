@@ -1,5 +1,13 @@
 # io-wallet-support-func
 
+## 1.5.4
+
+### Patch Changes
+
+- 794e6c1: Removed Application Insights dependency
+- Updated dependencies [794e6c1]
+  - io-wallet-common@1.5.1
+
 ## 1.5.3
 
 ### Patch Changes

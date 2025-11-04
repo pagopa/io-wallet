@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.5.1
+
+### Patch Changes
+
+- 794e6c1: Removed Application Insights dependency
+
 ## 1.5.0
 
 ### Minor Changes
