@@ -57,14 +57,13 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
         ),
       ),
       RTE.orElseFirstW((error) =>
-        RTE.fromIO(
-          pipe(
-            error,
-            sendTelemetryException({
-              fiscalCode,
-              functionName: "sendEmailOnWalletInstanceRevocation",
-            }),
-          ),
+        pipe(
+          error,
+          sendTelemetryException({
+            fiscalCode,
+            functionName: "sendEmailOnWalletInstanceRevocation",
+          }),
+          RTE.fromEither,
         ),
       ),
     ),

@@ -44,14 +44,13 @@ export const SendEmailOnWalletInstanceCreationHandler = H.of(
         }),
       ),
       RTE.orElseFirstW((error) =>
-        RTE.fromIO(
-          pipe(
-            error,
-            sendTelemetryException({
-              fiscalCode,
-              functionName: "sendEmailOnWalletInstanceCreation",
-            }),
-          ),
+        pipe(
+          error,
+          sendTelemetryException({
+            fiscalCode,
+            functionName: "sendEmailOnWalletInstanceCreation",
+          }),
+          RTE.fromEither,
         ),
       ),
     ),

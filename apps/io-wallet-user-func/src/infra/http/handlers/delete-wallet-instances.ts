@@ -22,14 +22,13 @@ export const DeleteWalletInstancesHandler = H.of((req: H.HttpRequest) =>
         RTE.chainW(() => revokeAllCredentials(fiscalCode)),
         RTE.map(() => H.empty),
         RTE.orElseFirstW((error) =>
-          RTE.fromIO(
-            pipe(
-              error,
-              sendTelemetryException({
-                fiscalCode,
-                functionName: "deleteWalletInstances",
-              }),
-            ),
+          pipe(
+            error,
+            sendTelemetryException({
+              fiscalCode,
+              functionName: "deleteWalletInstances",
+            }),
+            RTE.fromEither,
           ),
         ),
       ),

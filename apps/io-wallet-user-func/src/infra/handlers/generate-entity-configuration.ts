@@ -164,13 +164,12 @@ export const GenerateEntityConfigurationHandler = H.of(() =>
     RTE.chainW(uploadFile),
     RTE.chainW(purgeContent),
     RTE.orElseFirstW((error) =>
-      RTE.fromIO(
-        pipe(
-          error,
-          sendTelemetryException({
-            functionName: "generateEntityConfiguration",
-          }),
-        ),
+      pipe(
+        error,
+        sendTelemetryException({
+          functionName: "generateEntityConfiguration",
+        }),
+        RTE.fromEither,
       ),
     ),
   ),

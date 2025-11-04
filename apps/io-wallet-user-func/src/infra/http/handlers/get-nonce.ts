@@ -14,8 +14,10 @@ export const GetNonceHandler = H.of(() =>
     RTE.map((nonce) => ({ nonce })),
     RTE.map(H.successJson),
     RTE.orElseFirstW((error) =>
-      RTE.fromIO(
-        pipe(error, sendTelemetryException({ functionName: "getNonce" })),
+      pipe(
+        error,
+        sendTelemetryException({ functionName: "getNonce" }),
+        RTE.fromEither,
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),

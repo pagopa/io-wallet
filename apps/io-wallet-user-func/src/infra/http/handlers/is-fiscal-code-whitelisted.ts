@@ -23,14 +23,13 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
         })),
         RTE.map(H.successJson),
         RTE.orElseFirstW((error) =>
-          RTE.fromIO(
-            pipe(
-              error,
-              sendTelemetryException({
-                functionName: "isFiscalCodeWhitelisted",
-                fiscalCode,
-              }),
-            ),
+          pipe(
+            error,
+            sendTelemetryException({
+              fiscalCode,
+              functionName: "isFiscalCodeWhitelisted",
+            }),
+            RTE.fromEither,
           ),
         ),
       ),

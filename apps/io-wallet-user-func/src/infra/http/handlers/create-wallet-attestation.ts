@@ -84,14 +84,13 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
     RTE.map((wallet_attestation) => ({ wallet_attestation })),
     RTE.map(H.successJson),
     RTE.orElseFirstW((error) =>
-      RTE.fromIO(
-        pipe(
-          error,
-          sendTelemetryExceptionWithBody({
-            body: req.body,
-            functionName: "createWalletAttestation",
-          }),
-        ),
+      pipe(
+        error,
+        sendTelemetryExceptionWithBody({
+          body: req.body,
+          functionName: "createWalletAttestation",
+        }),
+        RTE.fromEither,
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),

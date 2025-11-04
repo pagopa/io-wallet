@@ -1,6 +1,5 @@
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
-import * as IO from "fp-ts/IO";
 import * as E from "fp-ts/lib/Either";
 import * as t from "io-ts";
 
@@ -20,7 +19,7 @@ const getFiscalCode: (input: unknown) => FiscalCode | undefined = (input) =>
 export const sendTelemetryExceptionWithBody: (input: {
   body: unknown;
   functionName: string;
-}) => (error: Error) => IO.IO<void> =
+}) => (error: Error) => E.Either<Error, void> =
   ({ body, functionName }) =>
   (error) =>
     pipe(body, getFiscalCode, (fiscalCode) =>

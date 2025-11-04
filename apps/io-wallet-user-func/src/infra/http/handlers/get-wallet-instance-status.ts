@@ -1,7 +1,6 @@
 import * as H from "@pagopa/handler-kit";
 import { X509Certificate } from "crypto";
 import { sequenceS } from "fp-ts/Apply";
-import * as IO from "fp-ts/IO";
 import * as E from "fp-ts/lib/Either";
 import { flow, identity, pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
@@ -95,7 +94,7 @@ const checkAttestationRevocation = ({
 const sendCustomEvent: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
-) => IO.IO<void> = (userId, walletInstanceId) => () =>
+) => E.Either<Error, void> = (userId, walletInstanceId) =>
   sendTelemetryCustomEvent({
     name: "REVOKED_WALLET_INSTANCE_FOR_REVOKED_OR_INVALID_CERTIFICATE",
     properties: {
@@ -125,7 +124,8 @@ const revokeWalletInstanceAndSendEvent: (
       }),
       TE.chainFirstW(() =>
         pipe(
-          TE.fromIO(sendCustomEvent(walletInstance.userId, walletInstance.id)),
+          sendCustomEvent(walletInstance.userId, walletInstance.id),
+          TE.fromEither,
           TE.fold(
             () => TE.right(undefined),
             () => TE.right(undefined),
@@ -224,14 +224,13 @@ export const GetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
         RTE.map(toWalletInstanceStatusApiModel),
         RTE.map(H.successJson),
         RTE.orElseFirstW((error) =>
-          RTE.fromIO(
-            pipe(
-              error,
-              sendTelemetryException({
-                fiscalCode,
-                functionName: "getWalletInstanceStatus",
-              }),
-            ),
+          pipe(
+            error,
+            sendTelemetryException({
+              fiscalCode,
+              functionName: "getWalletInstanceStatus",
+            }),
+            RTE.fromEither,
           ),
         ),
       ),

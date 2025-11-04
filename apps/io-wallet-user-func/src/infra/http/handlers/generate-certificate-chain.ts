@@ -175,13 +175,12 @@ export const GenerateCertificateChainHandler = H.of(
     ),
     RTE.map(H.successJson),
     RTE.orElseFirstW((error) =>
-      RTE.fromIO(
-        pipe(
-          error,
-          sendTelemetryException({
-            functionName: "generateCertificateChain",
-          }),
-        ),
+      pipe(
+        error,
+        sendTelemetryException({
+          functionName: "generateCertificateChain",
+        }),
+        RTE.fromEither,
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),

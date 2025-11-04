@@ -78,16 +78,15 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
           ),
         ),
         RTE.orElseFirstW((error) =>
-          RTE.fromIO(
-            pipe(
-              error,
-              sendTelemetryException({
-                fiscalCode,
-                functionName: "setWalletInstanceStatus",
-                pathParameter: req.path,
-                payload: req.body,
-              }),
-            ),
+          pipe(
+            error,
+            sendTelemetryException({
+              fiscalCode,
+              functionName: "setWalletInstanceStatus",
+              pathParameter: req.path,
+              payload: req.body,
+            }),
+            RTE.fromEither,
           ),
         ),
       ),

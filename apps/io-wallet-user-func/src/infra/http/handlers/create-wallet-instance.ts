@@ -109,14 +109,13 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     ),
     RTE.map(() => H.empty),
     RTE.orElseFirstW((error) =>
-      RTE.fromIO(
-        pipe(
-          error,
-          sendTelemetryExceptionWithBody({
-            body: req.body,
-            functionName: "createWalletInstance",
-          }),
-        ),
+      pipe(
+        error,
+        sendTelemetryExceptionWithBody({
+          body: req.body,
+          functionName: "createWalletInstance",
+        }),
+        RTE.fromEither,
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),
