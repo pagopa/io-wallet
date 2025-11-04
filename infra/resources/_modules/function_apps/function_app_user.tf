@@ -53,8 +53,8 @@ module "function_app_user_autoscaler_02" {
   scheduler = {
     maximum = 30
     normal_load = {
-      default = 5
-      minimum = 3
+      default = 15
+      minimum = 10
     }
   }
 
