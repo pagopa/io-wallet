@@ -126,11 +126,12 @@ const revokeWalletInstanceAndSendEvent: (
       TE.chainFirstW(() =>
         pipe(
           sendCustomEvent(walletInstance.userId, walletInstance.id),
-          TE.fromEither,
-          TE.fold(
-            () => TE.right(undefined),
-            () => TE.right(undefined),
+          // fire and forget
+          E.fold(
+            () => E.right(undefined),
+            () => E.right(undefined),
           ),
+          TE.fromEither,
         ),
       ),
       TE.matchW(
