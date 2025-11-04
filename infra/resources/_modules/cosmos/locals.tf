@@ -47,7 +47,7 @@ locals {
       name               = "whitelisted-fiscal-codes"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 8000
+        max_throughput = 12000
       }
       default_ttl = null
     },
