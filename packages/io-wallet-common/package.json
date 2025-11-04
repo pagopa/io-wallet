@@ -27,7 +27,6 @@
     "@pagopa/handler-kit": "catalog:",
     "@pagopa/logger": "catalog:",
     "@pagopa/ts-commons": "catalog:",
-    "applicationinsights": "catalog:",
     "fp-ts": "catalog:",
     "io-ts": "catalog:"
   },
