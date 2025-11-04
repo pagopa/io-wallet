@@ -21,14 +21,17 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
           whitelisted,
           ...(whitelisted ? { whitelistedAt } : {}),
         })),
-      ),
-    ),
-    RTE.map(H.successJson),
-    RTE.orElseFirstW((error) =>
-      RTE.fromIO(
-        pipe(
-          error,
-          sendTelemetryException({ functionName: "isFiscalCodeWhitelisted" }),
+        RTE.map(H.successJson),
+        RTE.orElseFirstW((error) =>
+          RTE.fromIO(
+            pipe(
+              error,
+              sendTelemetryException({
+                functionName: "isFiscalCodeWhitelisted",
+                fiscalCode,
+              }),
+            ),
+          ),
         ),
       ),
     ),
