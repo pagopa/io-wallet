@@ -1,6 +1,5 @@
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import * as appInsights from "applicationinsights";
 import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
@@ -23,10 +22,6 @@ vi.mock("@/nonce", async (importOriginal) => {
   };
 });
 
-const telemetryClient: appInsights.TelemetryClient = {
-  trackException: () => void 0,
-} as unknown as appInsights.TelemetryClient;
-
 describe("GetNonceHandler", () => {
   const logger = {
     format: L.format.simple,
@@ -43,7 +38,6 @@ describe("GetNonceHandler", () => {
     inputDecoder: H.HttpRequest,
     logger,
     nonceRepository,
-    telemetryClient,
   });
 
   it("should return a 200 HTTP response on success", async () => {
@@ -85,7 +79,6 @@ describe("GetNonceHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnInsert,
-      telemetryClient,
     });
 
     await expect(handler()).resolves.toEqual({

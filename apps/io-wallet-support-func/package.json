@@ -21,7 +21,6 @@
     "@pagopa/handler-kit-azure-func": "catalog:",
     "@pagopa/logger": "catalog:",
     "@pagopa/ts-commons": "catalog:",
-    "applicationinsights": "catalog:",
     "fp-ts": "catalog:",
     "io-ts": "catalog:",
     "io-wallet-common": "workspace:^"

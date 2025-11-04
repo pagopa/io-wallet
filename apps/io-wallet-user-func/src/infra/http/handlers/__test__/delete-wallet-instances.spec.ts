@@ -1,7 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { describe, expect, it } from "vitest";
@@ -39,17 +38,12 @@ describe("DeleteWalletInstancesHandler", () => {
     revokeAllCredentials: () => TE.right(undefined),
   };
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   it("should return a 204 HTTP response on success", async () => {
     const handler = DeleteWalletInstancesHandler({
       credentialRepository: pidIssuerClient,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -75,7 +69,6 @@ describe("DeleteWalletInstancesHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -104,7 +97,6 @@ describe("DeleteWalletInstancesHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -137,7 +129,6 @@ describe("DeleteWalletInstancesHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
@@ -162,7 +153,6 @@ describe("DeleteWalletInstancesHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -194,7 +184,6 @@ describe("DeleteWalletInstancesHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnDelete,
     });
 
@@ -218,7 +207,6 @@ describe("DeleteWalletInstancesHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 

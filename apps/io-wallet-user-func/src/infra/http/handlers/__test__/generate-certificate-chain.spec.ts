@@ -1,7 +1,6 @@
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { Crypto } from "@peculiar/webcrypto";
-import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
@@ -35,10 +34,6 @@ describe("GenerateCertificateChainHandler", () => {
     },
   ];
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   const certificateRepository: CertificateRepository = {
     getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
     insertCertificateChain: () => TE.right(undefined),
@@ -70,7 +65,6 @@ describe("GenerateCertificateChainHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -111,7 +105,6 @@ describe("GenerateCertificateChainHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
     });
 
     await expect(handler()).resolves.toEqual({

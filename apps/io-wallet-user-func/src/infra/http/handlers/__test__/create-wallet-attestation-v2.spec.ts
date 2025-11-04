@@ -9,7 +9,6 @@ import {
   NonEmptyString,
 } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
-import * as appInsights from "applicationinsights";
 import * as assert from "assert";
 import * as cbor from "cbor2";
 import { decode } from "cbor-x";
@@ -247,10 +246,6 @@ const certificateRepository: CertificateRepository = {
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
-const telemetryClient: appInsights.TelemetryClient = {
-  trackException: () => void 0,
-} as unknown as appInsights.TelemetryClient;
-
 function isStringArray(u: unknown): u is string[] {
   return Array.isArray(u) && u.every((item) => typeof item === "string");
 }
@@ -298,7 +293,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -332,7 +326,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -387,7 +380,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -459,7 +451,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -579,7 +570,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -610,7 +600,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -643,7 +632,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository,
     });
@@ -692,7 +680,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
@@ -736,7 +723,6 @@ describe("CreateWalletAttestationV2Handler", async () => {
       logger,
       nonceRepository,
       signer,
-      telemetryClient,
       walletAttestationConfig,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });

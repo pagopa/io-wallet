@@ -2,7 +2,6 @@
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
 
@@ -52,10 +51,6 @@ describe("SetWalletInstanceStatusHandler", () => {
     revokeAllCredentials: () => TE.right(undefined),
   };
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   const whitelistedFiscalCodeRepositoryTrue: WhitelistedFiscalCodeRepository = {
     checkIfFiscalCodeIsWhitelisted: () =>
       TE.right({
@@ -76,7 +71,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -107,7 +101,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -134,7 +127,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       queueClient,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -168,7 +160,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       queueClient,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -199,7 +190,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       queueClient: queueClientMock,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryFalse,
     });
@@ -224,7 +214,6 @@ describe("SetWalletInstanceStatusHandler", () => {
       inputDecoder: H.HttpRequest,
       logger,
       queueClient: queueClientMock,
-      telemetryClient,
       walletInstanceRepository,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryTrue,
     });

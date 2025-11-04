@@ -11,7 +11,6 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { Jwk, JwkPrivateKey, JwkPublicKey } from "io-wallet-common/jwk";
 
@@ -21,6 +20,7 @@ import {
   insertCertificateChain,
 } from "@/certificates";
 import { pemCertificateToBase64 } from "@/infra/crypto/certificate";
+import { sendTelemetryException } from "@/infra/telemetry";
 
 interface CertificateEnvironment {
   certificate: { crypto: Crypto; issuer: string; subject: string };
@@ -174,12 +174,12 @@ export const GenerateCertificateChainHandler = H.of(
       }),
     ),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) =>
-      pipe(
-        sendTelemetryException(error, {
+    RTE.orElseFirstW(
+      flow(
+        sendTelemetryException({
           functionName: "generateCertificateChain",
         }),
-        RTE.fromReader,
+        RTE.fromEither,
       ),
     ),
     RTE.orElseW(logErrorAndReturnResponse),

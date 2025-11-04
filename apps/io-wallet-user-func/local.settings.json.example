@@ -41,7 +41,6 @@
     "PidIssuerApiRequestTimeout": "PID_ISSUER_API_REQUEST_TIMEOUT",
     "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
     "SkipSignatureValidation": "SKIP_SIGNATURE_VALIDATION",
-    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "HardwarePublicTestKey": "HARDWARE_PUBLIC_TEST_PEM_BASE64_ENCODED",
     "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK",
     "MailupUsername": "MAILUP_USERNAME",
@@ -58,6 +57,8 @@
     "AzureSubscriptionId": "AZURE_SUBSCRIPTION_ID",
     "AzureResourceGroupName": "AZURE_RESOURCE_GROUP_NAME",
     "FrontDoorProfileName": "FRONT_DOOR_PROFILE_NAME",
-    "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME"
+    "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "NODE_OPTIONS": "--import @pagopa/azure-tracing"
   }
 }

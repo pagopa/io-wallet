@@ -5,7 +5,6 @@
     "CosmosDbEndpoint__accountEndpoint": "COSMOS_DB_ENDPOINT",
     "CosmosDbDatabaseName": "COSMOS_DB_DATABASE_NAME",
     "CosmosDbRequestTimeout": "COSMOS_DB_REQUEST_TIMEOUT",
-    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT",
-    "AppInsightsConnectionString": "APPLICATIONINSIGHTS_CONNECTION_STRING"
+    "HttpRequestTimeout": "HTTP_REQUEST_TIMEOUT"
   }
 }

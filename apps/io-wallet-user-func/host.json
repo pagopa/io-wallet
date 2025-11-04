@@ -19,6 +19,14 @@
       "default": "Warning",
       "Host.Aggregator": "Information",
       "Host.Results": "Information"
+    },
+    "applicationInsights": {
+      "samplingSettings": {
+        "minSamplingPercentage": 5,
+        "maxSamplingPercentage": 5,
+        "initialSamplingPercentage": 5,
+        "excludedTypes": "Exception;CustomEvent"
+      }
     }
   }
 }

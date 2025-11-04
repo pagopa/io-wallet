@@ -50,6 +50,8 @@ locals {
     AzureResourceGroupName = var.resource_group_name
     AzureSubscriptionId    = var.subscription_id
 
+    NODE_OPTIONS = "--import @pagopa/azure-tracing"
+
     WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
     WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
     },
@@ -125,13 +127,13 @@ locals {
         s.name => "foo"
       },
       {
-        FederationEntitySigningKeys  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=FederationEntitySigningKeysPre)"
-        WalletProviderSigningKeys    = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletProviderSigningKeysPre)"
-        PidIssuerApiClientPrivateKey = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
-        GoogleAppCredentialsEncoded  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
-        AppInsightsConnectionString  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AppInsightsConnectionString)"
-        AllowedDeveloperUsers        = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AllowedDeveloperUsers)"
-        StorageConnectionString      = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=StorageUatConnectionString)"
+        FederationEntitySigningKeys           = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=FederationEntitySigningKeysPre)"
+        WalletProviderSigningKeys             = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletProviderSigningKeysPre)"
+        PidIssuerApiClientPrivateKey          = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
+        GoogleAppCredentialsEncoded           = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
+        APPLICATIONINSIGHTS_CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AppInsightsConnectionString)"
+        AllowedDeveloperUsers                 = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AllowedDeveloperUsers)"
+        StorageConnectionString               = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=StorageUatConnectionString)"
       }
     )
   }
@@ -152,11 +154,7 @@ locals {
       WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
       WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
       },
-      local.function_apps.common_app_settings,
-      {
-        for s in var.support_func.app_settings :
-        s.name => s.key_vault_secret_name != null ? "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=${s.key_vault_secret_name})" : s.value
-      }
+      local.function_apps.common_app_settings
     )
   }
 

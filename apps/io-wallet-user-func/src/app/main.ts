@@ -1,18 +1,17 @@
-/* eslint-disable perfectionist/sort-imports */
-import ai from "@/infra/azure/appinsights/start";
-
+import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
+import { registerAzureFunctionHooks } from "@pagopa/azure-tracing/azure-functions";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
-import withAppInsights from "@/infra/azure/appinsights/wrapper-handler";
+import { getCrlFromUrls } from "@/certificates";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
@@ -38,9 +37,9 @@ import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-o
 import { MobileAttestationService } from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 
-import { CdnManagementClient } from "@azure/arm-cdn";
 import { getConfigFromEnvironment } from "./config";
-import { getCrlFromUrls } from "@/certificates";
+
+registerAzureFunctionHooks(app);
 
 const configOrError = pipe(
   getConfigFromEnvironment(process.env),
@@ -103,8 +102,6 @@ const pidIssuerClient = new PidIssuerClient(
   config.entityConfiguration.federationEntity.basePath.href,
 );
 
-const appInsightsClient = ai.defaultClient;
-
 const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
@@ -129,61 +126,50 @@ const certificateIssuerAndSubject = `C=${config.walletProvider.certificate.count
 
 app.http("healthCheck", {
   authLevel: "anonymous",
-  handler: withAppInsights(
-    HealthFunction({
-      cosmosClient,
-      pidIssuerClient,
-    }),
-  ),
+  handler: HealthFunction({
+    cosmosClient,
+    pidIssuerClient,
+  }),
   methods: ["GET"],
   route: "health",
 });
 
 app.http("createWalletAttestation", {
   authLevel: "function",
-  handler: withAppInsights(
-    CreateWalletAttestationFunction({
-      attestationService: mobileAttestationService,
-      certificateRepository,
-      entityConfiguration: {
-        ...config.entityConfiguration,
-        authorityHints: [config.entityConfiguration.trustAnchorUrl],
-      },
-      entityConfigurationSigner,
-      nonceRepository,
-      telemetryClient: appInsightsClient,
-      walletAttestationSigner,
-      walletInstanceRepository,
-    }),
-  ),
+  handler: CreateWalletAttestationFunction({
+    attestationService: mobileAttestationService,
+    certificateRepository,
+    entityConfiguration: {
+      ...config.entityConfiguration,
+      authorityHints: [config.entityConfiguration.trustAnchorUrl],
+    },
+    entityConfigurationSigner,
+    nonceRepository,
+    walletAttestationSigner,
+    walletInstanceRepository,
+  }),
   methods: ["POST"],
   route: "token",
 });
 
 app.http("createWalletInstance", {
   authLevel: "function",
-  handler: withAppInsights(
-    CreateWalletInstanceFunction({
-      attestationService: mobileAttestationService,
-      nonceRepository,
-      queueClient: walletInstanceCreationEmailQueueClient,
-      telemetryClient: appInsightsClient,
-      walletInstanceRepository,
-      whitelistedFiscalCodeRepository,
-    }),
-  ),
+  handler: CreateWalletInstanceFunction({
+    attestationService: mobileAttestationService,
+    nonceRepository,
+    queueClient: walletInstanceCreationEmailQueueClient,
+    walletInstanceRepository,
+    whitelistedFiscalCodeRepository,
+  }),
   methods: ["POST"],
   route: "wallet-instances",
 });
 
 app.http("getNonce", {
   authLevel: "function",
-  handler: withAppInsights(
-    GetNonceFunction({
-      nonceRepository,
-      telemetryClient: appInsightsClient,
-    }),
-  ),
+  handler: GetNonceFunction({
+    nonceRepository,
+  }),
   methods: ["GET"],
   route: "nonce",
 });
@@ -202,7 +188,6 @@ app.timer("generateEntityConfiguration", {
     inputDecoder: t.unknown,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
-    telemetryClient: appInsightsClient,
     walletAttestationSigner,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
@@ -210,45 +195,37 @@ app.timer("generateEntityConfiguration", {
 
 app.http("getWalletInstanceStatus", {
   authLevel: "function",
-  handler: withAppInsights(
-    GetWalletInstanceStatusFunction({
-      androidAttestationStatusListCheckFF:
-        config.attestationService.androidAttestationStatusListCheckFF,
-      getAttestationStatusList: () =>
-        getCrlFromUrls(
-          config.attestationService.androidCrlUrls,
-          config.attestationService.httpRequestTimeout,
-        ),
-      telemetryClient: appInsightsClient,
-      walletInstanceRepository,
-    }),
-  ),
+  handler: GetWalletInstanceStatusFunction({
+    androidAttestationStatusListCheckFF:
+      config.attestationService.androidAttestationStatusListCheckFF,
+    getAttestationStatusList: () =>
+      getCrlFromUrls(
+        config.attestationService.androidCrlUrls,
+        config.attestationService.httpRequestTimeout,
+      ),
+    walletInstanceRepository,
+  }),
   methods: ["GET"],
   route: "wallet-instances/{id}/status",
 });
 
 app.http("getCurrentWalletInstanceStatus", {
   authLevel: "function",
-  handler: withAppInsights(
-    GetCurrentWalletInstanceStatusFunction({
-      walletInstanceRepository,
-    }),
-  ),
+  handler: GetCurrentWalletInstanceStatusFunction({
+    walletInstanceRepository,
+  }),
   methods: ["GET"],
   route: "wallet-instances/current/status",
 });
 
 app.http("setWalletInstanceStatus", {
   authLevel: "function",
-  handler: withAppInsights(
-    SetWalletInstanceStatusFunction({
-      credentialRepository: pidIssuerClient,
-      queueClient: walletInstanceRevocationEmailQueueClient,
-      telemetryClient: appInsightsClient,
-      walletInstanceRepository,
-      whitelistedFiscalCodeRepository,
-    }),
-  ),
+  handler: SetWalletInstanceStatusFunction({
+    credentialRepository: pidIssuerClient,
+    queueClient: walletInstanceRevocationEmailQueueClient,
+    walletInstanceRepository,
+    whitelistedFiscalCodeRepository,
+  }),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
 });
@@ -258,7 +235,6 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
     inputDecoder: FiscalCode,
-    telemetryClient: appInsightsClient,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
 });
@@ -268,7 +244,6 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
   handler: SendEmailOnWalletInstanceRevocationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceRevocationQueueItem,
-    telemetryClient: appInsightsClient,
   }),
   queueName:
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
@@ -276,13 +251,10 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
 
 app.http("deleteWalletInstances", {
   authLevel: "function",
-  handler: withAppInsights(
-    DeleteWalletInstancesFunction({
-      credentialRepository: pidIssuerClient,
-      telemetryClient: appInsightsClient,
-      walletInstanceRepository,
-    }),
-  ),
+  handler: DeleteWalletInstancesFunction({
+    credentialRepository: pidIssuerClient,
+    walletInstanceRepository,
+  }),
   methods: ["DELETE"],
   route: "wallet-instances",
 });
@@ -309,52 +281,43 @@ app.http("deleteWalletInstances", {
 // this will replace the token endpoint
 app.http("createWalletAttestationV2", {
   authLevel: "function",
-  handler: withAppInsights(
-    CreateWalletAttestationV2Function({
-      attestationService: mobileAttestationService,
-      certificateRepository,
-      federationEntity: config.entityConfiguration.federationEntity,
-      nonceRepository,
-      signer: walletAttestationSigner,
-      telemetryClient: appInsightsClient,
-      walletAttestationConfig: {
-        ...config.walletProvider.walletAttestation,
-        trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
-      },
-      walletInstanceRepository,
-    }),
-  ),
+  handler: CreateWalletAttestationV2Function({
+    attestationService: mobileAttestationService,
+    certificateRepository,
+    federationEntity: config.entityConfiguration.federationEntity,
+    nonceRepository,
+    signer: walletAttestationSigner,
+    walletAttestationConfig: {
+      ...config.walletProvider.walletAttestation,
+      trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
+    },
+    walletInstanceRepository,
+  }),
   methods: ["POST"],
   route: "wallet-attestations",
 });
 
 app.http("isFiscalCodeWhitelisted", {
   authLevel: "function",
-  handler: withAppInsights(
-    IsFiscalCodeWhitelistedFunction({
-      telemetryClient: appInsightsClient,
-      whitelistedFiscalCodeRepository,
-    }),
-  ),
+  handler: IsFiscalCodeWhitelistedFunction({
+    whitelistedFiscalCodeRepository,
+  }),
   methods: ["GET"],
   route: "whitelisted-fiscal-code/{fiscalCode}",
 });
 
 app.http("generateCertificateChain", {
   authLevel: "function",
-  handler: withAppInsights(
-    GenerateCertificateChainFunction({
-      certificate: {
-        crypto: new Crypto(),
-        issuer: certificateIssuerAndSubject,
-        subject: certificateIssuerAndSubject,
-      },
-      certificateRepository,
-      federationEntitySigningKeys:
-        config.entityConfiguration.federationEntity.jwtSigningConfig.jwks,
-      telemetryClient: appInsightsClient,
-    }),
-  ),
+  handler: GenerateCertificateChainFunction({
+    certificate: {
+      crypto: new Crypto(),
+      issuer: certificateIssuerAndSubject,
+      subject: certificateIssuerAndSubject,
+    },
+    certificateRepository,
+    federationEntitySigningKeys:
+      config.entityConfiguration.federationEntity.jwtSigningConfig.jwks,
+  }),
   methods: ["POST"],
   route: "certificate-chain",
 });

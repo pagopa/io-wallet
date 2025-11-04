@@ -1,6 +1,5 @@
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import * as appInsights from "applicationinsights";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it } from "vitest";
 
@@ -28,10 +27,6 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       checkIfFiscalCodeIsWhitelisted: () => TE.left(new Error("generic error")),
     };
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   const logger = {
     format: L.format.simple,
     log: () => () => void 0,
@@ -58,7 +53,6 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       whitelistedFiscalCodeRepository:
         whitelistedFiscalCodeRepositoryThatReturnsWhitelistedFiscalCode,
     });
@@ -84,7 +78,6 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       whitelistedFiscalCodeRepository:
         whitelistedFiscalCodeRepositoryThatReturnsNonWhitelistedFiscalCode,
     });
@@ -109,7 +102,6 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       input: reqWithInvalidFiscalCode,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryThatFails,
     });
 
@@ -136,7 +128,6 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       whitelistedFiscalCodeRepository: whitelistedFiscalCodeRepositoryThatFails,
     });
 

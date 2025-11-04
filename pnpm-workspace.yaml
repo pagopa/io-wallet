@@ -2,8 +2,23 @@ packages:
   - apps/*
   - packages/*
 
+catalog:
+  "@azure/cosmos": ^4.5.1
+  "@azure/functions": ^4.8.0
+  "@azure/identity": ^4.12.0
+  "@azure/storage-blob": 12.28.0
+  "@azure/storage-queue": 12.27.0
+  "@pagopa/handler-kit": ^1.1.0
+  "@pagopa/handler-kit-azure-func": ^2.0.7
+  "@pagopa/logger": ^1.0.1
+  "@pagopa/ts-commons": ^13.1.2
+  fp-ts: ^2.16.11
+  io-ts: ^2.2.22
+
 configDependencies:
   pnpm-plugin-pagopa: 1.0.0+sha512-fWP4sdK5yH3OXi1oZeMEcMzBtjINfXx6woFOuzWtdlvuF7Co3vFJ3UIFLrOAolbYrXi4b3r2pIMESJt7vilizA==
+
+injectWorkspacePackages: true
 
 onlyBuiltDependencies:
   - azure-functions-core-tools
@@ -11,23 +26,7 @@ onlyBuiltDependencies:
   - esbuild
   - protobufjs
 
-injectWorkspacePackages: true
-
-catalog:
-  "@azure/cosmos": ^4.5.1
-  "@azure/functions": ^4.8.0
-  "@azure/storage-blob": 12.28.0
-  "@azure/storage-queue": 12.27.0
-  "@azure/identity": ^4.12.0
-  "@pagopa/handler-kit": ^1.1.0
-  "@pagopa/handler-kit-azure-func": ^2.0.7
-  "@pagopa/logger": ^1.0.1
-  "@pagopa/ts-commons": ^13.1.2
-  "applicationinsights": ^3.10.0
-  fp-ts: ^2.16.11
-  io-ts: ^2.2.22
-
 packageExtensions:
   "@azure/functions-opentelemetry-instrumentation":
     dependencies:
-      "@opentelemetry/api-logs": "0.52.1"
+      "@opentelemetry/api-logs": 0.52.1

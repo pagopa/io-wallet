@@ -2,7 +2,6 @@
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import * as appInsights from "applicationinsights";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
@@ -81,11 +80,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     },
   };
 
-  const telemetryClient: appInsights.TelemetryClient = {
-    trackEvent: () => void 0,
-    trackException: () => void 0,
-  } as unknown as appInsights.TelemetryClient;
-
   it("should return a 200 HTTP response and not revoked wallet instance on success", async () => {
     const getAttestationStatusList = () =>
       TE.right({
@@ -103,7 +97,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -156,7 +149,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryRevokedWI,
     });
 
@@ -209,7 +201,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryRevokedWI,
     });
 
@@ -246,7 +237,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -277,7 +267,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryNoWIFound,
     });
 
@@ -310,7 +299,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -341,7 +329,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnGet,
     });
 
@@ -372,7 +359,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnGet,
     });
 
@@ -428,7 +414,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryStringOsPatchLevel,
     });
 
@@ -491,7 +476,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryRevokedWI,
     });
 
@@ -547,7 +531,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryIosWI,
     });
 
@@ -577,7 +560,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -614,7 +596,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -643,7 +624,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 
@@ -674,7 +654,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryBatchPatchError,
     });
 
@@ -734,47 +713,12 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository: walletInstanceRepositoryNotRevokedWI,
     });
 
     await handler();
 
     expect(getAttestationStatusListMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("should return a 200 response with is_revoked = true when certificate has been revoked and telemetryClient.trackEvent fails", async () => {
-    const telemetryClientThatFails: appInsights.TelemetryClient = {
-      trackEvent: () => {
-        throw new Error("Failed to track event");
-      },
-      trackException: () => void 0,
-    } as unknown as appInsights.TelemetryClient;
-
-    const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
-      getAttestationStatusList,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      telemetryClient: telemetryClientThatFails,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: {
-        body: {
-          id: "123",
-          is_revoked: true,
-          revocation_reason: "CERTIFICATE_REVOKED_BY_ISSUER",
-        },
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-        statusCode: 200,
-      },
-    });
   });
 
   it("should not call getAttestationStatusList and should return a 200 response with is_revoked = false when FF is set to false", async () => {
@@ -786,7 +730,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      telemetryClient,
       walletInstanceRepository,
     });
 

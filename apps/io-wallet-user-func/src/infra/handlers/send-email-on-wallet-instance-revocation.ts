@@ -3,14 +3,14 @@ import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInst
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import * as t from "io-ts";
-import { sendTelemetryException } from "io-wallet-common/infra/azure/appinsights/telemetry";
 
 import { DEFAULT_TIMEZONE, formatDate } from "@/datetime";
 import { getUserEmailByFiscalCode, sendEmailToUser } from "@/email";
+import { sendTelemetryException } from "@/infra/telemetry";
 
 export const WalletInstanceRevocationQueueItem = t.type({
   fiscalCode: FiscalCode,
@@ -56,14 +56,13 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
             }),
         ),
       ),
-      RTE.orElseFirstW((error) =>
-        pipe(
-          sendTelemetryException(error, {
+      RTE.orElseFirstW(
+        flow(
+          sendTelemetryException({
             fiscalCode,
             functionName: "sendEmailOnWalletInstanceRevocation",
-            revokedAt,
           }),
-          RTE.fromReader,
+          RTE.fromEither,
         ),
       ),
     ),
