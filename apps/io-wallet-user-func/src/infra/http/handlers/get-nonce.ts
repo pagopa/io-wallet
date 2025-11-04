@@ -1,5 +1,5 @@
 import * as H from "@pagopa/handler-kit";
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
@@ -13,9 +13,8 @@ export const GetNonceHandler = H.of(() =>
     RTE.chainFirstW(insertNonce),
     RTE.map((nonce) => ({ nonce })),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) =>
-      pipe(
-        error,
+    RTE.orElseFirstW(
+      flow(
         sendTelemetryException({ functionName: "getNonce" }),
         RTE.fromEither,
       ),

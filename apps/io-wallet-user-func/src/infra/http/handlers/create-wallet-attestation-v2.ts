@@ -202,9 +202,8 @@ export const CreateWalletAttestationV2Handler = H.of((req: H.HttpRequest) =>
     RTE.chainFirst(validateRequest),
     RTE.chainW(generateWalletAttestations),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) =>
-      pipe(
-        error,
+    RTE.orElseFirstW(
+      flow(
         sendTelemetryExceptionWithBody({
           body: req.body,
           functionName: "createWalletAttestationV2",

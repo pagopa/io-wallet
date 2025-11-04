@@ -1,6 +1,6 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
@@ -83,9 +83,8 @@ export const CreateWalletAttestationHandler = H.of((req: H.HttpRequest) =>
     ),
     RTE.map((wallet_attestation) => ({ wallet_attestation })),
     RTE.map(H.successJson),
-    RTE.orElseFirstW((error) =>
-      pipe(
-        error,
+    RTE.orElseFirstW(
+      flow(
         sendTelemetryExceptionWithBody({
           body: req.body,
           functionName: "createWalletAttestation",

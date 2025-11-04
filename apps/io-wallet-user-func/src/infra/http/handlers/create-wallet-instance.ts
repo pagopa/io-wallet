@@ -2,7 +2,7 @@ import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { sequenceS } from "fp-ts/Apply";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -108,9 +108,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
       ),
     ),
     RTE.map(() => H.empty),
-    RTE.orElseFirstW((error) =>
-      pipe(
-        error,
+    RTE.orElseFirstW(
+      flow(
         sendTelemetryExceptionWithBody({
           body: req.body,
           functionName: "createWalletInstance",

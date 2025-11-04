@@ -3,7 +3,7 @@ import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInst
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 import * as t from "io-ts";
@@ -56,9 +56,8 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
             }),
         ),
       ),
-      RTE.orElseFirstW((error) =>
-        pipe(
-          error,
+      RTE.orElseFirstW(
+        flow(
           sendTelemetryException({
             fiscalCode,
             functionName: "sendEmailOnWalletInstanceRevocation",

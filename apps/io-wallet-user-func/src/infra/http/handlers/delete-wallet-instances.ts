@@ -1,5 +1,5 @@
 import * as H from "@pagopa/handler-kit";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
@@ -21,9 +21,8 @@ export const DeleteWalletInstancesHandler = H.of((req: H.HttpRequest) =>
         deleteUserWalletInstances,
         RTE.chainW(() => revokeAllCredentials(fiscalCode)),
         RTE.map(() => H.empty),
-        RTE.orElseFirstW((error) =>
-          pipe(
-            error,
+        RTE.orElseFirstW(
+          flow(
             sendTelemetryException({
               fiscalCode,
               functionName: "deleteWalletInstances",

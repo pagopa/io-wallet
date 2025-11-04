@@ -2,7 +2,7 @@ import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceCreation/index";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as HtmlToText from "html-to-text";
 
@@ -43,9 +43,8 @@ export const SendEmailOnWalletInstanceCreationHandler = H.of(
           to: emailAddress,
         }),
       ),
-      RTE.orElseFirstW((error) =>
-        pipe(
-          error,
+      RTE.orElseFirstW(
+        flow(
           sendTelemetryException({
             fiscalCode,
             functionName: "sendEmailOnWalletInstanceCreation",

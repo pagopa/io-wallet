@@ -1,5 +1,5 @@
 import * as H from "@pagopa/handler-kit";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
@@ -22,9 +22,8 @@ export const IsFiscalCodeWhitelistedHandler = H.of((req: H.HttpRequest) =>
           ...(whitelisted ? { whitelistedAt } : {}),
         })),
         RTE.map(H.successJson),
-        RTE.orElseFirstW((error) =>
-          pipe(
-            error,
+        RTE.orElseFirstW(
+          flow(
             sendTelemetryException({
               fiscalCode,
               functionName: "isFiscalCodeWhitelisted",
