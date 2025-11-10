@@ -46,13 +46,13 @@ resource "azurerm_api_management_named_value" "user_func_key" {
   api_management_name = var.apim.name
   resource_group_name = var.apim.resource_group_name
   display_name        = "io-wallet-user-func-key"
-  value               = data.azurerm_key_vault_secret.funciowallet_default.value
+  value               = data.azurerm_key_vault_secret.user_func_key_ioweb.value
   secret              = "true"
 }
 
-data "azurerm_key_vault_secret" "funciowallet_default" {
-  name         = "funciowallet-KEY-APPBACKEND"
-  key_vault_id = var.key_vault_id
+data "azurerm_key_vault_secret" "user_func_key_ioweb" {
+  name         = "io-wallet-user-func-key"
+  key_vault_id = var.key_vault_wallet_id
 }
 
 // SUPPORT API
