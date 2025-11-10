@@ -90,19 +90,18 @@ export const validateRevocation = (
     key.toLowerCase(),
   );
 
-  const revokedCertificates = x509Chain.filter((cert) => {
+  for (const cert of x509Chain) {
     const currentSn = cert.serialNumber.toLowerCase();
-    return revokedSerials.some((revokedSerial) =>
-      currentSn.includes(revokedSerial),
-    );
-  });
-
-  if (revokedCertificates.length > 0) {
-    return {
-      reason: `A certificate within the chain has been revoked: ${revokedCertificates.map((c) => c.serialNumber).join(", ")}`,
-      success: false,
-    };
+    if (
+      revokedSerials.some((revokedSerial) => currentSn.includes(revokedSerial))
+    ) {
+      return {
+        reason: `A certificate within the chain has been revoked: ${cert.serialNumber}`,
+        success: false,
+      };
+    }
   }
+
   return { success: true };
 };
 
