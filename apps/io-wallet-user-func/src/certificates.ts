@@ -92,7 +92,9 @@ export const validateRevocation = (
 
   for (const cert of x509Chain) {
     const currentSn = cert.serialNumber.toLowerCase();
-    if (revokedSerials.includes(currentSn)) {
+    if (
+      revokedSerials.some((revokedSerial) => currentSn.includes(revokedSerial))
+    ) {
       return {
         reason: `A certificate within the chain has been revoked: ${cert.serialNumber}`,
         success: false,
