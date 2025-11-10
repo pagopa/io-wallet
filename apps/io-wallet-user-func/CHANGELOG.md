@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.8.3
+
+### Patch Changes
+
+- 3dfaba7: Update `validateRevocation` to return immediately upon finding a revoked certificate
+
 ## 3.8.2
 
 ### Patch Changes
