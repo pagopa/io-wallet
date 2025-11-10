@@ -51,7 +51,7 @@ resource "azurerm_api_management_named_value" "user_func_key" {
 }
 
 data "azurerm_key_vault_secret" "user_func_key_ioweb" {
-  name         = "io-wallet-user-func-key"
+  name         = "io-wallet-user-func-ioweb-key"
   key_vault_id = var.key_vault_wallet_id
 }
 
