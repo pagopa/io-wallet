@@ -50,7 +50,7 @@ describe("CertificatesValidation", () => {
     const googlePublicKey = createPublicKey(
       decodeBase64String(GOOGLE_PUBLIC_KEY),
     );
-    const validation = validateIssuance(validChain, googlePublicKey);
+    const validation = validateIssuance(validChain, [googlePublicKey]);
     expect(validation).toHaveProperty("success", true);
   });
 
@@ -68,7 +68,7 @@ describe("CertificatesValidation", () => {
     const fakePublicKey = createPublicKey(
       decodeBase64String(HARDWARE_PUBLIC_TEST_KEY),
     );
-    const validation = validateIssuance(validChain, fakePublicKey);
+    const validation = validateIssuance(validChain, [fakePublicKey]);
     expect(validation).toHaveProperty("success", false);
   });
 });

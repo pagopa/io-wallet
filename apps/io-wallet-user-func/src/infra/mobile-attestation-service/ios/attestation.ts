@@ -67,7 +67,7 @@ export const verifyAttestation = async (
   const certificates = attStmt.x5c.map((data) => new X509Certificate(data));
   const issuanceValidation = validateIssuance(
     certificates,
-    rootCertificate.publicKey,
+    [rootCertificate.publicKey],
     allowDevelopmentEnvironment,
   );
 

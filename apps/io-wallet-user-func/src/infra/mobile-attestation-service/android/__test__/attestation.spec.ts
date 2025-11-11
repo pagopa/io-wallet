@@ -17,12 +17,43 @@ describe("AndroidAttestationValidation", () => {
     (el) => new X509Certificate(base64ToPem(el)),
   );
 
-  it("should return a validated attestation", async () => {
+  it("should return a validated attestation when the root public key is the first one", async () => {
     const result = verifyAttestation({
       attestationCrl: mockCrl,
       bundleIdentifiers: ["com.ioreactnativeintegrityexample"],
       challenge: "randomvalue",
-      googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
+      googlePublicKeys: GOOGLE_PUBLIC_KEY.split(",").map(decodeBase64String),
+      x509Chain,
+    });
+    const expectedResult = {
+      deviceDetails: {
+        attestationSecurityLevel: 2,
+        attestationVersion: 4,
+        bootPatchLevel: "20230805",
+        deviceLocked: true,
+        keymasterSecurityLevel: 2,
+        keymasterVersion: 41,
+        osPatchLevel: 202308,
+        osVersion: 130000,
+        platform: "android",
+        vendorPatchLevel: "20230805",
+        verifiedBootState: 0,
+        x509Chain: x509Chain.map((el) => el.toString()),
+      },
+      hardwareKey,
+      success: true,
+    };
+
+    await expect(result).resolves.toEqual(expectedResult);
+  });
+
+  it("should return a validated attestation when the root public key is the second one", async () => {
+    const googlePublicKeys = GOOGLE_PUBLIC_KEY.split(",").reverse().join(",");
+    const result = verifyAttestation({
+      attestationCrl: mockCrl,
+      bundleIdentifiers: ["com.ioreactnativeintegrityexample"],
+      challenge: "randomvalue",
+      googlePublicKeys: googlePublicKeys.split(",").map(decodeBase64String),
       x509Chain,
     });
     const expectedResult = {

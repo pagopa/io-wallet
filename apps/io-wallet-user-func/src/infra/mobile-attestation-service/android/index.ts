@@ -30,7 +30,7 @@ export const validateAndroidAttestation = (
   data: Buffer,
   nonce: NonEmptyString,
   bundleIdentifiers: string[],
-  googlePublicKey: string,
+  googlePublicKeys: string[],
   androidCrlUrls: string[],
   httpRequestTimeout: number,
 ): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
@@ -58,7 +58,7 @@ export const validateAndroidAttestation = (
                 attestationCrl,
                 bundleIdentifiers,
                 challenge: nonce,
-                googlePublicKey,
+                googlePublicKeys,
                 x509Chain,
               }),
             E.toError,
