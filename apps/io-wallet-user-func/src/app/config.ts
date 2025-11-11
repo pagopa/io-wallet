@@ -321,7 +321,7 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     googlePublicKeys: pipe(
       readFromEnvironment("GooglePublicKeys"),
       RE.map((keys) => keys.split(",")),
-      RE.orElse(() => RE.right([GOOGLE_PUBLIC_KEY])),
+      RE.orElse(() => RE.right(GOOGLE_PUBLIC_KEY.split(","))),
       RE.map(A.map(decodeBase64String)),
     ),
     hardwarePublicTestKey: pipe(
