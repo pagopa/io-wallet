@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.9.0
+
+### Minor Changes
+
+- f1860dc: Add support for multiple Google root keys
+
 ## 3.8.3
 
 ### Patch Changes
