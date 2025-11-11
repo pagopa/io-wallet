@@ -22,7 +22,7 @@ describe("AndroidAttestationValidation", () => {
       attestationCrl: mockCrl,
       bundleIdentifiers: ["com.ioreactnativeintegrityexample"],
       challenge: "randomvalue",
-      googlePublicKey: decodeBase64String(GOOGLE_PUBLIC_KEY),
+      googlePublicKeys: GOOGLE_PUBLIC_KEY.split(",").map(decodeBase64String),
       x509Chain,
     });
     const expectedResult = {

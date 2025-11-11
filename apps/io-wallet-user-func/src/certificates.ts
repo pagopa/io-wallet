@@ -10,6 +10,23 @@ import * as t from "io-ts";
 
 import { ValidationResult } from "@/attestation-service";
 
+const getRootPublicKey: (
+  x509Chain: readonly X509Certificate[],
+  googlePublicKeys: KeyObject[],
+) => KeyObject | undefined = (x509Chain, googlePublicKeys) => {
+  const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
+  if (!rootCert) {
+    return undefined;
+  }
+  for (const googlePublicKey of googlePublicKeys) {
+    if (rootCert.verify(googlePublicKey)) {
+      return googlePublicKey;
+    }
+  }
+
+  return undefined;
+};
+
 /**
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
  * @param x509Chain - The chain of {@link X509Certificate} certificates. The root certificate must be the last element of the array.
@@ -18,9 +35,18 @@ import { ValidationResult } from "@/attestation-service";
  */
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
-  rootPublicKey: KeyObject,
+  rootPublicKeys: KeyObject[],
   skipExpirationvalidation = false,
 ): ValidationResult => {
+  // Check the signature of root certificate with root public key
+  const rootPublicKey = getRootPublicKey(x509Chain, rootPublicKeys);
+  if (!rootPublicKey) {
+    return {
+      reason: `Root certificate not found or not signed by any provided root public key. x509chain: ${x509Chain}`,
+      success: false,
+    };
+  }
+
   if (!skipExpirationvalidation) {
     // Check certificates expiration dates
     const now = new Date();
@@ -48,15 +74,6 @@ export const validateIssuance = (
         }
       }
     });
-  }
-
-  // Check the signature of root certificate with root public key
-  const rootCert = x509Chain[x509Chain.length - 1]; // Last certificate in the chain is the root certificate
-  if (!rootCert || !rootCert.verify(rootPublicKey)) {
-    return {
-      reason: `Root certificate is not signed by root public key provided: ${x509Chain}`,
-      success: false,
-    };
   }
 
   return { success: true };

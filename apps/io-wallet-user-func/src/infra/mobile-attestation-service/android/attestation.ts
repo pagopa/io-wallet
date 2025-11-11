@@ -21,7 +21,7 @@ export interface VerifyAttestationParams {
   attestationCrl: CRL;
   bundleIdentifiers: string[];
   challenge: string;
-  googlePublicKey: string;
+  googlePublicKeys: string[];
   x509Chain: readonly X509Certificate[];
 }
 
@@ -47,7 +47,7 @@ interface CertWithExtension {
 export const verifyAttestation = async (
   params: VerifyAttestationParams,
 ): Promise<AndroidAttestationValidationResult> => {
-  const { attestationCrl, googlePublicKey, x509Chain } = params;
+  const { attestationCrl, googlePublicKeys, x509Chain } = params;
 
   if (x509Chain.length <= 0) {
     return {
@@ -57,10 +57,9 @@ export const verifyAttestation = async (
   }
 
   // 3. Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
-  const issuanceValidationResult = validateIssuance(
-    x509Chain,
-    createPublicKey(googlePublicKey),
-  );
+  const publicKeys = googlePublicKeys.map(createPublicKey);
+
+  const issuanceValidationResult = validateIssuance(x509Chain, publicKeys);
 
   if (!issuanceValidationResult.success) {
     return issuanceValidationResult;
