@@ -88,7 +88,7 @@ export const AttestationServiceConfiguration = t.type({
   allowedDeveloperUsers: t.array(t.string),
   androidAttestationStatusListCheckFF: t.boolean,
   androidBundleIdentifiers: t.array(t.string),
-  androidCrlUrls: t.array(t.string),
+  androidCrlUrl: t.string,
   androidPlayIntegrityUrl: t.string,
   androidPlayStoreCertificateHash: t.string,
   appleRootCertificate: t.string,
@@ -298,10 +298,9 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
       RE.map((identifiers) => identifiers.split(",")),
       RE.orElse(() => RE.right(["it.pagopa.io.app"])),
     ),
-    androidCrlUrls: pipe(
-      readFromEnvironment("AndroidCrlUrls"),
-      RE.map((identifiers) => identifiers.split(",")),
-      RE.orElse(() => RE.right([ANDROID_CRL_URL])),
+    androidCrlUrl: pipe(
+      readFromEnvironment("AndroidCrlUrl"),
+      RE.orElse(() => RE.right(ANDROID_CRL_URL)),
     ),
     androidPlayIntegrityUrl: pipe(
       readFromEnvironment("AndroidPlayIntegrityUrl"),

@@ -11,7 +11,7 @@ import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
-import { getCrlFromUrls } from "@/certificates";
+import { getCrlFromUrl } from "@/certificates";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
@@ -199,8 +199,8 @@ app.http("getWalletInstanceStatus", {
     androidAttestationStatusListCheckFF:
       config.attestationService.androidAttestationStatusListCheckFF,
     getAttestationStatusList: () =>
-      getCrlFromUrls(
-        config.attestationService.androidCrlUrls,
+      getCrlFromUrl(
+        config.attestationService.androidCrlUrl,
         config.attestationService.httpRequestTimeout,
       ),
     walletInstanceRepository,

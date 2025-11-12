@@ -6,12 +6,7 @@ import {
   GOOGLE_PUBLIC_KEY,
   HARDWARE_PUBLIC_TEST_KEY,
 } from "@/app/config";
-import {
-  CRL,
-  mergeCRL,
-  validateIssuance,
-  validateRevocation,
-} from "@/certificates";
+import { CRL, validateIssuance, validateRevocation } from "@/certificates";
 
 const revokedX509Chain = [
   "-----BEGIN CERTIFICATE-----\nMIICLDCCAbKgAwIBAgIKCXAxRHdzOYI5BjAKBggqhkjOPQQDAjAbMRkwFwYDVQQF\nExA4N2Y0NTE0NDc1YmEwYTJiMB4XDTE2MDUyNjE3MjAxNVoXDTI2MDUyNDE3MjAx\nNVowGzEZMBcGA1UEBRMQYjQxMDMwMWU1MWU0N2NmYjBZMBMGByqGSM49AgEGCCqG\nSM49AwEHA0IABA4z026cOo4gtJWwmMHC35v3tlvkl/WK6CdzM1/GeDVJVg5tw9Yi\nLfZMZ1pNa5hMNhiCjJTo/gDSimYQ0l8aqQGjgd0wgdowHQYDVR0OBBYEFDW8sdJy\ntohf7ksdrcYtMQmKmu4eMB8GA1UdIwQYMBaAFDBEI+Wi9gbhUKt3XxYWu5HMY8ZZ\nMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMCQGA1UdHgQdMBugGTAXghVp\nbnZhbGlkO2VtYWlsOmludmFsaWQwVAYDVR0fBE0wSzBJoEegRYZDaHR0cHM6Ly9h\nbmRyb2lkLmdvb2dsZWFwaXMuY29tL2F0dGVzdGF0aW9uL2NybC8wOTcwMzE0NDc3\nNzMzOTgyMzkwNjAKBggqhkjOPQQDAgNoADBlAjEA/KjXz483n538K3zxx+GPfXJo\n8RTKNcqMAJu1joME/eux0IZ8BVtGPj+r1P6NwWtHAjAf/IkoTdgJ/N1uqjFIN/N6\nVHVXEEBZ3T6LaEnzv2jWuvSag13qGyJ2K2RYyCFCjnk=\n-----END CERTIFICATE-----\n",
@@ -70,75 +65,5 @@ describe("CertificatesValidation", () => {
     );
     const validation = validateIssuance(validChain, [fakePublicKey]);
     expect(validation).toHaveProperty("success", false);
-  });
-});
-
-describe("mergeCRL", () => {
-  it("should return a valid merged CRL with single item", async () => {
-    const crlA = {
-      entries: {
-        a: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-      },
-    };
-
-    const result = mergeCRL([crlA]);
-    expect(result).toStrictEqual(crlA);
-  });
-
-  it("should return a valid merged CRL with multiple items", async () => {
-    const crlA = {
-      entries: {
-        a: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-      },
-    };
-
-    const crlB = {
-      entries: {
-        a: { reason: "SOFTWARE_FLAW", status: "REVOKED" },
-        d: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-      },
-    };
-
-    const mergedCrl = {
-      entries: {
-        a: { reason: "SOFTWARE_FLAW", status: "REVOKED" },
-        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        d: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-      },
-    };
-
-    const result = mergeCRL([crlA, crlB]);
-    expect(result).toStrictEqual(mergedCrl);
-  });
-
-  it("should return a valid merged CRL with an empty item", async () => {
-    const crlA = {
-      entries: {
-        a: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        b: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-        c: { reason: "KEY_COMPROMISE", status: "REVOKED" },
-      },
-    };
-
-    const crlB = {
-      entries: {},
-    };
-
-    const result = mergeCRL([crlA, crlB]);
-    expect(result).toStrictEqual(crlA);
-  });
-
-  it("should return an empty CRL", async () => {
-    const crlEmpty = {
-      entries: {},
-    };
-
-    const result = mergeCRL([]);
-    expect(result).toStrictEqual(crlEmpty);
   });
 });

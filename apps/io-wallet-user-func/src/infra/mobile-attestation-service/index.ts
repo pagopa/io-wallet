@@ -156,7 +156,7 @@ export class MobileAttestationService implements AttestationService {
                 nonce,
                 this.#configuration.androidBundleIdentifiers,
                 this.#configuration.googlePublicKeys,
-                this.#configuration.androidCrlUrls,
+                this.#configuration.androidCrlUrl,
                 this.#configuration.httpRequestTimeout,
               ),
               TE.mapLeft(toIntegrityCheckError),

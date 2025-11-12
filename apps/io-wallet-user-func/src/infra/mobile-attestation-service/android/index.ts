@@ -11,7 +11,7 @@ import * as t from "io-ts";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { getCrlFromUrls } from "@/certificates";
+import { getCrlFromUrl } from "@/certificates";
 
 import { ValidatedAttestation } from "../../mobile-attestation-service";
 import { AndroidAssertionError, AndroidAttestationError } from "../errors";
@@ -31,7 +31,7 @@ export const validateAndroidAttestation = (
   nonce: NonEmptyString,
   bundleIdentifiers: string[],
   googlePublicKeys: string[],
-  androidCrlUrls: string[],
+  androidCrlUrl: string,
   httpRequestTimeout: number,
 ): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(
@@ -50,7 +50,7 @@ export const validateAndroidAttestation = (
     TE.fromEither,
     TE.chain((x509Chain) =>
       pipe(
-        getCrlFromUrls(androidCrlUrls, httpRequestTimeout),
+        getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
         TE.chain((attestationCrl) =>
           TE.tryCatch(
             () =>
