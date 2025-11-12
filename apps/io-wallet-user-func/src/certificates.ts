@@ -2,10 +2,8 @@ import { KeyObject, X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
-import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as O from "fp-ts/Option";
-import * as RR from "fp-ts/ReadonlyRecord";
 import * as t from "io-ts";
 
 import { ValidationResult } from "@/attestation-service";
@@ -122,51 +120,26 @@ export const validateRevocation = (
   return { success: true };
 };
 
-const getCrlFromUrl =
-  (httpRequestTimeout = 4000) =>
-  (crlUrl: string): TE.TaskEither<Error, CRL> =>
-    pipe(
-      TE.tryCatch(
-        () =>
-          fetch(crlUrl, {
-            method: "GET",
-            signal: AbortSignal.timeout(httpRequestTimeout),
-          }),
-        E.toError,
-      ),
-      TE.chain((response) => TE.tryCatch(() => response.json(), E.toError)),
-      TE.chainEitherK((json) =>
-        pipe(
-          CRL.decode(json),
-          E.mapLeft(() => new Error("CRL invalid format")),
-        ),
-      ),
-    );
-
-export const mergeCRL = (input: readonly CRL[]): CRL =>
-  pipe(
-    input,
-    RA.reduce<CRL, CRL["entries"]>({}, (acc, curr) =>
-      pipe(
-        curr.entries,
-        RR.toReadonlyArray,
-        RA.reduce(acc, (merged, [key, value]) =>
-          RR.upsertAt(key, value)(merged),
-        ),
-      ),
-    ),
-    (entries) => ({ entries }),
-  );
-
-export const getCrlFromUrls = (
-  crlUrls: string[],
+export const getCrlFromUrl = (
+  crlUrl: string,
   httpRequestTimeout = 4000,
 ): TE.TaskEither<Error, CRL> =>
   pipe(
-    crlUrls,
-    RA.map(getCrlFromUrl(httpRequestTimeout)),
-    RA.sequence(TE.ApplicativePar),
-    TE.map(mergeCRL),
+    TE.tryCatch(
+      () =>
+        fetch(crlUrl, {
+          method: "GET",
+          signal: AbortSignal.timeout(httpRequestTimeout),
+        }),
+      E.toError,
+    ),
+    TE.chain((response) => TE.tryCatch(() => response.json(), E.toError)),
+    TE.chainEitherK((json) =>
+      pipe(
+        CRL.decode(json),
+        E.mapLeft(() => new Error("CRL invalid format")),
+      ),
+    ),
   );
 
 // TODO: move to another file
