@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.9.1
+
+### Patch Changes
+
+- ee48858: Refactor the Android CRL handling from multiple URLs to a single URL
+
 ## 3.9.0
 
 ### Minor Changes
