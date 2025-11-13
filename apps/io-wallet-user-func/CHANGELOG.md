@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.9.2
+
+### Patch Changes
+
+- 424eb1c: Added HTTP caching functionality to the Android attestation status fetch operation
+
 ## 3.9.1
 
 ### Patch Changes
