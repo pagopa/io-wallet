@@ -5,6 +5,9 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as O from "fp-ts/Option";
 import * as t from "io-ts";
+import fetch from "make-fetch-happen";
+import * as os from "os";
+import * as path from "path";
 
 import { ValidationResult } from "@/attestation-service";
 
@@ -120,6 +123,10 @@ export const validateRevocation = (
   return { success: true };
 };
 
+const fetchWithCache = fetch.defaults({
+  cachePath: path.join(os.tmpdir(), "attestation-status-cache"),
+});
+
 export const getCrlFromUrl = (
   crlUrl: string,
   httpRequestTimeout = 4000,
@@ -127,9 +134,9 @@ export const getCrlFromUrl = (
   pipe(
     TE.tryCatch(
       () =>
-        fetch(crlUrl, {
+        fetchWithCache(crlUrl, {
           method: "GET",
-          signal: AbortSignal.timeout(httpRequestTimeout),
+          timeout: httpRequestTimeout,
         }),
       E.toError,
     ),
