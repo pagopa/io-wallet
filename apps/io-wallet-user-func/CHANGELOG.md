@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.10.0
+
+### Minor Changes
+
+- ca00242: Updated wallet instance revocation email functionality to send different email templates based on user whitelist status
+
 ## 3.9.2
 
 ### Patch Changes
