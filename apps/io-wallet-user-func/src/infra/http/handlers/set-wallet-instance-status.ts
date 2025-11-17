@@ -13,10 +13,6 @@ import { enqueue } from "@/infra/azure/storage/queue";
 import { requireWalletInstanceId } from "@/infra/http/wallet-instance";
 import { sendTelemetryException } from "@/infra/telemetry";
 import { revokeUserWalletInstances } from "@/wallet-instance";
-import {
-  checkIfFiscalCodeIsWhitelisted,
-  WhitelistedFiscalCodeEnvironment,
-} from "@/whitelisted-fiscal-code";
 
 const SetWalletInstanceStatusBody = t.type({
   fiscal_code: FiscalCode,
@@ -30,26 +26,15 @@ const requireSetWalletInstanceStatusBody: (
 ) => E.Either<Error, SetWalletInstanceStatusBody> = (req) =>
   pipe(req.body, H.parse(SetWalletInstanceStatusBody, "Invalid body supplied"));
 
-// this function sends the email only if the user is NOT whitelisted
 const sendEmail: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<
-  WhitelistedFiscalCodeEnvironment & { queueClient: QueueClient },
-  Error,
-  void
-> = (fiscalCode) =>
-  pipe(
+) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = (
+  fiscalCode,
+) =>
+  enqueue({
     fiscalCode,
-    checkIfFiscalCodeIsWhitelisted,
-    RTE.chain(({ whitelisted }) =>
-      whitelisted
-        ? RTE.of(undefined)
-        : enqueue({
-            fiscalCode,
-            revokedAt: new Date(),
-          }),
-    ),
-  );
+    revokedAt: new Date(),
+  });
 
 export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
   pipe(
