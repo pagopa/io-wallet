@@ -1,5 +1,13 @@
 # io-wallet-messages-func
 
+## 1.1.2
+
+### Patch Changes
+
+- e12cc1b: Upgraded the Function App to Node.js v22
+- Updated dependencies [e12cc1b]
+  - io-wallet-common@1.5.2
+
 ## 1.1.1
 
 ### Patch Changes
