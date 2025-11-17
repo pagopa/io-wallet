@@ -223,8 +223,8 @@ importers:
         specifier: 'catalog:'
         version: 2.0.7(postcss@8.5.6)(typescript@5.7.3)
       '@pagopa/io-app-email-templates':
-        specifier: ^0.6.1
-        version: 0.6.1(encoding@0.1.13)
+        specifier: ^0.6.2
+        version: 0.6.2(encoding@0.1.13)
       '@pagopa/io-functions-commons':
         specifier: ^29.3.1
         version: 29.3.1(@azure/functions@4.8.0)(encoding@0.1.13)(express@4.21.2)(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
@@ -1385,8 +1385,8 @@ packages:
   '@pagopa/handler-kit@1.1.0':
     resolution: {integrity: sha512-siLQ96LZ77gXxdiYXYdWiNhS7lao/M6Hj9aO6zxALnVR6BxBjvQm4k1Y3MT71oS9s4gUTFyPoFf672FVMI7UaQ==}
 
-  '@pagopa/io-app-email-templates@0.6.1':
-    resolution: {integrity: sha512-4o6yItuijbwsMWiclwrQw3gItxWMEMh5kjlyV0GYKWXNGdUq4T7yniQKKzFuEb27H3FT9Fx59LrBKw2L/GD2KQ==}
+  '@pagopa/io-app-email-templates@0.6.2':
+    resolution: {integrity: sha512-DhGJJnUYPVumhQCNMEJa+58VB04mDvZFQCb93PW9EalHeTBAUHkDt+TXrq3rI/yj0uebV+1CLCOR8k7rRXe44w==}
 
   '@pagopa/io-functions-commons@29.3.1':
     resolution: {integrity: sha512-iFEqRmD8NORx/pXDQXEk+ySjDcA6TWUAH6xr5K039rKHHl5jyTgxFertoF2xTqeLgXfT0aOh8HJEfwWe6AjWww==}
@@ -5825,7 +5825,7 @@ snapshots:
       - ts-node
       - typescript
 
-  '@pagopa/io-app-email-templates@0.6.1(encoding@0.1.13)':
+  '@pagopa/io-app-email-templates@0.6.2(encoding@0.1.13)':
     dependencies:
       '@pagopa/ts-commons': 13.1.2(encoding@0.1.13)(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
       fp-ts: 2.16.11

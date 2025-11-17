@@ -80,7 +80,6 @@ const sendGenericEmail: (input: {
 > = ({ emailAddress, revokedAt }) =>
   pipe(
     htmlTemplateGeneric(
-      "", // no name
       formatDate(revokedAt, "HH:mm", DEFAULT_TIMEZONE),
       formatDate(revokedAt, "DD/MM/YYYY", DEFAULT_TIMEZONE),
       { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
