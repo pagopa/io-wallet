@@ -224,7 +224,6 @@ app.http("setWalletInstanceStatus", {
     credentialRepository: pidIssuerClient,
     queueClient: walletInstanceRevocationEmailQueueClient,
     walletInstanceRepository,
-    whitelistedFiscalCodeRepository,
   }),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
@@ -244,6 +243,7 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
   handler: SendEmailOnWalletInstanceRevocationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceRevocationQueueItem,
+    whitelistedFiscalCodeRepository,
   }),
   queueName:
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
