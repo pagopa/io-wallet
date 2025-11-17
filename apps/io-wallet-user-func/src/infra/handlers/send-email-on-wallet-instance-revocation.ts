@@ -45,6 +45,7 @@ const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
   tables: true,
 };
 
+// it provides a message specific to Documenti su IO
 const sendEmail: (input: {
   emailAddress: string;
   revokedAt: Date;
@@ -68,6 +69,7 @@ const sendEmail: (input: {
       }),
   );
 
+// it provides a generic message that works for both IT Wallet and Documenti su IO
 const sendGenericEmail: (input: {
   emailAddress: string;
   revokedAt: Date;
