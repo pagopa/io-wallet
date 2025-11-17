@@ -13,7 +13,7 @@ module "function_app_user_uat" {
 
   resource_group_name = var.resource_group_name
   health_check_path   = "/api/v1/wallet/health"
-  node_version        = 20
+  node_version        = 22
 
   subnet_cidr                          = var.cidr_subnet_user_uat_func
   subnet_pep_id                        = var.private_endpoint_subnet_id
