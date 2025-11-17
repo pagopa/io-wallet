@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 3.10.1
+
+### Patch Changes
+
+- e12cc1b: Upgraded the Function App to Node.js v22
+- Updated dependencies [e12cc1b]
+  - io-wallet-common@1.5.2
+
 ## 3.10.0
 
 ### Minor Changes
