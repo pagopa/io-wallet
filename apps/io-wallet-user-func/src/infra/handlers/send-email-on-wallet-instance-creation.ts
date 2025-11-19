@@ -1,6 +1,6 @@
 import * as H from "@pagopa/handler-kit";
+import { apply as htmlTemplateGeneric } from "@pagopa/io-app-email-templates/ItWalletWelcome/index";
 import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceCreation/index";
-import { apply as htmlTemplateGeneric } from "@pagopa/io-app-email-templates/WalletInstanceCreation/index"; // TODO
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { flow, pipe } from "fp-ts/function";
