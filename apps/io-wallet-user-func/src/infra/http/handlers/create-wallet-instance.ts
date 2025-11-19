@@ -50,9 +50,7 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
 
 const sendEmail: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = (
-  fiscalCode,
-) => enqueue(fiscalCode);
+) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = enqueue;
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
