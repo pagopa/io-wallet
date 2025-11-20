@@ -30,7 +30,7 @@
     "@pagopa/azure-tracing": "^0.4.8",
     "@pagopa/handler-kit": "catalog:",
     "@pagopa/handler-kit-azure-func": "catalog:",
-    "@pagopa/io-app-email-templates": "^0.6.2",
+    "@pagopa/io-app-email-templates": "^0.7.0",
     "@pagopa/io-functions-commons": "^29.3.1",
     "@pagopa/logger": "catalog:",
     "@pagopa/ts-commons": "catalog:",

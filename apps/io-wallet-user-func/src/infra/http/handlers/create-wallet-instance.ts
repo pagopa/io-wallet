@@ -22,10 +22,6 @@ import {
   revokeUserValidWalletInstancesExceptOne,
 } from "@/wallet-instance";
 import { consumeNonce, WalletInstanceRequest } from "@/wallet-instance-request";
-import {
-  checkIfFiscalCodeIsWhitelisted,
-  WhitelistedFiscalCodeEnvironment,
-} from "@/whitelisted-fiscal-code";
 
 const WalletInstanceRequestPayload = t.type({
   challenge: NonEmptyString,
@@ -52,21 +48,9 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
     ),
   );
 
-// this function sends the email only if the user is NOT whitelisted
 const sendEmail: (
   fiscalCode: FiscalCode,
-) => RTE.ReaderTaskEither<
-  WhitelistedFiscalCodeEnvironment & { queueClient: QueueClient },
-  Error,
-  void
-> = (fiscalCode) =>
-  pipe(
-    fiscalCode,
-    checkIfFiscalCodeIsWhitelisted,
-    RTE.chain(({ whitelisted }) =>
-      whitelisted ? RTE.of(undefined) : enqueue(fiscalCode),
-    ),
-  );
+) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = enqueue;
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(

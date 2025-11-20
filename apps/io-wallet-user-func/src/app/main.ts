@@ -159,7 +159,6 @@ app.http("createWalletInstance", {
     nonceRepository,
     queueClient: walletInstanceCreationEmailQueueClient,
     walletInstanceRepository,
-    whitelistedFiscalCodeRepository,
   }),
   methods: ["POST"],
   route: "wallet-instances",
@@ -234,6 +233,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
     inputDecoder: FiscalCode,
+    whitelistedFiscalCodeRepository,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
 });
