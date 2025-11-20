@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.11.0
+
+### Minor Changes
+
+- 4e07db8: Updated wallet instance creation email functionality to send different email templates based on user whitelist status
+
 ## 3.10.1
 
 ### Patch Changes
