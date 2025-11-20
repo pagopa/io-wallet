@@ -1,5 +1,5 @@
 ---
-"io-wallet-user-func": patch
+"io-wallet-user-func": major
 ---
 
 Removed /token endpoint
