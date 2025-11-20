@@ -2,105 +2,28 @@ import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as IOE from "fp-ts/IOEither";
-import { sequenceS, sequenceT } from "fp-ts/lib/Apply";
+import { sequenceT } from "fp-ts/lib/Apply";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import * as t from "io-ts";
-import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
+import { validateJwkKid } from "io-wallet-common/jwk";
 
 import { CertificateRepository } from "./certificates";
 import {
   WalletAttestationData,
   WalletAttestationToJwtModel,
-  WalletAttestationToJwtModelV2,
 } from "./encoders/wallet-attestation";
-import {
-  EntityConfigurationEnvironment,
-  FederationEntity,
-  FederationEntityMetadata,
-} from "./entity-configuration";
+import { FederationEntity } from "./entity-configuration";
 import { createHashBase64url } from "./infra/crypto/hashing";
 import { generateRandomHex } from "./infra/crypto/random";
 import { Signer } from "./signer";
 import { removeTrailingSlash } from "./url";
-import {
-  WalletAttestationRequest,
-  WalletAttestationRequestV2,
-} from "./wallet-attestation-request";
+import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { getLoAUri, LoA } from "./wallet-provider";
 
 const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
   pipe(disclosure, JSON.stringify, (str) =>
     Buffer.from(str).toString("base64url"),
   );
-
-export const WalletAttestationPayload = t.type({
-  aal: t.string,
-  algValueSupported: t.array(t.string),
-  federationEntity: FederationEntityMetadata,
-  iss: t.string,
-  sub: t.string,
-  walletInstancePublicKey: JwkPublicKey,
-});
-
-export type WalletAttestationPayload = t.TypeOf<
-  typeof WalletAttestationPayload
->;
-
-// Build the JWT Wallet Attestation given a Wallet Attestation Request
-export const createWalletAttestation =
-  (
-    attestationRequest: WalletAttestationRequest,
-  ): RTE.ReaderTaskEither<EntityConfigurationEnvironment, Error, string> =>
-  ({
-    entityConfiguration: {
-      federationEntity: { basePath, ...federationEntityMetadata },
-    },
-    walletAttestationSigner,
-  }) =>
-    pipe(
-      sequenceS(TE.ApplicativePar)({
-        publicJwk: pipe(
-          walletAttestationSigner.getFirstPublicKeyByKty("EC"),
-          E.chainW(validateJwkKid),
-          TE.fromEither,
-        ),
-        supportedSignAlgorithms: pipe(
-          walletAttestationSigner.getSupportedSignAlgorithms(),
-          TE.fromEither,
-        ),
-      }),
-      TE.chain(({ publicJwk, supportedSignAlgorithms }) =>
-        pipe(
-          {
-            aal: pipe(basePath, getLoAUri(LoA.basic)),
-            algValueSupported: supportedSignAlgorithms,
-            federationEntity: {
-              contacts: federationEntityMetadata.contacts,
-              homepageUri: federationEntityMetadata.homepageUri,
-              logoUri: federationEntityMetadata.logoUri,
-              organizationName: federationEntityMetadata.organizationName,
-              policyUri: federationEntityMetadata.policyUri,
-              tosUri: federationEntityMetadata.tosUri,
-            },
-            iss: basePath.href,
-            sub: attestationRequest.header.kid,
-            walletInstancePublicKey: attestationRequest.payload.cnf.jwk,
-          },
-          WalletAttestationToJwtModel.encode,
-          walletAttestationSigner.createJwtAndSign(
-            {
-              typ: "wallet-attestation+jwt",
-            },
-            publicJwk.kid,
-            "ES256",
-            "1h",
-          ),
-        ),
-      ),
-    );
-
-// ----- new wallet-attestation endpoint
 
 export interface WalletAttestationEnvironment {
   certificateRepository: CertificateRepository;
@@ -117,7 +40,7 @@ interface WalletAttestationConfig {
 
 export const getWalletAttestationData =
   (
-    walletAttestationRequest: WalletAttestationRequestV2,
+    walletAttestationRequest: WalletAttestationRequest,
   ): RTE.ReaderTaskEither<
     WalletAttestationEnvironment,
     Error,
@@ -151,7 +74,7 @@ export const createWalletAttestationAsJwt =
   (dep) =>
     pipe(
       walletAttestationData,
-      WalletAttestationToJwtModelV2.encode,
+      WalletAttestationToJwtModel.encode,
       ({ kid, ...payload }) =>
         dep.signer.createJwtAndSign(
           {

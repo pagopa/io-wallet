@@ -17,14 +17,6 @@ type WithJwkCnf = t.TypeOf<typeof WithJwkCnf>;
 const decodeJwt = (jwt: string) =>
   E.tryCatch(() => jose.decodeJwt(jwt), E.toError);
 
-export const verifyJwtSignature = (jwt: string) => (publicKey: JwkPublicKey) =>
-  pipe(
-    TE.tryCatch(() => jose.importJWK(publicKey), E.toError),
-    TE.chain((joseKey) =>
-      TE.tryCatch(() => jose.jwtVerify(jwt, joseKey), E.toError),
-    ),
-  );
-
 export const getPublicKeyFromCnf = (jwt: string) =>
   pipe(
     jwt,
@@ -38,7 +30,6 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     E.map((payload) => payload.cnf.jwk),
   );
 
-// ----- new wallet-attestation endpoint
 export const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
   pipe(
     TE.tryCatch(() => jose.importJWK(publicKey), E.toError),
