@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.0.0
+
+### Major Changes
+
+- c8e4777: Removed /token endpoint
+
 ## 3.11.1
 
 ### Patch Changes
