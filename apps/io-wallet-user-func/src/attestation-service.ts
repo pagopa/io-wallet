@@ -4,10 +4,7 @@ import * as TE from "fp-ts/TaskEither";
 import { DeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import {
-  WalletAttestationRequest,
-  WalletAttestationRequestV2,
-} from "./wallet-attestation-request";
+import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 
 export enum OperatingSystem {
@@ -65,29 +62,6 @@ export const validateAttestation: (
 
 export const validateAssertion: (
   walletAttestationRequest: WalletAttestationRequest,
-  hardwareKey: JwkPublicKey,
-  signCount: number,
-  user: FiscalCode,
-) => RTE.ReaderTaskEither<
-  { attestationService: AttestationService },
-  Error,
-  void
-> =
-  (walletAttestationRequest, hardwareKey, signCount, user) =>
-  ({ attestationService }) =>
-    attestationService.validateAssertion({
-      hardwareKey,
-      hardwareSignature: walletAttestationRequest.payload.hardware_signature,
-      integrityAssertion: walletAttestationRequest.payload.integrity_assertion,
-      jwk: walletAttestationRequest.payload.cnf.jwk,
-      nonce: walletAttestationRequest.payload.challenge,
-      signCount,
-      user,
-    });
-
-// ----- new wallet-attestation endpoint
-export const validateAssertionV2: (
-  walletAttestationRequest: WalletAttestationRequestV2,
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
