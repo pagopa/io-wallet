@@ -2,12 +2,10 @@ import { ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { createPublicKey } from "crypto";
 import * as E from "fp-ts/Either";
-import { identity, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import { Separated } from "fp-ts/lib/Separated";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
-import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
@@ -36,17 +34,8 @@ export class IntegrityCheckError extends Error {
 const toIntegrityCheckError = (e: Error | ValidationError): Error =>
   e instanceof ValidationError ? new IntegrityCheckError(e.violations) : e;
 
-const getErrorsOrFirstValidValue = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validated: Separated<readonly Error[], readonly any[]>,
-) =>
-  pipe(
-    validated.right,
-    RA.head,
-    E.fromOption(
-      () => new IntegrityCheckError(validated.left.map((el) => el.message)),
-    ),
-  );
+const getErrorMessages = (e: Error | ValidationError): string[] =>
+  e instanceof ValidationError ? e.violations : [e.message];
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -96,32 +85,40 @@ export class MobileAttestationService implements AttestationService {
         ),
       ),
       TE.chainW((clientData) =>
+        // First try iOS attestation validation, if it fails try Android assertion validation
         pipe(
-          [
-            validateiOSAssertion(
-              integrityAssertion,
-              hardwareSignature,
-              clientData,
-              hardwareKey,
-              signCount,
-              this.#configuration.iosBundleIdentifiers,
-              this.#configuration.iOsTeamIdentifier,
-              this.#configuration.skipSignatureValidation,
+          validateiOSAssertion(
+            integrityAssertion,
+            hardwareSignature,
+            clientData,
+            hardwareKey,
+            signCount,
+            this.#configuration.iosBundleIdentifiers,
+            this.#configuration.iOsTeamIdentifier,
+            this.#configuration.skipSignatureValidation,
+          ),
+          TE.orElse((iosErr) =>
+            pipe(
+              validateAndroidAssertion(
+                integrityAssertion,
+                hardwareSignature,
+                clientData,
+                hardwareKey,
+                this.#configuration.androidBundleIdentifiers,
+                this.#configuration.androidPlayStoreCertificateHash,
+                this.#configuration.googleAppCredentialsEncoded,
+                this.#configuration.androidPlayIntegrityUrl,
+                this.allowDevelopmentEnvironmentForUser(user),
+              ),
+              TE.mapLeft(
+                (androidErr) =>
+                  new IntegrityCheckError([
+                    ...getErrorMessages(iosErr),
+                    ...getErrorMessages(androidErr),
+                  ]),
+              ),
             ),
-            validateAndroidAssertion(
-              integrityAssertion,
-              hardwareSignature,
-              clientData,
-              hardwareKey,
-              this.#configuration.androidBundleIdentifiers,
-              this.#configuration.androidPlayStoreCertificateHash,
-              this.#configuration.googleAppCredentialsEncoded,
-              this.#configuration.androidPlayIntegrityUrl,
-              this.allowDevelopmentEnvironmentForUser(user),
-            ),
-          ],
-          RA.wilt(T.ApplicativePar)(identity),
-          T.map(getErrorsOrFirstValidValue),
+          ),
         ),
       ),
     );
@@ -139,17 +136,18 @@ export class MobileAttestationService implements AttestationService {
       ),
       TE.fromEither,
       TE.chainW((data) =>
+        // First try iOS attestation validation, if it fails try Android attestation validation
         pipe(
-          [
-            validateiOSAttestation(
-              data,
-              nonce,
-              hardwareKeyTag,
-              this.#configuration.iosBundleIdentifiers,
-              this.#configuration.iOsTeamIdentifier,
-              this.#configuration.appleRootCertificate,
-              this.allowDevelopmentEnvironmentForUser(user),
-            ),
+          validateiOSAttestation(
+            data,
+            nonce,
+            hardwareKeyTag,
+            this.#configuration.iosBundleIdentifiers,
+            this.#configuration.iOsTeamIdentifier,
+            this.#configuration.appleRootCertificate,
+            this.allowDevelopmentEnvironmentForUser(user),
+          ),
+          TE.orElse((iosErr) =>
             pipe(
               validateAndroidAttestation(
                 data,
@@ -160,10 +158,15 @@ export class MobileAttestationService implements AttestationService {
                 this.#configuration.httpRequestTimeout,
               ),
               TE.mapLeft(toIntegrityCheckError),
+              TE.mapLeft(
+                (androidErr) =>
+                  new IntegrityCheckError([
+                    ...getErrorMessages(iosErr),
+                    ...getErrorMessages(androidErr),
+                  ]),
+              ),
             ),
-          ],
-          RA.wilt(T.ApplicativeSeq)(identity),
-          T.map(getErrorsOrFirstValidValue),
+          ),
         ),
       ),
     );
