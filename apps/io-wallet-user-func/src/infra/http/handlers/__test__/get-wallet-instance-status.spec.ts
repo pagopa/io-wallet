@@ -92,7 +92,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -144,7 +143,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -196,7 +194,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -232,7 +229,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -262,7 +258,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -294,7 +289,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -324,7 +318,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -354,7 +347,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -409,7 +401,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -471,7 +462,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -526,7 +516,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -555,7 +544,6 @@ describe("GetWalletInstanceStatusHandler", () => {
 
   it("should return a 200 response with is_revoked = true and revocation_reason = CERTIFICATE_REVOKED_BY_ISSUER when certificate has been revoked", async () => {
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -591,7 +579,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -619,7 +606,6 @@ describe("GetWalletInstanceStatusHandler", () => {
       TE.left(new Error("Failed to get CRL"));
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -649,7 +635,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -708,7 +693,6 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: true,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -719,36 +703,5 @@ describe("GetWalletInstanceStatusHandler", () => {
     await handler();
 
     expect(getAttestationStatusListMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("should not call getAttestationStatusList and should return a 200 response with is_revoked = false when FF is set to false", async () => {
-    const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
-
-    const handler = GetWalletInstanceStatusHandler({
-      androidAttestationStatusListCheckFF: false,
-      getAttestationStatusList: getAttestationStatusListMock,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      walletInstanceRepository,
-    });
-
-    const result = await handler();
-
-    expect(getAttestationStatusListMock).toHaveBeenCalledTimes(0);
-
-    expect(result).toEqual({
-      _tag: "Right",
-      right: {
-        body: {
-          id: "123",
-          is_revoked: false,
-        },
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-        statusCode: 200,
-      },
-    });
   });
 });
