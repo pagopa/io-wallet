@@ -21,6 +21,7 @@ const buffer = new t.Type<Buffer, Buffer, unknown>(
   t.identity,
 );
 
+// iOS attestation type
 export const iOsAttestation = t.type({
   attStmt: t.type({
     receipt: buffer,
@@ -84,6 +85,7 @@ export const validateiOSAttestation = (
     ),
   );
 
+// iOS assertion type
 export const iOsAssertion = t.type({
   authenticatorData: buffer,
   signature: buffer,
