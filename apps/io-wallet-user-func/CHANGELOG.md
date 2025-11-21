@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 3.11.1
+
+### Patch Changes
+
+- 3d1bcff: Removed the feature flag AndroidAttestationStatusListCheckFF in the getWalletInstanceStatus endpoint
+
 ## 3.11.0
 
 ### Minor Changes

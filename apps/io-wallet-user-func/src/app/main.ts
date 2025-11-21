@@ -176,8 +176,6 @@ app.timer("generateEntityConfiguration", {
 app.http("getWalletInstanceStatus", {
   authLevel: "function",
   handler: GetWalletInstanceStatusFunction({
-    androidAttestationStatusListCheckFF:
-      config.attestationService.androidAttestationStatusListCheckFF,
     getAttestationStatusList: () =>
       getCrlFromUrl(
         config.attestationService.androidCrlUrl,
