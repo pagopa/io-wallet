@@ -39,7 +39,7 @@ locals {
   }
 
   repository = {
-    name                     = "io-wallet"
+    name = "io-wallet"
   }
 
   key_vault = {

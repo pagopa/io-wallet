@@ -112,6 +112,7 @@ module "repo" {
   github_private_runner = {
     container_app_environment_id       = data.azurerm_container_app_environment.runner.id
     container_app_environment_location = data.azurerm_container_app_environment.runner.location
+    labels                             = ["io"]
     key_vault = {
       name                = local.runner.secret.kv_name
       resource_group_name = local.runner.secret.kv_resource_group_name

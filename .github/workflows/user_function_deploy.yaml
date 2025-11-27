@@ -24,3 +24,5 @@ jobs:
       resource_group_name: io-p-itn-wallet-rg-01
       web_app_name: io-p-itn-wallet-user-func-02
       disable_auto_staging_deploy: true
+      use_labels: true
+      override_labels: io
