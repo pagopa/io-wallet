@@ -23,6 +23,7 @@
   "postStartCommand": {
     "set-workspace-as-safe-dir": "git config --global --add safe.directory ${containerWorkspaceFolder}"
   },
+  "postCreateCommand": "cp ${containerWorkspaceFolder}/.devcontainer/devcontainer.bashrc /home/vscode/.bashrc",
   "containerEnv": {
     "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
   },
