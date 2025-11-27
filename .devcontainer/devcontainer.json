@@ -31,10 +31,13 @@
       "extensions": [
         "-vscjava.vscode-java-pack",
         "-ms-dotnettools.csharp",
-        "-ms-azuretools.vscode-azureterraform",
+        "hashicorp.terraform",
         "ms-azuretools.vscode-azure-github-copilot",
         "ms-vscode.vscode-websearchforcopilot",
         "ms-azuretools.vscode-azureterraform",
+        "ms-azuretools.vscode-cosmosdb",
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-azuretools.vscode-azurestorage",
         "github.vscode-github-actions",
         "github.vscode-pull-request-github",
         "esbenp.prettier-vscode",
@@ -44,7 +47,9 @@
         "redhat.vscode-yaml",
         "dbaeumer.vscode-eslint",
         "github.copilot",
-        "github.copilot-chat"
+        "github.copilot-chat",
+        "MermaidChart.vscode-mermaid-chart",
+        "EditorConfig.EditorConfig"
       ]
     }
   }
