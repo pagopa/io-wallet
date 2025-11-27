@@ -32,7 +32,6 @@
       "extensions": [
         "-vscjava.vscode-java-pack",
         "-ms-dotnettools.csharp",
-        "hashicorp.terraform",
         "ms-azuretools.vscode-azure-github-copilot",
         "ms-vscode.vscode-websearchforcopilot",
         "ms-azuretools.vscode-azureterraform",
