@@ -2,3 +2,4 @@
 
 * @pagopa/io-wallet
 /infra/ @pagopa/io-wallet @pagopa/engineering-team-devex
+/.github/workflows/ @pagopa/io-wallet @pagopa/engineering-team-devex
