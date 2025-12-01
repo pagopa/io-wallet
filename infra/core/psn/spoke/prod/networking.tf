@@ -14,7 +14,7 @@ resource "azurerm_virtual_network" "spoke" {
 
 resource "azurerm_virtual_network_peering" "spoke_to_hub" {
   name                      = "peer-to-pagopa-hub-italynorth"
-  resource_group_name       = "pagopa-Prod-ITWallet-rg-spoke-italynorth" # azurerm_resource_group.networking.name
+  resource_group_name       = azurerm_resource_group.networking.name
   virtual_network_name      = azurerm_virtual_network.spoke.name
   remote_virtual_network_id = "/subscriptions/f3c27dbc-5c86-4c14-b43f-9faed77e5e19/resourceGroups/pagopa-rg-hub-network-italynorth/providers/Microsoft.Network/virtualNetworks/pagopa-hub-italynorth"
 
