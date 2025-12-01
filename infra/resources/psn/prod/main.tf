@@ -1,5 +1,5 @@
 module "ids" {
-  source = "../../_modules/ids"
+  source = "../../_modules/identities"
 
   environment = merge(local.environment, {
     name = "cmk"

@@ -26,7 +26,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_ids"></a> [ids](#module\_ids) | ../../_modules/ids | n/a |
+| <a name="module_ids"></a> [ids](#module\_ids) | ../../_modules/identities | n/a |
 
 ## Resources
 

@@ -39,7 +39,7 @@ data "azurerm_resource_group" "wallet" {
 }
 
 module "ids" {
-  source = "../_modules/ids"
+  source = "../_modules/identities"
 
   environment = merge(local.environment,
     {
