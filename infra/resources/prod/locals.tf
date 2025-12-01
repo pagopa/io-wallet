@@ -1,20 +1,23 @@
 locals {
-  prefix         = "io"
-  env_short      = "p"
-  u_env_short    = "u"
+  environment = {
+    prefix          = "io"
+    env_short       = "p"
+    location        = "italynorth"
+    domain          = "wallet"
+    instance_number = "01"
+  }
   location_short = "itn"
-  domain         = "wallet"
+  u_env_short    = "u"
   # the project on which the resources will be created
   # it's the prefix of any resource name
   # it includes the choosen location
-  project = "${local.prefix}-${local.env_short}-${local.location_short}"
+  project = "${local.environment.prefix}-${local.environment.env_short}-${local.location_short}"
 
   # some referenced resources are in a different location
   # for historical reasons
   # this project points to them (westeurope)
-  project_legacy = "${local.prefix}-${local.env_short}"
+  project_legacy = "${local.environment.prefix}-${local.environment.env_short}"
 
-  location           = "italynorth"
   location_legacy    = "westeurope"
   secondary_location = "spaincentral"
 

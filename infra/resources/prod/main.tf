@@ -41,8 +41,12 @@ data "azurerm_resource_group" "wallet" {
 module "ids" {
   source = "../_modules/ids"
 
-  project             = local.project
-  location            = local.location
+  environment = merge(local.environment,
+    {
+      environment = local.environment.env_short
+      name        = "psn"
+    }
+  )
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   tags = local.tags
@@ -52,7 +56,7 @@ module "key_vaults" {
   source = "../_modules/key_vaults"
 
   project             = local.project
-  location            = local.location
+  location            = local.environment.location
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   tenant_id = data.azurerm_client_config.current.tenant_id
@@ -88,7 +92,7 @@ module "cosmos" {
   source = "../_modules/cosmos"
 
   project             = local.project
-  location            = local.location
+  location            = local.environment.location
   secondary_location  = local.secondary_location
   resource_group_name = data.azurerm_resource_group.wallet.name
 
@@ -107,10 +111,10 @@ module "cosmos" {
 module "function_apps" {
   source = "../_modules/function_apps"
 
-  prefix              = local.prefix
-  env_short           = local.env_short
+  prefix              = local.environment.prefix
+  env_short           = local.environment.env_short
   u_env_short         = local.u_env_short
-  location            = local.location
+  location            = local.environment.location
   project             = local.project
   resource_group_name = data.azurerm_resource_group.wallet.name
 
@@ -160,7 +164,7 @@ module "cdn" {
   source = "../_modules/cdn"
 
   project         = local.project
-  location        = local.location
+  location        = local.environment.location
   location_legacy = local.location_legacy
 
   resource_group_name = data.azurerm_resource_group.wallet.name
@@ -274,12 +278,12 @@ module "apim_itn" {
 module "storage_accounts" {
   source = "../_modules/storage_accounts"
 
-  prefix          = local.prefix
-  env_short       = local.env_short
+  prefix          = local.environment.prefix
+  env_short       = local.environment.env_short
   u_env_short     = local.u_env_short
-  location        = local.location
+  location        = local.environment.location
   domain          = ""
-  app_name        = local.domain
+  app_name        = local.environment.domain
   instance_number = "01"
 
   resource_group_name = data.azurerm_resource_group.wallet.name
