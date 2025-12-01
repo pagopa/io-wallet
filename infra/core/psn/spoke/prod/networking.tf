@@ -72,7 +72,10 @@ resource "azurerm_route_table" "spoke" {
 }
 
 resource "azurerm_subnet" "pep" {
-  name                 = "iw-d-itn-pep-snet-01"
+  name = provider::dx::resource_name(merge(local.environment, {
+    name          = "pep"
+    resource_type = "subnet"
+  }))
   resource_group_name  = azurerm_resource_group.networking.name
   virtual_network_name = azurerm_virtual_network.spoke.name
 
