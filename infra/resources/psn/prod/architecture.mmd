@@ -1,0 +1,140 @@
+---
+title: "IT-Wallet Architecture on PSN (Milestone 2)"
+config:
+  theme: mc
+  fontFamily: Gill Sans, sans-serif;
+---
+graph LR
+    subgraph PagoPA["PagoPA"]
+
+        subgraph VNet["VNet (ItalyNorth)"]
+            AppIO["`App IO
+              (Backend)`"]
+            HubAppGwPEP[Private Link]
+        end
+        subgraph FrontDoor["Global"]
+          ITWalletCDN["`Front Door
+            (CDN)`"]
+          CDNID["`User-Assigned
+            Managed Identity`"]
+
+          IOWebCDN["`IO Web
+            (Static Website)`"]
+        end
+    end
+
+    subgraph PSN
+        PSNEnterpriseApp["Enterprise App"]
+
+        subgraph Hub["Hub"]
+
+            subgraph HubAppGwWaf["`Application Gateway + WAF
+              Public + Private IPs`"]
+              HubWAF
+              HubAppGw
+            end
+
+
+        end
+
+        subgraph Spoke["Spoke"]
+            subgraph VNetWallet["VNet"]
+
+                subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
+                    GitHubRunner[io-p-itn-github-caj-01]
+                end
+                subgraph ITWalletRG["io-p-itn-wallet-rg-01"]
+                HubAPIM["io-p-itn-apim-01"]
+                WalletFunctionUser[io-p-itn-wallet-user-func-02]
+                WalletFunctionSupport[io-p-itn-wallet-supp-func-01]
+                WalletKeyVault["io-p-itn-wallet-kv-01"]
+                WalletCosmos["io-p-itn-wallet-cosno-02"]
+
+                subgraph WalletCDNSA["iopitnwalletcdnst01"]
+                    direction TB
+                    ContainerSpid[spid-hub-login]
+                    ContainerPdnd[pdnd]
+                    ContainerExchange[exchange]
+                    ContainerWellKnown[well-known]
+                    ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
+                end
+
+                subgraph WalletSA["iopitnwalletst01"]
+                    direction TB
+                    QueueEmail["creation-email-queue-01"]
+                    QueueRevocationEmail["revocation-email-queue-01"]
+                    QueueEmail ~~~ QueueRevocationEmail
+                end
+                end
+            end
+        end
+
+    end
+
+    subgraph GitHub["GitHub"]
+        GitHubRepo
+    end
+
+    subgraph ThirdParties["Third Parties"]
+        RelyingParty["Relying Party"]
+        CredentialIssuer["Credential Issuer"]
+    end
+
+    ITWalletCDN --> CDNID --> PSNEnterpriseApp --> WalletCDNSA
+    AppIO --> HubAppGwPEP --> HubAppGwWaf
+    IOWebCDN --> HubAppGwWaf
+
+    Hub --> HubAPIM
+    HubAPIM --> WalletFunctionUser
+    HubAPIM --> WalletFunctionSupport --> WalletCosmos
+
+    WalletFunctionUser --> WalletCosmos
+    WalletFunctionUser --> WalletKeyVault
+    WalletFunctionUser --> WalletSA
+
+    GitHubRunner --> GitHubRepo
+
+    ThirdParties --> ITWalletCDN
+    PSNEnterpriseApp@{ icon: "azure:enterprise-applications", pos: "b" }
+    ITWalletCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
+    IOWebCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
+    HubWAF@{ icon: "azure:web-application-firewall-policieswaf", pos: "b" }
+    HubAppGw@{ icon: "azure:application-gateways", pos: "b" }
+    HubAppGwPEP@{ icon: "azure:private-link", pos: "b" }
+    HubAPIM@{ icon: "azure:api-management-services", pos: "b" }
+    AppIO@{ icon: "azure:app-service-plans", pos: "b" }
+    WalletFunctionUser@{ icon: "azure:function-apps", pos: "b" }
+    WalletFunctionSupport@{ icon: "azure:function-apps", pos: "b" }
+    CDNID@{ icon: "azure:managed-identities", pos: "b" }
+    WalletCosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
+    WalletKeyVault@{ icon: "azure:key-vaults", pos: "b" }
+    ContainerSpid@{ icon: "azure:storage-container", pos: "b" }
+    ContainerPdnd@{ icon: "azure:storage-container", pos: "b" }
+    ContainerExchange@{ icon: "azure:storage-container", pos: "b" }
+    ContainerWellKnown@{ icon: "azure:storage-container", pos: "b" }
+    GitHubRunner@{ icon: "azure:worker-container-app", pos: "b" }
+    GitHubRepo@{ icon: "aws:res-git-repository", pos: "b" }
+    QueueEmail@{ icon: "azure:storage-queue"}
+    QueueRevocationEmail@{ icon: "azure:storage-queue"}
+
+    classDef macroBlock stroke-dasharray: 5 5, stroke-width:3px
+    classDef subBlock stroke-dasharray: 5 5, stroke-width:2px
+    classDef thirdPartiesClass fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
+    classDef pagoPAStyle fill:#e8f4fd,stroke:#3498db,stroke-width:2px
+    classDef psnStyle fill:#edf7f6,stroke:#16a085,stroke-width:2px
+    classDef hubStyle fill:#fff4e6,stroke:#d68910,stroke-width:1px
+    classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
+    classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
+
+    linkStyle 4,5,6,18 stroke:#f39c12,stroke-width:2px
+
+    class PagoPA pagoPAStyle
+    class PSN psnStyle
+    class Hub,HubAppGwWaf hubStyle
+    class Spoke spokeStyle
+    class VNet,FrontDoor pagoPAStyle
+    class ITWalletRG,VNetWallet,GHRunnerRG,WalletSA,WalletCDNSA spokeStyle
+
+    class RelyingParty thirdPartiesClass
+    class CredentialIssuer thirdPartiesClass
+    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletKeyVault,WalletCosmos,GitHubRunner,WalletSA,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid,QueueEmail,QueueRevocationEmail disabledStyle

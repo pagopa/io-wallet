@@ -19,5 +19,5 @@ resource "azurerm_management_lock" "psn_id_01" {
   name       = azurerm_user_assigned_identity.psn_01.name
   scope      = azurerm_user_assigned_identity.psn_01.id
   lock_level = "CanNotDelete"
-  notes      = "This Managed Identity is used to get the CMK from HSM key erogated by PSN"
+  notes      = "This Managed Identity is used to get the CMK from the HSM erogated by PSN. If deleted, services depending on it will stop working."
 }
