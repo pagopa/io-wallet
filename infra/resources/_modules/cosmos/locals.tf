@@ -6,7 +6,7 @@ locals {
       name               = "wallet-instances"
       partition_key_path = "/userId"
       autoscale_settings = {
-        max_throughput = 12000
+        max_throughput = 8000
       }
       default_ttl = null
     },
@@ -47,7 +47,7 @@ locals {
       name               = "whitelisted-fiscal-codes"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 12000
+        max_throughput = 8000
       }
       default_ttl = null
     },
