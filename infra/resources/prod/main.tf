@@ -55,23 +55,15 @@ module "ids" {
 module "key_vaults" {
   source = "../_modules/key_vaults"
 
-  project             = local.project
-  location            = local.environment.location
+  environment = merge(local.environment,
+    {
+      environment = local.environment.env_short
+      name        = "wallet"
+    }
+  )
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   tenant_id = data.azurerm_client_config.current.tenant_id
-
-  key_vault_certificates = {
-    id                  = data.azurerm_key_vault.certificates.id
-    name                = data.azurerm_key_vault.certificates.name
-    resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-  }
-
-  cdn_principal_id = module.cdn.cdn_principal_id
-
-  ci_infra_principal_id = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
-
-  subscription_id = data.azurerm_subscription.current.subscription_id
 
   tags = local.tags
 }
@@ -182,10 +174,14 @@ module "cdn" {
 module "iam" {
   source = "../_modules/iam"
 
+  subscription_id = data.azurerm_subscription.current.subscription_id
+
   admin_ids = [
     data.azuread_group.eng_admins.object_id,
     data.azuread_group.wallet_admins.object_id,
   ]
+
+  cdn_principal_id = module.cdn.cdn_principal_id
 
   cicd_principal_ids = {
     infra = {
@@ -230,6 +226,11 @@ module "iam" {
     id                  = module.key_vaults.key_vault_wallet.id
     name                = module.key_vaults.key_vault_wallet.name
     resource_group_name = module.key_vaults.key_vault_wallet.resource_group_name
+  }
+
+  key_vault_certificates = {
+    name                = data.azurerm_key_vault.certificates.name
+    resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
   }
 
   cdn_storage_account = {

@@ -1,3 +1,13 @@
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription Id"
+}
+
+variable "cdn_principal_id" {
+  type        = string
+  description = "Principal ID of the CDN managed identity"
+}
+
 variable "cosmos_db_02" {
   type = object({
     id                  = string
@@ -39,6 +49,14 @@ variable "key_vault" {
   })
 
   description = "KeyVault Id and list of Entra groups who are administrator of Key Vaults"
+}
+
+variable "key_vault_certificates" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  description = "Key Vault used to store certificates for CDN"
 }
 
 variable "cdn_storage_account" {

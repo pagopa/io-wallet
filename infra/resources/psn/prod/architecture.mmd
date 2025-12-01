@@ -34,7 +34,6 @@ graph LR
               HubAppGw
             end
 
-
         end
 
         subgraph Spoke["Spoke"]
@@ -47,7 +46,9 @@ graph LR
                 HubAPIM["io-p-itn-apim-01"]
                 WalletFunctionUser[io-p-itn-wallet-user-func-02]
                 WalletFunctionSupport[io-p-itn-wallet-supp-func-01]
-                WalletKeyVault["io-p-itn-wallet-kv-01"]
+                WalletAppsKeyVaultPep["iw-p-itn-apps-kv-pep-01"]
+                WalletAppsKeyVault["iw-p-itn-apps-kv-01"]
+                WalletCDNKeyVault["iw-p-itn-cdn-kv-01"]
                 WalletCosmos["io-p-itn-wallet-cosno-02"]
                 WalletCMKKey["iw-p-itn-data-cmk-id-01"]
 
@@ -91,7 +92,7 @@ graph LR
 
     WalletFunctionUser --> WalletCosmos
     WalletFunctionUser --> WalletSA
-    WalletFunctionUser --> WalletKeyVault
+    WalletFunctionUser --> WalletAppsKeyVaultPep --> WalletAppsKeyVault
 
     WalletSA --> WalletCMKKey
     WalletCosmos --> WalletCMKKey
@@ -111,7 +112,9 @@ graph LR
     WalletFunctionSupport@{ icon: "azure:function-apps", pos: "b" }
     CDNID@{ icon: "azure:managed-identities", pos: "b" }
     WalletCosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
-    WalletKeyVault@{ icon: "azure:key-vaults", pos: "b" }
+    WalletAppsKeyVault@{ icon: "azure:key-vaults", pos: "b" }
+    WalletAppsKeyVaultPep@{ icon: "azure:private-endpoints", pos: "b" }
+    WalletCDNKeyVault@{ icon: "azure:key-vaults", pos: "b" }
     WalletCMKKey@{ icon: "azure:managed-identities", pos: "b" }
     ContainerSpid@{ icon: "azure:storage-container", pos: "b" }
     ContainerPdnd@{ icon: "azure:storage-container", pos: "b" }
@@ -142,4 +145,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletKeyVault,WalletCosmos,GitHubRunner,WalletSA,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid,QueueEmail,QueueRevocationEmail disabledStyle
+    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletCosmos,GitHubRunner,WalletSA,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid,QueueEmail,QueueRevocationEmail disabledStyle
