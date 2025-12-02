@@ -2,7 +2,6 @@ locals {
   environment = {
     prefix          = "iw"
     environment     = "p"
-    domain          = "wallet"
     location        = "italynorth"
     instance_number = "01"
   }
