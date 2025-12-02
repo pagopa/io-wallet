@@ -22,7 +22,7 @@ resource "azurerm_key_vault" "wallet" {
   enabled_for_disk_encryption   = true
   soft_delete_retention_days    = 90
   purge_protection_enabled      = true
-  public_network_access_enabled = true
+  public_network_access_enabled = var.private_endpoint == null ? true : false
   rbac_authorization_enabled    = true
 
   network_acls {
