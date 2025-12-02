@@ -28,11 +28,11 @@ data "azurerm_private_dns_zone" "privatelink_documents" {
 }
 
 data "azuread_group" "wallet_admins" {
-  display_name = format("%s-%s-adgroup-wallet-admins", local.prefix, local.env_short)
+  display_name = format("%s-%s-adgroup-wallet-admins", local.environment.prefix, local.environment.env_short)
 }
 
 data "azuread_group" "eng_admins" {
-  display_name = format("%s-%s-adgroup-admin", local.prefix, local.env_short)
+  display_name = format("%s-%s-adgroup-admin", local.environment.prefix, local.environment.env_short)
 }
 
 data "azurerm_application_insights" "common" {
@@ -66,21 +66,21 @@ data "azurerm_monitor_action_group" "io" {
 }
 
 data "azuread_service_principal" "psn_app_id" {
-  display_name = "${local.prefix}-${local.env_short}-psn-hsm-01"
+  display_name = "${local.environment.prefix}-${local.environment.env_short}-psn-hsm-01"
 }
 
 data "azurerm_user_assigned_identity" "infra_ci_id" {
-  name                = "${local.project}-${local.domain}-infra-github-ci-id-01"
+  name                = "${local.project}-${local.environment.domain}-infra-github-ci-id-01"
   resource_group_name = data.azurerm_resource_group.wallet.name
 }
 
 data "azurerm_user_assigned_identity" "infra_cd_id" {
-  name                = "${local.project}-${local.domain}-infra-github-cd-id-01"
+  name                = "${local.project}-${local.environment.domain}-infra-github-cd-id-01"
   resource_group_name = data.azurerm_resource_group.wallet.name
 }
 
 data "azurerm_user_assigned_identity" "app_cd_id" {
-  name                = "${local.project}-${local.domain}-app-github-cd-id-01"
+  name                = "${local.project}-${local.environment.domain}-app-github-cd-id-01"
   resource_group_name = data.azurerm_resource_group.wallet.name
 }
 
