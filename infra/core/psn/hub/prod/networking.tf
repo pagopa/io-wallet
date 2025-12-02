@@ -4,8 +4,21 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke" {
   name                      = "peer-to-pagopa-Prod-ITWallet-spoke-italynorth"
   resource_group_name       = data.azurerm_virtual_network.hub.resource_group_name
   virtual_network_name      = data.azurerm_virtual_network.hub.name
-  remote_virtual_network_id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/pagopa-Prod-ITWallet-rg-spoke-italynorth/providers/Microsoft.Network/virtualNetworks/pagopa-Prod-ITWallet-spoke-italynorth"
+  remote_virtual_network_id = local.spoke_vnet_id
 
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "spoke" {
+  provider = azurerm.hub
+
+  for_each = toset(local.private_dns_zones_spoke_links)
+
+  name                  = each.value
+  private_dns_zone_name = each.value
+  resource_group_name   = data.azurerm_virtual_network.hub.resource_group_name
+  virtual_network_id    = local.spoke_vnet_id
+
+  tags = local.tags
 }
