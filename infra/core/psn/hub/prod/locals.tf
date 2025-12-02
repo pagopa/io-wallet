@@ -1,4 +1,15 @@
 locals {
+  private_dns_zones_spoke_links = [
+    azurerm_private_dns_zone.kv.name,
+    azurerm_private_dns_zone.cosno.name,
+    azurerm_private_dns_zone.asp.name,
+    azurerm_private_dns_zone.blob.name,
+    azurerm_private_dns_zone.queue.name,
+    azurerm_private_dns_zone.table.name,
+  ]
+
+  spoke_vnet_id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/pagopa-Prod-ITWallet-rg-spoke-italynorth/providers/Microsoft.Network/virtualNetworks/pagopa-Prod-ITWallet-spoke-italynorth"
+
   tags = {
     BusinessUnit = "IT-Wallet"
     CostCenter   = "TS000 - Tecnologia e Servizi"
