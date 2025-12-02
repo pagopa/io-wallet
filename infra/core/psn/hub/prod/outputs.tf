@@ -7,3 +7,8 @@ output "application_gateway" {
   }
 }
 
+output "vpn" {
+  value = {
+    client_ip_address = local.vpn_client_address
+  }
+}

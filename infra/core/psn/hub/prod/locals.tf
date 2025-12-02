@@ -1,4 +1,11 @@
 locals {
+  environment = {
+    prefix          = "iw"
+    environment     = "p"
+    location        = "italynorth"
+    instance_number = "01"
+  }
+
   private_dns_zones_spoke_links = [
     azurerm_private_dns_zone.kv.name,
     azurerm_private_dns_zone.cosno.name,
@@ -8,7 +15,10 @@ locals {
     azurerm_private_dns_zone.table.name,
   ]
 
-  spoke_vnet_id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/pagopa-Prod-ITWallet-rg-spoke-italynorth/providers/Microsoft.Network/virtualNetworks/pagopa-Prod-ITWallet-spoke-italynorth"
+  spoke_vnet_name = "pagopa-Prod-ITWallet-spoke-italynorth"
+  spoke_vnet_id   = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/pagopa-Prod-ITWallet-rg-spoke-italynorth/providers/Microsoft.Network/virtualNetworks/pagopa-Prod-ITWallet-spoke-italynorth"
+
+  vpn_client_address = "172.16.201.0/24"
 
   tags = {
     BusinessUnit = "IT-Wallet"
