@@ -20,6 +20,7 @@ resource "azurerm_virtual_network_peering" "spoke_to_hub" {
 
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
+  use_remote_gateways          = true
 }
 
 resource "azurerm_route_table" "spoke" {
@@ -65,6 +66,12 @@ resource "azurerm_route_table" "spoke" {
       address_prefix         = "0.0.0.0/0"
       next_hop_in_ip_address = local.networking.firewall_ip
       next_hop_type          = local.networking.next_hope_type
+    },
+    {
+      name                   = "AllowP2SVPN"
+      address_prefix         = "172.16.201.0/24" # from Hub Gateway configuration
+      next_hop_type          = "VirtualNetworkGateway"
+      next_hop_in_ip_address = null
     }
   ]
 
