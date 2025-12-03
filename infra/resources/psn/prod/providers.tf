@@ -32,4 +32,12 @@ provider "azurerm" {
   subscription_id     = "725dede2-879b-45c5-82fa-eb816875b10c"
 }
 
+provider "azurerm" {
+  features {}
+  alias                           = "hub"
+  storage_use_azuread             = true
+  resource_provider_registrations = "none"
+  subscription_id                 = "f3c27dbc-5c86-4c14-b43f-9faed77e5e19"
+}
+
 provider "dx" {}
