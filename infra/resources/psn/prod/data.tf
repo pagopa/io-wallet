@@ -1,5 +1,7 @@
 data "azurerm_client_config" "current" {}
 
+data "azurerm_subscription" "current" {}
+
 data "azuread_group" "wallet" {
   display_name = "pagopa-ITWallet"
 }
@@ -33,6 +35,20 @@ data "azurerm_private_dns_zone" "kv" {
   provider = azurerm.hub
 
   name                = "privatelink.vaultcore.azure.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "blob" {
+  provider = azurerm.hub
+
+  name                = "privatelink.blob.core.windows.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "queue" {
+  provider = azurerm.hub
+
+  name                = "privatelink.queue.core.windows.net"
   resource_group_name = local.hub.resource_group_name
 }
 

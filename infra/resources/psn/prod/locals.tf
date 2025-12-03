@@ -17,6 +17,8 @@ locals {
     resource_group_name = "pagopa-rg-hub-network-italynorth"
   }
 
+  hsm_key_url = "https://pagopa-managedhsm.managedhsm.azure.net/keys/mdb001prod"
+
   tags = {
     BusinessUnit = "IT-Wallet"
     CostCenter   = "TS000 - Tecnologia e Servizi"

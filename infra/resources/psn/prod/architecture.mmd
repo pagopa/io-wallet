@@ -61,7 +61,9 @@ graph LR
                     ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
                 end
 
-                subgraph WalletSA["iopitnwalletst01"]
+                WalletSAPep["iw-u-itn-apps-x-pep-01"]
+
+                subgraph WalletSA["iwuitnappsst01"]
                     direction TB
                     QueueEmail["creation-email-queue-01"]
                     QueueRevocationEmail["revocation-email-queue-01"]
@@ -91,7 +93,7 @@ graph LR
     HubAPIM --> WalletFunctionSupport --> WalletCosmos
 
     WalletFunctionUser --> WalletCosmos
-    WalletFunctionUser --> WalletSA
+    WalletFunctionUser --> WalletSAPep --> WalletSA
     WalletFunctionUser --> WalletAppsKeyVaultPep --> WalletAppsKeyVault
 
     WalletSA --> WalletCMKKey
@@ -122,6 +124,7 @@ graph LR
     ContainerWellKnown@{ icon: "azure:storage-container", pos: "b" }
     GitHubRunner@{ icon: "azure:worker-container-app", pos: "b" }
     GitHubRepo@{ icon: "aws:res-git-repository", pos: "b" }
+    WalletSAPep@{ icon: "azure:private-endpoints", pos: "b" }
     QueueEmail@{ icon: "azure:storage-queue"}
     QueueRevocationEmail@{ icon: "azure:storage-queue"}
 
@@ -134,7 +137,7 @@ graph LR
     classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
     classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
 
-    linkStyle 4,5,6,20 stroke:#f39c12,stroke-width:2px
+    linkStyle 4,5,6,22 stroke:#f39c12,stroke-width:2px
 
     class PagoPA pagoPAStyle
     class PSN psnStyle
@@ -145,4 +148,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletCosmos,GitHubRunner,WalletSA,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid,QueueEmail,QueueRevocationEmail disabledStyle
+    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletCosmos,GitHubRunner,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid disabledStyle

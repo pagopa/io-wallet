@@ -1,37 +1,16 @@
-
-variable "prefix" {
-  type        = string
-  description = "IO prefix"
-}
-
-variable "env_short" {
-  type        = string
-  description = "IO env_short"
+variable "environment" {
+  type = object({
+    prefix          = string
+    environment     = string
+    location        = string
+    name            = string
+    instance_number = string
+  })
 }
 
 variable "u_env_short" {
   type        = string
   description = "IO uat env_short"
-}
-
-variable "location" {
-  type        = string
-  description = "Azure region"
-}
-
-variable "domain" {
-  type        = string
-  description = "Azure domain"
-}
-
-variable "app_name" {
-  type        = string
-  description = "Azure app_name"
-}
-
-variable "instance_number" {
-  type        = string
-  description = "Azure instance_number"
 }
 
 variable "tags" {
@@ -49,22 +28,30 @@ variable "action_group_id" {
   description = "Id of the alert action group"
 }
 
-variable "private_dns_zone_resource_group_name" {
-  type        = string
-  description = "Resource group of the Private DNS Zone used for private endpoints"
-}
-
-variable "subnet_pep_id" {
-  type        = string
-  description = "Id of the private endpoints' subnet"
-}
-
 variable "key_vault_wallet_id" {
   type        = string
   description = "Id of the wallet Key Vault where storage account saves secrets"
+  default     = null
 }
 
-variable "action_group_wallet_id" {
+variable "private_endpoint" {
+  type = object({
+    subnet_pep_id             = string
+    blob_private_dns_zone_id  = string
+    queue_private_dns_zone_id = string
+  })
+  default     = null
+  description = "Configuration for the Private Endpoints"
+}
+
+variable "user_assigned_managed_identity_id" {
   type        = string
-  description = "Id of the Action Group owned by the Wallet team"
+  default     = null
+  description = "Id of the user-assigned managed identity to associate to Storage Accounts"
+}
+
+variable "customer_managed_key_url" {
+  type        = string
+  default     = null
+  description = "URL of the customer managed key to encrypt the Storage Account"
 }

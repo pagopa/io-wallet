@@ -280,23 +280,23 @@ module "apim_itn" {
 module "storage_accounts" {
   source = "../_modules/storage_accounts"
 
-  prefix          = local.environment.prefix
-  env_short       = local.environment.env_short
-  u_env_short     = local.u_env_short
-  location        = local.environment.location
-  domain          = ""
-  app_name        = local.environment.domain
-  instance_number = "01"
-
+  environment = merge(local.environment,
+    {
+      environment = local.environment.env_short
+      name        = "wallet"
+    }
+  )
+  u_env_short         = local.u_env_short
   resource_group_name = data.azurerm_resource_group.wallet.name
 
-  subnet_pep_id                        = data.azurerm_subnet.pep.id
-  private_dns_zone_resource_group_name = data.azurerm_resource_group.weu_common.name
-  action_group_id                      = module.monitoring.action_group_wallet.id
+  private_endpoint = {
+    blob_private_dns_zone_id  = data.azurerm_private_dns_zone.privatelink_blob.id
+    queue_private_dns_zone_id = data.azurerm_private_dns_zone.privatelink_queue.id
+    subnet_pep_id             = data.azurerm_subnet.pep.id
+  }
 
+  action_group_id     = module.monitoring.action_group_wallet.id
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
-
-  action_group_wallet_id = module.monitoring.action_group_wallet.id
 
   tags = local.tags
 }
