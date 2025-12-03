@@ -6,6 +6,8 @@ locals {
     instance_number = "01"
   }
 
+  project = "${local.environment.prefix}-${local.environment.environment}-itn"
+
   spoke = {
     name                = "pagopa-Prod-ITWallet-spoke-italynorth"
     resource_group_name = "pagopa-Prod-ITWallet-rg-spoke-italynorth"
