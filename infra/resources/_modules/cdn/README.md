@@ -25,6 +25,7 @@ No modules.
 | [azurerm_cdn_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_profile) | resource |
 | [azurerm_monitor_diagnostic_setting.cdn_profile](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_metric_alert.storage_account_low_availability](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_monitor_scheduled_query_rules_alert.cdn_requests_error_alert](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_scheduled_query_rules_alert) | resource |
 | [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account_static_website.cdn_website](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) | resource |
 | [azurerm_storage_container.exchange](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
@@ -41,6 +42,7 @@ No modules.
 | <a name="input_action_group_wallet_id"></a> [action\_group\_wallet\_id](#input\_action\_group\_wallet\_id) | Id of the Action Group owned by the Wallet team | `string` | n/a | yes |
 | <a name="input_key_vault_certificate_secret_id"></a> [key\_vault\_certificate\_secret\_id](#input\_key\_vault\_certificate\_secret\_id) | Secret Id of the key vault that contains the CDN certificate | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_location_legacy"></a> [location\_legacy](#input\_location\_legacy) | Azure region | `string` | n/a | yes |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Log Analytics Workspace id | `string` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | IO prefix and short environment | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
@@ -51,6 +53,8 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#output\_cdn\_endpoint\_id) | n/a |
+| <a name="output_cdn_endpoint_name"></a> [cdn\_endpoint\_name](#output\_cdn\_endpoint\_name) | n/a |
 | <a name="output_cdn_principal_id"></a> [cdn\_principal\_id](#output\_cdn\_principal\_id) | n/a |
+| <a name="output_cdn_profile_name"></a> [cdn\_profile\_name](#output\_cdn\_profile\_name) | n/a |
 | <a name="output_storage_account_cdn"></a> [storage\_account\_cdn](#output\_storage\_account\_cdn) | n/a |
 <!-- END_TF_DOCS -->

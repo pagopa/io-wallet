@@ -49,7 +49,8 @@ graph LR
                 WalletAppsKeyVaultPep["iw-p-itn-apps-kv-pep-01"]
                 WalletAppsKeyVault["iw-p-itn-apps-kv-01"]
                 WalletCDNKeyVault["iw-p-itn-cdn-kv-01"]
-                WalletCosmos["io-p-itn-wallet-cosno-02"]
+                WalletCosmosPep["iw-p-itn-apps-cosno-pep-01"]
+                WalletCosmos["iw-p-itn-apps-cosno-01"]
                 WalletCMKKey["iw-p-itn-data-cmk-id-01"]
 
                 subgraph WalletCDNSA["iopitnwalletcdnst01"]
@@ -61,9 +62,9 @@ graph LR
                     ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
                 end
 
-                WalletSAPep["iw-u-itn-apps-x-pep-01"]
+                WalletSAPep["iw-p-itn-apps-x-pep-01"]
 
-                subgraph WalletSA["iwuitnappsst01"]
+                subgraph WalletSA["iwpitnappsst01"]
                     direction TB
                     QueueEmail["creation-email-queue-01"]
                     QueueRevocationEmail["revocation-email-queue-01"]
@@ -90,9 +91,9 @@ graph LR
 
     Hub --> HubAPIM
     HubAPIM --> WalletFunctionUser
-    HubAPIM --> WalletFunctionSupport --> WalletCosmos
+    HubAPIM --> WalletFunctionSupport --> WalletCosmosPep
 
-    WalletFunctionUser --> WalletCosmos
+    WalletFunctionUser --> WalletCosmosPep --> WalletCosmos
     WalletFunctionUser --> WalletSAPep --> WalletSA
     WalletFunctionUser --> WalletAppsKeyVaultPep --> WalletAppsKeyVault
 
@@ -113,6 +114,7 @@ graph LR
     WalletFunctionUser@{ icon: "azure:function-apps", pos: "b" }
     WalletFunctionSupport@{ icon: "azure:function-apps", pos: "b" }
     CDNID@{ icon: "azure:managed-identities", pos: "b" }
+    WalletCosmosPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletCosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
     WalletAppsKeyVault@{ icon: "azure:key-vaults", pos: "b" }
     WalletAppsKeyVaultPep@{ icon: "azure:private-endpoints", pos: "b" }
@@ -137,7 +139,7 @@ graph LR
     classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
     classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
 
-    linkStyle 4,5,6,22 stroke:#f39c12,stroke-width:2px
+    linkStyle 4,5,6,23 stroke:#f39c12,stroke-width:2px
 
     class PagoPA pagoPAStyle
     class PSN psnStyle
@@ -148,4 +150,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletCosmos,GitHubRunner,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid disabledStyle
+    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,GitHubRunner,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid disabledStyle

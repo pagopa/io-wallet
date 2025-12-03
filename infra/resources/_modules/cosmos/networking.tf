@@ -1,12 +1,21 @@
-resource "azurerm_private_endpoint" "sql_02" {
-  name                = "${var.project}-wallet-sql-pep-02"
-  location            = var.location
+locals {
+  pep_name = var.psn_service_principal_id == null ? provider::dx::resource_name(merge(
+    var.environment,
+    {
+      resource_type = "cosmos_private_endpoint"
+    }
+  )) : "io-p-itn-wallet-sql-pep-02" # temporary workaround until the resource will be deleted
+}
+
+resource "azurerm_private_endpoint" "sql" {
+  name                = local.pep_name
+  location            = var.environment.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.private_endpoint_subnet_id
 
   private_service_connection {
-    name                           = "${var.project}-wallet-sql-pep-02"
-    private_connection_resource_id = "/subscriptions/ec285037-c673-4f58-b594-d7c480da4e8b/resourceGroups/io-p-itn-wallet-rg-01/providers/Microsoft.DocumentDB/databaseAccounts/io-p-itn-wallet-cosno-02"
+    name                           = local.pep_name
+    private_connection_resource_id = azurerm_cosmosdb_account.apps.id
     is_manual_connection           = false
     subresource_names              = ["Sql"]
   }

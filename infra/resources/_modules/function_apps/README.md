@@ -17,9 +17,9 @@ No requirements.
 |------|--------|---------|
 | <a name="module_function_app_support"></a> [function\_app\_support](#module\_function\_app\_support) | pagopa-dx/azure-function-app/azurerm | ~> 3.0 |
 | <a name="module_function_app_support_autoscaler"></a> [function\_app\_support\_autoscaler](#module\_function\_app\_support\_autoscaler) | pagopa-dx/azure-app-service-plan-autoscaler/azurerm | ~> 0.0 |
-| <a name="module_function_app_user_02"></a> [function\_app\_user\_02](#module\_function\_app\_user\_02) | pagopa-dx/azure-function-app/azurerm | ~> 0.0 |
+| <a name="module_function_app_user_02"></a> [function\_app\_user\_02](#module\_function\_app\_user\_02) | pagopa-dx/azure-function-app/azurerm | ~> 3.0 |
 | <a name="module_function_app_user_autoscaler_02"></a> [function\_app\_user\_autoscaler\_02](#module\_function\_app\_user\_autoscaler\_02) | pagopa-dx/azure-app-service-plan-autoscaler/azurerm | ~> 0.0 |
-| <a name="module_function_app_user_uat"></a> [function\_app\_user\_uat](#module\_function\_app\_user\_uat) | pagopa-dx/azure-function-app/azurerm | ~> 0.0 |
+| <a name="module_function_app_user_uat"></a> [function\_app\_user\_uat](#module\_function\_app\_user\_uat) | pagopa-dx/azure-function-app/azurerm | ~> 3.0 |
 
 ## Resources
 
@@ -29,6 +29,7 @@ No requirements.
 | [azurerm_key_vault_secret.func_support_default_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_key_vault_secret.func_user_default_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_key_vault_secret.func_user_uat_default_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
+| [azurerm_monitor_metric_alert.app_service_plan_cpu_alert](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.function_app_support_response_time](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.function_app_user_response_time](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_subnet_nat_gateway_association.func_support](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_nat_gateway_association) | resource |
@@ -51,6 +52,8 @@ No requirements.
 | <a name="input_cosmos_database_name_uat"></a> [cosmos\_database\_name\_uat](#input\_cosmos\_database\_name\_uat) | uat Wallet Cosmos DB database name | `string` | n/a | yes |
 | <a name="input_cosmos_db_endpoint"></a> [cosmos\_db\_endpoint](#input\_cosmos\_db\_endpoint) | Cosmos DB endpoint to use as application environment variable | `string` | n/a | yes |
 | <a name="input_env_short"></a> [env\_short](#input\_env\_short) | Short environment | `string` | n/a | yes |
+| <a name="input_front_door_endpoint_name"></a> [front\_door\_endpoint\_name](#input\_front\_door\_endpoint\_name) | Front Door endpoint name | `string` | n/a | yes |
+| <a name="input_front_door_profile_name"></a> [front\_door\_profile\_name](#input\_front\_door\_profile\_name) | Front Door profile name | `string` | n/a | yes |
 | <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Id of the common Key Vault where save secrets in | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Id of the wallet Key Vault where save secrets | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_name"></a> [key\_vault\_wallet\_name](#input\_key\_vault\_wallet\_name) | Name of the wallet Key Vault where save secrets | `string` | n/a | yes |
@@ -62,11 +65,10 @@ No requirements.
 | <a name="input_project"></a> [project](#input\_project) | IO prefix and short environment | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
 | <a name="input_storage_account_cdn_name"></a> [storage\_account\_cdn\_name](#input\_storage\_account\_cdn\_name) | Name of the CDN storage account | `string` | n/a | yes |
-| <a name="input_support_func"></a> [support\_func](#input\_support\_func) | Configuration of the support-func | <pre>object({<br/>    app_settings = list(object({<br/>      name                  = string<br/>      value                 = optional(string, "")<br/>      key_vault_secret_name = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
+| <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription ID | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
 | <a name="input_u_env_short"></a> [u\_env\_short](#input\_u\_env\_short) | IO uat env\_short | `string` | n/a | yes |
 | <a name="input_user_func"></a> [user\_func](#input\_user\_func) | Configuration of the user-func | <pre>object({<br/>    app_settings = list(object({<br/>      name                  = string<br/>      value                 = optional(string, "")<br/>      key_vault_secret_name = optional(string)<br/>    }))<br/>  })</pre> | n/a | yes |
-| <a name="input_validate_wallet_instance_certificates_queue_name"></a> [validate\_wallet\_instance\_certificates\_queue\_name](#input\_validate\_wallet\_instance\_certificates\_queue\_name) | Wallet Instance Certificates Validation Queue Name | `string` | n/a | yes |
 | <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_wallet_instance_creation_email_queue_name"></a> [wallet\_instance\_creation\_email\_queue\_name](#input\_wallet\_instance\_creation\_email\_queue\_name) | Send Email on Wallet Instance Creation Queue Name | `string` | n/a | yes |
 | <a name="input_wallet_instance_revocation_email_queue_name"></a> [wallet\_instance\_revocation\_email\_queue\_name](#input\_wallet\_instance\_revocation\_email\_queue\_name) | Send Email on Wallet Instance Revocation Queue Name | `string` | n/a | yes |

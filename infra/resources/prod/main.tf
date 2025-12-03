@@ -84,16 +84,24 @@ module "monitoring" {
 module "cosmos" {
   source = "../_modules/cosmos"
 
-  project             = local.project
-  location            = local.environment.location
+  environment = merge(local.environment,
+    {
+      domain          = ""
+      environment     = local.environment.env_short
+      name            = "wallet"
+      instance_number = "02"
+    }
+  )
   secondary_location  = local.secondary_location
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   private_endpoint_subnet_id = data.azurerm_subnet.pep.id
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
 
-  action_group_wallet_id = module.monitoring.action_group_wallet.id
-  action_group_io_id     = data.azurerm_monitor_action_group.io.id
+  action_group_ids = [
+    module.monitoring.action_group_wallet.id,
+    data.azurerm_monitor_action_group.io.id
+  ]
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
   psn_service_principal_id          = data.azuread_service_principal.psn_app_id.client_id
@@ -122,10 +130,10 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
+  cosmos_db_endpoint   = module.cosmos.apps.endpoint
+  cosmos_database_name = module.cosmos.apps.database_name
 
-  cosmos_database_name_uat = module.cosmos.cosmos_account_wallet.database_name_uat
+  cosmos_database_name_uat = module.cosmos.apps.database_name_uat
 
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
@@ -195,17 +203,17 @@ module "iam" {
   }
 
   cosmos_db_02 = {
-    id                  = module.cosmos.cosmos_account_wallet.id
-    name                = module.cosmos.cosmos_account_wallet.name
-    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
-    database_name       = module.cosmos.cosmos_account_wallet.database_name
+    id                  = module.cosmos.apps.id
+    name                = module.cosmos.apps.name
+    resource_group_name = module.cosmos.apps.resource_group_name
+    database_name       = module.cosmos.apps.database_name
   }
 
   cosmos_db_uat = {
-    id                  = module.cosmos.cosmos_account_wallet.id
-    name                = module.cosmos.cosmos_account_wallet.name
-    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
-    database_name       = module.cosmos.cosmos_account_wallet.database_name_uat
+    id                  = module.cosmos.apps.id
+    name                = module.cosmos.apps.name
+    resource_group_name = module.cosmos.apps.resource_group_name
+    database_name       = module.cosmos.apps.database_name_uat
   }
 
   function_app = {
