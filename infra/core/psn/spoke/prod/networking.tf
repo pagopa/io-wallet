@@ -79,7 +79,7 @@ resource "azurerm_subnet" "pep" {
   resource_group_name  = azurerm_resource_group.networking.name
   virtual_network_name = azurerm_virtual_network.spoke.name
 
-  address_prefixes = ["10.100.4.0/23"]
+  address_prefixes = ["10.100.0.0/23"]
 }
 
 resource "azurerm_subnet_route_table_association" "pep" {
