@@ -8,6 +8,7 @@ locals {
 
   private_dns_zones_spoke_links = [
     azurerm_private_dns_zone.kv.name,
+    azurerm_private_dns_zone.hsm.name,
     azurerm_private_dns_zone.cosno.name,
     azurerm_private_dns_zone.asp.name,
     azurerm_private_dns_zone.blob.name,

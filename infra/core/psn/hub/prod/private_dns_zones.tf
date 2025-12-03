@@ -7,6 +7,15 @@ resource "azurerm_private_dns_zone" "kv" {
   tags = local.tags
 }
 
+resource "azurerm_private_dns_zone" "hsm" {
+  provider = azurerm.hub
+
+  name                = "privatelink.managedhsm.azure.net"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
+
 resource "azurerm_private_dns_zone" "cosno" {
   provider = azurerm.hub
 
