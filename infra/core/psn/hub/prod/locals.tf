@@ -14,6 +14,8 @@ locals {
     azurerm_private_dns_zone.blob.name,
     azurerm_private_dns_zone.queue.name,
     azurerm_private_dns_zone.table.name,
+    azurerm_private_dns_zone.containerapp_itn.name,
+    azurerm_private_dns_zone.acr.name,
   ]
 
   spoke_vnet_name = "pagopa-Prod-ITWallet-spoke-italynorth"
