@@ -13,9 +13,10 @@ on:
       - "infra/core/psn/hub/prod/**"
       - "infra/core/psn/spoke/prod/**"
       - ".github/workflows/pr_psn_infra.yaml"
-  push: # Remove after testing
-    branches:
-      - feat-add-terraform-workflow-plan-apply
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   changes:
@@ -42,7 +43,7 @@ jobs:
 
   plan_prod:
     needs: changes
-    uses: pagopa/dx/.github/workflows/infra_plan.yaml@main
+    uses: pagopa/dx/.github/workflows/infra_plan.yaml@support/psn-adaptation #main - Temporary, to be removed when using specific psn environment
     name: Infrastructure Plan
     secrets: inherit
 
