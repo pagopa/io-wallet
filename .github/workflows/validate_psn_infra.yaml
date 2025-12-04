@@ -56,7 +56,7 @@ jobs:
     with:
       environment: prod
       base_path: infra/core/psn/${{ matrix.infra }}
-      use_private_agent: false # true TBD
+      use_private_agent: true
       override_github_environment: infra-prod # TBD
-      # use_labels: true # TBD
-      # override_labels: psn # TBD
+      use_labels: true
+      override_labels: psn
