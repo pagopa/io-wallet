@@ -60,3 +60,21 @@ resource "azurerm_private_dns_zone" "table" {
 
   tags = local.tags
 }
+
+resource "azurerm_private_dns_zone" "containerapp_itn" {
+  provider = azurerm.hub
+
+  name                = "privatelink.italynorth.azurecontainerapps.io"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
+
+resource "azurerm_private_dns_zone" "acr" {
+  provider = azurerm.hub
+
+  name                = "privatelink.azurecr.io"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
