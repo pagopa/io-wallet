@@ -31,9 +31,9 @@ jobs:
         with:
           filters: |
             hub:
-              - 'infra/modules/test_module_1/**'
+              - 'infra/core/psn/hub/prod/**'
             spoke:
-              - 'infra/modules/test_module_2/**'
+              - 'infra/core/psn/spoke/prod/**'
 
       - name: All PSN Infra modules (for manual trigger)
         if: github.event_name == 'workflow_dispatch'
