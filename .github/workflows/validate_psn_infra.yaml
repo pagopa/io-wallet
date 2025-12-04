@@ -1,0 +1,57 @@
+name: PR PSN Infrastructure Plan - Prod
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "infra/core/psn/hub/prod/**"
+      - "infra/core/psn/spoke/prod/**"
+      - ".github/workflows/pr_psn_infra.yaml"
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.changes.outputs.changes || steps.all.outputs.changes }}
+    steps:
+      - name: Found changed PSN Infra modules
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 #v3.0.2
+        if: github.event_name != 'workflow_dispatch'
+        id: changes
+        with:
+          filters: |
+            hub:
+              - 'infra/modules/test_module_1/**'
+            spoke:
+              - 'infra/modules/test_module_2/**'
+
+      - name: All PSN Infra modules (for manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        id: all
+        run: |
+          echo 'changes=["hub", "spoke"]' >> $GITHUB_OUTPUT
+
+  plan_prod:
+    needs: changes
+    uses: pagopa/dx/.github/workflows/infra_plan.yaml@main
+    name: Infrastructure Plan
+    secrets: inherit
+
+    strategy:
+      fail-fast: false
+      matrix:
+        infra: ${{ fromJSON( needs.changes.outputs.changes ) }}
+
+    with:
+      environment: prod
+      base_path: infra/core/psn/${{ matrix.infra }}
+      use_private_agent: false # true TBD
+      override_github_environment: infra-prod # TBD
+      # use_labels: true # TBD
+      # override_labels: psn # TBD
