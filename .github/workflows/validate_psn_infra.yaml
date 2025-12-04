@@ -13,6 +13,9 @@ on:
       - "infra/core/psn/hub/prod/**"
       - "infra/core/psn/spoke/prod/**"
       - ".github/workflows/pr_psn_infra.yaml"
+  push: # Remove after testing
+    branches:
+      - feat-add-terraform-workflow-plan-apply
 
 jobs:
   changes:
