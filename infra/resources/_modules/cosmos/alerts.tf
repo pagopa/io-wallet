@@ -1,7 +1,7 @@
-resource "azurerm_monitor_metric_alert" "cosmos_db_provisioned_throughput_exceeded_02" {
-  name                = "[${azurerm_cosmosdb_account.wallet_02.name}] Provisioned Throughput Exceeded"
+resource "azurerm_monitor_metric_alert" "cosmos_db_provisioned_throughput_exceeded" {
+  name                = "[${azurerm_cosmosdb_account.apps.name}] Provisioned Throughput Exceeded"
   resource_group_name = var.resource_group_name
-  scopes              = [azurerm_cosmosdb_account.wallet_02.id]
+  scopes              = [azurerm_cosmosdb_account.apps.id]
   description         = "A collection throughput (RU/s) exceed provisioned throughput, and it's raising 429 errors. Please, consider to increase RU"
   severity            = 0
   window_size         = "PT5M"
@@ -21,7 +21,7 @@ resource "azurerm_monitor_metric_alert" "cosmos_db_provisioned_throughput_exceed
     dimension {
       name     = "Region"
       operator = "Include"
-      values   = [var.location]
+      values   = [var.environment.location]
     }
 
     dimension {
@@ -37,12 +37,12 @@ resource "azurerm_monitor_metric_alert" "cosmos_db_provisioned_throughput_exceed
     }
   }
 
-  action {
-    action_group_id = var.action_group_wallet_id
-  }
+  dynamic "action" {
+    for_each = var.action_group_ids
+    content {
+      action_group_id = action.value
+    }
 
-  action {
-    action_group_id = var.action_group_io_id
   }
 
   tags = var.tags

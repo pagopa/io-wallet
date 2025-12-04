@@ -1,13 +1,20 @@
-resource "azurerm_cosmosdb_account" "wallet_02" {
-  name                = "${var.project}-wallet-cosno-02"
+resource "azurerm_cosmosdb_account" "apps" {
+  name = provider::dx::resource_name(merge(
+    var.environment,
+    {
+      resource_type = "cosmos_db_nosql"
+    }
+  ))
+
   resource_group_name = var.resource_group_name
-  location            = var.location
+  location            = var.environment.location
   offer_type          = "Standard"
 
-  automatic_failover_enabled = true
+  managed_hsm_key_id            = "https://pagopa-managedhsm.managedhsm.azure.net/keys/mdb001prod"
+  default_identity_type         = local.identity_type
+  local_authentication_disabled = var.secondary_location == null # temporary workaround to keep different values for the two tenant
 
-  managed_hsm_key_id    = "https://pagopa-managedhsm.managedhsm.azure.net/keys/mdb001prod"
-  default_identity_type = "UserAssignedIdentity=${var.user_assigned_managed_identity_id}&FederatedClientId=${var.psn_service_principal_id}"
+  automatic_failover_enabled = true
 
   identity {
     type         = "UserAssigned"
@@ -21,15 +28,18 @@ resource "azurerm_cosmosdb_account" "wallet_02" {
   }
 
   geo_location {
-    location          = var.location
+    location          = var.environment.location
     failover_priority = 0
     zone_redundant    = true
   }
 
-  geo_location {
-    location          = var.secondary_location
-    failover_priority = 1
-    zone_redundant    = false
+  dynamic "geo_location" {
+    for_each = var.secondary_location == null ? [] : [var.secondary_location]
+    content {
+      location          = geo_location.value
+      failover_priority = 1
+      zone_redundant    = false
+    }
   }
 
   public_network_access_enabled     = false

@@ -37,17 +37,17 @@ No requirements.
 | [azurerm_api_management_named_value.support_func_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_named_value) | resource |
 | [azurerm_api_management_named_value.user_func_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_named_value) | resource |
 | [azurerm_api_management_named_value.user_func_key_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_named_value) | resource |
-| [azurerm_key_vault_secret.funciowallet_default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_key_vault_secret.support_func_key_default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_key_vault_secret.user_func_key_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_key_vault_secret.user_func_key_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
+| [azurerm_key_vault_secret.user_func_key_ioweb](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_apim"></a> [apim](#input\_apim) | APIM configuration variables | <pre>object({<br>    name                = string<br>    resource_group_name = string<br>  })</pre> | n/a | yes |
-| <a name="input_function_apps"></a> [function\_apps](#input\_function\_apps) | APIM configuration variables | <pre>object({<br>    user_function = object({<br>      function_hostname = string<br>    })<br>    support_function = object({<br>      function_hostname = string<br>    })<br>  })</pre> | n/a | yes |
+| <a name="input_apim"></a> [apim](#input\_apim) | APIM configuration variables | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
+| <a name="input_function_apps"></a> [function\_apps](#input\_function\_apps) | APIM configuration variables | <pre>object({<br/>    user_function = object({<br/>      function_hostname = string<br/>    })<br/>    support_function = object({<br/>      function_hostname = string<br/>    })<br/>  })</pre> | n/a | yes |
 | <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Key Vault ID | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Wallet Key Vault ID | `string` | n/a | yes |
 | <a name="input_product_id"></a> [product\_id](#input\_product\_id) | Product ID | `string` | n/a | yes |

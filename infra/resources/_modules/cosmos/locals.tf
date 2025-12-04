@@ -1,4 +1,6 @@
 locals {
+  identity_type = format("UserAssignedIdentity=${var.user_assigned_managed_identity_id}%s", var.psn_service_principal_id == null ? "" : "&FederatedClientId=${var.psn_service_principal_id}")
+
   wallet_cosmosdb_containers = [
     # Each document represents a wallet instance
     # The userId partition key is the user fiscal code

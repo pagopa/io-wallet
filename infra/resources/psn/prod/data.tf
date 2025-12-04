@@ -52,6 +52,13 @@ data "azurerm_private_dns_zone" "queue" {
   resource_group_name = local.hub.resource_group_name
 }
 
+data "azurerm_private_dns_zone" "documents" {
+  provider = azurerm.hub
+
+  name                = "privatelink.documents.azure.com"
+  resource_group_name = local.hub.resource_group_name
+}
+
 data "azurerm_key_vault_secret" "notification_slack" {
   name         = "slack-wallet-channel-email"
   key_vault_id = module.key_vault_app.key_vault_wallet.id
