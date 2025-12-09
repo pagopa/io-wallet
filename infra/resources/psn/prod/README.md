@@ -28,6 +28,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | ../../_modules/cosmos | n/a |
 | <a name="module_ids"></a> [ids](#module\_ids) | ../../_modules/identities | n/a |
 | <a name="module_key_vault_app"></a> [key\_vault\_app](#module\_key\_vault\_app) | ../../_modules/key_vaults | n/a |
 | <a name="module_key_vault_cdn"></a> [key\_vault\_cdn](#module\_key\_vault\_cdn) | ../../_modules/key_vaults | n/a |
@@ -44,6 +45,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | [azurerm_key_vault_secret.notification_email](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_key_vault_secret.notification_slack](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_private_dns_zone.blob](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) | data source |
+| [azurerm_private_dns_zone.documents](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) | data source |
 | [azurerm_private_dns_zone.kv](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) | data source |
 | [azurerm_private_dns_zone.queue](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/private_dns_zone) | data source |
 | [azurerm_resource_group.wallet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |

@@ -84,6 +84,28 @@ module "storage_accounts" {
   tags = local.tags
 }
 
+module "cosmos" {
+  source = "../../_modules/cosmos"
+
+  environment = merge(local.environment,
+    {
+      name = "apps"
+    }
+  )
+  resource_group_name = data.azurerm_resource_group.wallet.name
+
+  private_endpoint_subnet_id = data.azurerm_subnet.pep.id
+  private_link_documents_id  = data.azurerm_private_dns_zone.documents.id
+
+  action_group_ids = [
+    module.monitoring.action_group_wallet.id,
+  ]
+
+  user_assigned_managed_identity_id = module.ids.psn_identity.id
+
+  tags = local.tags
+}
+
 # TODO: replace with IAM submodules when all resources will be created
 module "team_roles" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
@@ -133,6 +155,15 @@ module "team_roles" {
       resource_group_name  = module.storage_accounts.wallet.resource_group_name
       role                 = "owner"
       description          = "Allow Wallet team to manage queues"
+    }
+  ]
+
+  cosmos = [
+    {
+      account_name        = module.cosmos.apps.name
+      resource_group_name = module.cosmos.apps.resource_group_name
+      description         = "Allow Wallet team to manage databases and containers in the Cosmos DB account"
+      role                = "writer"
     }
   ]
 }
