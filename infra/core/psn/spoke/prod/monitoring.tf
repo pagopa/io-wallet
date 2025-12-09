@@ -52,7 +52,7 @@ resource "azurerm_monitor_private_link_scope" "wallet" {
   resource_group_name = azurerm_resource_group.monitoring.name
 
   ingestion_access_mode = "PrivateOnly"
-  query_access_mode     = "Open"
+  query_access_mode     = "PrivateOnly"
 
   tags = local.tags
 }
