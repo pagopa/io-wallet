@@ -106,6 +106,75 @@ module "cosmos" {
   tags = local.tags
 }
 
+# TODO: move to function_apps module when old resources will be removed
+resource "dx_available_subnet_cidr" "func_support" {
+  prefix_length      = 24
+  virtual_network_id = data.azurerm_virtual_network.spoke.id
+}
+
+# TODO: move to function_apps module when old resources will be removed
+resource "dx_available_subnet_cidr" "func_user" {
+  prefix_length      = 24
+  virtual_network_id = data.azurerm_virtual_network.spoke.id
+}
+
+# TODO: move to function_apps module when old resources will be removed
+resource "dx_available_subnet_cidr" "func_user_uat" {
+  prefix_length      = 24
+  virtual_network_id = data.azurerm_virtual_network.spoke.id
+}
+
+module "function_apps" {
+  source = "../../_modules/function_apps"
+
+  environment = local.environment
+  u_env_short = "u"
+
+  resource_group_name = data.azurerm_resource_group.wallet.name
+  subscription_id     = data.azurerm_subscription.current.subscription_id
+
+  cidr_subnet_support_func  = dx_available_subnet_cidr.func_support.cidr_block
+  cidr_subnet_user_func     = dx_available_subnet_cidr.func_user.cidr_block
+  cidr_subnet_user_uat_func = dx_available_subnet_cidr.func_user_uat.cidr_block
+
+  subnet_route_table_id = data.azurerm_route_table.spoke.id
+
+  private_endpoint_subnet_id = data.azurerm_subnet.pep.id
+  private_dns_zone_ids = {
+    blob          = data.azurerm_private_dns_zone.blob.id
+    file          = data.azurerm_private_dns_zone.file.id
+    queue         = data.azurerm_private_dns_zone.queue.id
+    table         = data.azurerm_private_dns_zone.table.id
+    azurewebsites = data.azurerm_private_dns_zone.azurewebsites.id
+  }
+  virtual_network = {
+    resource_group_name = data.azurerm_virtual_network.spoke.resource_group_name
+    name                = data.azurerm_virtual_network.spoke.name
+  }
+
+  cosmos_db_endpoint                          = module.cosmos.apps.endpoint
+  cosmos_database_name                        = module.cosmos.apps.database_name
+  cosmos_database_name_uat                    = module.cosmos.apps.database_name_uat
+  storage_account_cdn_name                    = "" # TODO: fill when resource will be created
+  key_vault_id                                = module.key_vault_app.key_vault_wallet.id
+  key_vault_wallet_id                         = module.key_vault_app.key_vault_wallet.id
+  key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
+  wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
+  wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
+  front_door_profile_name                     = "" # TODO: fill when resource will be created
+  front_door_endpoint_name                    = "" # TODO: fill when resource will be created
+
+  application_insights_connection_string = data.azurerm_application_insights.core.connection_string
+
+  action_group_wallet_id = module.monitoring.action_group_wallet.id
+
+  user_func = {
+    app_settings = []
+  }
+
+  tags = local.tags
+}
+
 # TODO: replace with IAM submodules when all resources will be created
 module "team_roles" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
@@ -140,6 +209,24 @@ module "team_roles" {
       resource_group_name  = module.storage_accounts.wallet.resource_group_name
       role                 = "owner"
       description          = "Allow Wallet team to manage blobs in the storage account"
+    },
+    {
+      storage_account_name = module.function_apps.function_app_user.storage_account
+      resource_group_name  = module.function_apps.function_app_user.resource_group_name
+      role                 = "reader"
+      description          = "Allow Wallet team to read blobs in the function app storage account"
+    },
+    {
+      storage_account_name = module.function_apps.function_app_support.storage_account
+      resource_group_name  = module.function_apps.function_app_support.resource_group_name
+      role                 = "reader"
+      description          = "Allow Wallet team to read blobs in the function app storage account"
+    },
+    {
+      storage_account_name = module.function_apps.function_app_user_uat.storage_account
+      resource_group_name  = module.function_apps.function_app_user_uat.resource_group_name
+      role                 = "reader"
+      description          = "Allow Wallet team to read blobs in the UAT function app storage account"
     }
   ]
 

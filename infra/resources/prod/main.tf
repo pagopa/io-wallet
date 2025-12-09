@@ -112,14 +112,18 @@ module "cosmos" {
 module "function_apps" {
   source = "../_modules/function_apps"
 
-  prefix              = local.environment.prefix
-  env_short           = local.environment.env_short
-  u_env_short         = local.u_env_short
-  location            = local.environment.location
-  project             = local.project
+  environment = merge(local.environment,
+    {
+      environment = local.environment.env_short
+      name        = "wallet"
+    }
+  )
+  u_env_short          = local.u_env_short
+  user_instance_number = "02"
+
   resource_group_name = data.azurerm_resource_group.wallet.name
 
-  cidr_subnet_user_func_02  = "10.20.19.0/24"
+  cidr_subnet_user_func     = "10.20.19.0/24"
   cidr_subnet_support_func  = "10.20.13.0/24"
   cidr_subnet_user_uat_func = "10.20.12.0/26"
 
@@ -130,11 +134,9 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.apps.endpoint
-  cosmos_database_name = module.cosmos.apps.database_name
-
+  cosmos_db_endpoint       = module.cosmos.apps.endpoint
+  cosmos_database_name     = module.cosmos.apps.database_name
   cosmos_database_name_uat = module.cosmos.apps.database_name_uat
-
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
   key_vault_id          = data.azurerm_key_vault.weu_common.id
@@ -218,8 +220,8 @@ module "iam" {
 
   function_app = {
     user_func_02 = {
-      principal_id         = module.function_apps.function_app_user_02.principal_id
-      staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
+      principal_id         = module.function_apps.function_app_user.principal_id
+      staging_principal_id = module.function_apps.function_app_user.staging_principal_id
     }
     support_func = {
       principal_id         = module.function_apps.function_app_support.principal_id
@@ -270,7 +272,7 @@ module "apim_itn" {
 
   function_apps = {
     user_function = {
-      function_hostname = module.function_apps.function_app_user_02.default_hostname
+      function_hostname = module.function_apps.function_app_user.default_hostname
     }
     support_function = {
       function_hostname = module.function_apps.function_app_support.default_hostname
