@@ -21,7 +21,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 
   retention_in_days          = 90
   internet_ingestion_enabled = false
-  internet_query_enabled     = true
+  internet_query_enabled     = false
 
   tags = local.tags
 }
