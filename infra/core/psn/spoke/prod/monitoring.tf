@@ -42,7 +42,7 @@ resource "azurerm_application_insights" "this" {
 
   disable_ip_masking         = true
   internet_ingestion_enabled = false
-  internet_query_enabled     = true
+  internet_query_enabled     = false
 
   tags = local.tags
 }
