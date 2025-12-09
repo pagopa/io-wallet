@@ -1,18 +1,22 @@
 locals {
-  appgw_name = "pagopa-app-gw-italynorth"
-
-  backend_address_pool_name      = "appGatewayBackendPool"
-  frontend_port_name             = "appGatewayFrontendPort"
-  frontend_ip_configuration_name = "appGwPublicFrontendIp"
-  http_setting_name              = "appGatewayBackendHttpSettings"
-  listener_name                  = "appGatewayHttpListener"
-  request_routing_rule_name      = "appGatewayRule"
+  appgw = {
+    name                                   = "pagopa-app-gw-italynorth"
+    backend_address_pool_name              = "appGatewayBackendPool"
+    frontend_port_name                     = "appGatewayFrontendPort"
+    frontend_secure_port_name              = "appGatewayFrontendSecurePort"
+    frontend_public_ip_configuration_name  = "appGwPublicFrontendIp"
+    frontend_private_ip_configuration_name = "appGwPrivateFrontendIp"
+    private_link_name                      = "private-link-01"
+    http_setting_name                      = "appGatewayBackendHttpSettings"
+    listener_name                          = "appGatewayHttpListener"
+    request_routing_rule_name              = "appGatewayRule"
+  }
 }
 
 resource "azurerm_application_gateway" "hub" {
   provider = azurerm.hub
 
-  name                = local.appgw_name
+  name                = local.appgw.name
   location            = azurerm_resource_group.network.location
   resource_group_name = azurerm_resource_group.network.name
 
@@ -31,43 +35,96 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   frontend_ip_configuration {
-    name                 = local.frontend_ip_configuration_name
+    name                 = local.appgw.frontend_public_ip_configuration_name
     public_ip_address_id = data.azurerm_public_ip.appgw.id
   }
 
+  frontend_ip_configuration {
+    name                            = local.appgw.frontend_private_ip_configuration_name
+    private_ip_address_allocation   = "Static"
+    private_ip_address              = "10.251.0.132"
+    private_link_configuration_name = local.appgw.private_link_name
+    subnet_id                       = data.azurerm_subnet.hub_gateway_subnet.id
+  }
+
   frontend_port {
-    name = local.frontend_port_name
+    name = local.appgw.frontend_port_name
     port = 80
   }
 
+  frontend_port {
+    name = local.appgw.frontend_secure_port_name
+    port = 443
+  }
+
   backend_address_pool {
-    name = local.backend_address_pool_name
+    name  = local.appgw.backend_address_pool_name
+    fqdns = ["iw-p-itn-support-func-01.azurewebsites.net"] # TODO: replace with APIM fqdn
   }
 
   backend_http_settings {
-    name                                = local.http_setting_name
+    name                                = local.appgw.http_setting_name
     port                                = 443
     protocol                            = "Https"
     cookie_based_affinity               = "Disabled"
     pick_host_name_from_backend_address = true
+    probe_name                          = "${local.appgw.backend_address_pool_name}-probe"
     request_timeout                     = 20
   }
 
   http_listener {
-    name                           = local.listener_name
-    frontend_ip_configuration_name = local.frontend_ip_configuration_name
-    frontend_port_name             = local.frontend_port_name
+    name                           = local.appgw.listener_name
+    frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
+    frontend_port_name             = local.appgw.frontend_port_name
     protocol                       = "Http"
     require_sni                    = false
   }
 
   request_routing_rule {
-    name                       = local.request_routing_rule_name
+    name                       = local.appgw.request_routing_rule_name
     priority                   = 10010
-    http_listener_name         = local.listener_name
+    http_listener_name         = local.appgw.listener_name
     rule_type                  = "Basic"
-    backend_address_pool_name  = local.backend_address_pool_name
-    backend_http_settings_name = local.http_setting_name
+    backend_address_pool_name  = local.appgw.backend_address_pool_name
+    backend_http_settings_name = local.appgw.http_setting_name
+  }
+
+  probe {
+    name                                      = "${local.appgw.backend_address_pool_name}-probe"
+    protocol                                  = "Https"
+    path                                      = "/"
+    timeout                                   = 5
+    interval                                  = 10
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = true
+
+    match {
+      status_code = ["200"]
+    }
+  }
+
+  private_link_configuration {
+    name = local.appgw.private_link_name
+    ip_configuration {
+      name                          = "private-link-ip-01"
+      subnet_id                     = azurerm_subnet.private_links.id
+      private_ip_address_allocation = "Dynamic"
+      primary                       = true
+    }
+
+    ip_configuration {
+      name                          = "private-link-ip-02"
+      subnet_id                     = azurerm_subnet.private_links.id
+      private_ip_address_allocation = "Dynamic"
+      primary                       = false
+    }
+
+    ip_configuration {
+      name                          = "private-link-ip-03"
+      subnet_id                     = azurerm_subnet.private_links.id
+      private_ip_address_allocation = "Dynamic"
+      primary                       = false
+    }
   }
 
   ssl_policy {
