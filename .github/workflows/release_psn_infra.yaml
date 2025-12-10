@@ -8,6 +8,7 @@ on:
     paths:
       - "infra/core/psn/hub/prod/**"
       - "infra/core/psn/spoke/prod/**"
+      - "infra/resources/psn/prod/**"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -29,16 +30,18 @@ jobs:
         id: changes
         with:
           filters: |
-            hub:
+            core/psn/hub:
               - 'infra/core/psn/hub/prod/**'
-            spoke:
+            core/psn/spoke:
               - 'infra/core/psn/spoke/prod/**'
+            resources/psn:
+              - 'infra/resources/psn/prod/**'
 
       - name: All PSN Infra modules (for manual trigger)
         if: github.event_name == 'workflow_dispatch'
         id: all
         run: |
-          echo 'changes=["hub", "spoke"]' >> $GITHUB_OUTPUT
+          echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT
 
   release_prod:
     needs: changes
@@ -53,7 +56,7 @@ jobs:
 
     with:
       environment: prod
-      base_path: infra/core/psn/${{ matrix.infra }}
+      base_path: infra/${{ matrix.infra }}
       use_private_agent: true
       override_github_environment: infra-prod # TBD
       use_labels: true
