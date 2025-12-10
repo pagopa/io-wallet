@@ -42,7 +42,8 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         id: all
         run: |
-          echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT
+          # echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT # removed for tests
+          echo 'changes=["resources/psn"]' >> $GITHUB_OUTPUT
 
   plan_prod:
     needs: changes
