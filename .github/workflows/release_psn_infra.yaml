@@ -5,10 +5,9 @@ on:
   push:
     branches:
       - master
-      - feat-add-terraform-workflow-plan-apply # Remove after testing
-    # paths:
-    #   - "infra/core/psn/hub/prod/**"
-    #   - "infra/core/psn/spoke/prod/**"
+    paths:
+      - "infra/core/psn/hub/prod/**"
+      - "infra/core/psn/spoke/prod/**"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -41,21 +40,21 @@ jobs:
         run: |
           echo 'changes=["hub", "spoke"]' >> $GITHUB_OUTPUT
 
-  # release_prod:
-  #   needs: changes
-  #   uses: pagopa/dx/.github/workflows/infra_apply.yaml@support/psn-adaptation #main - Temporary, to be removed when using specific psn environment
-  #   name: Infrastructure Release
-  #   secrets: inherit
+  release_prod:
+    needs: changes
+    uses: pagopa/dx/.github/workflows/infra_apply.yaml@support/psn-adaptation #main - Temporary, to be removed when using specific psn environment
+    name: Infrastructure Release
+    secrets: inherit
 
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       infra: ${{ fromJSON( needs.changes.outputs.changes ) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        infra: ${{ fromJSON( needs.changes.outputs.changes ) }}
 
-  #   with:
-  #     environment: prod
-  #     base_path: infra/core/psn/${{ matrix.infra }}
-  #     use_private_agent: true
-  #     override_github_environment: infra-prod # TBD
-  #     use_labels: true
-  #     override_labels: psn
+    with:
+      environment: prod
+      base_path: infra/core/psn/${{ matrix.infra }}
+      use_private_agent: true
+      override_github_environment: infra-prod # TBD
+      use_labels: true
+      override_labels: psn
