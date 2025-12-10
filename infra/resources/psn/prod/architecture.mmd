@@ -10,7 +10,8 @@ graph LR
         subgraph VNet["VNet (ItalyNorth)"]
             AppIO["`App IO
               (Backend)`"]
-            HubAppGwPEP[Private Link]
+            HubAppGwPEP["io-p-itn-psn-agw-pep-01"]
+            HubAppGwPrivateDNS["psn.internal.io.pagopa.it"]
         end
         subgraph FrontDoor["Global"]
           ITWalletCDN["`Front Door
@@ -88,7 +89,7 @@ graph LR
     end
 
     ITWalletCDN --> CDNID --> PSNEnterpriseApp --> WalletCDNSA
-    AppIO --> HubAppGwPEP --> HubAppGwWaf
+    AppIO --> HubAppGwPEP --> HubAppGwPrivateDNS --> HubAppGwWaf
     IOWebCDN --> HubAppGwWaf
 
     Hub --> HubAPIM
@@ -111,6 +112,7 @@ graph LR
     HubWAF@{ icon: "azure:web-application-firewall-policieswaf", pos: "b" }
     HubAppGw@{ icon: "azure:application-gateways", pos: "b" }
     HubAppGwPEP@{ icon: "azure:private-link", pos: "b" }
+    HubAppGwPrivateDNS@{icon: "azure:dns-zones", pos: "b"}
     HubAPIM@{ icon: "azure:api-management-services", pos: "b" }
     AppIO@{ icon: "azure:app-service-plans", pos: "b" }
     WalletFunctionUserPep@{ icon: "azure:private-endpoints", pos: "b" }
@@ -143,7 +145,7 @@ graph LR
     classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
     classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
 
-    linkStyle 4,5,6,25 stroke:#f39c12,stroke-width:2px
+    linkStyle 4,5,6,26 stroke:#f39c12,stroke-width:2px
 
     class PagoPA pagoPAStyle
     class PSN psnStyle
@@ -154,4 +156,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,GitHubRunner,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid disabledStyle
+    class ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,GitHubRunner,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid disabledStyle
