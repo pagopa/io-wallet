@@ -6,8 +6,8 @@ on:
     branches:
       - master
       - feat-add-terraform-workflow-plan-apply # remove after tests
-    paths:
-      - "apps/io-wallet-user-func/CHANGELOG.md"
+    # paths:
+    #   - "apps/io-wallet-user-func/CHANGELOG.md"
 
 permissions:
   attestations: write
