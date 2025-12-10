@@ -26,4 +26,4 @@ jobs:
       web_app_name: iw-u-itn-user-func-01
       disable_auto_staging_deploy: true
       use_labels: true
-      override_labels: io
+      override_labels: psn
