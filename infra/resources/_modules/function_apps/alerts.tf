@@ -1,7 +1,7 @@
 resource "azurerm_monitor_metric_alert" "function_app_user_response_time" {
-  name                = "[${module.function_app_user_02.function_app.function_app.name}] Slow Response Time"
+  name                = "[${module.function_app_user.function_app.function_app.name}] Slow Response Time"
   resource_group_name = var.resource_group_name
-  scopes              = [module.function_app_user_02.function_app.function_app.id]
+  scopes              = [module.function_app_user.function_app.function_app.id]
   description         = "Slow responses from the Function App. Beware: deployments may slow it down for some minutes. Always check in application insight. Runbook https://pagopa.atlassian.net/wiki/spaces/SIW/pages/1311735955/Runbook"
   severity            = 1
   frequency           = "PT5M"
@@ -45,9 +45,9 @@ resource "azurerm_monitor_metric_alert" "function_app_support_response_time" {
 }
 
 resource "azurerm_monitor_metric_alert" "app_service_plan_cpu_alert" {
-  name                = "[${module.function_app_user_02.function_app.plan.name}] High CPU Usage"
+  name                = "[${module.function_app_user.function_app.plan.name}] High CPU Usage"
   resource_group_name = var.resource_group_name
-  scopes              = [module.function_app_user_02.function_app.plan.id]
+  scopes              = [module.function_app_user.function_app.plan.id]
   description         = "Critically high CPU usage detected on user App Service Plan"
   severity            = 1
   window_size         = "PT5M"

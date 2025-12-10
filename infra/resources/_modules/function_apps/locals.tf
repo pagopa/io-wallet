@@ -125,13 +125,12 @@ locals {
         s.name => "foo"
       },
       {
-        FederationEntitySigningKeys           = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=FederationEntitySigningKeysPre)"
-        WalletProviderSigningKeys             = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletProviderSigningKeysPre)"
-        PidIssuerApiClientPrivateKey          = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
-        GoogleAppCredentialsEncoded           = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
-        APPLICATIONINSIGHTS_CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AppInsightsConnectionString)"
-        AllowedDeveloperUsers                 = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AllowedDeveloperUsers)"
-        StorageConnectionString               = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=StorageUatConnectionString)"
+        FederationEntitySigningKeys  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=FederationEntitySigningKeysPre)"
+        WalletProviderSigningKeys    = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletProviderSigningKeysPre)"
+        PidIssuerApiClientPrivateKey = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
+        GoogleAppCredentialsEncoded  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
+        AllowedDeveloperUsers        = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AllowedDeveloperUsers)"
+        StorageConnectionString      = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=StorageUatConnectionString)"
       }
     )
   }
