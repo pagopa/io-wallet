@@ -84,9 +84,9 @@ graph LR
     AppIO --> HubAppGwPEP --> HubAppGwPrivateDNS --> HubAppGwWaf
     IOWebCDN --> HubAppGwWaf
 
-    Hub --> HubAPIM
-    HubAPIM --> WalletFunctionUserPep --> WalletFunctionUser
-    HubAPIM --> WalletFunctionSupportPep --> WalletFunctionSupport --> WalletCosmosPep
+    Hub --> SpokeAPIM
+    SpokeAPIM --> WalletFunctionUserPep --> WalletFunctionUser
+    SpokeAPIM --> WalletFunctionSupportPep --> WalletFunctionSupport --> WalletCosmosPep
 
     WalletFunctionUser --> WalletCosmosPep --> WalletCosmos
     WalletFunctionUser --> WalletSAPep --> WalletSA

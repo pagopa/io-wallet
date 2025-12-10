@@ -21,6 +21,11 @@ data "azurerm_virtual_network" "spoke" {
   resource_group_name = local.spoke.resource_group_name
 }
 
+data "azurerm_route_table" "spoke" {
+  name                = "pagopa-Prod-ITWallet-spoke-routetable"
+  resource_group_name = local.spoke.resource_group_name
+}
+
 data "azurerm_subnet" "pep" {
   name = provider::dx::resource_name(merge(local.environment, {
     domain        = ""
@@ -94,6 +99,27 @@ data "azurerm_private_dns_zone" "documents" {
   provider = azurerm.hub
 
   name                = "privatelink.documents.azure.com"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "management_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "management.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "scm_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "scm.azure-api.net"
   resource_group_name = local.hub.resource_group_name
 }
 
