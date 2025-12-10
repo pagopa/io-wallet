@@ -3,7 +3,7 @@ name: psn.internal.io.pagopa.it SSL Certificate Renewal
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 2,4'  # At 00:00 on Tuesday, Thursday
+    - cron: '0 0 * * 2,3'  # At 00:00 on Tuesday, Thursday
   push:
     branches:
       - CES-1535-creazione-private-endpoint-e-configurazione-dns
