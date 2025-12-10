@@ -1,0 +1,17 @@
+name: psn.internal.io.pagopa.it SSL Certificate Renewal
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 2,4'  # At 00:00 on Tuesday, Thursday
+
+jobs:
+  get_certificate:
+    uses: pagopa/io-infra/.github/workflows/ssl_certificate_renewal.yaml@main
+    name: Get SSL Certificate
+    with:
+      csr_common_name: "psn.internal.io.pagopa.it"
+      azure_dns_zone_resource_group: "io-p-rg-internal"
+      azure_dns_zone: "internal.io.pagopa.it"
+      key_vault_name: "io-p-itn-wallet-kv-01"
+      environment: "prod"
