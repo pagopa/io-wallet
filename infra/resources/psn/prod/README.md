@@ -23,7 +23,6 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 2.50.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.54.0 |
 | <a name="provider_azurerm.hub"></a> [azurerm.hub](#provider\_azurerm.hub) | 4.54.0 |
-| <a name="provider_dx"></a> [dx](#provider\_dx) | ~> 0.0 |
 
 ## Modules
 
@@ -42,9 +41,6 @@ The diagram below shows the resources actually deployed. This is a work in progr
 
 | Name | Type |
 |------|------|
-| [dx_available_subnet_cidr.func_support](https://registry.terraform.io/providers/pagopa-dx/azure/latest/docs/resources/available_subnet_cidr) | resource |
-| [dx_available_subnet_cidr.func_user](https://registry.terraform.io/providers/pagopa-dx/azure/latest/docs/resources/available_subnet_cidr) | resource |
-| [dx_available_subnet_cidr.func_user_uat](https://registry.terraform.io/providers/pagopa-dx/azure/latest/docs/resources/available_subnet_cidr) | resource |
 | [azuread_group.wallet](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/group) | data source |
 | [azurerm_application_insights.core](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/application_insights) | data source |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |

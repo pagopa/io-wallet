@@ -106,24 +106,6 @@ module "cosmos" {
   tags = local.tags
 }
 
-# TODO: move to function_apps module when old resources will be removed
-resource "dx_available_subnet_cidr" "func_support" {
-  prefix_length      = 24
-  virtual_network_id = data.azurerm_virtual_network.spoke.id
-}
-
-# TODO: move to function_apps module when old resources will be removed
-resource "dx_available_subnet_cidr" "func_user" {
-  prefix_length      = 24
-  virtual_network_id = data.azurerm_virtual_network.spoke.id
-}
-
-# TODO: move to function_apps module when old resources will be removed
-resource "dx_available_subnet_cidr" "func_user_uat" {
-  prefix_length      = 24
-  virtual_network_id = data.azurerm_virtual_network.spoke.id
-}
-
 module "function_apps" {
   source = "../../_modules/function_apps"
 
@@ -133,9 +115,9 @@ module "function_apps" {
   resource_group_name = data.azurerm_resource_group.wallet.name
   subscription_id     = data.azurerm_subscription.current.subscription_id
 
-  cidr_subnet_support_func  = dx_available_subnet_cidr.func_support.cidr_block
-  cidr_subnet_user_func     = dx_available_subnet_cidr.func_user.cidr_block
-  cidr_subnet_user_uat_func = dx_available_subnet_cidr.func_user_uat.cidr_block
+  cidr_subnet_support_func  = "10.100.5.0/24"
+  cidr_subnet_user_func     = "10.100.4.0/24"
+  cidr_subnet_user_uat_func = "10.100.7.0/24"
 
   subnet_route_table_id = data.azurerm_route_table.spoke.id
 
