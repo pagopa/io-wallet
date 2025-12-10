@@ -4,14 +4,20 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 2,4'  # At 00:00 on Tuesday, Thursday
+  push:
+    branches:
+      - CES-1535-creazione-private-endpoint-e-configurazione-dns
 
 jobs:
   get_certificate:
     uses: pagopa/io-infra/.github/workflows/ssl_certificate_renewal.yaml@main
     name: Get SSL Certificate
+    secrets: inherit
+    permissions:
+      id-token: write
     with:
       csr_common_name: "psn.internal.io.pagopa.it"
       azure_dns_zone_resource_group: "io-p-rg-internal"
       azure_dns_zone: "internal.io.pagopa.it"
       key_vault_name: "io-p-itn-wallet-kv-01"
-      environment: "prod"
+      environment: "infra-prod"
