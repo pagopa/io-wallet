@@ -21,8 +21,8 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | Name | Version |
 |------|---------|
 | <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 2.50.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.54.0 |
-| <a name="provider_azurerm.hub"></a> [azurerm.hub](#provider\_azurerm.hub) | 4.54.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.55.0 |
+| <a name="provider_azurerm.hub"></a> [azurerm.hub](#provider\_azurerm.hub) | 4.55.0 |
 
 ## Modules
 
