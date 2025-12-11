@@ -89,6 +89,8 @@ jobs:
       ARM_PSN_CLIENT_ID: ${{ secrets.ARM_PSN_CLIENT_ID }}
       ARM_PSN_SUBSCRIPTION_ID: ${{ secrets.ARM_PSN_SUBSCRIPTION_ID }}
       ARM_PSN_TENANT_ID: ${{ secrets.ARM_PSN_TENANT_ID}}
+      LE_PRIVATE_KEY_JSON: ${{ secrets.LE_PRIVATE_KEY_JSON }}
+      LE_REGR_JSON: ${{ secrets.LE_REGR_JSON }}
 
     steps:
 
@@ -109,6 +111,11 @@ jobs:
       #       az keyvault secret download --vault-name "$KEY_VAULT_NAME" --name le-private-key-json --file private_key.json
       #       az keyvault secret download --vault-name "$KEY_VAULT_NAME" --name le-regr-json --file regr.json
 
+      - name: Set LE Files
+        run: |
+          echo '${{ env.LE_PRIVATE_KEY_JSON }}' > private_key.json
+          echo '${{ env.LE_REGR_JSON }}' > regr.json
+
       - name: Setup Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
         with:
@@ -116,19 +123,17 @@ jobs:
 
       - name: Setup Python requirements
         shell: bash
-        env:
-          ACTION_PATH: ${{ github.action_path }}
+        working-directory: ./.github/workflows
         run: |
           pip3 install \
             --require-hashes \
-            --requirement "$ACTION_PATH/le_renew_ssl_certificate_python_requirements.txt"
+            --requirement "./le_renew_ssl_certificate_python_requirements.txt"
 
       - name: Generate the CSR
         shell: bash
-        env:
-          ACTION_PATH: ${{ github.action_path }}
+        working-directory: ./.github/workflows
         run: |
-          python3 "$ACTION_PATH/le_renew_ssl_certificate_generate_csr.py" \
+          python3 "./le_renew_ssl_certificate_generate_csr.py" \
             --common-name "$CSR_COMMON_NAME" \
             --out csr.der \
             --rsa-key-size 2048
@@ -147,9 +152,9 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
           AZURE_DNS_ZONE: ${{ env.DNS_ZONE }}
           AZURE_IDENTITY_TYPE: "MANAGED_IDENTITY"
-          ACTION_PATH: ${{ github.action_path }}
+        working-directory: ./.github/workflows
         run: |
-          python3 "$ACTION_PATH/le_renew_ssl_certificate_acme_tiny.py" \
+          python3 "./le_renew_ssl_certificate_acme_tiny.py" \
             --private-key private_key.json \
             --regr regr.json \
             --csr csr.der \
