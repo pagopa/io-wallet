@@ -132,8 +132,3 @@ data "azurerm_key_vault_secret" "notification_email" {
   name         = "email-wallet"
   key_vault_id = module.key_vault_app.key_vault_wallet.id
 }
-
-data "azurerm_route_table" "spoke" {
-  name                = "pagopa-Prod-ITWallet-spoke-routetable"
-  resource_group_name = "pagopa-Prod-ITWallet-rg-spoke-italynorth"
-}
