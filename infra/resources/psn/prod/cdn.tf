@@ -26,7 +26,7 @@ resource "azurerm_storage_account" "cdn" {
   tags = local.tags
 }
 
-resource "azurerm_storage_account_static_website" "cdn_website" {
+resource "azurerm_storage_account_static_website" "cdn" {
   storage_account_id = azurerm_storage_account.cdn.id
   index_document     = "index.html"
   error_404_document = "404.html"
@@ -44,7 +44,7 @@ resource "azurerm_storage_container" "exchange" {
   container_access_type = "container"
 }
 
-resource "azurerm_storage_container" "hub-spid-login" {
+resource "azurerm_storage_container" "hub_spid_login" {
   name                  = "hub-spid-login"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
