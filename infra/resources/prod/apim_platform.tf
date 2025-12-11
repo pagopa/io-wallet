@@ -1,3 +1,20 @@
+resource "azurerm_api_management_backend" "psn" {
+  name                = "psn-backend-01"
+  description         = "PSN hostname via private network"
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  protocol            = "http"
+  url                 = "http://psn.internal.io.pagopa.it/"
+}
+
+resource "azurerm_api_management_policy_fragment" "wallet_authentication" {
+  name              = "io-wallet-app-session-fragment"
+  description       = "Fragment to handle authentication session for IO app"
+  api_management_id = data.azurerm_api_management.platform_api_gateway.id
+  format            = "rawxml"
+  value             = file("${path.module}/fragments/io-wallet-app-session-fragment.xml")
+}
+
 resource "azurerm_api_management_product" "wallet" {
   product_id   = "it-wallet"
   display_name = "IT WALLET"
@@ -10,14 +27,6 @@ resource "azurerm_api_management_product" "wallet" {
   subscription_required = false
   approval_required     = false
 }
-
-# resource "azurerm_api_management_product_policy" "wallet" {
-#   product_id          = azurerm_api_management_product.wallet.product_id
-#   api_management_name = data.azurerm_api_management.platform_api_gateway.name
-#   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
-
-#   xml_content = file("${path.module}/policies/product_base_policy.xml")
-# }
 
 resource "azurerm_api_management_api_version_set" "wallet_v1" {
   name                = "wallet_v1"
@@ -41,8 +50,6 @@ resource "azurerm_api_management_api" "wallet" {
   display_name = "IT-Wallet"
   path         = "api/wallet"
   protocols    = ["https"]
-
-  service_url = "https://psn.internal.io.pagopa.it/"
 }
 
 resource "azurerm_api_management_product_api" "wallet" {
@@ -61,4 +68,20 @@ resource "azurerm_api_management_api_operation" "wallet_catchall" {
   method              = "*"
   url_template        = "/*"
   description         = "Forwards all requests to backend"
+}
+
+resource "azurerm_api_management_api_operation_policy" "wallet" {
+  api_name            = azurerm_api_management_api.wallet.name
+  operation_id        = azurerm_api_management_api_operation.wallet_catchall.id
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <base />
+      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+  </inbound>
+</policies>
+XML
 }
