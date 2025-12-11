@@ -55,3 +55,26 @@ resource "azurerm_storage_container" "pdnd" {
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
+
+module "cdn" {
+  source  = "pagopa-dx/azure-cdn/azurerm"
+  version = "~> 0.3"
+
+  environment = merge(
+    local.environment,
+    {
+      app_name  = "cdn",
+      env_short = local.environment.environment
+    }
+  )
+
+  resource_group_name = data.azurerm_resource_group.wallet.name
+
+  origins = {
+    primary = {
+      host_name = azurerm_storage_account.cdn.primary_web_host
+    }
+  }
+
+  tags = local.tags
+}

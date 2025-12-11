@@ -14,10 +14,8 @@ graph LR
             HubAppGwPrivateDNS["psn.internal.io.pagopa.it"]
         end
         subgraph FrontDoor["Global"]
-          ITWalletCDN["`Front Door
-            (CDN)`"]
-          CDNID["`User-Assigned
-            Managed Identity`"]
+          %% CDNID["`User-Assigned
+          %%   Managed Identity`"]
 
           IOWebCDN["`IO Web
             (Static Website)`"]
@@ -25,10 +23,19 @@ graph LR
     end
 
     subgraph PSN
-        PSNEnterpriseApp["Enterprise App"]
+        subgraph PSNGlobal["Global"]
+          ITWalletCDN["iw-p-itn-cdn-fde-01"]
+          subgraph WalletCDNSA["iwpitncdnst01"]
+              direction TB
+              ContainerSpid[spid-hub-login]
+              ContainerPdnd[pdnd]
+              ContainerExchange[exchange]
+              ContainerWellKnown[well-known]
+              ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
+          end
+        end
 
         subgraph Hub["Hub"]
-
             subgraph HubAppGwWaf["`Application Gateway + WAF
               Public + Private IPs`"]
               HubWAF
@@ -55,16 +62,6 @@ graph LR
                 WalletCosmosPep["iw-p-itn-apps-cosno-pep-01"]
                 WalletCosmos["iw-p-itn-apps-cosno-01"]
                 WalletCMKKey["iw-p-itn-data-cmk-id-01"]
-
-                subgraph WalletCDNSA["iopitnwalletcdnst01"]
-                    direction TB
-                    ContainerSpid[spid-hub-login]
-                    ContainerPdnd[pdnd]
-                    ContainerExchange[exchange]
-                    ContainerWellKnown[well-known]
-                    ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
-                end
-
                 WalletSAPep["iw-p-itn-apps-x-pep-01"]
 
                 subgraph WalletSA["iwpitnappsst01"]
@@ -88,7 +85,7 @@ graph LR
         CredentialIssuer["Credential Issuer"]
     end
 
-    ITWalletCDN --> CDNID --> PSNEnterpriseApp --> WalletCDNSA
+    ITWalletCDN --> WalletCDNSA
     AppIO --> HubAppGwPEP --> HubAppGwPrivateDNS --> HubAppGwWaf
     IOWebCDN --> HubAppGwWaf
 
@@ -106,7 +103,7 @@ graph LR
     GitHubRunner --> GitHubRepo
 
     ThirdParties --> ITWalletCDN
-    PSNEnterpriseApp@{ icon: "azure:enterprise-applications", pos: "b" }
+
     ITWalletCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
     IOWebCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
     HubWAF@{ icon: "azure:web-application-firewall-policieswaf", pos: "b" }
@@ -119,7 +116,6 @@ graph LR
     WalletFunctionUser@{ icon: "azure:function-apps", pos: "b" }
     WalletFunctionSupportPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletFunctionSupport@{ icon: "azure:function-apps", pos: "b" }
-    CDNID@{ icon: "azure:managed-identities", pos: "b" }
     WalletCosmosPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletCosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
     WalletAppsKeyVault@{ icon: "azure:key-vaults", pos: "b" }
@@ -141,14 +137,16 @@ graph LR
     classDef thirdPartiesClass fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
     classDef pagoPAStyle fill:#e8f4fd,stroke:#3498db,stroke-width:2px
     classDef psnStyle fill:#edf7f6,stroke:#16a085,stroke-width:2px
+    classDef psnGlobalStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
     classDef hubStyle fill:#fff4e6,stroke:#d68910,stroke-width:1px
     classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
     classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
 
-    linkStyle 4,5,6,26 stroke:#f39c12,stroke-width:2px
+    linkStyle 4,24 stroke:#f39c12,stroke-width:2px
 
     class PagoPA pagoPAStyle
     class PSN psnStyle
+    class PSNGlobal psnGlobalStyle
     class Hub,HubAppGwWaf hubStyle
     class Spoke spokeStyle
     class VNet,FrontDoor pagoPAStyle
@@ -156,4 +154,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,GitHubRunner disabledStyle
+    class HubAPIM,GitHubRunner disabledStyle
