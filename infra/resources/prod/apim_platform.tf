@@ -4,7 +4,7 @@ resource "azurerm_api_management_backend" "psn" {
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   protocol            = "http"
-  url                 = "http://psn.internal.io.pagopa.it/"
+  url                 = "https://psn.internal.io.pagopa.it/"
 }
 
 resource "azurerm_api_management_policy_fragment" "wallet_authentication" {

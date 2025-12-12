@@ -30,6 +30,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_apim"></a> [apim](#module\_apim) | pagopa-dx/azure-api-management/azurerm | ~> 2.1 |
+| <a name="module_appgw_roles"></a> [appgw\_roles](#module\_appgw\_roles) | pagopa-dx/azure-role-assignments/azurerm | ~> 1.3 |
 | <a name="module_cdn"></a> [cdn](#module\_cdn) | pagopa-dx/azure-cdn/azurerm | ~> 0.3 |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | ../../_modules/cosmos | n/a |
 | <a name="module_function_apps"></a> [function\_apps](#module\_function\_apps) | ../../_modules/function_apps | n/a |
@@ -77,6 +78,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | [azurerm_route_table.spoke](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/route_table) | data source |
 | [azurerm_subnet.pep](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
 | [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
+| [azurerm_user_assigned_identity.appgateway](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/user_assigned_identity) | data source |
 | [azurerm_virtual_network.spoke](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/virtual_network) | data source |
 
 ## Inputs

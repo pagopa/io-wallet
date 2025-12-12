@@ -282,3 +282,22 @@ module "team_roles" {
     }
   ]
 }
+
+module "appgw_roles" {
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 1.3"
+
+  principal_id    = data.azurerm_user_assigned_identity.appgateway.principal_id
+  subscription_id = data.azurerm_subscription.current.subscription_id
+
+  key_vault = [
+    {
+      name                = module.key_vault_infra.key_vault_wallet.name
+      resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
+      description         = "Allow AppGw to access secrets"
+      roles = {
+        secrets = "reader"
+      }
+    }
+  ]
+}
