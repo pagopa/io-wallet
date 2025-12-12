@@ -292,8 +292,8 @@ module "appgw_roles" {
 
   key_vault = [
     {
-      name                = module.key_vault_cdn.key_vault_wallet.name
-      resource_group_name = module.key_vault_cdn.key_vault_wallet.resource_group_name
+      name                = module.key_vault_infra.key_vault_wallet.name
+      resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
       description         = "Allow AppGw to access secrets"
       roles = {
         secrets = "reader"
