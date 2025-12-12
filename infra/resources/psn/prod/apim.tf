@@ -4,7 +4,7 @@ data "azurerm_key_vault_secret" "wallet_email" {
 }
 
 resource "dx_available_subnet_cidr" "apim_apps" {
-  prefix_length      = 24
+  prefix_length      = 25
   virtual_network_id = data.azurerm_virtual_network.spoke.id
 }
 
