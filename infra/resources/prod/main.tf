@@ -84,16 +84,24 @@ module "monitoring" {
 module "cosmos" {
   source = "../_modules/cosmos"
 
-  project             = local.project
-  location            = local.environment.location
+  environment = merge(local.environment,
+    {
+      domain          = ""
+      environment     = local.environment.env_short
+      name            = "wallet"
+      instance_number = "02"
+    }
+  )
   secondary_location  = local.secondary_location
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   private_endpoint_subnet_id = data.azurerm_subnet.pep.id
   private_link_documents_id  = data.azurerm_private_dns_zone.privatelink_documents.id
 
-  action_group_wallet_id = module.monitoring.action_group_wallet.id
-  action_group_io_id     = data.azurerm_monitor_action_group.io.id
+  action_group_ids = [
+    module.monitoring.action_group_wallet.id,
+    data.azurerm_monitor_action_group.io.id
+  ]
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
   psn_service_principal_id          = data.azuread_service_principal.psn_app_id.client_id
@@ -104,14 +112,18 @@ module "cosmos" {
 module "function_apps" {
   source = "../_modules/function_apps"
 
-  prefix              = local.environment.prefix
-  env_short           = local.environment.env_short
-  u_env_short         = local.u_env_short
-  location            = local.environment.location
-  project             = local.project
+  environment = merge(local.environment,
+    {
+      environment = local.environment.env_short
+      name        = "wallet"
+    }
+  )
+  u_env_short          = local.u_env_short
+  user_instance_number = "02"
+
   resource_group_name = data.azurerm_resource_group.wallet.name
 
-  cidr_subnet_user_func_02  = "10.20.19.0/24"
+  cidr_subnet_user_func     = "10.20.19.0/24"
   cidr_subnet_support_func  = "10.20.13.0/24"
   cidr_subnet_user_uat_func = "10.20.12.0/26"
 
@@ -122,11 +134,9 @@ module "function_apps" {
     name                = data.azurerm_virtual_network.vnet_common_itn.name
   }
 
-  cosmos_db_endpoint   = module.cosmos.cosmos_account_wallet.endpoint
-  cosmos_database_name = module.cosmos.cosmos_account_wallet.database_name
-
-  cosmos_database_name_uat = module.cosmos.cosmos_account_wallet.database_name_uat
-
+  cosmos_db_endpoint       = module.cosmos.apps.endpoint
+  cosmos_database_name     = module.cosmos.apps.database_name
+  cosmos_database_name_uat = module.cosmos.apps.database_name_uat
   storage_account_cdn_name = module.cdn.storage_account_cdn.name
 
   key_vault_id          = data.azurerm_key_vault.weu_common.id
@@ -195,23 +205,23 @@ module "iam" {
   }
 
   cosmos_db_02 = {
-    id                  = module.cosmos.cosmos_account_wallet.id
-    name                = module.cosmos.cosmos_account_wallet.name
-    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
-    database_name       = module.cosmos.cosmos_account_wallet.database_name
+    id                  = module.cosmos.apps.id
+    name                = module.cosmos.apps.name
+    resource_group_name = module.cosmos.apps.resource_group_name
+    database_name       = module.cosmos.apps.database_name
   }
 
   cosmos_db_uat = {
-    id                  = module.cosmos.cosmos_account_wallet.id
-    name                = module.cosmos.cosmos_account_wallet.name
-    resource_group_name = module.cosmos.cosmos_account_wallet.resource_group_name
-    database_name       = module.cosmos.cosmos_account_wallet.database_name_uat
+    id                  = module.cosmos.apps.id
+    name                = module.cosmos.apps.name
+    resource_group_name = module.cosmos.apps.resource_group_name
+    database_name       = module.cosmos.apps.database_name_uat
   }
 
   function_app = {
     user_func_02 = {
-      principal_id         = module.function_apps.function_app_user_02.principal_id
-      staging_principal_id = module.function_apps.function_app_user_02.staging_principal_id
+      principal_id         = module.function_apps.function_app_user.principal_id
+      staging_principal_id = module.function_apps.function_app_user.staging_principal_id
     }
     support_func = {
       principal_id         = module.function_apps.function_app_support.principal_id
@@ -262,7 +272,7 @@ module "apim_itn" {
 
   function_apps = {
     user_function = {
-      function_hostname = module.function_apps.function_app_user_02.default_hostname
+      function_hostname = module.function_apps.function_app_user.default_hostname
     }
     support_function = {
       function_hostname = module.function_apps.function_app_support.default_hostname

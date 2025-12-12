@@ -10,13 +10,10 @@ graph LR
         subgraph VNet["VNet (ItalyNorth)"]
             AppIO["`App IO
               (Backend)`"]
-            HubAppGwPEP[Private Link]
+            HubAppGwPEP["io-p-itn-psn-agw-pep-01"]
+            HubAppGwPrivateDNS["psn.internal.io.pagopa.it"]
         end
         subgraph FrontDoor["Global"]
-          ITWalletCDN["`Front Door
-            (CDN)`"]
-          CDNID["`User-Assigned
-            Managed Identity`"]
 
           IOWebCDN["`IO Web
             (Static Website)`"]
@@ -24,10 +21,7 @@ graph LR
     end
 
     subgraph PSN
-        PSNEnterpriseApp["Enterprise App"]
-
         subgraph Hub["Hub"]
-
             subgraph HubAppGwWaf["`Application Gateway + WAF
               Public + Private IPs`"]
               HubWAF
@@ -37,38 +31,40 @@ graph LR
         end
 
         subgraph Spoke["Spoke"]
+            WalletInfraKeyVault["iw-p-itn-infra-kv-01"]
+
+            subgraph PSNGlobal["Global"]
+              ITWalletCDN["iw-p-itn-cdn-fde-01"]
+              subgraph WalletCDNSA["iwpitncdnst01"]
+                ContainerSpid[spid-hub-login]
+                ContainerPdnd[pdnd]
+                ContainerExchange[exchange]
+                ContainerWellKnown[well-known]
+                ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
+              end
+            end
+
             subgraph VNetWallet["pagopa-Prod-ITWallet-spoke-italynorth"]
+              subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
+                  GitHubRunner[io-p-itn-github-caj-01]
+              end
+              SpokeAPIM["iw-p-itn-apps-apim-01"]
+              WalletFunctionUserPep["iw-p-itn-user-func-pep-01"]
+              WalletFunctionUser[iw-p-itn-user-func-01]
+              WalletFunctionSupportPep["iw-p-itn-support-func-pep-01"]
+              WalletFunctionSupport[iw-p-itn-support-func-01]
+              WalletAppsKeyVaultPep["iw-p-itn-apps-kv-pep-01"]
+              WalletAppsKeyVault["iw-p-itn-apps-kv-01"]
+              WalletCosmosPep["iw-p-itn-apps-cosno-pep-01"]
+              WalletCosmos["iw-p-itn-apps-cosno-01"]
+              WalletCMKKey["iw-p-itn-data-cmk-id-01"]
+              WalletSAPep["iw-p-itn-apps-x-pep-01"]
 
-                subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
-                    GitHubRunner[io-p-itn-github-caj-01]
-                end
-                subgraph ITWalletRG["iw-p-itn-wallet-rg-01"]
-                HubAPIM["io-p-itn-apim-01"]
-                WalletFunctionUser[io-p-itn-wallet-user-func-02]
-                WalletFunctionSupport[io-p-itn-wallet-supp-func-01]
-                WalletAppsKeyVaultPep["iw-p-itn-apps-kv-pep-01"]
-                WalletAppsKeyVault["iw-p-itn-apps-kv-01"]
-                WalletCDNKeyVault["iw-p-itn-cdn-kv-01"]
-                WalletCosmos["io-p-itn-wallet-cosno-02"]
-                WalletCMKKey["iw-p-itn-data-cmk-id-01"]
-
-                subgraph WalletCDNSA["iopitnwalletcdnst01"]
-                    direction TB
-                    ContainerSpid[spid-hub-login]
-                    ContainerPdnd[pdnd]
-                    ContainerExchange[exchange]
-                    ContainerWellKnown[well-known]
-                    ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
-                end
-
-                WalletSAPep["iw-u-itn-apps-x-pep-01"]
-
-                subgraph WalletSA["iwuitnappsst01"]
-                    direction TB
-                    QueueEmail["creation-email-queue-01"]
-                    QueueRevocationEmail["revocation-email-queue-01"]
-                    QueueEmail ~~~ QueueRevocationEmail
-                end
+              subgraph WalletSA["iwpitnappsst01"]
+                  direction TB
+                  QueueEmail["creation-email-queue-01"]
+                  QueueRevocationEmail["revocation-email-queue-01"]
+                  QueueEmail ~~~ QueueRevocationEmail
               end
             end
         end
@@ -84,15 +80,15 @@ graph LR
         CredentialIssuer["Credential Issuer"]
     end
 
-    ITWalletCDN --> CDNID --> PSNEnterpriseApp --> WalletCDNSA
-    AppIO --> HubAppGwPEP --> HubAppGwWaf
+    ITWalletCDN --> WalletCDNSA
+    AppIO --> HubAppGwPEP --> HubAppGwPrivateDNS --> HubAppGwWaf
     IOWebCDN --> HubAppGwWaf
 
-    Hub --> HubAPIM
-    HubAPIM --> WalletFunctionUser
-    HubAPIM --> WalletFunctionSupport --> WalletCosmos
+    Hub --> SpokeAPIM
+    SpokeAPIM --> WalletFunctionUserPep --> WalletFunctionUser
+    SpokeAPIM --> WalletFunctionSupportPep --> WalletFunctionSupport --> WalletCosmosPep
 
-    WalletFunctionUser --> WalletCosmos
+    WalletFunctionUser --> WalletCosmosPep --> WalletCosmos
     WalletFunctionUser --> WalletSAPep --> WalletSA
     WalletFunctionUser --> WalletAppsKeyVaultPep --> WalletAppsKeyVault
 
@@ -102,21 +98,24 @@ graph LR
     GitHubRunner --> GitHubRepo
 
     ThirdParties --> ITWalletCDN
-    PSNEnterpriseApp@{ icon: "azure:enterprise-applications", pos: "b" }
+
     ITWalletCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
     IOWebCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
     HubWAF@{ icon: "azure:web-application-firewall-policieswaf", pos: "b" }
     HubAppGw@{ icon: "azure:application-gateways", pos: "b" }
     HubAppGwPEP@{ icon: "azure:private-link", pos: "b" }
-    HubAPIM@{ icon: "azure:api-management-services", pos: "b" }
+    HubAppGwPrivateDNS@{icon: "azure:dns-zones", pos: "b"}
+    SpokeAPIM@{ icon: "azure:api-management-services", pos: "b" }
     AppIO@{ icon: "azure:app-service-plans", pos: "b" }
+    WalletFunctionUserPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletFunctionUser@{ icon: "azure:function-apps", pos: "b" }
+    WalletFunctionSupportPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletFunctionSupport@{ icon: "azure:function-apps", pos: "b" }
-    CDNID@{ icon: "azure:managed-identities", pos: "b" }
+    WalletCosmosPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletCosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
     WalletAppsKeyVault@{ icon: "azure:key-vaults", pos: "b" }
     WalletAppsKeyVaultPep@{ icon: "azure:private-endpoints", pos: "b" }
-    WalletCDNKeyVault@{ icon: "azure:key-vaults", pos: "b" }
+    WalletInfraKeyVault@{ icon: "azure:key-vaults", pos: "b" }
     WalletCMKKey@{ icon: "azure:managed-identities", pos: "b" }
     ContainerSpid@{ icon: "azure:storage-container", pos: "b" }
     ContainerPdnd@{ icon: "azure:storage-container", pos: "b" }
@@ -133,14 +132,16 @@ graph LR
     classDef thirdPartiesClass fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
     classDef pagoPAStyle fill:#e8f4fd,stroke:#3498db,stroke-width:2px
     classDef psnStyle fill:#edf7f6,stroke:#16a085,stroke-width:2px
+    classDef psnGlobalStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
     classDef hubStyle fill:#fff4e6,stroke:#d68910,stroke-width:1px
     classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
     classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
 
-    linkStyle 4,5,6,22 stroke:#f39c12,stroke-width:2px
+    linkStyle 4,24 stroke:#f39c12,stroke-width:2px
 
     class PagoPA pagoPAStyle
     class PSN psnStyle
+    class PSNGlobal psnGlobalStyle
     class Hub,HubAppGwWaf hubStyle
     class Spoke spokeStyle
     class VNet,FrontDoor pagoPAStyle
@@ -148,4 +149,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class HubAppGwPEP,ITWalletCDN,CDNID,PSNEnterpriseApp,HubAPIM,WalletFunctionUser,WalletFunctionSupport,WalletCosmos,GitHubRunner,WalletCDNSA,ContainerExchange,ContainerWellKnown,ContainerPdnd,ContainerSpid disabledStyle
+    class GitHubRunner disabledStyle

@@ -31,6 +31,23 @@ data "azurerm_subnet" "pep" {
   resource_group_name  = data.azurerm_virtual_network.spoke.resource_group_name
 }
 
+data "azurerm_application_insights" "core" {
+  name = provider::dx::resource_name(merge(
+    local.environment,
+    {
+      name          = "core"
+      resource_type = "application_insights"
+    }
+  ))
+  resource_group_name = provider::dx::resource_name(merge(
+    local.environment,
+    {
+      name          = "monitoring"
+      resource_type = "resource_group"
+    }
+  ))
+}
+
 data "azurerm_private_dns_zone" "kv" {
   provider = azurerm.hub
 
@@ -52,6 +69,55 @@ data "azurerm_private_dns_zone" "queue" {
   resource_group_name = local.hub.resource_group_name
 }
 
+data "azurerm_private_dns_zone" "table" {
+  provider = azurerm.hub
+
+  name                = "privatelink.table.core.windows.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "file" {
+  provider = azurerm.hub
+
+  name                = "privatelink.file.core.windows.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "azurewebsites" {
+  provider = azurerm.hub
+
+  name                = "privatelink.azurewebsites.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "documents" {
+  provider = azurerm.hub
+
+  name                = "privatelink.documents.azure.com"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "management_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "management.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "scm_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "scm.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
 data "azurerm_key_vault_secret" "notification_slack" {
   name         = "slack-wallet-channel-email"
   key_vault_id = module.key_vault_app.key_vault_wallet.id
@@ -60,4 +126,9 @@ data "azurerm_key_vault_secret" "notification_slack" {
 data "azurerm_key_vault_secret" "notification_email" {
   name         = "email-wallet"
   key_vault_id = module.key_vault_app.key_vault_wallet.id
+}
+
+data "azurerm_route_table" "spoke" {
+  name                = "pagopa-Prod-ITWallet-spoke-routetable"
+  resource_group_name = local.spoke.resource_group_name
 }
