@@ -12,12 +12,10 @@ permissions:
   id-token: write
 
 env:
-  KEY_VAULT_NAME: "iw-p-itn-cdn-kv-01"
-  # KEY_VAULT_SUBSCRIPTION_ID: "725dede2-879b-45c5-82fa-eb816875b10c"
-  # KEY_VAULT_TENANT_ID: "bda10453-bf8a-4af5-99ce-b3ac5093001b"
-  CSR_COMMON_NAME: "appgw.psn.test.com"
-  DNS_ZONE: "psn.test.com"
-  DNS_ZONE_RESOURCE_GROUP: "io-infra-rg"
+  KEY_VAULT_NAME: "iw-p-itn-infra-kv-01"
+  CSR_COMMON_NAME: "psn.internal.io.pagopa.it"
+  DNS_ZONE: "io.pagopa.it"
+  DNS_ZONE_RESOURCE_GROUP: "io.pagopa.it"
 
 jobs:
   get-existing-certificate:
@@ -97,20 +95,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@main
 
-      # - name: Azure Login (PSN)
-      #   uses: azure/login@6b2456866fc08b011acb422a92a4aa20e2c4de32 # v2.1.0
-      #   with:
-      #     client-id: ${{ env.ARM_PSN_CLIENT_ID }}
-      #     tenant-id: ${{ env.ARM_PSN_TENANT_ID }}
-      #     subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
-
-      # - name: Fetch LE keys from Key Vault
-      #   env:
-      #     KEY_VAULT_NAME: ${{ env.KEY_VAULT_NAME }}
-      #   run: |
-      #       az keyvault secret download --vault-name "$KEY_VAULT_NAME" --name le-private-key-json --file private_key.json
-      #       az keyvault secret download --vault-name "$KEY_VAULT_NAME" --name le-regr-json --file regr.json
-
       - name: Set LE Files
         working-directory: ./.github/workflows
         run: |
@@ -151,7 +135,7 @@ jobs:
         env:
           AZURE_DNS_ZONE_RESOURCE_GROUP: ${{ env.DNS_ZONE_RESOURCE_GROUP }}
           AZURE_SUBSCRIPTION_ID: ${{ env.ARM_SUBSCRIPTION_ID }}
-          AZURE_PRIVATE_DNS_ZONE: ${{ env.DNS_ZONE }}
+          AZURE_DNS_ZONE: ${{ env.DNS_ZONE }}
           AZURE_IDENTITY_TYPE: "MANAGED_IDENTITY"
         working-directory: ./.github/workflows
         run: |

@@ -15,7 +15,6 @@ import urllib.request
 
 import azure.identity
 import azure.mgmt.dns
-import azure.mgmt.privatedns
 import cryptography
 import jwcrypto.jwk
 
@@ -27,11 +26,11 @@ LOGGER.addHandler(logging.StreamHandler())
 LOGGER.setLevel(logging.INFO)
 
 
-def azure_dns_operation(subscription, resource_group, zone, domain, value, operation, is_private=False):
+def azure_dns_operation(subscription, resource_group, zone, domain, value, operation):
     log = LOGGER
 
     # helper function - get a DNS API client
-    def _get_dns_client(subscription, is_private):
+    def _get_dns_client(subscription):
         id_type = os.getenv("AZURE_IDENTITY_TYPE", "CLIENT_SECRET")
 
         if id_type == "MANAGED_IDENTITY":
@@ -45,10 +44,7 @@ def azure_dns_operation(subscription, resource_group, zone, domain, value, opera
         else:
             raise ValueError(f"Unknown identity type: {id_type}.")
 
-        if is_private:
-            return azure.mgmt.privatedns.PrivateDnsManagementClient(identity, subscription)
-        else:
-            return azure.mgmt.dns.DnsManagementClient(identity, subscription)
+        return azure.mgmt.dns.DnsManagementClient(identity, subscription)
 
     # helper function - remove zone name from domain string
     def _get_name(domain, zone):
@@ -57,9 +53,8 @@ def azure_dns_operation(subscription, resource_group, zone, domain, value, opera
         elif domain.endswith(".{}".format(zone)):
             return "_acme-challenge.{}".format(domain[: -len(".{}".format(zone))])
 
-    client = _get_dns_client(subscription, is_private)
-    zone_type = "Private DNS" if is_private else "DNS"
-    log.info("Azure %s client initialized", zone_type)
+    client = _get_dns_client(subscription)
+    log.info("Azure DNS client initialized")
 
     # get the domain without the zone name
     name = _get_name(domain, zone)
@@ -68,30 +63,18 @@ def azure_dns_operation(subscription, resource_group, zone, domain, value, opera
         log.info(
             "Updating TXT record on %s in %s zone with value %s", name, zone, value
         )
-        if is_private:
-            client.record_sets.create_or_update(
-                resource_group,
-                zone,
-                "TXT",
-                name,
-                {"ttl": DEFAULT_DNS_TTL_SEC, "txt_records": [{"value": [value]}]},
-            )
-        else:
-            client.record_sets.create_or_update(
-                resource_group,
-                zone,
-                name,
-                "TXT",
-                {"ttl": DEFAULT_DNS_TTL_SEC, "txt_records": [{"value": [value]}]},
-            )
+        client.record_sets.create_or_update(
+            resource_group,
+            zone,
+            name,
+            "TXT",
+            {"ttl": DEFAULT_DNS_TTL_SEC, "txt_records": [{"value": [value]}]},
+        )
 
         log.info("TXT record updated!")
     elif operation == "delete":
         log.info("Deleting TXT record on %s in %s zone", name, zone)
-        if is_private:
-            client.record_sets.delete(resource_group, zone, "TXT", _get_name(domain, zone))
-        else:
-            client.record_sets.delete(resource_group, zone, _get_name(domain, zone), "TXT")
+        client.record_sets.delete(resource_group, zone, _get_name(domain, zone), "TXT")
         log.info("TXT record deleted!")
     else:
         raise ValueError("Unknown DNS operation: {}".format(operation))
@@ -280,14 +263,12 @@ def get_crt(private_key, regr, csr, directory_url, out):
 
     # sanity check: dns zone domain should be a suffix of domain
     # read zone from env variable, it has been checked earlier so it must exist
-    zone = os.getenv("AZURE_DNS_ZONE", "") or os.getenv("AZURE_PRIVATE_DNS_ZONE", "")
-    is_private = os.getenv("AZURE_PRIVATE_DNS_ZONE", "") != ""
+    zone = os.environ["AZURE_DNS_ZONE"]
     valid_domains = list(filter(lambda d: d.endswith(zone), domains))
     if len(valid_domains) != len(domains):
-        zone_type = "Private DNS" if is_private else "DNS"
         raise ValueError(
-            "Domains do not belong to {} {} zone: {}".format(
-                zone, zone_type, list(set(domains) - set(valid_domains))
+            "Domains do not belong to {} DNS zone: {}".format(
+                zone, list(set(domains) - set(valid_domains))
             ),
         )
 
@@ -329,7 +310,7 @@ def get_crt(private_key, regr, csr, directory_url, out):
 
         # modify DNS record
         azure_dns_operation(
-            subscription, resource_group, zone, domain, txt_record_value, "update", is_private
+            subscription, resource_group, zone, domain, txt_record_value, "update"
         )
 
         try:
@@ -377,7 +358,7 @@ def get_crt(private_key, regr, csr, directory_url, out):
     for domain in domains:
         try:
             azure_dns_operation(
-                subscription, resource_group, zone, domain, txt_record_value, "delete", is_private
+                subscription, resource_group, zone, domain, txt_record_value, "delete"
             )
         except Exception as ex:
             log.error("%s", repr(ex))
@@ -434,16 +415,7 @@ def main(argv=None):
     # check that all needed env variables are set, bail out early raising an exception otherwise
     os.environ["AZURE_SUBSCRIPTION_ID"]
     os.environ["AZURE_DNS_ZONE_RESOURCE_GROUP"]
-
-    # validate that only one between AZURE_DNS_ZONE and AZURE_PRIVATE_DNS_ZONE is set
-    dns_zone = os.getenv("AZURE_DNS_ZONE", "")
-    private_dns_zone = os.getenv("AZURE_PRIVATE_DNS_ZONE", "")
-
-    if dns_zone and private_dns_zone:
-        raise ValueError("Only one of AZURE_DNS_ZONE or AZURE_PRIVATE_DNS_ZONE must be set, not both")
-
-    if not dns_zone and not private_dns_zone:
-        raise ValueError("Either AZURE_DNS_ZONE or AZURE_PRIVATE_DNS_ZONE must be set")
+    os.environ["AZURE_DNS_ZONE"]
 
     # main function
     get_crt(args.private_key, args.regr, args.csr, args.directory_url, args.out)
