@@ -43,8 +43,3 @@ resource "azurerm_resource_group" "monitoring" {
 
   tags = local.tags
 }
-
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-monitoring-rg-01"
-  to = azurerm_resource_group.monitoring
-}

@@ -97,6 +97,27 @@ data "azurerm_private_dns_zone" "documents" {
   resource_group_name = local.hub.resource_group_name
 }
 
+data "azurerm_private_dns_zone" "azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "management_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "management.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_private_dns_zone" "scm_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "scm.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+}
+
 data "azurerm_key_vault_secret" "notification_slack" {
   name         = "slack-wallet-channel-email"
   key_vault_id = module.key_vault_app.key_vault_wallet.id
@@ -109,5 +130,5 @@ data "azurerm_key_vault_secret" "notification_email" {
 
 data "azurerm_route_table" "spoke" {
   name                = "pagopa-Prod-ITWallet-spoke-routetable"
-  resource_group_name = "pagopa-Prod-ITWallet-rg-spoke-italynorth"
+  resource_group_name = local.spoke.resource_group_name
 }
