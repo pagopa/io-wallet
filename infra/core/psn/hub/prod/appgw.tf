@@ -66,7 +66,7 @@ resource "azurerm_application_gateway" "hub" {
 
   backend_address_pool {
     name  = local.appgw.backend_address_pool_name
-    fqdns = ["iw-p-itn-support-func-01.azurewebsites.net"] # TODO: replace with APIM fqdn
+    fqdns = ["iw-p-itn-apps-apim-01.azure-api.net"]
   }
 
   backend_http_settings {
@@ -92,8 +92,7 @@ resource "azurerm_application_gateway" "hub" {
     frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
     frontend_port_name             = local.appgw.frontend_secure_port_name
     protocol                       = "Https"
-    require_sni                    = true
-    host_name                      = "psn.internal.io.pagopa.it"
+    require_sni                    = false
     ssl_certificate_name           = "psn-internal-io-pagopa-it"
   }
 
@@ -144,6 +143,11 @@ resource "azurerm_application_gateway" "hub" {
     }
   }
 
+  ssl_certificate {
+    name                = "psn-internal-io-pagopa-it"
+    key_vault_secret_id = "https://iw-p-itn-infra-kv-01.vault.azure.net:443/secrets/psn-internal-io-pagopa-it/"
+  }
+
   ssl_policy {
     policy_type          = "Custom"
     min_protocol_version = "TLSv1_2"
@@ -166,6 +170,11 @@ resource "azurerm_application_gateway" "hub" {
     request_body_check       = true
     max_request_body_size_kb = "128"
     file_upload_limit_mb     = "100"
+  }
+
+  global {
+    request_buffering_enabled  = true
+    response_buffering_enabled = true
   }
 
   tags = local.tags
