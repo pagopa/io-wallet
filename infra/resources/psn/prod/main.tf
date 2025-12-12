@@ -209,6 +209,12 @@ module "team_roles" {
       resource_group_name  = module.function_apps.function_app_user_uat.resource_group_name
       role                 = "reader"
       description          = "Allow Wallet team to read blobs in the UAT function app storage account"
+    },
+    {
+      storage_account_name = azurerm_storage_account.cdn.name
+      resource_group_name  = azurerm_storage_account.cdn.resource_group_name
+      role                 = "owner"
+      description          = "Allow Wallet team to manage blobs in the CDN storage account"
     }
   ]
 
