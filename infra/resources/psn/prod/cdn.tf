@@ -16,7 +16,8 @@ resource "azurerm_storage_account" "cdn" {
   https_traffic_only_enabled      = true
   allow_nested_items_to_be_public = true
   public_network_access_enabled   = true
-  shared_access_key_enabled       = false
+  shared_access_key_enabled       = true
+  default_to_oauth_authentication = true
   min_tls_version                 = "TLS1_2"
 
   blob_properties {
@@ -72,7 +73,7 @@ module "cdn" {
 
   origins = {
     primary = {
-      host_name = azurerm_storage_account.cdn.primary_web_host
+      host_name = azurerm_storage_account.cdn.primary_blob_host
     }
   }
 
