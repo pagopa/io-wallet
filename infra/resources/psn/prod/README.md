@@ -33,7 +33,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | <a name="module_function_apps"></a> [function\_apps](#module\_function\_apps) | ../../_modules/function_apps | n/a |
 | <a name="module_ids"></a> [ids](#module\_ids) | ../../_modules/identities | n/a |
 | <a name="module_key_vault_app"></a> [key\_vault\_app](#module\_key\_vault\_app) | ../../_modules/key_vaults | n/a |
-| <a name="module_key_vault_cdn"></a> [key\_vault\_cdn](#module\_key\_vault\_cdn) | ../../_modules/key_vaults | n/a |
+| <a name="module_key_vault_infra"></a> [key\_vault\_infra](#module\_key\_vault\_infra) | ../../_modules/key_vaults | n/a |
 | <a name="module_monitoring"></a> [monitoring](#module\_monitoring) | ../../_modules/monitoring | n/a |
 | <a name="module_storage_accounts"></a> [storage\_accounts](#module\_storage\_accounts) | ../../_modules/storage_accounts | n/a |
 | <a name="module_team_roles"></a> [team\_roles](#module\_team\_roles) | pagopa-dx/azure-role-assignments/azurerm | ~> 1.3 |
@@ -42,6 +42,7 @@ The diagram below shows the resources actually deployed. This is a work in progr
 
 | Name | Type |
 |------|------|
+| [azurerm_key_vault_certificate.psn_internal_io_pagopa_it](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_certificate) | resource |
 | [azurerm_storage_account.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account_static_website.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) | resource |
 | [azurerm_storage_container.exchange](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
