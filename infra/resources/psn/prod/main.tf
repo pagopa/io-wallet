@@ -29,12 +29,12 @@ module "key_vault_app" {
   tags = local.tags
 }
 
-module "key_vault_cdn" {
+module "key_vault_infra" {
   source = "../../_modules/key_vaults"
 
   environment = merge(local.environment,
     {
-      name = "cdn"
+      name = "infra"
     }
   )
   resource_group_name = data.azurerm_resource_group.wallet.name
@@ -42,6 +42,46 @@ module "key_vault_cdn" {
   tenant_id = data.azurerm_client_config.current.tenant_id
 
   tags = local.tags
+}
+
+resource "azurerm_key_vault_certificate" "psn_internal_io_pagopa_it" {
+  name         = "psn-internal-io-pagopa-it"
+  key_vault_id = module.key_vault_infra.key_vault_wallet.id
+
+  certificate_policy {
+    issuer_parameters {
+      name = "Self"
+    }
+
+    key_properties {
+      exportable = true
+      key_size   = 2048
+      key_type   = "RSA"
+      reuse_key  = false
+    }
+
+    x509_certificate_properties {
+      key_usage = [
+        "digitalSignature",
+        "keyEncipherment",
+      ]
+      subject            = "CN=psn.internal.io.pagopa.it"
+      validity_in_months = 12
+    }
+
+    lifetime_action {
+      action {
+        action_type = "AutoRenew"
+      }
+      trigger {
+        days_before_expiry = 30
+      }
+    }
+
+    secret_properties {
+      content_type = "application/x-pkcs12"
+    }
+  }
 }
 
 module "monitoring" {
@@ -175,8 +215,8 @@ module "team_roles" {
       }
     },
     {
-      name                = module.key_vault_cdn.key_vault_wallet.name
-      resource_group_name = module.key_vault_cdn.key_vault_wallet.resource_group_name
+      name                = module.key_vault_infra.key_vault_wallet.name
+      resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
       description         = "Allow Wallet team to manage secrets and certificates"
       roles = {
         secrets      = "owner"
