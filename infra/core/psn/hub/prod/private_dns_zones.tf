@@ -114,3 +114,30 @@ resource "azurerm_private_dns_zone" "agentsvc" {
 
   tags = local.tags
 }
+
+resource "azurerm_private_dns_zone" "azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "azure-api.net"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
+
+resource "azurerm_private_dns_zone" "management_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "management.azure-api.net"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
+
+resource "azurerm_private_dns_zone" "scm_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = "scm.azure-api.net"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
