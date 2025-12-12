@@ -48,7 +48,7 @@ graph LR
               subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
                   GitHubRunner[io-p-itn-github-caj-01]
               end
-              HubAPIM["io-p-itn-apim-01"]
+              SpokeAPIM["iw-p-itn-apps-apim-01"]
               WalletFunctionUserPep["iw-p-itn-user-func-pep-01"]
               WalletFunctionUser[iw-p-itn-user-func-01]
               WalletFunctionSupportPep["iw-p-itn-support-func-pep-01"]
@@ -105,7 +105,7 @@ graph LR
     HubAppGw@{ icon: "azure:application-gateways", pos: "b" }
     HubAppGwPEP@{ icon: "azure:private-link", pos: "b" }
     HubAppGwPrivateDNS@{icon: "azure:dns-zones", pos: "b"}
-    HubAPIM@{ icon: "azure:api-management-services", pos: "b" }
+    SpokeAPIM@{ icon: "azure:api-management-services", pos: "b" }
     AppIO@{ icon: "azure:app-service-plans", pos: "b" }
     WalletFunctionUserPep@{ icon: "azure:private-endpoints", pos: "b" }
     WalletFunctionUser@{ icon: "azure:function-apps", pos: "b" }
@@ -149,4 +149,4 @@ graph LR
 
     class RelyingParty thirdPartiesClass
     class CredentialIssuer thirdPartiesClass
-    class HubAPIM,GitHubRunner disabledStyle
+    class GitHubRunner disabledStyle
