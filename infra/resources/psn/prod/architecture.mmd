@@ -31,7 +31,7 @@ graph LR
         end
 
         subgraph Spoke["Spoke"]
-              WalletCDNKeyVault["iw-p-itn-cdn-kv-01"]
+            WalletInfraKeyVault["iw-p-itn-infra-kv-01"]
 
             subgraph PSNGlobal["Global"]
               ITWalletCDN["iw-p-itn-cdn-fde-01"]
@@ -115,7 +115,7 @@ graph LR
     WalletCosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
     WalletAppsKeyVault@{ icon: "azure:key-vaults", pos: "b" }
     WalletAppsKeyVaultPep@{ icon: "azure:private-endpoints", pos: "b" }
-    WalletCDNKeyVault@{ icon: "azure:key-vaults", pos: "b" }
+    WalletInfraKeyVault@{ icon: "azure:key-vaults", pos: "b" }
     WalletCMKKey@{ icon: "azure:managed-identities", pos: "b" }
     ContainerSpid@{ icon: "azure:storage-container", pos: "b" }
     ContainerPdnd@{ icon: "azure:storage-container", pos: "b" }
