@@ -21,11 +21,6 @@ data "azurerm_virtual_network" "spoke" {
   resource_group_name = local.spoke.resource_group_name
 }
 
-data "azurerm_route_table" "spoke" {
-  name                = "pagopa-Prod-ITWallet-spoke-routetable"
-  resource_group_name = local.spoke.resource_group_name
-}
-
 data "azurerm_subnet" "pep" {
   name = provider::dx::resource_name(merge(local.environment, {
     domain        = ""
@@ -131,4 +126,9 @@ data "azurerm_key_vault_secret" "notification_slack" {
 data "azurerm_key_vault_secret" "notification_email" {
   name         = "email-wallet"
   key_vault_id = module.key_vault_app.key_vault_wallet.id
+}
+
+data "azurerm_route_table" "spoke" {
+  name                = "pagopa-Prod-ITWallet-spoke-routetable"
+  resource_group_name = local.spoke.resource_group_name
 }
