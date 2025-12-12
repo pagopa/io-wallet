@@ -42,8 +42,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         id: all
         run: |
-          # echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT # removed for tests
-          echo 'changes=["resources/psn"]' >> $GITHUB_OUTPUT
+          echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT # removed for tests
 
   plan_prod:
     needs: changes
@@ -61,6 +60,6 @@ jobs:
       environment: prod
       base_path: infra/${{ matrix.infra }}
       use_private_agent: true
-      override_github_environment: infra-prod # TBD
+      override_github_environment: infra-prod # TBD (Change if new environment is created)
       use_labels: true
       override_labels: psn
