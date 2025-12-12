@@ -112,6 +112,7 @@ jobs:
       #       az keyvault secret download --vault-name "$KEY_VAULT_NAME" --name le-regr-json --file regr.json
 
       - name: Set LE Files
+        working-directory: ./.github/workflows
         run: |
           echo '${{ env.LE_PRIVATE_KEY_JSON }}' > private_key.json
           echo '${{ env.LE_REGR_JSON }}' > regr.json
