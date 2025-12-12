@@ -69,7 +69,7 @@ def azure_dns_operation(subscription, resource_group, zone, domain, value, opera
             "Updating TXT record on %s in %s zone with value %s", name, zone, value
         )
         if is_private:
-            client.private_record_sets.create_or_update(
+            client.record_sets.create_or_update(
                 resource_group,
                 zone,
                 "TXT",
@@ -89,7 +89,7 @@ def azure_dns_operation(subscription, resource_group, zone, domain, value, opera
     elif operation == "delete":
         log.info("Deleting TXT record on %s in %s zone", name, zone)
         if is_private:
-            client.private_record_sets.delete(resource_group, zone, "TXT", _get_name(domain, zone))
+            client.record_sets.delete(resource_group, zone, "TXT", _get_name(domain, zone))
         else:
             client.record_sets.delete(resource_group, zone, _get_name(domain, zone), "TXT")
         log.info("TXT record deleted!")
