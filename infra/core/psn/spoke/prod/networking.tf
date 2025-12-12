@@ -75,7 +75,7 @@ resource "azurerm_route_table" "spoke" {
     },
     {
       # https://learn.microsoft.com/en-us/azure/api-management/api-management-using-with-internal-vnet#force-tunnel-traffic-to-on-premises-firewall-using-expressroute-or-network-virtual-appliance
-      name                   = "AllowAPIM"
+      name                   = "APIM"
       address_prefix         = "ApiManagement"
       next_hop_type          = "Internet"
       next_hop_in_ip_address = null
