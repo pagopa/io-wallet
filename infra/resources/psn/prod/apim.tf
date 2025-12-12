@@ -78,7 +78,7 @@ module "apim" {
   }
   subnet_id                     = azurerm_subnet.apim.id
   virtual_network_type_internal = true
-  enable_public_network_access  = true # Change after first apply
+  enable_public_network_access  = false
 
   # Autoscale
   autoscale = {
