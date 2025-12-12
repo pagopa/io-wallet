@@ -77,10 +77,8 @@ resource "azurerm_private_dns_a_record" "apim_scm_azure_api_net" {
 }
 
 module "apim" {
-  # source  = "pagopa-dx/azure-api-management/azurerm"
-  # version = "~> 2.0"
-
-  source = "github.com/pagopa/dx//infra/modules/azure_api_management?ref=apim-multiple-sub-dns"
+  source  = "pagopa-dx/azure-api-management/azurerm"
+  version = "~> 2.1"
 
   environment = merge(local.environment,
     {
@@ -116,7 +114,7 @@ module "apim" {
   }
   subnet_id                     = azurerm_subnet.apim.id
   virtual_network_type_internal = true
-  enable_public_network_access  = false
+  enable_public_network_access  = true
 
   # Autoscale
   autoscale = {
