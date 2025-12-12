@@ -8,8 +8,10 @@ locals {
     frontend_private_ip_configuration_name = "appGwPrivateFrontendIp"
     private_link_name                      = "private-link-01"
     http_setting_name                      = "appGatewayBackendHttpSettings"
-    listener_name                          = "appGatewayHttpListener"
-    request_routing_rule_name              = "appGatewayRule"
+    http_listener_name                     = "appGatewayHttpListener"
+    https_listener_name                    = "appGatewayHttpsListener"
+
+    request_routing_rule_name = "appGatewayRule"
   }
 }
 
@@ -22,6 +24,11 @@ resource "azurerm_application_gateway" "hub" {
 
   zones        = ["1", "2", "3"]
   enable_http2 = false
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.appgateway.id]
+  }
 
   sku {
     name     = "WAF_v2"
@@ -73,17 +80,27 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   http_listener {
-    name                           = local.appgw.listener_name
+    name                           = local.appgw.http_listener_name
     frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
     frontend_port_name             = local.appgw.frontend_port_name
     protocol                       = "Http"
     require_sni                    = false
   }
 
+  http_listener {
+    name                           = local.appgw.https_listener_name
+    frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
+    frontend_port_name             = local.appgw.frontend_secure_port_name
+    protocol                       = "Https"
+    require_sni                    = true
+    host_name                      = "psn.internal.io.pagopa.it"
+    ssl_certificate_name           = "psn-internal-io-pagopa-it"
+  }
+
   request_routing_rule {
     name                       = local.appgw.request_routing_rule_name
     priority                   = 10010
-    http_listener_name         = local.appgw.listener_name
+    http_listener_name         = local.appgw.https_listener_name
     rule_type                  = "Basic"
     backend_address_pool_name  = local.appgw.backend_address_pool_name
     backend_http_settings_name = local.appgw.http_setting_name
