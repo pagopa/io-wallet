@@ -21,21 +21,59 @@ resource "azurerm_subnet" "apim" {
 
   address_prefixes = [dx_available_subnet_cidr.apim_apps.cidr_block]
 
-  private_endpoint_network_policies = "Enabled"
-
   service_endpoints = [
     "Microsoft.Storage",
     "Microsoft.Sql",
     "Microsoft.KeyVault",
     "Microsoft.Web",
     "Microsoft.AzureActiveDirectory",
-    "Microsoft.EventHub"
+    "Microsoft.EventHub",
+    "Microsoft.ServiceBus"
   ]
 }
 
 resource "azurerm_subnet_route_table_association" "apim_apps" {
   route_table_id = data.azurerm_route_table.spoke.id
   subnet_id      = azurerm_subnet.apim.id
+}
+
+resource "azurerm_private_dns_a_record" "apim_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = module.apim.name
+  zone_name           = "azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+  ttl                 = 3600
+  records             = module.apim.private_ip_addresses
+  tags                = local.tags
+
+  depends_on = [module.apim]
+}
+
+resource "azurerm_private_dns_a_record" "apim_management_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = module.apim.name
+  zone_name           = "management.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+  ttl                 = 3600
+  records             = module.apim.private_ip_addresses
+  tags                = local.tags
+
+  depends_on = [module.apim]
+}
+
+resource "azurerm_private_dns_a_record" "apim_scm_azure_api_net" {
+  provider = azurerm.hub
+
+  name                = module.apim.name
+  zone_name           = "scm.azure-api.net"
+  resource_group_name = local.hub.resource_group_name
+  ttl                 = 3600
+  records             = module.apim.private_ip_addresses
+  tags                = local.tags
+
+  depends_on = [module.apim]
 }
 
 module "apim" {
