@@ -14,8 +14,6 @@ graph LR
             HubAppGwPrivateDNS["psn.internal.io.pagopa.it"]
         end
         subgraph FrontDoor["Global"]
-          %% CDNID["`User-Assigned
-          %%   Managed Identity`"]
 
           IOWebCDN["`IO Web
             (Static Website)`"]
@@ -23,18 +21,6 @@ graph LR
     end
 
     subgraph PSN
-        subgraph PSNGlobal["Global"]
-          ITWalletCDN["iw-p-itn-cdn-fde-01"]
-          subgraph WalletCDNSA["iwpitncdnst01"]
-              direction TB
-              ContainerSpid[spid-hub-login]
-              ContainerPdnd[pdnd]
-              ContainerExchange[exchange]
-              ContainerWellKnown[well-known]
-              ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
-          end
-        end
-
         subgraph Hub["Hub"]
             subgraph HubAppGwWaf["`Application Gateway + WAF
               Public + Private IPs`"]
@@ -45,31 +31,40 @@ graph LR
         end
 
         subgraph Spoke["Spoke"]
+              WalletCDNKeyVault["iw-p-itn-cdn-kv-01"]
+
+            subgraph PSNGlobal["Global"]
+              ITWalletCDN["iw-p-itn-cdn-fde-01"]
+              subgraph WalletCDNSA["iwpitncdnst01"]
+                ContainerSpid[spid-hub-login]
+                ContainerPdnd[pdnd]
+                ContainerExchange[exchange]
+                ContainerWellKnown[well-known]
+                ContainerSpid ~~~ ContainerPdnd ~~~ ContainerExchange ~~~ ContainerWellKnown
+              end
+            end
+
             subgraph VNetWallet["pagopa-Prod-ITWallet-spoke-italynorth"]
+              subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
+                  GitHubRunner[io-p-itn-github-caj-01]
+              end
+              HubAPIM["io-p-itn-apim-01"]
+              WalletFunctionUserPep["iw-p-itn-user-func-pep-01"]
+              WalletFunctionUser[iw-p-itn-user-func-01]
+              WalletFunctionSupportPep["iw-p-itn-support-func-pep-01"]
+              WalletFunctionSupport[iw-p-itn-support-func-01]
+              WalletAppsKeyVaultPep["iw-p-itn-apps-kv-pep-01"]
+              WalletAppsKeyVault["iw-p-itn-apps-kv-01"]
+              WalletCosmosPep["iw-p-itn-apps-cosno-pep-01"]
+              WalletCosmos["iw-p-itn-apps-cosno-01"]
+              WalletCMKKey["iw-p-itn-data-cmk-id-01"]
+              WalletSAPep["iw-p-itn-apps-x-pep-01"]
 
-                subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
-                    GitHubRunner[io-p-itn-github-caj-01]
-                end
-                subgraph ITWalletRG["iw-p-itn-wallet-rg-01"]
-                HubAPIM["io-p-itn-apim-01"]
-                WalletFunctionUserPep["iw-p-itn-user-func-pep-01"]
-                WalletFunctionUser[iw-p-itn-user-func-01]
-                WalletFunctionSupportPep["iw-p-itn-support-func-pep-01"]
-                WalletFunctionSupport[iw-p-itn-support-func-01]
-                WalletAppsKeyVaultPep["iw-p-itn-apps-kv-pep-01"]
-                WalletAppsKeyVault["iw-p-itn-apps-kv-01"]
-                WalletCDNKeyVault["iw-p-itn-cdn-kv-01"]
-                WalletCosmosPep["iw-p-itn-apps-cosno-pep-01"]
-                WalletCosmos["iw-p-itn-apps-cosno-01"]
-                WalletCMKKey["iw-p-itn-data-cmk-id-01"]
-                WalletSAPep["iw-p-itn-apps-x-pep-01"]
-
-                subgraph WalletSA["iwpitnappsst01"]
-                    direction TB
-                    QueueEmail["creation-email-queue-01"]
-                    QueueRevocationEmail["revocation-email-queue-01"]
-                    QueueEmail ~~~ QueueRevocationEmail
-                end
+              subgraph WalletSA["iwpitnappsst01"]
+                  direction TB
+                  QueueEmail["creation-email-queue-01"]
+                  QueueRevocationEmail["revocation-email-queue-01"]
+                  QueueEmail ~~~ QueueRevocationEmail
               end
             end
         end
