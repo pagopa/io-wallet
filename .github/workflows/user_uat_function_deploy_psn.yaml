@@ -1,4 +1,4 @@
-name: Deploy Function App PSN (user-func)
+name: Deploy Function App PSN (user-uat-func)
 
 on:
   workflow_dispatch: {}
@@ -22,7 +22,7 @@ jobs:
       workspace_name: io-wallet-user-func
       environment: app-prod
       resource_group_name: iw-p-itn-wallet-rg-01
-      web_app_name: iw-p-itn-user-func-01
+      web_app_name: iw-u-itn-user-func-01
       disable_auto_staging_deploy: true
       use_labels: true
       override_labels: psn

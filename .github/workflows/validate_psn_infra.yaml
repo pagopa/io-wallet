@@ -2,18 +2,19 @@ name: PR PSN Infrastructure Plan - Prod
 
 on:
   workflow_dispatch:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
-      - ready_for_review
-    paths:
-      - "infra/core/psn/hub/prod/**"
-      - "infra/core/psn/spoke/prod/**"
-      - "infra/resources/psn/prod/**"
-      - ".github/workflows/pr_psn_infra.yaml"
+  # TBD: Uncomment after permissions are set on identity
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - edited
+  #     - synchronize
+  #     - reopened
+  #     - ready_for_review
+  #   paths:
+  #     - "infra/core/psn/hub/prod/**"
+  #     - "infra/core/psn/spoke/prod/**"
+  #     - "infra/resources/psn/prod/**"
+  #     - ".github/workflows/pr_psn_infra.yaml"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -60,6 +61,6 @@ jobs:
       environment: prod
       base_path: infra/${{ matrix.infra }}
       use_private_agent: true
-      override_github_environment: infra-prod # TBD (Change if new environment is created)
+      override_github_environment: infra-prod
       use_labels: true
       override_labels: psn

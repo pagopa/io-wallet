@@ -2,13 +2,14 @@ name: PR PSN Infrastructure Release - Prod
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "infra/core/psn/hub/prod/**"
-      - "infra/core/psn/spoke/prod/**"
-      - "infra/resources/psn/prod/**"
+  # TBD: Uncomment after permissions are set on identity
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - "infra/core/psn/hub/prod/**"
+  #     - "infra/core/psn/spoke/prod/**"
+  #     - "infra/resources/psn/prod/**"
 
 concurrency:
   group: ${{ github.workflow }}
@@ -58,6 +59,6 @@ jobs:
       environment: prod
       base_path: infra/${{ matrix.infra }}
       use_private_agent: true
-      override_github_environment: infra-prod # TBD (Change if new environment is created)
+      override_github_environment: infra-prod
       use_labels: true
       override_labels: psn
