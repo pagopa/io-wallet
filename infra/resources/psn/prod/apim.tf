@@ -20,6 +20,17 @@ resource "azurerm_subnet" "apim" {
   virtual_network_name = data.azurerm_virtual_network.spoke.name
 
   address_prefixes = [dx_available_subnet_cidr.apim_apps.cidr_block]
+
+  private_endpoint_network_policies = "Enabled"
+
+  service_endpoints = [
+    "Microsoft.Storage",
+    "Microsoft.Sql",
+    "Microsoft.KeyVault",
+    "Microsoft.Web",
+    "Microsoft.AzureActiveDirectory",
+    "Microsoft.EventHub"
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "apim_apps" {
