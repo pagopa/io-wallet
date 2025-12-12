@@ -23,3 +23,13 @@ resource "azurerm_private_dns_zone_virtual_network_link" "spoke" {
 
   tags = local.tags
 }
+
+resource "azurerm_subnet" "private_links" {
+  name                 = "AzurePl"
+  resource_group_name  = data.azurerm_virtual_network.hub.resource_group_name
+  virtual_network_name = data.azurerm_virtual_network.hub.name
+
+  address_prefixes = ["10.251.1.64/27"]
+
+  private_link_service_network_policies_enabled = false
+}
