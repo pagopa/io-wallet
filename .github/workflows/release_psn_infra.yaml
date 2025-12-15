@@ -11,6 +11,11 @@ on:
   #     - "infra/core/psn/spoke/prod/**"
   #     - "infra/resources/psn/prod/**"
 
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
