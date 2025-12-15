@@ -1,0 +1,71 @@
+name: PR PSN Infrastructure Plan - Prod
+
+on:
+  workflow_dispatch:
+  # TBD: Uncomment after permissions are set on identity
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - edited
+  #     - synchronize
+  #     - reopened
+  #     - ready_for_review
+  #   paths:
+  #     - "infra/core/psn/hub/prod/**"
+  #     - "infra/core/psn/spoke/prod/**"
+  #     - "infra/resources/psn/prod/**"
+  #     - ".github/workflows/pr_psn_infra.yaml"
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.changes.outputs.changes || steps.all.outputs.changes }}
+    steps:
+      - name: Found changed PSN Infra modules
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 #v3.0.2
+        if: github.event_name != 'workflow_dispatch'
+        id: changes
+        with:
+          filters: |
+            core/psn/hub:
+              - 'infra/core/psn/hub/prod/**'
+            core/psn/spoke:
+              - 'infra/core/psn/spoke/prod/**'
+            resources/psn:
+              - 'infra/resources/psn/prod/**'
+
+      - name: All PSN Infra modules (for manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        id: all
+        run: |
+          echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT # removed for tests
+
+  plan_prod:
+    needs: changes
+    uses: pagopa/dx/.github/workflows/infra_plan.yaml@support/psn-adaptation #main - Temporary, to be removed when using specific psn environment
+    name: Infrastructure Plan
+    secrets: inherit
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        infra: ${{ fromJSON( needs.changes.outputs.changes ) }}
+
+    with:
+      environment: prod
+      base_path: infra/${{ matrix.infra }}
+      use_private_agent: true
+      override_github_environment: infra-prod
+      use_labels: true
+      override_labels: psn
