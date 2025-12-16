@@ -36,8 +36,6 @@ resource "azurerm_container_app_environment" "cae" {
   tags = local.tags
 }
 
-
-# Container App Job for Self-Hosted GitHub Runners
 resource "azurerm_container_app_job" "github_runner" {
   container_app_environment_id = azurerm_container_app_environment.cae.id
   name = provider::dx::resource_name(merge(local.environment, {
