@@ -24,7 +24,7 @@ resource "azurerm_container_app_environment" "cae" {
     workload_profile_type = "Consumption"
   }
 
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.cae_log_analytics.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
 
   infrastructure_resource_group_name = local.cae_infra_rg_name
 
