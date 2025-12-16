@@ -43,3 +43,13 @@ resource "azurerm_resource_group" "monitoring" {
 
   tags = local.tags
 }
+
+resource "azurerm_resource_group" "gh_runner" {
+  name = provider::dx::resource_name(merge(local.environment, {
+    name          = "github-runner"
+    resource_type = "resource_group",
+  }))
+  location = local.environment.location
+
+  tags = local.tags
+}
