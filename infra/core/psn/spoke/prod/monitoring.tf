@@ -97,3 +97,22 @@ resource "azurerm_private_endpoint" "ampls" {
 
   tags = local.tags
 }
+
+# Container Apps Environment Log Analytics Workspace
+resource "azurerm_log_analytics_workspace" "cae_log_analytics" {
+  name = replace(provider::dx::resource_name(merge(
+    local.environment,
+    {
+      name          = "core"
+      resource_type = "log_analytics"
+    }
+  )), "-core-", "-")
+  location            = local.environment.location
+  resource_group_name = azurerm_resource_group.monitoring.name
+
+  retention_in_days          = 30
+  internet_ingestion_enabled = true
+  internet_query_enabled     = true
+
+  tags = local.tags
+}
