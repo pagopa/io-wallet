@@ -20,6 +20,11 @@ locals {
     firewall_ip    = "10.251.0.68"
   }
 
+  repository = {
+    owner = "pagopa"
+    name  = "io-wallet"
+  }
+
   tags = {
     BusinessUnit = "IT-Wallet"
     CostCenter   = "TS000 - Tecnologia e Servizi"
