@@ -119,8 +119,8 @@ resource "azurerm_container_app_job" "github_runner" {
       }
 
       env {
-        name  = "GITHUB_PAT"
-        value = "github-runner-pat"
+        name        = "GITHUB_PAT"
+        secret_name = "github-runner-pat"
       }
     }
   }
