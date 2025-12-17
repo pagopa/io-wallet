@@ -143,8 +143,6 @@ module "function_apps" {
   key_vault_wallet_id   = module.key_vaults.key_vault_wallet.id
   key_vault_wallet_name = module.key_vaults.key_vault_wallet.name
 
-  application_insights_connection_string = data.azurerm_application_insights.common.connection_string
-
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
 
@@ -154,6 +152,8 @@ module "function_apps" {
   front_door_endpoint_name = module.cdn.cdn_endpoint_name
 
   subscription_id = data.azurerm_subscription.current.subscription_id
+
+  application_insights_connection_string = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.app_insights_connection_string.versionless_id})"
 
   nat_gateway_id = data.azurerm_nat_gateway.nat.id
 
@@ -204,22 +204,20 @@ module "iam" {
     }
   }
 
-  cosmos_db_02 = {
-    id                  = module.cosmos.apps.id
+  cosmos_db = {
     name                = module.cosmos.apps.name
     resource_group_name = module.cosmos.apps.resource_group_name
     database_name       = module.cosmos.apps.database_name
   }
 
   cosmos_db_uat = {
-    id                  = module.cosmos.apps.id
     name                = module.cosmos.apps.name
     resource_group_name = module.cosmos.apps.resource_group_name
     database_name       = module.cosmos.apps.database_name_uat
   }
 
   function_app = {
-    user_func_02 = {
+    user_func = {
       principal_id         = module.function_apps.function_app_user.principal_id
       staging_principal_id = module.function_apps.function_app_user.staging_principal_id
     }
@@ -233,8 +231,7 @@ module "iam" {
     }
   }
 
-  key_vault = {
-    id                  = module.key_vaults.key_vault_wallet.id
+  key_vault_app = {
     name                = module.key_vaults.key_vault_wallet.name
     resource_group_name = module.key_vaults.key_vault_wallet.resource_group_name
   }
@@ -245,13 +242,11 @@ module "iam" {
   }
 
   cdn_storage_account = {
-    id                  = module.cdn.storage_account_cdn.id
     name                = module.cdn.storage_account_cdn.name
     resource_group_name = module.cdn.storage_account_cdn.resource_group_name
   }
 
   storage_account = {
-    id                  = module.storage_accounts.wallet.id
     name                = module.storage_accounts.wallet.name
     resource_group_name = module.storage_accounts.wallet.resource_group_name
   }

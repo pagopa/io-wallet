@@ -44,46 +44,6 @@ module "key_vault_infra" {
   tags = local.tags
 }
 
-resource "azurerm_key_vault_certificate" "psn_internal_io_pagopa_it" {
-  name         = "psn-internal-io-pagopa-it"
-  key_vault_id = module.key_vault_infra.key_vault_wallet.id
-
-  certificate_policy {
-    issuer_parameters {
-      name = "Self"
-    }
-
-    key_properties {
-      exportable = true
-      key_size   = 2048
-      key_type   = "RSA"
-      reuse_key  = false
-    }
-
-    x509_certificate_properties {
-      key_usage = [
-        "digitalSignature",
-        "keyEncipherment",
-      ]
-      subject            = "CN=psn.internal.io.pagopa.it"
-      validity_in_months = 12
-    }
-
-    lifetime_action {
-      action {
-        action_type = "AutoRenew"
-      }
-      trigger {
-        days_before_expiry = 30
-      }
-    }
-
-    secret_properties {
-      content_type = "application/x-pkcs12"
-    }
-  }
-}
-
 module "monitoring" {
   source = "../../_modules/monitoring"
 
@@ -115,6 +75,8 @@ module "storage_accounts" {
     queue_private_dns_zone_id = data.azurerm_private_dns_zone.queue.id
     subnet_pep_id             = data.azurerm_subnet.pep.id
   }
+
+  key_vault_wallet_id = module.key_vault_app.key_vault_wallet.id
 
   action_group_id = module.monitoring.action_group_wallet.id
 
@@ -177,127 +139,93 @@ module "function_apps" {
   cosmos_db_endpoint                          = module.cosmos.apps.endpoint
   cosmos_database_name                        = module.cosmos.apps.database_name
   cosmos_database_name_uat                    = module.cosmos.apps.database_name_uat
-  storage_account_cdn_name                    = "" # TODO: fill when resource will be created
+  storage_account_cdn_name                    = azurerm_storage_account.cdn.name
   key_vault_id                                = module.key_vault_app.key_vault_wallet.id
   key_vault_wallet_id                         = module.key_vault_app.key_vault_wallet.id
   key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
-  front_door_profile_name                     = "" # TODO: fill when resource will be created
-  front_door_endpoint_name                    = "" # TODO: fill when resource will be created
+  front_door_profile_name                     = module.cdn.name
+  front_door_endpoint_name                    = module.cdn.endpoint_hostname
 
-  application_insights_connection_string = data.azurerm_application_insights.core.connection_string
+  application_insights_connection_string = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.app_insights_connection_string.versionless_id})"
 
   action_group_wallet_id = module.monitoring.action_group_wallet.id
 
-  user_func = {
-    app_settings = []
-  }
+  user_func = local.user_func
 
   tags = local.tags
 }
 
-# TODO: replace with IAM submodules when all resources will be created
-module "team_roles" {
-  source  = "pagopa-dx/azure-role-assignments/azurerm"
-  version = "~> 1.3"
+module "iam" {
+  source = "../../_modules/iam"
 
-  principal_id    = data.azuread_group.wallet.object_id
+  is_psn = true
+
   subscription_id = data.azurerm_subscription.current.subscription_id
 
-  key_vault = [
-    {
-      name                = module.key_vault_app.key_vault_wallet.name
-      resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
-      description         = "Allow Wallet team to manage secrets"
-      roles = {
-        secrets = "owner"
-      }
-    },
-    {
-      name                = module.key_vault_infra.key_vault_wallet.name
-      resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
-      description         = "Allow Wallet team to manage secrets and certificates"
-      roles = {
-        secrets      = "owner"
-        certificates = "owner"
-      }
-    }
+  admin_ids = [
+    data.azuread_group.wallet.object_id
   ]
 
-  storage_blob = [
-    {
-      storage_account_name = module.storage_accounts.wallet.name
-      resource_group_name  = module.storage_accounts.wallet.resource_group_name
-      role                 = "owner"
-      description          = "Allow Wallet team to manage blobs in the storage account"
-    },
-    {
-      storage_account_name = module.function_apps.function_app_user.storage_account
-      resource_group_name  = module.function_apps.function_app_user.resource_group_name
-      role                 = "reader"
-      description          = "Allow Wallet team to read blobs in the function app storage account"
-    },
-    {
-      storage_account_name = module.function_apps.function_app_support.storage_account
-      resource_group_name  = module.function_apps.function_app_support.resource_group_name
-      role                 = "reader"
-      description          = "Allow Wallet team to read blobs in the function app storage account"
-    },
-    {
-      storage_account_name = module.function_apps.function_app_user_uat.storage_account
-      resource_group_name  = module.function_apps.function_app_user_uat.resource_group_name
-      role                 = "reader"
-      description          = "Allow Wallet team to read blobs in the UAT function app storage account"
-    },
-    {
-      storage_account_name = azurerm_storage_account.cdn.name
-      resource_group_name  = azurerm_storage_account.cdn.resource_group_name
-      role                 = "owner"
-      description          = "Allow Wallet team to manage blobs in the CDN storage account"
+  cdn_principal_id = module.cdn.principal_id
+
+  cicd_principal_ids = {
+    infra = {
+      ci = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
+      cd = data.azurerm_user_assigned_identity.infra_cd_id.principal_id
     }
-  ]
-
-  storage_queue = [
-    {
-      storage_account_name = module.storage_accounts.wallet.name
-      resource_group_name  = module.storage_accounts.wallet.resource_group_name
-      role                 = "writer"
-      description          = "Allow Wallet team to send messages to queues"
-    },
-    {
-      storage_account_name = module.storage_accounts.wallet.name
-      resource_group_name  = module.storage_accounts.wallet.resource_group_name
-      role                 = "owner"
-      description          = "Allow Wallet team to manage queues"
+    app = {
+      cd = data.azurerm_user_assigned_identity.app_cd_id.principal_id
     }
-  ]
+  }
 
-  cosmos = [
-    {
-      account_name        = module.cosmos.apps.name
-      resource_group_name = module.cosmos.apps.resource_group_name
-      description         = "Allow Wallet team to manage databases and containers in the Cosmos DB account"
-      role                = "writer"
+  cosmos_db = {
+    name                = module.cosmos.apps.name
+    resource_group_name = module.cosmos.apps.resource_group_name
+    database_name       = module.cosmos.apps.database_name
+  }
+
+  cosmos_db_uat = {
+    name                = module.cosmos.apps.name
+    resource_group_name = module.cosmos.apps.resource_group_name
+    database_name       = module.cosmos.apps.database_name_uat
+  }
+
+  function_app = {
+    user_func = {
+      principal_id         = module.function_apps.function_app_user.principal_id
+      staging_principal_id = module.function_apps.function_app_user.staging_principal_id
     }
-  ]
-}
-
-module "appgw_roles" {
-  source  = "pagopa-dx/azure-role-assignments/azurerm"
-  version = "~> 1.3"
-
-  principal_id    = data.azurerm_user_assigned_identity.appgateway.principal_id
-  subscription_id = data.azurerm_subscription.current.subscription_id
-
-  key_vault = [
-    {
-      name                = module.key_vault_infra.key_vault_wallet.name
-      resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
-      description         = "Allow AppGw to access secrets"
-      roles = {
-        secrets = "reader"
-      }
+    support_func = {
+      principal_id         = module.function_apps.function_app_support.principal_id
+      staging_principal_id = module.function_apps.function_app_support.staging_principal_id
     }
-  ]
+    user_func_uat = {
+      principal_id         = module.function_apps.function_app_user_uat.principal_id
+      staging_principal_id = module.function_apps.function_app_user_uat.staging_principal_id
+    }
+  }
+
+  key_vault_app = {
+    name                = module.key_vault_app.key_vault_wallet.name
+    resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
+  }
+
+  key_vault_certificates = {
+    name                = module.key_vault_infra.key_vault_wallet.name
+    resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
+  }
+
+  cdn_storage_account = {
+    name                = azurerm_storage_account.cdn.name
+    resource_group_name = azurerm_storage_account.cdn.resource_group_name
+  }
+
+  storage_account = {
+    name                = azurerm_storage_account.cdn.name
+    resource_group_name = azurerm_storage_account.cdn.resource_group_name
+  }
+
+  wallet_dns_zone_id = null
 }

@@ -20,15 +20,12 @@ No requirements.
 | <a name="module_function_app_user"></a> [function\_app\_user](#module\_function\_app\_user) | pagopa-dx/azure-function-app/azurerm | ~> 4.0 |
 | <a name="module_function_app_user_autoscaler_02"></a> [function\_app\_user\_autoscaler\_02](#module\_function\_app\_user\_autoscaler\_02) | pagopa-dx/azure-app-service-plan-autoscaler/azurerm | ~> 2.0 |
 | <a name="module_function_app_user_uat"></a> [function\_app\_user\_uat](#module\_function\_app\_user\_uat) | pagopa-dx/azure-function-app/azurerm | ~> 4.0 |
+| <a name="module_function_app_user_uat_autoscaler"></a> [function\_app\_user\_uat\_autoscaler](#module\_function\_app\_user\_uat\_autoscaler) | pagopa-dx/azure-app-service-plan-autoscaler/azurerm | ~> 2.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [azurerm_key_vault_secret.app_insights_connection_string](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.func_support_default_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.func_user_default_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
-| [azurerm_key_vault_secret.func_user_uat_default_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_secret) | resource |
 | [azurerm_monitor_metric_alert.app_service_plan_cpu_alert](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.function_app_support_response_time](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.function_app_user_response_time](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
