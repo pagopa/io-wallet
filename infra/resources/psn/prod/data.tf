@@ -154,3 +154,11 @@ data "azurerm_user_assigned_identity" "app_cd_id" {
   name                = "${local.project}-app-github-cd-id-01"
   resource_group_name = "${local.project}-github-identities-rg-01"
 }
+
+# IO Cosmos DB account to be migrated
+data "azurerm_cosmosdb_account" "io_wallet" {
+  provider = azurerm.io
+
+  name                = "io-p-itn-wallet-cosno-02"
+  resource_group_name = "io-p-itn-wallet-rg-01"
+}
