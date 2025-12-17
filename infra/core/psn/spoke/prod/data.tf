@@ -36,3 +36,11 @@ data "azurerm_private_dns_zone" "agentsvc" {
   name                = "privatelink.agentsvc.azure-automation.net"
   resource_group_name = local.networking.hub.resource_group_name
 }
+
+data "azurerm_key_vault" "infra" {
+  name = provider::dx::resource_name(merge(local.environment, {
+    name          = "infra",
+    resource_type = "key_vault"
+  }))
+  resource_group_name = azurerm_resource_group.wallet.name
+}
