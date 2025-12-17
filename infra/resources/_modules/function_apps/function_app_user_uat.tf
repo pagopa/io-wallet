@@ -29,7 +29,39 @@ module "function_app_user_uat" {
     var.action_group_wallet_id,
   ]
 
+  application_insights_connection_string   = var.application_insights_connection_string
+  application_insights_sampling_percentage = 5
+
   use_case = "default"
+
+  tags = var.tags
+}
+
+module "function_app_user_uat_autoscaler" {
+  source  = "pagopa-dx/azure-app-service-plan-autoscaler/azurerm"
+  version = "~> 2.0"
+
+  resource_group_name = var.resource_group_name
+
+  location = var.environment.location
+
+  app_service_plan_id = module.function_app_user_uat.function_app.plan.id
+
+  target_service = {
+    function_apps = [
+      {
+        id = module.function_app_user_uat.function_app.function_app.id
+      }
+    ]
+  }
+
+  scheduler = {
+    maximum = 2
+    normal_load = {
+      default = 2
+      minimum = 2
+    }
+  }
 
   tags = var.tags
 }

@@ -139,3 +139,18 @@ data "azurerm_route_table" "spoke" {
   name                = "pagopa-Prod-ITWallet-spoke-routetable"
   resource_group_name = local.spoke.resource_group_name
 }
+
+data "azurerm_user_assigned_identity" "infra_ci_id" {
+  name                = "${local.project}-infra-github-ci-id-01"
+  resource_group_name = "${local.project}-github-identities-rg-01"
+}
+
+data "azurerm_user_assigned_identity" "infra_cd_id" {
+  name                = "${local.project}-infra-github-cd-id-01"
+  resource_group_name = "${local.project}-github-identities-rg-01"
+}
+
+data "azurerm_user_assigned_identity" "app_cd_id" {
+  name                = "${local.project}-app-github-cd-id-01"
+  resource_group_name = "${local.project}-github-identities-rg-01"
+}

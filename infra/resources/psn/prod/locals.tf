@@ -19,6 +19,56 @@ locals {
 
   hsm_key_url = "https://pagopa-managedhsm.managedhsm.azure.net/keys/mdb001prod"
 
+
+  user_func = {
+    app_settings = [
+      {
+        name                  = "GoogleAppCredentialsEncoded"
+        key_vault_secret_name = "GoogleAppCredentialsEncoded"
+      },
+      {
+        name                  = "FederationEntitySigningKeys"
+        key_vault_secret_name = "FederationEntitySigningKeys"
+      },
+      {
+        name                  = "WalletProviderSigningKeys"
+        key_vault_secret_name = "WalletProviderSigningKeys"
+      },
+      {
+        name                  = "TrialSystemApiKey"
+        key_vault_secret_name = "TrialSystemApiKey"
+      },
+      {
+        name                  = "PidIssuerApiClientPrivateKey"
+        key_vault_secret_name = "PidIssuerApiClientPrivateKey"
+      },
+      {
+        name                  = "SlackStatusChannelWebhook"
+        key_vault_secret_name = "SlackStatusChannelWebhook"
+      },
+      {
+        name                  = "AllowedDeveloperUsers"
+        key_vault_secret_name = "AllowedDeveloperUsers"
+      },
+      {
+        name                  = "StorageConnectionString"
+        key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
+      },
+      {
+        name                  = "AuthProfileApiKey"
+        key_vault_secret_name = "AuthProfileApiKey"
+      },
+      {
+        name                  = "MailupUsername"
+        key_vault_secret_name = "MailupUsername"
+      },
+      {
+        name                  = "MailupSecret"
+        key_vault_secret_name = "MailupSecret"
+      }
+    ]
+  }
+
   tags = {
     BusinessUnit = "IT-Wallet"
     CostCenter   = "TS000 - Tecnologia e Servizi"

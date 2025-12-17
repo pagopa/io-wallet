@@ -31,6 +31,7 @@ module "function_app_support" {
   ]
 
   use_case = "default"
+  size     = "P0v3"
 
   tags = var.tags
 }
@@ -56,8 +57,8 @@ module "function_app_support_autoscaler" {
   scheduler = {
     maximum = 30
     normal_load = {
-      default = 1
-      minimum = 1
+      default = 2
+      minimum = 2
     }
   }
 
