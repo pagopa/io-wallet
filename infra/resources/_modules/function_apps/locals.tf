@@ -1,8 +1,7 @@
 locals {
   # app settings shared across both the user-uat and user-prod Function Apps
   function_app_user_envs_shared_app_settings = merge({
-    FUNCTIONS_WORKER_RUNTIME = "node"
-    NODE_ENV                 = "production"
+    NODE_ENV = "production"
 
     // Keepalive fields are all optionals
     FETCH_KEEPALIVE_ENABLED             = "true"
@@ -51,9 +50,6 @@ locals {
     AzureSubscriptionId    = var.subscription_id
 
     NODE_OPTIONS = "--import @pagopa/azure-tracing"
-
-    WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
-    WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
     },
   )
 
@@ -129,7 +125,6 @@ locals {
         WalletProviderSigningKeys    = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=WalletProviderSigningKeysPre)"
         PidIssuerApiClientPrivateKey = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
         GoogleAppCredentialsEncoded  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
-        APPLICATIONINSIGHTS_CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AppInsightsConnectionString)"
         AllowedDeveloperUsers        = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AllowedDeveloperUsers)"
         StorageConnectionString      = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=StorageUatConnectionString)"
       }
@@ -138,8 +133,7 @@ locals {
 
   function_app_support = {
     app_settings = merge({
-      FUNCTIONS_WORKER_RUNTIME = "node"
-      NODE_ENV                 = "production"
+      NODE_ENV = "production"
 
       // Keepalive fields are all optionals
       FETCH_KEEPALIVE_ENABLED             = "true"
@@ -148,9 +142,6 @@ locals {
       FETCH_KEEPALIVE_MAX_FREE_SOCKETS    = "10"
       FETCH_KEEPALIVE_FREE_SOCKET_TIMEOUT = "30000"
       FETCH_KEEPALIVE_TIMEOUT             = "60000"
-
-      WEBSITE_SWAP_WARMUP_PING_PATH     = "/api/v1/wallet/health"
-      WEBSITE_SWAP_WARMUP_PING_STATUSES = "200"
       },
       local.function_apps.common_app_settings
     )
