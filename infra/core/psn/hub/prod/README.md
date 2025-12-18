@@ -44,7 +44,7 @@ To setup a Private Endpoint linked to the Application Gateway Private Link, foll
    - Create the Private Endpoint.
 3. When the Private Endpoint creation will be completed, you need to approve the connection from the Hub side. To do that, go to the Private Link Center in Azure Portal, select "Pending Connections", find your request and approve it.
 
-Your product can now access the Application Gateway, via the private IP address.
+Your product can now access the Application Gateway through a private IP address over Azure’s secure backbone, ensuring traffic never traverses the public internet.
 
 #### Configuring the DNS for the Private Endpoint
 
