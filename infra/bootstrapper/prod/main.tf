@@ -31,6 +31,14 @@ provider "azurerm" {
   storage_use_azuread = true
 }
 
+provider "azurerm" {
+  features {}
+  alias                           = "psn"
+  storage_use_azuread             = true
+  resource_provider_registrations = "none"
+  subscription_id                 = "725dede2-879b-45c5-82fa-eb816875b10c"
+}
+
 provider "github" {
   owner = "pagopa"
 }
