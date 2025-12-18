@@ -307,7 +307,7 @@ app.cosmosDB("migrateWalletInstances", {
   connection: "PagoPACosmosDbConnectionString",
   containerName: "wallet-instances",
   createLeaseCollectionIfNotExists: true,
-  databaseName: config.azure.cosmos.dbName,
+  databaseName: "db",
   handler: MigrateWalletInstancesFunction({
     inputDecoder: t.array(WalletInstance),
   }),
