@@ -12,7 +12,7 @@ There is a central Hub for the entire organization, and therefore **must not be 
 
 The **Hub is the only component that has access to internet**. In fact, each Spoke routes all its internet-bound traffic to the Hub, which filters it through a firewall. By default, this firewall blocks any egress connection which is not specified in the allowed rules.
 
-> **_WARNING:_** This may cause issues when deploying services in the Spoke. Sometimes, the deployment process needs to download packages or configurations from internet or other Azure services managed by the platfrom itself. In such cases, it is necessary to create specific allow rules in the Hub firewall to enable the required connections. To update rules, contact PSN support.
+> **_WARNING:_** This may cause issues when deploying services in the Spoke. Sometimes, the deployment process needs to download packages or configurations from internet or other Azure services managed by the platfrom itself. In such cases, it is necessary to create specific allow rules in the Hub firewall to enable the required connections. To update such rules, contact PSN support.
 
 ## List of resources
 
