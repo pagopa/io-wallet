@@ -3,9 +3,6 @@ name: api.wallet.io.pagopa.it TLS Certificate Renewal
 on:
   schedule:
     - cron: '0 3 * * 1,3'
-  push:
-    branches:
-      - api-wallet-certificate
   workflow_dispatch:
     inputs:
       force_renewal:
@@ -19,7 +16,7 @@ permissions:
 
 jobs:
   tls-certificate-renewal:
-    name: TLS Certificate Renewal
+    name: api.wallet.io.pagopa.it
     uses: ./.github/workflows/tls_certificate.yaml
     secrets: inherit
     with:

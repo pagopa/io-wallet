@@ -25,6 +25,12 @@ on:
         required: true
         type: string
 
+env:
+  KEY_VAULT_NAME: ${{ inputs.KEY_VAULT_NAME }}
+  CSR_COMMON_NAME: ${{ inputs.CSR_COMMON_NAME }}
+  DNS_ZONE: ${{ inputs.DNS_ZONE }}
+  DNS_ZONE_RESOURCE_GROUP: ${{ inputs.DNS_ZONE_RESOURCE_GROUP }}
+
 jobs:
   get-existing-certificate:
     name: Get Existing Certificate
