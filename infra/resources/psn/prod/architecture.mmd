@@ -11,22 +11,24 @@ graph LR
             AppIO["`App IO
               (Backend)`"]
             HubAppGwPEP["io-p-itn-psn-agw-pep-01"]
-            HubAppGwPrivateDNS["psn.internal.io.pagopa.it"]
+            HubAppGwPrivateDNS["internal.api.wallet.io.pagopa.it"]
         end
         subgraph FrontDoor["Global"]
           IOWebCDN["`IO Web
             (Static Website)`"]
         end
+        CDNDNS["wallet.io.pagopa.it"]
     end
 
     subgraph PSN
+
         subgraph Hub["Hub"]
             subgraph HubAppGwWaf["`Application Gateway + WAF
               Public + Private IPs`"]
               HubWAF
               HubAppGw
             end
-
+            AppGwPublicDNS["api.wallet.io.pagopa.it"]
             AppGwPrivateLink["private-link-01"]
 
         end
@@ -46,8 +48,8 @@ graph LR
             end
 
             subgraph VNetWallet["pagopa-Prod-ITWallet-spoke-italynorth"]
-              subgraph GHRunnerRG["io-p-itn-wallet-runner-rg-01"]
-                  GitHubRunner[io-p-itn-github-caj-01]
+              subgraph GHRunnerRG["iw-p-itn-github-runner-rg-01"]
+                  GitHubRunner["iw-p-itn-io-wallet-caj-01"]
               end
               SpokeAPIM["iw-p-itn-apps-apim-01"]
               WalletFunctionUserPep["iw-p-itn-user-func-pep-01"]
@@ -70,6 +72,7 @@ graph LR
             end
         end
 
+        APIMDNS["apim.internal.wallet.io.pagopa.it"]
     end
 
     subgraph GitHub["GitHub"]
@@ -81,11 +84,14 @@ graph LR
         CredentialIssuer["Credential Issuer"]
     end
 
+    HubAppGwWaf -.-> WalletInfraKeyVault
+    ITWalletCDN -.-> WalletInfraKeyVault
+
     ITWalletCDN --> WalletCDNSA
     AppIO --> HubAppGwPEP --> HubAppGwPrivateDNS --> AppGwPrivateLink --> HubAppGwWaf
-    IOWebCDN --> HubAppGwWaf
+    IOWebCDN --> AppGwPublicDNS --> HubAppGwWaf
 
-    Hub --> SpokeAPIM
+    Hub --> APIMDNS --> SpokeAPIM
     SpokeAPIM --> WalletFunctionUserPep --> WalletFunctionUser
     SpokeAPIM --> WalletFunctionSupportPep --> WalletFunctionSupport --> WalletCosmosPep
 
@@ -93,12 +99,12 @@ graph LR
     WalletFunctionUser --> WalletSAPep --> WalletSA
     WalletFunctionUser --> WalletAppsKeyVaultPep --> WalletAppsKeyVault
 
-    WalletSA --> WalletCMKKey
-    WalletCosmos --> WalletCMKKey
+    WalletSA -.-> WalletCMKKey
+    WalletCosmos -.-> WalletCMKKey
 
     GitHubRunner --> GitHubRepo
 
-    ThirdParties --> ITWalletCDN
+    ThirdParties --> CDNDNS --> ITWalletCDN
 
     ITWalletCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
     IOWebCDN@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
@@ -107,6 +113,9 @@ graph LR
     HubAppGwPEP@{ icon: "azure:private-endpoints", pos: "b" }
     AppGwPrivateLink@{ icon: "azure:private-link", pos: "b" }
     HubAppGwPrivateDNS@{icon: "azure:dns-zones", pos: "b"}
+    CDNDNS@{icon: "azure:dns-zones", pos: "b"}
+    APIMDNS@{icon: "azure:dns-zones", pos: "b"}
+    AppGwPublicDNS@{icon: "azure:dns-zones", pos: "b"}
     SpokeAPIM@{ icon: "azure:api-management-services", pos: "b" }
     AppIO@{ icon: "azure:app-service-plans", pos: "b" }
     WalletFunctionUserPep@{ icon: "azure:private-endpoints", pos: "b" }
@@ -138,8 +147,6 @@ graph LR
     classDef hubStyle fill:#fff4e6,stroke:#d68910,stroke-width:1px
     classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
     classDef disabledStyle fill:#f5f5f5,stroke:#d3d3d3,stroke-width:1px,stroke-dasharray: 3 3,color:#999999,opacity:0.6
-
-    linkStyle 4,25 stroke:#f39c12,stroke-width:2px
 
     class PagoPA pagoPAStyle
     class PSN psnStyle

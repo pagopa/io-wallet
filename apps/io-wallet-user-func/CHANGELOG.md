@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.0
+
+### Minor Changes
+
+- 35f833d: Added function `migrateWalletInstances` to copy wallet instances data to new tenant database collection
+
 ## 4.0.0
 
 ### Major Changes
