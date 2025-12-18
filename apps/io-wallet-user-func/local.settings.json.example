@@ -58,6 +58,6 @@
     "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
-    "CosmosDbTargetConnectionString": "COSMOS_DB_TARGET_CONNECTION_STRING"
+    "PagoPACosmosDbConnectionString": "PAGOPA_COSMOS_DB_CONNECTION_STRING"
   }
 }

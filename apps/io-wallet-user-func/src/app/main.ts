@@ -304,7 +304,7 @@ app.http("generateCertificateChain", {
 });
 
 app.cosmosDB("migrateWalletInstances", {
-  connection: "CosmosDbEndpoint",
+  connection: "PagoPACosmosDbConnectionString",
   containerName: "wallet-instances",
   createLeaseCollectionIfNotExists: true,
   databaseName: config.azure.cosmos.dbName,
@@ -314,7 +314,7 @@ app.cosmosDB("migrateWalletInstances", {
   leaseContainerName: "leases-migration",
   maxItemsPerInvocation: 50,
   return: output.cosmosDB({
-    connection: "CosmosDbConnectionStringTemp",
+    connection: "CosmosDbEndpoint",
     containerName: "wallet-instances",
     createIfNotExists: false,
     databaseName: "db",
