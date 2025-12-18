@@ -16,6 +16,10 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
+import {
+  getSlackConfigFromEnvironment,
+  SlackConfig,
+} from "io-wallet-common/infra/slack/config";
 import { fromBase64ToJwks, JwkPrivateKey } from "io-wallet-common/jwk";
 
 const booleanFromString = (input: string) =>
@@ -208,6 +212,7 @@ export const Config = t.type({
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
+  slack: SlackConfig,
   walletProvider: WalletProviderConfig,
 });
 
@@ -548,6 +553,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     ),
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
+    slack: getSlackConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
   }),
   RE.map(

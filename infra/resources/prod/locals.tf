@@ -60,8 +60,16 @@ locals {
         key_vault_secret_name = "WalletProviderSigningKeys"
       },
       {
+        name                  = "TrialSystemApiKey"
+        key_vault_secret_name = "TrialSystemApiKey"
+      },
+      {
         name                  = "PidIssuerApiClientPrivateKey"
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
+      },
+      {
+        name                  = "SlackStatusChannelWebhook"
+        key_vault_secret_name = "SlackStatusChannelWebhook"
       },
       {
         name                  = "AllowedDeveloperUsers"
