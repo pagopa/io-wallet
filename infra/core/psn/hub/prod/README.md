@@ -63,12 +63,8 @@ Your product can now resolve the Application Gateway private IP address by query
 > **_NOTE:_** If you try now to ping the address, it will not respond. The Application Gateway is configured to respond only to HTTPS requests.
 
 1. Create a KeyVault in your **product Spoke** using RBAC model.
-2. Generate a self-signed certificate for your domain via the KeyVault:
-   - Under `Certificates` blade, click on `Generate/Import`.
-   - Set the name using the domain name replacing dots with dashes (e.g. `psn-internal-<your-domain>-pagopa-it`).
-   - As `Subject`, set `CN=psn.internal.<your-domain>.pagopa.it`.
-   - Configure the desired expiration and renewal policies, then create the certificate.
-3. Grant access to the Application Gateway Managed Identity `pagopa-app-gw-id-01` in the Hub to read **secrets** (`Key Vault Secrets User`) from the KeyVault in your Spoke.
+2. Create a workflow to automatically renew the TLS certificate before expiration. You can use [this example](../../../../../.github/workflows/psn_internal_io_pagopa_it.yaml) to generate certificates for DNS zone in PagoPA tenant and save the certificate into the PSN tenant.
+3. Grant access to the Application Gateway Managed Identity `pagopa-app-gw-id-01` to read **secrets** (`Key Vault Secrets User`) from the KeyVault in your Spoke.
 
 Follow the remaining steps to [add the TLS certificate to Application Gateway](https://dx.pagopa.it/docs/azure/networking/app-gateway-tls-cert).
 
