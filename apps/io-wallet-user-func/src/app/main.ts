@@ -31,6 +31,7 @@ import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functio
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
+import { MigrateWalletInstancesFunction } from "@/infra/azure/functions/migrate-wallet-instances";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
@@ -257,8 +258,6 @@ app.http("deleteWalletInstances", {
 //   }),
 //   startFromBeginning: true,
 // });
-
-import { MigrateWalletInstancesFunction } from "@/infra/azure/functions/migrate-wallet-instances";
 
 app.http("createWalletAttestation", {
   authLevel: "function",
