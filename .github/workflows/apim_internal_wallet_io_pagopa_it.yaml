@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       force_renewal:
-        description: 'Force certificate renewal'
+        description: 'Renew the certificate even if not close to expiration'
         required: false
         default: false
         type: boolean
@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/tls_certificate.yaml
     secrets: inherit
     with:
-      force_renewal: ${{ github.event.inputs.force_renewal || false }}
+      force_renewal: ${{ inputs.force_renewal }}
       KEY_VAULT_NAME: "iw-p-itn-infra-kv-01"
       CSR_COMMON_NAME: "apim.internal.wallet.io.pagopa.it"
       DNS_ZONE: "wallet.io.pagopa.it"

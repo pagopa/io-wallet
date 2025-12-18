@@ -3,7 +3,7 @@ name: TLS Certificate Renewal
 on:
   workflow_call:
     inputs:
-      force_renewal:
+      FORCE_RENEWAL:
         description: 'Force certificate renewal'
         required: false
         default: false
@@ -62,7 +62,7 @@ jobs:
           echo "kv_cert_name=$key_vault_cert_name" >> $GITHUB_OUTPUT
 
       - name: Fetch and check certificate
-        if: ${{ inputs.force_renewal == false }}
+        if: ${{ inputs.FORCE_RENEWAL == false }}
         id: fetch_and_check
         env:
           KV_CERT_NAME: ${{ steps.calc_cert_name.outputs.kv_cert_name }}
@@ -87,7 +87,7 @@ jobs:
         env:
           REQUIRE_NEW_CERT: ${{ steps.fetch_and_check.outputs.require_new_certificate }}
           KV_CERT_NAME: ${{ steps.calc_cert_name.outputs.kv_cert_name }}
-          FORCE_RENEWAL: ${{ inputs.force_renewal }}
+          FORCE_RENEWAL: ${{ inputs.FORCE_RENEWAL }}
         run: |
           echo "KV_CERT_NAME=$KV_CERT_NAME" >> $GITHUB_OUTPUT
 
