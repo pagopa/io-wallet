@@ -6,7 +6,7 @@ This configuration stores the state file on the spoke Storage Account as current
 
 ## Environment description
 
-In Hub and Spoke architecture, the Hub is a central virtual network that acts as a common point of connectivity to other networks, the Spokes. The Spokes are virtual networks that peer with the Hub and host the application resources.
+In Hub and Spoke architecture, the Hub is the landing zone containing the central virtual network that acts as a common point of connectivity to other networks, the Spokes. The Spokes contain virtual networks that peer with the Hub and host the application resources.
 
 There is a central Hub for the entire organization, and therefore **must not be tied within the IT-Wallet project**. Each Spoke represents a project.
 
