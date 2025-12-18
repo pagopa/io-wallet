@@ -12,7 +12,7 @@ There is a central Hub for the entire organization, and therefore **must not be 
 
 The **Hub is the only component that has access to internet**. In fact, each Spoke routes all its internet-bound traffic to the Hub, which filters it through a firewall. By default, this firewall blocks any egress connection which is not specified in the allowed rules.
 
-> **_WARNING:_** This may cause issues when deploying services in the Spoke. Sometimes, the deployment process needs to download packages or configurations from internet or other Azure services managed by the platfrom itself. In such cases, it is necessary to create specific allow rules in the Hub firewall to enable the required connections. To update such rules, contact PSN support.
+> **_WARNING:_** This may cause issues when deploying services in the Spoke. Sometimes, the deployment process needs to download packages or configurations from internet or other Azure services managed by the platform itself. In such cases, it is necessary to create specific allow rules in the Hub firewall to enable the required connections. To update such rules, contact PSN support.
 
 ## List of resources
 
@@ -36,7 +36,7 @@ To setup a Private Endpoint linked to the Application Gateway Private Link, foll
 1. Identify the Application Gateway Private Link resource ID. It can be found in the output of this Terraform configuration, or by querying Azure directly in the Hub subscription.
 2. Create the Private Endpoint in your product virtual network with the following configuration:
    - In the "Resource" tab, select "Connect to an Azure resource by resource ID or alias.".
-   - In Resource ID, past the value you note in step 1.
+   - In Resource ID, paste the value you note in step 1.
    - As "Target sub-resource", type "appGwPrivateFrontendIp".
    - As "Request message", type something meaningful which explains what and why you are connecting resources.
    - In the "Virtual Network" tab, select your product Virtual Network and related subnet.
@@ -55,7 +55,7 @@ To resolve the Application Gateway private IP address from your product virtual 
 > **_WARNING:_** The names suggested below are not mandatory but they provide consistency across products. It is therefore strongly recommended to follow them.
 
 1. Create an Private DNS zone on your product side with the name `internal.<your-domain>.pagopa.it`
-2. Create an A record in the Private DNS zone created in step 1, with the name `psn` and the private IP address of the Private Endpont created in the previous section.
+2. Create an A record in the Private DNS zone created in step 1, with the name `psn` and the private IP address of the Private Endpoint created in the previous section.
 3. Link the Private DNS zone to your product virtual network.
 
 Your product can now resolve the Application Gateway private IP address by querying `psn.internal.<your-domain>.pagopa.it`, but only via HTTP. To enable HTTPS, carry on with the next section.
@@ -66,8 +66,8 @@ Your product can now resolve the Application Gateway private IP address by query
 2. Generate a self-signed certificate for your domain via the KeyVault:
    - Under `Certificates` blade, click on `Generate/Import`.
    - Set the name using the domain name replacing dots with dashes (e.g. `psn-internal-<your-domain>-pagopa-it`).
-   - As `Subejct`, set `CN=psn.internal.<your-domain>.pagopa.it`.
-   - Set as desired policies for expiration and renewal and create the certificate.
+   - As `Subject`, set `CN=psn.internal.<your-domain>.pagopa.it`.
+   - Configure the desired expiration and renewal policies, then create the certificate.
 3. Grant access to the Application Gateway Managed Identity `pagopa-app-gw-id-01` in the Hub to read **secrets** (`Key Vault Secrets User`) from the KeyVault in your Spoke.
 
 Follow the remaining steps to [add the TLS certificate to Application Gateway](https://dx.pagopa.it/docs/azure/networking/app-gateway-tls-cert).
