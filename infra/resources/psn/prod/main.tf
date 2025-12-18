@@ -108,7 +108,7 @@ module "cosmos" {
   tags = local.tags
 }
 
-# Private endpoint to expose IO Cosmos DB on PSN network for migration
+# Private endpoint to expose IO Cosmos DB (non-PSN) on PSN network for migration
 resource "azurerm_private_endpoint" "io_cosmos_on_psn" {
   name                = "io-p-itn-wallet-cosno-pep-02"
   location            = local.environment.location
@@ -117,7 +117,7 @@ resource "azurerm_private_endpoint" "io_cosmos_on_psn" {
 
   private_service_connection {
     name                           = "io-p-itn-wallet-cosno-pep-02"
-    private_connection_resource_id = data.azurerm_cosmosdb_account.io_wallet.id
+    private_connection_resource_id = "/subscriptions/ec285037-c673-4f58-b594-d7c480da4e8b/resourceGroups/io-p-itn-wallet-rg-01/providers/Microsoft.DocumentDB/databaseAccounts/io-p-itn-wallet-cosno-02"
     is_manual_connection           = true
     subresource_names              = ["Sql"]
     request_message                = "Connection for IO Wallet Cosmos DB migration to PSN"

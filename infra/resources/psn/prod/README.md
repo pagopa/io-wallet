@@ -23,7 +23,6 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 2.50.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.55.0 |
 | <a name="provider_azurerm.hub"></a> [azurerm.hub](#provider\_azurerm.hub) | 4.55.0 |
-| <a name="provider_azurerm.io"></a> [azurerm.io](#provider\_azurerm.io) | 4.55.0 |
 | <a name="provider_dx"></a> [dx](#provider\_dx) | ~> 0.0 |
 
 ## Modules
@@ -65,7 +64,6 @@ The diagram below shows the resources actually deployed. This is a work in progr
 | [azuread_group.wallet](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/group) | data source |
 | [azurerm_application_insights.core](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/application_insights) | data source |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
-| [azurerm_cosmosdb_account.io_wallet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/cosmosdb_account) | data source |
 | [azurerm_key_vault_secret.notification_email](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_key_vault_secret.notification_slack](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 | [azurerm_key_vault_secret.wallet_email](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
