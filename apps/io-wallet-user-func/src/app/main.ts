@@ -305,7 +305,7 @@ app.http("generateCertificateChain", {
 app.cosmosDB("migrateWalletInstances", {
   connection: "PagoPACosmosDbConnectionString",
   containerName: "wallet-instances",
-  createLeaseCollectionIfNotExists: true,
+  createLeaseCollectionIfNotExists: false,
   databaseName: "db",
   handler: MigrateWalletInstancesFunction({
     inputDecoder: t.array(WalletInstance),
