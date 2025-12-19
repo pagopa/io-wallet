@@ -14,6 +14,6 @@ module "github_repository" {
     infra_cd_policy_branches = local.repository.infra_cd_policy_branches
     opex_cd_policy_branches  = local.repository.opex_cd_policy_branches
     app_cd_policy_branches   = local.repository.app_cd_policy_branches
-    environments             = ["prod"]
+    environments             = ["prod", "psn-prod"]
   }
 }
