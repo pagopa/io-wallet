@@ -110,3 +110,8 @@ variable "is_psn" {
   default     = false
   description = "Temporary variable to manage both IO and PSN resources"
 }
+
+variable "front_door_endpoint_id" {
+  type        = string
+  description = "Front Door endpoint id"
+}
