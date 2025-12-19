@@ -4,7 +4,7 @@ resource "azurerm_api_management_backend" "psn" {
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   protocol            = "http"
-  url                 = "https://psn.internal.io.pagopa.it/"
+  url                 = "https://api.internal.wallet.io.pagopa.it/"
 }
 
 resource "azurerm_api_management_policy_fragment" "wallet_authentication" {
@@ -65,6 +65,82 @@ resource "azurerm_api_management_api" "wallet_user_v1" {
   }
 }
 
+resource "azurerm_api_management_api" "wallet_user_uat" {
+  name                  = "wallet-user-api-uat"
+  api_management_name   = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  subscription_required = false
+
+  version_set_id = azurerm_api_management_api_version_set.wallet_user.id
+  version        = "uat"
+  revision       = 1
+
+  description  = "REST APIs consumed by IO App"
+  display_name = "IT-Wallet User (UAT)"
+  path         = "api/wallet/uat"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi-link"
+    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-user-func/openapi.yaml"
+  }
+}
+
+resource "azurerm_api_management_api" "wallet_user_legacy" {
+  name                  = "wallet-user-api-legacy"
+  api_management_name   = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  subscription_required = false
+  revision              = 1
+
+  description  = "REST APIs consumed by IO App. This API group will be removed when app will switch the endpoints"
+  display_name = "IT-Wallet User"
+  path         = "api/v1/wallet"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi-link"
+    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-user-func/openapi.yaml"
+  }
+}
+
+resource "azurerm_api_management_api" "wallet_user_uat_legacy" {
+  name                  = "wallet-user-uat-api-legacy"
+  api_management_name   = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  subscription_required = false
+  revision              = 1
+
+  description  = "REST APIs (UAT) consumed by IO App. This API group will be removed when app will switch the endpoints"
+  display_name = "IT-Wallet User (UAT)"
+  path         = "api/v1/wallet/uat"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi-link"
+    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-user-func/openapi.yaml"
+  }
+}
+
+resource "azurerm_api_management_api" "wallet_support_legacy" {
+  name                  = "wallet-support-api-legacy"
+  api_management_name   = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  subscription_required = false
+
+  revision = 1
+
+  description  = "REST APIs consumed by Customer Service Support. This API group will be removed when app will switch the endpoints"
+  display_name = "IT-Wallet Customer Support"
+  path         = "api/v1/wallet/support"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi-link"
+    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-support-func/openapi.yaml"
+  }
+}
+
 resource "azurerm_api_management_api" "wallet_support_v1" {
   name                  = "wallet-support-api-v1"
   api_management_name   = data.azurerm_api_management.platform_api_gateway.name
@@ -96,8 +172,23 @@ resource "azurerm_api_management_api_tag" "wallet_user" {
   name   = azurerm_api_management_tag.wallet.name
 }
 
+resource "azurerm_api_management_api_tag" "wallet_user_legacy" {
+  api_id = azurerm_api_management_api.wallet_user_legacy.id
+  name   = azurerm_api_management_tag.wallet.name
+}
+
+resource "azurerm_api_management_api_tag" "wallet_user_uat_legacy" {
+  api_id = azurerm_api_management_api.wallet_user_uat_legacy.id
+  name   = azurerm_api_management_tag.wallet.name
+}
+
 resource "azurerm_api_management_api_tag" "wallet_support" {
   api_id = azurerm_api_management_api.wallet_support_v1.id
+  name   = azurerm_api_management_tag.wallet.name
+}
+
+resource "azurerm_api_management_api_tag" "wallet_support_legacy" {
+  api_id = azurerm_api_management_api.wallet_support_legacy.id
   name   = azurerm_api_management_tag.wallet.name
 }
 
@@ -108,8 +199,29 @@ resource "azurerm_api_management_product_api" "wallet_user" {
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
 }
 
+resource "azurerm_api_management_product_api" "wallet_user_legacy" {
+  api_name            = azurerm_api_management_api.wallet_user_legacy.name
+  product_id          = azurerm_api_management_product.wallet.product_id
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+}
+
+resource "azurerm_api_management_product_api" "wallet_user_uat_legacy" {
+  api_name            = azurerm_api_management_api.wallet_user_uat_legacy.name
+  product_id          = azurerm_api_management_product.wallet.product_id
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+}
+
 resource "azurerm_api_management_product_api" "wallet_support" {
   api_name            = azurerm_api_management_api.wallet_support_v1.name
+  product_id          = azurerm_api_management_product.wallet.product_id
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+}
+
+resource "azurerm_api_management_product_api" "wallet_support_legacy" {
+  api_name            = azurerm_api_management_api.wallet_support_legacy.name
   product_id          = azurerm_api_management_product.wallet.product_id
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
@@ -130,8 +242,37 @@ resource "azurerm_api_management_api_policy" "wallet_user" {
 XML
 }
 
+resource "azurerm_api_management_api_policy" "wallet_user_legacy" {
+  api_name            = azurerm_api_management_api.wallet_user_legacy.name
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <base />
+      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+  </inbound>
+</policies>
+XML
+}
+
 resource "azurerm_api_management_api_policy" "wallet_support" {
   api_name            = azurerm_api_management_api.wallet_support_v1.name
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <base />
+      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "wallet_support_legacy" {
+  api_name            = azurerm_api_management_api.wallet_support_legacy.name
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   xml_content         = <<XML
