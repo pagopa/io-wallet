@@ -94,7 +94,7 @@ resource "azurerm_api_management_api" "wallet_user_legacy" {
   revision              = 1
 
   description  = "REST APIs consumed by IO App. This API group will be removed when app will switch the endpoints"
-  display_name = "IT-Wallet User"
+  display_name = "IT-Wallet User (Legacy)"
   path         = "api/v1/wallet"
   protocols    = ["https"]
 
@@ -112,7 +112,7 @@ resource "azurerm_api_management_api" "wallet_user_uat_legacy" {
   revision              = 1
 
   description  = "REST APIs (UAT) consumed by IO App. This API group will be removed when app will switch the endpoints"
-  display_name = "IT-Wallet User (UAT)"
+  display_name = "IT-Wallet User (UAT) (Legacy)"
   path         = "api/v1/wallet/uat"
   protocols    = ["https"]
 
@@ -131,7 +131,7 @@ resource "azurerm_api_management_api" "wallet_support_legacy" {
   revision = 1
 
   description  = "REST APIs consumed by Customer Service Support. This API group will be removed when app will switch the endpoints"
-  display_name = "IT-Wallet Customer Support"
+  display_name = "IT-Wallet Customer Support (Legacy)"
   path         = "api/v1/wallet/support"
   protocols    = ["https"]
 
@@ -179,6 +179,11 @@ resource "azurerm_api_management_api_tag" "wallet_user_legacy" {
 
 resource "azurerm_api_management_api_tag" "wallet_user_uat_legacy" {
   api_id = azurerm_api_management_api.wallet_user_uat_legacy.id
+  name   = azurerm_api_management_tag.wallet.name
+}
+
+resource "azurerm_api_management_api_tag" "wallet_user_uat" {
+  api_id = azurerm_api_management_api.wallet_user_uat.id
   name   = azurerm_api_management_tag.wallet.name
 }
 
