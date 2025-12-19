@@ -154,3 +154,8 @@ data "azurerm_user_assigned_identity" "app_cd_id" {
   name                = "${local.project}-app-github-cd-id-01"
   resource_group_name = "${local.project}-github-identities-rg-01"
 }
+
+data "azurerm_key_vault_certificate" "apim" {
+  name         = "apim-internal-wallet-io-pagopa-it"
+  key_vault_id = module.key_vault_infra.key_vault_wallet.id
+}
