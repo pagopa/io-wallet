@@ -116,6 +116,28 @@ module "apim" {
   virtual_network_type_internal = true
   enable_public_network_access  = true
 
+  hostname_configuration = {
+    proxy = [
+      {
+        default_ssl_binding = false
+        host_name           = "iw-p-itn-apps-apim-01.azure-api.net"
+        key_vault_id        = null
+      },
+      {
+        default_ssl_binding = true
+        host_name           = "apim.internal.wallet.io.pagopa.it"
+        key_vault_id = replace(
+          data.azurerm_key_vault_certificate.apim.secret_id,
+          "/${data.azurerm_key_vault_certificate.apim.version}",
+          ""
+        )
+      }
+    ]
+    management       = null
+    portal           = null
+    developer_portal = null
+  }
+
   # Autoscale
   autoscale = {
     enabled                       = true
@@ -134,4 +156,17 @@ module "apim" {
   }
 
   tags = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "apim_internal_wallet_io_pagopa_it" {
+  name                = "apim"
+  zone_name           = "internal.wallet.io.pagopa.it"
+  records             = [module.apim.private_ip_addresses[0]]
+  resource_group_name = local.hub.resource_group_name
+  ttl                 = 3600
+}
+
+import {
+  to = azurerm_private_dns_a_record.apim_internal_wallet_io_pagopa_it
+  id = "/subscriptions/f3c27dbc-5c86-4c14-b43f-9faed77e5e19/resourceGroups/pagopa-rg-hub-network-italynorth/providers/Microsoft.Network/privateDnsZones/internal.wallet.io.pagopa.it/A/apim"
 }

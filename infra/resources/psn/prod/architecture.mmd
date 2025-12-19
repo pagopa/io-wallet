@@ -11,12 +11,13 @@ graph LR
             AppIO["`App IO
               (Backend)`"]
             HubAppGwPEP["io-p-itn-psn-agw-pep-01"]
-            HubAppGwPrivateDNS["internal.api.wallet.io.pagopa.it"]
+            HubAppGwPrivateDNS["api.internal.wallet.io.pagopa.it"]
         end
         subgraph FrontDoor["Global"]
           IOWebCDN["`IO Web
             (Static Website)`"]
         end
+        AppGwPublicDNS["api.wallet.io.pagopa.it"]
         CDNDNS["wallet.io.pagopa.it"]
     end
 
@@ -28,7 +29,6 @@ graph LR
               HubWAF
               HubAppGw
             end
-            AppGwPublicDNS["api.wallet.io.pagopa.it"]
             AppGwPrivateLink["private-link-01"]
 
         end

@@ -1,17 +1,35 @@
 locals {
+  apim_prefix = "apim"
+  cdn_prefix  = "cdn"
+
   appgw = {
-    name                                   = "pagopa-app-gw-italynorth"
-    backend_address_pool_name              = "appGatewayBackendPool"
-    frontend_port_name                     = "appGatewayFrontendPort"
-    frontend_secure_port_name              = "appGatewayFrontendSecurePort"
+    name = "pagopa-app-gw-italynorth"
+
+    apim_backend_pool_name = "${local.apim_prefix}-backend-pool"
+    cdn_backend_pool_name  = "${local.cdn_prefix}-backend-pool"
+
+    frontend_port_name        = "appGatewayFrontendPort"
+    frontend_secure_port_name = "appGatewayFrontendSecurePort"
+
     frontend_public_ip_configuration_name  = "appGwPublicFrontendIp"
     frontend_private_ip_configuration_name = "appGwPrivateFrontendIp"
-    private_link_name                      = "private-link-01"
-    http_setting_name                      = "appGatewayBackendHttpSettings"
-    http_listener_name                     = "appGatewayHttpListener"
-    https_listener_name                    = "appGatewayHttpsListener"
 
-    request_routing_rule_name = "appGatewayRule"
+    private_link_name = "private-link-01"
+
+    apim_backend_settings_name = "${local.apim_prefix}-backend-pool-settings"
+    cdn_backend_settings_name  = "${local.cdn_prefix}-backend-pool-settings"
+
+    apim_http_listener_name = "${local.apim_prefix}-listener"
+    cdn_listener_name       = "${local.cdn_prefix}-listener"
+
+    certificate_name_internal = "api-internal-wallet-io-pagopa-it"
+    certificate_name_cdn      = "wallet-io-pagopa-it"
+
+    apim_routing_rule_name = "${local.apim_prefix}-routing-rule"
+    cdn_routing_rule_name  = "${local.cdn_prefix}-routing-rule"
+
+    apim_probe_name = "${local.apim_prefix}-backend-pool-probe"
+    cdn_probe_name  = "${local.cdn_prefix}-backend-pool-probe"
   }
 }
 
@@ -65,52 +83,92 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   backend_address_pool {
-    name  = local.appgw.backend_address_pool_name
-    fqdns = ["iw-p-itn-apps-apim-01.azure-api.net"]
+    name  = local.appgw.apim_backend_pool_name
+    fqdns = ["apim.internal.wallet.io.pagopa.it"]
+  }
+
+  backend_address_pool {
+    name  = local.appgw.cdn_backend_pool_name
+    fqdns = ["iwpitncdnst01.blob.core.windows.net"]
   }
 
   backend_http_settings {
-    name                                = local.appgw.http_setting_name
+    name                                = local.appgw.apim_backend_settings_name
     port                                = 443
     protocol                            = "Https"
     cookie_based_affinity               = "Disabled"
     pick_host_name_from_backend_address = true
-    probe_name                          = "${local.appgw.backend_address_pool_name}-probe"
+    probe_name                          = local.appgw.apim_probe_name
     request_timeout                     = 20
   }
 
-  http_listener {
-    name                           = local.appgw.http_listener_name
-    frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
-    frontend_port_name             = local.appgw.frontend_port_name
-    protocol                       = "Http"
-    require_sni                    = false
+  backend_http_settings {
+    name                                = local.appgw.cdn_backend_settings_name
+    port                                = 443
+    protocol                            = "Https"
+    cookie_based_affinity               = "Disabled"
+    pick_host_name_from_backend_address = true
+    probe_name                          = local.appgw.cdn_probe_name
+    request_timeout                     = 20
   }
 
+
   http_listener {
-    name                           = local.appgw.https_listener_name
+    name                           = local.appgw.apim_http_listener_name
     frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
     frontend_port_name             = local.appgw.frontend_secure_port_name
     protocol                       = "Https"
     require_sni                    = false
-    ssl_certificate_name           = "psn-internal-io-pagopa-it"
+    ssl_certificate_name           = local.appgw.certificate_name_internal
+  }
+
+  http_listener {
+    name                           = local.appgw.cdn_listener_name
+    frontend_ip_configuration_name = local.appgw.frontend_public_ip_configuration_name
+    frontend_port_name             = local.appgw.frontend_secure_port_name
+    protocol                       = "Https"
+    require_sni                    = false
+    ssl_certificate_name           = local.appgw.certificate_name_cdn
   }
 
   request_routing_rule {
-    name                       = local.appgw.request_routing_rule_name
+    name                       = local.appgw.apim_routing_rule_name
     priority                   = 10010
-    http_listener_name         = local.appgw.https_listener_name
+    http_listener_name         = local.appgw.apim_http_listener_name
     rule_type                  = "Basic"
-    backend_address_pool_name  = local.appgw.backend_address_pool_name
-    backend_http_settings_name = local.appgw.http_setting_name
+    backend_address_pool_name  = local.appgw.apim_backend_pool_name
+    backend_http_settings_name = local.appgw.apim_backend_settings_name
+  }
+
+  request_routing_rule {
+    name                       = local.appgw.cdn_routing_rule_name
+    priority                   = 10020
+    http_listener_name         = local.appgw.cdn_listener_name
+    rule_type                  = "Basic"
+    backend_address_pool_name  = local.appgw.cdn_backend_pool_name
+    backend_http_settings_name = local.appgw.cdn_backend_settings_name
   }
 
   probe {
-    name                                      = "${local.appgw.backend_address_pool_name}-probe"
+    name                                      = local.appgw.apim_probe_name
     protocol                                  = "Https"
     path                                      = "/"
     timeout                                   = 5
     interval                                  = 10
+    unhealthy_threshold                       = 3
+    pick_host_name_from_backend_http_settings = true
+
+    match {
+      status_code = ["200"]
+    }
+  }
+
+  probe {
+    name                                      = local.appgw.cdn_probe_name
+    protocol                                  = "Https"
+    path                                      = "/well-known/android-crl.json"
+    timeout                                   = 5
+    interval                                  = 30
     unhealthy_threshold                       = 3
     pick_host_name_from_backend_http_settings = true
 
@@ -144,8 +202,13 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   ssl_certificate {
-    name                = "psn-internal-io-pagopa-it"
-    key_vault_secret_id = "https://iw-p-itn-infra-kv-01.vault.azure.net:443/secrets/psn-internal-io-pagopa-it/"
+    name                = local.appgw.certificate_name_internal
+    key_vault_secret_id = "https://iw-p-itn-infra-kv-01.vault.azure.net:443/secrets/${local.appgw.certificate_name_internal}/"
+  }
+
+  ssl_certificate {
+    name                = local.appgw.certificate_name_cdn
+    key_vault_secret_id = "https://iw-p-itn-infra-kv-01.vault.azure.net:443/secrets/${local.appgw.certificate_name_cdn}/"
   }
 
   ssl_policy {
