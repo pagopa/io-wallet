@@ -161,12 +161,12 @@ module "apim" {
 resource "azurerm_private_dns_a_record" "apim_internal_wallet_io_pagopa_it" {
   name                = "apim"
   zone_name           = "internal.wallet.io.pagopa.it"
-  records             = module.apim.private_ip_addresses[0]
+  records             = [module.apim.private_ip_addresses[0]]
   resource_group_name = local.hub.resource_group_name
   ttl                 = 3600
 }
 
 import {
   to = azurerm_private_dns_a_record.apim_internal_wallet_io_pagopa_it
-  id = "/subscriptions/f3c27dbc-5c86-4c14-b43f-9faed77e5e19/resourceGroups/pagopa-rg-hub-network-italynorth/providers/Microsoft.Network/privateDnsZones/internal.wallet.io.pagopa.it/apim"
+  id = "/subscriptions/f3c27dbc-5c86-4c14-b43f-9faed77e5e19/resourceGroups/pagopa-rg-hub-network-italynorth/providers/Microsoft.Network/privateDnsZones/internal.wallet.io.pagopa.it/A/apim"
 }
