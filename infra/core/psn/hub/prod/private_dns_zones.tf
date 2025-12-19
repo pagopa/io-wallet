@@ -150,5 +150,3 @@ resource "azurerm_private_dns_zone" "internal_wallet_io_pagopa_it" {
 
   tags = local.tags
 }
-
-
