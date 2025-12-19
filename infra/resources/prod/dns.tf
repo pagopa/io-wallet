@@ -1,8 +1,3 @@
-data "azurerm_dns_zone" "io_pagopa_it" {
-  name                = "io.pagopa.it"
-  resource_group_name = "io-p-rg-external"
-}
-
 resource "azurerm_dns_a_record" "api_wallet_io_pagopa_it" {
   name                = "api.wallet"
   records             = ["72.146.49.243"] # AppGw (PSN) public ip

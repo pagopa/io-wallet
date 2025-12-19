@@ -94,6 +94,11 @@ data "azurerm_user_assigned_identity" "app_cd_id" {
   resource_group_name = data.azurerm_resource_group.wallet.name
 }
 
+data "azurerm_dns_zone" "io_pagopa_it" {
+  name                = "io.pagopa.it"
+  resource_group_name = "io-p-rg-external"
+}
+
 data "azurerm_dns_zone" "wallet_io_pagopa_it" {
   name                = local.wallet_dns_zone.name
   resource_group_name = local.wallet_dns_zone.resource_group_name
