@@ -11,6 +11,19 @@ resource "azurerm_virtual_network_peering" "hub_to_spoke" {
   allow_gateway_transit        = true
 }
 
+resource "azurerm_private_dns_zone_virtual_network_link" "hub" {
+  provider = azurerm.hub
+
+  for_each = toset(local.private_dns_zones_hub_links)
+
+  name                  = data.azurerm_virtual_network.hub.name
+  private_dns_zone_name = each.value
+  resource_group_name   = data.azurerm_virtual_network.hub.resource_group_name
+  virtual_network_id    = data.azurerm_virtual_network.hub.id
+
+  tags = local.tags
+}
+
 resource "azurerm_private_dns_zone_virtual_network_link" "spoke" {
   provider = azurerm.hub
 

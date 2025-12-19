@@ -6,6 +6,13 @@ locals {
     instance_number = "01"
   }
 
+  private_dns_zones_hub_links = [
+    azurerm_private_dns_zone.azure_api_net.name,
+    azurerm_private_dns_zone.management_azure_api_net.name,
+    azurerm_private_dns_zone.scm_azure_api_net.name,
+    azurerm_private_dns_zone.internal_wallet_io_pagopa_it.name
+  ]
+
   private_dns_zones_spoke_links = [
     azurerm_private_dns_zone.kv.name,
     azurerm_private_dns_zone.hsm.name,
@@ -23,6 +30,7 @@ locals {
     azurerm_private_dns_zone.azure_api_net.name,
     azurerm_private_dns_zone.management_azure_api_net.name,
     azurerm_private_dns_zone.scm_azure_api_net.name,
+    azurerm_private_dns_zone.internal_wallet_io_pagopa_it.name
   ]
 
   spoke_vnet_name = "pagopa-Prod-ITWallet-spoke-italynorth"

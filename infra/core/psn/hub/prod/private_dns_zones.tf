@@ -141,3 +141,14 @@ resource "azurerm_private_dns_zone" "scm_azure_api_net" {
 
   tags = local.tags
 }
+
+resource "azurerm_private_dns_zone" "internal_wallet_io_pagopa_it" {
+  provider = azurerm.hub
+
+  name                = "internal.wallet.io.pagopa.it"
+  resource_group_name = data.azurerm_virtual_network.hub.resource_group_name
+
+  tags = local.tags
+}
+
+
