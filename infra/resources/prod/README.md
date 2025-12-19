@@ -50,6 +50,7 @@
 | [azurerm_api_management_api_tag.wallet_support_legacy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_user_legacy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
+| [azurerm_api_management_api_tag.wallet_user_uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_user_uat_legacy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_version_set.wallet_support](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_version_set) | resource |
 | [azurerm_api_management_api_version_set.wallet_user](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_version_set) | resource |

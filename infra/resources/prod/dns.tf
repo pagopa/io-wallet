@@ -27,7 +27,7 @@ resource "azurerm_private_dns_zone" "internal_wallet_io_pagopa_it" {
 
 resource "azurerm_private_dns_zone_virtual_network_link" "vnet_common_internal_wallet_io_pagopa_it" {
   name                  = data.azurerm_virtual_network.vnet_common_itn.name
-  resource_group_name   = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
+  resource_group_name   = azurerm_private_dns_zone.internal_wallet_io_pagopa_it.resource_group_name
   virtual_network_id    = data.azurerm_virtual_network.vnet_common_itn.id
   private_dns_zone_name = azurerm_private_dns_zone.internal_wallet_io_pagopa_it.name
 }
