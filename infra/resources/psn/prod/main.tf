@@ -288,4 +288,6 @@ module "iam" {
   }
 
   wallet_dns_zone_id = null
+
+  front_door_endpoint_id = null
 }
