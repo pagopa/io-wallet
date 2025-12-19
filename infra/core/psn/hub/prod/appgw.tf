@@ -22,7 +22,7 @@ locals {
     apim_http_listener_name = "${local.apim_prefix}-listener"
     cdn_listener_name       = "${local.cdn_prefix}-listener"
 
-    certificate_name_internal = "internal-apim-wallet-io-pagopa-it"
+    certificate_name_internal = "api-internal-wallet-io-pagopa-it"
     certificate_name_cdn      = "wallet-io-pagopa-it"
 
     apim_routing_rule_name = "${local.apim_prefix}-routing-rule"
