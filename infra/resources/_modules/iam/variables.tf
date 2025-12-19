@@ -111,7 +111,7 @@ variable "is_psn" {
   description = "Temporary variable to manage both IO and PSN resources"
 }
 
-variable "front_door_endpoint_id" {
+variable "cdn_endpoint_id" {
   type        = string
-  description = "Front Door endpoint id"
+  description = "CDN endpoint id"
 }
