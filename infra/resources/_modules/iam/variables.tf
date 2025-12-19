@@ -110,3 +110,8 @@ variable "is_psn" {
   default     = false
   description = "Temporary variable to manage both IO and PSN resources"
 }
+
+variable "cdn_endpoint_id" {
+  type        = string
+  description = "CDN endpoint id"
+}

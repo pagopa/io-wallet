@@ -252,6 +252,8 @@ module "iam" {
   }
 
   wallet_dns_zone_id = data.azurerm_dns_zone.wallet_io_pagopa_it.id
+  
+  cdn_endpoint_id = module.cdn.cdn_endpoint_id
 }
 
 module "apim_itn" {
