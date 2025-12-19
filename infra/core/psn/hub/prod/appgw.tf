@@ -28,8 +28,8 @@ locals {
     apim_routing_rule_name = "${local.apim_prefix}-routing-rule"
     cdn_routing_rule_name  = "${local.cdn_prefix}-routing-rule"
 
-    apim_probe_name = "${local.apim_prefix}-backend-pool-settings-probe"
-    cdn_probe_name  = "${local.cdn_prefix}-backend-pool-settings-probe"
+    apim_probe_name = "${local.apim_prefix}-backend-pool-probe"
+    cdn_probe_name  = "${local.cdn_prefix}-backend-pool-probe"
   }
 }
 
