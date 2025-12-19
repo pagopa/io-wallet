@@ -2,6 +2,22 @@ name: PR PSN Infrastructure Plan - Prod
 
 on:
   workflow_dispatch:
+    inputs:
+      hub:
+        description: 'Plan in Hub'
+        required: false
+        type: boolean
+        default: false
+      spoke:
+        description: 'Plan in Spoke'
+        required: false
+        type: boolean
+        default: false
+      resources:
+        description: 'Plan in Resources PSN'
+        required: false
+        type: boolean
+        default: false
   # TBD: Uncomment after permissions are set on identity
   # pull_request:
   #   types:
@@ -48,11 +64,25 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         id: all
         run: |
-          echo 'changes=["core/psn/hub", "core/psn/spoke", "resources/psn"]' >> $GITHUB_OUTPUT # removed for tests
+          modules=()
+          if [ "${{ inputs.hub }}" == "true" ]; then
+            modules+=("core/psn/hub")
+          fi
+          if [ "${{ inputs.spoke }}" == "true" ]; then
+            modules+=("core/psn/spoke")
+          fi
+          if [ "${{ inputs.resources }}" == "true" ]; then
+            modules+=("resources/psn")
+          fi
+          if [ ${#modules[@]} -eq 0 ]; then
+            modules=("core/psn/hub" "core/psn/spoke" "resources/psn")
+          fi
+          json_array=$(printf '%s\n' "${modules[@]}" | jq -R . | jq -s -c .)
+          echo "changes=$json_array" >> $GITHUB_OUTPUT
 
   plan_prod:
     needs: changes
-    uses: pagopa/dx/.github/workflows/infra_plan.yaml@support/psn-adaptation #main - Temporary, to be removed when using specific psn environment
+    uses: pagopa/dx/.github/workflows/infra_plan.yaml@main
     name: Infrastructure Plan
     secrets: inherit
 
@@ -66,6 +96,6 @@ jobs:
       environment: prod
       base_path: infra/${{ matrix.infra }}
       use_private_agent: true
-      override_github_environment: infra-prod
+      override_github_environment: infra-psn-prod
       use_labels: true
       override_labels: psn

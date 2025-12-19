@@ -7,36 +7,6 @@ data "azurerm_client_config" "psn" {
   provider = azurerm.psn
 }
 
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-github-identities-rg-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/iw-p-itn-infra-github-ci-id-01"
-  to = azurerm_user_assigned_identity.infra_psn_ci
-}
-
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-github-identities-rg-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/iw-p-itn-app-github-ci-id-01"
-  to = azurerm_user_assigned_identity.app_psn_ci
-}
-
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-github-identities-rg-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/iw-p-itn-opex-github-ci-id-01"
-  to = azurerm_user_assigned_identity.opex_psn_ci
-}
-
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-github-identities-rg-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/iw-p-itn-infra-github-cd-id-01"
-  to = azurerm_user_assigned_identity.infra_psn_cd
-}
-
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-github-identities-rg-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/iw-p-itn-app-github-cd-id-01"
-  to = azurerm_user_assigned_identity.app_psn_cd
-}
-
-import {
-  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-github-identities-rg-01/providers/Microsoft.ManagedIdentity/userAssignedIdentities/iw-p-itn-opex-github-cd-id-01"
-  to = azurerm_user_assigned_identity.opex_psn_cd
-}
-
 resource "azurerm_user_assigned_identity" "infra_psn_ci" {
   provider            = azurerm.psn
   name                = "iw-p-itn-infra-github-ci-id-01"
