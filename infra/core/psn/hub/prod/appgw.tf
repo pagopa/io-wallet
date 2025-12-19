@@ -20,9 +20,9 @@ locals {
     apim_backend_settings_name = "${local.apim_prefix}-backend-pool-settings"
     cdn_backend_settings_name  = "${local.cdn_prefix}-backend-pool-settings"
 
-    api_listener_name       = "${local.api_prefix}-listener"
-    apim_http_listener_name = "${local.apim_prefix}-listener"
-    cdn_listener_name       = "${local.cdn_prefix}-listener"
+    api_listener_name  = "${local.api_prefix}-listener"
+    apim_listener_name = "${local.apim_prefix}-listener"
+    cdn_listener_name  = "${local.cdn_prefix}-listener"
 
     certificate_name_api      = "api-wallet-io-pagopa-it"
     certificate_name_internal = "api-internal-wallet-io-pagopa-it"
@@ -117,11 +117,12 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   http_listener {
-    name                           = local.appgw.apim_http_listener_name
+    name                           = local.appgw.apim_listener_name
     frontend_ip_configuration_name = local.appgw.frontend_private_ip_configuration_name
     frontend_port_name             = local.appgw.frontend_secure_port_name
     protocol                       = "Https"
-    require_sni                    = false
+    host_name                      = "api.internal.wallet.io.pagopa.it"
+    require_sni                    = true
     ssl_certificate_name           = local.appgw.certificate_name_internal
   }
 
@@ -130,7 +131,8 @@ resource "azurerm_application_gateway" "hub" {
     frontend_ip_configuration_name = local.appgw.frontend_public_ip_configuration_name
     frontend_port_name             = local.appgw.frontend_secure_port_name
     protocol                       = "Https"
-    require_sni                    = false
+    host_name                      = "wallet.io.pagopa.it"
+    require_sni                    = true
     ssl_certificate_name           = local.appgw.certificate_name_cdn
   }
 
@@ -139,14 +141,15 @@ resource "azurerm_application_gateway" "hub" {
     frontend_ip_configuration_name = local.appgw.frontend_public_ip_configuration_name
     frontend_port_name             = local.appgw.frontend_secure_port_name
     protocol                       = "Https"
-    require_sni                    = false
+    host_name                      = "api.wallet.io.pagopa.it"
+    require_sni                    = true
     ssl_certificate_name           = local.appgw.certificate_name_api
   }
 
   request_routing_rule {
     name                       = local.appgw.apim_routing_rule_name
     priority                   = 10010
-    http_listener_name         = local.appgw.apim_http_listener_name
+    http_listener_name         = local.appgw.apim_listener_name
     rule_type                  = "Basic"
     backend_address_pool_name  = local.appgw.apim_backend_pool_name
     backend_http_settings_name = local.appgw.apim_backend_settings_name
@@ -155,7 +158,7 @@ resource "azurerm_application_gateway" "hub" {
   request_routing_rule {
     name                       = local.appgw.api_routing_rule_name
     priority                   = 10012
-    http_listener_name         = local.appgw.api_http_listener_name
+    http_listener_name         = local.appgw.api_listener_name
     rule_type                  = "Basic"
     backend_address_pool_name  = local.appgw.apim_backend_pool_name
     backend_http_settings_name = local.appgw.apim_backend_settings_name
