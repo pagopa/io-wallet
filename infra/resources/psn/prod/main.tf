@@ -203,9 +203,16 @@ module "function_apps" {
   tags = local.tags
 }
 
-resource "azurerm_role_assignment" "apim_kv_infra" {
+resource "azurerm_role_assignment" "apim_kv_infra_certificate" {
   scope                = module.key_vault_infra.key_vault_wallet.id
   role_definition_name = "Key Vault Certificate User"
+  principal_id         = module.apim.principal_id
+  description          = "Allow APIM to read certificates from KeyVault"
+}
+
+resource "azurerm_role_assignment" "apim_kv_infra_secrets" {
+  scope                = module.key_vault_infra.key_vault_wallet.id
+  role_definition_name = "Key Vault Secrets User"
   principal_id         = module.apim.principal_id
   description          = "Allow APIM to read certificates from KeyVault"
 }
