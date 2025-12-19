@@ -17,6 +17,7 @@ graph LR
           IOWebCDN["`IO Web
             (Static Website)`"]
         end
+        AppGwPublicDNS["api.wallet.io.pagopa.it"]
         CDNDNS["wallet.io.pagopa.it"]
     end
 
@@ -28,7 +29,6 @@ graph LR
               HubWAF
               HubAppGw
             end
-            AppGwPublicDNS["api.wallet.io.pagopa.it"]
             AppGwPrivateLink["private-link-01"]
 
         end
