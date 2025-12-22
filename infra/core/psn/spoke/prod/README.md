@@ -42,6 +42,7 @@ Setting up these resources required some configuration at firewall level in orde
   - italynorth.ext.azurecontainerapps.dev
   - \*azure.com
   - \*.vault.azure.net
+  - \*azurecontainerapps.io (port 80)
 - Hashicorp:
   - \*terraform.io
   - \*hashicorp.com
