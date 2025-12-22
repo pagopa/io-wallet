@@ -17,7 +17,7 @@ For more information, see [Hub documentation](../../hub/prod/README.md).
 
 ### Container App Environment and Job
 
-This is a traditional setup for hosting GitHub self-hosted runners in Azure Container Apps Jobs. It distinguishes the runner deployed in Spoke VNet from the one used in IO VNet by using the label [`psn`](./container_app_environment.tf#79).
+This is a traditional setup for hosting GitHub self-hosted runners in Azure Container Apps Jobs. It distinguishes the runner deployed in Spoke VNet from the one used in IO VNet by using the label [`psn`](./container_app_environment.tf#L79).
 
 Setting up these resources required some configuration at firewall level in order to allow the Container App to reach external services. In particular, the Container App Environment subnet has been granted access to:
 
