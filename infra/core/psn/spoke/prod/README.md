@@ -2,7 +2,7 @@
 
 This directory contains the Terraform code to deploy changes to the PSN Spoke infrastructure.
 
-> [!NOTE]  
+> [!Note]
 > Most of the resources have been deployed by PSN itself on behalf of IT-Wallet project and then imported here, so it was not possible to adhere to PagoPA naming conventions.
 
 ## Environment description
@@ -48,7 +48,8 @@ Setting up these resources required some configuration at firewall level in orde
 - NPM
   - \*.npmjs.org
 
-> **_WARNING:_** Any application in the Spoke that needs to access internet services must have an exception rule on the firewall `pagopa-pa-azfwpolicy-italynorth`. Set the resource subnet CIDR as source and the required destination FQDNs.
+> [!Warning]
+> Any application in the Spoke that needs to access internet services must have an exception rule on the firewall `pagopa-pa-azfwpolicy-italynorth`. Set the resource subnet CIDR as source and the required destination FQDNs.
 
 ### Spoke Virtual Network and Hub peering
 
@@ -74,7 +75,8 @@ The resource groups are organized as follows:
 - `gh-runner`: contains Container App Environment and Job for GitHub self-hosted runner
 - `wallet`: contains all application resources
 
-> **_WARNING:_** The `Owner` role can be obtained only for the resource group `wallet` via PIM. Therefore, modifications on other resource groups might require PSN support.
+> [!Warning]
+> The `Owner` role can be obtained only for the resource group `wallet` via PIM. Therefore, modifications on other resource groups might require PSN support.
 
 ### Storage Account for Terraform backends
 
