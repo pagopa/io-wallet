@@ -6,7 +6,7 @@
   },
   "extensions": {
     "http": {
-      "routePrefix": "api/wallet/v1"
+      "routePrefix": "api/v1/wallet"
     },
     "queues": {
       "visibilityTimeout": "00:05:00",
