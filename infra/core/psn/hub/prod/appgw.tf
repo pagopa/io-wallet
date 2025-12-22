@@ -103,7 +103,8 @@ resource "azurerm_application_gateway" "hub" {
     port                                = 443
     protocol                            = "Https"
     cookie_based_affinity               = "Disabled"
-    pick_host_name_from_backend_address = true
+    host_name                           = "apim.internal.wallet.io.pagopa.it"
+    pick_host_name_from_backend_address = false
     probe_name                          = local.appgw.apim_probe_name
     request_timeout                     = 20
   }
@@ -179,21 +180,21 @@ resource "azurerm_application_gateway" "hub" {
   probe {
     name                                      = local.appgw.apim_probe_name
     protocol                                  = "Https"
-    path                                      = "/echo/fake" # temporary path for health probe
+    path                                      = "/status-0123456789abcdef"
     timeout                                   = 5
     interval                                  = 10
     unhealthy_threshold                       = 3
     pick_host_name_from_backend_http_settings = true
 
     match {
-      status_code = ["204"]
+      status_code = ["200", "204"]
     }
   }
 
   probe {
     name                                      = local.appgw.cdn_probe_name
     protocol                                  = "Https"
-    path                                      = "/well-known/android-crl.json"
+    path                                      = "/well-known/openid-federation"
     timeout                                   = 5
     interval                                  = 30
     unhealthy_threshold                       = 3
