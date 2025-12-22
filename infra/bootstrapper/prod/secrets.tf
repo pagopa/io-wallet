@@ -217,12 +217,12 @@ resource "github_actions_environment_secret" "opex_psn_cd" {
 # CI
 resource "azurerm_federated_identity_credential" "github_app_psn_ci" {
   provider            = azurerm.psn
-  resource_group_name = azurerm_user_assigned_identity.app_psn_cd.resource_group_name
-  name                = format(local.ids.federated_identity_name, "app", "cd")
+  resource_group_name = azurerm_user_assigned_identity.app_psn_ci.resource_group_name
+  name                = format(local.ids.federated_identity_name, "app", "ci")
   audience            = local.ids.audience
   issuer              = local.ids.issuer
-  parent_id           = azurerm_user_assigned_identity.app_psn_cd.id
-  subject             = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.app_environment_name, "cd")}"
+  parent_id           = azurerm_user_assigned_identity.app_psn_ci.id
+  subject             = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.app_environment_name, "ci")}"
 }
 
 resource "azurerm_federated_identity_credential" "github_infra_psn_ci" {
