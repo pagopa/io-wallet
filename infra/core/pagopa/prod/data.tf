@@ -13,7 +13,7 @@ data "azurerm_subnet" "pep" {
   resource_group_name  = data.azurerm_virtual_network.vnet_common_itn.resource_group_name
 }
 
-data "azurerm_private_dns_zone" "internal_io_pagopa_it" {
-  name                = "internal.io.pagopa.it"
-  resource_group_name = "${local.project_legacy}-rg-internal"
+data "azurerm_private_dns_zone" "internal_wallet_io_pagopa_it" {
+  name                = "internal.wallet.io.pagopa.it"
+  resource_group_name = "${local.project}-wallet-rg-01"
 }
