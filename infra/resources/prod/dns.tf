@@ -39,3 +39,11 @@ resource "azurerm_private_dns_a_record" "api_internal_wallet_io_pagopa_it" {
   ttl                 = 10
   zone_name           = azurerm_private_dns_zone.internal_wallet_io_pagopa_it.name
 }
+
+resource "azurerm_dns_a_record" "wallet_io_pagopa_it" {
+  name                = "wallet"
+  zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
+  resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
+  ttl                 = 600
+  records             = ["72.146.49.243"] # AppGw (PSN) public ip
+}
