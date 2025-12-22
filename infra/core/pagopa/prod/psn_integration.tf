@@ -35,8 +35,8 @@ resource "azurerm_private_endpoint" "psn_application_gateway" {
 
 resource "azurerm_private_dns_a_record" "psn_application_gateway" {
   name                = "psn"
-  zone_name           = "internal.io.pagopa.it"
-  resource_group_name = "io-p-rg-internal"
+  zone_name           = data.azurerm_private_dns_zone.internal_io_pagopa_it.name
+  resource_group_name = data.azurerm_private_dns_zone.internal_io_pagopa_it.resource_group_name
   records             = ["10.20.2.119"]
   ttl                 = 3600
 }
