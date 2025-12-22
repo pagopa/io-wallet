@@ -34,6 +34,8 @@ locals {
 
     apim_probe_name = "${local.apim_prefix}-backend-pool-probe"
     cdn_probe_name  = "${local.cdn_prefix}-backend-pool-probe"
+
+    cdn_rewrite_rule_set_name = "${local.cdn_prefix}-rewrite-rule-set"
   }
 }
 
@@ -171,6 +173,7 @@ resource "azurerm_application_gateway" "hub" {
     rule_type                  = "Basic"
     backend_address_pool_name  = local.appgw.cdn_backend_pool_name
     backend_http_settings_name = local.appgw.cdn_backend_settings_name
+    rewrite_rule_set_name      = local.appgw.cdn_rewrite_rule_set_name
   }
 
   probe {
@@ -198,6 +201,26 @@ resource "azurerm_application_gateway" "hub" {
 
     match {
       status_code = ["200"]
+    }
+  }
+
+  rewrite_rule_set {
+    name = local.appgw.cdn_rewrite_rule_set_name
+
+    rewrite_rule {
+      name          = "well-known-rewrite"
+      rule_sequence = 100
+
+      condition {
+        variable    = "var_uri_path"
+        pattern     = "^\\/\\.well-known\\/(.*)$"
+        ignore_case = false
+      }
+
+      url {
+        path    = "/well-known/{var_uri_path_1}"
+        reroute = false
+      }
     }
   }
 
