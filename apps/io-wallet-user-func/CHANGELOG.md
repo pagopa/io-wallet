@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.2
+
+### Patch Changes
+
+- 1e61622: ""
+
 ## 4.1.1
 
 ### Patch Changes
