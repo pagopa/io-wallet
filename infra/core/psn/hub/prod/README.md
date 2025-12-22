@@ -5,7 +5,8 @@ This directory contains the Terraform code to deploy changes to PSN Hub infrastr
 > [!NOTE]  
 > Most of the resources have been deployed by PSN itself on behalf of IT-Wallet project and then imported as terraform code in [this repository folder](http://github.com/pagopa/io-wallet/tree/master/infra/core/psn/hub/prod), so it was not possible to adhere to PagoPA naming conventions.
 
-This configuration stores the state file on the spoke Storage Account as currently we do not have permissions to add role assignments on the hub subscription.
+> [!WARNING]  
+> This configuration stores the state file on the spoke Storage Account as currently we do not have permissions to add role assignments on the hub subscription.
 
 ## Environment description
 
