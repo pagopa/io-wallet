@@ -31,6 +31,12 @@ The following attributes of the Private Endpoint are particularly important:
 
 Once this Terraform configuration has been applied and the connection request has been approved by a PSN tenant user, workloads in the IO virtual network can reach the PSN Application Gateway through the Private Endpoint.
 
+### DNS A Record for PSN Application Gateway
+
+To allow workloads in the IO virtual network to reach the PSN Application Gateway by name rather than by IP, this configuration also creates a DNS A record in the IO private DNS zone.
+
+The record name corresponds to the hostname part of the PSN Application Gateway FQDN, and its target IP is the private IP address automatically assigned to the Private Endpoint. This means that if the Private Endpoint IP changes, the A record is updated accordingly by Terraform during the next apply.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
