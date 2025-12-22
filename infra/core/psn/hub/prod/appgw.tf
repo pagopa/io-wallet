@@ -190,7 +190,7 @@ resource "azurerm_application_gateway" "hub" {
   probe {
     name                                      = local.appgw.cdn_probe_name
     protocol                                  = "Https"
-    path                                      = "/well-known/android-crl.json"
+    path                                      = "/probes/healthcheck.txt"
     timeout                                   = 5
     interval                                  = 30
     unhealthy_threshold                       = 3
