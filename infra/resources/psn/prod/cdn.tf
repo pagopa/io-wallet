@@ -87,12 +87,11 @@ resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
   behavior_on_match         = "Continue"
 
   conditions {
-    request_uri_condition {
-      operator = "BeginsWith"
-      match_values = [
-        "https://${module.cdn.endpoint_hostname}/.well-known/"
-      ]
-      transforms = []
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = [".well-known"]
+      transforms       = []
+      negate_condition = false
     }
   }
 
