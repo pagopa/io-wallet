@@ -187,7 +187,7 @@ resource "azurerm_application_gateway" "hub" {
     pick_host_name_from_backend_http_settings = true
 
     match {
-      status_code = ["200", "204"]
+      status_code = ["200"]
     }
   }
 
