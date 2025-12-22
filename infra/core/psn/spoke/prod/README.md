@@ -1,6 +1,9 @@
 # IT-Wallet - PSN Spoke - PROD
 
-This directory contains the Terraform code to deploy changes to the PSN Spoke infrastructure. Most of the resources have been deployed by PSN itself on behalf of IT-Wallet project and then imported here, so it was not possible to adhere to PagoPA naming conventions.
+This directory contains the Terraform code to deploy changes to the PSN Spoke infrastructure.
+
+> [!NOTE]  
+> Most of the resources have been deployed by PSN itself on behalf of IT-Wallet project and then imported here, so it was not possible to adhere to PagoPA naming conventions.
 
 ## Environment description
 
@@ -49,7 +52,7 @@ Setting up these resources required some configuration at firewall level in orde
 
 ### Spoke Virtual Network and Hub peering
 
-A policy enforces the association of a route table to any subnet created in this VNet. The route table is `pagopa-Prod-ITWallet-spoke-routetable`, which forces traffic to the Firewall in Hub for any destination. This might be reason of connectivity issues for resources deployed in this VNet.
+A policy enforces the association of a route table to any subnet created in this VNet. The route table is `pagopa-Prod-ITWallet-spoke-routetable`, which forces traffic to the Firewall in Hub for any destination. This might be the reason for connectivity issues for resources deployed in this VNet.
 
 Moreover, subnets cannot be created via Terraform as it creates the subnet before attaching the route table via the object `azurerm_subnet_route_table_association`. As a workaround, the subnet must be created manually and then imported into the Terraform state.
 Currently, all the routes have been defined by PSN, except for `AllowP2SVPN` (to allow VPN connections) and `APIM`. The latter in particular needs to communicate with the internet during the deployment phase as it has several dependencies, and also requires firewall rules against Azure services via service tags:
