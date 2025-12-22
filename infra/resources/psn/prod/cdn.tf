@@ -57,6 +57,21 @@ resource "azurerm_storage_container" "pdnd" {
   container_access_type = "container"
 }
 
+resource "azurerm_storage_container" "probes" {
+  name                  = "probes"
+  storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
+resource "azurerm_storage_blob" "healthcheck" {
+  name                   = "healthcheck.txt"
+  storage_account_name   = azurerm_storage_account.cdn.name
+  storage_container_name = azurerm_storage_container.probes.name
+  type                   = "Block"
+  source_content         = "OK"
+  content_type           = "text/plain"
+}
+
 module "cdn" {
   source  = "pagopa-dx/azure-cdn/azurerm"
   version = "~> 0.3"
