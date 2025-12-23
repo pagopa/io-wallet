@@ -65,6 +65,10 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name                  = "PagoPACosmosDbConnectionString"
+        key_vault_secret_name = "PagoPACosmosDbConnectionString"
       }
     ]
   }

@@ -75,6 +75,7 @@ locals {
   function_app_user_slot_disabled = [
     # "addWalletInstanceUserId",
     "generateEntityConfiguration",
+    "migrateWalletInstances",
     "sendEmailOnWalletInstanceCreation",
     "sendEmailOnWalletInstanceRevocation",
   ]
