@@ -115,3 +115,9 @@ variable "cdn_endpoint_id" {
   type        = string
   description = "CDN endpoint id"
 }
+
+variable "cdn_frontdoor" {
+  type        = string
+  description = "Whether the CDN is Front Door or not"
+  default     = "false"
+}

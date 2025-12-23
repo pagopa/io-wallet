@@ -31,6 +31,7 @@ No requirements.
 
 | Name | Type |
 |------|------|
+| [azurerm_role_assignment.func_app_user_cdn_endpoint_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.infra_cd_subscription_rbac_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 
 ## Inputs
@@ -39,6 +40,8 @@ No requirements.
 |------|-------------|------|---------|:--------:|
 | <a name="input_admin_ids"></a> [admin\_ids](#input\_admin\_ids) | Id of the Entra ID group with admin roles | `set(string)` | n/a | yes |
 | <a name="input_application_gateway_id"></a> [application\_gateway\_id](#input\_application\_gateway\_id) | Application Gateway resource ID | `string` | `null` | no |
+| <a name="input_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#input\_cdn\_endpoint\_id) | CDN endpoint id | `string` | n/a | yes |
+| <a name="input_cdn_frontdoor"></a> [cdn\_frontdoor](#input\_cdn\_frontdoor) | Whether the CDN is Front Door or not | `string` | `"false"` | no |
 | <a name="input_cdn_principal_id"></a> [cdn\_principal\_id](#input\_cdn\_principal\_id) | Principal ID of the CDN managed identity | `string` | n/a | yes |
 | <a name="input_cdn_storage_account"></a> [cdn\_storage\_account](#input\_cdn\_storage\_account) | Storage Account Id used for CDN | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_cicd_principal_ids"></a> [cicd\_principal\_ids](#input\_cicd\_principal\_ids) | Principal ID of CICD pipelines | <pre>object({<br/>    infra = object({<br/>      ci = string<br/>      cd = string<br/>    })<br/>    app = object({<br/>      ci = optional(string, "")<br/>      cd = string<br/>    })<br/>  })</pre> | n/a | yes |
