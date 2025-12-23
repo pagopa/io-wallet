@@ -103,8 +103,7 @@ resource "azurerm_application_gateway" "hub" {
     port                                = 443
     protocol                            = "Https"
     cookie_based_affinity               = "Disabled"
-    host_name                           = "apim.internal.wallet.io.pagopa.it"
-    pick_host_name_from_backend_address = false
+    pick_host_name_from_backend_address = true
     probe_name                          = local.appgw.apim_probe_name
     request_timeout                     = 20
   }
