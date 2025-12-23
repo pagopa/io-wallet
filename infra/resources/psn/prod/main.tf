@@ -289,5 +289,6 @@ module "iam" {
 
   wallet_dns_zone_id = null
 
-  cdn_endpoint_id = null
+  cdn_endpoint_id = module.cdn.endpoint_id
+  cdn_frontdoor   = true
 }

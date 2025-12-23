@@ -18,19 +18,18 @@ on:
         required: false
         type: boolean
         default: false
-  # TBD: Uncomment after permissions are set on identity
-  # pull_request:
-  #   types:
-  #     - opened
-  #     - edited
-  #     - synchronize
-  #     - reopened
-  #     - ready_for_review
-  #   paths:
-  #     - "infra/core/psn/hub/prod/**"
-  #     - "infra/core/psn/spoke/prod/**"
-  #     - "infra/resources/psn/prod/**"
-  #     - ".github/workflows/pr_psn_infra.yaml"
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      # TBD: Uncomment after permissions are set on identity
+      # - "infra/core/psn/hub/prod/**"
+      # - "infra/core/psn/spoke/prod/**"
+      - "infra/resources/psn/prod/**"
 
 permissions:
   contents: read

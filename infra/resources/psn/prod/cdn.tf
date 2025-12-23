@@ -94,3 +94,27 @@ module "cdn" {
 
   tags = local.tags
 }
+
+resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
+  name                      = "WellKnownRewrite"
+  cdn_frontdoor_rule_set_id = module.cdn.rule_set_id
+  order                     = 1
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = [".well-known"]
+      transforms       = []
+      negate_condition = false
+    }
+  }
+
+  actions {
+    url_rewrite_action {
+      source_pattern          = "/.well-known/"
+      destination             = "/well-known/"
+      preserve_unmatched_path = true
+    }
+  }
+}
