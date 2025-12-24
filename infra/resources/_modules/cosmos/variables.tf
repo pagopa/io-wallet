@@ -46,3 +46,21 @@ variable "psn_service_principal_id" {
   description = "Id of the service principal federated with PSN"
   default     = null
 }
+
+variable "throughput" {
+  type = object({
+    wallet_instances              = optional(number, 8000)
+    nonces                        = optional(number, 4000)
+    whitelisted_fiscal_codes      = optional(number, 8000)
+    certificates                  = optional(number, 8000)
+    leases_revoke_wallet_instance = optional(number, 1000)
+    uat = optional(object({
+      wallet_instances         = optional(number, 1000)
+      nonces                   = optional(number, 1000)
+      certificates             = optional(number, 1000)
+      whitelisted_fiscal_codes = optional(number, 1000)
+    }), {})
+  })
+  description = "Max throughput (RU/s) configuration for Cosmos DB containers"
+  default     = {}
+}
