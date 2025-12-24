@@ -69,6 +69,12 @@ locals {
     ]
   }
 
+  backend_paths = {
+    user_v1    = "/api/wallet/v1"
+    user_uat   = "/api/v1/wallet"
+    support_v1 = "/api/v1/wallet"
+  }
+
   tags = {
     BusinessUnit = "IT-Wallet"
     CostCenter   = "TS000 - Tecnologia e Servizi"
