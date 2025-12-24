@@ -4,7 +4,7 @@ resource "azurerm_api_management_backend" "func_support" {
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
-  url                 = "https://${module.function_apps.function_app_support.default_hostname}/api/v1/wallet"
+  url                 = "https://${module.function_apps.function_app_support.default_hostname}${local.backend_paths.support_v1}"
 }
 
 resource "azurerm_api_management_backend" "func_user" {
@@ -13,7 +13,7 @@ resource "azurerm_api_management_backend" "func_user" {
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
-  url                 = "https://${module.function_apps.function_app_user.default_hostname}/api/wallet/v1"
+  url                 = "https://${module.function_apps.function_app_user.default_hostname}${local.backend_paths.user_v1}"
 }
 
 resource "azurerm_api_management_backend" "func_user_uat" {
@@ -22,7 +22,7 @@ resource "azurerm_api_management_backend" "func_user_uat" {
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
-  url                 = "https://${module.function_apps.function_app_user_uat.default_hostname}/api/v1/wallet"
+  url                 = "https://${module.function_apps.function_app_user_uat.default_hostname}${local.backend_paths.user_uat}"
 }
 
 resource "azurerm_api_management_product" "private" {
