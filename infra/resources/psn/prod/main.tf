@@ -105,6 +105,20 @@ module "cosmos" {
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
 
+  throughput = {
+    wallet_instances              = 10000
+    nonces                        = 6000
+    whitelisted_fiscal_codes      = 10000
+    certificates                  = 10000
+    leases_revoke_wallet_instance = 2000
+    uat = {
+      wallet_instances         = 2000
+      nonces                   = 2000
+      certificates             = 2000
+      whitelisted_fiscal_codes = 2000
+    }
+  }
+
   tags = local.tags
 }
 

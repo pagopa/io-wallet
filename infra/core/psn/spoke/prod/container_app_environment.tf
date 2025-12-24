@@ -96,9 +96,9 @@ resource "azurerm_container_app_job" "github_runner" {
 
   template {
     container {
-      cpu    = 1.5
+      cpu    = 2
       image  = "ghcr.io/pagopa/github-self-hosted-runner-azure:beta-tls-debugging"
-      memory = "3Gi"
+      memory = "4Gi"
       name   = "github-runner"
 
       env {
