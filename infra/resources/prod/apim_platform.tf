@@ -241,6 +241,7 @@ resource "azurerm_api_management_api_policy" "wallet_user" {
   <inbound>
       <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
+      <rewrite-uri template="@("/api/wallet/v1/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
 </policies>
@@ -256,6 +257,39 @@ resource "azurerm_api_management_api_policy" "wallet_user_legacy" {
   <inbound>
       <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
+      <rewrite-uri template="@("/api/wallet/v1/" + context.Request.Url.Path)" />
+      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "wallet_user_uat" {
+  api_name            = azurerm_api_management_api.wallet_user_uat.name
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <base />
+      <rewrite-uri template="@("/api/wallet/uat/" + context.Request.Url.Path)" />
+      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "wallet_user_uat_legacy" {
+  api_name            = azurerm_api_management_api.wallet_user_uat_legacy.name
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <base />
+      <rewrite-uri template="@("/api/wallet/uat/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
 </policies>
@@ -270,6 +304,7 @@ resource "azurerm_api_management_api_policy" "wallet_support" {
 <policies>
   <inbound>
       <base />
+      <rewrite-uri template="@("/api/wallet/support/v1/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
 </policies>
@@ -284,6 +319,7 @@ resource "azurerm_api_management_api_policy" "wallet_support_legacy" {
 <policies>
   <inbound>
       <base />
+      <rewrite-uri template="@("/api/wallet/support/v1/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
 </policies>
