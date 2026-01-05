@@ -2,7 +2,7 @@ resource "azurerm_dns_a_record" "this" {
   name                = "@"
   zone_name           = var.wallet_dns_zone_name
   resource_group_name = var.wallet_dns_zone_resource_group_name
-  ttl                 = 600
+  ttl                 = 300
   target_resource_id  = var.cdn_endpoint_id
   tags                = var.tags
 }
