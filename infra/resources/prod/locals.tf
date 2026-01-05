@@ -92,8 +92,8 @@ locals {
         key_vault_secret_name = "MailupSecret"
       },
       {
-        name                  = "CosmosAccountConnectionString"
-        value                 = "CosmosAccountConnectionString"
+        name  = "CosmosAccountConnectionString"
+        value = "CosmosAccountConnectionString"
       }
     ]
   }

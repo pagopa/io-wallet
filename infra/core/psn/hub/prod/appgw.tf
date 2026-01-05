@@ -55,9 +55,13 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   sku {
-    name     = "WAF_v2"
-    tier     = "WAF_v2"
-    capacity = 2
+    name = "WAF_v2"
+    tier = "WAF_v2"
+  }
+
+  autoscale_configuration {
+    min_capacity = 10
+    max_capacity = 50
   }
 
   gateway_ip_configuration {
