@@ -44,6 +44,8 @@ resource "azurerm_dns_a_record" "wallet_io_pagopa_it" {
   name                = "wallet"
   zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
   resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
-  ttl                 = 600
+  ttl                 = 30
   records             = ["72.146.49.243"] # AppGw (PSN) public ip
+
+  tags = local.tags
 }
