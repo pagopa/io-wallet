@@ -63,12 +63,27 @@ resource "azurerm_storage_container" "probes" {
   container_access_type = "container"
 }
 
+resource "azurerm_storage_container" "root" {
+  name                  = "$root"
+  storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
 resource "azurerm_storage_blob" "healthcheck" {
   name                   = "healthcheck.txt"
   storage_account_name   = azurerm_storage_account.cdn.name
   storage_container_name = azurerm_storage_container.probes.name
   type                   = "Block"
   source_content         = "OK"
+  content_type           = "text/plain"
+}
+
+resource "azurerm_storage_blob" "index" {
+  name                   = "index.html"
+  storage_account_name   = azurerm_storage_account.cdn.name
+  storage_container_name = azurerm_storage_container.root.name
+  type                   = "Block"
+  source_content         = ""
   content_type           = "text/plain"
 }
 
@@ -117,4 +132,14 @@ resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
       preserve_unmatched_path = true
     }
   }
+}
+
+import {
+  to = azurerm_storage_blob.index
+  id = "https://iopitnwalletcdnst01.blob.core.windows.net/$root/index.html"
+}
+
+import {
+  to = azurerm_storage_container.root
+  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-wallet-rg-01/providers/Microsoft.Storage/storageAccounts/iwpitncdnst01/blobServices/default/containers/$root"
 }
