@@ -49,3 +49,16 @@ resource "azurerm_dns_a_record" "wallet_io_pagopa_it" {
 
   tags = local.tags
 }
+
+resource "azurerm_dns_txt_record" "wallet_io_pagopa_it" {
+  name                = "_dnsauth.wallet"
+  zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
+  resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
+  ttl                 = 3600
+
+  record {
+    value = "_nf8vvdk9f1qleomxqgtnyj3fws7aql7"
+  }
+
+  tags = local.tags
+}

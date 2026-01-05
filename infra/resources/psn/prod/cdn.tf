@@ -92,6 +92,12 @@ module "cdn" {
     }
   }
 
+  custom_domains = [
+    {
+      host_name = "wallet.io.pagopa.it"
+    }
+  ]
+
   tags = local.tags
 }
 
