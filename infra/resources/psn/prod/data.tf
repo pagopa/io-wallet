@@ -55,6 +55,13 @@ data "azurerm_application_insights" "core" {
   ))
 }
 
+data "azurerm_application_gateway" "hub" {
+  provider = azurerm.hub
+
+  name                = "pagopa-app-gw-italynorth"
+  resource_group_name = local.hub.resource_group_name
+}
+
 data "azurerm_private_dns_zone" "kv" {
   provider = azurerm.hub
 
