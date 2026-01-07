@@ -12,13 +12,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "vnet_common_internal_w
   private_dns_zone_name = azurerm_private_dns_zone.internal_wallet_io_pagopa_it.name
 }
 
-removed {
-  from = azurerm_private_dns_a_record.api_internal_wallet_io_pagopa_it
-  lifecycle {
-    destroy = false
-  }
-}
-
 resource "azurerm_dns_txt_record" "wallet_io_pagopa_it" {
   name                = "_dnsauth.wallet"
   zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
@@ -28,6 +21,16 @@ resource "azurerm_dns_txt_record" "wallet_io_pagopa_it" {
   record {
     value = "_nf8vvdk9f1qleomxqgtnyj3fws7aql7"
   }
+
+  tags = local.tags
+}
+
+resource "azurerm_dns_a_record" "wallet_io_pagopa_it" {
+  name                = "wallet"
+  zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
+  resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
+  ttl                 = 30
+  records             = ["iw-p-itn-cdn-fde-01-aza7ezdzg9buc8gm.a02.azurefd.net"]
 
   tags = local.tags
 }
