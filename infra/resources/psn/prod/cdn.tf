@@ -63,6 +63,12 @@ resource "azurerm_storage_container" "probes" {
   container_access_type = "container"
 }
 
+resource "azurerm_storage_container" "root" {
+  name                  = "$root"
+  storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
 resource "azurerm_storage_blob" "healthcheck" {
   name                   = "healthcheck.txt"
   storage_account_name   = azurerm_storage_account.cdn.name
@@ -70,6 +76,15 @@ resource "azurerm_storage_blob" "healthcheck" {
   type                   = "Block"
   source_content         = "OK"
   content_type           = "text/plain"
+}
+
+resource "azurerm_storage_blob" "index" {
+  name                   = "index.html"
+  storage_account_name   = azurerm_storage_account.cdn.name
+  storage_container_name = azurerm_storage_container.root.name
+  type                   = "Block"
+  source_content         = ""
+  content_type           = "text/html"
 }
 
 module "cdn" {
