@@ -28,6 +28,19 @@ resource "azurerm_api_management_product" "wallet" {
   approval_required     = false
 }
 
+resource "azurerm_api_management_product" "wallet_private" {
+  product_id   = "it-wallet-private"
+  display_name = "IT WALLET - Private"
+  description  = "Product for IT-Wallet APIs with subscription"
+
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+
+  published             = true
+  subscription_required = true
+  approval_required     = false
+}
+
 resource "azurerm_api_management_api_version_set" "wallet_user" {
   name                = "wallet-user-apis"
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
@@ -90,7 +103,7 @@ resource "azurerm_api_management_api" "wallet_support_v1" {
   name                  = "wallet-support-api-v1"
   api_management_name   = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
-  subscription_required = false
+  subscription_required = true
 
   version_set_id = azurerm_api_management_api_version_set.wallet_support.id
   version        = "v1"
@@ -136,7 +149,7 @@ resource "azurerm_api_management_product_api" "wallet_user" {
 
 resource "azurerm_api_management_product_api" "wallet_support" {
   api_name            = azurerm_api_management_api.wallet_support_v1.name
-  product_id          = azurerm_api_management_product.wallet.product_id
+  product_id          = azurerm_api_management_product.wallet_private.product_id
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
 }
