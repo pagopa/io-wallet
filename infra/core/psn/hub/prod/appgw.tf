@@ -65,7 +65,7 @@ resource "azurerm_application_gateway" "hub" {
   frontend_ip_configuration {
     name                            = local.appgw.frontend_private_ip_configuration_name
     private_ip_address_allocation   = "Static"
-    private_ip_address              = "10.250.3.6" # first 5 ips are reserved https://learn.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure
+    private_ip_address              = "10.251.3.6" # first 5 ips are reserved https://learn.microsoft.com/en-us/azure/application-gateway/configuration-infrastructure
     private_link_configuration_name = local.appgw.private_link_name
     subnet_id                       = data.azurerm_subnet.hub_gateway_subnet.id
   }
