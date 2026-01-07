@@ -4,13 +4,7 @@ resource "azurerm_api_management_named_value" "func_support_key" {
   resource_group_name = module.apim.resource_group_name
   display_name        = "SupportFunctionKey"
   secret              = true
-
-  value_from_key_vault {
-    secret_id          = azurerm_key_vault_secret.func_support_default_key.versionless_id
-    identity_client_id = null
-  }
-
-  # tags = tolist(local.tags)
+  value               = azurerm_key_vault_secret.func_support_default_key.value
 }
 
 resource "azurerm_api_management_backend" "func_support" {
