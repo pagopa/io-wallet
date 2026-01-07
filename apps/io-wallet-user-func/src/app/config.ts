@@ -139,10 +139,7 @@ const AzureFrontDoorConfig = t.type({
 type AzureFrontDoorConfig = t.TypeOf<typeof AzureFrontDoorConfig>;
 
 const AzureConfig = t.type({
-  cosmos: t.intersection([
-    AzureCosmosConfig,
-    t.type({ connectionString: t.string }),
-  ]),
+  cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
   storage: AzureStorageConfig,
@@ -420,24 +417,12 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   AzureConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    cosmos: getAzureCosmosConfigFromEnvironment,
-    cosmosAccountConnectionString: readFromEnvironment(
-      "CosmosAccountConnectionString",
-    ),
-    frontDoor: getAzureFrontDoorConfigFromEnvironment,
-    generic: getAzureGenericConfigFromEnvironment,
-    storage: getAzureStorageConfigFromEnvironment,
-  }),
-  RE.map(({ cosmos, cosmosAccountConnectionString, ...rest }) => ({
-    ...rest,
-    cosmos: {
-      ...cosmos,
-      connectionString: cosmosAccountConnectionString,
-    },
-  })),
-);
+> = sequenceS(RE.Apply)({
+  cosmos: getAzureCosmosConfigFromEnvironment,
+  frontDoor: getAzureFrontDoorConfigFromEnvironment,
+  generic: getAzureGenericConfigFromEnvironment,
+  storage: getAzureStorageConfigFromEnvironment,
+});
 
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
