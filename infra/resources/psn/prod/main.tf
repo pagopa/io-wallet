@@ -242,8 +242,7 @@ module "iam" {
     data.azuread_group.wallet.object_id
   ]
 
-  cdn_principal_id  = module.cdn.principal_id
-  apim_principal_id = module.apim.principal_id
+  cdn_principal_id = module.cdn.principal_id
 
   cicd_principal_ids = {
     infra = {

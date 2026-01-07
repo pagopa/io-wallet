@@ -79,25 +79,3 @@ module "key_vault_infra" {
     }
   ]
 }
-
-module "key_vault_apim" {
-  count = var.is_psn ? 1 : 0
-
-  source  = "pagopa-dx/azure-role-assignments/azurerm"
-  version = "~> 1.3"
-
-  principal_id    = var.apim_principal_id
-  subscription_id = var.subscription_id
-
-  key_vault = [
-    {
-      name = var.key_vault_app.name
-      resource_group_name = var.key_vault_app.resource_group_name
-      has_rbac_support = var.is_psn
-      description = "Allow APIM to read secrets from Key Vault for named values"
-      roles = {
-        secrets = "reader"
-      }
-    }
-  ]
-}
