@@ -71,8 +71,8 @@ locals {
 
   backend_paths = {
     user_v1    = "/api/wallet/v1"
-    user_uat   = "/api/v1/wallet"
-    support_v1 = "/api/v1/wallet"
+    user_uat   = "/api/wallet/v1"
+    support_v1 = "/api/wallet/v1"
   }
 
   tags = {
