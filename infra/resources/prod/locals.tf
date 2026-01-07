@@ -90,6 +90,10 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name  = "CosmosAccountConnectionString"
+        value = "CosmosAccountConnectionString"
       }
     ]
   }
