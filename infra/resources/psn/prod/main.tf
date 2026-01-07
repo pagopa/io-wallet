@@ -106,16 +106,16 @@ module "cosmos" {
   user_assigned_managed_identity_id = module.ids.psn_identity.id
 
   throughput = {
-    wallet_instances              = 30000
-    nonces                        = 30000
-    whitelisted_fiscal_codes      = 30000
-    certificates                  = 30000
-    leases_revoke_wallet_instance = 30000
+    wallet_instances              = 12000
+    nonces                        = 4000
+    whitelisted_fiscal_codes      = 4000
+    certificates                  = 10000
+    leases_revoke_wallet_instance = 4000
     uat = {
-      wallet_instances         = 5000
-      nonces                   = 5000
-      certificates             = 5000
-      whitelisted_fiscal_codes = 5000
+      wallet_instances         = 4000
+      nonces                   = 2000
+      certificates             = 2000
+      whitelisted_fiscal_codes = 2000
     }
   }
 
