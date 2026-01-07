@@ -55,8 +55,9 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   sku {
-    name = "WAF_v2"
-    tier = "WAF_v2"
+    name     = "WAF_v2"
+    tier     = "WAF_v2"
+    capacity = null
   }
 
   autoscale_configuration {

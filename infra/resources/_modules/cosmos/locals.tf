@@ -8,7 +8,7 @@ locals {
       name               = "wallet-instances"
       partition_key_path = "/userId"
       autoscale_settings = {
-        max_throughput = 8000
+        max_throughput = var.throughput.wallet_instances
       }
       default_ttl = null
     },
@@ -17,7 +17,7 @@ locals {
       name               = "nonces"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 4000
+        max_throughput = var.throughput.nonces
       }
       default_ttl = 300
     },
@@ -33,7 +33,7 @@ locals {
       name               = "leases-revoke-wallet-instance"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 1000
+        max_throughput = var.throughput.leases_revoke_wallet_instance
       }
       default_ttl = null
     },
@@ -49,7 +49,7 @@ locals {
       name               = "whitelisted-fiscal-codes"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 8000
+        max_throughput = var.throughput.whitelisted_fiscal_codes
       }
       default_ttl = null
     },
@@ -57,7 +57,7 @@ locals {
       name               = "certificates"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 8000
+        max_throughput = var.throughput.certificates
       }
       default_ttl = null
     },
@@ -68,7 +68,7 @@ locals {
       name               = "wallet-instances"
       partition_key_path = "/userId"
       autoscale_settings = {
-        max_throughput = 1000
+        max_throughput = var.throughput.uat.wallet_instances
       }
       default_ttl = null
     },
@@ -76,7 +76,7 @@ locals {
       name               = "nonces"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 1000
+        max_throughput = var.throughput.uat.nonces
       }
       default_ttl = 300
     },
@@ -84,7 +84,7 @@ locals {
       name               = "certificates"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 1000
+        max_throughput = var.throughput.uat.certificates
       }
       default_ttl = null
     },
@@ -92,7 +92,7 @@ locals {
       name               = "whitelisted-fiscal-codes"
       partition_key_path = "/id"
       autoscale_settings = {
-        max_throughput = 1000
+        max_throughput = var.throughput.uat.whitelisted_fiscal_codes
       }
       default_ttl = null
     },
