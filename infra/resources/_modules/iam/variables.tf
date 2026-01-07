@@ -121,3 +121,9 @@ variable "cdn_frontdoor" {
   description = "Whether the CDN is Front Door or not"
   default     = "false"
 }
+
+variable "apim_principal_id" {
+  type        = string
+  description = "APIM principal id"
+  default     = null
+}
