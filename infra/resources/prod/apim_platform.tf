@@ -77,7 +77,7 @@ resource "azurerm_api_management_api" "wallet_user_uat" {
 
   description  = "REST APIs consumed by IO App"
   display_name = "IT-Wallet User (UAT)"
-  path         = "api/wallet/uat"
+  path         = "api/wallet"
   protocols    = ["https"]
 
   import {
