@@ -1,3 +1,12 @@
+resource "azurerm_api_management_named_value" "func_support_key" {
+  name                = "support-func-key"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "SupportFunctionKey"
+  secret              = true
+  value               = azurerm_key_vault_secret.func_support_default_key.value
+}
+
 resource "azurerm_api_management_backend" "func_support" {
   name                = "function-support-01"
   description         = "Function App Support Backend"
@@ -5,6 +14,12 @@ resource "azurerm_api_management_backend" "func_support" {
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
   url                 = "https://${module.function_apps.function_app_support.default_hostname}${local.backend_paths.support_v1}"
+
+  credentials {
+    header = {
+      "x-functions-key" = "{{${azurerm_api_management_named_value.func_support_key.name}}}"
+    }
+  }
 }
 
 resource "azurerm_api_management_backend" "func_user" {
@@ -113,7 +128,7 @@ resource "azurerm_api_management_api" "support_v1" {
   name                  = "support-api-v1"
   api_management_name   = module.apim.name
   resource_group_name   = module.apim.resource_group_name
-  subscription_required = false
+  subscription_required = true
 
   version_set_id = azurerm_api_management_api_version_set.support.id
   version        = "v1"
