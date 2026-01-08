@@ -214,6 +214,10 @@ module "function_apps" {
 
   user_func = local.user_func
 
+  health_check_path_user = "/api/wallet/v1/health"
+  health_check_path_user_uat = "/api/wallet/v1/health"
+  health_check_path_support = "/api/wallet/v1/health"
+
   tags = local.tags
 }
 

@@ -160,6 +160,10 @@ module "function_apps" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
+  health_check_path_user = "/api/v1/wallet/health"
+  health_check_path_user_uat = "/api/v1/wallet/health"
+  health_check_path_support = "/api/v1/wallet/health"
+
   tags = local.tags
 }
 
