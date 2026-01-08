@@ -2,18 +2,26 @@
   "openapi": "3.0.3",
   "info": {
     "title": "IO Wallet - IO Web API",
-    "version": "1.0.0"
+    "version": "v1"
   },
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ],
+  "servers": [{
+    "url": "https://apim.internal.wallet.io.pagopa.it/api/wallet/ioweb/v1"
+  }],
   "paths": {
     "/wallet-instances/current/status": {
       "get": {
         "summary": "Retrieve the current Wallet Instance status",
         "operationId": "getCurrentWalletInstanceStatus",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "fiscal-code",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FiscalCode"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Wallet Instance status successfully retrieved",
@@ -129,13 +137,6 @@
     }
   },
   "components": {
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
     "responses": {
       "Forbidden": {
         "description": "The server understands the request but refuses to authorize it",
@@ -210,8 +211,19 @@
     },
     "schemas": {
       "SetWalletInstanceStatusData": {
-        "type": "string",
-        "enum": ["REVOKED"]
+        "type":"object",
+        "properties": {
+          "status":{
+            "type":"string",
+            "enum":[
+              "REVOKED"
+            ]
+          },
+          "fiscal_code":{
+            "$ref":"#/components/schemas/FiscalCode"
+          }
+        },
+        "required": ["status", "fiscal_code"]
       },
       "WalletData": {
         "description": "Describes the status of the wallet.",
@@ -235,6 +247,13 @@
           }
         },
         "required": ["is_whitelisted"]
+      },
+      "FiscalCode": {
+        "type": "string",
+        "description": "User's fiscal code.",
+        "format": "FiscalCode",
+        "x-import": "@pagopa/ts-commons/lib/strings",
+        "example": "SPNDNL80R13C555X"
       },
       "ProblemJson": {
         "type": "object",
