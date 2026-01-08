@@ -208,8 +208,19 @@
     },
     "schemas": {
       "SetWalletInstanceStatusData": {
-        "type": "string",
-        "enum": ["REVOKED"]
+        "type":"object",
+        "properties": {
+          "status":{
+            "type":"string",
+            "enum":[
+              "REVOKED"
+            ]
+          },
+          "fiscal_code":{
+            "$ref":"#/components/schemas/FiscalCode"
+          }
+        },
+        "required": ["status", "fiscal_code"]
       },
       "WalletData": {
         "description": "Describes the status of the wallet.",
