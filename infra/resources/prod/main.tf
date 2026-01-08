@@ -267,8 +267,9 @@ module "apim_itn" {
 
   project_legacy = local.project_legacy
   apim = {
-    name                = local.apim.name
-    resource_group_name = local.apim.resource_group_name
+    name                = data.azurerm_api_management.apim.name
+    resource_group_name = data.azurerm_api_management.apim.resource_group_name
+    id                  = data.azurerm_api_management.apim.id
   }
 
   function_apps = {
