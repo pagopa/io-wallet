@@ -2,8 +2,11 @@
   "openapi": "3.0.3",
   "info": {
     "title": "IO Wallet - IO Web API",
-    "version": "1.0.0"
+    "version": "v1"
   },
+  "servers": [{
+    "url": "https://apim.internal.wallet.io.pagopa.it/api/wallet/ioweb/v1"
+  }],
   "paths": {
     "/wallet-instances/current/status": {
       "get": {
