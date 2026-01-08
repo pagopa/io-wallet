@@ -4,16 +4,21 @@
     "title": "IO Wallet - IO Web API",
     "version": "1.0.0"
   },
-  "security": [
-    {
-      "BearerAuth": []
-    }
-  ],
   "paths": {
     "/wallet-instances/current/status": {
       "get": {
         "summary": "Retrieve the current Wallet Instance status",
         "operationId": "getCurrentWalletInstanceStatus",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "fiscal-code",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FiscalCode"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Wallet Instance status successfully retrieved",
@@ -129,13 +134,6 @@
     }
   },
   "components": {
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
     "responses": {
       "Forbidden": {
         "description": "The server understands the request but refuses to authorize it",
@@ -235,6 +233,13 @@
           }
         },
         "required": ["is_whitelisted"]
+      },
+      "FiscalCode": {
+        "type": "string",
+        "description": "User's fiscal code.",
+        "format": "FiscalCode",
+        "x-import": "@pagopa/ts-commons/lib/strings",
+        "example": "SPNDNL80R13C555X"
       },
       "ProblemJson": {
         "type": "object",
