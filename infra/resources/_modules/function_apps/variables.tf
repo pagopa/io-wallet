@@ -175,16 +175,16 @@ variable "subnet_route_table_id" {
 }
 
 variable "health_check_path_user" {
-  type = string
+  type        = string
   description = "Health check path for user function app"
 }
 
 variable "health_check_path_user_uat" {
-  type = string
+  type        = string
   description = "Health check path for user uat function app"
 }
 
 variable "health_check_path_support" {
-  type = string
+  type        = string
   description = "Health check path for support function app"
 }

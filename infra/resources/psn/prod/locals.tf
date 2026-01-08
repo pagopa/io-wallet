@@ -19,7 +19,6 @@ locals {
 
   hsm_key_url = "https://pagopa-managedhsm.managedhsm.azure.net/keys/mdb001prod"
 
-
   user_func = {
     app_settings = [
       {
@@ -65,6 +64,14 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name                  = "CosmosAccountConnectionString"
+        key_vault_secret_name = "CosmosAccountConnectionString"
+      },
+      {
+        name                  = "PagoPACosmosDbConnectionString"
+        key_vault_secret_name = "PagoPACosmosDbConnectionString"
       }
     ]
   }
