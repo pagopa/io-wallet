@@ -17,7 +17,7 @@ resource "azurerm_api_management_policy_fragment" "wallet_authentication" {
 
 resource "azurerm_api_management_product" "wallet" {
   product_id   = "it-wallet"
-  display_name = "IT WALLET"
+  display_name = "IT WALLET - Public"
   description  = "Product for IT-Wallet APIs without subscription"
 
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
@@ -28,47 +28,34 @@ resource "azurerm_api_management_product" "wallet" {
   approval_required     = false
 }
 
-resource "azurerm_api_management_product" "wallet_private" {
-  product_id   = "it-wallet-private"
-  display_name = "IT WALLET - Private"
-  description  = "Product for IT-Wallet APIs with subscription"
-
+resource "azurerm_api_management_api_version_set" "wallet_user_ioapp" {
+  name                = "wallet-user-ioapp-apis"
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
-
-  published             = true
-  subscription_required = true
-  approval_required     = false
-}
-
-resource "azurerm_api_management_api_version_set" "wallet_user" {
-  name                = "wallet-user-apis"
-  api_management_name = data.azurerm_api_management.platform_api_gateway.name
-  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
-  display_name        = "Wallet User"
+  display_name        = "Wallet User - IO App"
   versioning_scheme   = "Segment"
 }
 
-resource "azurerm_api_management_api_version_set" "wallet_support" {
-  name                = "wallet-support-apis"
+resource "azurerm_api_management_api_version_set" "wallet_user_uat_ioapp" {
+  name                = "wallet-user-uat-ioapp-apis"
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
-  display_name        = "Wallet Customer Support"
+  display_name        = "Wallet User UAT - IO App"
   versioning_scheme   = "Segment"
 }
 
-resource "azurerm_api_management_api" "wallet_user_v1" {
-  name                  = "wallet-user-api-v1"
+resource "azurerm_api_management_api" "wallet_user_ioapp_v1" {
+  name                  = "wallet-user-ioapp-api-v1"
   api_management_name   = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
   subscription_required = false
 
-  version_set_id = azurerm_api_management_api_version_set.wallet_user.id
+  version_set_id = azurerm_api_management_api_version_set.wallet_user_ioapp.id
   version        = "v1"
   revision       = 1
 
   description  = "REST APIs consumed by IO App"
-  display_name = "IT-Wallet User"
+  display_name = "IT-Wallet User - IO App v1"
   path         = "api/wallet"
   protocols    = ["https"]
 
@@ -78,45 +65,24 @@ resource "azurerm_api_management_api" "wallet_user_v1" {
   }
 }
 
-resource "azurerm_api_management_api" "wallet_user_uat" {
-  name                  = "wallet-user-api-uat"
+resource "azurerm_api_management_api" "wallet_user_uat_ioapp_v1" {
+  name                  = "wallet-user-uat-ioapp-api-v1"
   api_management_name   = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
   subscription_required = false
 
-  version_set_id = azurerm_api_management_api_version_set.wallet_user.id
-  version        = "uat"
+  version_set_id = azurerm_api_management_api_version_set.wallet_user_uat_ioapp.id
+  version        = "v1"
   revision       = 1
 
   description  = "REST APIs consumed by IO App"
-  display_name = "IT-Wallet User (UAT)"
-  path         = "api/wallet"
+  display_name = "IT-Wallet User UAT - IO App v1"
+  path         = "api/wallet/uat"
   protocols    = ["https"]
 
   import {
     content_format = "openapi-link"
     content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-user-func/openapi.yaml"
-  }
-}
-
-resource "azurerm_api_management_api" "wallet_support_v1" {
-  name                  = "wallet-support-api-v1"
-  api_management_name   = data.azurerm_api_management.platform_api_gateway.name
-  resource_group_name   = data.azurerm_api_management.platform_api_gateway.resource_group_name
-  subscription_required = true
-
-  version_set_id = azurerm_api_management_api_version_set.wallet_support.id
-  version        = "v1"
-  revision       = 1
-
-  description  = "REST APIs consumed by Customer Service Support"
-  display_name = "IT-Wallet Customer Support"
-  path         = "api/wallet/support"
-  protocols    = ["https"]
-
-  import {
-    content_format = "openapi-link"
-    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-support-func/openapi.yaml"
   }
 }
 
@@ -126,36 +92,31 @@ resource "azurerm_api_management_tag" "wallet" {
 }
 
 resource "azurerm_api_management_api_tag" "wallet_user" {
-  api_id = azurerm_api_management_api.wallet_user_v1.id
+  api_id = azurerm_api_management_api.wallet_user_ioapp_v1.id
   name   = azurerm_api_management_tag.wallet.name
 }
 
 resource "azurerm_api_management_api_tag" "wallet_user_uat" {
-  api_id = azurerm_api_management_api.wallet_user_uat.id
+  api_id = azurerm_api_management_api.wallet_user_uat_ioapp_v1.id
   name   = azurerm_api_management_tag.wallet.name
 }
 
-resource "azurerm_api_management_api_tag" "wallet_support" {
-  api_id = azurerm_api_management_api.wallet_support_v1.id
-  name   = azurerm_api_management_tag.wallet.name
-}
-
-resource "azurerm_api_management_product_api" "wallet_user" {
-  api_name            = azurerm_api_management_api.wallet_user_v1.name
+resource "azurerm_api_management_product_api" "wallet_user_v1" {
+  api_name            = azurerm_api_management_api.wallet_user_ioapp_v1.name
   product_id          = azurerm_api_management_product.wallet.product_id
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
 }
 
-resource "azurerm_api_management_product_api" "wallet_support" {
-  api_name            = azurerm_api_management_api.wallet_support_v1.name
-  product_id          = azurerm_api_management_product.wallet_private.product_id
+resource "azurerm_api_management_product_api" "wallet_user_uat_v1" {
+  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  product_id          = azurerm_api_management_product.wallet.product_id
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
 }
 
-resource "azurerm_api_management_api_policy" "wallet_user" {
-  api_name            = azurerm_api_management_api.wallet_user_v1.name
+resource "azurerm_api_management_api_policy" "wallet_user_v1" {
+  api_name            = azurerm_api_management_api.wallet_user_ioapp_v1.name
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   xml_content         = <<XML
@@ -170,8 +131,8 @@ resource "azurerm_api_management_api_policy" "wallet_user" {
 XML
 }
 
-resource "azurerm_api_management_api_policy" "wallet_user_uat" {
-  api_name            = azurerm_api_management_api.wallet_user_uat.name
+resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
+  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   xml_content         = <<XML
@@ -180,21 +141,6 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat" {
       <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
       <rewrite-uri template="@("/api/wallet/uat/" + context.Request.Url.Path)" />
-      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
-  </inbound>
-</policies>
-XML
-}
-
-resource "azurerm_api_management_api_policy" "wallet_support" {
-  api_name            = azurerm_api_management_api.wallet_support_v1.name
-  api_management_name = data.azurerm_api_management.platform_api_gateway.name
-  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
-  xml_content         = <<XML
-<policies>
-  <inbound>
-      <base />
-      <rewrite-uri template="@("/api/wallet/support/v1/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
 </policies>
