@@ -65,27 +65,16 @@ module "apim_v2_wallet_support_api" {
   product_ids           = [module.apim_v2_wallet_support_product.product_id]
   subscription_required = true
 
-  service_url = format("https://%s/api/v1/wallet", var.function_apps.support_function.function_hostname)
+  service_url = "https://api.internal.wallet.io.pagopa.it/api/wallet/support/v1"
 
   description  = "API for Wallet Support Assistance"
   display_name = "IO Wallet - Support"
   path         = "api/v1/wallet/support"
   protocols    = ["https"]
+  revision     = "2"
 
   content_format = "openapi"
-
-  content_value = file("${path.module}/api/support/_swagger.json")
-
-  xml_content = file("${path.module}/api/support/_base_policy.xml")
-}
-
-resource "azurerm_api_management_named_value" "support_func_key" {
-  name                = "io-wallet-support-func-key"
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
-  display_name        = "io-wallet-support-func-key"
-  value               = data.azurerm_key_vault_secret.support_func_key_default.value
-  secret              = "true"
+  content_value  = file("${path.module}/api/support/_swagger.json")
 }
 
 data "azurerm_key_vault_secret" "support_func_key_default" {
