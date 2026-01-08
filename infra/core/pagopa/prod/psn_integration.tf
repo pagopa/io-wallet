@@ -35,10 +35,11 @@ resource "azurerm_private_endpoint" "psn_application_gateway" {
 
 resource "azurerm_private_dns_a_record" "psn_application_gateway" {
   name                = "api"
-  resource_group_name = "io-p-itn-wallet-rg-01"
+  resource_group_name = data.azurerm_private_dns_zone.internal_wallet_io_pagopa_it.resource_group_name
 
   zone_name = data.azurerm_private_dns_zone.internal_wallet_io_pagopa_it.name
   records   = [azurerm_private_endpoint.psn_application_gateway.private_service_connection[0].private_ip_address]
   ttl       = 3600
-  tags      = local.tags
+
+  tags = local.tags
 }
