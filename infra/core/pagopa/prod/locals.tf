@@ -6,8 +6,7 @@ locals {
     instance_number = "01"
   }
 
-  project        = "${local.environment.prefix}-${local.environment.environment}-itn"
-  project_legacy = "${local.environment.prefix}-${local.environment.environment}"
+  project = "${local.environment.prefix}-${local.environment.environment}-itn"
 
   tags = {
     CostCenter     = "TS310 - PAGAMENTI & SERVIZI"
