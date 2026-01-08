@@ -25,12 +25,13 @@ resource "azurerm_dns_txt_record" "wallet_io_pagopa_it" {
   tags = local.tags
 }
 
-resource "azurerm_dns_a_record" "wallet_io_pagopa_it" {
+resource "azurerm_dns_cname_record" "wallet_io_pagopa_it" {
   name                = "wallet"
-  zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
   resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
-  ttl                 = 30
-  records             = ["iw-p-itn-cdn-fde-01-aza7ezdzg9buc8gm.a02.azurefd.net"]
+
+  zone_name = data.azurerm_dns_zone.io_pagopa_it.name
+  record    = "iw-p-itn-cdn-fde-01-aza7ezdzg9buc8gm.a02.azurefd.net"
+  ttl       = 60
 
   tags = local.tags
 }
