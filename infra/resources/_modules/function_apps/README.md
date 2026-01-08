@@ -57,6 +57,9 @@ No requirements.
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | <pre>object({<br/>    prefix          = string<br/>    environment     = string<br/>    location        = string<br/>    domain          = optional(string)<br/>    instance_number = string<br/>  })</pre> | n/a | yes |
 | <a name="input_front_door_endpoint_name"></a> [front\_door\_endpoint\_name](#input\_front\_door\_endpoint\_name) | Front Door endpoint name | `string` | n/a | yes |
 | <a name="input_front_door_profile_name"></a> [front\_door\_profile\_name](#input\_front\_door\_profile\_name) | Front Door profile name | `string` | n/a | yes |
+| <a name="input_health_check_path_support"></a> [health\_check\_path\_support](#input\_health\_check\_path\_support) | Health check path for support function app | `string` | n/a | yes |
+| <a name="input_health_check_path_user"></a> [health\_check\_path\_user](#input\_health\_check\_path\_user) | Health check path for user function app | `string` | n/a | yes |
+| <a name="input_health_check_path_user_uat"></a> [health\_check\_path\_user\_uat](#input\_health\_check\_path\_user\_uat) | Health check path for user uat function app | `string` | n/a | yes |
 | <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Id of the common Key Vault where save secrets in | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Id of the wallet Key Vault where save secrets | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_name"></a> [key\_vault\_wallet\_name](#input\_key\_vault\_wallet\_name) | Name of the wallet Key Vault where save secrets | `string` | n/a | yes |
