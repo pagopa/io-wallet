@@ -118,6 +118,11 @@ data "azurerm_key_vault_certificate" "wallet_certificate" {
   key_vault_id = data.azurerm_key_vault.certificates.id
 }
 
+data "azurerm_api_management" "apim" {
+  name                = "${local.project}-apim-01"
+  resource_group_name = "${local.project}-common-rg-01"
+}
+
 data "azurerm_api_management" "platform_api_gateway" {
   name                = "${local.project}-platform-api-gateway-apim-01"
   resource_group_name = "${local.project}-common-rg-01"

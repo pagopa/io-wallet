@@ -127,6 +127,15 @@ resource "azurerm_api_management_api_policy" "wallet_user_v1" {
       <rewrite-uri template="@("/api/wallet/v1/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
 </policies>
 XML
 }
@@ -140,9 +149,18 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
   <inbound>
       <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
-      <rewrite-uri template="@("/api/wallet/uat/" + context.Request.Url.Path)" />
+      <rewrite-uri template="@("/api/wallet/uat/v1/" + context.Request.Url.Path)" />
       <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
   </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
 </policies>
 XML
 }

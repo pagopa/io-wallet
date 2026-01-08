@@ -27,8 +27,6 @@ locals {
   }
 
   apim = {
-    name                = "${local.project}-apim-01"
-    resource_group_name = "${local.project}-common-rg-01"
     products = {
       io_web = {
         product_id = "io-web-api"
