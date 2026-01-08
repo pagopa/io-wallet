@@ -1,0 +1,276 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "IO Wallet - IO Web API",
+    "version": "1.0.0"
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/wallet-instances/current/status": {
+      "get": {
+        "summary": "Retrieve the current Wallet Instance status",
+        "operationId": "getCurrentWalletInstanceStatus",
+        "responses": {
+          "200": {
+            "description": "Wallet Instance status successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WalletData"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/wallet-instances/{id}/status": {
+      "put": {
+        "summary": "Revoke a Wallet Instance",
+        "operationId": "setWalletInstanceStatus",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "description": "Revoke the Wallet Instance associated with the authenticated user. \nIf the Wallet Instance is already revoked, the operation succeed.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetWalletInstanceStatusData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Wallet Instance status successfully set"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/whitelisted-fiscal-code/{id}": {
+      "get": {
+        "summary": "Check if the fiscal code is whitelisted",
+        "operationId": "isFiscalCodeWhitelisted",
+        "parameters": [{
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+                "type": "string"
+            }
+        }],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhitelistedFiscalCodeData"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableContent"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "responses": {
+      "Forbidden": {
+        "description": "The server understands the request but refuses to authorize it",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The specified resource was not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      },
+      "UnprocessableContent": {
+        "description": "Unprocessable Content",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      },
+      "ServiceUnavailable": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemJson"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "SetWalletInstanceStatusData": {
+        "type": "string",
+        "enum": ["REVOKED"]
+      },
+      "WalletData": {
+        "description": "Describes the status of the wallet.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "is_revoked": {
+            "type": "boolean"
+          }
+        },
+        "required": ["id", "is_revoked"]
+      },
+      "WhitelistedFiscalCodeData": {
+        "description": "Describes if the fiscal code is whitelisted.",
+        "type": "object",
+        "properties": {
+          "is_whitelisted": {
+            "type": "boolean"
+          }
+        },
+        "required": ["is_whitelisted"]
+      },
+      "ProblemJson": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri",
+            "description": "An absolute URI that identifies the problem type. When dereferenced,\nit SHOULD provide human-readable documentation for the problem type\n(e.g., using HTML).",
+            "default": "about:blank",
+            "example": "https://example.com/problem/constraint-violation"
+          },
+          "title": {
+            "type": "string",
+            "description": "A short, summary of the problem type. Written in english and readable for engineers (usually not suited for non technical stakeholders and not localized); example: Service Unavailable"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The HTTP status code generated by the origin server for this occurrence of the problem.",
+            "minimum": 100,
+            "maximum": 600,
+            "exclusiveMaximum": true,
+            "example": 500
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human readable explanation specific to this occurrence of the\nproblem.",
+            "example": "There was an error processing the request"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri",
+            "description": "An absolute URI that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced."
+          }
+        }
+      }
+    }
+  }
+}
