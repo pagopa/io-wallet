@@ -8,7 +8,7 @@ module "function_app_user_uat" {
   })
 
   resource_group_name = var.resource_group_name
-  health_check_path   = "/api/v1/wallet/health"
+  health_check_path   = var.health_check_path_user_uat
   node_version        = 22
 
   subnet_id   = try(azurerm_subnet.func_user_uat[0].id, null)
