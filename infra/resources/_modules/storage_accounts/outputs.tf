@@ -21,6 +21,9 @@ output "wallet" {
 
 output "wallet_uat" {
   value = {
+    id                            = azurerm_storage_account.common_uat.id
     name                          = azurerm_storage_account.common_uat.name
+    resource_group_name           = azurerm_storage_account.common_uat.resource_group_name
+    connection_string_secret_name = try(azurerm_key_vault_secret.st_uat_connection_string[0].name, null)
   }
 }
