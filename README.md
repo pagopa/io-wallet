@@ -1,6 +1,6 @@
 # IO Wallet
 
-### Introduction
+## Introduction
 
 Welcome! 😊
 
@@ -10,6 +10,12 @@ This is the `io-wallet` project mono-repository containing applications and pack
 - `apps/io-wallet-user-func`: Contains functionalities for end users.
 - `packages/io-wallet-common`: Contains shared code among the workspaces.
 - `infra`: Contains Terraform code for provisioning and managing the IO Wallet infrastructure on Azure.
+
+## Architecture
+
+The diagram below shows the cloud architecture of the resources deployed.
+
+![architecture-diagram](./architecture/cloud_architecture.png)
 
 ## Technologies
 
