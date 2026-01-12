@@ -19,7 +19,6 @@ locals {
 
   hsm_key_url = "https://pagopa-managedhsm.managedhsm.azure.net/keys/mdb001prod"
 
-
   user_func = {
     app_settings = [
       {
@@ -65,14 +64,22 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name                  = "CosmosAccountConnectionString"
+        key_vault_secret_name = "CosmosAccountConnectionString"
+      },
+      {
+        name                  = "PagoPACosmosDbConnectionString"
+        key_vault_secret_name = "PagoPACosmosDbConnectionString"
       }
     ]
   }
 
   backend_paths = {
     user_v1    = "/api/wallet/v1"
-    user_uat   = "/api/v1/wallet"
-    support_v1 = "/api/v1/wallet"
+    user_uat   = "/api/wallet/v1"
+    support_v1 = "/api/wallet/v1"
   }
 
   tags = {

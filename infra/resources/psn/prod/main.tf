@@ -106,16 +106,16 @@ module "cosmos" {
   user_assigned_managed_identity_id = module.ids.psn_identity.id
 
   throughput = {
-    wallet_instances              = 30000
-    nonces                        = 30000
-    whitelisted_fiscal_codes      = 30000
-    certificates                  = 30000
-    leases_revoke_wallet_instance = 30000
+    wallet_instances              = 12000
+    nonces                        = 4000
+    whitelisted_fiscal_codes      = 4000
+    certificates                  = 10000
+    leases_revoke_wallet_instance = 4000
     uat = {
-      wallet_instances         = 5000
-      nonces                   = 5000
-      certificates             = 5000
-      whitelisted_fiscal_codes = 5000
+      wallet_instances         = 4000
+      nonces                   = 2000
+      certificates             = 2000
+      whitelisted_fiscal_codes = 2000
     }
   }
 
@@ -213,6 +213,10 @@ module "function_apps" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
 
   user_func = local.user_func
+
+  health_check_path_user     = "/api/wallet/v1/health"
+  health_check_path_user_uat = "/api/wallet/v1/health"
+  health_check_path_support  = "/api/wallet/v1/health"
 
   tags = local.tags
 }

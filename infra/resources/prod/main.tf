@@ -160,6 +160,10 @@ module "function_apps" {
   action_group_wallet_id = module.monitoring.action_group_wallet.id
   action_group_io_id     = data.azurerm_monitor_action_group.io.id
 
+  health_check_path_user     = "/api/v1/wallet/health"
+  health_check_path_user_uat = "/api/v1/wallet/health"
+  health_check_path_support  = "/api/v1/wallet/health"
+
   tags = local.tags
 }
 
@@ -263,8 +267,9 @@ module "apim_itn" {
 
   project_legacy = local.project_legacy
   apim = {
-    name                = local.apim.name
-    resource_group_name = local.apim.resource_group_name
+    name                = data.azurerm_api_management.apim.name
+    resource_group_name = data.azurerm_api_management.apim.resource_group_name
+    id                  = data.azurerm_api_management.apim.id
   }
 
   function_apps = {

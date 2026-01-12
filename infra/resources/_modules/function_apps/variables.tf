@@ -173,3 +173,18 @@ variable "subnet_route_table_id" {
   default     = null
   description = "Route table to associate with the subnets"
 }
+
+variable "health_check_path_user" {
+  type        = string
+  description = "Health check path for user function app"
+}
+
+variable "health_check_path_user_uat" {
+  type        = string
+  description = "Health check path for user uat function app"
+}
+
+variable "health_check_path_support" {
+  type        = string
+  description = "Health check path for support function app"
+}

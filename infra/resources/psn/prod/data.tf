@@ -142,6 +142,16 @@ data "azurerm_key_vault_secret" "notification_email" {
   key_vault_id = module.key_vault_app.key_vault_wallet.id
 }
 
+data "azurerm_key_vault_secret" "function_user_ioweb_key" {
+  name         = "function-user-ioweb-key"
+  key_vault_id = module.key_vault_app.key_vault_wallet.id
+}
+
+data "azurerm_key_vault_secret" "function_user_ioapp_key" {
+  name         = "function-user-ioapp-key"
+  key_vault_id = module.key_vault_app.key_vault_wallet.id
+}
+
 data "azurerm_route_table" "spoke" {
   name                = "pagopa-Prod-ITWallet-spoke-routetable"
   resource_group_name = local.spoke.resource_group_name
