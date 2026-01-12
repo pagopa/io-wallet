@@ -18,3 +18,9 @@ output "wallet" {
     connection_string_secret_name = try(azurerm_key_vault_secret.st_connection_string[0].name, null)
   }
 }
+
+output "wallet_uat" {
+  value = {
+    name                          = azurerm_storage_account.common_uat.name
+  }
+}
