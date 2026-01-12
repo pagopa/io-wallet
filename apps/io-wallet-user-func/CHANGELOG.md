@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.4
+
+### Patch Changes
+
+- ef3cb43: Implement identity-based connections for queue trigger and output
+
 ## 4.1.3
 
 ### Patch Changes
