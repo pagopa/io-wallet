@@ -18,13 +18,11 @@ export const getAzureCosmosConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   AzureCosmosConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    dbName: readFromEnvironment("CosmosDbDatabaseName"),
-    endpoint: readFromEnvironment("CosmosDbEndpoint__accountEndpoint"),
-    requestTimeout: pipe(
-      readFromEnvironment("CosmosDbRequestTimeout"),
-      RE.chainW(stringToNumberDecoderRE),
-    ),
-  }),
-);
+> = sequenceS(RE.Apply)({
+  dbName: readFromEnvironment("CosmosDbDatabaseName"),
+  endpoint: readFromEnvironment("CosmosDbEndpoint__accountEndpoint"),
+  requestTimeout: pipe(
+    readFromEnvironment("CosmosDbRequestTimeout"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+});

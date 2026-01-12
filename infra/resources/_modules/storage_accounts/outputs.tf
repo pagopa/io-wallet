@@ -12,9 +12,9 @@ output "wallet_instance_revocation_email_queue_name_01" {
 
 output "wallet" {
   value = {
-    id                            = module.storage_account.id
-    name                          = module.storage_account.name
-    resource_group_name           = module.storage_account.resource_group_name
-    connection_string_secret_name = azurerm_key_vault_secret.st_connection_string.name
+    id                            = azurerm_storage_account.common.id
+    name                          = azurerm_storage_account.common.name
+    resource_group_name           = azurerm_storage_account.common.resource_group_name
+    connection_string_secret_name = try(azurerm_key_vault_secret.st_connection_string[0].name, null)
   }
 }

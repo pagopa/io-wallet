@@ -1,0 +1,28 @@
+name: Deploy Function App PSN (support-func)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - master
+    paths:
+      - "apps/io-wallet-support-func/CHANGELOG.md"
+
+permissions:
+  attestations: write
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@main
+    secrets: inherit
+    with:
+      workspace_name: io-wallet-support-func
+      environment: app-psn-prod
+      resource_group_name: iw-p-itn-wallet-rg-01
+      web_app_name: iw-p-itn-support-func-01
+      disable_auto_staging_deploy: true
+      use_labels: true
+      override_labels: psn

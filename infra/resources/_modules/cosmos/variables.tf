@@ -1,15 +1,16 @@
-variable "project" {
-  type        = string
-  description = "IO prefix and short environment"
-}
-
-variable "location" {
-  type        = string
-  description = "Azure region"
+variable "environment" {
+  type = object({
+    prefix          = string
+    environment     = string
+    location        = string
+    name            = string
+    instance_number = string
+  })
 }
 
 variable "secondary_location" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "tags" {
@@ -30,14 +31,9 @@ variable "private_link_documents_id" {
   type = string
 }
 
-variable "action_group_wallet_id" {
-  type        = string
-  description = "Id of the Action Group owned by the Wallet team"
-}
-
-variable "action_group_io_id" {
-  type        = string
-  description = "Id of the Action Group shared among all IO teams"
+variable "action_group_ids" {
+  type        = set(string)
+  description = "Set of action group to use for alerts"
 }
 
 variable "user_assigned_managed_identity_id" {
@@ -48,4 +44,23 @@ variable "user_assigned_managed_identity_id" {
 variable "psn_service_principal_id" {
   type        = string
   description = "Id of the service principal federated with PSN"
+  default     = null
+}
+
+variable "throughput" {
+  type = object({
+    wallet_instances              = optional(number, 8000)
+    nonces                        = optional(number, 4000)
+    whitelisted_fiscal_codes      = optional(number, 8000)
+    certificates                  = optional(number, 8000)
+    leases_revoke_wallet_instance = optional(number, 1000)
+    uat = optional(object({
+      wallet_instances         = optional(number, 1000)
+      nonces                   = optional(number, 1000)
+      certificates             = optional(number, 1000)
+      whitelisted_fiscal_codes = optional(number, 1000)
+    }), {})
+  })
+  description = "Max throughput (RU/s) configuration for Cosmos DB containers"
+  default     = {}
 }

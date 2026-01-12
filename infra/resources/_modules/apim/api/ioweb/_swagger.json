@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "IO Wallet - IO Web API",
+    "title": "IO Web - Wallet",
     "version": "1.0.0"
   },
   "security": [

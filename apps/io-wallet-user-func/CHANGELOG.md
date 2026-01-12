@@ -1,5 +1,29 @@
 # io-wallet-user-func
 
+## 4.1.3
+
+### Patch Changes
+
+- 744c896: Switched DB connection from Managed Identity to connection string
+
+## 4.1.2
+
+### Patch Changes
+
+- 1e61622: ""
+
+## 4.1.1
+
+### Patch Changes
+
+- 2252b2e: Updated migrateWalletInstances function
+
+## 4.1.0
+
+### Minor Changes
+
+- 35f833d: Added function `migrateWalletInstances` to copy wallet instances data to new tenant database collection
+
 ## 4.0.0
 
 ### Major Changes

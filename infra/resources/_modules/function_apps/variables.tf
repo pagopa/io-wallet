@@ -1,11 +1,11 @@
-variable "prefix" {
-  type        = string
-  description = "IO Prefix"
-}
-
-variable "env_short" {
-  type        = string
-  description = "Short environment"
+variable "environment" {
+  type = object({
+    prefix          = string
+    environment     = string
+    location        = string
+    domain          = optional(string)
+    instance_number = string
+  })
 }
 
 variable "u_env_short" {
@@ -13,14 +13,9 @@ variable "u_env_short" {
   description = "IO uat env_short"
 }
 
-variable "project" {
-  type        = string
-  description = "IO prefix and short environment"
-}
-
-variable "location" {
-  type        = string
-  description = "Azure region"
+variable "user_instance_number" {
+  type    = string
+  default = "01"
 }
 
 variable "tags" {
@@ -33,7 +28,7 @@ variable "resource_group_name" {
   description = "Name of the resource group where resources will be created"
 }
 
-variable "cidr_subnet_user_func_02" {
+variable "cidr_subnet_user_func" {
   type        = string
   description = "CIDR block for user function app subnet 02"
 }
@@ -64,6 +59,7 @@ variable "key_vault_id" {
 variable "private_dns_zone_resource_group_name" {
   type        = string
   description = "Resource group name of the private DNS zone to use for private endpoints"
+  default     = null
 }
 
 variable "cosmos_database_name" {
@@ -100,7 +96,6 @@ variable "user_func" {
 variable "application_insights_connection_string" {
   type        = string
   description = "Application Insights instrumentation key"
-  default     = null
 
   sensitive = true
 }
@@ -113,6 +108,7 @@ variable "cidr_subnet_support_func" {
 variable "nat_gateway_id" {
   type        = string
   description = "NAT gateway Id"
+  default     = null
 }
 
 variable "action_group_wallet_id" {
@@ -123,6 +119,7 @@ variable "action_group_wallet_id" {
 variable "action_group_io_id" {
   type        = string
   description = "Id of the Action Group shared among all IO teams"
+  default     = null
 }
 
 variable "wallet_instance_creation_email_queue_name" {
@@ -158,4 +155,36 @@ variable "front_door_endpoint_name" {
 variable "subscription_id" {
   type        = string
   description = "Azure Subscription ID"
+}
+
+variable "private_dns_zone_ids" {
+  type = object({
+    blob          = optional(string)
+    file          = optional(string)
+    queue         = optional(string)
+    table         = optional(string)
+    azurewebsites = optional(string)
+  })
+  default = null
+}
+
+variable "subnet_route_table_id" {
+  type        = string
+  default     = null
+  description = "Route table to associate with the subnets"
+}
+
+variable "health_check_path_user" {
+  type        = string
+  description = "Health check path for user function app"
+}
+
+variable "health_check_path_user_uat" {
+  type        = string
+  description = "Health check path for user uat function app"
+}
+
+variable "health_check_path_support" {
+  type        = string
+  description = "Health check path for support function app"
 }

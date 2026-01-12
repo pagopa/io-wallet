@@ -1,11 +1,11 @@
-variable "project" {
-  type        = string
-  description = "IO prefix and short environment"
-}
-
-variable "location" {
-  type        = string
-  description = "Azure region"
+variable "environment" {
+  type = object({
+    prefix          = string
+    environment     = string
+    location        = string
+    name            = string
+    instance_number = string
+  })
 }
 
 variable "tags" {
@@ -20,26 +20,14 @@ variable "resource_group_name" {
 
 variable "tenant_id" {
   type        = string
-  description = "Tenant Id"
+  description = "Azure tenant Id"
 }
 
-variable "key_vault_certificates" {
+variable "private_endpoint" {
   type = object({
-    id                  = string
-    name                = string
-    resource_group_name = string
+    subnet_pep_id             = string
+    private_dns_zone_group_id = string
   })
-}
-
-variable "cdn_principal_id" {
-  type = string
-}
-
-variable "ci_infra_principal_id" {
-  type        = string
-  description = "Principal ID of CICD infra pipelines"
-}
-
-variable "subscription_id" {
-  type = string
+  default     = null
+  description = "Configuration for the Private Endpoint. If null, KeyVault will be publicly available on internet"
 }

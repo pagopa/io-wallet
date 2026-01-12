@@ -3,6 +3,11 @@ variable "project" {
   description = "IO prefix and short environment"
 }
 
+variable "display_name" {
+  type        = string
+  description = "Display name for the action group"
+}
+
 variable "tags" {
   type        = map(any)
   description = "Resource tags"

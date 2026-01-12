@@ -4,5 +4,8 @@ terraform {
     azurerm = {
       source = "hashicorp/azurerm"
     }
+    dx = {
+      source = "pagopa-dx/azure"
+    }
   }
 }

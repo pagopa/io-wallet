@@ -1,0 +1,99 @@
+name: PR PSN Infrastructure Release - Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      hub:
+        description: 'Plan in Hub'
+        required: false
+        type: boolean
+        default: false
+      spoke:
+        description: 'Plan in Spoke'
+        required: false
+        type: boolean
+        default: false
+      resources:
+        description: 'Plan in Resources PSN'
+        required: false
+        type: boolean
+        default: false
+  # TBD: Uncomment after permissions are set on identity
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - "infra/core/psn/hub/prod/**"
+  #     - "infra/core/psn/spoke/prod/**"
+  #     - "infra/resources/psn/prod/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.changes.outputs.changes || steps.all.outputs.changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6.0.1
+        if: github.event_name != 'workflow_dispatch'
+
+      - name: Found changed PSN Infra modules
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 #v3.0.2
+        if: github.event_name != 'workflow_dispatch'
+        id: changes
+        with:
+          filters: |
+            core/psn/hub:
+              - 'infra/core/psn/hub/prod/**'
+            core/psn/spoke:
+              - 'infra/core/psn/spoke/prod/**'
+            resources/psn:
+              - 'infra/resources/psn/prod/**'
+
+      - name: All PSN Infra modules (for manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        id: all
+        run: |
+          modules=()
+          if [ "${{ inputs.hub }}" == "true" ]; then
+            modules+=("core/psn/hub")
+          fi
+          if [ "${{ inputs.spoke }}" == "true" ]; then
+            modules+=("core/psn/spoke")
+          fi
+          if [ "${{ inputs.resources }}" == "true" ]; then
+            modules+=("resources/psn")
+          fi
+          if [ ${#modules[@]} -eq 0 ]; then
+            modules=("core/psn/hub" "core/psn/spoke" "resources/psn")
+          fi
+          json_array=$(printf '%s\n' "${modules[@]}" | jq -R . | jq -s -c .)
+          echo "changes=$json_array" >> $GITHUB_OUTPUT
+
+  release_prod:
+    needs: changes
+    uses: pagopa/dx/.github/workflows/infra_apply.yaml@main
+    name: Infrastructure Release
+    secrets: inherit
+
+    strategy:
+      fail-fast: false
+      matrix:
+        infra: ${{ fromJSON( needs.changes.outputs.changes ) }}
+
+    with:
+      environment: prod
+      base_path: infra/${{ matrix.infra }}
+      use_private_agent: true
+      override_github_environment: infra-psn-prod
+      use_labels: true
+      override_labels: psn

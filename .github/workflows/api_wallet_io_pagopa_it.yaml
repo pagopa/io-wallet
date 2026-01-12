@@ -1,0 +1,28 @@
+name: api.wallet.io.pagopa.it TLS Certificate Renewal
+
+on:
+  schedule:
+    - cron: '0 3 * * 1,3'
+  workflow_dispatch:
+    inputs:
+      force_renewal:
+        description: 'Force certificate renewal'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+
+jobs:
+  tls-certificate-renewal:
+    name: api.wallet.io.pagopa.it
+    uses: ./.github/workflows/tls_certificate.yaml
+    secrets: inherit
+    with:
+      force_renewal: ${{ github.event.inputs.force_renewal || false }}
+      KEY_VAULT_NAME: "iw-p-itn-infra-kv-01"
+      CSR_COMMON_NAME: "api.wallet.io.pagopa.it"
+      DNS_ZONE: "wallet.io.pagopa.it"
+      DNS_ZONE_RESOURCE_GROUP: "io-p-rg-external"
+

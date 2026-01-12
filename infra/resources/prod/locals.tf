@@ -1,20 +1,23 @@
 locals {
-  prefix         = "io"
-  env_short      = "p"
-  u_env_short    = "u"
+  environment = {
+    prefix          = "io"
+    env_short       = "p"
+    location        = "italynorth"
+    domain          = "wallet"
+    instance_number = "01"
+  }
   location_short = "itn"
-  domain         = "wallet"
+  u_env_short    = "u"
   # the project on which the resources will be created
   # it's the prefix of any resource name
   # it includes the choosen location
-  project = "${local.prefix}-${local.env_short}-${local.location_short}"
+  project = "${local.environment.prefix}-${local.environment.env_short}-${local.location_short}"
 
   # some referenced resources are in a different location
   # for historical reasons
   # this project points to them (westeurope)
-  project_legacy = "${local.prefix}-${local.env_short}"
+  project_legacy = "${local.environment.prefix}-${local.environment.env_short}"
 
-  location           = "italynorth"
   location_legacy    = "westeurope"
   secondary_location = "spaincentral"
 
@@ -24,8 +27,6 @@ locals {
   }
 
   apim = {
-    name                = "${local.project}-apim-01"
-    resource_group_name = "${local.project}-common-rg-01"
     products = {
       io_web = {
         product_id = "io-web-api"
@@ -77,10 +78,6 @@ locals {
         key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
       },
       {
-        name                  = "APPLICATIONINSIGHTS_CONNECTION_STRING"
-        key_vault_secret_name = "AppInsightsConnectionString"
-      },
-      {
         name                  = "AuthProfileApiKey"
         key_vault_secret_name = "AuthProfileApiKey"
       },
@@ -91,6 +88,10 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name  = "CosmosAccountConnectionString"
+        value = "CosmosAccountConnectionString"
       }
     ]
   }

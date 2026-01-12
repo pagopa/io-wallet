@@ -1,5 +1,11 @@
 # io-wallet-support-func
 
+## 2.0.0
+
+### Major Changes
+
+- 98b3eef: Changed HTTP Route Prefix
+
 ## 1.5.5
 
 ### Patch Changes

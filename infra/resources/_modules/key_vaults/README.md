@@ -13,30 +13,24 @@ No requirements.
 
 ## Modules
 
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_key_vault_role_assignments"></a> [key\_vault\_role\_assignments](#module\_key\_vault\_role\_assignments) | github.com/pagopa-dx/terraform-azurerm-azure-role-assignments//modules/key_vault | n/a |
+No modules.
 
 ## Resources
 
 | Name | Type |
 |------|------|
 | [azurerm_key_vault.wallet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
-| [azurerm_key_vault_access_policy.certificate_access](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault_access_policy) | resource |
+| [azurerm_private_endpoint.kv_wallet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cdn_principal_id"></a> [cdn\_principal\_id](#input\_cdn\_principal\_id) | n/a | `string` | n/a | yes |
-| <a name="input_ci_infra_principal_id"></a> [ci\_infra\_principal\_id](#input\_ci\_infra\_principal\_id) | Principal ID of CICD infra pipelines | `string` | n/a | yes |
-| <a name="input_key_vault_certificates"></a> [key\_vault\_certificates](#input\_key\_vault\_certificates) | n/a | <pre>object({<br>    id                  = string<br>    name                = string<br>    resource_group_name = string<br>  })</pre> | n/a | yes |
-| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
-| <a name="input_project"></a> [project](#input\_project) | IO prefix and short environment | `string` | n/a | yes |
+| <a name="input_environment"></a> [environment](#input\_environment) | n/a | <pre>object({<br/>    prefix          = string<br/>    environment     = string<br/>    location        = string<br/>    name            = string<br/>    instance_number = string<br/>  })</pre> | n/a | yes |
+| <a name="input_private_endpoint"></a> [private\_endpoint](#input\_private\_endpoint) | Configuration for the Private Endpoint. If null, KeyVault will be publicly available on internet | <pre>object({<br/>    subnet_pep_id             = string<br/>    private_dns_zone_group_id = string<br/>  })</pre> | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
-| <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | n/a | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
-| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Tenant Id | `string` | n/a | yes |
+| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Azure tenant Id | `string` | n/a | yes |
 
 ## Outputs
 

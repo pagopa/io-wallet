@@ -1,7 +1,7 @@
 resource "azurerm_monitor_action_group" "wallet" {
-  name                = "${var.project}-wallet-ag-01"
+  name                = "${var.project}-ag-01"
   resource_group_name = var.resource_group_name
-  short_name          = "wallet_ag_01"
+  short_name          = var.display_name
 
   enabled = true
 

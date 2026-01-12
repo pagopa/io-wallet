@@ -1,7 +1,7 @@
 locals {
   repository = {
     name                     = "io-wallet"
-    description              = "Wallet Provider implementation for EUDI Wallet and IT-Wallet for App IO"
+    description              = "Wallet Provider implementation for IT-Wallet"
     topics                   = ["eudiw", "io", "it-wallet"]
     reviewers_teams          = ["io-wallet", "engineering-team-cloud-eng"]
     default_branch_name      = "master"
