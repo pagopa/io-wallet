@@ -175,16 +175,36 @@ variable "subnet_route_table_id" {
 }
 
 variable "health_check_path_user" {
-  type = string
+  type        = string
   description = "Health check path for user function app"
 }
 
 variable "health_check_path_user_uat" {
-  type = string
+  type        = string
   description = "Health check path for user uat function app"
 }
 
 variable "health_check_path_support" {
-  type = string
+  type        = string
   description = "Health check path for support function app"
+}
+
+variable "wallet_instance_storage_account_url" {
+  type        = string
+  description = "The URL of the Wallet Instance Storage Account"
+}
+
+variable "wallet_instance_storage_account_name" {
+  type        = string
+  description = "The name of the Wallet Instance Storage Account"
+}
+
+variable "wallet_instance_storage_account_uat_url" {
+  type        = string
+  description = "The URL of the Wallet Instance Storage Account UAT"
+}
+
+variable "wallet_instance_storage_account_uat_name" {
+  type        = string
+  description = "The name of the Wallet Instance Storage Account UAT"
 }

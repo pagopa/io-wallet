@@ -164,6 +164,12 @@ module "function_apps" {
   health_check_path_user_uat = "/api/v1/wallet/health"
   health_check_path_support  = "/api/v1/wallet/health"
 
+  wallet_instance_storage_account_url          = null
+  wallet_instance_storage_account_name         = null
+
+  wallet_instance_storage_account_uat_url          = null
+  wallet_instance_storage_account_uat_name         = null
+
   tags = local.tags
 }
 

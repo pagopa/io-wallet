@@ -1,0 +1,195 @@
+---
+title: "IT-Wallet Architecture"
+config:
+  theme: mc
+  fontFamily: Gill Sans, sans-serif;
+---
+graph LR
+
+  users("fa:fa-users Users")
+
+  subgraph pagopa["PagoPA"]
+    dns_cdn["`**wallet**.io.pagopa.it`"]
+    io_app["fa:fa-mobile App IO"]
+    io_web["fa:fa-globe IO Web"]
+    customer_support["fa:fa-user-gear Customer Care"]
+
+    subgraph pagopa_itn["`io-p-itn-common-vnet-01
+    (Italy North)`"]
+      pagopa_appgw["io-p-itn-agw-01"]
+      pagopa_apim["io-p-itn-apim-01"]
+      psn_appgw_pep["io-p-itn-psn-agw-pep-01"]
+      pagopa_platform_apim["io-p-itn-platform-api-gateway-apim-01"]
+      psn_appgw_private_dns["`**api**.internal.wallet.io.pagopa.it
+      10.20.2.119`"]
+    end
+
+    subgraph pagopa_weu["`io-p-vnet-common
+    (West Europe)`"]
+      session_manager["io-p-weu-session-manager-app-01"]
+      redis["io-p-redis-common"]
+
+      session_manager --> redis
+    end
+  end
+
+  subgraph psn["PSN"]
+    subgraph hub["Hub"]
+      subgraph hub_appgw_waf["`Application Gateway
+        (Private IP only)`"]
+        direction LR
+        appgw_private_link["private-link-01"]
+        hub_appgw["pagopa-app-gw-italynorth"]
+
+        appgw_private_link --> hub_appgw
+      end
+      hub_waf["pagopa-pa-azfwpolicy-italynorth"]
+    end
+
+    subgraph spoke["Spoke"]
+      keyvault_infra["iw-p-itn-infra-kv-01"]
+
+      subgraph psn_global["Global"]
+        frontdoor_cdn["iw-p-itn-cdn-fde-01"]
+        subgraph cdn_storage_account["iwpitncdnst01"]
+          container_spid[spid-hub-login]
+          container_pdnd[pdnd]
+          container_exchange[exchange]
+          container_wellknown[well-known]
+          container_root[$root]
+        end
+      end
+
+      subgraph spoke_vnet["pagopa-Prod-ITWallet-spoke-italynorth"]
+        subgraph spoke_ghrunner_rg["iw-p-itn-github-runner-rg-01"]
+          spoke_ghrunner["iw-p-itn-io-wallet-caj-01"]
+        end
+
+        spoke_apim["iw-p-itn-apps-apim-01"]
+        function_user_pep["iw-p-itn-user-func-pep-01"]
+        function_user[iw-p-itn-user-func-01]
+        function_support_pep["iw-p-itn-support-func-pep-01"]
+        function_support[iw-p-itn-support-func-01]
+        keyvault_apps_pep["iw-p-itn-apps-kv-pep-01"]
+        keyvault_apps["iw-p-itn-apps-kv-01"]
+        cosmos_pep["iw-p-itn-apps-cosno-pep-01"]
+        cosmos["iw-p-itn-apps-cosno-01"]
+        id_cmk_key["iw-p-itn-data-cmk-id-01"]
+        storage_account_apps_pep["iw-p-itn-apps-x-pep-01"]
+
+        subgraph storage_account_apps["iwpitnappsst01"]
+          direction TB
+          queue_email["creation-email-queue-01"]
+          queue_revocation_email["revocation-email-queue-01"]
+        end
+      end
+    end
+
+    apim_dns["`**apim**.internal.wallet.io.pagopa.it
+    10.100.6.10`"]
+  end
+
+  subgraph github["GitHub"]
+    github_repository["fa:fa-code-branch repository"]
+  end
+
+  subgraph third_parties["Third Parties"]
+    relying_party["Relying Party"]
+    credential_issuer["Credential Issuer"]
+  end
+
+  %% connections
+  users --> io_web
+  users --> io_app
+
+  io_app --> pagopa_appgw
+  io_web --> pagopa_appgw
+  customer_support --> pagopa_appgw
+
+  pagopa_appgw -->|"ioweb/support"| pagopa_apim
+  pagopa_appgw -->|"ioapp"| pagopa_platform_apim
+
+  pagopa_apim ---> psn_appgw_pep
+  pagopa_apim --> session_manager
+
+  pagopa_platform_apim --->|psn-backend-01| psn_appgw_pep
+  pagopa_platform_apim -->|session-manager-backend-x| session_manager
+
+  psn_appgw_pep --> psn_appgw_private_dns --> hub_waf --> hub_appgw_waf
+  hub_appgw_waf -.-> keyvault_infra
+
+  frontdoor_cdn --> cdn_storage_account
+
+  hub_appgw_waf --> apim_dns --> spoke_apim
+
+  spoke_apim --->|x-functions-key| function_user_pep --> function_user
+  spoke_apim --->|x-functions-key| function_support_pep --> function_support
+  spoke_apim -.-> keyvault_infra
+
+  storage_account_apps -.-> id_cmk_key
+  cosmos -.-> id_cmk_key
+
+  function_support ---> cosmos_pep
+
+  function_user ---> cosmos_pep --> cosmos
+  function_user ---> storage_account_apps_pep --> storage_account_apps
+  function_user ---> keyvault_apps_pep --> keyvault_apps
+
+  spoke_ghrunner --> github_repository
+
+  third_parties --> dns_cdn --> frontdoor_cdn
+
+  %% style
+  session_manager@{ icon: "azure:app-services", pos: "b" }
+  redis@{ icon: "azure:cache-redis", pos: "b" }
+  frontdoor_cdn@{ icon: "azure:front-door-and-cdn-profiles", pos: "b" }
+  hub_waf@{ icon: "azure:web-application-firewall-policieswaf", pos: "b" }
+  pagopa_appgw@{ icon: "azure:application-gateways", pos: "b" }
+  hub_appgw@{ icon: "azure:application-gateways", pos: "b" }
+  psn_appgw_pep@{ icon: "azure:private-endpoints", pos: "b" }
+  appgw_private_link@{ icon: "azure:private-link", pos: "b" }
+  psn_appgw_private_dns@{icon: "azure:dns-zones", pos: "b"}
+  dns_cdn@{icon: "azure:dns-zones", pos: "b"}
+  spoke_apim@{ icon: "azure:api-management-services", pos: "b" }
+  pagopa_platform_apim@{ icon: "azure:api-management-services", pos: "b" }
+  pagopa_apim@{ icon: "azure:api-management-services", pos: "b" }
+  function_user_pep@{ icon: "azure:private-endpoints", pos: "b" }
+  function_user@{ icon: "azure:function-apps", pos: "b" }
+  function_support_pep@{ icon: "azure:private-endpoints", pos: "b" }
+  function_support@{ icon: "azure:function-apps", pos: "b" }
+  keyvault_apps_pep@{ icon: "azure:private-endpoints", pos: "b" }
+  keyvault_apps@{ icon: "azure:key-vaults", pos: "b" }
+  keyvault_infra@{ icon: "azure:key-vaults", pos: "b" }
+  cosmos_pep@{ icon: "azure:private-endpoints", pos: "b" }
+  cosmos@{ icon: "azure:azure-cosmos-db", pos: "b" }
+  id_cmk_key@{ icon: "azure:managed-identities", pos: "b" }
+  container_spid@{ icon: "azure:storage-container", pos: "b" }
+  container_pdnd@{ icon: "azure:storage-container", pos: "b" }
+  container_exchange@{ icon: "azure:storage-container", pos: "b" }
+  container_wellknown@{ icon: "azure:storage-container", pos: "b" }
+  container_root@{ icon: "azure:storage-container", pos: "b" }
+  spoke_ghrunner@{ icon: "azure:worker-container-app", pos: "b" }
+  storage_account_apps_pep@{ icon: "azure:private-endpoints", pos: "b" }
+  queue_email@{ icon: "azure:storage-queue"}
+  queue_revocation_email@{ icon: "azure:storage-queue"}
+  apim_dns@{icon: "azure:dns-zones", pos: "b"}
+
+  classDef macroBlock stroke-dasharray: 5 5, stroke-width:3px
+  classDef subBlock stroke-dasharray: 5 5, stroke-width:2px
+  classDef thirdPartiesClass fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
+  classDef pagoPAStyle fill:#e8f4fd,stroke:#3498db,stroke-width:2px
+  classDef psnStyle fill:#edf7f6,stroke:#16a085,stroke-width:2px
+  classDef psnGlobalStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+  classDef hubStyle fill:#fff4e6,stroke:#d68910,stroke-width:1px
+  classDef spokeStyle fill:#f4ecf7,stroke:#8e44ad,stroke-width:1px
+
+  class pagopa,pagopa_itn,pagopa_weu pagoPAStyle
+  class psn psnStyle
+  class psn_global,cdn_storage_account psnGlobalStyle
+  class hub,hub_appgw_waf hubStyle
+  class spoke spokeStyle
+  class spoke_vnet,frontdoor_cdn pagoPAStyle
+  class spoke_vnet,spoke_ghrunner_rg,storage_account_apps spokeStyle
+
+  class relying_party thirdPartiesClass
+  class credential_issuer thirdPartiesClass
