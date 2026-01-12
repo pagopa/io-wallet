@@ -30,7 +30,6 @@
     "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
     "EntityConfigurationStorageAccountName": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT_NAME",
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
-    "StorageConnectionString": "STORAGE_ACCOUNT_CONNECTION_STRING",
     "WalletInstanceCreationEmailQueueName": "WALLET_INSTANCE_CREATION_EMAIL_QUEUE_NAME",
     "WalletInstanceRevocationEmailQueueName": "WALLET_INSTANCE_REVOCATION_EMAIL_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
@@ -58,6 +57,8 @@
     "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
-    "PagoPACosmosDbConnectionString": "PAGOPA_COSMOS_DB_CONNECTION_STRING"
+    "PagoPACosmosDbConnectionString": "PAGOPA_COSMOS_DB_CONNECTION_STRING",
+    "WalletInstanceStorageAccountUrl": "WALLET_INSTANCE_STORAGE_ACCOUNT_URL",
+    "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME"
   }
 }
