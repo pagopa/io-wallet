@@ -228,7 +228,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
 });
 
 app.storageQueue("sendEmailOnWalletInstanceRevocation", {
-  connection: "StorageConnectionString",
+  connection: "WalletInstanceStorageAccount",
   handler: SendEmailOnWalletInstanceRevocationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceRevocationQueueItem,
