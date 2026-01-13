@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.5
+
+### Patch Changes
+
+- 9ae0766: Fix sendEmailOnWalletInstanceRevocation with storage account identity-based connection
+
 ## 4.1.4
 
 ### Patch Changes
