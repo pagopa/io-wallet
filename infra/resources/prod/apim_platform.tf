@@ -90,8 +90,8 @@ resource "azurerm_api_management_api" "wallet_user_uat_ioapp_v1" {
   protocols    = ["https"]
 
   import {
-    content_format = "openapi-link"
-    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-user-func/openapi.yaml"
+    content_format = "openapi"
+    content_value  = file("${path.module}/apis/user_uat_v1/openapi.yaml")
   }
 }
 
