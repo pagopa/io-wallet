@@ -33,6 +33,33 @@ module "func_app_user" {
       resource_group_name  = var.cdn_storage_account.resource_group_name
       description          = "Allow Function App user to write blobs to CDN Storage Account"
       role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user to write blobs to Storage Account"
+      role                 = "writer"
+    },
+  ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user to read messages from queues"
+      role                 = "reader"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user to manage queues"
+      role                 = "owner"
     }
   ]
 }
@@ -74,6 +101,33 @@ module "func_app_user_slot" {
       resource_group_name  = var.cdn_storage_account.resource_group_name
       description          = "Allow Function App user slot to write blobs to CDN Storage Account"
       role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user slot to write blobs to Storage Account"
+      role                 = "writer"
+    }
+  ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user slot to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user slot to read messages from queues"
+      role                 = "reader"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App user slot to manage queues"
+      role                 = "owner"
     }
   ]
 }
@@ -172,6 +226,36 @@ module "func_app_user_uat" {
       }
     }
   ]
+
+  storage_blob = [
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to write blobs to Storage Account"
+      role                 = "writer"
+    }
+  ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to read messages from queues"
+      role                 = "reader"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to manage queues"
+      role                 = "owner"
+    }
+  ]
 }
 
 module "func_app_user_uat_slot" {
@@ -202,6 +286,36 @@ module "func_app_user_uat_slot" {
       roles = {
         secrets = "reader"
       }
+    }
+  ]
+
+  storage_blob = [
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to write blobs to Storage Account"
+      role                 = "writer"
+    }
+  ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to read messages from queues"
+      role                 = "reader"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to manage queues"
+      role                 = "owner"
     }
   ]
 }

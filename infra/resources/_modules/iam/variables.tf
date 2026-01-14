@@ -72,6 +72,14 @@ variable "storage_account" {
   description = "Generic Storage Account for Wallet uses"
 }
 
+variable "storage_account_uat" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  description = "Generic Storage Account for Wallet UAT uses"
+}
+
 variable "cicd_principal_ids" {
   type = object({
     infra = object({

@@ -110,7 +110,6 @@ const AzureStorageConfig = t.type({
     containerName: t.string,
   }),
   walletInstances: t.type({
-    connectionString: t.string,
     queues: t.type({
       creationSendEmail: t.type({
         name: t.string,
@@ -119,6 +118,7 @@ const AzureStorageConfig = t.type({
         name: t.string,
       }),
     }),
+    url: t.string,
   }),
 });
 
@@ -352,30 +352,29 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
-    storageAccountConnectionString: readFromEnvironment(
-      "StorageConnectionString",
-    ),
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
     walletInstanceRevocationEmailQueueName: readFromEnvironment(
       "WalletInstanceRevocationEmailQueueName",
     ),
+    walletInstanceStorageAccountUrl: readFromEnvironment(
+      "WalletInstanceStorageAccountUrl",
+    ),
   }),
   RE.map(
     ({
       entityConfigurationStorageAccountName,
       entityConfigurationStorageContainerName,
-      storageAccountConnectionString,
       walletInstanceCreationEmailQueueName,
       walletInstanceRevocationEmailQueueName,
+      walletInstanceStorageAccountUrl,
     }) => ({
       entityConfiguration: {
         accountName: entityConfigurationStorageAccountName,
         containerName: entityConfigurationStorageContainerName,
       },
       walletInstances: {
-        connectionString: storageAccountConnectionString,
         queues: {
           creationSendEmail: {
             name: walletInstanceCreationEmailQueueName,
@@ -384,6 +383,7 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
             name: walletInstanceRevocationEmailQueueName,
           },
         },
+        url: walletInstanceStorageAccountUrl,
       },
     }),
   ),
