@@ -1,5 +1,17 @@
 # io-wallet-user-func
 
+## 4.1.6
+
+### Patch Changes
+
+- e5d4fc6: Fixed entity configuration purge to use Azure Front Door endpoint instead of classic CDN endpoint
+
+## 4.1.5
+
+### Patch Changes
+
+- 9ae0766: Fix sendEmailOnWalletInstanceRevocation with storage account identity-based connection
+
 ## 4.1.4
 
 ### Patch Changes

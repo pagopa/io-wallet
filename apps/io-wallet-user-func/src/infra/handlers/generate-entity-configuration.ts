@@ -145,7 +145,7 @@ const purgeContent: () => RTE.ReaderTaskEither<
     pipe(
       TE.tryCatch(
         () =>
-          cdnManagementClient.endpoints.beginPurgeContent(
+          cdnManagementClient.afdEndpoints.beginPurgeContent(
             resourceGroupName,
             profileName,
             endpointName,

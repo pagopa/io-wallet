@@ -30,7 +30,7 @@ resource "azurerm_storage_account" "common" {
 
   public_network_access_enabled   = false
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled       = true # TODO: restore var.user_assigned_managed_identity_id == null
+  shared_access_key_enabled       = var.user_assigned_managed_identity_id == null
   default_to_oauth_authentication = var.user_assigned_managed_identity_id != null
 
   dynamic "customer_managed_key" {
