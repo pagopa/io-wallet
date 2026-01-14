@@ -135,15 +135,6 @@ resource "azurerm_api_management_api_policy" "wallet_user_v1" {
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_psn.name}" />
   </inbound>
-  <backend>
-    <base />
-  </backend>
-  <outbound>
-    <base />
-  </outbound>
-  <on-error>
-    <base />
-  </on-error>
 </policies>
 XML
 }
@@ -159,15 +150,34 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_uat_psn.name}" />
   </inbound>
-  <backend>
-    <base />
-  </backend>
-  <outbound>
-    <base />
-  </outbound>
-  <on-error>
-    <base />
-  </on-error>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_operation_policy" "health_check_uat_policy" {
+  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  operation_id        = "HealthCheck"
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+
+  xml_content = <<XML
+<policies>
+    <inbound>
+        <set-variable name="skipSessionFragment" value="true" />
+        <rewrite-uri template="/health" />
+        <base />
+    </inbound>
+    <outbound>
+        <base />
+        <choose>
+            <when condition="@(context.Response.StatusCode == 200)">
+                <set-body>@("{}")</set-body>
+                <set-header name="Content-Type" exists-action="override">
+                    <value>application/json</value>
+                </set-header>
+            </when>
+        </choose>
+    </outbound>
 </policies>
 XML
 }
