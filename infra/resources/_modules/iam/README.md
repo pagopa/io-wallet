@@ -52,6 +52,7 @@ No requirements.
 | <a name="input_key_vault_app"></a> [key\_vault\_app](#input\_key\_vault\_app) | KeyVault Id and list of Entra groups who are administrator of Key Vaults | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_key_vault_certificates"></a> [key\_vault\_certificates](#input\_key\_vault\_certificates) | Key Vault used to store certificates for CDN | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_storage_account"></a> [storage\_account](#input\_storage\_account) | Generic Storage Account for Wallet uses | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
+| <a name="input_storage_account_uat"></a> [storage\_account\_uat](#input\_storage\_account\_uat) | Generic Storage Account for Wallet UAT uses | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription Id | `string` | n/a | yes |
 | <a name="input_wallet_dns_zone_id"></a> [wallet\_dns\_zone\_id](#input\_wallet\_dns\_zone\_id) | wallet.io.pagopa.it DNS zone id | `string` | n/a | yes |
 
