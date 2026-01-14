@@ -307,8 +307,13 @@ module "iam" {
   }
 
   storage_account = {
-    name                = azurerm_storage_account.cdn.name
-    resource_group_name = azurerm_storage_account.cdn.resource_group_name
+    name                = module.storage_accounts.wallet.name
+    resource_group_name = module.storage_accounts.wallet.resource_group_name
+  }
+
+  storage_account_uat = {
+    name                = module.storage_accounts.wallet_uat.name
+    resource_group_name = module.storage_accounts.wallet_uat.resource_group_name
   }
 
   wallet_dns_zone_id = null
