@@ -218,11 +218,11 @@ module "function_apps" {
   health_check_path_user_uat = "/api/wallet/v1/health"
   health_check_path_support  = "/api/wallet/v1/health"
 
-  wallet_instance_storage_account_url          = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet.name)
-  wallet_instance_storage_account_name         = module.storage_accounts.wallet.name
+  wallet_instance_storage_account_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
+  wallet_instance_storage_account_name = module.storage_accounts.wallet.name
 
   wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
-  wallet_instance_storage_account_uat_url = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet_uat.name)
+  wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
 
   tags = local.tags
 }
