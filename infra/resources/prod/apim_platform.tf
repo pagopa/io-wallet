@@ -1,10 +1,19 @@
-resource "azurerm_api_management_backend" "psn" {
-  name                = "psn-backend-01"
-  description         = "PSN hostname via private network"
+resource "azurerm_api_management_backend" "wallet_user_psn" {
+  name                = "wallet-user-psn-backend-01"
+  description         = "Wallet User PSN hostname via private network"
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   protocol            = "http"
-  url                 = "https://api.internal.wallet.io.pagopa.it/"
+  url                 = "https://api.internal.wallet.io.pagopa.it/api/wallet/v1"
+}
+
+resource "azurerm_api_management_backend" "wallet_user_uat_psn" {
+  name                = "wallet-user-uat-psn-backend-01"
+  description         = "Wallet User UAT PSN hostname via private network"
+  api_management_name = data.azurerm_api_management.platform_api_gateway.name
+  resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
+  protocol            = "http"
+  url                 = "https://api.internal.wallet.io.pagopa.it/api/wallet/uat/v1/"
 }
 
 resource "azurerm_api_management_policy_fragment" "wallet_authentication" {
@@ -124,8 +133,7 @@ resource "azurerm_api_management_api_policy" "wallet_user_v1" {
   <inbound>
       <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
-      <rewrite-uri template="@("/api/wallet/v1/" + context.Request.Url.Path)" />
-      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+      <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_psn.name}" />
   </inbound>
   <backend>
     <base />
@@ -149,8 +157,7 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
   <inbound>
       <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
-      <rewrite-uri template="@("/api/wallet/uat/v1/" + context.Request.Url.Path)" />
-      <set-backend-service backend-id="${azurerm_api_management_backend.psn.name}" />
+      <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_uat_psn.name}" />
   </inbound>
   <backend>
     <base />
