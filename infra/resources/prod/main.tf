@@ -164,6 +164,12 @@ module "function_apps" {
   health_check_path_user_uat = "/api/v1/wallet/health"
   health_check_path_support  = "/api/v1/wallet/health"
 
+  wallet_instance_storage_account_url          = null
+  wallet_instance_storage_account_name         = null
+
+  wallet_instance_storage_account_uat_url          = null
+  wallet_instance_storage_account_uat_name         = null
+
   tags = local.tags
 }
 
@@ -253,6 +259,11 @@ module "iam" {
   storage_account = {
     name                = module.storage_accounts.wallet.name
     resource_group_name = module.storage_accounts.wallet.resource_group_name
+  }
+
+  storage_account_uat = {
+    name                = module.storage_accounts.wallet_uat.name
+    resource_group_name = module.storage_accounts.wallet_uat.resource_group_name
   }
 
   wallet_dns_zone_id = data.azurerm_dns_zone.wallet_io_pagopa_it.id

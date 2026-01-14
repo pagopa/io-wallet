@@ -218,6 +218,12 @@ module "function_apps" {
   health_check_path_user_uat = "/api/wallet/v1/health"
   health_check_path_support  = "/api/wallet/v1/health"
 
+  wallet_instance_storage_account_url          = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet.name)
+  wallet_instance_storage_account_name         = module.storage_accounts.wallet.name
+
+  wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
+  wallet_instance_storage_account_uat_url = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet_uat.name)
+
   tags = local.tags
 }
 
@@ -301,8 +307,13 @@ module "iam" {
   }
 
   storage_account = {
-    name                = azurerm_storage_account.cdn.name
-    resource_group_name = azurerm_storage_account.cdn.resource_group_name
+    name                = module.storage_accounts.wallet.name
+    resource_group_name = module.storage_accounts.wallet.resource_group_name
+  }
+
+  storage_account_uat = {
+    name                = module.storage_accounts.wallet_uat.name
+    resource_group_name = module.storage_accounts.wallet_uat.resource_group_name
   }
 
   wallet_dns_zone_id = null

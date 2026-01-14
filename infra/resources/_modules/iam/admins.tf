@@ -47,6 +47,18 @@ module "admins_roles" {
       description          = "Allow admins to manage blobs"
       role                 = "owner"
     },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow admins to manage blobs"
+      role                 = "owner"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow admins to manage blobs"
+      role                 = "owner"
+    },
   ]
 
   storage_queue = [
@@ -65,6 +77,24 @@ module "admins_roles" {
     {
       storage_account_name = var.storage_account.name
       resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow admins to manage queues"
+      role                 = "owner"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow admins to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
+      description          = "Allow admins to read messages from queues"
+      role                 = "reader"
+    },
+    {
+      storage_account_name = var.storage_account_uat.name
+      resource_group_name  = var.storage_account_uat.resource_group_name
       description          = "Allow admins to manage queues"
       role                 = "owner"
     }

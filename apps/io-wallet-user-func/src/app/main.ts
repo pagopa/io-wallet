@@ -74,8 +74,9 @@ const subscriptionId = config.azure.generic.subscriptionId;
 
 const cdnManagementClient = new CdnManagementClient(credential, subscriptionId);
 
-const queueServiceClient = QueueServiceClient.fromConnectionString(
-  config.azure.storage.walletInstances.connectionString,
+const queueServiceClient = new QueueServiceClient(
+  config.azure.storage.walletInstances.url,
+  credential,
 );
 
 const walletInstanceCreationEmailQueueClient =
@@ -217,7 +218,7 @@ app.http("setWalletInstanceStatus", {
 });
 
 app.storageQueue("sendEmailOnWalletInstanceCreation", {
-  connection: "StorageConnectionString",
+  connection: "WalletInstanceStorageAccount",
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
     inputDecoder: FiscalCode,
@@ -227,7 +228,7 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
 });
 
 app.storageQueue("sendEmailOnWalletInstanceRevocation", {
-  connection: "StorageConnectionString",
+  connection: "WalletInstanceStorageAccount",
   handler: SendEmailOnWalletInstanceRevocationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceRevocationQueueItem,
