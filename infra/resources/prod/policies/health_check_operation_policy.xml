@@ -1,0 +1,18 @@
+<policies>
+    <inbound>
+        <set-variable name="skipSessionFragment" value="true" />
+        <rewrite-uri template="/health" />
+        <base />
+    </inbound>
+    <outbound>
+        <base />
+        <choose>
+            <when condition="@(context.Response.StatusCode == 200)">
+                <set-body>@("{}")</set-body>
+                <set-header name="Content-Type" exists-action="override">
+                    <value>application/json</value>
+                </set-header>
+            </when>
+        </choose>
+    </outbound>
+</policies>

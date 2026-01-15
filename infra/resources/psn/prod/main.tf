@@ -206,7 +206,7 @@ module "function_apps" {
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
   front_door_profile_name                     = module.cdn.name
-  front_door_endpoint_name                    = module.cdn.endpoint_hostname
+  front_door_endpoint_name                    = module.cdn.endpoint_name
 
   application_insights_connection_string = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.app_insights_connection_string.versionless_id})"
 
