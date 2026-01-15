@@ -156,7 +156,7 @@ resource "azurerm_api_management_api" "user_ioweb_v1" {
 
   import {
     content_format = "openapi"
-    content_value  = file("${path.module}/apim/api/ioweb/swagger.json") # TODO: this file is duplicated, find an elegant way to share this file
+    content_value  = file("${path.module}/apim/api/ioweb/swagger.yaml") # TODO: this file is duplicated, find an elegant way to share this file
   }
 }
 
@@ -197,8 +197,8 @@ resource "azurerm_api_management_api" "support_v1" {
   protocols    = ["https"]
 
   import {
-    content_format = "openapi-link"
-    content_value  = "https://raw.githubusercontent.com/pagopa/io-wallet/refs/heads/master/apps/io-wallet-support-func/openapi.yaml"
+    content_format = "openapi"
+    content_value  = file("${path.module}/apim/api/support/swagger.yaml")
   }
 }
 

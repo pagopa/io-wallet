@@ -1,0 +1,229 @@
+openapi: 3.0.1
+info:
+  title: IT-Wallet Customer Support
+  description: REST APIs consumed by Customer Service Support
+  version: v1
+servers:
+- url: https://apim.internal.wallet.io.pagopa.it/api/wallet/support/v1
+paths:
+  "/wallet-instances/current":
+    post:
+      summary: GetCurrentWalletInstanceByFiscalCode
+      description: Retrieve the current Wallet Instance information given a fiscal
+        code
+      operationId: getCurrentWalletInstanceByFiscalCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/GetCurrentWalletInstanceByFiscalCodeBody"
+            example:
+              fiscal_code: SPNDNL80R13C555X
+      responses:
+        '200':
+          description: Wallet Instance successfully retrieved
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WalletInstanceData"
+              example:
+                id: string
+                is_revoked: true
+                created_at: '2018-10-13T00:00:00.0000000+00:00'
+                revoked_at: '2018-10-13T00:00:00.0000000+00:00'
+                revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
+                device_details:
+                  platform: android
+                  os_patch_level: {}
+                  os_version: 0
+        '404':
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/health":
+    get:
+      summary: HealthCheck
+      description: Used to check if the function is healthy
+      operationId: healthCheck
+      responses:
+        '200':
+          description: The function is health
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+components:
+  schemas:
+    WalletInstanceData:
+      required:
+      - id
+      - is_revoked
+      - created_at
+      type: object
+      properties:
+        id:
+          type: string
+        is_revoked:
+          type: boolean
+        created_at:
+          "$ref": "#/components/schemas/Timestamp"
+        revoked_at:
+          "$ref": "#/components/schemas/Timestamp"
+        revocation_reason:
+          "$ref": "#/components/schemas/RevocationReason"
+        device_details:
+          "$ref": "#/components/schemas/DeviceDetails"
+      description: Current wallet instance information
+    ProblemJson:
+      type: object
+      properties:
+        type:
+          type: string
+          description: |-
+            An absolute URI that identifies the problem type. When dereferenced,
+            it SHOULD provide human-readable documentation for the problem type
+            (e.g., using HTML).
+          format: uri
+          default: about:blank
+          example: https://example.com/problem/constraint-violation
+        title:
+          type: string
+          description: 'A short, summary of the problem type. Written in english and
+            readable for engineers (usually not suited for non technical stakeholders
+            and not localized); example: Service Unavailable'
+        status:
+          maximum: 600
+          exclusiveMaximum: true
+          minimum: 100
+          type: integer
+          description: The HTTP status code generated by the origin server for this
+            occurrence of the problem.
+          format: int32
+          example: 500
+        detail:
+          type: string
+          description: |-
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: There was an error processing the request
+        instance:
+          type: string
+          description: An absolute URI that identifies the specific occurrence of
+            the problem. It may or may not yield further information if dereferenced.
+          format: uri
+    FiscalCode:
+      type: string
+      description: User's fiscal code.
+      format: FiscalCode
+      example: SPNDNL80R13C555X
+      x-import: "@pagopa/ts-commons/lib/strings"
+    GetCurrentWalletInstanceByFiscalCodeBody:
+      required:
+      - fiscal_code
+      type: object
+      properties:
+        fiscal_code:
+          "$ref": "#/components/schemas/FiscalCode"
+    Timestamp:
+      type: string
+      description: A date-time field in ISO-8601 format and UTC timezone.
+      format: UTCISODateFromString
+      example: '2018-10-13T00:00:00Z'
+      x-import: "@pagopa/ts-commons/lib/dates"
+    AndroidDeviceDetails:
+      required:
+      - platform
+      type: object
+      properties:
+        platform:
+          enum:
+          - android
+          type: string
+        os_patch_level:
+          oneOf:
+          - type: string
+          - type: number
+        os_version:
+          type: number
+    IosDeviceDetails:
+      required:
+      - platform
+      type: object
+      properties:
+        platform:
+          enum:
+          - ios
+          type: string
+    DeviceDetails:
+      type: object
+      oneOf:
+      - "$ref": "#/components/schemas/AndroidDeviceDetails"
+      - "$ref": "#/components/schemas/IosDeviceDetails"
+      description: User device information
+    RevocationReason:
+      enum:
+      - CERTIFICATE_REVOKED_BY_ISSUER
+      - NEW_WALLET_INSTANCE_CREATED
+      - REVOKED_BY_USER
+      type: string
