@@ -3,6 +3,7 @@ lockfileVersion: '9.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
+  injectWorkspacePackages: true
 
 catalogs:
   default:
@@ -39,6 +40,10 @@ catalogs:
     io-ts:
       specifier: ^2.2.22
       version: 2.2.22
+
+packageExtensionsChecksum: sha256-YCwncs1iugjnrtZg4RL1WZb63d9zR1h8uEpB281TeAc=
+
+pnpmfileChecksum: sha256-FMjTmt1bCo0SOOG7o/y8rRzputl19yL2BTfTrVHFYS4=
 
 importers:
 
@@ -4647,6 +4652,7 @@ snapshots:
   '@azure/functions-opentelemetry-instrumentation@0.2.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
+      '@opentelemetry/api-logs': 0.52.1
       '@opentelemetry/instrumentation': 0.52.1(@opentelemetry/api@1.9.0)
     transitivePeerDependencies:
       - supports-color
