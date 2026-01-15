@@ -55,19 +55,12 @@ const config = configOrError;
 
 const credential = new DefaultAzureCredential();
 
-// const cosmosClient = new CosmosClient({
-//   aadCredentials: credential,
-//   connectionPolicy: {
-//     requestTimeout: config.azure.cosmos.requestTimeout,
-//   },
-//   endpoint: config.azure.cosmos.endpoint,
-// });
-
 const cosmosClient = new CosmosClient({
+  aadCredentials: credential,
   connectionPolicy: {
     requestTimeout: config.azure.cosmos.requestTimeout,
   },
-  connectionString: config.azure.cosmos.connectionString,
+  endpoint: config.azure.cosmos.endpoint,
 });
 
 const subscriptionId = config.azure.generic.subscriptionId;
