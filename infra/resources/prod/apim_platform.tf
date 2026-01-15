@@ -156,7 +156,7 @@ XML
 
 resource "azurerm_api_management_api_operation_policy" "health_check_uat_policy" {
   api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
-  operation_id        = "HealthCheck"
+  operation_id        = "healthCheck"
   resource_group_name = data.azurerm_api_management.platform_api_gateway.resource_group_name
   api_management_name = data.azurerm_api_management.platform_api_gateway.name
 
