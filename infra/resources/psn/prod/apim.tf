@@ -143,16 +143,16 @@ module "apim" {
     enabled                       = true
     default_instances             = 2
     minimum_instances             = 2
-    maximum_instances             = 2
+    maximum_instances             = 6
     scale_out_capacity_percentage = 60
-    scale_out_time_window         = "PT10M"
+    scale_out_time_window         = "PT3M"
     scale_out_value               = "2"
-    scale_out_cooldown            = "PT45M"
+    scale_out_cooldown            = "PT5M"
     scale_in_capacity_percentage  = 30
 
-    scale_in_time_window = "PT30M"
+    scale_in_time_window = "PT5M"
     scale_in_value       = "2"
-    scale_in_cooldown    = "PT30M"
+    scale_in_cooldown    = "PT5M"
   }
 
   tags = local.tags
