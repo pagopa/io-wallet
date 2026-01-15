@@ -3,7 +3,6 @@ lockfileVersion: '9.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
-  injectWorkspacePackages: true
 
 catalogs:
   default:
@@ -40,10 +39,6 @@ catalogs:
     io-ts:
       specifier: ^2.2.22
       version: 2.2.22
-
-packageExtensionsChecksum: sha256-YCwncs1iugjnrtZg4RL1WZb63d9zR1h8uEpB281TeAc=
-
-pnpmfileChecksum: sha256-FMjTmt1bCo0SOOG7o/y8rRzputl19yL2BTfTrVHFYS4=
 
 importers:
 
@@ -284,7 +279,7 @@ importers:
         version: 3.2.5
       undici:
         specifier: ^7.16.0
-        version: 7.16.0
+        version: 7.18.2
     devDependencies:
       '@pagopa/eslint-config':
         specifier: ^5.0.0
@@ -4208,8 +4203,8 @@ packages:
     resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
     engines: {node: '>=14.0'}
 
-  undici@7.16.0:
-    resolution: {integrity: sha512-QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==}
+  undici@7.18.2:
+    resolution: {integrity: sha512-y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==}
     engines: {node: '>=20.18.1'}
 
   unherit@1.1.3:
@@ -4652,7 +4647,6 @@ snapshots:
   '@azure/functions-opentelemetry-instrumentation@0.2.0(@opentelemetry/api@1.9.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
-      '@opentelemetry/api-logs': 0.52.1
       '@opentelemetry/instrumentation': 0.52.1(@opentelemetry/api@1.9.0)
     transitivePeerDependencies:
       - supports-color
@@ -8922,7 +8916,7 @@ snapshots:
     dependencies:
       '@fastify/busboy': 2.1.1
 
-  undici@7.16.0: {}
+  undici@7.18.2: {}
 
   unherit@1.1.3:
     dependencies:
