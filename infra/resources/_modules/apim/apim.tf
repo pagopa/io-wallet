@@ -84,7 +84,7 @@ module "apim_v2_wallet_support_api" {
   revision     = "2"
 
   content_format = "openapi"
-  content_value  = file("${path.module}/api/support/_swagger.json")
+  content_value  = file("${path.module}/api/support/swagger.yaml")
 }
 
 resource "azurerm_api_management_api_tag" "wallet_support" {
