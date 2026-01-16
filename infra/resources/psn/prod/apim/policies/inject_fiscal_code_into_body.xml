@@ -1,0 +1,13 @@
+<policies>
+    <inbound>
+        <base />
+        <include-fragment fragment-id="extract-user-fiscal-code" />
+        <set-variable name="requestBody" value="@{ return context.Request.Body.As<Newtonsoft.Json.Linq.JObject>(preserveContent: true); }" />
+        <set-body>@{
+        var body = (Newtonsoft.Json.Linq.JObject)context.Variables["requestBody"];
+        var fiscalCode = (string)context.Variables["fiscalCode"];
+        body["fiscal_code"] = fiscalCode;
+        return body.ToString();
+    }</set-body>
+    </inbound>
+</policies>

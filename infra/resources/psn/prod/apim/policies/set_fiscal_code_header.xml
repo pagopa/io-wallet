@@ -1,0 +1,18 @@
+<policies>
+    <inbound>
+        <base />
+        <include-fragment fragment-id="extract-user-fiscal-code" />
+        <set-header name="fiscal-code" exists-action="override">
+            <value>@((string)context.Variables["fiscalCode"])</value>
+        </set-header>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>

@@ -1,0 +1,713 @@
+openapi: 3.0.1
+info:
+  title: IT-Wallet User - IO App v1
+  description: REST APIs consumed by IO App
+  version: v1
+servers:
+- url: https://apim.internal.wallet.io.pagopa.it/api/wallet/v1
+paths:
+  "/nonce":
+    get:
+      summary: GetNonce
+      description: Returns a randomly generated nonce
+      operationId: getNonce
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
+      responses:
+        '200':
+          description: Nonce successfully generated
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/NonceDetailView"
+              example:
+                nonce: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/wallet-instances":
+    post:
+      summary: CreateWalletInstance
+      description: Create a wallet instance
+      operationId: createWalletInstance
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateWalletInstanceBody"
+            example:
+              challenge: string
+              key_attestation: string
+              hardware_key_tag: string
+      responses:
+        '204':
+          description: Wallet instance successfully created
+        '409':
+          description: There has been a conflict
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/wallet-attestations":
+    post:
+      summary: CreateWalletAttestation
+      description: Create and return a Wallet Attestation
+      operationId: createWalletAttestation
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/CreateWalletAttestationBody"
+            example:
+              assertion: eyJhbGciOiJFUzI1NiIsImtpZCI6InZiZVhKa3NNNDV4cGh0QU5uQ2lHNm1DeXVVNGpmR056b3BHdUt2b2dnOWMiLCJ0eXAiOiJ3YXIrand0In0.eyJpc3MiOiJodHRwczovL3dhbGxldC1wcm92aWRlci5leGFtcGxlLm9yZy9pbnN0YW5jZS92YmVYSmtzTTQ1eHBodEFObkNpRzZtQ3l1VTRqZkdOem9wR3VLdm9nZzljIiwic3ViIjoiaHR0cHM6Ly93YWxsZXQtcHJvdmlkZXIuZXhhbXBsZS5vcmcvIiwiY2hhbGxlbmdlIjoiNmVjNjkzMjQtNjBhOC00ZTViLWE2OTctYTc2NmQ4NTc5MGVhIiwiaGFyZHdhcmVfc2lnbmF0dXJlIjoiS29aSWh2Y05BUWNDb0lBd2dBSUIuLi5yZWRhY3RlZCIsImludGVncml0eV9hc3NlcnRpb24iOiJvMk5tYlhSdllYQndiR1V0WVhCd1lYLi4ucmVkYWN0ZWQiLCJoYXJkd2FyZV9rZXlfdGFnIjoiV1FoeUR5bUZLc1A5NWlGcXB6ZEVEV1c0bDdhVm5hMkZuNEpDZVdIWXRiVT0iLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4IjoiNEhOcHRJLXhyMnBqeVJKS0dNbno0V21kblFEX3VKU3E0Ujk1Tmo5OGI0NCIsInkiOiJMSVpuU0IzOXZGSmhZZ1MzazdqWEU0cjMtQ29HRlF3WnRQQklScXBObHJnIiwia2lkIjoidmJlWEprc000NXhwaHRBTm5DaUc2bUN5dVU0amZHTnpvcEd1S3ZvZ2c5YyJ9fSwidnBfZm9ybWF0c19zdXBwb3J0ZWQiOnsiand0X3ZjX2pzb24iOnsiYWxnX3ZhbHVlc19zdXBwb3J0ZWQiOlsiRVMyNTZLIiwiRVMzODQiXX0sImp3dF92cF9qc29uIjp7ImFsZ192YWx1ZXNfc3VwcG9ydGVkIjpbIkVTMjU2SyIsIkVkRFNBIl19fSwiaWF0IjoxNjg2NjQ1MTE1LCJleHAiOjE2ODY2NTIzMTV9.F32bisVth4eDdGxDjB9ByENT-oZLtSY_89uwTSePo2GMEKaeEedpXZE_9mrX7t0_Fmc5m6LNVvIIBqotqsYJYQ
+      responses:
+        '200':
+          description: List of generated Wallet Attestations
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WalletAttestationsView"
+              example:
+                wallet_attestations:
+                - format: jwt
+                  wallet_attestation: string
+        '403':
+          description: The server understands the request but refuses to authorize
+            it
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '404':
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '409':
+          description: There has been a conflict
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/wallet-instances/current/status":
+    get:
+      summary: GetCurrentWalletInstanceStatus
+      description: Retrieve the current Wallet Instance status
+      operationId: getCurrentWalletInstanceStatus
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
+      responses:
+        '200':
+          description: Wallet Instance status successfully retrieved
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WalletInstanceData"
+              example:
+                id: string
+                is_revoked: true
+                revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '404':
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/wallet-instances/{id}/status":
+    get:
+      summary: GetWalletInstanceStatus
+      description: Retrieve a Wallet Instance status
+      operationId: getWalletInstanceStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: x-user
+        in: header
+        required: true
+        schema:
+          $ref: "#/components/schemas/XUser"
+      responses:
+        '200':
+          description: Wallet Instance status successfully retrieved
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WalletInstanceData"
+              example:
+                id: string
+                is_revoked: true
+                revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '404':
+          description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+    put:
+      summary: SetWalletInstanceStatus
+      description: |
+        Revoke the Wallet Instance associated with the authenticated user.
+        If the Wallet Instance is already revoked, the operation will succeed.
+      operationId: setWalletInstanceStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: x-user
+        in: header
+        required: true
+        schema:
+          $ref: "#/components/schemas/XUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/SetWalletInstanceStatusData"
+            example:
+              status: REVOKED
+      responses:
+        '204':
+          description: Wallet Instance status successfully set
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/health":
+    get:
+      summary: HealthCheck
+      description: Used to check if the function is healthy
+      operationId: healthCheck
+      responses:
+        '200':
+          description: The function is health
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+  "/whitelisted-fiscal-code":
+    get:
+      summary: IsFiscalCodeWhitelisted
+      description: Used to check if the fiscal code is in the whitelist
+      operationId: isFiscalCodeWhitelisted
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
+      responses:
+        '200':
+          description: Returned when no issues were found in either case (fiscal code
+            whitelisted, or not)
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WhitelistedFiscalCodeData"
+              example:
+                whitelisted: true
+                whitelistedAt: string
+                fiscalCode: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '422':
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+components:
+  schemas:
+    XUser:
+      type: string
+    SetWalletInstanceStatusData:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          enum:
+          - REVOKED
+          type: string
+    WalletInstanceData:
+      required:
+      - id
+      - is_revoked
+      type: object
+      properties:
+        id:
+          type: string
+        is_revoked:
+          type: boolean
+        revocation_reason:
+          "$ref": "#/components/schemas/RevocationReason"
+      description: Describes the status of the wallet.
+    NonceDetailView:
+      required:
+      - nonce
+      type: object
+      properties:
+        nonce:
+          type: string
+    WalletAttestationsView:
+      required:
+      - wallet_attestations
+      type: object
+      properties:
+        wallet_attestations:
+          maxItems: 2
+          minItems: 2
+          type: array
+          items:
+            required:
+            - format
+            - wallet_attestation
+            type: object
+            properties:
+              format:
+                enum:
+                - jwt
+                - dc+sd-jwt
+                type: string
+              wallet_attestation:
+                type: string
+    CreateWalletInstanceBody:
+      required:
+      - challenge
+      - key_attestation
+      - hardware_key_tag
+      type: object
+      properties:
+        challenge:
+          minLength: 1
+          type: string
+          format: binary
+        key_attestation:
+          minLength: 1
+          type: string
+          format: binary
+        hardware_key_tag:
+          minLength: 1
+          type: string
+    CreateWalletAttestationBody:
+      required:
+      - assertion
+      type: object
+      properties:
+        assertion:
+          minLength: 1
+          type: string
+          format: binary
+          example: eyJhbGciOiJFUzI1NiIsImtpZCI6InZiZVhKa3NNNDV4cGh0QU5uQ2lHNm1DeXVVNGpmR056b3BHdUt2b2dnOWMiLCJ0eXAiOiJ3YXIrand0In0.eyJpc3MiOiJodHRwczovL3dhbGxldC1wcm92aWRlci5leGFtcGxlLm9yZy9pbnN0YW5jZS92YmVYSmtzTTQ1eHBodEFObkNpRzZtQ3l1VTRqZkdOem9wR3VLdm9nZzljIiwic3ViIjoiaHR0cHM6Ly93YWxsZXQtcHJvdmlkZXIuZXhhbXBsZS5vcmcvIiwiY2hhbGxlbmdlIjoiNmVjNjkzMjQtNjBhOC00ZTViLWE2OTctYTc2NmQ4NTc5MGVhIiwiaGFyZHdhcmVfc2lnbmF0dXJlIjoiS29aSWh2Y05BUWNDb0lBd2dBSUIuLi5yZWRhY3RlZCIsImludGVncml0eV9hc3NlcnRpb24iOiJvMk5tYlhSdllYQndiR1V0WVhCd1lYLi4ucmVkYWN0ZWQiLCJoYXJkd2FyZV9rZXlfdGFnIjoiV1FoeUR5bUZLc1A5NWlGcXB6ZEVEV1c0bDdhVm5hMkZuNEpDZVdIWXRiVT0iLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4IjoiNEhOcHRJLXhyMnBqeVJKS0dNbno0V21kblFEX3VKU3E0Ujk1Tmo5OGI0NCIsInkiOiJMSVpuU0IzOXZGSmhZZ1MzazdqWEU0cjMtQ29HRlF3WnRQQklScXBObHJnIiwia2lkIjoidmJlWEprc000NXhwaHRBTm5DaUc2bUN5dVU0amZHTnpvcEd1S3ZvZ2c5YyJ9fSwidnBfZm9ybWF0c19zdXBwb3J0ZWQiOnsiand0X3ZjX2pzb24iOnsiYWxnX3ZhbHVlc19zdXBwb3J0ZWQiOlsiRVMyNTZLIiwiRVMzODQiXX0sImp3dF92cF9qc29uIjp7ImFsZ192YWx1ZXNfc3VwcG9ydGVkIjpbIkVTMjU2SyIsIkVkRFNBIl19fSwiaWF0IjoxNjg2NjQ1MTE1LCJleHAiOjE2ODY2NTIzMTV9.F32bisVth4eDdGxDjB9ByENT-oZLtSY_89uwTSePo2GMEKaeEedpXZE_9mrX7t0_Fmc5m6LNVvIIBqotqsYJYQ
+    RevocationReason:
+      enum:
+      - CERTIFICATE_REVOKED_BY_ISSUER
+      - NEW_WALLET_INSTANCE_CREATED
+      - REVOKED_BY_USER
+      type: string
+    ProblemJson:
+      type: object
+      properties:
+        type:
+          type: string
+          description: |-
+            An absolute URI that identifies the problem type. When dereferenced,
+            it SHOULD provide human-readable documentation for the problem type
+            (e.g., using HTML).
+          format: uri
+          default: about:blank
+          example: https://example.com/problem/constraint-violation
+        title:
+          type: string
+          description: 'A short, summary of the problem type. Written in english and
+            readable for engineers (usually not suited for non technical stakeholders
+            and not localized); example: Service Unavailable'
+        status:
+          maximum: 600
+          exclusiveMaximum: true
+          minimum: 100
+          type: integer
+          description: The HTTP status code generated by the origin server for this
+            occurrence of the problem.
+          format: int32
+          example: 500
+        detail:
+          type: string
+          description: |-
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: There was an error processing the request
+        instance:
+          type: string
+          description: An absolute URI that identifies the specific occurrence of
+            the problem. It may or may not yield further information if dereferenced.
+          format: uri
+    WhitelistedFiscalCodeData:
+      required:
+      - whitelisted
+      - fiscalCode
+      type: object
+      properties:
+        whitelisted:
+          type: boolean
+          description: Boolean value that specifies whether the tax code is whitelisted
+            or not.
+        whitelistedAt:
+          type: string
+          description: |-
+            Date, expressed in ISO 8601 format, when the fiscal code was added to the whitelist.
+            Only present if the fiscal code is whitelisted.
+        fiscalCode:
+          type: string
+          description: The fiscal code, the same one passed in input.
