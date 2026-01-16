@@ -357,113 +357,113 @@ resource "azurerm_api_management_policy_fragment" "extract_user_fiscal_code" {
   description       = "Extract user fiscal code from x-user header"
   api_management_id = module.apim.id
   format            = "rawxml"
-  value             = file("${path.module}/fragments/extract-user-fiscal-code.xml")
+  value             = file("${path.module}/apim/fragments/extract-user-fiscal-code.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "is_fiscal_code_whitelisted_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "isFiscalCodeWhitelisted"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/is_fiscal_code_whitelisted_operation_policy.xml")
+  xml_content = file("${path.module}/apim/policies/is_fiscal_code_whitelisted_operation.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "create_wallet_attestation_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "createWalletAttestation"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "createWalletInstance"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "setWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "get_wallet_instance_status_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "getWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/set_fiscal_code_from_header.xml")
+  xml_content = file("${path.module}/apim/policies/set_fiscal_code_header.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "get_current_wallet_instance_status_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "getCurrentWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/set_fiscal_code_from_header.xml")
+  xml_content = file("${path.module}/apim/policies/set_fiscal_code_header.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "is_fiscal_code_whitelisted_uat_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "isFiscalCodeWhitelisted"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/is_fiscal_code_whitelisted_operation_policy.xml")
+  xml_content = file("${path.module}/apim/policies/is_fiscal_code_whitelisted_operation.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "create_wallet_attestation_uat_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "createWalletAttestation"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_uat_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "createWalletInstance"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_status_uat_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "setWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "get_wallet_instance_status_uat_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "getWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/set_fiscal_code_from_header.xml")
+  xml_content = file("${path.module}/apim/policies/set_fiscal_code_header.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "get_current_wallet_instance_status_uat_policy" {
-  api_name            = azurerm_api_management_api.wallet_user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "getCurrentWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/policies/set_fiscal_code_from_header.xml")
+  xml_content = file("${path.module}/apim/policies/set_fiscal_code_header.xml")
 }
