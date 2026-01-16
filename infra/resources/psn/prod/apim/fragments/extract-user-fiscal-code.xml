@@ -1,0 +1,14 @@
+<fragment>
+	<set-variable name="userDecoded" value="@(System.Text.Encoding.UTF8.GetString(
+        System.Convert.FromBase64String(
+            context.Request.Headers.GetValueOrDefault("x-user","")
+        )))" />
+	<set-variable name="userJson" value="@{
+    var json = context.Variables.GetValueOrDefault<string>("userDecoded");
+    return Newtonsoft.Json.Linq.JObject.Parse(json);
+}" />
+	<set-variable name="fiscalCode" value="@{
+    var userJson = (Newtonsoft.Json.Linq.JObject)context.Variables["userJson"];
+    return (string)userJson["fiscal_code"];
+}" />
+</fragment>
