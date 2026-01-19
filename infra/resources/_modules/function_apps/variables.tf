@@ -208,3 +208,9 @@ variable "wallet_instance_storage_account_uat_name" {
   type        = string
   description = "The name of the Wallet Instance Storage Account UAT"
 }
+
+variable "is_psn" {
+  type        = bool
+  default     = false
+  description = "Temporary variable to manage both IO and PSN resources"
+}
