@@ -4,7 +4,7 @@ info:
   description: REST APIs consumed by IO App
   version: v1
 servers:
-- url: https://proxy.internal.io.pagopa.it/api/wallet/uat/v1
+- url: https://apim.internal.wallet.io.pagopa.it/api/wallet/uat/v1
 paths:
   "/nonce":
     get:
@@ -49,6 +49,12 @@ paths:
       summary: CreateWalletInstance
       description: Create a wallet instance
       operationId: createWalletInstance
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
       requestBody:
         content:
           application/json:
@@ -114,6 +120,12 @@ paths:
       summary: CreateWalletAttestation
       description: Create and return a Wallet Attestation
       operationId: createWalletAttestation
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
       requestBody:
         content:
           application/json:
@@ -210,6 +222,12 @@ paths:
       summary: GetCurrentWalletInstanceStatus
       description: Retrieve the current Wallet Instance status
       operationId: getCurrentWalletInstanceStatus
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -221,8 +239,32 @@ paths:
                 id: string
                 is_revoked: true
                 revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
         "404":
           description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        "422":
+          description: Unprocessable Content
           content:
             application/json:
               schema:
@@ -268,6 +310,11 @@ paths:
         required: true
         schema:
           type: string
+      - name: x-user
+        in: header
+        required: true
+        schema:
+          $ref: "#/components/schemas/XUser"
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -279,8 +326,32 @@ paths:
                 id: string
                 is_revoked: true
                 revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
         "404":
           description: The specified resource was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        "422":
+          description: Unprocessable Content
           content:
             application/json:
               schema:
@@ -327,6 +398,11 @@ paths:
         required: true
         schema:
           type: string
+      - name: x-user
+        in: header
+        required: true
+        schema:
+          $ref: "#/components/schemas/XUser"
       requestBody:
         content:
           application/json:
@@ -337,6 +413,18 @@ paths:
       responses:
         "204":
           description: Wallet Instance status successfully set
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
         "422":
           description: Unprocessable Content
           content:
@@ -373,7 +461,7 @@ paths:
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-  "/info":
+  "/health":
     get:
       summary: HealthCheck
       description: Used to check if the function is healthy
@@ -407,6 +495,12 @@ paths:
       summary: IsFiscalCodeWhitelisted
       description: Used to check if the fiscal code is in the whitelist
       operationId: isFiscalCodeWhitelisted
+      parameters:
+        - in: header
+          name: x-user
+          required: true
+          schema:
+            $ref: "#/components/schemas/XUser"
       responses:
         "200":
           description: Returned when no issues were found in either case (fiscal code
@@ -419,6 +513,30 @@ paths:
                 whitelisted: true
                 whitelistedAt: string
                 fiscalCode: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemJson"
+              example:
+                type: about:blank
+                title: string
+                status: 500
+                detail: There was an error processing the request
+                instance: string
         "500":
           description: Internal Server Error
           content:
@@ -445,6 +563,8 @@ paths:
                 instance: string
 components:
   schemas:
+    XUser:
+      type: string
     SetWalletInstanceStatusData:
       required:
       - status
