@@ -11,12 +11,6 @@ paths:
       summary: GetNonce
       description: Returns a randomly generated nonce
       operationId: getNonce
-      parameters:
-        - in: header
-          name: x-user
-          required: true
-          schema:
-            $ref: "#/components/schemas/XUser"
       responses:
         '200':
           description: Nonce successfully generated
