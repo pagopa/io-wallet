@@ -397,7 +397,7 @@ resource "azurerm_api_management_api_operation_policy" "set_wallet_instance_stat
 }
 
 resource "azurerm_api_management_api_operation_policy" "get_wallet_instance_status_policy" {
-  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "getWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
@@ -406,7 +406,7 @@ resource "azurerm_api_management_api_operation_policy" "get_wallet_instance_stat
 }
 
 resource "azurerm_api_management_api_operation_policy" "get_current_wallet_instance_status_policy" {
-  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "getCurrentWalletInstanceStatus"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
