@@ -15,7 +15,7 @@ module "apim_v2_web_wallet_api" {
 
   service_url = "https://api.internal.wallet.io.pagopa.it/api/wallet/ioweb/v1"
 
-  description  = "Wallet APIs"
+  description  = "APIs consumed by IO WEB application"
   display_name = "IO Web - Wallet"
   path         = "ioweb/wallet/api/${var.revision}"
   protocols    = ["https"]
