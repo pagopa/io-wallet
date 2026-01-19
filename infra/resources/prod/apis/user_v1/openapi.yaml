@@ -1,4 +1,3 @@
----
 openapi: 3.0.1
 info:
   title: IT-Wallet User UAT - IO App v1
@@ -333,7 +332,8 @@ paths:
           application/json:
             schema:
               "$ref": "#/components/schemas/SetWalletInstanceStatusData"
-            example: REVOKED
+            example:
+              status: REVOKED
       responses:
         '204':
           description: Wallet Instance status successfully set
@@ -446,9 +446,14 @@ paths:
 components:
   schemas:
     SetWalletInstanceStatusData:
-      enum:
-      - REVOKED
-      type: string
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          enum:
+          - REVOKED
+          type: string
     WalletInstanceData:
       required:
       - id
