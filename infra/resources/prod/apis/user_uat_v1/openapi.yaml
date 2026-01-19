@@ -12,32 +12,32 @@ paths:
       description: Returns a randomly generated nonce
       operationId: getNonce
       responses:
-        '200':
+        "200":
           description: Nonce successfully generated
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/NonceDetailView"
+                $ref: "#/components/schemas/NonceDetailView"
               example:
                 nonce: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -53,56 +53,56 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/CreateWalletInstanceBody"
+              $ref: "#/components/schemas/CreateWalletInstanceBody"
             example:
               challenge: string
               key_attestation: string
               hardware_key_tag: string
       responses:
-        '204':
+        "204":
           description: Wallet instance successfully created
-        '409':
+        "409":
           description: There has been a conflict
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '422':
+        "422":
           description: Unprocessable Content
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -118,87 +118,87 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/CreateWalletAttestationBody"
+              $ref: "#/components/schemas/CreateWalletAttestationBody"
             example:
               assertion: eyJhbGciOiJFUzI1NiIsImtpZCI6InZiZVhKa3NNNDV4cGh0QU5uQ2lHNm1DeXVVNGpmR056b3BHdUt2b2dnOWMiLCJ0eXAiOiJ3YXIrand0In0.eyJpc3MiOiJodHRwczovL3dhbGxldC1wcm92aWRlci5leGFtcGxlLm9yZy9pbnN0YW5jZS92YmVYSmtzTTQ1eHBodEFObkNpRzZtQ3l1VTRqZkdOem9wR3VLdm9nZzljIiwic3ViIjoiaHR0cHM6Ly93YWxsZXQtcHJvdmlkZXIuZXhhbXBsZS5vcmcvIiwiY2hhbGxlbmdlIjoiNmVjNjkzMjQtNjBhOC00ZTViLWE2OTctYTc2NmQ4NTc5MGVhIiwiaGFyZHdhcmVfc2lnbmF0dXJlIjoiS29aSWh2Y05BUWNDb0lBd2dBSUIuLi5yZWRhY3RlZCIsImludGVncml0eV9hc3NlcnRpb24iOiJvMk5tYlhSdllYQndiR1V0WVhCd1lYLi4ucmVkYWN0ZWQiLCJoYXJkd2FyZV9rZXlfdGFnIjoiV1FoeUR5bUZLc1A5NWlGcXB6ZEVEV1c0bDdhVm5hMkZuNEpDZVdIWXRiVT0iLCJjbmYiOnsiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4IjoiNEhOcHRJLXhyMnBqeVJKS0dNbno0V21kblFEX3VKU3E0Ujk1Tmo5OGI0NCIsInkiOiJMSVpuU0IzOXZGSmhZZ1MzazdqWEU0cjMtQ29HRlF3WnRQQklScXBObHJnIiwia2lkIjoidmJlWEprc000NXhwaHRBTm5DaUc2bUN5dVU0amZHTnpvcEd1S3ZvZ2c5YyJ9fSwidnBfZm9ybWF0c19zdXBwb3J0ZWQiOnsiand0X3ZjX2pzb24iOnsiYWxnX3ZhbHVlc19zdXBwb3J0ZWQiOlsiRVMyNTZLIiwiRVMzODQiXX0sImp3dF92cF9qc29uIjp7ImFsZ192YWx1ZXNfc3VwcG9ydGVkIjpbIkVTMjU2SyIsIkVkRFNBIl19fSwiaWF0IjoxNjg2NjQ1MTE1LCJleHAiOjE2ODY2NTIzMTV9.F32bisVth4eDdGxDjB9ByENT-oZLtSY_89uwTSePo2GMEKaeEedpXZE_9mrX7t0_Fmc5m6LNVvIIBqotqsYJYQ
       responses:
-        '200':
+        "200":
           description: List of generated Wallet Attestations
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WalletAttestationsView"
+                $ref: "#/components/schemas/WalletAttestationsView"
               example:
                 wallet_attestations:
                 - format: jwt
                   wallet_attestation: string
-        '403':
+        "403":
           description: The server understands the request but refuses to authorize
             it
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '404':
+        "404":
           description: The specified resource was not found
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '409':
+        "409":
           description: There has been a conflict
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '422':
+        "422":
           description: Unprocessable Content
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -211,46 +211,46 @@ paths:
       description: Retrieve the current Wallet Instance status
       operationId: getCurrentWalletInstanceStatus
       responses:
-        '200':
+        "200":
           description: Wallet Instance status successfully retrieved
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WalletInstanceData"
+                $ref: "#/components/schemas/WalletInstanceData"
               example:
                 id: string
                 is_revoked: true
                 revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
-        '404':
+        "404":
           description: The specified resource was not found
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -269,46 +269,46 @@ paths:
         schema:
           type: string
       responses:
-        '200':
+        "200":
           description: Wallet Instance status successfully retrieved
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WalletInstanceData"
+                $ref: "#/components/schemas/WalletInstanceData"
               example:
                 id: string
                 is_revoked: true
                 revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
-        '404':
+        "404":
           description: The specified resource was not found
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -331,42 +331,42 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/SetWalletInstanceStatusData"
+              $ref: "#/components/schemas/SetWalletInstanceStatusData"
             example:
               status: REVOKED
       responses:
-        '204':
+        "204":
           description: Wallet Instance status successfully set
-        '422':
+        "422":
           description: Unprocessable Content
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -379,7 +379,7 @@ paths:
       description: Used to check if the function is healthy
       operationId: healthCheck
       responses:
-        '200':
+        "200":
           description: The function is health
           content:
             application/json:
@@ -390,12 +390,12 @@ paths:
                     type: string
               example:
                 message: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -408,35 +408,35 @@ paths:
       description: Used to check if the fiscal code is in the whitelist
       operationId: isFiscalCodeWhitelisted
       responses:
-        '200':
+        "200":
           description: Returned when no issues were found in either case (fiscal code
             whitelisted, or not)
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WhitelistedFiscalCodeData"
+                $ref: "#/components/schemas/WhitelistedFiscalCodeData"
               example:
                 whitelisted: true
                 whitelistedAt: string
                 fiscalCode: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -465,7 +465,7 @@ components:
         is_revoked:
           type: boolean
         revocation_reason:
-          "$ref": "#/components/schemas/RevocationReason"
+          $ref: "#/components/schemas/RevocationReason"
       description: Describes the status of the wallet.
     NonceDetailView:
       required:
@@ -544,9 +544,7 @@ components:
           example: https://example.com/problem/constraint-violation
         title:
           type: string
-          description: 'A short, summary of the problem type. Written in english and
-            readable for engineers (usually not suited for non technical stakeholders
-            and not localized); example: Service Unavailable'
+          description: "A short, summary of the problem type. Written in english and readable for engineers (usually not suited for non technical stakeholders and not localized); example: Service Unavailable"
         status:
           maximum: 600
           exclusiveMaximum: true

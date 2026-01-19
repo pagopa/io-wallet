@@ -16,68 +16,68 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/GetCurrentWalletInstanceByFiscalCodeBody"
+              $ref: "#/components/schemas/GetCurrentWalletInstanceByFiscalCodeBody"
             example:
               fiscal_code: SPNDNL80R13C555X
       responses:
-        '200':
+        "200":
           description: Wallet Instance successfully retrieved
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WalletInstanceData"
+                $ref: "#/components/schemas/WalletInstanceData"
               example:
                 id: string
                 is_revoked: true
-                created_at: '2018-10-13T00:00:00.0000000+00:00'
-                revoked_at: '2018-10-13T00:00:00.0000000+00:00'
+                created_at: "2018-10-13T00:00:00.0000000+00:00"
+                revoked_at: "2018-10-13T00:00:00.0000000+00:00"
                 revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
                 device_details:
                   platform: android
                   os_patch_level: {}
                   os_version: 0
-        '404':
+        "404":
           description: The specified resource was not found
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '422':
+        "422":
           description: Unprocessable Content
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
                 status: 500
                 detail: There was an error processing the request
                 instance: string
-        '503':
+        "503":
           description: Service Unavailable
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -90,7 +90,7 @@ paths:
       description: Used to check if the function is healthy
       operationId: healthCheck
       responses:
-        '200':
+        "200":
           description: The function is health
           content:
             application/json:
@@ -101,12 +101,12 @@ paths:
                     type: string
               example:
                 message: string
-        '500':
+        "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ProblemJson"
+                $ref: "#/components/schemas/ProblemJson"
               example:
                 type: about:blank
                 title: string
@@ -127,13 +127,13 @@ components:
         is_revoked:
           type: boolean
         created_at:
-          "$ref": "#/components/schemas/Timestamp"
+          $ref: "#/components/schemas/Timestamp"
         revoked_at:
-          "$ref": "#/components/schemas/Timestamp"
+          $ref: "#/components/schemas/Timestamp"
         revocation_reason:
-          "$ref": "#/components/schemas/RevocationReason"
+          $ref: "#/components/schemas/RevocationReason"
         device_details:
-          "$ref": "#/components/schemas/DeviceDetails"
+          $ref: "#/components/schemas/DeviceDetails"
       description: Current wallet instance information
     ProblemJson:
       type: object
@@ -149,9 +149,7 @@ components:
           example: https://example.com/problem/constraint-violation
         title:
           type: string
-          description: 'A short, summary of the problem type. Written in english and
-            readable for engineers (usually not suited for non technical stakeholders
-            and not localized); example: Service Unavailable'
+          description: "A short, summary of the problem type. Written in english and readable for engineers (usually not suited for non technical stakeholders and not localized); example: Service Unavailable"
         status:
           maximum: 600
           exclusiveMaximum: true
@@ -184,12 +182,12 @@ components:
       type: object
       properties:
         fiscal_code:
-          "$ref": "#/components/schemas/FiscalCode"
+          $ref: "#/components/schemas/FiscalCode"
     Timestamp:
       type: string
       description: A date-time field in ISO-8601 format and UTC timezone.
       format: UTCISODateFromString
-      example: '2018-10-13T00:00:00Z'
+      example: "2018-10-13T00:00:00Z"
       x-import: "@pagopa/ts-commons/lib/dates"
     AndroidDeviceDetails:
       required:
@@ -218,8 +216,8 @@ components:
     DeviceDetails:
       type: object
       oneOf:
-      - "$ref": "#/components/schemas/AndroidDeviceDetails"
-      - "$ref": "#/components/schemas/IosDeviceDetails"
+      - $ref: "#/components/schemas/AndroidDeviceDetails"
+      - $ref: "#/components/schemas/IosDeviceDetails"
       description: User device information
     RevocationReason:
       enum:

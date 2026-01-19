@@ -15,20 +15,20 @@ paths:
         name: fiscal-code
         required: true
         schema:
-          "$ref": "#/components/schemas/FiscalCode"
+          $ref: "#/components/schemas/FiscalCode"
       responses:
-        '200':
+        "200":
           description: Wallet Instance status successfully retrieved
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WalletData"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '500':
-          "$ref": "#/components/responses/InternalServerError"
-        '503':
-          "$ref": "#/components/responses/ServiceUnavailable"
+                $ref: "#/components/schemas/WalletData"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   "/wallet-instances/{id}/status":
     put:
       summary: SetWalletInstanceStatus
@@ -39,22 +39,23 @@ paths:
         required: true
         schema:
           type: string
-      description: "Revoke the Wallet Instance associated with the authenticated user.
-        \nIf the Wallet Instance is already revoked, the operation succeed.\n"
+      description: |-
+        Revoke the Wallet Instance associated with the authenticated user.
+        If the Wallet Instance is already revoked, the operation succeed.
       requestBody:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/SetWalletInstanceStatusData"
+              $ref: "#/components/schemas/SetWalletInstanceStatusData"
       responses:
-        '204':
+        "204":
           description: Wallet Instance status successfully set
-        '422':
-          "$ref": "#/components/responses/UnprocessableContent"
-        '500':
-          "$ref": "#/components/responses/InternalServerError"
-        '503':
-          "$ref": "#/components/responses/ServiceUnavailable"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   "/whitelisted-fiscal-code/{fiscal-code}":
     get:
       summary: IsFiscalCodeWhitelisted
@@ -66,18 +67,18 @@ paths:
         schema:
           type: string
       responses:
-        '200':
+        "200":
           description: Successfully retrieved
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WhitelistedFiscalCodeData"
-        '422':
-          "$ref": "#/components/responses/UnprocessableContent"
-        '500':
-          "$ref": "#/components/responses/InternalServerError"
-        '503':
-          "$ref": "#/components/responses/ServiceUnavailable"
+                $ref: "#/components/schemas/WhitelistedFiscalCodeData"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 components:
   responses:
     Forbidden:
@@ -85,31 +86,31 @@ components:
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     NotFound:
       description: The specified resource was not found
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     UnprocessableContent:
       description: Unprocessable Content
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     InternalServerError:
       description: Internal Server Error
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     ServiceUnavailable:
       description: Service Unavailable
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
   schemas:
     SetWalletInstanceStatusData:
       type: object
@@ -119,7 +120,7 @@ components:
           enum:
           - REVOKED
         fiscal_code:
-          "$ref": "#/components/schemas/FiscalCode"
+          $ref: "#/components/schemas/FiscalCode"
       required:
       - status
       - fiscal_code
@@ -162,9 +163,7 @@ components:
           example: https://example.com/problem/constraint-violation
         title:
           type: string
-          description: 'A short, summary of the problem type. Written in english and
-            readable for engineers (usually not suited for non technical stakeholders
-            and not localized); example: Service Unavailable'
+          description: "A short, summary of the problem type. Written in english and readable for engineers (usually not suited for non technical stakeholders and not localized); example: Service Unavailable"
         status:
           type: integer
           format: int32

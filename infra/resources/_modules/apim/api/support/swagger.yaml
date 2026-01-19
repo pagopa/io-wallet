@@ -14,22 +14,22 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/GetCurrentWalletInstanceByFiscalCodeBody"
+              $ref: "#/components/schemas/GetCurrentWalletInstanceByFiscalCodeBody"
       responses:
-        '200':
+        "200":
           description: Wallet Instance successfully retrieved
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/WalletInstanceData"
-        '404':
-          "$ref": "#/components/responses/NotFound"
-        '422':
-          "$ref": "#/components/responses/UnprocessableContent"
-        '500':
-          "$ref": "#/components/responses/InternalServerError"
-        '503':
-          "$ref": "#/components/responses/ServiceUnavailable"
+                $ref: "#/components/schemas/WalletInstanceData"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 components:
   securitySchemes:
     SubscriptionKey:
@@ -42,25 +42,25 @@ components:
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     UnprocessableContent:
       description: Unprocessable Content
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     InternalServerError:
       description: Internal Server Error
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
     ServiceUnavailable:
       description: Service Unavailable
       content:
         application/json:
           schema:
-            "$ref": "#/components/schemas/ProblemJson"
+            $ref: "#/components/schemas/ProblemJson"
   schemas:
     WalletInstanceData:
       description: Current wallet instance information
@@ -71,13 +71,13 @@ components:
         is_revoked:
           type: boolean
         created_at:
-          "$ref": "#/components/schemas/Timestamp"
+          $ref: "#/components/schemas/Timestamp"
         revoked_at:
-          "$ref": "#/components/schemas/Timestamp"
+          $ref: "#/components/schemas/Timestamp"
         revocation_reason:
-          "$ref": "#/components/schemas/RevocationReason"
+          $ref: "#/components/schemas/RevocationReason"
         device_details:
-          "$ref": "#/components/schemas/DeviceDetails"
+          $ref: "#/components/schemas/DeviceDetails"
       required:
       - id
       - is_revoked
@@ -96,9 +96,7 @@ components:
           example: https://example.com/problem/constraint-violation
         title:
           type: string
-          description: 'A short, summary of the problem type. Written in english and
-            readable for engineers (usually not suited for non technical stakeholders
-            and not localized); example: Service Unavailable'
+          description: "A short, summary of the problem type. Written in english and readable for engineers (usually not suited for non technical stakeholders and not localized); example: Service Unavailable"
         status:
           type: integer
           format: int32
@@ -129,7 +127,7 @@ components:
       type: object
       properties:
         fiscal_code:
-          "$ref": "#/components/schemas/FiscalCode"
+          $ref: "#/components/schemas/FiscalCode"
       required:
       - fiscal_code
     Timestamp:
@@ -137,7 +135,7 @@ components:
       format: UTCISODateFromString
       description: A date-time field in ISO-8601 format and UTC timezone.
       x-import: "@pagopa/ts-commons/lib/dates"
-      example: '2018-10-13T00:00:00.000Z'
+      example: "2018-10-13T00:00:00.000Z"
     AndroidDeviceDetails:
       type: object
       properties:
@@ -164,8 +162,8 @@ components:
       type: object
       description: User device information
       oneOf:
-      - "$ref": "#/components/schemas/AndroidDeviceDetails"
-      - "$ref": "#/components/schemas/IosDeviceDetails"
+      - $ref: "#/components/schemas/AndroidDeviceDetails"
+      - $ref: "#/components/schemas/IosDeviceDetails"
     RevocationReason:
       type: string
       enum:
