@@ -83,6 +83,8 @@ module "storage_accounts" {
   user_assigned_managed_identity_id = module.ids.psn_identity.id
   customer_managed_key_url          = local.hsm_key_url
 
+  is_psn = true
+
   tags = local.tags
 }
 
@@ -223,6 +225,8 @@ module "function_apps" {
 
   wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
   wallet_instance_storage_account_uat_url = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet_uat.name)
+
+  is_psn = true
 
   tags = local.tags
 }
