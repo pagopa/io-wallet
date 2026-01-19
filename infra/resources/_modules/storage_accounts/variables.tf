@@ -55,3 +55,9 @@ variable "customer_managed_key_url" {
   default     = null
   description = "URL of the customer managed key to encrypt the Storage Account"
 }
+
+variable "is_psn" {
+  type        = bool
+  default     = false
+  description = "Temporary variable to manage both IO and PSN resources"
+}

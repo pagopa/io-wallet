@@ -170,6 +170,8 @@ module "function_apps" {
   wallet_instance_storage_account_uat_url          = null
   wallet_instance_storage_account_uat_name         = null
 
+  is_psn = false
+
   tags = local.tags
 }
 
@@ -320,6 +322,8 @@ module "storage_accounts" {
 
   action_group_id     = module.monitoring.action_group_wallet.id
   key_vault_wallet_id = module.key_vaults.key_vault_wallet.id
+
+  is_psn = false
 
   tags = local.tags
 }
