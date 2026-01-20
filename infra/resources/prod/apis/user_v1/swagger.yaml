@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: IT-Wallet User UAT - IO App v1
+  title: IT-Wallet User - IO App v1
   description: REST APIs consumed by IO App
   version: v1
 servers:
