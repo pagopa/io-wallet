@@ -16,12 +16,9 @@ resource "azurerm_api_management_backend" "wallet_user_uat_psn" {
   url                 = "https://api.internal.wallet.io.pagopa.it/api/wallet/uat/v1/"
 }
 
-resource "azurerm_api_management_policy_fragment" "wallet_authentication" {
+data "azurerm_api_management_policy_fragment" "wallet_authentication" {
   name              = "io-wallet-app-session-fragment"
-  description       = "Handle authentication session for IO app"
   api_management_id = data.azurerm_api_management.platform_api_gateway.id
-  format            = "rawxml"
-  value             = file("${path.module}/fragments/io-wallet-app-session-fragment.xml")
 }
 
 resource "azurerm_api_management_product" "wallet" {
@@ -131,7 +128,7 @@ resource "azurerm_api_management_api_policy" "wallet_user_v1" {
   xml_content         = <<XML
 <policies>
   <inbound>
-      <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <include-fragment fragment-id="${data.azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_psn.name}" />
   </inbound>
@@ -146,7 +143,7 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
   xml_content         = <<XML
 <policies>
   <inbound>
-      <include-fragment fragment-id="${azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <include-fragment fragment-id="${data.azurerm_api_management_policy_fragment.wallet_authentication.name}" />
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_uat_psn.name}" />
   </inbound>
