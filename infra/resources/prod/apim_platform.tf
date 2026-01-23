@@ -16,9 +16,8 @@ resource "azurerm_api_management_backend" "wallet_user_uat_psn" {
   url                 = "https://api.internal.wallet.io.pagopa.it/api/wallet/uat/v1/"
 }
 
-data "azurerm_api_management_policy_fragment" "wallet_authentication" {
-  name              = "io-wallet-app-session-fragment"
-  api_management_id = data.azurerm_api_management.platform_api_gateway.id
+locals {
+  wallet_authentication_fragment_name = "ioapp-authenticated"
 }
 
 resource "azurerm_api_management_product" "wallet" {
@@ -128,7 +127,11 @@ resource "azurerm_api_management_api_policy" "wallet_user_v1" {
   xml_content         = <<XML
 <policies>
   <inbound>
-      <include-fragment fragment-id="${data.azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <choose>
+          <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
+              <include-fragment fragment-id="${local.wallet_authentication_fragment_name}" />
+          </when>
+      </choose>
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_psn.name}" />
   </inbound>
@@ -143,7 +146,11 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
   xml_content         = <<XML
 <policies>
   <inbound>
-      <include-fragment fragment-id="${data.azurerm_api_management_policy_fragment.wallet_authentication.name}" />
+      <choose>
+          <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
+              <include-fragment fragment-id="${local.wallet_authentication_fragment_name}" />
+          </when>
+      </choose>
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.wallet_user_uat_psn.name}" />
   </inbound>
