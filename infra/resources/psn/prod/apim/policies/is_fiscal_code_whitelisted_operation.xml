@@ -1,7 +1,6 @@
 <policies>
     <inbound>
         <base />
-        <include-fragment fragment-id="extract-user-fiscal-code" />
         <rewrite-uri template="@(
      "/whitelisted-fiscal-code/" 
     + context.Variables["fiscalCode"]

@@ -1,0 +1,6 @@
+<policies>
+    <inbound>
+        <set-variable name="skipFiscalCodeFragment" value="true" />
+        <base />
+    </inbound>
+</policies>
