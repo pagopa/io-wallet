@@ -60,6 +60,7 @@ No requirements.
 | <a name="input_health_check_path_support"></a> [health\_check\_path\_support](#input\_health\_check\_path\_support) | Health check path for support function app | `string` | n/a | yes |
 | <a name="input_health_check_path_user"></a> [health\_check\_path\_user](#input\_health\_check\_path\_user) | Health check path for user function app | `string` | n/a | yes |
 | <a name="input_health_check_path_user_uat"></a> [health\_check\_path\_user\_uat](#input\_health\_check\_path\_user\_uat) | Health check path for user uat function app | `string` | n/a | yes |
+| <a name="input_is_psn"></a> [is\_psn](#input\_is\_psn) | Temporary variable to manage both IO and PSN resources | `bool` | `false` | no |
 | <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Id of the common Key Vault where save secrets in | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Id of the wallet Key Vault where save secrets | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_name"></a> [key\_vault\_wallet\_name](#input\_key\_vault\_wallet\_name) | Name of the wallet Key Vault where save secrets | `string` | n/a | yes |
@@ -78,6 +79,10 @@ No requirements.
 | <a name="input_virtual_network"></a> [virtual\_network](#input\_virtual\_network) | Virtual network to create subnet in | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_wallet_instance_creation_email_queue_name"></a> [wallet\_instance\_creation\_email\_queue\_name](#input\_wallet\_instance\_creation\_email\_queue\_name) | Send Email on Wallet Instance Creation Queue Name | `string` | n/a | yes |
 | <a name="input_wallet_instance_revocation_email_queue_name"></a> [wallet\_instance\_revocation\_email\_queue\_name](#input\_wallet\_instance\_revocation\_email\_queue\_name) | Send Email on Wallet Instance Revocation Queue Name | `string` | n/a | yes |
+| <a name="input_wallet_instance_storage_account_name"></a> [wallet\_instance\_storage\_account\_name](#input\_wallet\_instance\_storage\_account\_name) | The name of the Wallet Instance Storage Account | `string` | n/a | yes |
+| <a name="input_wallet_instance_storage_account_uat_name"></a> [wallet\_instance\_storage\_account\_uat\_name](#input\_wallet\_instance\_storage\_account\_uat\_name) | The name of the Wallet Instance Storage Account UAT | `string` | n/a | yes |
+| <a name="input_wallet_instance_storage_account_uat_url"></a> [wallet\_instance\_storage\_account\_uat\_url](#input\_wallet\_instance\_storage\_account\_uat\_url) | The URL of the Wallet Instance Storage Account UAT | `string` | n/a | yes |
+| <a name="input_wallet_instance_storage_account_url"></a> [wallet\_instance\_storage\_account\_url](#input\_wallet\_instance\_storage\_account\_url) | The URL of the Wallet Instance Storage Account | `string` | n/a | yes |
 
 ## Outputs
 
