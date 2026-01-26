@@ -129,7 +129,7 @@ resource "azurerm_api_management_api_policy" "wallet_user_v1" {
   <inbound>
       <choose>
           <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
-              <include-fragment fragment-id="${local.wallet_authentication_fragment_name}" />
+            <include-fragment fragment-id="${local.wallet_authentication_fragment_name}" />
           </when>
       </choose>
       <base />
@@ -148,7 +148,7 @@ resource "azurerm_api_management_api_policy" "wallet_user_uat_v1" {
   <inbound>
       <choose>
           <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
-              <include-fragment fragment-id="${local.wallet_authentication_fragment_name}" />
+            <include-fragment fragment-id="${local.wallet_authentication_fragment_name}" />
           </when>
       </choose>
       <base />
