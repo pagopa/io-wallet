@@ -40,6 +40,7 @@ No modules.
 | <a name="input_action_group_id"></a> [action\_group\_id](#input\_action\_group\_id) | Id of the alert action group | `string` | n/a | yes |
 | <a name="input_customer_managed_key_url"></a> [customer\_managed\_key\_url](#input\_customer\_managed\_key\_url) | URL of the customer managed key to encrypt the Storage Account | `string` | `null` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | <pre>object({<br/>    prefix          = string<br/>    environment     = string<br/>    location        = string<br/>    name            = string<br/>    instance_number = string<br/>  })</pre> | n/a | yes |
+| <a name="input_is_psn"></a> [is\_psn](#input\_is\_psn) | Temporary variable to manage both IO and PSN resources | `bool` | `false` | no |
 | <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Id of the wallet Key Vault where storage account saves secrets | `string` | `null` | no |
 | <a name="input_private_endpoint"></a> [private\_endpoint](#input\_private\_endpoint) | Configuration for the Private Endpoints | <pre>object({<br/>    subnet_pep_id             = string<br/>    blob_private_dns_zone_id  = string<br/>    queue_private_dns_zone_id = string<br/>  })</pre> | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |

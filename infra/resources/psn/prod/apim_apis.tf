@@ -301,6 +301,11 @@ resource "azurerm_api_management_api_policy" "user_ioapp_v1" {
       <set-header name="x-functions-key" exists-action="override">
         <value>{{${azurerm_api_management_named_value.func_user_ioapp_key.display_name}}}</value>
       </set-header>
+      <choose>
+        <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
+          <include-fragment fragment-id="extract-user-fiscal-code" />
+        </when>
+      </choose>
       <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
   </inbound>
 </policies>
@@ -332,6 +337,11 @@ resource "azurerm_api_management_api_policy" "user_uat_ioapp_v1" {
 <policies>
   <inbound>
       <base />
+      <choose>
+        <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
+          <include-fragment fragment-id="extract-user-fiscal-code" />
+        </when>
+      </choose>
       <set-backend-service backend-id="${azurerm_api_management_backend.func_user_uat.name}" />
   </inbound>
 </policies>
@@ -466,4 +476,40 @@ resource "azurerm_api_management_api_operation_policy" "get_current_wallet_insta
   api_management_name = module.apim.name
 
   xml_content = file("${path.module}/apim/policies/set_fiscal_code_header.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "get_nonce_policy" {
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
+  operation_id        = "getNonce"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/skip_extract_fiscal_code_fragment_operation.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "get_nonce_uat_policy" {
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
+  operation_id        = "getNonce"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/skip_extract_fiscal_code_fragment_operation.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "health_check_policy" {
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
+  operation_id        = "healthCheck"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/skip_extract_fiscal_code_fragment_operation.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "health_check_uat_policy" {
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
+  operation_id        = "healthCheck"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/skip_extract_fiscal_code_fragment_operation.xml")
 }
