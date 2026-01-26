@@ -302,7 +302,7 @@ resource "azurerm_api_management_api_policy" "user_ioapp_v1" {
         <value>{{${azurerm_api_management_named_value.func_user_ioapp_key.display_name}}}</value>
       </set-header>
       <choose>
-        <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
+        <when condition="@(!context.Variables.ContainsKey(&quot;skipFiscalCodeFragment&quot;))">
           <include-fragment fragment-id="extract-user-fiscal-code" />
         </when>
       </choose>
@@ -338,7 +338,7 @@ resource "azurerm_api_management_api_policy" "user_uat_ioapp_v1" {
   <inbound>
       <base />
       <choose>
-        <when condition="@(!context.Variables.ContainsKey(&quot;skipSessionFragment&quot;))">
+        <when condition="@(!context.Variables.ContainsKey(&quot;skipFiscalCodeFragment&quot;))">
           <include-fragment fragment-id="extract-user-fiscal-code" />
         </when>
       </choose>
