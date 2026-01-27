@@ -109,8 +109,8 @@ graph LR
   pagopa_appgw -->|"ioweb/support"| pagopa_apim
   pagopa_appgw -->|"ioapp"| pagopa_platform_apim
 
-  pagopa_apim ---> psn_appgw_pep
-  pagopa_apim --> session_manager
+  pagopa_apim -->|"ioweb"| dns_cdn
+  pagopa_apim -->|"ioweb/support"| psn_appgw_pep
 
   pagopa_platform_apim --->|psn-backend-01| psn_appgw_pep
   pagopa_platform_apim -->|session-manager-backend-x| session_manager

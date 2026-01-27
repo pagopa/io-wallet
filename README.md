@@ -15,7 +15,7 @@ This is the `io-wallet` project mono-repository containing applications and pack
 
 The diagram below shows the cloud architecture of the resources deployed.
 
-![architecture-diagram](./architecture/cloud_architecture.png)
+![architecture-diagram](./architecture/cloud_architecture.svg)
 
 ## Technologies
 
