@@ -49,11 +49,10 @@ variable "psn_service_principal_id" {
 
 variable "throughput" {
   type = object({
-    wallet_instances              = optional(number, 8000)
-    nonces                        = optional(number, 4000)
-    whitelisted_fiscal_codes      = optional(number, 8000)
-    certificates                  = optional(number, 8000)
-    leases_revoke_wallet_instance = optional(number, 1000)
+    wallet_instances         = optional(number, 8000)
+    nonces                   = optional(number, 4000)
+    whitelisted_fiscal_codes = optional(number, 8000)
+    certificates             = optional(number, 8000)
     uat = optional(object({
       wallet_instances         = optional(number, 1000)
       nonces                   = optional(number, 1000)
