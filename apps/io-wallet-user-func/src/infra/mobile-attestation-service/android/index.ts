@@ -3,7 +3,6 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
-import * as J from "fp-ts/Json";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
@@ -64,40 +63,25 @@ export const validateAndroidAssertion = (
   hardwareKey: JwkPublicKey,
   bundleIdentifiers: string[],
   androidPlayStoreCertificateHash: string,
-  googleAppCredentialsEncoded: string,
+  googleAppCredentials: GoogleAppCredentials,
   androidPlayIntegrityUrl: string,
   allowDevelopmentEnvironment: boolean,
 ) =>
   pipe(
-    E.tryCatch(
-      () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
-      E.toError,
-    ),
-    E.chain(J.parse),
-    E.mapLeft(
+    TE.tryCatch(
       () =>
-        new AndroidAssertionError(
-          "Unable to parse Google App Credentials string",
-        ),
-    ),
-    E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
-    TE.fromEither,
-    TE.chain((googleAppCredentials) =>
-      TE.tryCatch(
-        () =>
-          verifyAssertion({
-            allowDevelopmentEnvironment,
-            androidPlayIntegrityUrl,
-            androidPlayStoreCertificateHash,
-            bundleIdentifiers,
-            clientData,
-            googleAppCredentials,
-            hardwareKey,
-            hardwareSignature,
-            integrityAssertion,
-          }),
-        E.toError,
-      ),
+        verifyAssertion({
+          allowDevelopmentEnvironment,
+          androidPlayIntegrityUrl,
+          androidPlayStoreCertificateHash,
+          bundleIdentifiers,
+          clientData,
+          googleAppCredentials,
+          hardwareKey,
+          hardwareSignature,
+          integrityAssertion,
+        }),
+      E.toError,
     ),
     TE.chain((assertionValidationResult) =>
       assertionValidationResult.success

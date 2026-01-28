@@ -2,7 +2,6 @@ import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
@@ -77,8 +76,7 @@ export const iOsAssertion = t.type({
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
 
 export const validateiOSAssertion = (
-  integrityAssertion: NonEmptyString,
-  hardwareSignature: NonEmptyString,
+  decodedAssertion: t.TypeOf<typeof iOsAssertion>,
   clientData: string,
   hardwareKey: JwkPublicKey,
   signCount: number,
@@ -87,34 +85,18 @@ export const validateiOSAssertion = (
   skipSignatureValidation: boolean,
 ) =>
   pipe(
-    sequenceS(E.Applicative)({
-      authenticatorData: E.tryCatch(
-        () => Buffer.from(integrityAssertion, "base64"),
-        E.toError,
-      ),
-      signature: E.tryCatch(
-        () => Buffer.from(hardwareSignature, "base64"),
-        E.toError,
-      ),
-    }),
-    E.chainW(
-      parse(iOsAssertion, "[iOS Assertion] assertion format is invalid"),
-    ),
-    TE.fromEither,
-    TE.chain((decodedAssertion) =>
-      TE.tryCatch(
-        () =>
-          verifyAssertion({
-            bundleIdentifiers,
-            clientData,
-            decodedAssertion,
-            hardwareKey,
-            signCount,
-            skipSignatureValidation,
-            teamIdentifier,
-          }),
-        E.toError,
-      ),
+    TE.tryCatch(
+      () =>
+        verifyAssertion({
+          bundleIdentifiers,
+          clientData,
+          decodedAssertion,
+          hardwareKey,
+          signCount,
+          skipSignatureValidation,
+          teamIdentifier,
+        }),
+      E.toError,
     ),
     TE.chain((assertionValidationResult) =>
       assertionValidationResult.success
