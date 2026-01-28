@@ -28,7 +28,7 @@ import {
   validateAndroidAttestation,
 } from "./android";
 import { GoogleAppCredentials } from "./android/assertion";
-import { AndroidAssertionError } from "./errors";
+import { AndroidAssertionError, AndroidAttestationError } from "./errors";
 import {
   iOsAssertion,
   iOsAttestation,
@@ -188,7 +188,7 @@ export class MobileAttestationService implements AttestationService {
         E.tryCatch(
           () => new X509Certificate(base64ToPem(b64)),
           () =>
-            new Error("Not a valid Android attestation (X509 parse failed)"),
+            new AndroidAttestationError(`Unable to decode X509 certificate`),
         ),
       ),
       A.sequence(E.Applicative),
