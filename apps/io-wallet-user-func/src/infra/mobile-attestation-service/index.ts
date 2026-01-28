@@ -1,12 +1,15 @@
-import { ValidationError } from "@pagopa/handler-kit";
+
+import { parse, ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode as cborDecode } from "cbor-x";
 import { createPublicKey } from "crypto";
+import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
+import * as A from "fp-ts/Array";
 import * as TE from "fp-ts/TaskEither";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
@@ -20,10 +23,15 @@ import {
 } from "@/attestation-service";
 
 import {
+  base64ToPem,
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
-import { validateiOSAssertion, validateiOSAttestation } from "./ios";
+import {
+  iOsAttestation,
+  validateiOSAssertion,
+  validateiOSAttestation,
+} from "./ios";
 
 export class IntegrityCheckError extends Error {
   name = "IntegrityCheckError";
@@ -81,35 +89,68 @@ export class MobileAttestationService implements AttestationService {
       ),
       TE.chainW((clientData) =>
         pipe(
-          this.isIosAttestation(integrityAssertion),
+          E.tryCatch(
+            () => cborDecode(Buffer.from(integrityAssertion, "base64")),
+            E.toError,
+          ),
+          E.chainW((decoded) =>
+            iOsAttestation.decode(decoded)._tag === "Right"
+              ? E.right(decoded)
+              : E.left(new Error("Not a valid iOS assertion")),
+          ),
           TE.fromEither,
-          TE.chainW((isIos) =>
-            isIos
-              ? validateiOSAssertion(
-                  integrityAssertion,
-                  hardwareSignature,
-                  clientData,
-                  hardwareKey,
-                  signCount,
-                  this.#configuration.iosBundleIdentifiers,
-                  this.#configuration.iOsTeamIdentifier,
-                  this.#configuration.skipSignatureValidation,
-                )
-              : validateAndroidAssertion(
-                  integrityAssertion,
-                  hardwareSignature,
-                  clientData,
-                  hardwareKey,
-                  this.#configuration.androidBundleIdentifiers,
-                  this.#configuration.androidPlayStoreCertificateHash,
-                  this.#configuration.googleAppCredentialsEncoded,
-                  this.#configuration.androidPlayIntegrityUrl,
-                  this.allowDevelopmentEnvironmentForUser(user),
-                ),
+          TE.chainW(() =>
+            validateiOSAssertion(
+              integrityAssertion,
+              hardwareSignature,
+              clientData,
+              hardwareKey,
+              signCount,
+              this.#configuration.iosBundleIdentifiers,
+              this.#configuration.iOsTeamIdentifier,
+              this.#configuration.skipSignatureValidation,
+            ),
+          ),
+          TE.orElseW(() =>
+            validateAndroidAssertion(
+              integrityAssertion,
+              hardwareSignature,
+              clientData,
+              hardwareKey,
+              this.#configuration.androidBundleIdentifiers,
+              this.#configuration.androidPlayStoreCertificateHash,
+              this.#configuration.googleAppCredentialsEncoded,
+              this.#configuration.androidPlayIntegrityUrl,
+              this.allowDevelopmentEnvironmentForUser(user),
+            ),
           ),
         ),
       ),
     );
+
+  private parseIosAttestation = (data: Buffer) =>
+    pipe(
+      E.tryCatch(() => cborDecode(data), E.toError),
+      E.chainW(
+        parse(
+          iOsAttestation,
+          "[iOS Attestation] attestation format is invalid",
+        ),
+      ),
+    );
+
+    private parseAndroidAttestation = (data: Buffer) =>
+    pipe(
+      data.toString("utf-8").split(","),
+      A.map((b64) =>
+        E.tryCatch(
+          () => new X509Certificate(base64ToPem(b64)),
+          () => new Error("Not a valid Android attestation (X509 parse failed)")
+        )
+      ),
+      A.sequence(E.Applicative),
+    );
+
 
   validateAttestation = (
     attestation: NonEmptyString,
@@ -125,48 +166,45 @@ export class MobileAttestationService implements AttestationService {
       TE.fromEither,
       TE.chainW((data) =>
         pipe(
-          this.isIosAttestation(data),
+          this.parseIosAttestation(data),
           TE.fromEither,
-          TE.chainW((isIos) =>
-            isIos
-              ? validateiOSAttestation(
-                  data,
+          TE.chainW((decoded) =>
+            validateiOSAttestation(
+              decoded,
+              nonce,
+              hardwareKeyTag,
+              this.#configuration.iosBundleIdentifiers,
+              this.#configuration.iOsTeamIdentifier,
+              this.#configuration.appleRootCertificate,
+              this.allowDevelopmentEnvironmentForUser(user),
+            ),
+          ),
+          TE.orElseW(() =>
+            pipe(
+              this.parseAndroidAttestation(data),
+              TE.fromEither,
+              TE.chainW((x509Chain) =>
+                validateAndroidAttestation(
+                  x509Chain,
                   nonce,
-                  hardwareKeyTag,
-                  this.#configuration.iosBundleIdentifiers,
-                  this.#configuration.iOsTeamIdentifier,
-                  this.#configuration.appleRootCertificate,
-                  this.allowDevelopmentEnvironmentForUser(user),
-                )
-              : pipe(
-                  validateAndroidAttestation(
-                    data,
-                    nonce,
-                    this.#configuration.androidBundleIdentifiers,
-                    this.#configuration.googlePublicKeys,
-                    this.#configuration.androidCrlUrl,
-                    this.#configuration.httpRequestTimeout,
-                  ),
-                  TE.mapLeft(toIntegrityCheckError),
+                  this.#configuration.androidBundleIdentifiers,
+                  this.#configuration.googlePublicKeys,
+                  this.#configuration.androidCrlUrl,
+                  this.#configuration.httpRequestTimeout,
                 ),
+              ),
+              TE.mapLeft(toIntegrityCheckError),
+              TE.orElseW((err) =>
+                TE.left(
+                  new ValidationError([
+                    "Attestation payload is neither valid iOS nor Android format",
+                    String(err),
+                  ]),
+                ),
+              ),
+            ),
           ),
         ),
-      ),
-    );
-
-  private isIosAttestation = (
-    input: Buffer | string,
-  ): E.Either<Error, boolean> =>
-    pipe(
-      typeof input === "string"
-        ? E.tryCatch(() => Buffer.from(input, "base64"), E.toError)
-        : E.right(input),
-      E.chain((buf) => E.tryCatch(() => cborDecode(buf), E.toError)),
-      E.map(
-        (decoded) =>
-          // typeof decoded === "object" &&
-          // decoded !== null &&
-          decoded.fmt === "apple-appattest",
       ),
     );
 }

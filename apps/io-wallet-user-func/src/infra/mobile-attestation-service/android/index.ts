@@ -4,8 +4,6 @@ import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import * as RA from "fp-ts/lib/ReadonlyArray";
-import * as S from "fp-ts/lib/string";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
@@ -27,7 +25,7 @@ const DeviceDetailsWithKey = t.type({
 });
 
 export const validateAndroidAttestation = (
-  data: Buffer,
+  x509Chain: X509Certificate[],
   nonce: NonEmptyString,
   bundleIdentifiers: string[],
   googlePublicKeys: string[],
@@ -35,45 +33,28 @@ export const validateAndroidAttestation = (
   httpRequestTimeout: number,
 ): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(
-    data.toString("utf-8"),
-    S.split(","),
-    RA.map(
-      flow(base64ToPem, (cert) =>
-        E.tryCatch(
-          () => new X509Certificate(cert),
-          () =>
-            new AndroidAttestationError(`Unable to decode X509 certificate`),
-        ),
+    getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
+    TE.chain((attestationCrl) =>
+      TE.tryCatch(
+        () =>
+          verifyAttestation({
+            attestationCrl,
+            bundleIdentifiers,
+            challenge: nonce,
+            googlePublicKeys,
+            x509Chain,
+          }),
+        E.toError,
       ),
     ),
-    RA.sequence(E.Applicative),
-    TE.fromEither,
-    TE.chain((x509Chain) =>
-      pipe(
-        getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
-        TE.chain((attestationCrl) =>
-          TE.tryCatch(
-            () =>
-              verifyAttestation({
-                attestationCrl,
-                bundleIdentifiers,
-                challenge: nonce,
-                googlePublicKeys,
-                x509Chain,
-              }),
-            E.toError,
+    TE.chain((attestationValidationResult) =>
+      attestationValidationResult.success
+        ? TE.right(attestationValidationResult)
+        : TE.left(
+            new AndroidAttestationError(attestationValidationResult.reason),
           ),
-        ),
-        TE.chain((attestationValidationResult) =>
-          attestationValidationResult.success
-            ? TE.right(attestationValidationResult)
-            : TE.left(
-                new AndroidAttestationError(attestationValidationResult.reason),
-              ),
-        ),
-        TE.chainW(flow(parse(DeviceDetailsWithKey), TE.fromEither)),
-      ),
     ),
+    TE.chainW(flow(parse(DeviceDetailsWithKey), TE.fromEither)),
   );
 
 export const validateAndroidAssertion = (
