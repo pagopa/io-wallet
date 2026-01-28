@@ -130,7 +130,7 @@ export class MobileAttestationService implements AttestationService {
               TE.orElseW(() =>
                 TE.left(
                   new ValidationError([
-                    "Assertion payload is neither valid iOS nor Android format"
+                    "Assertion payload is neither valid iOS nor Android format",
                   ]),
                 ),
               ),
@@ -185,7 +185,7 @@ export class MobileAttestationService implements AttestationService {
               TE.orElseW(() =>
                 TE.left(
                   new ValidationError([
-                    "Attestation payload is neither valid iOS nor Android format"
+                    "Attestation payload is neither valid iOS nor Android format",
                   ]),
                 ),
               ),
@@ -193,6 +193,19 @@ export class MobileAttestationService implements AttestationService {
           ),
         ),
       ),
+    );
+
+  private parseAndroidAttestation = (data: Buffer) =>
+    pipe(
+      data.toString("utf-8").split(","),
+      A.map((b64) =>
+        E.tryCatch(
+          () => new X509Certificate(base64ToPem(b64)),
+          () =>
+            new Error("Not a valid Android attestation (X509 parse failed)"),
+        ),
+      ),
+      A.sequence(E.Applicative),
     );
 
   private parseGoogleAppCredentials = (googleAppCredentialsEncoded: string) =>
@@ -209,19 +222,6 @@ export class MobileAttestationService implements AttestationService {
           ),
       ),
       E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
-    );
-
-  private parseAndroidAttestation = (data: Buffer) =>
-    pipe(
-      data.toString("utf-8").split(","),
-      A.map((b64) =>
-        E.tryCatch(
-          () => new X509Certificate(base64ToPem(b64)),
-          () =>
-            new Error("Not a valid Android attestation (X509 parse failed)"),
-        ),
-      ),
-      A.sequence(E.Applicative),
     );
 
   private parseIosAssertion = ({
