@@ -126,14 +126,7 @@ export class MobileAttestationService implements AttestationService {
                   this.#configuration.androidPlayIntegrityUrl,
                   this.allowDevelopmentEnvironmentForUser(user),
                 ),
-              ),
-              TE.orElseW(() =>
-                TE.left(
-                  new ValidationError([
-                    "Assertion payload is neither valid iOS nor Android format",
-                  ]),
-                ),
-              ),
+              )
             ),
           ),
         ),
@@ -181,14 +174,7 @@ export class MobileAttestationService implements AttestationService {
                   this.#configuration.httpRequestTimeout,
                 ),
               ),
-              TE.mapLeft(toIntegrityCheckError),
-              TE.orElseW(() =>
-                TE.left(
-                  new ValidationError([
-                    "Attestation payload is neither valid iOS nor Android format",
-                  ]),
-                ),
-              ),
+              TE.mapLeft(toIntegrityCheckError)
             ),
           ),
         ),
