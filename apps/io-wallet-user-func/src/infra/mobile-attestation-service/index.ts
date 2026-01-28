@@ -1,4 +1,3 @@
-
 import { parse, ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { decode as cborDecode } from "cbor-x";
