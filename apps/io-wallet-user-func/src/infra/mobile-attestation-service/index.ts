@@ -1,13 +1,15 @@
-import { ValidationError } from "@pagopa/handler-kit";
+import { parse, ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { decode as cborDecode } from "cbor-x";
 import { createPublicKey } from "crypto";
+import { X509Certificate } from "crypto";
+import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
-import { identity, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import { Separated } from "fp-ts/lib/Separated";
+import { sequenceS } from "fp-ts/lib/Apply";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
-import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
@@ -21,10 +23,22 @@ import {
 } from "@/attestation-service";
 
 import {
+  base64ToPem,
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
-import { validateiOSAssertion, validateiOSAttestation } from "./ios";
+import { GoogleAppCredentials } from "./android/assertion";
+import {
+  AndroidAssertionError,
+  AndroidAttestationError,
+  IosAttestationError,
+} from "./errors";
+import {
+  iOsAssertion,
+  iOsAttestation,
+  validateiOSAssertion,
+  validateiOSAttestation,
+} from "./ios";
 
 export class IntegrityCheckError extends Error {
   name = "IntegrityCheckError";
@@ -35,18 +49,6 @@ export class IntegrityCheckError extends Error {
 
 const toIntegrityCheckError = (e: Error | ValidationError): Error =>
   e instanceof ValidationError ? new IntegrityCheckError(e.violations) : e;
-
-const getErrorsOrFirstValidValue = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validated: Separated<readonly Error[], readonly any[]>,
-) =>
-  pipe(
-    validated.right,
-    RA.head,
-    E.fromOption(
-      () => new IntegrityCheckError(validated.left.map((el) => el.message)),
-    ),
-  );
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -87,20 +89,21 @@ export class MobileAttestationService implements AttestationService {
       TE.tryCatch(() => calculateJwkThumbprint(jwk, "sha256"), E.toError),
       TE.chainEitherKW((jwk_thumbprint) =>
         pipe(
-          {
-            challenge: nonce,
-            jwk_thumbprint,
-          },
+          { challenge: nonce, jwk_thumbprint },
           J.stringify,
           E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
         ),
       ),
       TE.chainW((clientData) =>
         pipe(
-          [
+          this.parseIosAssertion({
+            hardwareSignature,
+            integrityAssertion,
+          }),
+          TE.fromEither,
+          TE.chainW((decodedAssertion) =>
             validateiOSAssertion(
-              integrityAssertion,
-              hardwareSignature,
+              decodedAssertion,
               clientData,
               hardwareKey,
               signCount,
@@ -108,20 +111,33 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.iOsTeamIdentifier,
               this.#configuration.skipSignatureValidation,
             ),
-            validateAndroidAssertion(
-              integrityAssertion,
-              hardwareSignature,
-              clientData,
-              hardwareKey,
-              this.#configuration.androidBundleIdentifiers,
-              this.#configuration.androidPlayStoreCertificateHash,
-              this.#configuration.googleAppCredentialsEncoded,
-              this.#configuration.androidPlayIntegrityUrl,
-              this.allowDevelopmentEnvironmentForUser(user),
+          ),
+          TE.orElseW((iosErr) =>
+            pipe(
+              this.parseGoogleAppCredentials(
+                this.#configuration.googleAppCredentialsEncoded,
+              ),
+              TE.fromEither,
+              TE.chain((googleAppCredentials) =>
+                validateAndroidAssertion(
+                  integrityAssertion,
+                  hardwareSignature,
+                  clientData,
+                  hardwareKey,
+                  this.#configuration.androidBundleIdentifiers,
+                  this.#configuration.androidPlayStoreCertificateHash,
+                  googleAppCredentials,
+                  this.#configuration.androidPlayIntegrityUrl,
+                  this.allowDevelopmentEnvironmentForUser(user),
+                ),
+              ),
+              TE.orElseW((androidErr) =>
+                TE.left(
+                  new IntegrityCheckError([iosErr.message, androidErr.message]),
+                ),
+              ),
             ),
-          ],
-          RA.wilt(T.ApplicativePar)(identity),
-          T.map(getErrorsOrFirstValidValue),
+          ),
         ),
       ),
     );
@@ -140,9 +156,11 @@ export class MobileAttestationService implements AttestationService {
       TE.fromEither,
       TE.chainW((data) =>
         pipe(
-          [
+          this.parseIosAttestation(data),
+          TE.fromEither,
+          TE.chainW((decoded) =>
             validateiOSAttestation(
-              data,
+              decoded,
               nonce,
               hardwareKeyTag,
               this.#configuration.iosBundleIdentifiers,
@@ -150,22 +168,91 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.appleRootCertificate,
               this.allowDevelopmentEnvironmentForUser(user),
             ),
+          ),
+          TE.orElseW((iosErr) =>
             pipe(
-              validateAndroidAttestation(
-                data,
-                nonce,
-                this.#configuration.androidBundleIdentifiers,
-                this.#configuration.googlePublicKeys,
-                this.#configuration.androidCrlUrl,
-                this.#configuration.httpRequestTimeout,
+              this.parseAndroidAttestation(data),
+              TE.fromEither,
+              TE.chainW((x509Chain) =>
+                validateAndroidAttestation(
+                  x509Chain,
+                  nonce,
+                  this.#configuration.androidBundleIdentifiers,
+                  this.#configuration.googlePublicKeys,
+                  this.#configuration.androidCrlUrl,
+                  this.#configuration.httpRequestTimeout,
+                ),
               ),
               TE.mapLeft(toIntegrityCheckError),
+              TE.orElseW((androidErr) =>
+                TE.left(
+                  new IntegrityCheckError([iosErr.message, androidErr.message]),
+                ),
+              ),
             ),
-          ],
-          RA.wilt(T.ApplicativeSeq)(identity),
-          T.map(getErrorsOrFirstValidValue),
+          ),
         ),
       ),
     );
+
+  private parseAndroidAttestation = (data: Buffer) =>
+    pipe(
+      data.toString("utf-8").split(","),
+      A.map((b64) =>
+        E.tryCatch(
+          () => new X509Certificate(base64ToPem(b64)),
+          () =>
+            new AndroidAttestationError(`Unable to decode X509 certificate`),
+        ),
+      ),
+      A.sequence(E.Applicative),
+    );
+
+  private parseGoogleAppCredentials = (googleAppCredentialsEncoded: string) =>
+    pipe(
+      E.tryCatch(
+        () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
+        E.toError,
+      ),
+      E.chain(J.parse),
+      E.mapLeft(
+        () =>
+          new AndroidAssertionError(
+            "Unable to parse Google App Credentials string",
+          ),
+      ),
+      E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
+    );
+
+  private parseIosAssertion = ({
+    hardwareSignature,
+    integrityAssertion,
+  }: {
+    hardwareSignature: NonEmptyString;
+    integrityAssertion: NonEmptyString;
+  }) =>
+    pipe(
+      sequenceS(E.Applicative)({
+        authenticatorData: E.tryCatch(
+          () => Buffer.from(integrityAssertion, "base64"),
+          E.toError,
+        ),
+        signature: E.tryCatch(
+          () => Buffer.from(hardwareSignature, "base64"),
+          E.toError,
+        ),
+      }),
+      E.chainW(
+        parse(iOsAssertion, "[iOS Assertion] assertion format is invalid"),
+      ),
+    );
+
+  private parseIosAttestation = (data: Buffer) =>
+    pipe(
+      E.tryCatch(() => cborDecode(data), E.toError),
+      E.chainW(parse(iOsAttestation)),
+      E.mapLeft(() => new IosAttestationError("Unable to decode data")),
+    );
 }
+
 export { ValidatedAttestation };
