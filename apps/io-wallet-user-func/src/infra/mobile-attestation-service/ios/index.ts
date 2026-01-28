@@ -76,7 +76,7 @@ export const iOsAssertion = t.type({
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
 
 export const validateiOSAssertion = (
-  decodedAssertion: t.TypeOf<typeof iOsAssertion>,
+  decodedAssertion: iOsAssertion,
   clientData: string,
   hardwareKey: JwkPublicKey,
   signCount: number,
