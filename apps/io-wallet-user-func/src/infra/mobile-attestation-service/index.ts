@@ -110,7 +110,7 @@ export class MobileAttestationService implements AttestationService {
           ),
           TE.orElseW(() =>
             pipe(
-              this.decodeGoogleAppCredentials(
+              this.parseGoogleAppCredentials(
                 this.#configuration.googleAppCredentialsEncoded,
               ),
               TE.fromEither,
@@ -125,6 +125,13 @@ export class MobileAttestationService implements AttestationService {
                   googleAppCredentials,
                   this.#configuration.androidPlayIntegrityUrl,
                   this.allowDevelopmentEnvironmentForUser(user),
+                ),
+              ),
+              TE.orElseW(() =>
+                TE.left(
+                  new ValidationError([
+                    "Assertion payload is neither valid iOS nor Android format"
+                  ]),
                 ),
               ),
             ),
@@ -175,11 +182,10 @@ export class MobileAttestationService implements AttestationService {
                 ),
               ),
               TE.mapLeft(toIntegrityCheckError),
-              TE.orElseW((err) =>
+              TE.orElseW(() =>
                 TE.left(
                   new ValidationError([
-                    "Attestation payload is neither valid iOS nor Android format",
-                    String(err),
+                    "Attestation payload is neither valid iOS nor Android format"
                   ]),
                 ),
               ),
@@ -189,7 +195,7 @@ export class MobileAttestationService implements AttestationService {
       ),
     );
 
-  private decodeGoogleAppCredentials = (googleAppCredentialsEncoded: string) =>
+  private parseGoogleAppCredentials = (googleAppCredentialsEncoded: string) =>
     pipe(
       E.tryCatch(
         () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
