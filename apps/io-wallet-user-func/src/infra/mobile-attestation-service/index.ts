@@ -1,13 +1,12 @@
 import { ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { decode as cborDecode } from "cbor-x";
 import { createPublicKey } from "crypto";
 import * as E from "fp-ts/Either";
-import { identity, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import { Separated } from "fp-ts/lib/Separated";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
-import * as T from "fp-ts/Task";
 import * as TE from "fp-ts/TaskEither";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
@@ -35,18 +34,6 @@ export class IntegrityCheckError extends Error {
 
 const toIntegrityCheckError = (e: Error | ValidationError): Error =>
   e instanceof ValidationError ? new IntegrityCheckError(e.violations) : e;
-
-const getErrorsOrFirstValidValue = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validated: Separated<readonly Error[], readonly any[]>,
-) =>
-  pipe(
-    validated.right,
-    RA.head,
-    E.fromOption(
-      () => new IntegrityCheckError(validated.left.map((el) => el.message)),
-    ),
-  );
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
@@ -87,41 +74,39 @@ export class MobileAttestationService implements AttestationService {
       TE.tryCatch(() => calculateJwkThumbprint(jwk, "sha256"), E.toError),
       TE.chainEitherKW((jwk_thumbprint) =>
         pipe(
-          {
-            challenge: nonce,
-            jwk_thumbprint,
-          },
+          { challenge: nonce, jwk_thumbprint },
           J.stringify,
           E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
         ),
       ),
       TE.chainW((clientData) =>
         pipe(
-          [
-            validateiOSAssertion(
-              integrityAssertion,
-              hardwareSignature,
-              clientData,
-              hardwareKey,
-              signCount,
-              this.#configuration.iosBundleIdentifiers,
-              this.#configuration.iOsTeamIdentifier,
-              this.#configuration.skipSignatureValidation,
-            ),
-            validateAndroidAssertion(
-              integrityAssertion,
-              hardwareSignature,
-              clientData,
-              hardwareKey,
-              this.#configuration.androidBundleIdentifiers,
-              this.#configuration.androidPlayStoreCertificateHash,
-              this.#configuration.googleAppCredentialsEncoded,
-              this.#configuration.androidPlayIntegrityUrl,
-              this.allowDevelopmentEnvironmentForUser(user),
-            ),
-          ],
-          RA.wilt(T.ApplicativePar)(identity),
-          T.map(getErrorsOrFirstValidValue),
+          this.isIosAttestation(integrityAssertion),
+          TE.fromEither,
+          TE.chainW((isIos) =>
+            isIos
+              ? validateiOSAssertion(
+                  integrityAssertion,
+                  hardwareSignature,
+                  clientData,
+                  hardwareKey,
+                  signCount,
+                  this.#configuration.iosBundleIdentifiers,
+                  this.#configuration.iOsTeamIdentifier,
+                  this.#configuration.skipSignatureValidation,
+                )
+              : validateAndroidAssertion(
+                  integrityAssertion,
+                  hardwareSignature,
+                  clientData,
+                  hardwareKey,
+                  this.#configuration.androidBundleIdentifiers,
+                  this.#configuration.androidPlayStoreCertificateHash,
+                  this.#configuration.googleAppCredentialsEncoded,
+                  this.#configuration.androidPlayIntegrityUrl,
+                  this.allowDevelopmentEnvironmentForUser(user),
+                ),
+          ),
         ),
       ),
     );
@@ -140,32 +125,50 @@ export class MobileAttestationService implements AttestationService {
       TE.fromEither,
       TE.chainW((data) =>
         pipe(
-          [
-            validateiOSAttestation(
-              data,
-              nonce,
-              hardwareKeyTag,
-              this.#configuration.iosBundleIdentifiers,
-              this.#configuration.iOsTeamIdentifier,
-              this.#configuration.appleRootCertificate,
-              this.allowDevelopmentEnvironmentForUser(user),
-            ),
-            pipe(
-              validateAndroidAttestation(
-                data,
-                nonce,
-                this.#configuration.androidBundleIdentifiers,
-                this.#configuration.googlePublicKeys,
-                this.#configuration.androidCrlUrl,
-                this.#configuration.httpRequestTimeout,
-              ),
-              TE.mapLeft(toIntegrityCheckError),
-            ),
-          ],
-          RA.wilt(T.ApplicativeSeq)(identity),
-          T.map(getErrorsOrFirstValidValue),
+          this.isIosAttestation(data),
+          TE.fromEither,
+          TE.chainW((isIos) =>
+            isIos
+              ? validateiOSAttestation(
+                  data,
+                  nonce,
+                  hardwareKeyTag,
+                  this.#configuration.iosBundleIdentifiers,
+                  this.#configuration.iOsTeamIdentifier,
+                  this.#configuration.appleRootCertificate,
+                  this.allowDevelopmentEnvironmentForUser(user),
+                )
+              : pipe(
+                  validateAndroidAttestation(
+                    data,
+                    nonce,
+                    this.#configuration.androidBundleIdentifiers,
+                    this.#configuration.googlePublicKeys,
+                    this.#configuration.androidCrlUrl,
+                    this.#configuration.httpRequestTimeout,
+                  ),
+                  TE.mapLeft(toIntegrityCheckError),
+                ),
+          ),
         ),
       ),
     );
+
+  private isIosAttestation = (
+    input: Buffer | string,
+  ): E.Either<Error, boolean> =>
+    pipe(
+      typeof input === "string"
+        ? E.tryCatch(() => Buffer.from(input, "base64"), E.toError)
+        : E.right(input),
+      E.chain((buf) => E.tryCatch(() => cborDecode(buf), E.toError)),
+      E.map(
+        (decoded) =>
+          // typeof decoded === "object" &&
+          // decoded !== null &&
+          decoded.fmt === "apple-appattest",
+      ),
+    );
 }
+
 export { ValidatedAttestation };
