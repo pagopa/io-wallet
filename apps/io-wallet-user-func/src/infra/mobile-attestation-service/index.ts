@@ -28,7 +28,11 @@ import {
   validateAndroidAttestation,
 } from "./android";
 import { GoogleAppCredentials } from "./android/assertion";
-import { AndroidAssertionError, AndroidAttestationError } from "./errors";
+import {
+  AndroidAssertionError,
+  AndroidAttestationError,
+  IosAttestationError,
+} from "./errors";
 import {
   iOsAssertion,
   iOsAttestation,
@@ -108,7 +112,7 @@ export class MobileAttestationService implements AttestationService {
               this.#configuration.skipSignatureValidation,
             ),
           ),
-          TE.orElseW(() =>
+          TE.orElseW((iosErr) =>
             pipe(
               this.parseGoogleAppCredentials(
                 this.#configuration.googleAppCredentialsEncoded,
@@ -125,6 +129,11 @@ export class MobileAttestationService implements AttestationService {
                   googleAppCredentials,
                   this.#configuration.androidPlayIntegrityUrl,
                   this.allowDevelopmentEnvironmentForUser(user),
+                ),
+              ),
+              TE.orElseW((androidErr) =>
+                TE.left(
+                  new IntegrityCheckError([iosErr.message, androidErr.message]),
                 ),
               ),
             ),
@@ -160,7 +169,7 @@ export class MobileAttestationService implements AttestationService {
               this.allowDevelopmentEnvironmentForUser(user),
             ),
           ),
-          TE.orElseW(() =>
+          TE.orElseW((iosErr) =>
             pipe(
               this.parseAndroidAttestation(data),
               TE.fromEither,
@@ -175,6 +184,11 @@ export class MobileAttestationService implements AttestationService {
                 ),
               ),
               TE.mapLeft(toIntegrityCheckError),
+              TE.orElseW((androidErr) =>
+                TE.left(
+                  new IntegrityCheckError([iosErr.message, androidErr.message]),
+                ),
+              ),
             ),
           ),
         ),
@@ -236,12 +250,8 @@ export class MobileAttestationService implements AttestationService {
   private parseIosAttestation = (data: Buffer) =>
     pipe(
       E.tryCatch(() => cborDecode(data), E.toError),
-      E.chainW(
-        parse(
-          iOsAttestation,
-          "[iOS Attestation] attestation format is invalid",
-        ),
-      ),
+      E.chainW(parse(iOsAttestation)),
+      E.mapLeft(() => new IosAttestationError("Unable to decode data")),
     );
 }
 
