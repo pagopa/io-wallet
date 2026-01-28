@@ -126,7 +126,7 @@ export class MobileAttestationService implements AttestationService {
                   this.#configuration.androidPlayIntegrityUrl,
                   this.allowDevelopmentEnvironmentForUser(user),
                 ),
-              )
+              ),
             ),
           ),
         ),
@@ -174,7 +174,7 @@ export class MobileAttestationService implements AttestationService {
                   this.#configuration.httpRequestTimeout,
                 ),
               ),
-              TE.mapLeft(toIntegrityCheckError)
+              TE.mapLeft(toIntegrityCheckError),
             ),
           ),
         ),
