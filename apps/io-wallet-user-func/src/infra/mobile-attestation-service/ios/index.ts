@@ -1,8 +1,8 @@
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { decode } from "cbor-x";
+import { decode as cborDecode } from "cbor-x";
 import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
@@ -21,7 +21,6 @@ const buffer = new t.Type<Buffer, Buffer, unknown>(
   t.identity,
 );
 
-// iOS attestation type
 export const iOsAttestation = t.type({
   attStmt: t.type({
     receipt: buffer,
@@ -33,8 +32,24 @@ export const iOsAttestation = t.type({
 
 export type iOsAttestation = t.TypeOf<typeof iOsAttestation>;
 
+export const parseIosAttestation = (data: Buffer) =>
+  pipe(
+    E.tryCatch(
+      () => cborDecode(data),
+      () => new IosAttestationError("Unable to decode data"),
+    ),
+    E.chainW(
+      flow(
+        parse(iOsAttestation),
+        E.mapLeft(
+          () => new IosAttestationError("Attestation format is invalid"),
+        ),
+      ),
+    ),
+  );
+
 export const validateiOSAttestation = (
-  data: Buffer,
+  decodedAttestation: iOsAttestation,
   challenge: NonEmptyString,
   keyId: string,
   bundleIdentifiers: string[],
@@ -43,49 +58,34 @@ export const validateiOSAttestation = (
   allowDevelopmentEnvironment: boolean,
 ): TE.TaskEither<Error, ValidatedAttestation> =>
   pipe(
-    E.tryCatch(
-      () => decode(data),
-      () => new IosAttestationError(`Unable to decode data`),
+    TE.tryCatch(
+      () =>
+        verifyAttestation({
+          allowDevelopmentEnvironment,
+          appleRootCertificate,
+          bundleIdentifiers,
+          challenge,
+          decodedAttestation,
+          keyId,
+          teamIdentifier,
+        }),
+      E.toError,
     ),
-    E.chainW(
-      parse(iOsAttestation, "[iOS Attestation] attestation format is invalid"),
+    TE.chain((attestationValidationResult) =>
+      attestationValidationResult.success
+        ? TE.right(attestationValidationResult)
+        : TE.left(new IosAttestationError(attestationValidationResult.reason)),
     ),
-    TE.fromEither,
-    TE.chain((decodedAttestation) =>
+    TE.chainW((result) =>
       pipe(
-        TE.tryCatch(
-          () =>
-            verifyAttestation({
-              allowDevelopmentEnvironment,
-              appleRootCertificate,
-              bundleIdentifiers,
-              challenge,
-              decodedAttestation,
-              keyId,
-              teamIdentifier,
-            }),
-          E.toError,
-        ),
-        TE.chain((attestationValidationResult) =>
-          attestationValidationResult.success
-            ? TE.right(attestationValidationResult)
-            : TE.left(
-                new IosAttestationError(attestationValidationResult.reason),
-              ),
-        ),
-        TE.chainW((result) =>
-          pipe(
-            result.hardwareKey,
-            parse(JwkPublicKey, "Invalid JWK Public Key"),
-            E.map((hardwareKey) => ({ ...result, hardwareKey })),
-            TE.fromEither,
-          ),
-        ),
+        result.hardwareKey,
+        parse(JwkPublicKey, "Invalid JWK Public Key"),
+        E.map((hardwareKey) => ({ ...result, hardwareKey })),
+        TE.fromEither,
       ),
     ),
   );
 
-// iOS assertion type
 export const iOsAssertion = t.type({
   authenticatorData: buffer,
   signature: buffer,
@@ -93,16 +93,13 @@ export const iOsAssertion = t.type({
 
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
 
-export const validateiOSAssertion = (
-  integrityAssertion: NonEmptyString,
-  hardwareSignature: NonEmptyString,
-  clientData: string,
-  hardwareKey: JwkPublicKey,
-  signCount: number,
-  bundleIdentifiers: string[],
-  teamIdentifier: string,
-  skipSignatureValidation: boolean,
-) =>
+export const parseIosAssertion = ({
+  hardwareSignature,
+  integrityAssertion,
+}: {
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+}) =>
   pipe(
     sequenceS(E.Applicative)({
       authenticatorData: E.tryCatch(
@@ -114,24 +111,37 @@ export const validateiOSAssertion = (
         E.toError,
       ),
     }),
+    E.mapLeft(() => new IosAssertionError("Unable to decode data")),
     E.chainW(
-      parse(iOsAssertion, "[iOS Assertion] assertion format is invalid"),
-    ),
-    TE.fromEither,
-    TE.chain((decodedAssertion) =>
-      TE.tryCatch(
-        () =>
-          verifyAssertion({
-            bundleIdentifiers,
-            clientData,
-            decodedAssertion,
-            hardwareKey,
-            signCount,
-            skipSignatureValidation,
-            teamIdentifier,
-          }),
-        E.toError,
+      flow(
+        parse(iOsAssertion),
+        E.mapLeft(() => new IosAssertionError("Assertion format is invalid")),
       ),
+    ),
+  );
+
+export const validateiOSAssertion = (
+  decodedAssertion: iOsAssertion,
+  clientData: string,
+  hardwareKey: JwkPublicKey,
+  signCount: number,
+  bundleIdentifiers: string[],
+  teamIdentifier: string,
+  skipSignatureValidation: boolean,
+) =>
+  pipe(
+    TE.tryCatch(
+      () =>
+        verifyAssertion({
+          bundleIdentifiers,
+          clientData,
+          decodedAssertion,
+          hardwareKey,
+          signCount,
+          skipSignatureValidation,
+          teamIdentifier,
+        }),
+      E.toError,
     ),
     TE.chain((assertionValidationResult) =>
       assertionValidationResult.success
