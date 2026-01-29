@@ -3,6 +3,9 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
+import * as J from "fp-ts/Json";
+import * as S from "fp-ts/lib/string";
+import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
@@ -23,8 +26,21 @@ const DeviceDetailsWithKey = t.type({
   hardwareKey: JwkPublicKey,
 });
 
+export const parseAndroidAttestation = (data: Buffer) =>
+  pipe(
+    data.toString("utf-8"),
+    S.split(","),
+    RA.map((b64) =>
+      E.tryCatch(
+        () => new X509Certificate(base64ToPem(b64)),
+        () => new AndroidAttestationError("Unable to decode X509 certificate"),
+      ),
+    ),
+    RA.sequence(E.Applicative),
+  );
+
 export const validateAndroidAttestation = (
-  x509Chain: X509Certificate[],
+  x509Chain: readonly X509Certificate[],
   nonce: NonEmptyString,
   bundleIdentifiers: string[],
   googlePublicKeys: string[],
@@ -54,6 +70,24 @@ export const validateAndroidAttestation = (
           ),
     ),
     TE.chainW(flow(parse(DeviceDetailsWithKey), TE.fromEither)),
+  );
+
+export const parseGoogleAppCredentials = (
+  googleAppCredentialsEncoded: string,
+) =>
+  pipe(
+    E.tryCatch(
+      () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
+      E.toError,
+    ),
+    E.chain(J.parse),
+    E.chainW(parse(GoogleAppCredentials)),
+    E.mapLeft(
+      () =>
+        new AndroidAssertionError(
+          "Unable to parse Google App Credentials string",
+        ),
+    ),
   );
 
 export const validateAndroidAssertion = (

@@ -1,13 +1,9 @@
-import { parse, ValidationError } from "@pagopa/handler-kit";
+import { ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { decode as cborDecode } from "cbor-x";
 import { createPublicKey } from "crypto";
-import { X509Certificate } from "crypto";
-import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import { sequenceS } from "fp-ts/lib/Apply";
 import * as O from "fp-ts/Option";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
@@ -23,19 +19,14 @@ import {
 } from "@/attestation-service";
 
 import {
-  base64ToPem,
+  parseAndroidAttestation,
+  parseGoogleAppCredentials,
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
-import { GoogleAppCredentials } from "./android/assertion";
 import {
-  AndroidAssertionError,
-  AndroidAttestationError,
-  IosAttestationError,
-} from "./errors";
-import {
-  iOsAssertion,
-  iOsAttestation,
+  parseIosAssertion,
+  parseIosAttestation,
   validateiOSAssertion,
   validateiOSAttestation,
 } from "./ios";
@@ -96,7 +87,7 @@ export class MobileAttestationService implements AttestationService {
       ),
       TE.chainW((clientData) =>
         pipe(
-          this.parseIosAssertion({
+          parseIosAssertion({
             hardwareSignature,
             integrityAssertion,
           }),
@@ -114,7 +105,7 @@ export class MobileAttestationService implements AttestationService {
           ),
           TE.orElseW((iosErr) =>
             pipe(
-              this.parseGoogleAppCredentials(
+              parseGoogleAppCredentials(
                 this.#configuration.googleAppCredentialsEncoded,
               ),
               TE.fromEither,
@@ -156,7 +147,7 @@ export class MobileAttestationService implements AttestationService {
       TE.fromEither,
       TE.chainW((data) =>
         pipe(
-          this.parseIosAttestation(data),
+          parseIosAttestation(data),
           TE.fromEither,
           TE.chainW((decoded) =>
             validateiOSAttestation(
@@ -171,7 +162,7 @@ export class MobileAttestationService implements AttestationService {
           ),
           TE.orElseW((iosErr) =>
             pipe(
-              this.parseAndroidAttestation(data),
+              parseAndroidAttestation(data),
               TE.fromEither,
               TE.chainW((x509Chain) =>
                 validateAndroidAttestation(
@@ -193,65 +184,6 @@ export class MobileAttestationService implements AttestationService {
           ),
         ),
       ),
-    );
-
-  private parseAndroidAttestation = (data: Buffer) =>
-    pipe(
-      data.toString("utf-8").split(","),
-      A.map((b64) =>
-        E.tryCatch(
-          () => new X509Certificate(base64ToPem(b64)),
-          () =>
-            new AndroidAttestationError(`Unable to decode X509 certificate`),
-        ),
-      ),
-      A.sequence(E.Applicative),
-    );
-
-  private parseGoogleAppCredentials = (googleAppCredentialsEncoded: string) =>
-    pipe(
-      E.tryCatch(
-        () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
-        E.toError,
-      ),
-      E.chain(J.parse),
-      E.mapLeft(
-        () =>
-          new AndroidAssertionError(
-            "Unable to parse Google App Credentials string",
-          ),
-      ),
-      E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
-    );
-
-  private parseIosAssertion = ({
-    hardwareSignature,
-    integrityAssertion,
-  }: {
-    hardwareSignature: NonEmptyString;
-    integrityAssertion: NonEmptyString;
-  }) =>
-    pipe(
-      sequenceS(E.Applicative)({
-        authenticatorData: E.tryCatch(
-          () => Buffer.from(integrityAssertion, "base64"),
-          E.toError,
-        ),
-        signature: E.tryCatch(
-          () => Buffer.from(hardwareSignature, "base64"),
-          E.toError,
-        ),
-      }),
-      E.chainW(
-        parse(iOsAssertion, "[iOS Assertion] assertion format is invalid"),
-      ),
-    );
-
-  private parseIosAttestation = (data: Buffer) =>
-    pipe(
-      E.tryCatch(() => cborDecode(data), E.toError),
-      E.chainW(parse(iOsAttestation)),
-      E.mapLeft(() => new IosAttestationError("Unable to decode data")),
     );
 }
 

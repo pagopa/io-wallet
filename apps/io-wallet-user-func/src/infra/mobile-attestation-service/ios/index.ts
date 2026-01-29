@@ -1,7 +1,9 @@
 import { parse } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { decode as cborDecode } from "cbor-x";
 import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
+import { flow, pipe } from "fp-ts/function";
+import { sequenceS } from "fp-ts/lib/Apply";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { JwkPublicKey } from "io-wallet-common/jwk";
@@ -29,6 +31,22 @@ export const iOsAttestation = t.type({
 });
 
 export type iOsAttestation = t.TypeOf<typeof iOsAttestation>;
+
+export const parseIosAttestation = (data: Buffer) =>
+  pipe(
+    E.tryCatch(
+      () => cborDecode(data),
+      () => new IosAttestationError("Unable to decode data"),
+    ),
+    E.chainW(
+      flow(
+        parse(iOsAttestation),
+        E.mapLeft(
+          () => new IosAttestationError("Attestation format is invalid"),
+        ),
+      ),
+    ),
+  );
 
 export const validateiOSAttestation = (
   decodedAttestation: iOsAttestation,
@@ -74,6 +92,33 @@ export const iOsAssertion = t.type({
 });
 
 export type iOsAssertion = t.TypeOf<typeof iOsAssertion>;
+
+export const parseIosAssertion = ({
+  hardwareSignature,
+  integrityAssertion,
+}: {
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+}) =>
+  pipe(
+    sequenceS(E.Applicative)({
+      authenticatorData: E.tryCatch(
+        () => Buffer.from(integrityAssertion, "base64"),
+        E.toError,
+      ),
+      signature: E.tryCatch(
+        () => Buffer.from(hardwareSignature, "base64"),
+        E.toError,
+      ),
+    }),
+    E.mapLeft(() => new IosAssertionError("Unable to decode data")),
+    E.chainW(
+      flow(
+        parse(iOsAssertion),
+        E.mapLeft(() => new IosAssertionError("Assertion format is invalid")),
+      ),
+    ),
+  );
 
 export const validateiOSAssertion = (
   decodedAssertion: iOsAssertion,
