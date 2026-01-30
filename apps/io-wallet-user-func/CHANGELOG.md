@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.7
+
+### Patch Changes
+
+- f78da99: Refactors the MobileAttestationService class
+
 ## 4.1.6
 
 ### Patch Changes

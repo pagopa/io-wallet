@@ -108,11 +108,10 @@ module "cosmos" {
   user_assigned_managed_identity_id = module.ids.psn_identity.id
 
   throughput = {
-    wallet_instances              = 12000
-    nonces                        = 4000
-    whitelisted_fiscal_codes      = 4000
-    certificates                  = 10000
-    leases_revoke_wallet_instance = 4000
+    wallet_instances         = 12000
+    nonces                   = 4000
+    whitelisted_fiscal_codes = 4000
+    certificates             = 10000
     uat = {
       wallet_instances         = 4000
       nonces                   = 2000
@@ -220,11 +219,11 @@ module "function_apps" {
   health_check_path_user_uat = "/api/wallet/v1/health"
   health_check_path_support  = "/api/wallet/v1/health"
 
-  wallet_instance_storage_account_url          = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet.name)
-  wallet_instance_storage_account_name         = module.storage_accounts.wallet.name
+  wallet_instance_storage_account_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
+  wallet_instance_storage_account_name = module.storage_accounts.wallet.name
 
   wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
-  wallet_instance_storage_account_uat_url = format("https://%s.queue.core.windows.net",module.storage_accounts.wallet_uat.name)
+  wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
 
   is_psn = true
 

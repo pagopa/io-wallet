@@ -4,8 +4,8 @@ import { X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import * as RA from "fp-ts/lib/ReadonlyArray";
 import * as S from "fp-ts/lib/string";
+import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
@@ -26,8 +26,21 @@ const DeviceDetailsWithKey = t.type({
   hardwareKey: JwkPublicKey,
 });
 
+export const parseAndroidAttestation = (data: Buffer) =>
+  pipe(
+    data.toString("utf-8"),
+    S.split(","),
+    RA.map((b64) =>
+      E.tryCatch(
+        () => new X509Certificate(base64ToPem(b64)),
+        () => new AndroidAttestationError("Unable to decode X509 certificate"),
+      ),
+    ),
+    RA.sequence(E.Applicative),
+  );
+
 export const validateAndroidAttestation = (
-  data: Buffer,
+  x509Chain: readonly X509Certificate[],
   nonce: NonEmptyString,
   bundleIdentifiers: string[],
   googlePublicKeys: string[],
@@ -35,44 +48,45 @@ export const validateAndroidAttestation = (
   httpRequestTimeout: number,
 ): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(
-    data.toString("utf-8"),
-    S.split(","),
-    RA.map(
-      flow(base64ToPem, (cert) =>
-        E.tryCatch(
-          () => new X509Certificate(cert),
-          () =>
-            new AndroidAttestationError(`Unable to decode X509 certificate`),
-        ),
+    getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
+    TE.chain((attestationCrl) =>
+      TE.tryCatch(
+        () =>
+          verifyAttestation({
+            attestationCrl,
+            bundleIdentifiers,
+            challenge: nonce,
+            googlePublicKeys,
+            x509Chain,
+          }),
+        E.toError,
       ),
     ),
-    RA.sequence(E.Applicative),
-    TE.fromEither,
-    TE.chain((x509Chain) =>
-      pipe(
-        getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
-        TE.chain((attestationCrl) =>
-          TE.tryCatch(
-            () =>
-              verifyAttestation({
-                attestationCrl,
-                bundleIdentifiers,
-                challenge: nonce,
-                googlePublicKeys,
-                x509Chain,
-              }),
-            E.toError,
+    TE.chain((attestationValidationResult) =>
+      attestationValidationResult.success
+        ? TE.right(attestationValidationResult)
+        : TE.left(
+            new AndroidAttestationError(attestationValidationResult.reason),
           ),
+    ),
+    TE.chainW(flow(parse(DeviceDetailsWithKey), TE.fromEither)),
+  );
+
+export const parseGoogleAppCredentials = (
+  googleAppCredentialsEncoded: string,
+) =>
+  pipe(
+    E.tryCatch(
+      () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
+      E.toError,
+    ),
+    E.chain(J.parse),
+    E.chainW(parse(GoogleAppCredentials)),
+    E.mapLeft(
+      () =>
+        new AndroidAssertionError(
+          "Unable to parse Google App Credentials string",
         ),
-        TE.chain((attestationValidationResult) =>
-          attestationValidationResult.success
-            ? TE.right(attestationValidationResult)
-            : TE.left(
-                new AndroidAttestationError(attestationValidationResult.reason),
-              ),
-        ),
-        TE.chainW(flow(parse(DeviceDetailsWithKey), TE.fromEither)),
-      ),
     ),
   );
 
@@ -83,40 +97,25 @@ export const validateAndroidAssertion = (
   hardwareKey: JwkPublicKey,
   bundleIdentifiers: string[],
   androidPlayStoreCertificateHash: string,
-  googleAppCredentialsEncoded: string,
+  googleAppCredentials: GoogleAppCredentials,
   androidPlayIntegrityUrl: string,
   allowDevelopmentEnvironment: boolean,
 ) =>
   pipe(
-    E.tryCatch(
-      () => Buffer.from(googleAppCredentialsEncoded, "base64").toString(),
-      E.toError,
-    ),
-    E.chain(J.parse),
-    E.mapLeft(
+    TE.tryCatch(
       () =>
-        new AndroidAssertionError(
-          "Unable to parse Google App Credentials string",
-        ),
-    ),
-    E.chainW(parse(GoogleAppCredentials, "Invalid Google App Credentials")),
-    TE.fromEither,
-    TE.chain((googleAppCredentials) =>
-      TE.tryCatch(
-        () =>
-          verifyAssertion({
-            allowDevelopmentEnvironment,
-            androidPlayIntegrityUrl,
-            androidPlayStoreCertificateHash,
-            bundleIdentifiers,
-            clientData,
-            googleAppCredentials,
-            hardwareKey,
-            hardwareSignature,
-            integrityAssertion,
-          }),
-        E.toError,
-      ),
+        verifyAssertion({
+          allowDevelopmentEnvironment,
+          androidPlayIntegrityUrl,
+          androidPlayStoreCertificateHash,
+          bundleIdentifiers,
+          clientData,
+          googleAppCredentials,
+          hardwareKey,
+          hardwareSignature,
+          integrityAssertion,
+        }),
+      E.toError,
     ),
     TE.chain((assertionValidationResult) =>
       assertionValidationResult.success

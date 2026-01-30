@@ -48,8 +48,8 @@ resource "azurerm_application_gateway" "hub" {
   }
 
   autoscale_configuration {
-    min_capacity = 1
-    max_capacity = 2
+    min_capacity = 5
+    max_capacity = 20
   }
 
   gateway_ip_configuration {
