@@ -38,10 +38,6 @@ locals {
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
       },
       {
-        name                  = "SlackStatusChannelWebhook"
-        key_vault_secret_name = "SlackStatusChannelWebhook"
-      },
-      {
         name                  = "AllowedDeveloperUsers"
         key_vault_secret_name = "AllowedDeveloperUsers"
       },
