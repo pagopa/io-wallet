@@ -2,11 +2,6 @@ name: Deploy Function App (user-uat-func)
 
 on:
   workflow_dispatch: {}
-  push:
-    branches:
-      - master
-    paths:
-      - "apps/io-wallet-user-func/CHANGELOG.md"
 
 permissions:
   attestations: write
