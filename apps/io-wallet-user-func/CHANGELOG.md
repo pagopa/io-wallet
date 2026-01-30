@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.8
+
+### Patch Changes
+
+- 36b21c3: Removed Slack and Trial System related code
+
 ## 4.1.7
 
 ### Patch Changes
