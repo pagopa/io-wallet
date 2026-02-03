@@ -1,6 +1,6 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
-import { app, output } from "@azure/functions";
+import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
@@ -10,7 +10,6 @@ import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 import { getCrlFromUrl } from "@/certificates";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
