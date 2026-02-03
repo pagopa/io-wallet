@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "4.1.8",
+  "version": "4.1.9",
   "private": true,
   "scripts": {
     "build": "tsup-node",

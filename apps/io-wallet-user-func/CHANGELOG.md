@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.9
+
+### Patch Changes
+
+- c9157f7: Switched DB connection from connection string to Managed Identity
+
 ## 4.1.8
 
 ### Patch Changes
