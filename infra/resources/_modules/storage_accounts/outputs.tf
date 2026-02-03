@@ -15,7 +15,6 @@ output "wallet" {
     id                            = azurerm_storage_account.common.id
     name                          = azurerm_storage_account.common.name
     resource_group_name           = azurerm_storage_account.common.resource_group_name
-    connection_string_secret_name = try(azurerm_key_vault_secret.st_connection_string[0].name, null)
   }
 }
 
