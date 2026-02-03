@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.10
+
+### Patch Changes
+
+- 239a3b2: Removed migrateWalletInstances function
+
 ## 4.1.9
 
 ### Patch Changes
