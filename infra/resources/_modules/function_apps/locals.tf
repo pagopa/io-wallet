@@ -130,7 +130,6 @@ locals {
         PidIssuerApiClientPrivateKey  = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=PidIssuerApiClientPrivateKeyPre)"
         GoogleAppCredentialsEncoded   = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=GoogleAppCredentialsEncoded)"
         AllowedDeveloperUsers         = "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=AllowedDeveloperUsers)"
-        StorageConnectionString       = var.is_psn ? null : "@Microsoft.KeyVault(VaultName=${var.key_vault_wallet_name};SecretName=StorageUatConnectionString)"
       }
     )
   }
