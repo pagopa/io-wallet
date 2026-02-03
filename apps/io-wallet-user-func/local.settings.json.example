@@ -57,7 +57,6 @@
     "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
-    "PagoPACosmosDbConnectionString": "PAGOPA_COSMOS_DB_CONNECTION_STRING",
     "WalletInstanceStorageAccountUrl": "WALLET_INSTANCE_STORAGE_ACCOUNT_URL",
     "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME"
   }

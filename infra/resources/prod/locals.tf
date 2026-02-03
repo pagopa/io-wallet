@@ -74,10 +74,6 @@ locals {
         key_vault_secret_name = "AllowedDeveloperUsers"
       },
       {
-        name                  = "StorageConnectionString"
-        key_vault_secret_name = module.storage_accounts.wallet.connection_string_secret_name
-      },
-      {
         name                  = "AuthProfileApiKey"
         key_vault_secret_name = "AuthProfileApiKey"
       },
