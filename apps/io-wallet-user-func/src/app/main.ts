@@ -27,7 +27,6 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
-import { MigrateWalletInstancesFunction } from "@/infra/azure/functions/migrate-wallet-instances";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
@@ -301,23 +300,4 @@ app.http("generateCertificateChain", {
   }),
   methods: ["POST"],
   route: "certificate-chain",
-});
-
-app.cosmosDB("migrateWalletInstances", {
-  connection: "PagoPACosmosDbConnectionString",
-  containerName: "wallet-instances",
-  createLeaseCollectionIfNotExists: false,
-  databaseName: "db",
-  handler: MigrateWalletInstancesFunction({
-    inputDecoder: t.array(WalletInstance),
-  }),
-  leaseContainerName: "leases-migration",
-  maxItemsPerInvocation: 50,
-  return: output.cosmosDB({
-    connection: "CosmosDbEndpoint",
-    containerName: "wallet-instances",
-    createIfNotExists: false,
-    databaseName: "db",
-  }),
-  startFromBeginning: true,
 });
