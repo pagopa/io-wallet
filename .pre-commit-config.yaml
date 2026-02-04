@@ -8,18 +8,12 @@ repos:
         files: infra/(resources/prod|repository)
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.96.1
+    rev: v1.102.0
     hooks:
       - id: terraform_tflint
         args:
           - --args=--disable-rule terraform_required_version
           - --args=--disable-rule terraform_required_providers
-          - --args=--disable-rule terraform_unused_declarations
-          - --args=--disable-rule terraform_deprecated_interpolation
-          - --args=--disable-rule terraform_deprecated_index
-          - --args=--disable-rule terraform_typed_variables
-          - --args=--disable-rule terraform_map_duplicate_keys
-          - --args=--disable-rule terraform_module_pinned_source
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
       - id: terraform_fmt
       - id: terraform_docs
@@ -41,3 +35,5 @@ repos:
         args:
           - --args=--skip-dirs="**/.terraform"
           - --args=--ignorefile=__GIT_WORKING_DIR__/.trivyignore
+          - --args=--tf-exclude-downloaded-modules
+          - --hook-config=--parallelism-limit=1
