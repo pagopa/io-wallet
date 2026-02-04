@@ -21,13 +21,6 @@ data "azurerm_virtual_network" "spoke" {
   resource_group_name = local.spoke.resource_group_name
 }
 
-data "azurerm_user_assigned_identity" "appgateway" {
-  provider = azurerm.hub
-
-  name                = "pagopa-app-gw-id-01"
-  resource_group_name = local.hub.resource_group_name
-}
-
 data "azurerm_subnet" "pep" {
   name = provider::dx::resource_name(merge(local.environment, {
     domain        = ""
