@@ -27,7 +27,6 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#input\_cdn\_endpoint\_id) | ID of the CDN endpoint to expose via DNS | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
 | <a name="input_wallet_dns_zone_name"></a> [wallet\_dns\_zone\_name](#input\_wallet\_dns\_zone\_name) | DNS zone name for wallet | `string` | n/a | yes |
 | <a name="input_wallet_dns_zone_resource_group_name"></a> [wallet\_dns\_zone\_resource\_group\_name](#input\_wallet\_dns\_zone\_resource\_group\_name) | Resource group name for wallet DNS zone | `string` | n/a | yes |
