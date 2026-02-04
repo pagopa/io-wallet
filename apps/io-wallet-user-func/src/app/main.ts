@@ -1,6 +1,6 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
-import { app, output } from "@azure/functions";
+import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
@@ -10,7 +10,6 @@ import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
-import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 import { getCrlFromUrl } from "@/certificates";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
@@ -27,7 +26,6 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
-import { MigrateWalletInstancesFunction } from "@/infra/azure/functions/migrate-wallet-instances";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
@@ -55,19 +53,12 @@ const config = configOrError;
 
 const credential = new DefaultAzureCredential();
 
-// const cosmosClient = new CosmosClient({
-//   aadCredentials: credential,
-//   connectionPolicy: {
-//     requestTimeout: config.azure.cosmos.requestTimeout,
-//   },
-//   endpoint: config.azure.cosmos.endpoint,
-// });
-
 const cosmosClient = new CosmosClient({
+  aadCredentials: credential,
   connectionPolicy: {
     requestTimeout: config.azure.cosmos.requestTimeout,
   },
-  connectionString: config.azure.cosmos.connectionString,
+  endpoint: config.azure.cosmos.endpoint,
 });
 
 const subscriptionId = config.azure.generic.subscriptionId;
@@ -308,23 +299,4 @@ app.http("generateCertificateChain", {
   }),
   methods: ["POST"],
   route: "certificate-chain",
-});
-
-app.cosmosDB("migrateWalletInstances", {
-  connection: "PagoPACosmosDbConnectionString",
-  containerName: "wallet-instances",
-  createLeaseCollectionIfNotExists: false,
-  databaseName: "db",
-  handler: MigrateWalletInstancesFunction({
-    inputDecoder: t.array(WalletInstance),
-  }),
-  leaseContainerName: "leases-migration",
-  maxItemsPerInvocation: 50,
-  return: output.cosmosDB({
-    connection: "CosmosDbEndpoint",
-    containerName: "wallet-instances",
-    createIfNotExists: false,
-    databaseName: "db",
-  }),
-  startFromBeginning: true,
 });

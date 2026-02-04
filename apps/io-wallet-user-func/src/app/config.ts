@@ -16,10 +16,6 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
-import {
-  getSlackConfigFromEnvironment,
-  SlackConfig,
-} from "io-wallet-common/infra/slack/config";
 import { fromBase64ToJwks, JwkPrivateKey } from "io-wallet-common/jwk";
 
 const booleanFromString = (input: string) =>
@@ -139,10 +135,7 @@ const AzureFrontDoorConfig = t.type({
 type AzureFrontDoorConfig = t.TypeOf<typeof AzureFrontDoorConfig>;
 
 const AzureConfig = t.type({
-  cosmos: t.intersection([
-    AzureCosmosConfig,
-    t.type({ connectionString: t.string }),
-  ]),
+  cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
   storage: AzureStorageConfig,
@@ -215,7 +208,6 @@ export const Config = t.type({
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
-  slack: SlackConfig,
   walletProvider: WalletProviderConfig,
 });
 
@@ -420,24 +412,12 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   AzureConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    cosmos: getAzureCosmosConfigFromEnvironment,
-    cosmosAccountConnectionString: readFromEnvironment(
-      "CosmosAccountConnectionString",
-    ),
-    frontDoor: getAzureFrontDoorConfigFromEnvironment,
-    generic: getAzureGenericConfigFromEnvironment,
-    storage: getAzureStorageConfigFromEnvironment,
-  }),
-  RE.map(({ cosmos, cosmosAccountConnectionString, ...rest }) => ({
-    ...rest,
-    cosmos: {
-      ...cosmos,
-      connectionString: cosmosAccountConnectionString,
-    },
-  })),
-);
+> = sequenceS(RE.Apply)({
+  cosmos: getAzureCosmosConfigFromEnvironment,
+  frontDoor: getAzureFrontDoorConfigFromEnvironment,
+  generic: getAzureGenericConfigFromEnvironment,
+  storage: getAzureStorageConfigFromEnvironment,
+});
 
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -566,7 +546,6 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     ),
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
-    slack: getSlackConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
   }),
   RE.map(

@@ -110,7 +110,7 @@ module "cosmos" {
   throughput = {
     wallet_instances         = 12000
     nonces                   = 4000
-    whitelisted_fiscal_codes = 4000
+    whitelisted_fiscal_codes = 8000
     certificates             = 10000
     uat = {
       wallet_instances         = 4000

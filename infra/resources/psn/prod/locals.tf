@@ -34,16 +34,8 @@ locals {
         key_vault_secret_name = "WalletProviderSigningKeys"
       },
       {
-        name                  = "TrialSystemApiKey"
-        key_vault_secret_name = "TrialSystemApiKey"
-      },
-      {
         name                  = "PidIssuerApiClientPrivateKey"
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
-      },
-      {
-        name                  = "SlackStatusChannelWebhook"
-        key_vault_secret_name = "SlackStatusChannelWebhook"
       },
       {
         name                  = "AllowedDeveloperUsers"
@@ -60,14 +52,6 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
-      },
-      {
-        name                  = "CosmosAccountConnectionString"
-        key_vault_secret_name = "CosmosAccountConnectionString"
-      },
-      {
-        name                  = "PagoPACosmosDbConnectionString"
-        key_vault_secret_name = "PagoPACosmosDbConnectionString"
       }
     ]
   }

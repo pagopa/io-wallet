@@ -15,6 +15,13 @@ module "admins_roles" {
       database            = var.cosmos_db.database_name
       description         = "Allow admins to manage Cosmos DB"
       role                = "writer"
+    },
+    {
+      account_name        = var.cosmos_db_uat.name
+      resource_group_name = var.cosmos_db_uat.resource_group_name
+      database            = var.cosmos_db_uat.database_name
+      description         = "Allow admins to manage Cosmos DB"
+      role                = "writer"
     }
   ]
 

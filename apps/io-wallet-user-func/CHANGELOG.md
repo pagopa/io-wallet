@@ -1,5 +1,23 @@
 # io-wallet-user-func
 
+## 4.1.10
+
+### Patch Changes
+
+- 239a3b2: Removed migrateWalletInstances function
+
+## 4.1.9
+
+### Patch Changes
+
+- c9157f7: Switched DB connection from connection string to Managed Identity
+
+## 4.1.8
+
+### Patch Changes
+
+- 36b21c3: Removed Slack and Trial System related code
+
 ## 4.1.7
 
 ### Patch Changes
