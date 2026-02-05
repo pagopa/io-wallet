@@ -7,10 +7,6 @@ variable "project_legacy" {
   type = string
 }
 
-variable "tags" {
-  type        = map(any)
-  description = "Resource tags"
-}
 
 variable "apim" {
   type = object({

@@ -41,7 +41,6 @@ No requirements.
 | <a name="input_product_id"></a> [product\_id](#input\_product\_id) | Product ID | `string` | n/a | yes |
 | <a name="input_project_legacy"></a> [project\_legacy](#input\_project\_legacy) | n/a | `string` | n/a | yes |
 | <a name="input_revision"></a> [revision](#input\_revision) | Revision | `string` | `"v1"` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |
 
 ## Outputs
 

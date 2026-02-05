@@ -122,8 +122,6 @@ module "apim_itn" {
   }
 
   product_id = local.apim.products.io_web.product_id
-
-  tags = local.tags
 }
 
 module "dns" {
