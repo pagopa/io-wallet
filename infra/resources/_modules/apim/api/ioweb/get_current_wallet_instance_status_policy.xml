@@ -8,11 +8,9 @@
     </inbound>
     <outbound>
         <base />
-        <set-body template="liquid">
-            {
-                "id": "{{body.id}}",
-                "is_revoked": {{body.is_revoked}}
-            }
-        </set-body>
+        <set-body>@{
+            var res = context.Response.Body.As<JObject>(true);
+            return new JObject(new JProperty("id", res["id"]), new JProperty("is_revoked", res["is_revoked"])).ToString();
+        }</set-body>
     </outbound>
 </policies>
