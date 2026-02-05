@@ -15,11 +15,8 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_apim_v2_wallet_admin_api"></a> [apim\_v2\_wallet\_admin\_api](#module\_apim\_v2\_wallet\_admin\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_admin_product"></a> [apim\_v2\_wallet\_admin\_product](#module\_apim\_v2\_wallet\_admin\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
-| <a name="module_apim_v2_wallet_app_api"></a> [apim\_v2\_wallet\_app\_api](#module\_apim\_v2\_wallet\_app\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_app_product"></a> [apim\_v2\_wallet\_app\_product](#module\_apim\_v2\_wallet\_app\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
-| <a name="module_apim_v2_wallet_pdnd_api"></a> [apim\_v2\_wallet\_pdnd\_api](#module\_apim\_v2\_wallet\_pdnd\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_pdnd_product"></a> [apim\_v2\_wallet\_pdnd\_product](#module\_apim\_v2\_wallet\_pdnd\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_api"></a> [apim\_v2\_wallet\_support\_api](#module\_apim\_v2\_wallet\_support\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_product"></a> [apim\_v2\_wallet\_support\_product](#module\_apim\_v2\_wallet\_support\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
@@ -30,31 +27,17 @@ No requirements.
 | Name | Type |
 |------|------|
 | [azurerm_api_management_api_operation_policy.get_current_wallet_instance_status_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
-| [azurerm_api_management_api_operation_policy.health_check_pdnd_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
-| [azurerm_api_management_api_operation_policy.set_wallet_instance_status_pdnd_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
+| [azurerm_api_management_api_operation_policy.is_fiscal_code_whitelisted_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.set_wallet_instance_status_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
-| [azurerm_api_management_api_tag.wallet_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
-| [azurerm_api_management_api_tag.wallet_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
-| [azurerm_api_management_api_tag.wallet_pdnd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_support](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_web](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
-| [azurerm_api_management_named_value.app_func_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_named_value) | resource |
-| [azurerm_api_management_named_value.user_func_key](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_named_value) | resource |
-| [azurerm_api_management_named_value.user_func_key_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_named_value) | resource |
 | [azurerm_api_management_tag.wallet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_tag) | resource |
-| [azurerm_key_vault_secret.support_func_key_default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
-| [azurerm_key_vault_secret.user_func_key_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
-| [azurerm_key_vault_secret.user_func_key_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
-| [azurerm_key_vault_secret.user_func_key_ioweb](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault_secret) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_apim"></a> [apim](#input\_apim) | APIM configuration variables | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>    id                  = string<br/>  })</pre> | n/a | yes |
-| <a name="input_function_apps"></a> [function\_apps](#input\_function\_apps) | APIM configuration variables | <pre>object({<br/>    user_function = object({<br/>      function_hostname = string<br/>    })<br/>    support_function = object({<br/>      function_hostname = string<br/>    })<br/>  })</pre> | n/a | yes |
-| <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Key Vault ID | `string` | n/a | yes |
-| <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Wallet Key Vault ID | `string` | n/a | yes |
 | <a name="input_product_id"></a> [product\_id](#input\_product\_id) | Product ID | `string` | n/a | yes |
 | <a name="input_project_legacy"></a> [project\_legacy](#input\_project\_legacy) | n/a | `string` | n/a | yes |
 | <a name="input_revision"></a> [revision](#input\_revision) | Revision | `string` | `"v1"` | no |

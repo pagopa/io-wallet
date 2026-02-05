@@ -60,9 +60,6 @@ No requirements.
 | <a name="input_health_check_path_support"></a> [health\_check\_path\_support](#input\_health\_check\_path\_support) | Health check path for support function app | `string` | n/a | yes |
 | <a name="input_health_check_path_user"></a> [health\_check\_path\_user](#input\_health\_check\_path\_user) | Health check path for user function app | `string` | n/a | yes |
 | <a name="input_health_check_path_user_uat"></a> [health\_check\_path\_user\_uat](#input\_health\_check\_path\_user\_uat) | Health check path for user uat function app | `string` | n/a | yes |
-| <a name="input_is_psn"></a> [is\_psn](#input\_is\_psn) | Temporary variable to manage both IO and PSN resources | `bool` | `false` | no |
-| <a name="input_key_vault_id"></a> [key\_vault\_id](#input\_key\_vault\_id) | Id of the common Key Vault where save secrets in | `string` | n/a | yes |
-| <a name="input_key_vault_wallet_id"></a> [key\_vault\_wallet\_id](#input\_key\_vault\_wallet\_id) | Id of the wallet Key Vault where save secrets | `string` | n/a | yes |
 | <a name="input_key_vault_wallet_name"></a> [key\_vault\_wallet\_name](#input\_key\_vault\_wallet\_name) | Name of the wallet Key Vault where save secrets | `string` | n/a | yes |
 | <a name="input_nat_gateway_id"></a> [nat\_gateway\_id](#input\_nat\_gateway\_id) | NAT gateway Id | `string` | `null` | no |
 | <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | n/a | <pre>object({<br/>    blob          = optional(string)<br/>    file          = optional(string)<br/>    queue         = optional(string)<br/>    table         = optional(string)<br/>    azurewebsites = optional(string)<br/>  })</pre> | `null` | no |

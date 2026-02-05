@@ -76,14 +76,10 @@ module "storage_accounts" {
     subnet_pep_id             = data.azurerm_subnet.pep.id
   }
 
-  key_vault_wallet_id = module.key_vault_app.key_vault_wallet.id
-
   action_group_id = module.monitoring.action_group_wallet.id
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
   customer_managed_key_url          = local.hsm_key_url
-
-  is_psn = true
 
   tags = local.tags
 }
@@ -201,8 +197,6 @@ module "function_apps" {
   cosmos_database_name                        = module.cosmos.apps.database_name
   cosmos_database_name_uat                    = module.cosmos.apps.database_name_uat
   storage_account_cdn_name                    = azurerm_storage_account.cdn.name
-  key_vault_id                                = module.key_vault_app.key_vault_wallet.id
-  key_vault_wallet_id                         = module.key_vault_app.key_vault_wallet.id
   key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
@@ -224,8 +218,6 @@ module "function_apps" {
 
   wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
   wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
-
-  is_psn = true
 
   tags = local.tags
 }

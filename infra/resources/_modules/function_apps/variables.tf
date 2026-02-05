@@ -51,11 +51,6 @@ variable "cosmos_db_endpoint" {
   description = "Cosmos DB endpoint to use as application environment variable"
 }
 
-variable "key_vault_id" {
-  type        = string
-  description = "Id of the common Key Vault where save secrets in"
-}
-
 variable "private_dns_zone_resource_group_name" {
   type        = string
   description = "Resource group name of the private DNS zone to use for private endpoints"
@@ -65,11 +60,6 @@ variable "private_dns_zone_resource_group_name" {
 variable "cosmos_database_name" {
   type        = string
   description = "Wallet Cosmos DB database name"
-}
-
-variable "key_vault_wallet_id" {
-  type        = string
-  description = "Id of the wallet Key Vault where save secrets"
 }
 
 variable "key_vault_wallet_name" {
@@ -207,10 +197,4 @@ variable "wallet_instance_storage_account_uat_url" {
 variable "wallet_instance_storage_account_uat_name" {
   type        = string
   description = "The name of the Wallet Instance Storage Account UAT"
-}
-
-variable "is_psn" {
-  type        = bool
-  default     = false
-  description = "Temporary variable to manage both IO and PSN resources"
 }
