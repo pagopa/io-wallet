@@ -1,14 +1,8 @@
 # IO Wallet - Resources
 
-## Architecture Diagram
+## Networking Restrictions to be Aware Of
 
-The diagram below shows the cloud architecture of the resources deployed on PSN tenant, and how they are reached by IO resources.
-
-![architecture-diagram](./architecture.png)
-
-### Networking Restrictions to be Aware Of
-
-#### APIM
+### APIM
 
 Deploying APIM the Spoke network could be challenging. In fact, due to network restrictions, APIM needs to reach some external endpoints and Azure services to work properly. Therefore, traffic from APIM's subnet should be allowed by the firewall to:
 
