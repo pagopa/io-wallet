@@ -39,11 +39,6 @@ moved {
 }
 
 moved {
-  from = module.iam.module.key_vault_certificate_cdn.module.key_vault.azurerm_key_vault_access_policy.this["io-p-sec-rg|io-p-kv|reader||reader"]
-  to   = module.key_vault_certificate_cdn.module.key_vault.azurerm_key_vault_access_policy.this["io-p-sec-rg|io-p-kv|reader||reader"]
-}
-
-moved {
   from = module.iam.module.key_vault_certificate_infra_cd.module.key_vault.azurerm_key_vault_access_policy.this["io-p-sec-rg|io-p-kv|reader||reader"]
   to   = module.key_vault_certificate_infra_cd.module.key_vault.azurerm_key_vault_access_policy.this["io-p-sec-rg|io-p-kv|reader||reader"]
 }
