@@ -3,7 +3,6 @@
         <base />
         <cors>
             <allowed-origins>
-                <origin>https://ioapp.it/</origin>
                 <origin>https://account.ioapp.it/</origin>
             </allowed-origins>
             <allowed-methods preflight-result-max-age="300">
@@ -26,6 +25,7 @@
         </validate-jwt>
         <!-- get the claim fiscal_number -->
         <set-variable name="fiscalCode" value="@((string)((Jwt)context.Variables["jwt"]).Claims.GetValueOrDefault("fiscal_number"))" />
+        <set-header name="Authorization" exists-action="delete" />
     </inbound>
     <outbound>
         <base />
