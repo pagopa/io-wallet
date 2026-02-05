@@ -3,9 +3,6 @@
         <base />
         <rewrite-uri template="/health" />
     </inbound>
-    <backend>
-        <base />
-    </backend>
     <outbound>
         <base />
         <choose>
@@ -16,7 +13,4 @@
             </when>
         </choose>
     </outbound>
-    <on-error>
-        <base />
-    </on-error>
 </policies>

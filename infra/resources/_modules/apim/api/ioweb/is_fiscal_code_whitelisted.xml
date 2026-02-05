@@ -1,13 +1,8 @@
 <policies>
     <inbound>
         <base />
-        <!-- forwards the call to the Function App -->
-        <set-header name="Authorization" exists-action="delete" />
         <set-method>GET</set-method>
         <rewrite-uri template="@($"/whitelisted-fiscal-code/{context.Variables["fiscalCode"]}")" />
-        <set-header name="x-functions-key" exists-action="override">
-            <value>{{io-wallet-user-func-key}}</value>
-        </set-header>
     </inbound>
     <outbound>
         <base />

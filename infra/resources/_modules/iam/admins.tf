@@ -38,7 +38,7 @@ module "admins_roles" {
     {
       name                = var.key_vault_certificates.name
       resource_group_name = var.key_vault_certificates.resource_group_name
-      has_rbac_support    = var.is_psn
+      has_rbac_support    = true
       description         = "Allow admins to manage infrastructure-scoped KeyVault"
       roles = {
         secrets      = "owner",

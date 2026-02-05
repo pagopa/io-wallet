@@ -12,16 +12,16 @@ output "wallet_instance_revocation_email_queue_name_01" {
 
 output "wallet" {
   value = {
-    id                            = azurerm_storage_account.common.id
-    name                          = azurerm_storage_account.common.name
-    resource_group_name           = azurerm_storage_account.common.resource_group_name
+    id                  = azurerm_storage_account.common.id
+    name                = azurerm_storage_account.common.name
+    resource_group_name = azurerm_storage_account.common.resource_group_name
   }
 }
 
 output "wallet_uat" {
   value = {
-    id                            = azurerm_storage_account.common_uat.id
-    name                          = azurerm_storage_account.common_uat.name
-    resource_group_name           = azurerm_storage_account.common_uat.resource_group_name
+    id                  = azurerm_storage_account.common_uat.id
+    name                = azurerm_storage_account.common_uat.name
+    resource_group_name = azurerm_storage_account.common_uat.resource_group_name
   }
 }

@@ -6,11 +6,6 @@ data "azurerm_resource_group" "weu_common" {
   name = "${local.project_legacy}-rg-common"
 }
 
-data "azurerm_key_vault" "weu_common" {
-  name                = "${local.project_legacy}-kv-common"
-  resource_group_name = data.azurerm_resource_group.weu_common.name
-}
-
 data "azurerm_virtual_network" "vnet_common_itn" {
   name                = "${local.project}-common-vnet-01"
   resource_group_name = "${local.project}-common-rg-01"
@@ -27,16 +22,6 @@ data "azurerm_private_dns_zone" "privatelink_documents" {
   resource_group_name = data.azurerm_resource_group.weu_common.name
 }
 
-data "azurerm_private_dns_zone" "privatelink_blob" {
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = data.azurerm_resource_group.weu_common.name
-}
-
-data "azurerm_private_dns_zone" "privatelink_queue" {
-  name                = "privatelink.queue.core.windows.net"
-  resource_group_name = data.azurerm_resource_group.weu_common.name
-}
-
 data "azuread_group" "wallet_admins" {
   display_name = format("%s-%s-adgroup-wallet-admins", local.environment.prefix, local.environment.env_short)
 }
@@ -48,16 +33,6 @@ data "azuread_group" "eng_admins" {
 data "azurerm_application_insights" "common" {
   name                = "${local.project_legacy}-ai-common"
   resource_group_name = data.azurerm_resource_group.weu_common.name
-}
-
-data "azurerm_log_analytics_workspace" "law" {
-  name                = "${local.project_legacy}-law-common"
-  resource_group_name = data.azurerm_resource_group.weu_common.name
-}
-
-data "azurerm_nat_gateway" "nat" {
-  name                = "${local.project}-ng-01"
-  resource_group_name = "${local.project}-common-rg-01"
 }
 
 data "azurerm_key_vault_secret" "notification_slack" {
@@ -89,11 +64,6 @@ data "azurerm_user_assigned_identity" "infra_cd_id" {
   resource_group_name = data.azurerm_resource_group.wallet.name
 }
 
-data "azurerm_user_assigned_identity" "app_cd_id" {
-  name                = "${local.project}-${local.environment.domain}-app-github-cd-id-01"
-  resource_group_name = data.azurerm_resource_group.wallet.name
-}
-
 data "azurerm_dns_zone" "io_pagopa_it" {
   name                = "io.pagopa.it"
   resource_group_name = "io-p-rg-external"
@@ -111,11 +81,6 @@ data "azurerm_resource_group" "weu_sec" {
 data "azurerm_key_vault" "certificates" {
   name                = "${local.project_legacy}-kv"
   resource_group_name = data.azurerm_resource_group.weu_sec.name
-}
-
-data "azurerm_key_vault_certificate" "wallet_certificate" {
-  name         = "wallet-io-pagopa-it"
-  key_vault_id = data.azurerm_key_vault.certificates.id
 }
 
 data "azurerm_api_management" "apim" {

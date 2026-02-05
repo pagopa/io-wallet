@@ -94,11 +94,6 @@ variable "cicd_principal_ids" {
   description = "Principal ID of CICD pipelines"
 }
 
-variable "wallet_dns_zone_id" {
-  type        = string
-  description = "wallet.io.pagopa.it DNS zone id"
-}
-
 variable "cosmos_db_uat" {
   type = object({
     name                = string
@@ -107,25 +102,12 @@ variable "cosmos_db_uat" {
   })
 }
 
-variable "application_gateway_id" {
+variable "appgw_identity_principal_id" {
   type        = string
   description = "Application Gateway resource ID"
-  default     = null
-}
-
-variable "is_psn" {
-  type        = bool
-  default     = false
-  description = "Temporary variable to manage both IO and PSN resources"
 }
 
 variable "cdn_endpoint_id" {
   type        = string
   description = "CDN endpoint id"
-}
-
-variable "cdn_frontdoor" {
-  type        = string
-  description = "Whether the CDN is Front Door or not"
-  default     = "false"
 }

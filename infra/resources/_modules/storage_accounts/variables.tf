@@ -28,12 +28,6 @@ variable "action_group_id" {
   description = "Id of the alert action group"
 }
 
-variable "key_vault_wallet_id" {
-  type        = string
-  description = "Id of the wallet Key Vault where storage account saves secrets"
-  default     = null
-}
-
 variable "private_endpoint" {
   type = object({
     subnet_pep_id             = string
@@ -54,10 +48,4 @@ variable "customer_managed_key_url" {
   type        = string
   default     = null
   description = "URL of the customer managed key to encrypt the Storage Account"
-}
-
-variable "is_psn" {
-  type        = bool
-  default     = false
-  description = "Temporary variable to manage both IO and PSN resources"
 }

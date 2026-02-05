@@ -7,7 +7,6 @@ locals {
     instance_number = "01"
   }
   location_short = "itn"
-  u_env_short    = "u"
   # the project on which the resources will be created
   # it's the prefix of any resource name
   # it includes the choosen location
@@ -18,7 +17,6 @@ locals {
   # this project points to them (westeurope)
   project_legacy = "${local.environment.prefix}-${local.environment.env_short}"
 
-  location_legacy    = "westeurope"
   secondary_location = "spaincentral"
 
   wallet_dns_zone = {
@@ -41,54 +39,5 @@ locals {
     Owner          = "IO"
     ManagementTeam = "IO Wallet"
     Source         = "https://github.com/pagopa/io-wallet/blob/main/infra/resources/prod"
-  }
-
-  user_func = {
-    app_settings = [
-      {
-        name                  = "GoogleAppCredentialsEncoded"
-        key_vault_secret_name = "GoogleAppCredentialsEncoded"
-      },
-      {
-        name                  = "FederationEntitySigningKeys"
-        key_vault_secret_name = "FederationEntitySigningKeys"
-      },
-      {
-        name                  = "WalletProviderSigningKeys"
-        key_vault_secret_name = "WalletProviderSigningKeys"
-      },
-      {
-        name                  = "TrialSystemApiKey"
-        key_vault_secret_name = "TrialSystemApiKey"
-      },
-      {
-        name                  = "PidIssuerApiClientPrivateKey"
-        key_vault_secret_name = "PidIssuerApiClientPrivateKey"
-      },
-      {
-        name                  = "SlackStatusChannelWebhook"
-        key_vault_secret_name = "SlackStatusChannelWebhook"
-      },
-      {
-        name                  = "AllowedDeveloperUsers"
-        key_vault_secret_name = "AllowedDeveloperUsers"
-      },
-      {
-        name                  = "AuthProfileApiKey"
-        key_vault_secret_name = "AuthProfileApiKey"
-      },
-      {
-        name                  = "MailupUsername"
-        key_vault_secret_name = "MailupUsername"
-      },
-      {
-        name                  = "MailupSecret"
-        key_vault_secret_name = "MailupSecret"
-      },
-      {
-        name  = "CosmosAccountConnectionString"
-        value = "CosmosAccountConnectionString"
-      }
-    ]
   }
 }
