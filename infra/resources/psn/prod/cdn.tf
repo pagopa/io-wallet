@@ -139,3 +139,71 @@ resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
     }
   }
 }
+
+resource "azurerm_monitor_metric_alert" "storage_account_low_availability" {
+  name                = "[${azurerm_storage_account.cdn.name}] Low Availability"
+  resource_group_name = data.azurerm_resource_group.wallet.name
+  scopes              = [azurerm_storage_account.cdn.id]
+  description         = "The average availability is less than 99.8%"
+  severity            = 0
+  window_size         = "PT5M"
+  frequency           = "PT5M"
+  auto_mitigate       = false
+
+  # Metric info
+  # https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/metrics-supported#microsoftstoragestorageaccounts
+  criteria {
+    metric_namespace       = "Microsoft.Storage/storageAccounts"
+    metric_name            = "Availability"
+    aggregation            = "Average"
+    operator               = "LessThan"
+    threshold              = 99.8
+    skip_metric_validation = false
+  }
+
+  action {
+    action_group_id = module.monitoring.action_group_wallet.id
+  }
+
+  action {
+    action_group_id = module.monitoring.action_group_wallet.id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_scheduled_query_rules_alert" "cdn_requests_error_alert" {
+  name                    = "[${module.cdn.name}] Request Errors"
+  location                = local.environment.location
+  resource_group_name     = data.azurerm_resource_group.wallet.name
+  severity                = 0
+  description             = "Elevated rate of 4xx and 5xx errors from the CDN"
+  auto_mitigation_enabled = true
+
+  action {
+    action_group = [module.monitoring.action_group_wallet.id]
+  }
+
+  query = format(<<-EOT
+    AzureDiagnostics
+    | where ResourceId == toupper("%s")
+    | where Category == "AzureCdnAccessLog"
+    | where isReceivedFromClient_b == true
+    | where requestUri_s == "https://wallet.io.pagopa.it:443/.well-known/openid-federation"
+    | where httpStatus_d >= 400
+    | summarize AggregatedValue = count()
+    EOT
+  , module.cdn.id)
+
+  data_source_id = data.azurerm_log_analytics_workspace.core.id
+
+  trigger {
+    operator  = "GreaterThanOrEqual"
+    threshold = 1
+  }
+
+  frequency   = 5
+  time_window = 5
+
+  tags = local.tags
+}

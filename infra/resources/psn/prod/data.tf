@@ -48,10 +48,34 @@ data "azurerm_application_insights" "core" {
   ))
 }
 
+data "azurerm_log_analytics_workspace" "core" {
+  name = provider::dx::resource_name(merge(
+    local.environment,
+    {
+      name          = "core"
+      resource_type = "log_analytics"
+    }
+  ))
+  resource_group_name = provider::dx::resource_name(merge(
+    local.environment,
+    {
+      name          = "monitoring"
+      resource_type = "resource_group"
+    }
+  ))
+}
+
 data "azurerm_application_gateway" "hub" {
   provider = azurerm.hub
 
   name                = "pagopa-app-gw-italynorth"
+  resource_group_name = local.hub.resource_group_name
+}
+
+data "azurerm_user_assigned_identity" "app_gw" {
+  provider = azurerm.hub
+
+  name                = "pagopa-app-gw-id-01"
   resource_group_name = local.hub.resource_group_name
 }
 

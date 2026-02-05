@@ -94,11 +94,6 @@ variable "cicd_principal_ids" {
   description = "Principal ID of CICD pipelines"
 }
 
-variable "wallet_dns_zone_id" {
-  type        = string
-  description = "wallet.io.pagopa.it DNS zone id"
-}
-
 variable "cosmos_db_uat" {
   type = object({
     name                = string
@@ -107,7 +102,7 @@ variable "cosmos_db_uat" {
   })
 }
 
-variable "application_gateway_id" {
+variable "appgw_identity_principal_id" {
   type        = string
   description = "Application Gateway resource ID"
 }

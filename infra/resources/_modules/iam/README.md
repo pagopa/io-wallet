@@ -32,14 +32,13 @@ No requirements.
 | Name | Type |
 |------|------|
 | [azurerm_role_assignment.func_app_user_cdn_endpoint_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.infra_cd_subscription_rbac_admin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_admin_ids"></a> [admin\_ids](#input\_admin\_ids) | Id of the Entra ID group with admin roles | `set(string)` | n/a | yes |
-| <a name="input_application_gateway_id"></a> [application\_gateway\_id](#input\_application\_gateway\_id) | Application Gateway resource ID | `string` | n/a | yes |
+| <a name="input_appgw_identity_principal_id"></a> [appgw\_identity\_principal\_id](#input\_appgw\_identity\_principal\_id) | Application Gateway resource ID | `string` | n/a | yes |
 | <a name="input_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#input\_cdn\_endpoint\_id) | CDN endpoint id | `string` | n/a | yes |
 | <a name="input_cdn_principal_id"></a> [cdn\_principal\_id](#input\_cdn\_principal\_id) | Principal ID of the CDN managed identity | `string` | n/a | yes |
 | <a name="input_cdn_storage_account"></a> [cdn\_storage\_account](#input\_cdn\_storage\_account) | Storage Account Id used for CDN | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
@@ -52,7 +51,6 @@ No requirements.
 | <a name="input_storage_account"></a> [storage\_account](#input\_storage\_account) | Generic Storage Account for Wallet uses | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_storage_account_uat"></a> [storage\_account\_uat](#input\_storage\_account\_uat) | Generic Storage Account for Wallet UAT uses | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription Id | `string` | n/a | yes |
-| <a name="input_wallet_dns_zone_id"></a> [wallet\_dns\_zone\_id](#input\_wallet\_dns\_zone\_id) | wallet.io.pagopa.it DNS zone id | `string` | n/a | yes |
 
 ## Outputs
 

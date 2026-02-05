@@ -247,8 +247,6 @@ resource "azurerm_role_assignment" "apim_kv_infra_secrets" {
 module "iam" {
   source = "../../_modules/iam"
 
-  is_psn = true
-
   subscription_id = data.azurerm_subscription.current.subscription_id
 
   admin_ids = [
@@ -319,8 +317,6 @@ module "iam" {
     resource_group_name = module.storage_accounts.wallet_uat.resource_group_name
   }
 
-  wallet_dns_zone_id = null
-
-  cdn_endpoint_id = module.cdn.endpoint_id
-  cdn_frontdoor   = true
+  appgw_identity_principal_id = data.azurerm_user_assigned_identity.app_gw.principal_id
+  cdn_endpoint_id             = module.cdn.endpoint_id
 }

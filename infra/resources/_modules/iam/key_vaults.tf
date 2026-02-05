@@ -60,12 +60,10 @@ module "key_vault_certificate_infra_cd" {
 }
 
 module "key_vault_infra" {
-  count = var.application_gateway_id != null ? 1 : 0
-
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
 
-  principal_id    = var.application_gateway_id
+  principal_id    = var.appgw_identity_principal_id
   subscription_id = var.subscription_id
 
   key_vault = [
