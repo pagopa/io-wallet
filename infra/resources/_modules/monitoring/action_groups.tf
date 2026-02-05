@@ -3,7 +3,7 @@ resource "azurerm_monitor_action_group" "wallet" {
   resource_group_name = var.resource_group_name
   short_name          = var.display_name
 
-  enabled = true
+  enabled = false
 
   email_receiver {
     name                    = "email"

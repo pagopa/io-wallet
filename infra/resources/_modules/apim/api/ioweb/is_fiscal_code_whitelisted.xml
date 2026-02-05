@@ -6,10 +6,11 @@
     </inbound>
     <outbound>
         <base />
-        <set-body template="liquid">
-            {
-                "is_whitelisted": {{body.whitelisted}}
-            }
-        </set-body>
+        <set-body>@{
+            var response = context.Response.Body.As<JObject>(preserveContent: true);
+            var outBody = new JObject();
+            outBody["is_whitelisted"] = response["whitelisted"];
+            return outBody.ToString();
+        }</set-body>
     </outbound>
 </policies>
