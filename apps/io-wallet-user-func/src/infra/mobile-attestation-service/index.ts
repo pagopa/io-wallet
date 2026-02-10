@@ -24,13 +24,13 @@ import {
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
+import { ExternalServiceError } from "./android/assertion";
 import {
   parseIosAssertion,
   parseIosAttestation,
   validateiOSAssertion,
   validateiOSAttestation,
 } from "./ios";
-import { ExternalServiceError } from "./android/assertion";
 
 export class IntegrityCheckError extends Error {
   name = "IntegrityCheckError";
