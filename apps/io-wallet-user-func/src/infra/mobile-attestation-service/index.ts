@@ -30,6 +30,7 @@ import {
   validateiOSAssertion,
   validateiOSAttestation,
 } from "./ios";
+import { ExternalServiceError } from "./android/assertion";
 
 export class IntegrityCheckError extends Error {
   name = "IntegrityCheckError";
@@ -123,9 +124,14 @@ export class MobileAttestationService implements AttestationService {
                 ),
               ),
               TE.orElseW((androidErr) =>
-                TE.left(
-                  new IntegrityCheckError([iosErr.message, androidErr.message]),
-                ),
+                androidErr instanceof ExternalServiceError
+                  ? TE.left(androidErr)
+                  : TE.left(
+                      new IntegrityCheckError([
+                        iosErr.message,
+                        androidErr.message,
+                      ]),
+                    ),
               ),
             ),
           ),
