@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.12
+
+### Patch Changes
+
+- 9683312: Fixed HTTP status for Google Play Integrity API failures: external service errors now return 500 instead of 409
+
 ## 4.1.11
 
 ### Patch Changes
