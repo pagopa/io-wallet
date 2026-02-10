@@ -23,6 +23,7 @@ import { describe, expect, it } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
 import { CertificateRepository } from "@/certificates";
+import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
@@ -739,6 +740,59 @@ describe("CreateWalletAttestationHandler", async () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 404,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response when validateAssertion returns ExternalServiceError", async () => {
+    const mockAttestationServiceExternalServiceError: AttestationService = {
+      getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
+      validateAssertion: () => TE.left(new ExternalServiceError("foo")),
+      validateAttestation: () =>
+        TE.right({
+          deviceDetails: { platform: "ios" },
+          hardwareKey: {
+            crv: "P-256",
+            kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
+            kty: "EC",
+            x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
+            y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
+          },
+        }),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: walletAttestationRequest,
+        fiscal_code: mockFiscalCode,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletAttestationHandler({
+      attestationService: mockAttestationServiceExternalServiceError,
+      certificateRepository,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        body: {
+          detail: "ExternalServiceError",
+          status: 500,
+          title: "Internal Server Error",
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
       }),
     });
   });

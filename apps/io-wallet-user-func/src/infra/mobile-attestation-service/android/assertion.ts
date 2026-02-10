@@ -39,6 +39,10 @@ export interface VerifyAssertionParams {
 
 export const playintegrity = google.playintegrity("v1");
 
+export class ExternalServiceError extends Error {
+  name = "ExternalServiceError";
+}
+
 export const verifyAssertion = async (
   params: VerifyAssertionParams,
 ): Promise<ValidationResult> => {
@@ -85,12 +89,17 @@ export const verifyAssertion = async (
   let responseValidated;
 
   for (const packageName of bundleIdentifiers) {
-    const result = await playintegrity.v1.decodeIntegrityToken({
-      packageName,
-      requestBody: {
-        integrityToken: integrityAssertion,
-      },
-    });
+    let result;
+    try {
+      result = await playintegrity.v1.decodeIntegrityToken({
+        packageName,
+        requestBody: {
+          integrityToken: integrityAssertion,
+        },
+      });
+    } catch {
+      throw new ExternalServiceError();
+    }
 
     const token = result.data.tokenPayloadExternal;
 
