@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.11
+
+### Patch Changes
+
+- 0917748: Added external OpenAPI spec
+
 ## 4.1.10
 
 ### Patch Changes
