@@ -72,6 +72,7 @@ export const verifyAssertion = async (
     };
   }
 
+  // Then verify the integrity token
   const jwtClient = new google.auth.JWT({
     email: googleAppCredentials.client_email,
     key: googleAppCredentials.private_key,
