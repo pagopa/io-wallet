@@ -1,5 +1,13 @@
 # io-wallet-messages-func
 
+## 1.1.4
+
+### Patch Changes
+
+- 5ab3006: Updated npm dependencies
+- Updated dependencies [5ab3006]
+  - io-wallet-common@1.5.4
+
 ## 1.1.3
 
 ### Patch Changes

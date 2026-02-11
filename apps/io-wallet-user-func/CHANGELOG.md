@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 4.1.14
+
+### Patch Changes
+
+- 5ab3006: Updated npm dependencies
+- Updated dependencies [5ab3006]
+  - io-wallet-common@1.5.4
+
 ## 4.1.13
 
 ### Patch Changes

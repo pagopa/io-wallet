@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.5.4
+
+### Patch Changes
+
+- 5ab3006: Updated npm dependencies
+
 ## 1.5.3
 
 ### Patch Changes
