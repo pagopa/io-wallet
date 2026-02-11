@@ -9,9 +9,7 @@ import { WalletInstance } from "io-wallet-common/wallet-instance";
 
 import { WalletInstanceRepository } from "@/wallet-instance";
 
-export class CosmosDbWalletInstanceRepository
-  implements WalletInstanceRepository
-{
+export class CosmosDbWalletInstanceRepository implements WalletInstanceRepository {
   #container: Container;
   constructor(db: Database) {
     this.#container = db.container("wallet-instances");

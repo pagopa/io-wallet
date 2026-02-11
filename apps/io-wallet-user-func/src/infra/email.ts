@@ -11,9 +11,7 @@ import * as t from "io-ts";
 import { AuthProfileApiConfig, MailConfig } from "@/app/config";
 import { EmailNotificationService, SendEmailNotificationParams } from "@/email";
 
-export class EmailNotificationServiceClient
-  implements EmailNotificationService
-{
+export class EmailNotificationServiceClient implements EmailNotificationService {
   #authProfileApiConfig: AuthProfileApiConfig;
   #mailConfig: MailConfig;
 
