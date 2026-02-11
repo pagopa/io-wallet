@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.5.3
+
+### Patch Changes
+
+- a621f33: Updated dependencies
+
 ## 1.5.2
 
 ### Patch Changes

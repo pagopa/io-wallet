@@ -1,5 +1,13 @@
 # io-wallet-messages-func
 
+## 1.1.3
+
+### Patch Changes
+
+- a621f33: Updated dependencies
+- Updated dependencies [a621f33]
+  - io-wallet-common@1.5.3
+
 ## 1.1.2
 
 ### Patch Changes
