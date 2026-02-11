@@ -37,8 +37,6 @@ export interface VerifyAssertionParams {
   integrityAssertion: NonEmptyString;
 }
 
-export const playintegrity = google.playintegrity("v1");
-
 export class ExternalServiceError extends Error {
   name = "ExternalServiceError";
 }
@@ -74,15 +72,18 @@ export const verifyAssertion = async (
     };
   }
 
-  // Then verify the integrity token
-  const jwtClient = new google.auth.JWT(
-    googleAppCredentials.client_email,
-    undefined,
-    googleAppCredentials.private_key,
-    [androidPlayIntegrityUrl],
-  );
+  const jwtClient = new google.auth.JWT({
+    email: googleAppCredentials.client_email,
+    key: googleAppCredentials.private_key,
+    scopes: [androidPlayIntegrityUrl],
+  });
 
-  google.options({ auth: jwtClient });
+  await jwtClient.authorize();
+
+  const playintegrity = google.playintegrity({
+    auth: jwtClient,
+    version: "v1",
+  });
 
   let bundleIdentifier;
   let tokenPayloadExternal;

@@ -28,7 +28,7 @@
   "devDependencies": {
     "@pagopa/eslint-config": "^5.1.2",
     "@vitest/coverage-v8": "^4.0.1",
-    "eslint": "9.35.0",
+    "eslint": "^9.39.2",
     "prettier": "^3.8.1",
     "tsup": "^8.5.1",
     "typescript": "5.9.3",
