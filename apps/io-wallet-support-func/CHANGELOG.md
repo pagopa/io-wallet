@@ -1,5 +1,13 @@
 # io-wallet-support-func
 
+## 2.0.2
+
+### Patch Changes
+
+- 5ab3006: Updated npm dependencies
+- Updated dependencies [5ab3006]
+  - io-wallet-common@1.5.4
+
 ## 2.0.1
 
 ### Patch Changes
