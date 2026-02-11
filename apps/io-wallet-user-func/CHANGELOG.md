@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 4.1.13
+
+### Patch Changes
+
+- a621f33: Updated dependencies
+- Updated dependencies [a621f33]
+  - io-wallet-common@1.5.3
+
 ## 4.1.12
 
 ### Patch Changes
