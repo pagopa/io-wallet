@@ -14,11 +14,11 @@
     "start": "func start"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^5.0.0",
+    "@pagopa/eslint-config": "^5.1.2",
     "eslint": "9.35.0",
-    "prettier": "^3.6.2",
-    "tsup": "^8.5.0",
-    "typescript": "^5.7.3",
+    "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
     "fp-ts": "catalog:",
     "io-ts": "catalog:",
     "io-wallet-common": "workspace:^",
-    "uuid": "^11.1.0"
+    "uuid": "^13.0.0"
   },
   "main": "dist/main.js",
   "files": [

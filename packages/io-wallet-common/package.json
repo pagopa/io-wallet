@@ -31,10 +31,10 @@
     "io-ts": "catalog:"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^5.0.0",
+    "@pagopa/eslint-config": "^5.1.2",
     "eslint": "9.35.0",
-    "prettier": "^3.6.2",
-    "typescript": "5.7.3",
+    "prettier": "^3.8.1",
+    "typescript": "5.9.3",
     "vitest": "^3.2.4"
   }
 }

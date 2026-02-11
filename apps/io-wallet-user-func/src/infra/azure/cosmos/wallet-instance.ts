@@ -24,9 +24,7 @@ const toError = (genericMessage: string) => (error: unknown) =>
       )
     : new Error(`${genericMessage}: ${error}`);
 
-export class CosmosDbWalletInstanceRepository
-  implements WalletInstanceRepository
-{
+export class CosmosDbWalletInstanceRepository implements WalletInstanceRepository {
   #idKeyedContainer: Container;
   #userIdKeyedContainer: Container;
 

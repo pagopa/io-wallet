@@ -12,9 +12,7 @@ const toError = (genericMessage: string) => (error: unknown) =>
       )
     : new Error(`${genericMessage}: ${error}`);
 
-export class CosmosDbWhitelistedFiscalCodeRepository
-  implements WhitelistedFiscalCodeRepository
-{
+export class CosmosDbWhitelistedFiscalCodeRepository implements WhitelistedFiscalCodeRepository {
   #containerName: Container;
 
   constructor(db: Database) {
