@@ -17,9 +17,8 @@ import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
-// import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
-import { CreateWalletAttestationsFunction } from "@/infra/azure/functions/create-wallet-attestations";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
+import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
 import { DeleteWalletInstancesFunction } from "@/infra/azure/functions/delete-wallet-instances";
 import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
@@ -240,25 +239,6 @@ app.http("deleteWalletInstances", {
   route: "wallet-instances",
 });
 
-// app.cosmosDB("addWalletInstanceUserId", {
-//   connection: "CosmosDbEndpoint",
-//   containerName: "wallet-instances",
-//   databaseName: config.azure.cosmos.dbName,
-//   handler: AddWalletInstanceUserIdFunction({
-//     inputDecoder: t.array(WalletInstance),
-//     telemetryClient: appInsightsClient,
-//   }),
-//   leaseContainerName: "leases-wallet-instances-user-id",
-//   leaseContainerPrefix: "wallet-instances-user-id-",
-//   return: output.cosmosDB({
-//     connection: "CosmosDbEndpoint",
-//     containerName: "wallet-instances-user-id",
-//     createIfNotExists: false,
-//     databaseName: config.azure.cosmos.dbName,
-//   }),
-//   startFromBeginning: true,
-// });
-
 app.http("createWalletAttestation", {
   authLevel: "function",
   handler: CreateWalletAttestationFunction({
@@ -275,25 +255,6 @@ app.http("createWalletAttestation", {
   }),
   methods: ["POST"],
   route: "wallet-attestations",
-});
-
-// this endpoint will replace the one in createWalletAttestation function
-app.http("createWalletAttestations", {
-  authLevel: "function",
-  handler: CreateWalletAttestationsFunction({
-    attestationService: mobileAttestationService,
-    certificateRepository,
-    federationEntity: config.entityConfiguration.federationEntity,
-    nonceRepository,
-    signer: walletAttestationSigner,
-    walletAttestationConfig: {
-      ...config.walletProvider.walletAttestation,
-      trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
-    },
-    walletInstanceRepository,
-  }),
-  methods: ["POST"],
-  route: "wallet-attestations-1.3",
 });
 
 app.http("isFiscalCodeWhitelisted", {
@@ -319,4 +280,22 @@ app.http("generateCertificateChain", {
   }),
   methods: ["POST"],
   route: "certificate-chain",
+});
+
+app.http("createWalletInstanceAttestation", {
+  authLevel: "function",
+  handler: CreateWalletInstanceAttestationFunction({
+    attestationService: mobileAttestationService,
+    certificateRepository,
+    federationEntity: config.entityConfiguration.federationEntity,
+    nonceRepository,
+    signer: walletAttestationSigner,
+    walletAttestationConfig: {
+      ...config.walletProvider.walletAttestation,
+      trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
+    },
+    walletInstanceRepository,
+  }),
+  methods: ["POST"],
+  route: "wallet-instance-attestations",
 });

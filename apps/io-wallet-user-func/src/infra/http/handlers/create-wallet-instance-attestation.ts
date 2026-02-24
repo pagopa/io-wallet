@@ -2,7 +2,6 @@ import * as H from "@pagopa/handler-kit";
 import { parse } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -16,17 +15,15 @@ import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { getPublicKeyFromCnf, verifyAndDecodeJwt } from "@/verifier";
-import { createWalletAppAttestation } from "@/wallet-app-attestation";
-import {
-  WalletAttestations,
-  WalletAttestationsEnvironment,
-} from "@/wallet-attestations";
 import {
   getValidWalletInstanceByUserId,
   WalletInstanceEnvironment,
 } from "@/wallet-instance";
+import {
+  createWalletInstanceAttestation,
+  WalletInstanceAttestationEnvironment,
+} from "@/wallet-instance-attestation";
 import { consumeNonce } from "@/wallet-instance-request";
-import { createWalletUnitAttestation } from "@/wallet-unit-attestation";
 
 const WalletAttestationRequestHeader = t.type({
   alg: t.string,
@@ -104,7 +101,7 @@ const getWalletAttestationData =
   (
     walletAttestationRequest: WalletAttestationRequest,
   ): RTE.ReaderTaskEither<
-    WalletAttestationsEnvironment,
+    WalletInstanceAttestationEnvironment,
     Error,
     WalletAttestationData
   > =>
@@ -139,11 +136,8 @@ const getWalletAttestationData =
       ),
     );
 
-const testWalletAttestations: WalletAttestations = {
-  wallet_attestations: {
-    wallet_app_attestation: "this_is_a_test_wallet_app_attestation",
-    wallet_unit_attestation: "this_is_a_test_wallet_unit_attestation",
-  },
+const testWalletInstanceAttestation = {
+  wallet_instance_attestation: "this_is_a_test_wallet_instance_attestation",
 };
 
 /**
@@ -195,24 +189,14 @@ const generateWalletAttestations = ({
   pipe(
     assertion,
     getWalletAttestationData,
-    RTE.chainW((walletAttestationData) =>
-      pipe(
-        sequenceS(RTE.ApplyPar)({
-          walletAppAttestation: createWalletAppAttestation(
-            walletAttestationData,
-          ),
-          walletUnitAttestation: createWalletUnitAttestation(
-            walletAttestationData,
-          ),
-        }),
-        RTE.map(({ walletAppAttestation, walletUnitAttestation }) =>
+    RTE.chainW(
+      flow(
+        createWalletInstanceAttestation,
+        RTE.map((walletInstanceAttestation) =>
           isTestUser
-            ? testWalletAttestations
+            ? testWalletInstanceAttestation
             : {
-                wallet_attestations: {
-                  wallet_app_attestation: walletAppAttestation,
-                  wallet_unit_attestation: walletUnitAttestation,
-                },
+                wallet_instance_attestation: walletInstanceAttestation,
               },
         ),
       ),
@@ -257,24 +241,25 @@ const addIsTestUser = ({
   userId,
 });
 
-export const CreateWalletAttestationsHandler = H.of((req: H.HttpRequest) =>
-  pipe(
-    req,
-    requireWalletAttestationRequest,
-    TE.map(addIsTestUser),
-    RTE.fromTaskEither,
-    RTE.chainFirst(validateRequest),
-    RTE.chainW(generateWalletAttestations),
-    RTE.map(H.successJson),
-    RTE.orElseFirstW(
-      flow(
-        sendTelemetryExceptionWithBody({
-          body: req.body,
-          functionName: "createWalletAttestations",
-        }),
-        RTE.fromEither,
+export const CreateWalletInstanceAttestationHandler = H.of(
+  (req: H.HttpRequest) =>
+    pipe(
+      req,
+      requireWalletAttestationRequest,
+      TE.map(addIsTestUser),
+      RTE.fromTaskEither,
+      RTE.chainFirst(validateRequest),
+      RTE.chainW(generateWalletAttestations),
+      RTE.map(H.successJson),
+      RTE.orElseFirstW(
+        flow(
+          sendTelemetryExceptionWithBody({
+            body: req.body,
+            functionName: "createWalletInstanceAttestation",
+          }),
+          RTE.fromEither,
+        ),
       ),
+      RTE.orElseW(logErrorAndReturnResponse),
     ),
-    RTE.orElseW(logErrorAndReturnResponse),
-  ),
 );

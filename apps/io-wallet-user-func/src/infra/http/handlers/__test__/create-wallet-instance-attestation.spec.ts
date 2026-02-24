@@ -23,7 +23,7 @@ import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/con
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
-import { CreateWalletAttestationsHandler } from "../create-wallet-attestations";
+import { CreateWalletInstanceAttestationHandler } from "../create-wallet-instance-attestation";
 import { privateEcKey, publicEcKey, signer } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
@@ -117,17 +117,10 @@ const certificateRepository: CertificateRepository = {
   insertCertificateChain: () => TE.right(undefined),
 };
 
-const WalletAttestations = t.type({
-  wallet_attestations: t.type({
-    wallet_app_attestation: t.string,
-    wallet_unit_attestation: t.string,
-  }),
-});
-
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
-describe("CreateWalletAttestationsHandler", async () => {
+describe("CreateWalletInstanceAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
 
   const walletAttestationRequest = await new jose.SignJWT({
@@ -162,7 +155,7 @@ describe("CreateWalletAttestationsHandler", async () => {
   };
 
   it("should return a 200 HTTP response on success", async () => {
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository,
       federationEntity,
@@ -179,10 +172,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         body: expect.objectContaining({
-          wallet_attestations: expect.objectContaining({
-            wallet_app_attestation: expect.any(String),
-            wallet_unit_attestation: expect.any(String),
-          }),
+          wallet_instance_attestation: expect.any(String),
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -193,7 +183,7 @@ describe("CreateWalletAttestationsHandler", async () => {
   });
 
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository,
       federationEntity,
@@ -207,44 +197,28 @@ describe("CreateWalletAttestationsHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(8);
+    expect.assertions(4);
 
     if (E.isRight(result)) {
-      const body = WalletAttestations.decode(result.right.body);
+      const body = t
+        .type({
+          wallet_instance_attestation: t.string,
+        })
+        .decode(result.right.body);
       if (E.isRight(body)) {
-        const walletAppAtt =
-          body.right.wallet_attestations.wallet_app_attestation;
-        const walletUnitAtt =
-          body.right.wallet_attestations.wallet_unit_attestation;
-        const walletAppAttHeader = jose.decodeProtectedHeader(walletAppAtt);
-        const walletUnitAttHeader = jose.decodeProtectedHeader(walletUnitAtt);
-        expect(Object.keys(walletAppAttHeader).sort()).toEqual(
+        const walletInstanceAtt = body.right.wallet_instance_attestation;
+        const walletInstanceAttHeader =
+          jose.decodeProtectedHeader(walletInstanceAtt);
+        expect(Object.keys(walletInstanceAttHeader).sort()).toEqual(
           ["alg", "typ", "kid", "x5c"].sort(),
         );
-        expect(Object.keys(walletUnitAttHeader).sort()).toEqual(
-          ["alg", "typ", "kid", "x5c"].sort(),
-        );
-        const walletAppAttPayload = jose.decodeJwt(walletAppAtt);
-        expect(Object.keys(walletAppAttPayload).sort()).toEqual(
+        const walletInstanceAttPayload = jose.decodeJwt(walletInstanceAtt);
+        expect(Object.keys(walletInstanceAttPayload).sort()).toEqual(
           ["cnf", "exp", "iat", "iss", "sub"].sort(),
         );
-        const walletUnitAttPayload = jose.decodeJwt(walletUnitAtt);
-        expect(Object.keys(walletUnitAttPayload).sort()).toEqual(
-          [
-            "attested_keys",
-            "exp",
-            "iat",
-            "iss",
-            "key_storage",
-            "status",
-            "user_authentication",
-          ].sort(),
-        );
         // check trailing slashes are removed
-        expect((walletAppAttPayload.iss || "").endsWith("/")).toBe(false);
-        expect((walletAppAttPayload.sub || "").endsWith("/")).toBe(false);
-        expect((walletUnitAttPayload.iss || "").endsWith("/")).toBe(false);
-        expect((walletUnitAttPayload.sub || "").endsWith("/")).toBe(false);
+        expect((walletInstanceAttPayload.iss || "").endsWith("/")).toBe(false);
+        expect((walletInstanceAttPayload.sub || "").endsWith("/")).toBe(false);
       }
     }
   });
@@ -255,7 +229,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       insertCertificateChain: () => TE.right(undefined),
     };
 
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository: certificateRepositoryError,
       federationEntity,
@@ -285,7 +259,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       insertCertificateChain: () => TE.right(undefined),
     };
 
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository: certificateRepositoryNone,
       federationEntity,
@@ -317,7 +291,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository,
       federationEntity,
@@ -365,7 +339,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository,
       federationEntity,
@@ -408,7 +382,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationService,
       certificateRepository,
       federationEntity,
@@ -461,7 +435,7 @@ describe("CreateWalletAttestationsHandler", async () => {
       },
       method: "POST",
     };
-    const handler = CreateWalletAttestationsHandler({
+    const handler = CreateWalletInstanceAttestationHandler({
       attestationService: mockAttestationServiceExternalServiceError,
       certificateRepository,
       federationEntity,
