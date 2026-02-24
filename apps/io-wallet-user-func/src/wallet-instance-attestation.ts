@@ -1,13 +1,15 @@
+import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { WalletAttestationsEnvironment } from "@/wallet-attestations";
-
+import { CertificateRepository } from "./certificates";
+import { FederationEntity } from "./entity-configuration";
+import { Signer } from "./signer";
 import { removeTrailingSlash } from "./url";
 
-interface WalletAppAttestationData {
+interface WalletInstanceAttestationData {
   iss: string;
   kid: string;
   sub: string;
@@ -15,7 +17,7 @@ interface WalletAppAttestationData {
   x5c: string[];
 }
 
-interface WalletAppAttestationJwtModel {
+interface WalletInstanceAttestationJwtModel {
   cnf: {
     jwk: JwkPublicKey;
   };
@@ -25,9 +27,9 @@ interface WalletAppAttestationJwtModel {
   x5c: string[];
 }
 
-const WalletAppAttestationToJwtModel: E.Encoder<
-  WalletAppAttestationJwtModel,
-  WalletAppAttestationData
+const WalletInstanceAttestationToJwtModel: E.Encoder<
+  WalletInstanceAttestationJwtModel,
+  WalletInstanceAttestationData
 > = {
   encode: ({ iss, kid, sub, walletInstancePublicKey, x5c }) => ({
     cnf: {
@@ -40,14 +42,25 @@ const WalletAppAttestationToJwtModel: E.Encoder<
   }),
 };
 
-export const createWalletAppAttestation =
+export interface WalletInstanceAttestationEnvironment {
+  certificateRepository: CertificateRepository;
+  federationEntity: FederationEntity;
+  signer: Signer;
+  walletAttestationConfig: { trustAnchorUrl: ValidUrl };
+}
+
+export const createWalletInstanceAttestation =
   (
-    walletAttestationData: WalletAppAttestationData,
-  ): RTE.ReaderTaskEither<WalletAttestationsEnvironment, Error, string> =>
+    walletAttestationData: WalletInstanceAttestationData,
+  ): RTE.ReaderTaskEither<
+    WalletInstanceAttestationEnvironment,
+    Error,
+    string
+  > =>
   (dep) =>
     pipe(
       walletAttestationData,
-      WalletAppAttestationToJwtModel.encode,
+      WalletInstanceAttestationToJwtModel.encode,
       ({ kid, x5c, ...payload }) =>
         dep.signer.createJwtAndSign(
           {
