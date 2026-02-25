@@ -124,7 +124,6 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
 
   const walletAttestationRequest = await new jose.SignJWT({
-    attested_key: "attested_key",
     aud: "aud",
     cnf: {
       jwk: publicEcKey,
@@ -134,12 +133,15 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     integrity_assertion: authenticatorData.toString("base64"),
     iss: "demokey",
     nonce: challenge,
+    platform: "iOS",
     sub: "https://wallet-provider.example.org/",
+    wallet_solution_id: "appio",
+    wallet_solution_version: "3.25.0.1",
   })
     .setProtectedHeader({
       alg: "ES256",
       kid: publicEcKey.kid,
-      typ: "attestations-request+jwt",
+      typ: "wia-request+jwt",
     })
     .setIssuedAt()
     .setExpirationTime("2h")

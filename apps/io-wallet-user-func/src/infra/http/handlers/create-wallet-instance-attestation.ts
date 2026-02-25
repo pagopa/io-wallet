@@ -25,14 +25,13 @@ import {
 } from "@/wallet-instance-attestation";
 import { consumeNonce } from "@/wallet-instance-request";
 
-const WalletAttestationRequestHeader = t.type({
-  alg: t.string,
+const WalletInstanceAttestationRequestHeader = t.type({
+  alg: t.literal("ES256"),
   kid: t.string,
-  typ: t.literal("attestations-request+jwt"),
+  typ: t.literal("wia-request+jwt"),
 });
 
-const WalletAttestationRequestPayload = t.type({
-  attested_key: t.string,
+const WalletInstanceAttestationRequestPayload = t.type({
   aud: NonEmptyString,
   cnf: t.type({
     jwk: JwkPublicKey,
@@ -44,29 +43,33 @@ const WalletAttestationRequestPayload = t.type({
   integrity_assertion: NonEmptyString,
   iss: t.string,
   nonce: NonEmptyString,
+  platform: t.literal("iOS", "Android"),
+  wallet_solution_id: t.string,
+  wallet_solution_version: t.string,
 });
 
-const WalletAttestationRequest = t.type({
-  header: WalletAttestationRequestHeader,
-  payload: WalletAttestationRequestPayload,
+const WalletInstanceAttestationRequest = t.type({
+  header: WalletInstanceAttestationRequestHeader,
+  payload: WalletInstanceAttestationRequestPayload,
 });
 
-type WalletAttestationRequest = t.TypeOf<typeof WalletAttestationRequest>;
+type WalletInstanceAttestationRequest = t.TypeOf<
+  typeof WalletInstanceAttestationRequest
+>;
 
-// verify and decode the wallet instance request
-const verifyAndDecodeWalletAttestationRequest = (
-  walletAttestationRequest: string,
-): TE.TaskEither<Error, WalletAttestationRequest> =>
+const verifyAndDecodeWalletInstanceAttestationRequest = (
+  walletInstanceAttestationRequest: string,
+): TE.TaskEither<Error, WalletInstanceAttestationRequest> =>
   pipe(
-    walletAttestationRequest,
+    walletInstanceAttestationRequest,
     getPublicKeyFromCnf,
     TE.fromEither,
-    TE.chain(verifyAndDecodeJwt(walletAttestationRequest)),
-    TE.chainEitherKW(parse(WalletAttestationRequest)),
+    TE.chain(verifyAndDecodeJwt(walletInstanceAttestationRequest)),
+    TE.chainEitherKW(parse(WalletInstanceAttestationRequest)),
   );
 
 const validateAssertion: (
-  walletAttestationRequest: WalletAttestationRequest,
+  walletInstanceAttestationRequest: WalletInstanceAttestationRequest,
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
@@ -75,19 +78,21 @@ const validateAssertion: (
   Error,
   void
 > =
-  (walletAttestationRequest, hardwareKey, signCount, user) =>
+  (walletInstanceAttestationRequest, hardwareKey, signCount, user) =>
   ({ attestationService }) =>
     attestationService.validateAssertion({
       hardwareKey,
-      hardwareSignature: walletAttestationRequest.payload.hardware_signature,
-      integrityAssertion: walletAttestationRequest.payload.integrity_assertion,
-      jwk: walletAttestationRequest.payload.cnf.jwk,
-      nonce: walletAttestationRequest.payload.nonce,
+      hardwareSignature:
+        walletInstanceAttestationRequest.payload.hardware_signature,
+      integrityAssertion:
+        walletInstanceAttestationRequest.payload.integrity_assertion,
+      jwk: walletInstanceAttestationRequest.payload.cnf.jwk,
+      nonce: walletInstanceAttestationRequest.payload.nonce,
       signCount,
       user,
     });
 
-interface WalletAttestationData {
+interface WalletInstanceAttestationData {
   iss: string;
   keyStorage: string[];
   kid: string;
@@ -97,13 +102,13 @@ interface WalletAttestationData {
   x5c: string[];
 }
 
-const getWalletAttestationData =
+const getWalletInstanceAttestationData =
   (
-    walletAttestationRequest: WalletAttestationRequest,
+    walletInstanceAttestationRequest: WalletInstanceAttestationRequest,
   ): RTE.ReaderTaskEither<
     WalletInstanceAttestationEnvironment,
     Error,
-    WalletAttestationData
+    WalletInstanceAttestationData
   > =>
   ({ certificateRepository, federationEntity: { basePath }, signer }) =>
     pipe(
@@ -115,9 +120,10 @@ const getWalletAttestationData =
         iss: basePath.href,
         keyStorage: [],
         kid,
-        sub: walletAttestationRequest.header.kid,
+        sub: walletInstanceAttestationRequest.header.kid,
         userAuthentication: [],
-        walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
+        walletInstancePublicKey:
+          walletInstanceAttestationRequest.payload.cnf.jwk,
       })),
       TE.chainW(({ kid, ...data }) =>
         pipe(
@@ -147,7 +153,7 @@ const testWalletInstanceAttestation = {
  * 3. For non-test users, validates the assertion in the request
  */
 const validateRequest: (input: {
-  assertion: WalletAttestationRequest;
+  assertion: WalletInstanceAttestationRequest;
   isTestUser: boolean;
   userId: FiscalCode;
 }) => RTE.ReaderTaskEither<
@@ -179,16 +185,16 @@ const validateRequest: (input: {
     ),
   );
 
-const generateWalletAttestations = ({
+const generateWalletInstanceAttestation = ({
   assertion,
   isTestUser,
 }: {
-  assertion: WalletAttestationRequest;
+  assertion: WalletInstanceAttestationRequest;
   isTestUser: boolean;
 }) =>
   pipe(
     assertion,
-    getWalletAttestationData,
+    getWalletInstanceAttestationData,
     RTE.chainW(
       flow(
         createWalletInstanceAttestation,
@@ -203,15 +209,15 @@ const generateWalletAttestations = ({
     ),
   );
 
-const WalletAttestationRequestBody = t.type({
+const WalletInstanceAttestationRequestBody = t.type({
   assertion: NonEmptyString,
   fiscal_code: FiscalCode,
 });
 
-const requireWalletAttestationRequest = (req: H.HttpRequest) =>
+const requireWalletInstanceAttestationRequest = (req: H.HttpRequest) =>
   pipe(
     req.body,
-    H.parse(WalletAttestationRequestBody),
+    H.parse(WalletInstanceAttestationRequestBody),
     E.map(({ assertion, fiscal_code }) => ({
       assertion,
       fiscalCode: fiscal_code,
@@ -220,7 +226,7 @@ const requireWalletAttestationRequest = (req: H.HttpRequest) =>
     TE.chain(({ assertion, fiscalCode }) =>
       pipe(
         assertion,
-        verifyAndDecodeWalletAttestationRequest,
+        verifyAndDecodeWalletInstanceAttestationRequest,
         TE.map((validatedAssertion) => ({
           assertion: validatedAssertion,
           userId: fiscalCode,
@@ -233,7 +239,7 @@ const addIsTestUser = ({
   assertion,
   userId,
 }: {
-  assertion: WalletAttestationRequest;
+  assertion: WalletInstanceAttestationRequest;
   userId: FiscalCode;
 }) => ({
   assertion,
@@ -245,11 +251,11 @@ export const CreateWalletInstanceAttestationHandler = H.of(
   (req: H.HttpRequest) =>
     pipe(
       req,
-      requireWalletAttestationRequest,
+      requireWalletInstanceAttestationRequest,
       TE.map(addIsTestUser),
       RTE.fromTaskEither,
       RTE.chainFirst(validateRequest),
-      RTE.chainW(generateWalletAttestations),
+      RTE.chainW(generateWalletInstanceAttestation),
       RTE.map(H.successJson),
       RTE.orElseFirstW(
         flow(
