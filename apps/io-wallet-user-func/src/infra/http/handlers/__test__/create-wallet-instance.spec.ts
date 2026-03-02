@@ -98,7 +98,7 @@ describe("CreateWalletInstanceHandler", () => {
         statusCode: 204,
       }),
     });
-    
+
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 
