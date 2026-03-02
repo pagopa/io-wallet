@@ -30,6 +30,12 @@ const WalletInstanceRequestPayload = t.type({
   key_attestation: NonEmptyString,
 });
 
+const WalletInstanceRequestPayloadWithOptionalEmailNotification =
+  t.intersection([
+    WalletInstanceRequestPayload,
+    t.partial({ email_notification_enabled: t.boolean }),
+  ]);
+
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
 >;
@@ -37,20 +43,34 @@ type WalletInstanceRequestPayload = t.TypeOf<
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
     req.body,
-    H.parse(WalletInstanceRequestPayload),
-    E.chain(({ challenge, fiscal_code, hardware_key_tag, key_attestation }) =>
-      sequenceS(E.Apply)({
-        challenge: E.right(challenge),
-        fiscalCode: E.right(fiscal_code),
-        hardwareKeyTag: E.right(hardware_key_tag),
-        keyAttestation: E.right(key_attestation),
-      }),
+    H.parse(WalletInstanceRequestPayloadWithOptionalEmailNotification),
+    E.chain(
+      ({
+        challenge,
+        email_notification_enabled,
+        fiscal_code,
+        hardware_key_tag,
+        key_attestation,
+      }) =>
+        sequenceS(E.Apply)({
+          challenge: E.right(challenge),
+          emailNotificationEnabled: E.right(email_notification_enabled ?? true),
+          fiscalCode: E.right(fiscal_code),
+          hardwareKeyTag: E.right(hardware_key_tag),
+          keyAttestation: E.right(key_attestation),
+        }),
     ),
   );
 
 const sendEmail: (
   fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = enqueue;
+
+const sendEmailIfEnabled = (
+  emailNotificationEnabled: boolean,
+  fiscalCode: FiscalCode,
+): RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> =>
+  emailNotificationEnabled ? sendEmail(fiscalCode) : RTE.right(undefined);
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -86,7 +106,12 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
                 "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
-            RTE.chainW(() => sendEmail(walletInstanceRequest.fiscalCode)),
+            RTE.chainW(() =>
+              sendEmailIfEnabled(
+                walletInstanceRequest.emailNotificationEnabled,
+                walletInstanceRequest.fiscalCode,
+              ),
+            ),
           ),
         ),
       ),

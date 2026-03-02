@@ -64,6 +64,7 @@ paths:
               challenge: string
               key_attestation: string
               hardware_key_tag: string
+              email_notification_enabled: true
       responses:
         "204":
           description: Wallet instance successfully created
@@ -634,6 +635,9 @@ components:
         hardware_key_tag:
           minLength: 1
           type: string
+        email_notification_enabled:
+          type: boolean
+          default: true
     CreateWalletAttestationBody:
       required:
       - assertion

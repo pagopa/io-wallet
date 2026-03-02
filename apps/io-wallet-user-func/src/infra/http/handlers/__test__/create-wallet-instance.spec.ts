@@ -5,7 +5,7 @@ import * as L from "@pagopa/logger";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
 import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
@@ -63,15 +63,20 @@ describe("CreateWalletInstanceHandler", () => {
       }),
   };
 
+  const sendMessageSpy = vi.fn(() =>
+    Promise.resolve({
+      errorCode: undefined,
+      messageId: "messageId",
+    } as QueueSendMessageResponse),
+  );
+
   const queueClient: QueueClient = {
-    sendMessage: () =>
-      Promise.resolve({
-        errorCode: undefined,
-        messageId: "messageId",
-      } as QueueSendMessageResponse),
+    sendMessage: sendMessageSpy,
   } as unknown as QueueClient;
 
-  it("should return a 204 HTTP response on success", async () => {
+  it("should return a 204 HTTP response on success and enqueue email by default", async () => {
+    sendMessageSpy.mockClear();
+
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
@@ -93,6 +98,70 @@ describe("CreateWalletInstanceHandler", () => {
         statusCode: 204,
       }),
     });
+    
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should skip email enqueue when email_notification_enabled is false", async () => {
+    sendMessageSpy.mockClear();
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        ...walletInstanceRequest,
+        email_notification_enabled: false,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(sendMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it("should enqueue email when email_notification_enabled is true", async () => {
+    sendMessageSpy.mockClear();
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        ...walletInstanceRequest,
+        email_notification_enabled: true,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 
   it("should return a 422 HTTP response on invalid body", async () => {
