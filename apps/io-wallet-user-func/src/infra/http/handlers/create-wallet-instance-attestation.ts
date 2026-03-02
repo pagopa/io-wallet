@@ -8,109 +8,144 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as O from "fp-ts/Option";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
+import { validateJwkKid } from "io-wallet-common/jwk";
 
-import { AttestationService } from "@/attestation-service";
+import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
+import {
+  validateAssertionRequest,
+  validateHeaderKidMatchesCnfKidIfPresent,
+  validateIssuerMatchesHardwareKeyTag,
+  verifyJwtWithInternalKey,
+} from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
-import { getPublicKeyFromCnf, verifyAndDecodeJwt } from "@/verifier";
-import {
-  getValidWalletInstanceByUserId,
-  WalletInstanceEnvironment,
-} from "@/wallet-instance";
+import { WalletInstanceEnvironment } from "@/wallet-instance";
 import {
   createWalletInstanceAttestation,
+  WalletInstanceAttestationData,
   WalletInstanceAttestationEnvironment,
 } from "@/wallet-instance-attestation";
-import { consumeNonce } from "@/wallet-instance-request";
 
-const WalletInstanceAttestationRequestHeader = t.type({
-  alg: t.literal("ES256"),
-  kid: t.string,
-  typ: t.literal("wia-request+jwt"),
+const WalletInstanceAttestationRequestBody = t.type({
+  assertion: NonEmptyString,
+  fiscal_code: FiscalCode,
 });
 
-const WalletInstanceAttestationRequestPayload = t.type({
-  aud: NonEmptyString,
-  cnf: t.type({
-    jwk: JwkPublicKey,
+const ES256PublicJwk = t.intersection([
+  t.type({
+    crv: t.literal("P-256"),
+    kty: t.literal("EC"),
+    x: NonEmptyString,
+    y: NonEmptyString,
   }),
-  exp: t.number,
-  hardware_key_tag: NonEmptyString,
-  hardware_signature: NonEmptyString,
-  iat: t.number,
-  integrity_assertion: NonEmptyString,
-  iss: t.string,
-  nonce: NonEmptyString,
-  platform: t.literal("iOS", "Android"),
-  wallet_solution_id: t.string,
-  wallet_solution_version: t.string,
+  t.partial({
+    kid: NonEmptyString,
+  }),
+]);
+
+const AssertionJWT = t.type({
+  header: t.type({
+    alg: t.literal("ES256"),
+    kid: NonEmptyString,
+    typ: t.literal("wia-request+jwt"),
+  }),
+  payload: t.type({
+    cnf: t.type({
+      jwk: ES256PublicJwk,
+    }),
+    exp: t.number,
+    hardware_key_tag: NonEmptyString,
+    hardware_signature: NonEmptyString,
+    iat: t.number,
+    integrity_assertion: NonEmptyString,
+    iss: NonEmptyString,
+    nonce: NonEmptyString,
+    platform: t.union([t.literal("iOS"), t.literal("Android")]),
+    wallet_solution_id: NonEmptyString,
+    wallet_solution_version: NonEmptyString,
+  }),
 });
 
-const WalletInstanceAttestationRequest = t.type({
-  header: WalletInstanceAttestationRequestHeader,
-  payload: WalletInstanceAttestationRequestPayload,
-});
-
-type WalletInstanceAttestationRequest = t.TypeOf<
-  typeof WalletInstanceAttestationRequest
->;
+interface WIARequest {
+  cnf: {
+    jwk: t.TypeOf<typeof ES256PublicJwk>;
+  };
+  hardwareKeyTag: NonEmptyString;
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+  iss: NonEmptyString;
+  nonce: NonEmptyString;
+  platform: "Android" | "iOS";
+  walletSolutionId: NonEmptyString;
+  walletSolutionVersion: NonEmptyString;
+}
 
 const verifyAndDecodeWalletInstanceAttestationRequest = (
   walletInstanceAttestationRequest: string,
-): TE.TaskEither<Error, WalletInstanceAttestationRequest> =>
+): TE.TaskEither<Error, WIARequest> =>
   pipe(
     walletInstanceAttestationRequest,
-    getPublicKeyFromCnf,
-    TE.fromEither,
-    TE.chain(verifyAndDecodeJwt(walletInstanceAttestationRequest)),
-    TE.chainEitherKW(parse(WalletInstanceAttestationRequest)),
+    verifyJwtWithInternalKey,
+    TE.chainEitherKW(parse(AssertionJWT)),
+    TE.chainEitherKW(validateHeaderKidMatchesCnfKidIfPresent),
+    TE.map(({ payload }) => ({
+      cnf: {
+        jwk: payload.cnf.jwk,
+      },
+      hardwareKeyTag: payload.hardware_key_tag,
+      hardwareSignature: payload.hardware_signature,
+      integrityAssertion: payload.integrity_assertion,
+      iss: payload.iss,
+      nonce: payload.nonce,
+      platform: payload.platform,
+      walletSolutionId: payload.wallet_solution_id,
+      walletSolutionVersion: payload.wallet_solution_version,
+    })),
+    TE.chainEitherKW(validateIssuerMatchesHardwareKeyTag),
   );
 
-const validateAssertion: (
-  walletInstanceAttestationRequest: WalletInstanceAttestationRequest,
-  hardwareKey: JwkPublicKey,
-  signCount: number,
-  user: FiscalCode,
-) => RTE.ReaderTaskEither<
-  { attestationService: AttestationService },
-  Error,
-  void
-> =
-  (walletInstanceAttestationRequest, hardwareKey, signCount, user) =>
-  ({ attestationService }) =>
-    attestationService.validateAssertion({
-      hardwareKey,
-      hardwareSignature:
-        walletInstanceAttestationRequest.payload.hardware_signature,
-      integrityAssertion:
-        walletInstanceAttestationRequest.payload.integrity_assertion,
-      jwk: walletInstanceAttestationRequest.payload.cnf.jwk,
-      nonce: walletInstanceAttestationRequest.payload.nonce,
-      signCount,
-      user,
-    });
+const requireWalletInstanceAttestationRequest = flow(
+  H.parse(WalletInstanceAttestationRequestBody),
+  E.map(({ assertion, fiscal_code }) => ({
+    assertion,
+    fiscalCode: fiscal_code,
+  })),
+  TE.fromEither,
+  TE.chain(({ assertion, fiscalCode }) =>
+    pipe(
+      assertion,
+      verifyAndDecodeWalletInstanceAttestationRequest,
+      TE.map((wiaRequest) => ({
+        userId: fiscalCode,
+        wiaRequest,
+      })),
+    ),
+  ),
+);
 
-interface WalletInstanceAttestationData {
-  iss: string;
-  keyStorage: string[];
-  kid: string;
-  sub: string;
-  userAuthentication: string[];
-  walletInstancePublicKey: JwkPublicKey;
-  x5c: string[];
+interface VerifiedAttestationData {
+  cnf: {
+    jwk: t.TypeOf<typeof ES256PublicJwk>;
+  };
+  walletSolutionId: NonEmptyString;
+  walletSolutionVersion: NonEmptyString;
 }
 
 const getWalletInstanceAttestationData =
   (
-    walletInstanceAttestationRequest: WalletInstanceAttestationRequest,
+    verifiedAttestationData: VerifiedAttestationData,
   ): RTE.ReaderTaskEither<
     WalletInstanceAttestationEnvironment,
     Error,
     WalletInstanceAttestationData
   > =>
-  ({ certificateRepository, federationEntity: { basePath }, signer }) =>
+  ({
+    certificateRepository,
+    federationEntity: { basePath },
+    signer,
+    walletAttestationConfig: { oauthClientSub },
+  }) =>
     pipe(
       "EC",
       signer.getFirstPublicKeyByKty,
@@ -118,20 +153,19 @@ const getWalletInstanceAttestationData =
       TE.fromEither,
       TE.map(({ kid }) => ({
         iss: basePath.href,
-        keyStorage: [],
         kid,
-        sub: walletInstanceAttestationRequest.header.kid,
-        userAuthentication: [],
-        walletInstancePublicKey:
-          walletInstanceAttestationRequest.payload.cnf.jwk,
+        oauthClientSub,
+        walletInstancePublicKey: verifiedAttestationData.cnf.jwk,
+        walletProviderName: basePath.href,
+        walletSolutionCertificationInformation: undefined,
+        walletSolutionId: verifiedAttestationData.walletSolutionId,
+        walletSolutionVersion: verifiedAttestationData.walletSolutionVersion,
       })),
-      TE.chainW(({ kid, ...data }) =>
+      TE.chain(({ kid, ...data }) =>
         pipe(
-          kid,
-          certificateRepository.getCertificateChainByKid,
-          TE.chainW((maybeCert) =>
-            pipe(
-              maybeCert,
+          certificateRepository.getCertificateChainByKid(kid),
+          TE.chain(
+            flow(
               O.match(
                 () => TE.left(new Error("Certificate chain not found")),
                 (chain) => TE.right({ ...data, kid, x5c: chain }),
@@ -146,116 +180,58 @@ const testWalletInstanceAttestation = {
   wallet_instance_attestation: "this_is_a_test_wallet_instance_attestation",
 };
 
-/**
- * Validates the wallet attestation request by performing the following steps:
- * 1. Consumes the nonce from the request
- * 2. Retrieves the wallet instance associated with the attestation request and verifies it hasn't been revoked
- * 3. For non-test users, validates the assertion in the request
- */
-const validateRequest: (input: {
-  assertion: WalletInstanceAttestationRequest;
-  isTestUser: boolean;
+const verifyAssertion: (input: {
   userId: FiscalCode;
+  wiaRequest: WIARequest;
 }) => RTE.ReaderTaskEither<
-  NonceEnvironment &
-    WalletInstanceEnvironment & {
-      attestationService: AttestationService;
-    },
+  AssertionValidationConfig & NonceEnvironment & WalletInstanceEnvironment,
   Error,
   void
-> = ({ assertion, isTestUser, userId }) =>
-  pipe(
-    assertion.payload.nonce,
-    consumeNonce,
-    RTE.chainW(() =>
-      getValidWalletInstanceByUserId(
-        assertion.payload.hardware_key_tag,
-        userId,
-      ),
-    ),
-    RTE.chain((walletInstance) =>
-      isTestUser
-        ? RTE.right(undefined)
-        : validateAssertion(
-            assertion,
-            walletInstance.hardwareKey,
-            walletInstance.signCount,
-            userId,
-          ),
-    ),
-  );
+> = ({ userId, wiaRequest }) =>
+  validateAssertionRequest({
+    assertion: wiaRequest,
+    userId,
+  });
 
-const generateWalletInstanceAttestation = ({
-  assertion,
-  isTestUser,
-}: {
-  assertion: WalletInstanceAttestationRequest;
-  isTestUser: boolean;
-}) =>
-  pipe(
-    assertion,
-    getWalletInstanceAttestationData,
-    RTE.chainW(
-      flow(
-        createWalletInstanceAttestation,
-        RTE.map((walletInstanceAttestation) =>
-          isTestUser
-            ? testWalletInstanceAttestation
-            : {
-                wallet_instance_attestation: walletInstanceAttestation,
-              },
-        ),
-      ),
-    ),
-  );
-
-const WalletInstanceAttestationRequestBody = t.type({
-  assertion: NonEmptyString,
-  fiscal_code: FiscalCode,
-});
-
-const requireWalletInstanceAttestationRequest = (req: H.HttpRequest) =>
-  pipe(
-    req.body,
-    H.parse(WalletInstanceAttestationRequestBody),
-    E.map(({ assertion, fiscal_code }) => ({
-      assertion,
-      fiscalCode: fiscal_code,
-    })),
-    TE.fromEither,
-    TE.chain(({ assertion, fiscalCode }) =>
-      pipe(
-        assertion,
-        verifyAndDecodeWalletInstanceAttestationRequest,
-        TE.map((validatedAssertion) => ({
-          assertion: validatedAssertion,
-          userId: fiscalCode,
-        })),
-      ),
-    ),
-  );
-
-const addIsTestUser = ({
-  assertion,
-  userId,
-}: {
-  assertion: WalletInstanceAttestationRequest;
+const generateWalletInstanceAttestation: (request: {
   userId: FiscalCode;
-}) => ({
-  assertion,
-  isTestUser: isLoadTestUser(userId),
-  userId,
-});
+  wiaRequest: WIARequest;
+}) => RTE.ReaderTaskEither<
+  AssertionValidationConfig &
+    NonceEnvironment &
+    WalletInstanceAttestationEnvironment &
+    WalletInstanceEnvironment,
+  Error,
+  {
+    wallet_instance_attestation: string;
+  }
+> = (request) =>
+  pipe(
+    request,
+    verifyAssertion,
+    RTE.map(() => ({
+      cnf: request.wiaRequest.cnf,
+      walletSolutionId: request.wiaRequest.walletSolutionId,
+      walletSolutionVersion: request.wiaRequest.walletSolutionVersion,
+    })),
+    RTE.chainW(getWalletInstanceAttestationData),
+    RTE.chainW(createWalletInstanceAttestation),
+    RTE.map((walletInstanceAttestation) => ({
+      wallet_instance_attestation: walletInstanceAttestation,
+    })),
+  );
 
 export const CreateWalletInstanceAttestationHandler = H.of(
   (req: H.HttpRequest) =>
     pipe(
-      req,
+      req.body,
       requireWalletInstanceAttestationRequest,
-      TE.map(addIsTestUser),
       RTE.fromTaskEither,
-      RTE.chainFirst(validateRequest),
-      RTE.chainW(generateWalletInstanceAttestation),
+      RTE.chain(({ userId, wiaRequest }) =>
+        isLoadTestUser(userId)
+          ? RTE.right(testWalletInstanceAttestation)
+          : generateWalletInstanceAttestation({ userId, wiaRequest }),
+      ),
       RTE.map(H.successJson),
       RTE.orElseFirstW(
         flow(

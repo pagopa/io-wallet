@@ -39,14 +39,21 @@ export const parseAndroidAttestation = (data: Buffer) =>
     RA.sequence(E.Applicative),
   );
 
-export const validateAndroidAttestation = (
-  x509Chain: readonly X509Certificate[],
-  nonce: NonEmptyString,
-  bundleIdentifiers: string[],
-  googlePublicKeys: string[],
-  androidCrlUrl: string,
-  httpRequestTimeout: number,
-): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
+export const validateAndroidAttestation = ({
+  androidCrlUrl,
+  bundleIdentifiers,
+  googlePublicKeys,
+  httpRequestTimeout,
+  nonce,
+  x509Chain,
+}: {
+  androidCrlUrl: string;
+  bundleIdentifiers: string[];
+  googlePublicKeys: string[];
+  httpRequestTimeout: number;
+  nonce?: NonEmptyString;
+  x509Chain: readonly X509Certificate[];
+}): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(
     getCrlFromUrl(androidCrlUrl, httpRequestTimeout),
     TE.chain((attestationCrl) =>

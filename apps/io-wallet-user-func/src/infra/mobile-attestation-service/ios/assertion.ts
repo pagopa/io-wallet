@@ -12,7 +12,6 @@ export interface VerifyAssertionParams {
   decodedAssertion: iOsAssertion;
   hardwareKey: JwkPublicKey;
   signCount: number;
-  skipSignatureValidation: boolean;
   teamIdentifier: string;
 }
 
@@ -25,7 +24,6 @@ export const verifyAssertion = async (
     decodedAssertion,
     hardwareKey,
     signCount,
-    skipSignatureValidation,
     teamIdentifier,
   } = params;
 
@@ -56,10 +54,7 @@ export const verifyAssertion = async (
   // 4. Verify the signature using the public key and nonce.
   const verifier = createVerify("SHA256");
   verifier.update(nonce);
-  if (
-    !skipSignatureValidation &&
-    !verifier.verify(publicHardwareKeyPem, signature)
-  ) {
+  if (!verifier.verify(publicHardwareKeyPem, signature)) {
     return {
       reason: "Invalid signature",
       success: false,
