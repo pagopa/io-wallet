@@ -194,6 +194,7 @@ const WalletProviderConfig = t.type({
   }),
   jwtSigningConfig: CryptoConfiguration,
   walletAttestation: t.type({
+    oauthClientSub: t.string,
     walletLink: t.string,
     walletName: t.string,
   }),
@@ -500,6 +501,9 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("WalletAttestationJwtDefaultDuration"),
       RE.orElse(() => RE.right("1h")),
     ),
+    walletAttestationOauthClientSub: readFromEnvironment(
+      "WalletAttestationOauthClientSub",
+    ),
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
     ),
@@ -512,6 +516,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       certificateCountry,
       certificateLocality,
       certificateState,
+      walletAttestationOauthClientSub,
       walletAttestationWalletLink,
       walletAttestationWalletName,
       ...jwtSigningConfig
@@ -523,6 +528,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       },
       jwtSigningConfig,
       walletAttestation: {
+        oauthClientSub: walletAttestationOauthClientSub,
         walletLink: walletAttestationWalletLink,
         walletName: walletAttestationWalletName,
       },

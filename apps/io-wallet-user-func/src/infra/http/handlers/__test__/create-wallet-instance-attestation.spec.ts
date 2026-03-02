@@ -14,10 +14,13 @@ import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import * as jose from "jose";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { AttestationService } from "@/attestation-service";
 import { CertificateRepository } from "@/certificates";
+import {
+  AssertionValidationConfig,
+  verifyIosAssertion,
+} from "@/infra/mobile-attestation-service";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -65,25 +68,17 @@ const federationEntity = {
 };
 
 const walletAttestationConfig = {
-  trustAnchorUrl: url("https://foo.com"),
-  walletLink: "https://foo.com",
-  walletName: "Wallet name",
+  oauthClientSub: "oauthClientSub",
 };
 
-const mockAttestationService: AttestationService = {
-  getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
-  validateAssertion: () => TE.right(undefined),
-  validateAttestation: () =>
-    TE.right({
-      deviceDetails: { platform: "ios" },
-      hardwareKey: {
-        crv: "P-256",
-        kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
-        kty: "EC",
-        x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
-        y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
-      },
-    }),
+const assertionValidationConfig: AssertionValidationConfig = {
+  allowedDeveloperUsers: ["a"],
+  androidBundleIdentifiers: [],
+  androidPlayIntegrityUrl: "",
+  androidPlayStoreCertificateHash: "",
+  googleAppCredentialsEncoded: "",
+  iosBundleIdentifiers: [],
+  iOsTeamIdentifier: "",
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
@@ -120,6 +115,15 @@ const certificateRepository: CertificateRepository = {
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
+vi.mock("@/infra/mobile-attestation-service", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@/infra/mobile-attestation-service")>();
+  return {
+    ...actual,
+    verifyIosAssertion: vi.fn(() => () => TE.right(void 0)),
+  };
+});
+
 describe("CreateWalletInstanceAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
 
@@ -131,7 +135,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     hardware_key_tag: keyId,
     hardware_signature: signature.toString("base64"),
     integrity_assertion: authenticatorData.toString("base64"),
-    iss: "demokey",
+    iss: keyId,
     nonce: challenge,
     platform: "iOS",
     sub: "https://wallet-provider.example.org/",
@@ -158,7 +162,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -186,7 +190,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -199,7 +203,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(4);
+    expect.assertions(6);
 
     if (E.isRight(result)) {
       const body = t
@@ -216,8 +220,21 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         );
         const walletInstanceAttPayload = jose.decodeJwt(walletInstanceAtt);
         expect(Object.keys(walletInstanceAttPayload).sort()).toEqual(
-          ["cnf", "exp", "iat", "iss", "sub"].sort(),
+          ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
         );
+        const eudiWalletInfo = t
+          .type({
+            general_info: t.type({
+              wallet_provider_name: t.string,
+            }),
+          })
+          .decode(walletInstanceAttPayload.eudi_wallet_info);
+        expect(E.isRight(eudiWalletInfo)).toBe(true);
+        if (E.isRight(eudiWalletInfo)) {
+          expect(eudiWalletInfo.right.general_info.wallet_provider_name).toBe(
+            walletInstanceAttPayload.iss,
+          );
+        }
         // check trailing slashes are removed
         expect((walletInstanceAttPayload.iss || "").endsWith("/")).toBe(false);
         expect((walletInstanceAttPayload.sub || "").endsWith("/")).toBe(false);
@@ -232,7 +249,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
 
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository: certificateRepositoryError,
       federationEntity,
       input: req,
@@ -262,7 +279,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
 
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository: certificateRepositoryNone,
       federationEntity,
       input: req,
@@ -294,7 +311,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -342,7 +359,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -385,7 +402,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationService,
+      ...assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -414,21 +431,9 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   });
 
   it("should return a 500 HTTP response when validateAssertion returns ExternalServiceError", async () => {
-    const mockAttestationServiceExternalServiceError: AttestationService = {
-      getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
-      validateAssertion: () => TE.left(new ExternalServiceError("foo")),
-      validateAttestation: () =>
-        TE.right({
-          deviceDetails: { platform: "ios" },
-          hardwareKey: {
-            crv: "P-256",
-            kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
-            kty: "EC",
-            x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
-            y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
-          },
-        }),
-    };
+    vi.mocked(verifyIosAssertion).mockReturnValueOnce(() =>
+      TE.left(new ExternalServiceError("foo")),
+    );
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
@@ -438,7 +443,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      attestationService: mockAttestationServiceExternalServiceError,
+      ...assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -462,6 +467,124 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 422 HTTP response when payload.iss does not match payload.hardware_key_tag", async () => {
+    const invalidIssuerWalletAttestationRequest = await new jose.SignJWT({
+      aud: "aud",
+      cnf: {
+        jwk: publicEcKey,
+      },
+      hardware_key_tag: keyId,
+      hardware_signature: signature.toString("base64"),
+      integrity_assertion: authenticatorData.toString("base64"),
+      iss: "invalid-issuer",
+      nonce: challenge,
+      platform: "iOS",
+      wallet_solution_id: "appio",
+      wallet_solution_version: "3.25.0.1",
+    })
+      .setProtectedHeader({
+        alg: "ES256",
+        kid: publicEcKey.kid,
+        typ: "wia-request+jwt",
+      })
+      .setIssuedAt()
+      .setExpirationTime("2h")
+      .sign(josePrivateKey);
+
+    const invalidReq = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: invalidIssuerWalletAttestationRequest,
+        fiscal_code: mockFiscalCode,
+      },
+      method: "POST",
+    };
+
+    const handler = CreateWalletInstanceAttestationHandler({
+      ...assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: invalidReq,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 422,
+      }),
+    });
+  });
+
+  it("should return a 422 HTTP response when payload.cnf.jwk.kid does not match header.kid", async () => {
+    const publicEcKeyWithDifferentKid = {
+      ...publicEcKey,
+      kid: "different-cnf-kid",
+    };
+    const invalidCnfKidWalletAttestationRequest = await new jose.SignJWT({
+      aud: "aud",
+      cnf: {
+        jwk: publicEcKeyWithDifferentKid,
+      },
+      hardware_key_tag: keyId,
+      hardware_signature: signature.toString("base64"),
+      integrity_assertion: authenticatorData.toString("base64"),
+      iss: keyId,
+      nonce: challenge,
+      platform: "iOS",
+      wallet_solution_id: "appio",
+      wallet_solution_version: "3.25.0.1",
+    })
+      .setProtectedHeader({
+        alg: "ES256",
+        kid: publicEcKey.kid,
+        typ: "wia-request+jwt",
+      })
+      .setIssuedAt()
+      .setExpirationTime("2h")
+      .sign(josePrivateKey);
+
+    const invalidReq = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: invalidCnfKidWalletAttestationRequest,
+        fiscal_code: mockFiscalCode,
+      },
+      method: "POST",
+    };
+
+    const handler = CreateWalletInstanceAttestationHandler({
+      ...assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: invalidReq,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 422,
       }),
     });
   });

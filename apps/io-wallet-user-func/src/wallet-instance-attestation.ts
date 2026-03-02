@@ -1,4 +1,3 @@
-import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "io-ts/lib/Encoder";
@@ -9,11 +8,15 @@ import { FederationEntity } from "./entity-configuration";
 import { Signer } from "./signer";
 import { removeTrailingSlash } from "./url";
 
-interface WalletInstanceAttestationData {
+export interface WalletInstanceAttestationData {
   iss: string;
   kid: string;
-  sub: string;
+  oauthClientSub: string;
   walletInstancePublicKey: JwkPublicKey;
+  walletProviderName: string;
+  walletSolutionCertificationInformation: string | undefined;
+  walletSolutionId: string;
+  walletSolutionVersion: string;
   x5c: string[];
 }
 
@@ -21,9 +24,16 @@ interface WalletInstanceAttestationJwtModel {
   cnf: {
     jwk: JwkPublicKey;
   };
+  eudi_wallet_info: {
+    general_info: {
+      wallet_provider_name: string;
+      wallet_solution_certification_information: string | undefined;
+      wallet_solution_id: string;
+      wallet_solution_version: string;
+    };
+  };
   iss: string;
   kid: string;
-  sub: string;
   x5c: string[];
 }
 
@@ -31,13 +41,32 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
   WalletInstanceAttestationJwtModel,
   WalletInstanceAttestationData
 > = {
-  encode: ({ iss, kid, sub, walletInstancePublicKey, x5c }) => ({
+  encode: ({
+    iss,
+    kid,
+    oauthClientSub,
+    walletInstancePublicKey,
+    walletProviderName,
+    walletSolutionCertificationInformation,
+    walletSolutionId,
+    walletSolutionVersion,
+    x5c,
+  }) => ({
     cnf: {
       jwk: walletInstancePublicKey,
     },
+    eudi_wallet_info: {
+      general_info: {
+        wallet_provider_name: removeTrailingSlash(walletProviderName),
+        wallet_solution_certification_information:
+          walletSolutionCertificationInformation,
+        wallet_solution_id: walletSolutionId,
+        wallet_solution_version: walletSolutionVersion,
+      },
+    },
     iss: removeTrailingSlash(iss),
     kid,
-    sub: removeTrailingSlash(sub),
+    sub: removeTrailingSlash(oauthClientSub),
     x5c,
   }),
 };
@@ -46,7 +75,9 @@ export interface WalletInstanceAttestationEnvironment {
   certificateRepository: CertificateRepository;
   federationEntity: FederationEntity;
   signer: Signer;
-  walletAttestationConfig: { trustAnchorUrl: ValidUrl };
+  walletAttestationConfig: {
+    oauthClientSub: string;
+  };
 }
 
 export const createWalletInstanceAttestation =

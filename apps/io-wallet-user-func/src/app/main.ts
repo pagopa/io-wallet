@@ -33,7 +33,10 @@ import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whiteli
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
-import { MobileAttestationService } from "@/infra/mobile-attestation-service";
+import {
+  AssertionValidationConfig,
+  MobileAttestationService,
+} from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 
 import { getConfigFromEnvironment } from "./config";
@@ -282,17 +285,28 @@ app.http("generateCertificateChain", {
   route: "certificate-chain",
 });
 
+const assertionValidationConfig: AssertionValidationConfig = {
+  allowedDeveloperUsers: config.attestationService.allowedDeveloperUsers,
+  androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
+  androidPlayIntegrityUrl: config.attestationService.androidPlayIntegrityUrl,
+  androidPlayStoreCertificateHash:
+    config.attestationService.androidPlayStoreCertificateHash,
+  googleAppCredentialsEncoded:
+    config.attestationService.googleAppCredentialsEncoded,
+  iosBundleIdentifiers: config.attestationService.iosBundleIdentifiers,
+  iOsTeamIdentifier: config.attestationService.iOsTeamIdentifier,
+};
+
 app.http("createWalletInstanceAttestation", {
   authLevel: "function",
   handler: CreateWalletInstanceAttestationFunction({
-    attestationService: mobileAttestationService,
+    ...assertionValidationConfig,
     certificateRepository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
     signer: walletAttestationSigner,
     walletAttestationConfig: {
-      ...config.walletProvider.walletAttestation,
-      trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
+      oauthClientSub: config.walletProvider.walletAttestation.oauthClientSub,
     },
     walletInstanceRepository,
   }),
