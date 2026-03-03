@@ -66,12 +66,6 @@ const sendEmail: (
   fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = enqueue;
 
-const sendEmailIfEnabled = (
-  emailNotificationEnabled: boolean,
-  fiscalCode: FiscalCode,
-): RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> =>
-  emailNotificationEnabled ? sendEmail(fiscalCode) : RTE.right(undefined);
-
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req,
@@ -107,10 +101,9 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               ),
             ),
             RTE.chainW(() =>
-              sendEmailIfEnabled(
-                walletInstanceRequest.emailNotificationEnabled,
-                walletInstanceRequest.fiscalCode,
-              ),
+              walletInstanceRequest.emailNotificationEnabled
+                ? sendEmail(walletInstanceRequest.fiscalCode)
+                : RTE.right(undefined),
             ),
           ),
         ),
