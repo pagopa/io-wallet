@@ -64,7 +64,7 @@ paths:
               challenge: string
               key_attestation: string
               hardware_key_tag: string
-              email_notification_enabled: true
+              is_renewal: true
       responses:
         "204":
           description: Wallet instance successfully created
@@ -635,9 +635,9 @@ components:
         hardware_key_tag:
           minLength: 1
           type: string
-        email_notification_enabled:
+        is_renewal:
           type: boolean
-          default: true
+          default: false
     CreateWalletAttestationBody:
       required:
       - assertion
@@ -652,6 +652,7 @@ components:
       enum:
       - CERTIFICATE_REVOKED_BY_ISSUER
       - NEW_WALLET_INSTANCE_CREATED
+      - WALLET_INSTANCE_RENEWAL
       - REVOKED_BY_USER
       type: string
     ProblemJson:

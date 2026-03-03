@@ -30,7 +30,7 @@ const WalletInstanceRequestPayload = t.intersection([
     hardware_key_tag: NonEmptyString,
     key_attestation: NonEmptyString,
   }),
-  t.partial({ email_notification_enabled: t.boolean }),
+  t.partial({ is_renewal: t.boolean }),
 ]);
 
 type WalletInstanceRequestPayload = t.TypeOf<
@@ -44,16 +44,16 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
     E.chain(
       ({
         challenge,
-        email_notification_enabled,
         fiscal_code,
         hardware_key_tag,
+        is_renewal,
         key_attestation,
       }) =>
         sequenceS(E.Apply)({
           challenge: E.right(challenge),
-          emailNotificationEnabled: E.right(email_notification_enabled ?? true),
           fiscalCode: E.right(fiscal_code),
           hardwareKeyTag: E.right(hardware_key_tag),
+          isRenewal: E.right(is_renewal ?? false),
           keyAttestation: E.right(key_attestation),
         }),
     ),
@@ -94,13 +94,15 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               revokeUserValidWalletInstancesExceptOne(
                 walletInstanceRequest.fiscalCode,
                 walletInstanceRequest.hardwareKeyTag,
-                "NEW_WALLET_INSTANCE_CREATED",
+                walletInstanceRequest.isRenewal
+                  ? "WALLET_INSTANCE_RENEWAL"
+                  : "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
             RTE.chainW(() =>
-              walletInstanceRequest.emailNotificationEnabled
-                ? sendEmail(walletInstanceRequest.fiscalCode)
-                : RTE.right(undefined),
+              walletInstanceRequest.isRenewal
+                ? RTE.right(undefined)
+                : sendEmail(walletInstanceRequest.fiscalCode),
             ),
           ),
         ),

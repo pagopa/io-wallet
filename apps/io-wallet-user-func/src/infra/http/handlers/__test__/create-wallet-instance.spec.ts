@@ -102,45 +102,14 @@ describe("CreateWalletInstanceHandler", () => {
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("should skip email enqueue when email_notification_enabled is false", async () => {
+  it("should enqueue email and use NEW_WALLET_INSTANCE_CREATED when is_renewal is false", async () => {
     sendMessageSpy.mockClear();
 
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
         ...walletInstanceRequest,
-        email_notification_enabled: false,
-      },
-      method: "POST",
-    };
-    const handler = CreateWalletInstanceHandler({
-      attestationService: mockAttestationService,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      queueClient,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        statusCode: 204,
-      }),
-    });
-
-    expect(sendMessageSpy).not.toHaveBeenCalled();
-  });
-
-  it("should enqueue email when email_notification_enabled is true", async () => {
-    sendMessageSpy.mockClear();
-
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: {
-        ...walletInstanceRequest,
-        email_notification_enabled: true,
+        is_renewal: false,
       },
       method: "POST",
     };
@@ -162,6 +131,37 @@ describe("CreateWalletInstanceHandler", () => {
     });
 
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should skip email enqueue when is_renewal is true", async () => {
+    sendMessageSpy.mockClear();
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        ...walletInstanceRequest,
+        is_renewal: true,
+      },
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(sendMessageSpy).not.toHaveBeenCalled();
   });
 
   it("should return a 422 HTTP response on invalid body", async () => {
