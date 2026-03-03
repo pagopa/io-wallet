@@ -102,7 +102,7 @@ describe("CreateWalletInstanceHandler", () => {
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("should enqueue email and use NEW_WALLET_INSTANCE_CREATED when is_renewal is false", async () => {
+  it("should enqueue email when is_renewal is false", async () => {
     sendMessageSpy.mockClear();
 
     const req = {
