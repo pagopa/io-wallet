@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.1.15
+
+### Patch Changes
+
+- 4c96fad: Add optional is_renewal to wallet instance creation (default false) and skip email enqueue when true
+
 ## 4.1.14
 
 ### Patch Changes
