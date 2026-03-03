@@ -391,6 +391,9 @@ components:
         hardware_key_tag:
           type: string
           minLength: 1
+        is_renewal:
+          type: boolean
+          default: false
         fiscal_code:
           $ref: "#/components/schemas/FiscalCode"
       required:
@@ -430,6 +433,7 @@ components:
         [
           "CERTIFICATE_REVOKED_BY_ISSUER",
           "NEW_WALLET_INSTANCE_CREATED",
+          "WALLET_INSTANCE_RENEWAL",
           "REVOKED_BY_USER",
         ]
 
