@@ -2,4 +2,4 @@
 "io-wallet-user-func": patch
 ---
 
-Add optional email_notification_enabled to wallet instance creation (default true) and skip email enqueue when false.
+Add optional is_renewal to wallet instance creation (default false) and skip email enqueue when true
