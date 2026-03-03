@@ -23,12 +23,15 @@ import {
 } from "@/wallet-instance";
 import { consumeNonce, WalletInstanceRequest } from "@/wallet-instance-request";
 
-const WalletInstanceRequestPayload = t.type({
-  challenge: NonEmptyString,
-  fiscal_code: FiscalCode,
-  hardware_key_tag: NonEmptyString,
-  key_attestation: NonEmptyString,
-});
+const WalletInstanceRequestPayload = t.intersection([
+  t.type({
+    challenge: NonEmptyString,
+    fiscal_code: FiscalCode,
+    hardware_key_tag: NonEmptyString,
+    key_attestation: NonEmptyString,
+  }),
+  t.partial({ is_renewal: t.boolean }),
+]);
 
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
@@ -38,13 +41,21 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
     req.body,
     H.parse(WalletInstanceRequestPayload),
-    E.chain(({ challenge, fiscal_code, hardware_key_tag, key_attestation }) =>
-      sequenceS(E.Apply)({
-        challenge: E.right(challenge),
-        fiscalCode: E.right(fiscal_code),
-        hardwareKeyTag: E.right(hardware_key_tag),
-        keyAttestation: E.right(key_attestation),
-      }),
+    E.chain(
+      ({
+        challenge,
+        fiscal_code,
+        hardware_key_tag,
+        is_renewal,
+        key_attestation,
+      }) =>
+        sequenceS(E.Apply)({
+          challenge: E.right(challenge),
+          fiscalCode: E.right(fiscal_code),
+          hardwareKeyTag: E.right(hardware_key_tag),
+          isRenewal: E.right(is_renewal ?? false),
+          keyAttestation: E.right(key_attestation),
+        }),
     ),
   );
 
@@ -83,10 +94,16 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
               revokeUserValidWalletInstancesExceptOne(
                 walletInstanceRequest.fiscalCode,
                 walletInstanceRequest.hardwareKeyTag,
-                "NEW_WALLET_INSTANCE_CREATED",
+                walletInstanceRequest.isRenewal
+                  ? "WALLET_INSTANCE_RENEWAL"
+                  : "NEW_WALLET_INSTANCE_CREATED",
               ),
             ),
-            RTE.chainW(() => sendEmail(walletInstanceRequest.fiscalCode)),
+            RTE.chainW(() =>
+              walletInstanceRequest.isRenewal
+                ? RTE.right(undefined)
+                : sendEmail(walletInstanceRequest.fiscalCode),
+            ),
           ),
         ),
       ),

@@ -32,6 +32,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateWalletInstanceBody"
+            example:
+              challenge: string
+              key_attestation: string
+              hardware_key_tag: string
+              is_renewal: true
       responses:
         "204":
           description: Wallet instance successfully created
@@ -322,6 +327,9 @@ components:
         challenge: string
         key_attestation: string
         hardware_key_tag: string
+        is_renewal:
+          type: boolean
+          default: false
     CreateWalletInstanceAttestationBody:
       type: string
       minLength: 1
@@ -341,6 +349,7 @@ components:
       enum:
       - CERTIFICATE_REVOKED_BY_ISSUER
       - NEW_WALLET_INSTANCE_CREATED
+      - WALLET_INSTANCE_RENEWAL
       - REVOKED_BY_USER
       type: string
     ProblemJson:

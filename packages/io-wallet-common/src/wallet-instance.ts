@@ -32,6 +32,7 @@ export type WalletInstanceValid = t.TypeOf<typeof WalletInstanceValid>;
 export const RevocationReason = t.union([
   t.literal("CERTIFICATE_REVOKED_BY_ISSUER"),
   t.literal("NEW_WALLET_INSTANCE_CREATED"),
+  t.literal("WALLET_INSTANCE_RENEWAL"),
   t.literal("REVOKED_BY_USER"),
 ]);
 export type RevocationReason = t.TypeOf<typeof RevocationReason>;
