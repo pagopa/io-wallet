@@ -93,7 +93,6 @@ export const AttestationServiceConfiguration = t.type({
   httpRequestTimeout: NumberFromString,
   iosBundleIdentifiers: t.array(t.string),
   iOsTeamIdentifier: t.string,
-  skipSignatureValidation: t.boolean,
 });
 
 export type AttestationServiceConfiguration = t.TypeOf<
@@ -327,11 +326,6 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     iOsTeamIdentifier: pipe(
       readFromEnvironment("IosTeamIdentifier"),
       RE.orElse(() => RE.right("DSEVY6MV9G")),
-    ),
-    skipSignatureValidation: pipe(
-      readFromEnvironment("SkipSignatureValidation"),
-      RE.map(booleanFromString),
-      RE.orElse(() => RE.right(false)),
     ),
   }),
 );
