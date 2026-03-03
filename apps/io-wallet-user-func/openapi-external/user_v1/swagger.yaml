@@ -195,7 +195,7 @@ paths:
       operationId: createWalletInstanceAttestation
       requestBody:
         content:
-          application/json:
+          application/jwt:
             schema:
               $ref: "#/components/schemas/CreateWalletInstanceAttestationBody"
       responses:
