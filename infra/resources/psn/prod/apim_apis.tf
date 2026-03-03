@@ -388,6 +388,15 @@ resource "azurerm_api_management_api_operation_policy" "create_wallet_attestatio
   xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
 }
 
+resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_attestation_policy" {
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
+  operation_id        = "createWalletInstanceAttestation"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
+}
+
 resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_policy" {
   api_name            = azurerm_api_management_api.user_ioapp_v1.name
   operation_id        = "createWalletInstance"
@@ -436,6 +445,15 @@ resource "azurerm_api_management_api_operation_policy" "is_fiscal_code_whitelist
 resource "azurerm_api_management_api_operation_policy" "create_wallet_attestation_uat_policy" {
   api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
   operation_id        = "createWalletAttestation"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_attestation_uat_policy" {
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
+  operation_id        = "createWalletInstanceAttestation"
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
