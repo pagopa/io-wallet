@@ -7,7 +7,6 @@ import { deleteNonce, NonceEnvironment } from "./nonce";
 
 const WalletInstanceRequest = t.type({
   challenge: NonEmptyString,
-  emailNotificationEnabled: t.boolean,
   fiscalCode: FiscalCode,
   hardwareKeyTag: NonEmptyString,
   keyAttestation: NonEmptyString,

@@ -23,18 +23,15 @@ import {
 } from "@/wallet-instance";
 import { consumeNonce, WalletInstanceRequest } from "@/wallet-instance-request";
 
-const WalletInstanceRequestPayload = t.type({
-  challenge: NonEmptyString,
-  fiscal_code: FiscalCode,
-  hardware_key_tag: NonEmptyString,
-  key_attestation: NonEmptyString,
-});
-
-const WalletInstanceRequestPayloadWithOptionalEmailNotification =
-  t.intersection([
-    WalletInstanceRequestPayload,
-    t.partial({ email_notification_enabled: t.boolean }),
-  ]);
+const WalletInstanceRequestPayload = t.intersection([
+  t.type({
+    challenge: NonEmptyString,
+    fiscal_code: FiscalCode,
+    hardware_key_tag: NonEmptyString,
+    key_attestation: NonEmptyString,
+  }),
+  t.partial({ email_notification_enabled: t.boolean }),
+]);
 
 type WalletInstanceRequestPayload = t.TypeOf<
   typeof WalletInstanceRequestPayload
@@ -43,7 +40,7 @@ type WalletInstanceRequestPayload = t.TypeOf<
 const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
     req.body,
-    H.parse(WalletInstanceRequestPayloadWithOptionalEmailNotification),
+    H.parse(WalletInstanceRequestPayload),
     E.chain(
       ({
         challenge,
