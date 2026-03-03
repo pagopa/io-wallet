@@ -207,7 +207,7 @@ paths:
         - $ref: "#/components/parameters/XUserHeader"
       requestBody:
         content:
-          application/json:
+          application/jwt:
             schema:
               $ref: "#/components/schemas/CreateWalletInstanceAttestationBody"
       responses:
