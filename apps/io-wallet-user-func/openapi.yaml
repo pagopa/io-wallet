@@ -3,7 +3,7 @@ info:
   title: IO Wallet - User API
   version: 1.0.0
 servers:
-  - url: https://io-p-itn-wallet-user-func-02.azurewebsites.net/api/v1/wallet
+  - url: https://iw-p-itn-user-func-01.azurewebsites.net/api/wallet/v1
 paths:
   /nonce:
     get:
