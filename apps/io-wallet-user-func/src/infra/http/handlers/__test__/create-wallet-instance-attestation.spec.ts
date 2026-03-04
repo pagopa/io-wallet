@@ -19,7 +19,7 @@ import { describe, expect, it, vi } from "vitest";
 import { CertificateRepository } from "@/certificates";
 import {
   AssertionValidationConfig,
-  verifyIosAssertion,
+  verifyAndroidAssertion,
 } from "@/infra/mobile-attestation-service";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
@@ -113,6 +113,7 @@ vi.mock("@/infra/mobile-attestation-service", async (importOriginal) => {
     await importOriginal<typeof import("@/infra/mobile-attestation-service")>();
   return {
     ...actual,
+    verifyAndroidAssertion: vi.fn(() => () => TE.right(void 0)),
     verifyIosAssertion: vi.fn(() => () => TE.right(void 0)),
   };
 });
@@ -144,10 +145,43 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     .setExpirationTime("2h")
     .sign(josePrivateKey);
 
+  const androidWalletAttestationRequest = await new jose.SignJWT({
+    aud: "aud",
+    cnf: {
+      jwk: publicEcKey,
+    },
+    hardware_key_tag: keyId,
+    hardware_signature: signature.toString("base64"),
+    integrity_assertion: authenticatorData.toString("base64"),
+    iss: keyId,
+    nonce: challenge,
+    platform: "android",
+    sub: "https://wallet-provider.example.org/",
+    wallet_solution_id: "appio",
+    wallet_solution_version: "3.25.0.1",
+  })
+    .setProtectedHeader({
+      alg: "ES256",
+      kid: publicEcKey.kid,
+      typ: "wia-request+jwt",
+    })
+    .setIssuedAt()
+    .setExpirationTime("2h")
+    .sign(josePrivateKey);
+
   const req = {
     ...H.request("https://wallet-provider.example.org"),
     body: {
       assertion: walletAttestationRequest,
+      fiscal_code: mockFiscalCode,
+    },
+    method: "POST",
+  };
+
+  const androidReq = {
+    ...H.request("https://wallet-provider.example.org"),
+    body: {
+      assertion: androidWalletAttestationRequest,
       fiscal_code: mockFiscalCode,
     },
     method: "POST",
@@ -159,6 +193,34 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       certificateRepository,
       federationEntity,
       input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        body: expect.objectContaining({
+          wallet_instance_attestation: expect.any(String),
+        }),
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      }),
+    });
+  });
+
+  it("should return a 200 HTTP response on android request success", async () => {
+    const handler = CreateWalletInstanceAttestationHandler({
+      assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: androidReq,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
@@ -422,23 +484,15 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     });
   });
 
-  it("should return a 500 HTTP response when validateAssertion returns ExternalServiceError", async () => {
-    vi.mocked(verifyIosAssertion).mockReturnValueOnce(() =>
+  it("should return a 500 HTTP response when verifyAndroidAssertion returns ExternalServiceError", async () => {
+    vi.mocked(verifyAndroidAssertion).mockReturnValueOnce(() =>
       TE.left(new ExternalServiceError("foo")),
     );
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: {
-        assertion: walletAttestationRequest,
-        fiscal_code: mockFiscalCode,
-      },
-      method: "POST",
-    };
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       certificateRepository,
       federationEntity,
-      input: req,
+      input: androidReq,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
