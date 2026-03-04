@@ -14,3 +14,5 @@ overrides:
   endpoints:
     /api/v1/wallet/wallet-instances/{id}/status:
       response_time_threshold: 10
+      availability_evaluation_frequency: 30 # Default: 10
+      availability_evaluation_time_window: 50 # Default: 20
