@@ -23,7 +23,7 @@ interface Assertion {
   hardwareSignature: NonEmptyString;
   integrityAssertion: NonEmptyString;
   nonce: NonEmptyString;
-  platform: "Android" | "iOS";
+  platform: "android" | "ios";
 }
 
 const validateAssertion: (
@@ -36,7 +36,7 @@ const validateAssertion: (
   Error,
   void
 > = (assertion, hardwareKey, signCount, user) =>
-  assertion.platform === "iOS"
+  assertion.platform === "ios"
     ? verifyIosAssertion({
         hardwareKey,
         hardwareSignature: assertion.hardwareSignature,

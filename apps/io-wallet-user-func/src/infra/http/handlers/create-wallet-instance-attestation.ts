@@ -32,6 +32,23 @@ const WalletInstanceAttestationRequestBody = t.type({
   fiscal_code: FiscalCode,
 });
 
+const Platform = t.union([t.literal("ios"), t.literal("android")]);
+
+const PlatformFromRequest = new t.Type<
+  t.TypeOf<typeof Platform>,
+  string,
+  unknown
+>(
+  "PlatformFromRequest",
+  Platform.is,
+  (input, context) =>
+    pipe(
+      t.string.validate(input, context),
+      E.chain((platform) => Platform.decode(platform.toLowerCase())),
+    ),
+  (platform) => platform,
+);
+
 const AssertionJWTApi = t.type({
   header: t.type({
     alg: t.literal("ES256"),
@@ -49,7 +66,7 @@ const AssertionJWTApi = t.type({
     integrity_assertion: NonEmptyString,
     iss: NonEmptyString,
     nonce: NonEmptyString,
-    platform: t.union([t.literal("iOS"), t.literal("Android")]),
+    platform: PlatformFromRequest,
     wallet_solution_id: NonEmptyString,
     wallet_solution_version: NonEmptyString,
   }),
@@ -72,7 +89,7 @@ const AssertionJWTDecoded = t.type({
     integrityAssertion: NonEmptyString,
     iss: NonEmptyString,
     nonce: NonEmptyString,
-    platform: t.union([t.literal("iOS"), t.literal("Android")]),
+    platform: Platform,
     walletSolutionId: NonEmptyString,
     walletSolutionVersion: NonEmptyString,
   }),

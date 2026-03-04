@@ -130,7 +130,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     integrity_assertion: authenticatorData.toString("base64"),
     iss: keyId,
     nonce: challenge,
-    platform: "iOS",
+    platform: "ios",
     sub: "https://wallet-provider.example.org/",
     wallet_solution_id: "appio",
     wallet_solution_version: "3.25.0.1",
@@ -474,7 +474,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       integrity_assertion: authenticatorData.toString("base64"),
       iss: "invalid-issuer",
       nonce: challenge,
-      platform: "iOS",
+      platform: "ios",
       wallet_solution_id: "appio",
       wallet_solution_version: "3.25.0.1",
     })
@@ -535,7 +535,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       integrity_assertion: authenticatorData.toString("base64"),
       iss: keyId,
       nonce: challenge,
-      platform: "iOS",
+      platform: "ios",
       wallet_solution_id: "appio",
       wallet_solution_version: "3.25.0.1",
     })
@@ -594,7 +594,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       integrity_assertion: authenticatorData.toString("base64"),
       iss: keyId,
       nonce: challenge,
-      platform: "iOS",
+      platform: "ios",
       wallet_solution_id: "appio",
       wallet_solution_version: "3.25.0.1",
     })
