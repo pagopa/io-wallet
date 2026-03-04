@@ -16,9 +16,9 @@ import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate"
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
-// import { AddWalletInstanceUserIdFunction } from "@/infra/azure/functions/add-wallet-instance-user-id";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
+import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
 import { DeleteWalletInstancesFunction } from "@/infra/azure/functions/delete-wallet-instances";
 import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
@@ -33,7 +33,10 @@ import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whiteli
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
-import { MobileAttestationService } from "@/infra/mobile-attestation-service";
+import {
+  AssertionValidationConfig,
+  MobileAttestationService,
+} from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 
 import { getConfigFromEnvironment } from "./config";
@@ -105,6 +108,18 @@ const pidIssuerClient = new PidIssuerClient(
 const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
+
+const assertionValidationConfig: AssertionValidationConfig = {
+  allowedDeveloperUsers: config.attestationService.allowedDeveloperUsers,
+  androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
+  androidPlayIntegrityUrl: config.attestationService.androidPlayIntegrityUrl,
+  androidPlayStoreCertificateHash:
+    config.attestationService.androidPlayStoreCertificateHash,
+  googleAppCredentialsEncoded:
+    config.attestationService.googleAppCredentialsEncoded,
+  iosBundleIdentifiers: config.attestationService.iosBundleIdentifiers,
+  iOsTeamIdentifier: config.attestationService.iOsTeamIdentifier,
+};
 
 const emailNotificationService = new EmailNotificationServiceClient({
   authProfileApiConfig: config.authProfile,
@@ -239,25 +254,6 @@ app.http("deleteWalletInstances", {
   route: "wallet-instances",
 });
 
-// app.cosmosDB("addWalletInstanceUserId", {
-//   connection: "CosmosDbEndpoint",
-//   containerName: "wallet-instances",
-//   databaseName: config.azure.cosmos.dbName,
-//   handler: AddWalletInstanceUserIdFunction({
-//     inputDecoder: t.array(WalletInstance),
-//     telemetryClient: appInsightsClient,
-//   }),
-//   leaseContainerName: "leases-wallet-instances-user-id",
-//   leaseContainerPrefix: "wallet-instances-user-id-",
-//   return: output.cosmosDB({
-//     connection: "CosmosDbEndpoint",
-//     containerName: "wallet-instances-user-id",
-//     createIfNotExists: false,
-//     databaseName: config.azure.cosmos.dbName,
-//   }),
-//   startFromBeginning: true,
-// });
-
 app.http("createWalletAttestation", {
   authLevel: "function",
   handler: CreateWalletAttestationFunction({
@@ -299,4 +295,21 @@ app.http("generateCertificateChain", {
   }),
   methods: ["POST"],
   route: "certificate-chain",
+});
+
+app.http("createWalletInstanceAttestation", {
+  authLevel: "function",
+  handler: CreateWalletInstanceAttestationFunction({
+    assertionValidationConfig,
+    certificateRepository,
+    federationEntity: config.entityConfiguration.federationEntity,
+    nonceRepository,
+    signer: walletAttestationSigner,
+    walletAttestationConfig: {
+      oauthClientSub: config.walletProvider.walletAttestation.oauthClientSub,
+    },
+    walletInstanceRepository,
+  }),
+  methods: ["POST"],
+  route: "wallet-instance-attestations",
 });

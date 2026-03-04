@@ -1,0 +1,88 @@
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { pipe } from "fp-ts/function";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import { JwkPublicKey } from "io-wallet-common/jwk";
+
+import {
+  AssertionValidationConfig,
+  verifyAndroidAssertion,
+  verifyIosAssertion,
+} from "@/infra/mobile-attestation-service";
+import { NonceEnvironment } from "@/nonce";
+import {
+  getValidWalletInstanceByUserId,
+  WalletInstanceEnvironment,
+} from "@/wallet-instance";
+import { consumeNonce } from "@/wallet-instance-request";
+
+interface Assertion {
+  cnf: {
+    jwk: JwkPublicKey;
+  };
+  hardwareKeyTag: NonEmptyString;
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+  nonce: NonEmptyString;
+  platform: "android" | "ios";
+}
+
+const validateAssertion: (
+  assertion: Assertion,
+  hardwareKey: JwkPublicKey,
+  signCount: number,
+  user: FiscalCode,
+) => RTE.ReaderTaskEither<
+  { assertionValidationConfig: AssertionValidationConfig },
+  Error,
+  void
+> = (assertion, hardwareKey, signCount, user) =>
+  assertion.platform === "ios"
+    ? verifyIosAssertion({
+        hardwareKey,
+        hardwareSignature: assertion.hardwareSignature,
+        integrityAssertion: assertion.integrityAssertion,
+        jwk: assertion.cnf.jwk,
+        nonce: assertion.nonce,
+        signCount,
+      })
+    : verifyAndroidAssertion({
+        hardwareKey,
+        hardwareSignature: assertion.hardwareSignature,
+        integrityAssertion: assertion.integrityAssertion,
+        jwk: assertion.cnf.jwk,
+        nonce: assertion.nonce,
+        user,
+      });
+
+/**
+ * Validates the wallet attestation request by performing the following steps:
+ * 1. Consumes the nonce from the request
+ * 2. Retrieves the wallet instance associated with the attestation request and verifies it hasn't been revoked
+ * 3. Validates the assertion in the request
+ */
+export const validateAssertionRequest: (input: {
+  assertion: Assertion;
+  userId: FiscalCode;
+}) => RTE.ReaderTaskEither<
+  NonceEnvironment &
+    WalletInstanceEnvironment & {
+      assertionValidationConfig: AssertionValidationConfig;
+    },
+  Error,
+  void
+> = ({ assertion, userId }) =>
+  pipe(
+    assertion.nonce,
+    consumeNonce,
+    RTE.chainW(() =>
+      getValidWalletInstanceByUserId(assertion.hardwareKeyTag, userId),
+    ),
+    RTE.chainW((walletInstance) =>
+      validateAssertion(
+        assertion,
+        walletInstance.hardwareKey,
+        walletInstance.signCount,
+        userId,
+      ),
+    ),
+  );

@@ -1,10 +1,8 @@
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import * as t from "io-ts";
 import { EntityNotFoundError } from "io-wallet-common/error";
 import {
   RevocationReason,
@@ -12,18 +10,6 @@ import {
   WalletInstanceRevoked,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
-
-class RevokedWalletInstance extends Error {
-  name = "WalletInstanceRevoked";
-  constructor() {
-    super("The wallet instance has been revoked.");
-  }
-}
-
-export const WalletInstanceUserId = t.type({
-  id: NonEmptyString,
-  userId: FiscalCode,
-});
 
 export interface WalletInstanceEnvironment {
   walletInstanceRepository: WalletInstanceRepository;
@@ -51,9 +37,6 @@ export interface WalletInstanceRepository {
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
-  getUserId: (
-    id: WalletInstance["id"],
-  ) => TE.TaskEither<Error, O.Option<WalletInstanceUserId>>;
   getValidByUserIdExcludingOne: (
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -66,7 +49,12 @@ export type WalletInstanceRevocationDetails = Pick<
   "id" | "isRevoked" | "revocationReason"
 >;
 
-export type WalletInstanceUserId = t.TypeOf<typeof WalletInstanceUserId>;
+class RevokedWalletInstance extends Error {
+  name = "WalletInstanceRevoked";
+  constructor() {
+    super("The wallet instance has been revoked.");
+  }
+}
 
 export const getWalletInstanceByUserId: (
   id: WalletInstance["id"],
@@ -103,24 +91,6 @@ export const insertWalletInstance: (
   (walletInstance) =>
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
-
-export const getWalletInstanceUserId: (
-  id: WalletInstance["id"],
-) => RTE.ReaderTaskEither<
-  WalletInstanceEnvironment,
-  Error,
-  WalletInstanceUserId
-> =
-  (id) =>
-  ({ walletInstanceRepository }) =>
-    pipe(
-      walletInstanceRepository.getUserId(id),
-      TE.chain(
-        TE.fromOption(
-          () => new EntityNotFoundError("Wallet instance not found"),
-        ),
-      ),
-    );
 
 export const getValidWalletInstanceByUserId: (
   id: WalletInstance["id"],

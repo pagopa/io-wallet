@@ -26,7 +26,6 @@ describe("iOSAssertionValidation", () => {
       decodedAssertion,
       hardwareKey,
       signCount: 0,
-      skipSignatureValidation: false,
       teamIdentifier,
     });
 

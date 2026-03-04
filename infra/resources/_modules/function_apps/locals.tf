@@ -43,6 +43,8 @@ locals {
     WalletProviderCertificateState    = "Lazio"
     WalletProviderCertificateLocality = "Roma"
 
+    WalletAttestationOauthClientSub = "https://ioapp.it"
+
     FrontDoorProfileName  = var.front_door_profile_name
     FrontDoorEndpointName = var.front_door_endpoint_name
 

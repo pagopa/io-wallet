@@ -7,11 +7,6 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { WalletInstanceRequest } from "./wallet-instance-request";
 
-export enum OperatingSystem {
-  android = "Android",
-  iOS = "Apple iOS",
-}
-
 export interface AttestationService {
   getHardwarePublicTestKey: () => TE.TaskEither<Error, JwkPublicKey>;
   validateAssertion: (

@@ -58,6 +58,7 @@
     "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
     "WalletInstanceStorageAccountUrl": "WALLET_INSTANCE_STORAGE_ACCOUNT_URL",
-    "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME"
+    "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME",
+    "WalletAttestationOauthClientSub": "WALLET_ATTESTATION_OAUTH_CLIENT_SUB"
   }
 }

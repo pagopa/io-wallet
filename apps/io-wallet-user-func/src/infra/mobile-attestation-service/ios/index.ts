@@ -127,7 +127,6 @@ export const validateiOSAssertion = (
   signCount: number,
   bundleIdentifiers: string[],
   teamIdentifier: string,
-  skipSignatureValidation: boolean,
 ) =>
   pipe(
     TE.tryCatch(
@@ -138,7 +137,6 @@ export const validateiOSAssertion = (
           decodedAssertion,
           hardwareKey,
           signCount,
-          skipSignatureValidation,
           teamIdentifier,
         }),
       E.toError,

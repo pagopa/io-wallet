@@ -12,10 +12,7 @@ import {
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 
-import {
-  WalletInstanceRepository,
-  WalletInstanceUserId,
-} from "@/wallet-instance";
+import { WalletInstanceRepository } from "@/wallet-instance";
 
 const toError = (genericMessage: string) => (error: unknown) =>
   error instanceof Error && error.name === "TimeoutError"
@@ -25,11 +22,9 @@ const toError = (genericMessage: string) => (error: unknown) =>
     : new Error(`${genericMessage}: ${error}`);
 
 export class CosmosDbWalletInstanceRepository implements WalletInstanceRepository {
-  #idKeyedContainer: Container;
   #userIdKeyedContainer: Container;
 
   constructor(db: Database) {
-    this.#idKeyedContainer = db.container("wallet-instances-user-id");
     this.#userIdKeyedContainer = db.container("wallet-instances");
   }
 
@@ -134,31 +129,6 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
     );
   }
 
-  getUserId(id: WalletInstance["id"]) {
-    return pipe(
-      TE.tryCatch(
-        () => this.#idKeyedContainer.item(id, id).read(),
-        toError("Error getting wallet instance user id"),
-      ),
-      TE.chain(({ resource }) =>
-        resource === undefined
-          ? TE.right(O.none)
-          : pipe(
-              resource,
-              WalletInstanceUserId.decode,
-              E.map(O.some),
-              E.mapLeft(
-                () =>
-                  new Error(
-                    "Error getting wallet instance user id: invalid result format",
-                  ),
-              ),
-              TE.fromEither,
-            ),
-      ),
-    );
-  }
-
   getValidByUserIdExcludingOne(
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -211,11 +181,6 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
   insert(walletInstance: WalletInstance) {
     return TE.tryCatch(async () => {
       await this.#userIdKeyedContainer.items.create(walletInstance);
-      // TODO
-      // await this.#idKeyedContainer.items.create({
-      //   id: walletInstance.id,
-      //   userId: walletInstance.userId,
-      // });
     }, toError("Error inserting wallet instance"));
   }
 
