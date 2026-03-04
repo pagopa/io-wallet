@@ -20,6 +20,18 @@ export const ECKey = t.intersection([
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
+export const ES256PublicJwk = t.intersection(
+  [
+    ECKey,
+    t.type({
+      kid: t.string,
+    }),
+  ],
+  "ES256PublicJwk",
+);
+
+export type ES256PublicJwk = t.TypeOf<typeof ES256PublicJwk>;
+
 export const ECPrivateKey = t.intersection([
   ECKey,
   t.type({

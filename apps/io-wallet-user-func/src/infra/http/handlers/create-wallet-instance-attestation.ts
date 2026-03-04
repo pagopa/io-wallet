@@ -1,5 +1,5 @@
 import * as H from "@pagopa/handler-kit";
-import { parse } from "@pagopa/handler-kit";
+import { parse, ValidationError } from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
@@ -8,18 +8,18 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as O from "fp-ts/Option";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { validateJwkKid } from "io-wallet-common/jwk";
+import { ES256PublicJwk, validateJwkKid } from "io-wallet-common/jwk";
 
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
-import {
-  validateAssertionRequest,
-  validateHeaderKidMatchesCnfKidIfPresent,
-  validateIssuerMatchesHardwareKeyTag,
-  verifyJwtWithInternalKey,
-} from "@/infra/mobile-attestation-service/assertion-request-validation";
+import { validateAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
+import {
+  validateHeaderKidMatchesCnfKid,
+  validateIssuerMatchesHardwareKeyTag,
+  verifyJwtWithInternalKey,
+} from "@/verifier";
 import { WalletInstanceEnvironment } from "@/wallet-instance";
 import {
   createWalletInstanceAttestation,
@@ -32,19 +32,7 @@ const WalletInstanceAttestationRequestBody = t.type({
   fiscal_code: FiscalCode,
 });
 
-const ES256PublicJwk = t.intersection([
-  t.type({
-    crv: t.literal("P-256"),
-    kty: t.literal("EC"),
-    x: NonEmptyString,
-    y: NonEmptyString,
-  }),
-  t.partial({
-    kid: NonEmptyString,
-  }),
-]);
-
-const AssertionJWT = t.type({
+const AssertionJWTApi = t.type({
   header: t.type({
     alg: t.literal("ES256"),
     kid: NonEmptyString,
@@ -67,42 +55,100 @@ const AssertionJWT = t.type({
   }),
 });
 
-interface WIARequest {
-  cnf: {
-    jwk: t.TypeOf<typeof ES256PublicJwk>;
-  };
-  hardwareKeyTag: NonEmptyString;
-  hardwareSignature: NonEmptyString;
-  integrityAssertion: NonEmptyString;
-  iss: NonEmptyString;
-  nonce: NonEmptyString;
-  platform: "Android" | "iOS";
-  walletSolutionId: NonEmptyString;
-  walletSolutionVersion: NonEmptyString;
-}
+const AssertionJWTDecoded = t.type({
+  header: t.type({
+    alg: t.literal("ES256"),
+    kid: NonEmptyString,
+    typ: t.literal("wia-request+jwt"),
+  }),
+  payload: t.type({
+    cnf: t.type({
+      jwk: ES256PublicJwk,
+    }),
+    exp: t.number,
+    hardwareKeyTag: NonEmptyString,
+    hardwareSignature: NonEmptyString,
+    iat: t.number,
+    integrityAssertion: NonEmptyString,
+    iss: NonEmptyString,
+    nonce: NonEmptyString,
+    platform: t.union([t.literal("iOS"), t.literal("Android")]),
+    walletSolutionId: NonEmptyString,
+    walletSolutionVersion: NonEmptyString,
+  }),
+});
+
+const AssertionJWT = new t.Type<
+  t.TypeOf<typeof AssertionJWTDecoded>,
+  t.TypeOf<typeof AssertionJWTApi>,
+  unknown
+>(
+  "AssertionJWT",
+  AssertionJWTDecoded.is,
+  (input, context) =>
+    pipe(
+      AssertionJWTApi.validate(input, context),
+      E.map(({ header, payload }) => ({
+        header,
+        payload: {
+          cnf: payload.cnf,
+          exp: payload.exp,
+          hardwareKeyTag: payload.hardware_key_tag,
+          hardwareSignature: payload.hardware_signature,
+          iat: payload.iat,
+          integrityAssertion: payload.integrity_assertion,
+          iss: payload.iss,
+          nonce: payload.nonce,
+          platform: payload.platform,
+          walletSolutionId: payload.wallet_solution_id,
+          walletSolutionVersion: payload.wallet_solution_version,
+        },
+      })),
+    ),
+  ({ header, payload }) => ({
+    header,
+    payload: {
+      cnf: payload.cnf,
+      exp: payload.exp,
+      hardware_key_tag: payload.hardwareKeyTag,
+      hardware_signature: payload.hardwareSignature,
+      iat: payload.iat,
+      integrity_assertion: payload.integrityAssertion,
+      iss: payload.iss,
+      nonce: payload.nonce,
+      platform: payload.platform,
+      wallet_solution_id: payload.walletSolutionId,
+      wallet_solution_version: payload.walletSolutionVersion,
+    },
+  }),
+);
+
+type WIARequest = Omit<
+  t.TypeOf<typeof AssertionJWTDecoded>["payload"],
+  "exp" | "iat" | "iss"
+>;
 
 const verifyAndDecodeWalletInstanceAttestationRequest = (
   walletInstanceAttestationRequest: string,
-): TE.TaskEither<Error, WIARequest> =>
+): TE.TaskEither<ValidationError, WIARequest> =>
   pipe(
     walletInstanceAttestationRequest,
     verifyJwtWithInternalKey,
     TE.chainEitherKW(parse(AssertionJWT)),
-    TE.chainEitherKW(validateHeaderKidMatchesCnfKidIfPresent),
-    TE.map(({ payload }) => ({
-      cnf: {
-        jwk: payload.cnf.jwk,
-      },
-      hardwareKeyTag: payload.hardware_key_tag,
-      hardwareSignature: payload.hardware_signature,
-      integrityAssertion: payload.integrity_assertion,
-      iss: payload.iss,
-      nonce: payload.nonce,
-      platform: payload.platform,
-      walletSolutionId: payload.wallet_solution_id,
-      walletSolutionVersion: payload.wallet_solution_version,
-    })),
-    TE.chainEitherKW(validateIssuerMatchesHardwareKeyTag),
+    TE.chainFirstEitherKW(validateHeaderKidMatchesCnfKid),
+    TE.chainFirstEitherKW(({ payload }) =>
+      validateIssuerMatchesHardwareKeyTag(payload),
+    ),
+    TE.map(({ payload }) => payload),
+    TE.mapLeft((error) =>
+      error instanceof ValidationError
+        ? error
+        : new ValidationError([
+            error instanceof Error
+              ? error.message
+              : "Unexpected validation error",
+          ]),
+    ),
   );
 
 const requireWalletInstanceAttestationRequest = flow(

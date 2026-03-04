@@ -588,4 +588,63 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       }),
     });
   });
+
+  it("should return a 422 HTTP response when payload.cnf.jwk.kid is missing", async () => {
+    const publicEcKeyWithoutKid = { ...publicEcKey };
+    delete (publicEcKeyWithoutKid as { kid?: unknown }).kid;
+    const invalidCnfKidWalletAttestationRequest = await new jose.SignJWT({
+      aud: "aud",
+      cnf: {
+        jwk: publicEcKeyWithoutKid,
+      },
+      hardware_key_tag: keyId,
+      hardware_signature: signature.toString("base64"),
+      integrity_assertion: authenticatorData.toString("base64"),
+      iss: keyId,
+      nonce: challenge,
+      platform: "iOS",
+      wallet_solution_id: "appio",
+      wallet_solution_version: "3.25.0.1",
+    })
+      .setProtectedHeader({
+        alg: "ES256",
+        kid: publicEcKey.kid,
+        typ: "wia-request+jwt",
+      })
+      .setIssuedAt()
+      .setExpirationTime("2h")
+      .sign(josePrivateKey);
+
+    const invalidReq = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: {
+        assertion: invalidCnfKidWalletAttestationRequest,
+        fiscal_code: mockFiscalCode,
+      },
+      method: "POST",
+    };
+
+    const handler = CreateWalletInstanceAttestationHandler({
+      assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: invalidReq,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      walletAttestationConfig,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 422,
+      }),
+    });
+  });
 });
