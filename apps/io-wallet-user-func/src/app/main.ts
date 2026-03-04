@@ -109,6 +109,18 @@ const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
 );
 
+const assertionValidationConfig: AssertionValidationConfig = {
+  allowedDeveloperUsers: config.attestationService.allowedDeveloperUsers,
+  androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
+  androidPlayIntegrityUrl: config.attestationService.androidPlayIntegrityUrl,
+  androidPlayStoreCertificateHash:
+    config.attestationService.androidPlayStoreCertificateHash,
+  googleAppCredentialsEncoded:
+    config.attestationService.googleAppCredentialsEncoded,
+  iosBundleIdentifiers: config.attestationService.iosBundleIdentifiers,
+  iOsTeamIdentifier: config.attestationService.iOsTeamIdentifier,
+};
+
 const emailNotificationService = new EmailNotificationServiceClient({
   authProfileApiConfig: config.authProfile,
   mailConfig: config.mail,
@@ -285,22 +297,10 @@ app.http("generateCertificateChain", {
   route: "certificate-chain",
 });
 
-const assertionValidationConfig: AssertionValidationConfig = {
-  allowedDeveloperUsers: config.attestationService.allowedDeveloperUsers,
-  androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
-  androidPlayIntegrityUrl: config.attestationService.androidPlayIntegrityUrl,
-  androidPlayStoreCertificateHash:
-    config.attestationService.androidPlayStoreCertificateHash,
-  googleAppCredentialsEncoded:
-    config.attestationService.googleAppCredentialsEncoded,
-  iosBundleIdentifiers: config.attestationService.iosBundleIdentifiers,
-  iOsTeamIdentifier: config.attestationService.iOsTeamIdentifier,
-};
-
 app.http("createWalletInstanceAttestation", {
   authLevel: "function",
   handler: CreateWalletInstanceAttestationFunction({
-    ...assertionValidationConfig,
+    assertionValidationConfig,
     certificateRepository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,

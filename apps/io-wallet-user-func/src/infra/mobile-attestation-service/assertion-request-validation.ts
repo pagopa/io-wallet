@@ -90,12 +90,11 @@ const validateAssertion: (
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
-) => RTE.ReaderTaskEither<AssertionValidationConfig, Error, void> = (
-  assertion,
-  hardwareKey,
-  signCount,
-  user,
-) =>
+) => RTE.ReaderTaskEither<
+  { assertionValidationConfig: AssertionValidationConfig },
+  Error,
+  void
+> = (assertion, hardwareKey, signCount, user) =>
   assertion.platform === "iOS"
     ? verifyIosAssertion({
         hardwareKey,
@@ -124,7 +123,10 @@ export const validateAssertionRequest: (input: {
   assertion: Assertion;
   userId: FiscalCode;
 }) => RTE.ReaderTaskEither<
-  AssertionValidationConfig & NonceEnvironment & WalletInstanceEnvironment,
+  NonceEnvironment &
+    WalletInstanceEnvironment & {
+      assertionValidationConfig: AssertionValidationConfig;
+    },
   Error,
   void
 > = ({ assertion, userId }) =>

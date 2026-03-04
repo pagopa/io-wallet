@@ -162,7 +162,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -190,7 +190,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -249,7 +249,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
 
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository: certificateRepositoryError,
       federationEntity,
       input: req,
@@ -279,7 +279,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
 
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository: certificateRepositoryNone,
       federationEntity,
       input: req,
@@ -311,7 +311,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -359,7 +359,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -402,7 +402,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -443,7 +443,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       method: "POST",
     };
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: req,
@@ -505,7 +505,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
 
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: invalidReq,
@@ -566,7 +566,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
 
     const handler = CreateWalletInstanceAttestationHandler({
-      ...assertionValidationConfig,
+      assertionValidationConfig,
       certificateRepository,
       federationEntity,
       input: invalidReq,

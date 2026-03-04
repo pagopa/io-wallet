@@ -184,7 +184,10 @@ const verifyAssertion: (input: {
   userId: FiscalCode;
   wiaRequest: WIARequest;
 }) => RTE.ReaderTaskEither<
-  AssertionValidationConfig & NonceEnvironment & WalletInstanceEnvironment,
+  NonceEnvironment &
+    WalletInstanceEnvironment & {
+      assertionValidationConfig: AssertionValidationConfig;
+    },
   Error,
   void
 > = ({ userId, wiaRequest }) =>
@@ -197,10 +200,11 @@ const generateWalletInstanceAttestation: (request: {
   userId: FiscalCode;
   wiaRequest: WIARequest;
 }) => RTE.ReaderTaskEither<
-  AssertionValidationConfig &
-    NonceEnvironment &
+  NonceEnvironment &
     WalletInstanceAttestationEnvironment &
-    WalletInstanceEnvironment,
+    WalletInstanceEnvironment & {
+      assertionValidationConfig: AssertionValidationConfig;
+    },
   Error,
   {
     wallet_instance_attestation: string;

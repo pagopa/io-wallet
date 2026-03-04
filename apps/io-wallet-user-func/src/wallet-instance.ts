@@ -104,24 +104,6 @@ export const insertWalletInstance: (
   ({ walletInstanceRepository }) =>
     walletInstanceRepository.insert(walletInstance);
 
-export const getWalletInstanceUserId: (
-  id: WalletInstance["id"],
-) => RTE.ReaderTaskEither<
-  WalletInstanceEnvironment,
-  Error,
-  WalletInstanceUserId
-> =
-  (id) =>
-  ({ walletInstanceRepository }) =>
-    pipe(
-      walletInstanceRepository.getUserId(id),
-      TE.chain(
-        TE.fromOption(
-          () => new EntityNotFoundError("Wallet instance not found"),
-        ),
-      ),
-    );
-
 export const getValidWalletInstanceByUserId: (
   id: WalletInstance["id"],
   userId: WalletInstance["userId"],
