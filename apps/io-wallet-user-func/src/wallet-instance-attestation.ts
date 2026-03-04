@@ -9,10 +9,9 @@ import { Signer } from "./signer";
 import { removeTrailingSlash } from "./url";
 
 export interface WalletInstanceAttestationData {
-  iss: string;
+  jwk: JwkPublicKey;
   kid: string;
   oauthClientSub: string;
-  walletInstancePublicKey: JwkPublicKey;
   walletProviderName: string;
   walletSolutionCertificationInformation: string | undefined;
   walletSolutionId: string;
@@ -32,8 +31,8 @@ interface WalletInstanceAttestationJwtModel {
       wallet_solution_version: string;
     };
   };
-  iss: string;
   kid: string;
+  sub: string;
   x5c: string[];
 }
 
@@ -42,10 +41,9 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
   WalletInstanceAttestationData
 > = {
   encode: ({
-    iss,
+    jwk,
     kid,
     oauthClientSub,
-    walletInstancePublicKey,
     walletProviderName,
     walletSolutionCertificationInformation,
     walletSolutionId,
@@ -53,7 +51,7 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     x5c,
   }) => ({
     cnf: {
-      jwk: walletInstancePublicKey,
+      jwk,
     },
     eudi_wallet_info: {
       general_info: {
@@ -64,7 +62,7 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
         wallet_solution_version: walletSolutionVersion,
       },
     },
-    iss: removeTrailingSlash(iss),
+    iss: removeTrailingSlash(walletProviderName),
     kid,
     sub: removeTrailingSlash(oauthClientSub),
     x5c,

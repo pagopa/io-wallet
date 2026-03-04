@@ -170,18 +170,14 @@ const requireWalletInstanceAttestationRequest = flow(
   ),
 );
 
-interface VerifiedAttestationData {
-  cnf: {
-    jwk: t.TypeOf<typeof ES256PublicJwk>;
-  };
-  walletSolutionId: NonEmptyString;
-  walletSolutionVersion: NonEmptyString;
-}
-
 const getWalletInstanceAttestationData =
-  (
-    verifiedAttestationData: VerifiedAttestationData,
-  ): RTE.ReaderTaskEither<
+  (input: {
+    cnf: {
+      jwk: t.TypeOf<typeof ES256PublicJwk>;
+    };
+    walletSolutionId: NonEmptyString;
+    walletSolutionVersion: NonEmptyString;
+  }): RTE.ReaderTaskEither<
     WalletInstanceAttestationEnvironment,
     Error,
     WalletInstanceAttestationData
@@ -197,50 +193,33 @@ const getWalletInstanceAttestationData =
       signer.getFirstPublicKeyByKty,
       E.chainW(validateJwkKid),
       TE.fromEither,
-      TE.map(({ kid }) => ({
-        iss: basePath.href,
-        kid,
-        oauthClientSub,
-        walletInstancePublicKey: verifiedAttestationData.cnf.jwk,
-        walletProviderName: basePath.href,
-        walletSolutionCertificationInformation: undefined,
-        walletSolutionId: verifiedAttestationData.walletSolutionId,
-        walletSolutionVersion: verifiedAttestationData.walletSolutionVersion,
-      })),
-      TE.chain(({ kid, ...data }) =>
+      TE.chain(({ kid }) =>
         pipe(
           certificateRepository.getCertificateChainByKid(kid),
           TE.chain(
             flow(
               O.match(
                 () => TE.left(new Error("Certificate chain not found")),
-                (chain) => TE.right({ ...data, kid, x5c: chain }),
+                (chain) => TE.right({ kid, x5c: chain }),
               ),
             ),
           ),
         ),
       ),
+      TE.map(({ kid, x5c }) => ({
+        jwk: input.cnf.jwk,
+        kid,
+        oauthClientSub,
+        walletProviderName: basePath.href,
+        walletSolutionCertificationInformation: undefined,
+        walletSolutionId: input.walletSolutionId,
+        walletSolutionVersion: input.walletSolutionVersion,
+        x5c,
+      })),
     );
 
-const testWalletInstanceAttestation = {
-  wallet_instance_attestation: "this_is_a_test_wallet_instance_attestation",
-};
-
-const verifyAssertion: (input: {
-  userId: FiscalCode;
-  wiaRequest: WIARequest;
-}) => RTE.ReaderTaskEither<
-  NonceEnvironment &
-    WalletInstanceEnvironment & {
-      assertionValidationConfig: AssertionValidationConfig;
-    },
-  Error,
-  void
-> = ({ userId, wiaRequest }) =>
-  validateAssertionRequest({
-    assertion: wiaRequest,
-    userId,
-  });
+const testWalletInstanceAttestation =
+  "this_is_a_test_wallet_instance_attestation";
 
 const generateWalletInstanceAttestation: (request: {
   userId: FiscalCode;
@@ -252,23 +231,20 @@ const generateWalletInstanceAttestation: (request: {
       assertionValidationConfig: AssertionValidationConfig;
     },
   Error,
-  {
-    wallet_instance_attestation: string;
-  }
-> = (request) =>
+  string
+> = ({ userId, wiaRequest }) =>
   pipe(
-    request,
-    verifyAssertion,
+    validateAssertionRequest({
+      assertion: wiaRequest,
+      userId,
+    }),
     RTE.map(() => ({
-      cnf: request.wiaRequest.cnf,
-      walletSolutionId: request.wiaRequest.walletSolutionId,
-      walletSolutionVersion: request.wiaRequest.walletSolutionVersion,
+      cnf: wiaRequest.cnf,
+      walletSolutionId: wiaRequest.walletSolutionId,
+      walletSolutionVersion: wiaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletInstanceAttestationData),
     RTE.chainW(createWalletInstanceAttestation),
-    RTE.map((walletInstanceAttestation) => ({
-      wallet_instance_attestation: walletInstanceAttestation,
-    })),
   );
 
 export const CreateWalletInstanceAttestationHandler = H.of(
@@ -282,6 +258,9 @@ export const CreateWalletInstanceAttestationHandler = H.of(
           ? RTE.right(testWalletInstanceAttestation)
           : generateWalletInstanceAttestation({ userId, wiaRequest }),
       ),
+      RTE.map((walletInstanceAttestation) => ({
+        wallet_instance_attestation: walletInstanceAttestation,
+      })),
       RTE.map(H.successJson),
       RTE.orElseFirstW(
         flow(

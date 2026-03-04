@@ -59,15 +59,10 @@ const toClientData = (
     ),
   );
 
-const decodeBase64ToBuffer = (
-  value: NonEmptyString,
-): TE.TaskEither<Error, Buffer> =>
-  pipe(
-    E.tryCatch(
-      () => Buffer.from(value, "base64"),
-      () => new Error(`Invalid base64 value: ${value}`),
-    ),
-    TE.fromEither,
+const decodeBase64ToBuffer = (value: NonEmptyString): E.Either<Error, Buffer> =>
+  E.tryCatch(
+    () => Buffer.from(value, "base64"),
+    () => new Error(`Invalid base64 value: ${value}`),
   );
 
 export class MobileAttestationService implements AttestationService {
@@ -167,6 +162,7 @@ export class MobileAttestationService implements AttestationService {
   ): TE.TaskEither<Error | IntegrityCheckError, ValidatedAttestation> =>
     pipe(
       decodeBase64ToBuffer(attestation),
+      TE.fromEither,
       TE.chainW((data) =>
         pipe(
           parseIosAttestation(data),

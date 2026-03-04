@@ -24,8 +24,6 @@ interface Assertion {
   integrityAssertion: NonEmptyString;
   nonce: NonEmptyString;
   platform: "Android" | "iOS";
-  walletSolutionId: NonEmptyString;
-  walletSolutionVersion: NonEmptyString;
 }
 
 const validateAssertion: (
