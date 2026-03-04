@@ -31,6 +31,7 @@ interface WalletInstanceAttestationJwtModel {
       wallet_solution_version: string;
     };
   };
+  iss: string;
   kid: string;
   sub: string;
   x5c: string[];

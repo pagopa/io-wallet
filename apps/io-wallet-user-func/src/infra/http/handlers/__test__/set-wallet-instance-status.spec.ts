@@ -23,7 +23,6 @@ describe("SetWalletInstanceStatusHandler", () => {
     deleteAllByUserId: () => TE.left(new Error("not implemented")),
     getByUserId: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
-    getUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
     insert: () => TE.left(new Error("not implemented")),
   };
@@ -131,7 +130,6 @@ describe("SetWalletInstanceStatusHandler", () => {
         deleteAllByUserId: () => TE.left(new Error("not implemented")),
         getByUserId: () => TE.left(new Error("not implemented")),
         getLastByUserId: () => TE.left(new Error("not implemented")),
-        getUserId: () => TE.left(new Error("not implemented")),
         getValidByUserIdExcludingOne: () =>
           TE.left(new Error("not implemented")),
         insert: () => TE.left(new Error("not implemented")),

@@ -270,6 +270,8 @@ paths:
       summary: CreateWalletInstanceAttestation
       description: Create and return a Wallet Instance Attestation (WIA)
       operationId: createWalletInstanceAttestation
+      security:
+        - FunctionsKey: []
       requestBody:
         content:
           application/json:

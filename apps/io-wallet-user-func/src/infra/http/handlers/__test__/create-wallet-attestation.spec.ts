@@ -228,13 +228,6 @@ const walletInstanceRepository: WalletInstanceRepository = {
       }),
     ),
   getLastByUserId: () => TE.left(new Error("not implemented")),
-  getUserId: () =>
-    TE.right(
-      O.some({
-        id: "123" as NonEmptyString,
-        userId: mockFiscalCode,
-      }),
-    ),
   getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
 };
@@ -705,7 +698,6 @@ describe("CreateWalletAttestationHandler", async () => {
     const walletInstanceRepositoryWithNotFoundWI: WalletInstanceRepository = {
       ...walletInstanceRepository,
       getByUserId: () => TE.right(O.none),
-      getUserId: () => TE.right(O.none),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),
