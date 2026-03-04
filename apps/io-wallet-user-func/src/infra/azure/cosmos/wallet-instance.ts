@@ -1,5 +1,4 @@
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
-import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
@@ -51,18 +50,6 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
       );
       await this.#userIdKeyedContainer.items.batch(operations, userId);
     }, toError("Error updating wallet instances"));
-  }
-
-  deleteAllByUserId(userId: WalletInstance["userId"]) {
-    // the functionality to delete all items given a partition key is currently in preview
-    return pipe(
-      this.getAllByUserId(userId),
-      TE.map(A.map(({ id }) => id)),
-      TE.chainW(
-        flow(A.traverse(TE.ApplicativeSeq)((id) => this.delete(id, userId))),
-      ),
-      TE.map(() => undefined),
-    );
   }
 
   getByUserId(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
@@ -182,41 +169,5 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
     return TE.tryCatch(async () => {
       await this.#userIdKeyedContainer.items.create(walletInstance);
     }, toError("Error inserting wallet instance"));
-  }
-
-  private delete(
-    id: WalletInstance["id"],
-    userId: WalletInstance["userId"],
-  ): TE.TaskEither<Error, void> {
-    return TE.tryCatch(async () => {
-      await this.#userIdKeyedContainer.item(id, userId).delete();
-    }, toError("Error deleting wallet instance"));
-  }
-
-  private getAllByUserId(
-    userId: WalletInstance["userId"],
-  ): TE.TaskEither<Error, WalletInstance[]> {
-    return pipe(
-      TE.tryCatch(async () => {
-        const { resources: items } = await this.#userIdKeyedContainer.items
-          .readAll({
-            partitionKey: userId,
-          })
-          .fetchAll();
-        return items;
-      }, toError("Error getting wallet instances by user id")),
-      TE.chainW(
-        flow(
-          t.array(WalletInstance).decode,
-          E.mapLeft(
-            () =>
-              new Error(
-                "Error getting wallet instances: invalid result format",
-              ),
-          ),
-          TE.fromEither,
-        ),
-      ),
-    );
   }
 }
