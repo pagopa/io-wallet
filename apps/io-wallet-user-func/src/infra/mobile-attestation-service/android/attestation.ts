@@ -17,14 +17,6 @@ import { CRL, validateIssuance, validateRevocation } from "@/certificates";
  */
 const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
 
-export interface VerifyAttestationParams {
-  attestationCrl: CRL;
-  bundleIdentifiers: string[];
-  challenge?: string;
-  googlePublicKeys: string[];
-  x509Chain: readonly X509Certificate[];
-}
-
 type AndroidAttestationValidationResult =
   | {
       deviceDetails: AndroidDeviceDetails;
@@ -36,6 +28,14 @@ type AndroidAttestationValidationResult =
 interface CertWithExtension {
   certificate: X509Certificate;
   extension: pkijs.Extension;
+}
+
+interface VerifyAttestationParams {
+  attestationCrl: CRL;
+  bundleIdentifiers: string[];
+  challenge: string;
+  googlePublicKeys: string[];
+  x509Chain: readonly X509Certificate[];
 }
 
 /**
@@ -229,18 +229,17 @@ const validateExtension = async (
     };
   }
 
-  if (challenge) {
-    const receivedChallenge = Buffer.from(
-      keyDescription.attestationChallenge.buffer,
-    ).toString("utf-8");
+  // Check challenge
+  const receivedChallenge = Buffer.from(
+    keyDescription.attestationChallenge.buffer,
+  ).toString("utf-8");
 
-    if (receivedChallenge !== challenge) {
-      return {
-        reason:
-          "The received challenge does not match the one contained in the certificate.",
-        success: false,
-      };
-    }
+  if (receivedChallenge !== challenge) {
+    return {
+      reason:
+        "The received challenge does not match the one contained in the certificate.",
+      success: false,
+    };
   }
 
   // Check softwareEnforced authorization list
