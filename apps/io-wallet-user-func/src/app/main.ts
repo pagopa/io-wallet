@@ -19,7 +19,6 @@ import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/wh
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
-import { DeleteWalletInstancesFunction } from "@/infra/azure/functions/delete-wallet-instances";
 import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
@@ -242,16 +241,6 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
   }),
   queueName:
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
-});
-
-app.http("deleteWalletInstances", {
-  authLevel: "function",
-  handler: DeleteWalletInstancesFunction({
-    credentialRepository: pidIssuerClient,
-    walletInstanceRepository,
-  }),
-  methods: ["DELETE"],
-  route: "wallet-instances",
 });
 
 app.http("createWalletAttestation", {

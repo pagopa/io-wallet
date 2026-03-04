@@ -83,7 +83,6 @@ const assertionValidationConfig: AssertionValidationConfig = {
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
-  deleteAllByUserId: () => TE.left(new Error("not implemented")),
   getByUserId: () =>
     TE.right(
       O.some({
