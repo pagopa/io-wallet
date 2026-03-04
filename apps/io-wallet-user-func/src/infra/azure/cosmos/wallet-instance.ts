@@ -1,5 +1,4 @@
 import { Container, Database, PatchOperationInput } from "@azure/cosmos";
-import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
