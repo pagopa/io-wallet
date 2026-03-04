@@ -211,7 +211,6 @@ const getWalletInstanceAttestationData =
         kid,
         oauthClientSub,
         walletProviderName: basePath.href,
-        walletSolutionCertificationInformation: undefined,
         walletSolutionId: input.walletSolutionId,
         walletSolutionVersion: input.walletSolutionVersion,
         x5c,

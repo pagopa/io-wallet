@@ -58,7 +58,7 @@ const validateAssertion: (
  * Validates the wallet attestation request by performing the following steps:
  * 1. Consumes the nonce from the request
  * 2. Retrieves the wallet instance associated with the attestation request and verifies it hasn't been revoked
- * 3. For non-test users, validates the assertion in the request
+ * 3. Validates the assertion in the request
  */
 export const validateAssertionRequest: (input: {
   assertion: Assertion;

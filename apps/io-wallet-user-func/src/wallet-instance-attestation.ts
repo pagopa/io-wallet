@@ -13,7 +13,6 @@ export interface WalletInstanceAttestationData {
   kid: string;
   oauthClientSub: string;
   walletProviderName: string;
-  walletSolutionCertificationInformation: string | undefined;
   walletSolutionId: string;
   walletSolutionVersion: string;
   x5c: string[];
@@ -26,7 +25,6 @@ interface WalletInstanceAttestationJwtModel {
   eudi_wallet_info: {
     general_info: {
       wallet_provider_name: string;
-      wallet_solution_certification_information: string | undefined;
       wallet_solution_id: string;
       wallet_solution_version: string;
     };
@@ -46,7 +44,6 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     kid,
     oauthClientSub,
     walletProviderName,
-    walletSolutionCertificationInformation,
     walletSolutionId,
     walletSolutionVersion,
     x5c,
@@ -57,8 +54,6 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     eudi_wallet_info: {
       general_info: {
         wallet_provider_name: removeTrailingSlash(walletProviderName),
-        wallet_solution_certification_information:
-          walletSolutionCertificationInformation,
         wallet_solution_id: walletSolutionId,
         wallet_solution_version: walletSolutionVersion,
       },
