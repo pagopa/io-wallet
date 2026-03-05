@@ -15,7 +15,7 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 2.50.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.54.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
