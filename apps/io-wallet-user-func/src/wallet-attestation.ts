@@ -82,7 +82,7 @@ export const createWalletAttestationAsJwt =
           },
           kid,
           "ES256",
-          "1h",
+          "5m",
         )(payload),
     );
 
@@ -143,7 +143,7 @@ export const createWalletAttestationAsSdJwt =
                 },
                 sdJwtModel.kid,
                 "ES256",
-                "1h",
+                "5m",
                 // TODO: SIW-2656. env var are not used
               ),
               TE.map((jwt) =>
