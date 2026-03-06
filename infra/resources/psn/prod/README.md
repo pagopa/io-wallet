@@ -40,8 +40,8 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 | Name | Version |
 |------|---------|
 | <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 2.50.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.55.0 |
-| <a name="provider_azurerm.hub"></a> [azurerm.hub](#provider\_azurerm.hub) | 4.55.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
+| <a name="provider_azurerm.hub"></a> [azurerm.hub](#provider\_azurerm.hub) | 4.62.0 |
 | <a name="provider_dx"></a> [dx](#provider\_dx) | ~> 0.0 |
 
 ## Modules
@@ -49,6 +49,7 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_apim"></a> [apim](#module\_apim) | pagopa-dx/azure-api-management/azurerm | ~> 2.1 |
+| <a name="module_apim_roles"></a> [apim\_roles](#module\_apim\_roles) | pagopa-dx/azure-role-assignments/azurerm | ~> 1.3 |
 | <a name="module_cdn"></a> [cdn](#module\_cdn) | pagopa-dx/azure-cdn/azurerm | ~> 0.3 |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | ../../_modules/cosmos | n/a |
 | <a name="module_function_apps"></a> [function\_apps](#module\_function\_apps) | ../../_modules/function_apps | n/a |
@@ -69,6 +70,8 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 | [azurerm_api_management_api.user_uat_ioapp_v1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api) | resource |
 | [azurerm_api_management_api_operation_policy.create_wallet_attestation_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.create_wallet_attestation_uat_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
+| [azurerm_api_management_api_operation_policy.create_wallet_instance_attestation_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
+| [azurerm_api_management_api_operation_policy.create_wallet_instance_attestation_uat_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.create_wallet_instance_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.create_wallet_instance_uat_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.get_current_wallet_instance_status_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
