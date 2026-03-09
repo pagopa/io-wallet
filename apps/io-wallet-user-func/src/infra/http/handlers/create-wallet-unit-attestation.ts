@@ -147,7 +147,7 @@ const validateAndroidKeysToAttest: (
     RTE.map(({ deviceDetails: { keymasterSecurityLevel }, jwk }) => ({
       jwk,
       keyStorage:
-        keymasterSecurityLevel === 2
+        keymasterSecurityLevel >= 2
           ? "iso_18045_moderate"
           : "iso_18045_enhanced-basic",
       userAuthentication: "iso_18045_moderate",
