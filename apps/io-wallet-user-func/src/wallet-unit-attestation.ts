@@ -98,6 +98,6 @@ export const createWalletUnitAttestation =
           },
           kid,
           "ES256",
-          "1h",
+          "1y",
         )(payload),
     );

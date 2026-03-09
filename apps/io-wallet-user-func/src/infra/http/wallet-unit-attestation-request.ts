@@ -11,6 +11,7 @@ import { Platform, PlatformFromRequest } from "@/infra/http/platform-codecs";
 import { verifyJwtWithInternalKey } from "@/verifier";
 
 const headerTyp = "wua-request+jwt";
+const keyAttestationHeaderTyp = "key-attestation-request+jwt";
 
 const WalletUnitAttestationRequestBody = t.type({
   assertion: NonEmptyString,
@@ -120,9 +121,9 @@ type AssertionJwt = t.TypeOf<typeof AssertionJwt>;
 
 const KeyAttestationJwtApi = t.type({
   header: t.type({
-    alg: t.string,
-    kid: t.string,
-    typ: t.string,
+    alg: t.literal("ES256"),
+    kid: NonEmptyString,
+    typ: t.literal(keyAttestationHeaderTyp),
   }),
   payload: t.type({
     cnf: t.type({
@@ -139,9 +140,9 @@ const KeyAttestationJwtApi = t.type({
 
 const KeyAttestationJwtDecoded = t.type({
   header: t.type({
-    alg: t.string,
-    kid: t.string,
-    typ: t.string,
+    alg: t.literal("ES256"),
+    kid: NonEmptyString,
+    typ: t.literal(keyAttestationHeaderTyp),
   }),
   payload: t.type({
     cnf: t.type({
