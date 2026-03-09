@@ -231,7 +231,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     method: "POST",
   };
 
-  it.skip("should return a 200 HTTP response on success if is a test user", async () => {
+  it("should return a 200 HTTP response on success if is a test user", async () => {
     const handler = CreateWalletUnitAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
@@ -266,7 +266,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     });
   });
 
-  it.skip("should return a 200 HTTP response on success with iOS platform", async () => {
+  it("should return a 200 HTTP response on success with iOS platform", async () => {
     const handler = CreateWalletUnitAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
@@ -294,7 +294,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     });
   });
 
-  it.skip("should return a 200 HTTP response on success with Android platform", async () => {
+  it("should return a 200 HTTP response on success with Android platform", async () => {
     const handler = CreateWalletUnitAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
@@ -329,7 +329,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     });
   });
 
-  it.skip("should return a 409 HTTP response with Android platform when verifyAndroidAttestation fails", async () => {
+  it("should return a 409 HTTP response with Android platform when verifyAndroidAttestation fails", async () => {
     vi.mocked(verifyAndroidAssertion).mockReturnValueOnce(() =>
       TE.left(new IntegrityCheckError(["foo"])),
     );
