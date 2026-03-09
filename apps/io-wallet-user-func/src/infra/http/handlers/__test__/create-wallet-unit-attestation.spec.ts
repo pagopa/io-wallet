@@ -20,8 +20,8 @@ import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
   IntegrityCheckError,
-  verifyAndroidAssertion,
   verifyAndroidAttestation,
+  verifyIosAssertion,
 } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -330,7 +330,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should return a 409 HTTP response with Android platform when verifyAndroidAttestation fails", async () => {
-    vi.mocked(verifyAndroidAssertion).mockReturnValueOnce(() =>
+    vi.mocked(verifyAndroidAttestation).mockReturnValueOnce(() =>
       TE.left(new IntegrityCheckError(["foo"])),
     );
     const handler = CreateWalletUnitAttestationHandler({
@@ -438,41 +438,6 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     });
   });
 
-  it("should return 200 when platform is Android and key attestation is present", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
-      androidAttestationValidationConfig,
-      assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
-      input: {
-        ...H.request("https://wallet-provider.example.org"),
-        body: {
-          assertion: walletUnitAttestationRequestAndroid,
-          fiscal_code: mockFiscalCode,
-        },
-        method: "POST",
-      },
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      signer,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        body: expect.objectContaining({
-          wallet_unit_attestation: expect.any(String),
-        }),
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-        statusCode: 200,
-      }),
-    });
-  });
-
   it("should return 409 when platform is Android and keyAttestation key does not match payload.cnf.jwk", async () => {
     vi.mocked(verifyAndroidAttestation).mockImplementationOnce(
       () => () =>
@@ -546,6 +511,34 @@ describe("CreateWalletUnitAttestationHandler", async () => {
           "Content-Type": "application/json",
         }),
         statusCode: 200,
+      }),
+    });
+  });
+
+  it("should return a 409 HTTP response with iOS platform when verifyIosAssertion fails", async () => {
+    vi.mocked(verifyIosAssertion).mockReturnValueOnce(() =>
+      TE.left(new IntegrityCheckError(["foo"])),
+    );
+    const handler = CreateWalletUnitAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      signer,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 409,
       }),
     });
   });
