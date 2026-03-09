@@ -203,7 +203,7 @@ module "function_apps" {
   front_door_profile_name                     = module.cdn.name
   front_door_endpoint_name                    = module.cdn.endpoint_name
 
-  application_insights_connection_string = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.app_insights_connection_string.versionless_id})"
+  application_insights_connection_string = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application_insights_connection_string.versionless_id})"
 
   action_group_wallet_id = module.monitoring.action_group_wallet.id
 
