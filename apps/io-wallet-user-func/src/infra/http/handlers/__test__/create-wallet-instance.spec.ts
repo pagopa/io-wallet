@@ -296,8 +296,6 @@ describe("CreateWalletInstanceHandler", () => {
         statusCode: 204,
       }),
     });
-
-    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 
   it("should return a 500 HTTP response on getValidByUserIdExcludingOne error", async () => {

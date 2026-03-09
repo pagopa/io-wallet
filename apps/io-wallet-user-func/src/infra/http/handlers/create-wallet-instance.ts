@@ -94,6 +94,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             RTE.chainW(() =>
               pipe(
                 revokeAllCredentials(walletInstanceRequest.fiscalCode),
+                // If revokeAllCredentials fails, emit telemetry and continue revoking the wallet instance
+                // This avoids blocking wallet revocation on external dependencies
                 RTE.orElseW(
                   flow(
                     sendTelemetryExceptionWithBody({
