@@ -94,7 +94,19 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             RTE.chainW(() =>
               pipe(
                 revokeAllCredentials(walletInstanceRequest.fiscalCode),
-                RTE.orElseW(() => RTE.right(undefined)),
+                RTE.orElseW(
+                  flow(
+                    sendTelemetryExceptionWithBody({
+                      body: req.body,
+                      functionName: "createWalletInstance",
+                    }),
+                    E.fold(
+                      () => E.right(undefined),
+                      () => E.right(undefined),
+                    ),
+                    RTE.fromEither,
+                  ),
+                ),
               ),
             ),
             RTE.chainW(() =>

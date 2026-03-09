@@ -122,7 +122,21 @@ const revokeWalletInstanceAndSendEvent: (
         credentialRepository,
       },
       revokeAllCredentials(walletInstance.userId),
-      TE.orElseW(() => TE.right(undefined)),
+      // If revokeAllCredentials fails, emit telemetry and continue revoking the wallet instance
+      // This avoids blocking wallet revocation on external dependencies
+      TE.orElseW(
+        flow(
+          sendTelemetryException({
+            fiscalCode: walletInstance.userId,
+            functionName: "getWalletInstanceStatus",
+          }),
+          E.fold(
+            () => E.right(undefined),
+            () => E.right(undefined),
+          ),
+          TE.fromEither,
+        ),
+      ),
       TE.chainW(() =>
         pipe(
           {
