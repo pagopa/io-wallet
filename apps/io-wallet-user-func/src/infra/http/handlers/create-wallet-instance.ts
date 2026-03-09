@@ -93,7 +93,8 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
             insertWalletInstance(walletInstance),
             RTE.chainW(() =>
               pipe(
-                revokeAllCredentials(walletInstanceRequest.fiscalCode),
+                walletInstanceRequest.fiscalCode,
+                revokeAllCredentials,
                 // If revokeAllCredentials fails, emit telemetry and continue revoking the wallet instance
                 // This avoids blocking wallet revocation on external dependencies
                 RTE.orElseW(
