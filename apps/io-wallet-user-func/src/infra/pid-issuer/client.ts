@@ -6,14 +6,8 @@ import { Agent, fetch, RequestInit } from "undici";
 import { Config, PidIssuerApiClientConfig } from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { removeTrailingSlash } from "@/url";
-
-import { PidIssuerHealthCheck } from "./health-check";
-
-export class PidIssuerClient
-  implements CredentialRepository, PidIssuerHealthCheck
-{
+export class PidIssuerClient implements CredentialRepository {
   #baseURL: string;
-  #healthCheckEnabled: boolean;
   #init: RequestInit;
   #requestTimeout: number;
   #walletProviderEntity: string;
@@ -23,7 +17,6 @@ export class PidIssuerClient
       baseURL,
       clientCertificate,
       clientPrivateKey,
-      healthCheckEnabled,
       requestTimeout,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
@@ -31,7 +24,6 @@ export class PidIssuerClient
   ) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = removeTrailingSlash(basePath);
-    this.#healthCheckEnabled = healthCheckEnabled;
     this.#init = {
       dispatcher: new Agent({
         connect: {
@@ -47,28 +39,6 @@ export class PidIssuerClient
     };
     this.#requestTimeout = requestTimeout;
   }
-
-  healthCheck = () =>
-    this.#healthCheckEnabled
-      ? TE.tryCatch(
-          async () => {
-            const result = await fetch(new URL(`/revokeAll`, this.#baseURL), {
-              body: JSON.stringify({
-                unique_id: "foo",
-                wallet_provider: this.#walletProviderEntity,
-              }),
-              method: "POST",
-              signal: AbortSignal.timeout(this.#requestTimeout),
-              ...this.#init,
-            });
-            return result.status === 404;
-          },
-          (error) =>
-            new Error(
-              `Error occurred while checking PID issuer health: ${error}`,
-            ),
-        )
-      : TE.of(true);
 
   revokeAllCredentials = (fiscalCode: FiscalCode) =>
     TE.tryCatch(

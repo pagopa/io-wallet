@@ -17,6 +17,7 @@ import {
 
 import { ValidationResult } from "@/attestation-service";
 import { CRL, validateRevocation } from "@/certificates";
+import { CredentialRepository, revokeAllCredentials } from "@/credential";
 import { requireFiscalCodeFromHeader } from "@/infra/http/fiscal-code";
 import { requireWalletInstanceId } from "@/infra/http/wallet-instance";
 import {
@@ -109,20 +110,29 @@ const revokeWalletInstanceAndSendEvent: (
   walletInstance: WalletInstanceValid,
 ) => RT.ReaderTask<
   {
+    credentialRepository: CredentialRepository;
     walletInstanceRepository: WalletInstanceRepository;
   },
   WalletInstanceRevocationDetails | WalletInstanceValidId
 > =
   (walletInstance) =>
-  ({ walletInstanceRepository }) =>
+  ({ credentialRepository, walletInstanceRepository }) =>
     pipe(
       {
-        walletInstanceRepository,
+        credentialRepository,
       },
-      revokeWalletInstance({
-        revocationReason: certificateRevokedByIssuerReason,
-        ...walletInstance,
-      }),
+      revokeAllCredentials(walletInstance.userId),
+      TE.chainW(() =>
+        pipe(
+          {
+            walletInstanceRepository,
+          },
+          revokeWalletInstance({
+            revocationReason: certificateRevokedByIssuerReason,
+            ...walletInstance,
+          }),
+        ),
+      ),
       TE.chainFirstW(() =>
         pipe(
           sendCustomEvent(walletInstance.userId, walletInstance.id),
@@ -148,6 +158,7 @@ const revokeWalletInstanceIfCertificateRevoked: (
   walletInstance: WalletInstanceValid,
 ) => RT.ReaderTask<
   {
+    credentialRepository: CredentialRepository;
     getAttestationStatusList: GetAttestationStatusList;
     walletInstanceRepository: WalletInstanceRepository;
   },

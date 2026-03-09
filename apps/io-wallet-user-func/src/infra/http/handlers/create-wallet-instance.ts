@@ -14,6 +14,7 @@ import {
   validateAttestation,
   ValidatedAttestation,
 } from "@/attestation-service";
+import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -90,6 +91,9 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
         RTE.chainW(({ walletInstance }) =>
           pipe(
             insertWalletInstance(walletInstance),
+            RTE.chainW(() =>
+              revokeAllCredentials(walletInstanceRequest.fiscalCode),
+            ),
             RTE.chainW(() =>
               revokeUserValidWalletInstancesExceptOne(
                 walletInstanceRequest.fiscalCode,

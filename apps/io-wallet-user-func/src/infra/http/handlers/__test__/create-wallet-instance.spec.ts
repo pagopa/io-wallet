@@ -4,10 +4,12 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
+import { CredentialRepository } from "@/credential";
 import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -68,6 +70,10 @@ describe("CreateWalletInstanceHandler", () => {
     } as QueueSendMessageResponse),
   );
 
+  const credentialRepository: CredentialRepository = {
+    revokeAllCredentials: RTE.right(undefined),
+  };
+
   const queueClient: QueueClient = {
     sendMessage: sendMessageSpy,
   } as unknown as QueueClient;
@@ -82,6 +88,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -113,6 +120,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -144,6 +152,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -172,6 +181,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -203,6 +213,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -239,6 +250,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -274,6 +286,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -310,6 +323,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -341,6 +355,7 @@ describe("CreateWalletInstanceHandler", () => {
         validateAttestation: () =>
           TE.left(new IntegrityCheckError(["foo", "bar"])),
       },
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,

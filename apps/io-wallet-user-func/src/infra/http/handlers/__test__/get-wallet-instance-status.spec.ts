@@ -3,10 +3,12 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
+import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { GetWalletInstanceStatusHandler } from "../get-wallet-instance-status";
@@ -30,6 +32,10 @@ describe("GetWalletInstanceStatusHandler", () => {
   const logger = {
     format: L.format.simple,
     log: () => () => void 0,
+  };
+
+  const credentialRepository: CredentialRepository = {
+    revokeAllCredentials: RTE.right(undefined),
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
@@ -90,6 +96,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -139,6 +146,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -188,6 +196,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -223,6 +232,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -250,6 +260,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -281,6 +292,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -308,6 +320,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -335,6 +348,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -389,6 +403,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -450,6 +465,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -504,6 +520,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -532,6 +549,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
   it("should return a 200 response with is_revoked = true and revocation_reason = CERTIFICATE_REVOKED_BY_ISSUER when certificate has been revoked", async () => {
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -567,6 +585,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -594,6 +613,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       TE.left(new Error("Failed to get CRL"));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -623,6 +643,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -681,6 +702,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
