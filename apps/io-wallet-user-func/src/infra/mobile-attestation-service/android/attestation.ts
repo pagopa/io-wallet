@@ -33,7 +33,7 @@ interface CertWithExtension {
 interface VerifyAttestationParams {
   attestationCrl: CRL;
   bundleIdentifiers: string[];
-  challenge: string;
+  challenge?: string;
   googlePublicKeys: string[];
   x509Chain: readonly X509Certificate[];
 }
@@ -229,17 +229,18 @@ const validateExtension = async (
     };
   }
 
-  // Check challenge
-  const receivedChallenge = Buffer.from(
-    keyDescription.attestationChallenge.buffer,
-  ).toString("utf-8");
+  if (challenge) {
+    const receivedChallenge = Buffer.from(
+      keyDescription.attestationChallenge.buffer,
+    ).toString("utf-8");
 
-  if (receivedChallenge !== challenge) {
-    return {
-      reason:
-        "The received challenge does not match the one contained in the certificate.",
-      success: false,
-    };
+    if (receivedChallenge !== challenge) {
+      return {
+        reason:
+          "The received challenge does not match the one contained in the certificate.",
+        success: false,
+      };
+    }
   }
 
   // Check softwareEnforced authorization list

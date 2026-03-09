@@ -1,7 +1,6 @@
 import { QueueClient } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { sequenceS } from "fp-ts/Apply";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
@@ -41,21 +40,20 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
   pipe(
     req.body,
     H.parse(WalletInstanceRequestPayload),
-    E.chain(
+    E.map(
       ({
         challenge,
         fiscal_code,
         hardware_key_tag,
         is_renewal,
         key_attestation,
-      }) =>
-        sequenceS(E.Apply)({
-          challenge: E.right(challenge),
-          fiscalCode: E.right(fiscal_code),
-          hardwareKeyTag: E.right(hardware_key_tag),
-          isRenewal: E.right(is_renewal ?? false),
-          keyAttestation: E.right(key_attestation),
-        }),
+      }) => ({
+        challenge: challenge,
+        fiscalCode: fiscal_code,
+        hardwareKeyTag: hardware_key_tag,
+        isRenewal: is_renewal ?? false,
+        keyAttestation: key_attestation,
+      }),
     ),
   );
 

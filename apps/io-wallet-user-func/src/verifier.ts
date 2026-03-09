@@ -18,7 +18,7 @@ type WithJwkCnf = t.TypeOf<typeof WithJwkCnf>;
 const decodeJwt = (jwt: string) =>
   E.tryCatch(() => jose.decodeJwt(jwt), E.toError);
 
-export const getPublicKeyFromCnf = (jwt: string) =>
+const getPublicKeyFromCnf = (jwt: string) =>
   pipe(
     jwt,
     decodeJwt,
@@ -31,7 +31,7 @@ export const getPublicKeyFromCnf = (jwt: string) =>
     E.map((payload) => payload.cnf.jwk),
   );
 
-export const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
+const verifyAndDecodeJwt = (jwt: string) => (publicKey: JwkPublicKey) =>
   pipe(
     TE.tryCatch(() => jose.importJWK(publicKey), E.toError),
     TE.chain((joseKey) =>

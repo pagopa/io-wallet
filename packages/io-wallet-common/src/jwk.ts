@@ -20,17 +20,23 @@ export const ECKey = t.intersection([
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
-export const ES256PublicJwk = t.intersection(
+export const ECKeyWithKid = t.intersection(
   [
     ECKey,
     t.type({
       kid: t.string,
     }),
   ],
-  "ES256PublicJwk",
+  "ECKeyWithKid",
 );
 
-export type ES256PublicJwk = t.TypeOf<typeof ES256PublicJwk>;
+export type ECKeyWithKid = t.TypeOf<typeof ECKeyWithKid>;
+
+export const Cnf = t.type({
+  jwk: ECKeyWithKid,
+});
+
+export type Cnf = t.TypeOf<typeof Cnf>;
 
 export const ECPrivateKey = t.intersection([
   ECKey,
@@ -128,3 +134,13 @@ export const validateJwkKid: (
       kid,
     })),
   );
+
+export const areJwksEqual = (
+  left: ECKeyWithKid,
+  right: ECKeyWithKid,
+): boolean =>
+  left.kty === right.kty &&
+  left.crv === right.crv &&
+  left.x === right.x &&
+  left.y === right.y &&
+  left.kid === right.kid;

@@ -19,6 +19,7 @@ import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/wh
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
+import { CreateWalletUnitAttestationFunction } from "@/infra/azure/functions/create-wallet-unit-attestation";
 import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
@@ -33,6 +34,7 @@ import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import {
+  AndroidAttestationValidationConfig,
   AssertionValidationConfig,
   MobileAttestationService,
 } from "@/infra/mobile-attestation-service";
@@ -118,6 +120,13 @@ const assertionValidationConfig: AssertionValidationConfig = {
     config.attestationService.googleAppCredentialsEncoded,
   iosBundleIdentifiers: config.attestationService.iosBundleIdentifiers,
   iOsTeamIdentifier: config.attestationService.iOsTeamIdentifier,
+};
+
+const androidAttestationValidationConfig: AndroidAttestationValidationConfig = {
+  androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
+  androidCrlUrl: config.attestationService.androidCrlUrl,
+  googlePublicKeys: config.attestationService.googlePublicKeys,
+  httpRequestTimeout: config.attestationService.httpRequestTimeout,
 };
 
 const emailNotificationService = new EmailNotificationServiceClient({
@@ -301,4 +310,19 @@ app.http("createWalletInstanceAttestation", {
   }),
   methods: ["POST"],
   route: "wallet-instance-attestations",
+});
+
+app.http("createWalletUnitAttestation", {
+  authLevel: "function",
+  handler: CreateWalletUnitAttestationFunction({
+    androidAttestationValidationConfig,
+    assertionValidationConfig,
+    certificateRepository,
+    federationEntity: config.entityConfiguration.federationEntity,
+    nonceRepository,
+    signer: walletAttestationSigner,
+    walletInstanceRepository,
+  }),
+  methods: ["POST"],
+  route: "wallet-unit-attestations",
 });

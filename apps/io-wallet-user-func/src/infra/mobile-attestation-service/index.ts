@@ -9,6 +9,7 @@ import * as R from "fp-ts/Reader";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
+import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
 import * as jose from "jose";
@@ -213,6 +214,13 @@ const allowDevelopmentEnvironmentForUser: (
 ) => R.Reader<AssertionValidationConfig, boolean> = (user) => (config) =>
   config.allowedDeveloperUsers.includes(user);
 
+export interface AndroidAttestationValidationConfig {
+  androidBundleIdentifiers: string[];
+  androidCrlUrl: string;
+  googlePublicKeys: string[];
+  httpRequestTimeout: number;
+}
+
 export interface AssertionValidationConfig {
   allowedDeveloperUsers: string[];
   androidBundleIdentifiers: string[];
@@ -299,4 +307,42 @@ export const verifyIosAssertion: (
         ),
       ),
       TE.mapLeft((iosErr) => new IntegrityCheckError([iosErr.message])),
+    );
+
+export const verifyAndroidAttestation: (
+  attestation: NonEmptyString,
+) => RTE.ReaderTaskEither<
+  { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
+  Error | IntegrityCheckError,
+  { deviceDetails: AndroidDeviceDetails; jwk: JwkPublicKey }
+> =
+  (attestation) =>
+  ({ androidAttestationValidationConfig: config }) =>
+    pipe(
+      attestation,
+      decodeBase64ToBuffer,
+      E.chainW(parseAndroidAttestation),
+      TE.fromEither,
+      TE.chainW((x509Chain) =>
+        validateAndroidAttestation({
+          androidCrlUrl: config.androidCrlUrl,
+          bundleIdentifiers: config.androidBundleIdentifiers,
+          googlePublicKeys: config.googlePublicKeys,
+          httpRequestTimeout: config.httpRequestTimeout,
+          x509Chain,
+        }),
+      ),
+      TE.chainEitherKW(({ deviceDetails, hardwareKey }) =>
+        pipe(
+          deviceDetails,
+          AndroidDeviceDetails.decode,
+          E.map((deviceDetails) => ({
+            deviceDetails,
+            jwk: hardwareKey,
+          })),
+          E.mapLeft(() => new Error()),
+        ),
+      ),
+      TE.mapLeft(toIntegrityCheckError),
+      TE.mapLeft((androidErr) => new IntegrityCheckError([androidErr.message])),
     );
