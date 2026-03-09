@@ -1,5 +1,12 @@
 # io-wallet-user-func
 
+## 4.2.1
+
+### Patch Changes
+
+- ccd6292: Removed delete /wallet-instances endpoint
+- 21ba8de: ""
+
 ## 4.2.0
 
 ### Minor Changes
