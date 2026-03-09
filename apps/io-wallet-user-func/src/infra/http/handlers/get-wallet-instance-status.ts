@@ -122,6 +122,7 @@ const revokeWalletInstanceAndSendEvent: (
         credentialRepository,
       },
       revokeAllCredentials(walletInstance.userId),
+      TE.orElseW(() => TE.right(undefined)),
       TE.chainW(() =>
         pipe(
           {

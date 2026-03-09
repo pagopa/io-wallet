@@ -3,7 +3,6 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
-import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -35,7 +34,7 @@ describe("GetWalletInstanceStatusHandler", () => {
   };
 
   const credentialRepository: CredentialRepository = {
-    revokeAllCredentials: RTE.right(undefined),
+    revokeAllCredentials: () => TE.right(undefined),
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
@@ -657,6 +656,37 @@ describe("GetWalletInstanceStatusHandler", () => {
         body: {
           id: "123",
           is_revoked: false,
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      },
+    });
+  });
+
+  it("should return a 200 response with is_revoked = true when certificate has been revoked but revokeAllCredentials fails", async () => {
+    const credentialRepositoryThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () =>
+        TE.left(new Error("failed on revokeAllCredentials!")),
+    };
+
+    const handler = GetWalletInstanceStatusHandler({
+      credentialRepository: credentialRepositoryThatFailsOnRevoke,
+      getAttestationStatusList,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          id: "123",
+          is_revoked: true,
+          revocation_reason: "CERTIFICATE_REVOKED_BY_ISSUER",
         },
         headers: expect.objectContaining({
           "Content-Type": "application/json",

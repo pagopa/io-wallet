@@ -92,7 +92,10 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
           pipe(
             insertWalletInstance(walletInstance),
             RTE.chainW(() =>
-              revokeAllCredentials(walletInstanceRequest.fiscalCode),
+              pipe(
+                revokeAllCredentials(walletInstanceRequest.fiscalCode),
+                RTE.orElseW(() => RTE.right(undefined)),
+              ),
             ),
             RTE.chainW(() =>
               revokeUserValidWalletInstancesExceptOne(

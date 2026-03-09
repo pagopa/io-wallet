@@ -4,7 +4,6 @@ import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
-import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { describe, expect, it, vi } from "vitest";
 
@@ -71,7 +70,7 @@ describe("CreateWalletInstanceHandler", () => {
   );
 
   const credentialRepository: CredentialRepository = {
-    revokeAllCredentials: RTE.right(undefined),
+    revokeAllCredentials: () => TE.right(undefined),
   };
 
   const queueClient: QueueClient = {
@@ -268,6 +267,37 @@ describe("CreateWalletInstanceHandler", () => {
         statusCode: 500,
       }),
     });
+  });
+
+  it("should return a 204 HTTP response when revokeAllCredentials fails", async () => {
+    const credentialRepositoryThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () =>
+        TE.left(new Error("failed on revokeAllCredentials!")),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository: credentialRepositoryThatFailsOnRevoke,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
   });
 
   it("should return a 500 HTTP response on getValidByUserIdExcludingOne error", async () => {
