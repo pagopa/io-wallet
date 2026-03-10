@@ -123,7 +123,7 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when getCosmosHealth and getPidIssuerHealth return an error", async () => {
+  it("should return a 500 HTTP response when checkIfFiscalCodeIsWhitelisted fails", async () => {
     const handler = IsFiscalCodeWhitelistedHandler({
       input: req,
       inputDecoder: H.HttpRequest,

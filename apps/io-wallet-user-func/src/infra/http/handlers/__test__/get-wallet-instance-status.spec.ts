@@ -7,6 +7,7 @@ import * as TE from "fp-ts/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { CredentialRepository } from "@/credential";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { GetWalletInstanceStatusHandler } from "../get-wallet-instance-status";
@@ -30,6 +31,10 @@ describe("GetWalletInstanceStatusHandler", () => {
   const logger = {
     format: L.format.simple,
     log: () => () => void 0,
+  };
+
+  const credentialRepository: CredentialRepository = {
+    revokeAllCredentials: () => TE.right(undefined),
   };
 
   const walletInstanceRepository: WalletInstanceRepository = {
@@ -90,6 +95,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -139,6 +145,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -188,6 +195,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -223,6 +231,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -250,6 +259,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -281,6 +291,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -308,6 +319,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -335,6 +347,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       insert: () => TE.left(new Error("not implemented")),
     };
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -389,6 +402,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -450,6 +464,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -504,6 +519,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -532,6 +548,7 @@ describe("GetWalletInstanceStatusHandler", () => {
 
   it("should return a 200 response with is_revoked = true and revocation_reason = CERTIFICATE_REVOKED_BY_ISSUER when certificate has been revoked", async () => {
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -567,6 +584,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       });
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -594,6 +612,7 @@ describe("GetWalletInstanceStatusHandler", () => {
       TE.left(new Error("Failed to get CRL"));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -623,6 +642,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     };
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -636,6 +656,37 @@ describe("GetWalletInstanceStatusHandler", () => {
         body: {
           id: "123",
           is_revoked: false,
+        },
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      },
+    });
+  });
+
+  it("should return a 200 response with is_revoked = true when certificate has been revoked but revokeAllCredentials fails", async () => {
+    const credentialRepositoryThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () =>
+        TE.left(new Error("failed on revokeAllCredentials!")),
+    };
+
+    const handler = GetWalletInstanceStatusHandler({
+      credentialRepository: credentialRepositoryThatFailsOnRevoke,
+      getAttestationStatusList,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        body: {
+          id: "123",
+          is_revoked: true,
+          revocation_reason: "CERTIFICATE_REVOKED_BY_ISSUER",
         },
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -681,6 +732,7 @@ describe("GetWalletInstanceStatusHandler", () => {
     const getAttestationStatusListMock = vi.fn(() => TE.right({ entries: {} }));
 
     const handler = GetWalletInstanceStatusHandler({
+      credentialRepository,
       getAttestationStatusList: getAttestationStatusListMock,
       input: req,
       inputDecoder: H.HttpRequest,

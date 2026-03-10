@@ -142,7 +142,6 @@ app.http("healthCheck", {
   authLevel: "anonymous",
   handler: HealthFunction({
     cosmosClient,
-    pidIssuerClient,
   }),
   methods: ["GET"],
   route: "health",
@@ -152,6 +151,7 @@ app.http("createWalletInstance", {
   authLevel: "function",
   handler: CreateWalletInstanceFunction({
     attestationService: mobileAttestationService,
+    credentialRepository: pidIssuerClient,
     nonceRepository,
     queueClient: walletInstanceCreationEmailQueueClient,
     walletInstanceRepository,
@@ -191,6 +191,7 @@ app.timer("generateEntityConfiguration", {
 app.http("getWalletInstanceStatus", {
   authLevel: "function",
   handler: GetWalletInstanceStatusFunction({
+    credentialRepository: pidIssuerClient,
     getAttestationStatusList: () =>
       getCrlFromUrl(
         config.attestationService.androidCrlUrl,
