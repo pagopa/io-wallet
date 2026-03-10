@@ -12,6 +12,7 @@ on:
         type: boolean
 
 permissions:
+  contents: read
   id-token: write
 
 jobs:
@@ -20,7 +21,7 @@ jobs:
     uses: ./.github/workflows/tls_certificate.yaml
     secrets: inherit
     with:
-      force_renewal: ${{ inputs.force_renewal }}
+      FORCE_RENEWAL: ${{ inputs.force_renewal || false }}
       KEY_VAULT_NAME: "iw-p-itn-infra-kv-01"
       CSR_COMMON_NAME: "apim.internal.wallet.io.pagopa.it"
       DNS_ZONE: "wallet.io.pagopa.it"

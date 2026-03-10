@@ -10,25 +10,16 @@ import { HealthCheckError } from "io-wallet-common/error";
 import { getCosmosHealth } from "io-wallet-common/infra/azure/cosmos/health-check";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
-import {
-  getPidIssuerHealth,
-  PidIssuerHealthCheck,
-} from "@/infra/pid-issuer/health-check";
-
 const getHealthCheck: RTE.ReaderTaskEither<
   {
     cosmosClient: CosmosClient;
-    pidIssuerClient: PidIssuerHealthCheck;
   },
   Error,
   void
-> = ({ cosmosClient, pidIssuerClient }) =>
-  // It runs multiple health checks in parallel
+> = ({ cosmosClient }) =>
+  // It can run multiple health checks in parallel
   pipe(
-    [
-      pipe({ cosmosClient }, getCosmosHealth),
-      pipe({ pidIssuerClient }, getPidIssuerHealth),
-    ],
+    [pipe({ cosmosClient }, getCosmosHealth)],
     RA.wilt(T.ApplicativePar)(identity),
     T.chain(({ left: errors }) =>
       pipe(

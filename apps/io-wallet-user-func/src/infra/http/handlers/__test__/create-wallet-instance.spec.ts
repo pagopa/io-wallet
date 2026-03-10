@@ -2,12 +2,13 @@
 import { QueueClient, QueueSendMessageResponse } from "@azure/storage-queue";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
+import { CredentialRepository } from "@/credential";
 import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
 import { NonceRepository } from "@/nonce";
@@ -68,13 +69,22 @@ describe("CreateWalletInstanceHandler", () => {
     } as QueueSendMessageResponse),
   );
 
+  const revokeAllCredentialsSpy = vi.fn(() => TE.right(undefined));
+
+  const credentialRepository: CredentialRepository = {
+    revokeAllCredentials: revokeAllCredentialsSpy,
+  };
+
   const queueClient: QueueClient = {
     sendMessage: sendMessageSpy,
   } as unknown as QueueClient;
 
-  it("should return a 204 HTTP response on success and enqueue email by default", async () => {
+  beforeEach(() => {
     sendMessageSpy.mockClear();
+    revokeAllCredentialsSpy.mockClear();
+  });
 
+  it("should return a 204 HTTP response on success and enqueue email by default", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: walletInstanceRequest,
@@ -82,6 +92,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -101,8 +112,6 @@ describe("CreateWalletInstanceHandler", () => {
   });
 
   it("should enqueue email when is_renewal is false", async () => {
-    sendMessageSpy.mockClear();
-
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
@@ -113,6 +122,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -132,8 +142,6 @@ describe("CreateWalletInstanceHandler", () => {
   });
 
   it("should skip email enqueue when is_renewal is true", async () => {
-    sendMessageSpy.mockClear();
-
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
@@ -144,6 +152,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -172,6 +181,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -203,6 +213,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -239,6 +250,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -254,6 +266,145 @@ describe("CreateWalletInstanceHandler", () => {
           "Content-Type": "application/problem+json",
         }),
         statusCode: 500,
+      }),
+    });
+  });
+
+  it("should not call revokeAllCredentials when there are no old wallet instances to revoke", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(revokeAllCredentialsSpy).not.toHaveBeenCalled();
+  });
+
+  it("should call revokeAllCredentials when there are old wallet instances to revoke", async () => {
+    const walletInstanceRepositoryWithOldValidWalletInstance: WalletInstanceRepository =
+      {
+        ...walletInstanceRepository,
+        getValidByUserIdExcludingOne: () =>
+          TE.right(
+            O.some([
+              {
+                createdAt: new Date(),
+                deviceDetails: {
+                  platform: "ios",
+                },
+                hardwareKey: {
+                  crv: "P-256",
+                  kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
+                  kty: "EC",
+                  x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
+                  y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
+                },
+                id: "old-wallet-instance" as NonEmptyString,
+                isRevoked: false,
+                signCount: 0,
+                userId: mockFiscalCode,
+              },
+            ]),
+          ),
+      };
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository:
+        walletInstanceRepositoryWithOldValidWalletInstance,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(revokeAllCredentialsSpy).toHaveBeenCalled();
+  });
+
+  it("should return a 204 HTTP response when revokeAllCredentials fails", async () => {
+    const walletInstanceRepositoryWithOldValidWalletInstance: WalletInstanceRepository =
+      {
+        ...walletInstanceRepository,
+        getValidByUserIdExcludingOne: () =>
+          TE.right(
+            O.some([
+              {
+                createdAt: new Date(),
+                deviceDetails: {
+                  platform: "ios",
+                },
+                hardwareKey: {
+                  crv: "P-256",
+                  kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
+                  kty: "EC",
+                  x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
+                  y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
+                },
+                id: "old-wallet-instance" as NonEmptyString,
+                isRevoked: false,
+                signCount: 0,
+                userId: mockFiscalCode,
+              },
+            ]),
+          ),
+      };
+
+    const credentialRepositoryThatFailsOnRevoke: CredentialRepository = {
+      revokeAllCredentials: () =>
+        TE.left(new Error("failed on revokeAllCredentials!")),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository: credentialRepositoryThatFailsOnRevoke,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository:
+        walletInstanceRepositoryWithOldValidWalletInstance,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
       }),
     });
   });
@@ -274,6 +425,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -310,6 +462,7 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
@@ -341,6 +494,7 @@ describe("CreateWalletInstanceHandler", () => {
         validateAttestation: () =>
           TE.left(new IntegrityCheckError(["foo", "bar"])),
       },
+      credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
