@@ -17,6 +17,7 @@ export interface AttestedKey {
 export interface WalletUnitAttestationData {
   attestedKeys: readonly AttestedKey[];
   kid: string;
+  platform: "android" | "ios";
   walletProviderName: string;
   walletSolutionId: string;
   walletSolutionVersion: string;

@@ -135,12 +135,8 @@ export const validateJwkKid: (
     })),
   );
 
-export const areJwksEqual = (
-  left: ECKeyWithKid,
-  right: ECKeyWithKid,
-): boolean =>
+export const areJwksEqual = (left: ECKey, right: ECKey): boolean =>
   left.kty === right.kty &&
   left.crv === right.crv &&
   left.x === right.x &&
-  left.y === right.y &&
-  left.kid === right.kid;
+  left.y === right.y;

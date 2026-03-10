@@ -385,7 +385,7 @@ const verifyAndDecodeWalletUnitAttestationRequest = (
         : new H.ValidationError([
             error instanceof Error
               ? error.message
-              : "Unexpected validation error",
+              : "Invalid Wallet Unit Attestation request",
           ]),
     ),
   );

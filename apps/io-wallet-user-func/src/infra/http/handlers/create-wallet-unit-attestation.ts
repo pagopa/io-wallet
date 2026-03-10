@@ -8,6 +8,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import {
   areJwksEqual,
+  ECKey,
   ECKeyWithKid,
   JwkPublicKey,
   validateJwkKid,
@@ -93,7 +94,7 @@ const verifyAttestedJwkMatchesCnf = ({
 }): E.Either<IntegrityCheckError, void> =>
   pipe(
     attestedJwk,
-    ECKeyWithKid.decode,
+    ECKey.decode,
     E.mapLeft(() => new Error()),
     E.chain((attestedEs256Jwk) =>
       areJwksEqual(attestedEs256Jwk, cnfJwk)

@@ -9,6 +9,7 @@ import * as R from "fp-ts/Reader";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
+import { PathReporter } from "io-ts/PathReporter";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
@@ -340,7 +341,14 @@ export const verifyAndroidAttestation: (
             deviceDetails,
             jwk: hardwareKey,
           })),
-          E.mapLeft(() => new Error()),
+          E.mapLeft(
+            (errors) =>
+              new Error(
+                `Invalid Android device details: ${PathReporter.report(
+                  E.left(errors),
+                ).join(", ")}`,
+              ),
+          ),
         ),
       ),
       TE.mapLeft(toIntegrityCheckError),
