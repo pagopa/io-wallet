@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.2.2
+
+### Patch Changes
+
+- beedc34: Removed PID Issuer health-check logic and extended PID Issuer credential revocation flow
+
 ## 4.2.1
 
 ### Patch Changes
