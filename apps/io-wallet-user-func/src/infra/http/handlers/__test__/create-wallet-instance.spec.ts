@@ -342,7 +342,8 @@ describe("CreateWalletInstanceHandler", () => {
       logger,
       nonceRepository,
       queueClient,
-      walletInstanceRepository: walletInstanceRepositoryWithOldValidWalletInstance,
+      walletInstanceRepository:
+        walletInstanceRepositoryWithOldValidWalletInstance,
     });
 
     await expect(handler()).resolves.toEqual({
