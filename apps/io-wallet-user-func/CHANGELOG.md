@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.2.3
+
+### Patch Changes
+
+- be03221: Update wallet instance creation revocation flow to call PID Issuer /revokeAll only when at least one previous valid wallet instance is actually revoked
+
 ## 4.2.2
 
 ### Patch Changes
