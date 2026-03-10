@@ -194,7 +194,7 @@ export const revokeUserValidWalletInstancesExceptOne: (
   userId: WalletInstance["userId"],
   walletInstanceId: WalletInstance["id"],
   reason: RevocationReason,
-) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, void> = (
+) => RTE.ReaderTaskEither<WalletInstanceEnvironment, Error, boolean> = (
   userId,
   walletInstanceId,
   reason,
@@ -202,6 +202,9 @@ export const revokeUserValidWalletInstancesExceptOne: (
   pipe(
     getUserValidWalletInstancesIdExceptOne(userId, walletInstanceId),
     RTE.chain((validWalletInstances) =>
-      revokeUserWalletInstances(userId, validWalletInstances, reason),
+      pipe(
+        revokeUserWalletInstances(userId, validWalletInstances, reason),
+        RTE.map(() => validWalletInstances.length > 0),
+      ),
     ),
   );
