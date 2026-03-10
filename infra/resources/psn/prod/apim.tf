@@ -169,6 +169,7 @@ module "apim_roles" {
     name                = module.key_vault_app.key_vault_wallet.name
     resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
     description         = "Allow ${module.apim.name} to read secrets on ${module.key_vault_app.key_vault_wallet.name}"
+    has_rbac_support    = true
     roles = {
       secrets = "reader"
     }
