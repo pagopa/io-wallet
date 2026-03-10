@@ -297,6 +297,61 @@ describe("CreateWalletInstanceHandler", () => {
     expect(revokeAllCredentialsSpy).not.toHaveBeenCalled();
   });
 
+  it("should call revokeAllCredentials when there are old wallet instances to revoke", async () => {
+    const walletInstanceRepositoryWithOldValidWalletInstance: WalletInstanceRepository =
+      {
+        ...walletInstanceRepository,
+        getValidByUserIdExcludingOne: () =>
+          TE.right(
+            O.some([
+              {
+                createdAt: new Date(),
+                deviceDetails: {
+                  platform: "ios",
+                },
+                hardwareKey: {
+                  crv: "P-256",
+                  kid: "ea693e3c-e8f6-436c-ac78-afdf9956eecb",
+                  kty: "EC",
+                  x: "01m0xf5ujQ5g22FvZ2zbFrvyLx9bgN2AiLVFtca2BUE",
+                  y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
+                },
+                id: "old-wallet-instance" as NonEmptyString,
+                isRevoked: false,
+                signCount: 0,
+                userId: mockFiscalCode,
+              },
+            ]),
+          ),
+      };
+
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      walletInstanceRepository:
+        walletInstanceRepositoryWithOldValidWalletInstance,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(revokeAllCredentialsSpy).toHaveBeenCalled();
+  });
+
   it("should return a 204 HTTP response when revokeAllCredentials fails", async () => {
     const walletInstanceRepositoryWithOldValidWalletInstance: WalletInstanceRepository =
       {
