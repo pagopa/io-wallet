@@ -168,7 +168,7 @@ def get_crt(private_key, regr, csr, directory_url, out):
     def _poll_until_not(url, pending_statuses, err_msg):
         result, t0 = None, time.time()
         while result is None or result["status"] in pending_statuses:
-            if time.time() - t0 > 600:  # 10 minutes timeout
+            if time.time() - t0 > 1200:  # 20 minutes timeout
                 raise ValueError("Polling timeout")
             if result is not None and result["status"] == "invalid":
                 for challenge_result in result["challenges"]:
