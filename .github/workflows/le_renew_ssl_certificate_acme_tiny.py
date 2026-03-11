@@ -19,7 +19,7 @@ import cryptography
 import jwcrypto.jwk
 
 DEFAULT_DIRECTORY_URL = "https://acme-v02.api.letsencrypt.org/directory"
-DEFAULT_DNS_TTL_SEC = 30
+DEFAULT_DNS_TTL_SEC = 120
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(logging.StreamHandler())
@@ -174,7 +174,7 @@ def get_crt(private_key, regr, csr, directory_url, out):
                 for challenge_result in result["challenges"]:
                     # 400 may be returned for transient errors (NXDOMAIN)
                     returned_status_code = challenge_result["error"]["status"]
-                    if returned_status_code == "400":
+                    if returned_status_code == 400 or returned_status_code == "400":
                         continue  # ignore
                     else:
                         raise ValueError(
@@ -371,7 +371,7 @@ def main(argv=None):
         description=textwrap.dedent(
             """\
             This script automates the process of getting a signed TLS certificate from Let's Encrypt using
-            the ACME protocol. It is intented to be run in a Azure DevOps pipeline and have access to your private
+            the ACME protocol. It is intended to be run in a Azure DevOps pipeline and have access to your private
             account key, so PLEASE READ THROUGH IT! It's only ~300 lines, so it won't take long.
 
             Example Usage:
