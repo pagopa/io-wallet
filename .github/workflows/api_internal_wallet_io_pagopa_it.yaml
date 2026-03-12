@@ -26,3 +26,4 @@ jobs:
       CSR_COMMON_NAME: "api.internal.wallet.io.pagopa.it"
       DNS_ZONE: "io.pagopa.it"
       DNS_ZONE_RESOURCE_GROUP: "io-p-rg-external"
+      GITHUB_EVENT_NAME: ${{ github.event_name }}
