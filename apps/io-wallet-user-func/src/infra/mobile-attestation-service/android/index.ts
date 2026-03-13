@@ -51,7 +51,7 @@ export const validateAndroidAttestation = ({
   bundleIdentifiers: string[];
   googlePublicKeys: string[];
   httpRequestTimeout: number;
-  nonce?: NonEmptyString;
+  nonce: string;
   x509Chain: readonly X509Certificate[];
 }): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(

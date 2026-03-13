@@ -327,6 +327,11 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         statusCode: 200,
       }),
     });
+
+    expect(verifyAndroidAttestation).toHaveBeenCalledWith(
+      "base64_attestation",
+      challenge,
+    );
   });
 
   it("should return a 409 HTTP response with Android platform when verifyAndroidAttestation fails", async () => {
@@ -362,6 +367,11 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         statusCode: 409,
       }),
     });
+
+    expect(verifyAndroidAttestation).toHaveBeenCalledWith(
+      "base64_attestation",
+      challenge,
+    );
   });
 
   it("should return 422 when platform is Android and key attestation is missing", async () => {

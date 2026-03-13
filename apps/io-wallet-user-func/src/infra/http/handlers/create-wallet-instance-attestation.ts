@@ -9,7 +9,7 @@ import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { validateJwkKid } from "io-wallet-common/jwk";
 
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
-import { validateAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
+import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -88,7 +88,7 @@ const generateWalletInstanceAttestation: (request: {
   string
 > = ({ userId, wiaRequest }) =>
   pipe(
-    validateAssertionRequest({
+    validateWalletInstanceAssertionRequest({
       assertion: wiaRequest,
       userId,
     }),

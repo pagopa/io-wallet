@@ -18,9 +18,10 @@ import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
   IntegrityCheckError,
+  toKeysThumbprints,
 } from "@/infra/mobile-attestation-service";
 import { verifyAndroidAttestation } from "@/infra/mobile-attestation-service";
-import { validateAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
+import { validateWalletUnitAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -130,31 +131,35 @@ const generateWalletUnitAttestation: (request: {
   );
 
 const validateAndroidKeysToAttest: (
+  nonce: NonEmptyString,
   keysToAttest: Extract<WUARequest, { platform: "android" }>["keysToAttest"],
 ) => RTE.ReaderTaskEither<
   { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
   Error | IntegrityCheckError,
   readonly AttestedKey[]
-> = RTE.traverseArray(({ jwk, keyAttestation }) =>
+> = (nonce, keysToAttest) =>
   pipe(
-    keyAttestation,
-    verifyAndroidAttestation,
-    RTE.chainFirstEitherKW(({ jwk: attestedJwk }) =>
-      verifyAttestedJwkMatchesCnf({
-        attestedJwk,
-        cnfJwk: jwk,
-      }),
+    keysToAttest,
+    RTE.traverseArray(({ jwk, keyAttestation }) =>
+      pipe(
+        verifyAndroidAttestation(keyAttestation, nonce),
+        RTE.chainFirstEitherKW(({ jwk: attestedJwk }) =>
+          verifyAttestedJwkMatchesCnf({
+            attestedJwk,
+            cnfJwk: jwk,
+          }),
+        ),
+        RTE.map(({ deviceDetails: { keymasterSecurityLevel }, jwk }) => ({
+          jwk,
+          keyStorage:
+            keymasterSecurityLevel >= 2
+              ? "iso_18045_moderate"
+              : "iso_18045_enhanced-basic",
+          userAuthentication: "iso_18045_moderate",
+        })),
+      ),
     ),
-    RTE.map(({ deviceDetails: { keymasterSecurityLevel }, jwk }) => ({
-      jwk,
-      keyStorage:
-        keymasterSecurityLevel >= 2
-          ? "iso_18045_moderate"
-          : "iso_18045_enhanced-basic",
-      userAuthentication: "iso_18045_moderate",
-    })),
-  ),
-);
+  );
 
 const validateIosKeysToAttest: (
   keysToAttest: Extract<WUARequest, { platform: "ios" }>["keysToAttest"],
@@ -170,6 +175,43 @@ const validateIosKeysToAttest: (
   }),
 );
 
+const validateRequestHardwareAssertion: (input: {
+  userId: FiscalCode;
+  wuaRequest: WUARequest;
+}) => RTE.ReaderTaskEither<
+  NonceEnvironment &
+    WalletInstanceEnvironment & {
+      assertionValidationConfig: AssertionValidationConfig;
+    },
+  Error,
+  void
+> = ({ userId, wuaRequest }) =>
+  pipe(
+    wuaRequest.keysToAttest.map(({ jwk }) => jwk),
+    toKeysThumbprints,
+    RTE.fromTaskEither,
+    RTE.chainW((attestedKeysThumbprints) =>
+      validateWalletUnitAssertionRequest({
+        assertion: {
+          ...wuaRequest,
+          attestedKeysThumbprints,
+        },
+        userId,
+      }),
+    ),
+  );
+
+const validateKeysToAttest: (
+  wuaRequest: WUARequest,
+) => RTE.ReaderTaskEither<
+  { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
+  Error | IntegrityCheckError,
+  readonly AttestedKey[]
+> = (wuaRequest) =>
+  wuaRequest.platform === "android"
+    ? validateAndroidKeysToAttest(wuaRequest.nonce, wuaRequest.keysToAttest)
+    : validateIosKeysToAttest(wuaRequest.keysToAttest);
+
 const validateAssertionRequestAndAttestKeys: (input: {
   userId: FiscalCode;
   wuaRequest: WUARequest;
@@ -183,15 +225,8 @@ const validateAssertionRequestAndAttestKeys: (input: {
   readonly AttestedKey[]
 > = ({ userId, wuaRequest }) =>
   pipe(
-    validateAssertionRequest({
-      assertion: wuaRequest,
-      userId,
-    }),
-    RTE.chainW(() =>
-      wuaRequest.platform === "android"
-        ? validateAndroidKeysToAttest(wuaRequest.keysToAttest)
-        : validateIosKeysToAttest(wuaRequest.keysToAttest),
-    ),
+    validateRequestHardwareAssertion({ userId, wuaRequest }),
+    RTE.chainW(() => validateKeysToAttest(wuaRequest)),
   );
 
 export const CreateWalletUnitAttestationHandler = H.of((req: H.HttpRequest) =>

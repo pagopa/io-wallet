@@ -3,7 +3,6 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { createPublicKey } from "crypto";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import * as J from "fp-ts/Json";
 import * as O from "fp-ts/Option";
 import * as R from "fp-ts/Reader";
 import * as RTE from "fp-ts/ReaderTaskEither";
@@ -12,7 +11,6 @@ import * as TE from "fp-ts/TaskEither";
 import { PathReporter } from "io-ts/PathReporter";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
-import { calculateJwkThumbprint } from "jose";
 import * as jose from "jose";
 
 import { AttestationServiceConfiguration } from "@/app/config";
@@ -29,6 +27,7 @@ import {
   validateAndroidAttestation,
 } from "./android";
 import { ExternalServiceError } from "./android/assertion";
+import { toClientData, toThumbprint } from "./client-data";
 import {
   parseIosAssertion,
   parseIosAttestation,
@@ -46,18 +45,17 @@ export class IntegrityCheckError extends Error {
 const toIntegrityCheckError = (e: Error | ValidationError): Error =>
   e instanceof ValidationError ? new IntegrityCheckError(e.violations) : e;
 
-const toClientData = (
+const toSingleKeyClientData = (
   nonce: NonEmptyString,
   jwk: JwkPublicKey,
 ): TE.TaskEither<Error | ValidationError, string> =>
   pipe(
-    TE.tryCatch(() => calculateJwkThumbprint(jwk, "sha256"), E.toError),
-    TE.chainEitherKW((jwk_thumbprint) =>
-      pipe(
-        { challenge: nonce, jwk_thumbprint },
-        J.stringify,
-        E.mapLeft(() => new ValidationError(["Unable to create clientData"])),
-      ),
+    toThumbprint(jwk),
+    TE.chainW((thumbprint) =>
+      toClientData({
+        challenge: nonce,
+        thumbprint,
+      }),
     ),
   );
 
@@ -103,7 +101,7 @@ export class MobileAttestationService implements AttestationService {
     user,
   }: ValidateAssertionRequest) =>
     pipe(
-      toClientData(nonce, jwk),
+      toSingleKeyClientData(nonce, jwk),
       TE.chainW((clientData) =>
         pipe(
           parseIosAssertion({
@@ -209,6 +207,7 @@ export class MobileAttestationService implements AttestationService {
 }
 
 export { ValidatedAttestation };
+export { toClientData, toKeysThumbprints, toThumbprint } from "./client-data";
 
 const allowDevelopmentEnvironmentForUser: (
   user: FiscalCode,
@@ -232,35 +231,34 @@ export interface AssertionValidationConfig {
   iOsTeamIdentifier: string;
 }
 
-export const verifyAndroidAssertion: (
-  input: Omit<ValidateAssertionRequest, "signCount">,
-) => RTE.ReaderTaskEither<
+export const verifyAndroidAssertion: (input: {
+  clientData: string;
+  hardwareKey: JwkPublicKey;
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+  user: FiscalCode;
+}) => RTE.ReaderTaskEither<
   { assertionValidationConfig: AssertionValidationConfig },
   ExternalServiceError | IntegrityCheckError,
   void
 > =
-  ({ hardwareKey, hardwareSignature, integrityAssertion, jwk, nonce, user }) =>
+  ({ clientData, hardwareKey, hardwareSignature, integrityAssertion, user }) =>
   ({ assertionValidationConfig: config }) =>
     pipe(
-      toClientData(nonce, jwk),
-      TE.chainW((clientData) =>
-        pipe(
-          config.googleAppCredentialsEncoded,
-          parseGoogleAppCredentials,
-          TE.fromEither,
-          TE.chain((googleAppCredentials) =>
-            validateAndroidAssertion(
-              integrityAssertion,
-              hardwareSignature,
-              clientData,
-              hardwareKey,
-              config.androidBundleIdentifiers,
-              config.androidPlayStoreCertificateHash,
-              googleAppCredentials,
-              config.androidPlayIntegrityUrl,
-              allowDevelopmentEnvironmentForUser(user)(config),
-            ),
-          ),
+      config.googleAppCredentialsEncoded,
+      parseGoogleAppCredentials,
+      TE.fromEither,
+      TE.chain((googleAppCredentials) =>
+        validateAndroidAssertion(
+          integrityAssertion,
+          hardwareSignature,
+          clientData,
+          hardwareKey,
+          config.androidBundleIdentifiers,
+          config.androidPlayStoreCertificateHash,
+          googleAppCredentials,
+          config.androidPlayIntegrityUrl,
+          allowDevelopmentEnvironmentForUser(user)(config),
         ),
       ),
       TE.mapLeft((androidErr) =>
@@ -270,41 +268,39 @@ export const verifyAndroidAssertion: (
       ),
     );
 
-export const verifyIosAssertion: (
-  input: Omit<ValidateAssertionRequest, "user">,
-) => RTE.ReaderTaskEither<
+export const verifyIosAssertion: (input: {
+  clientData: string;
+  hardwareKey: JwkPublicKey;
+  hardwareSignature: NonEmptyString;
+  integrityAssertion: NonEmptyString;
+  signCount: number;
+}) => RTE.ReaderTaskEither<
   { assertionValidationConfig: AssertionValidationConfig },
   IntegrityCheckError,
   void
 > =
   ({
+    clientData,
     hardwareKey,
     hardwareSignature,
     integrityAssertion,
-    jwk,
-    nonce,
     signCount,
   }) =>
   ({ assertionValidationConfig: config }) =>
     pipe(
-      toClientData(nonce, jwk),
-      TE.chainW((clientData) =>
-        pipe(
-          parseIosAssertion({
-            hardwareSignature,
-            integrityAssertion,
-          }),
-          TE.fromEither,
-          TE.chainW((decodedAssertion) =>
-            validateiOSAssertion(
-              decodedAssertion,
-              clientData,
-              hardwareKey,
-              signCount,
-              config.iosBundleIdentifiers,
-              config.iOsTeamIdentifier,
-            ),
-          ),
+      parseIosAssertion({
+        hardwareSignature,
+        integrityAssertion,
+      }),
+      TE.fromEither,
+      TE.chainW((decodedAssertion) =>
+        validateiOSAssertion(
+          decodedAssertion,
+          clientData,
+          hardwareKey,
+          signCount,
+          config.iosBundleIdentifiers,
+          config.iOsTeamIdentifier,
         ),
       ),
       TE.mapLeft((iosErr) => new IntegrityCheckError([iosErr.message])),
@@ -312,12 +308,13 @@ export const verifyIosAssertion: (
 
 export const verifyAndroidAttestation: (
   attestation: NonEmptyString,
+  nonce: NonEmptyString,
 ) => RTE.ReaderTaskEither<
   { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
   Error | IntegrityCheckError,
   { deviceDetails: AndroidDeviceDetails; jwk: JwkPublicKey }
 > =
-  (attestation) =>
+  (attestation, nonce) =>
   ({ androidAttestationValidationConfig: config }) =>
     pipe(
       attestation,
@@ -330,6 +327,7 @@ export const verifyAndroidAttestation: (
           bundleIdentifiers: config.androidBundleIdentifiers,
           googlePublicKeys: config.googlePublicKeys,
           httpRequestTimeout: config.httpRequestTimeout,
+          nonce,
           x509Chain,
         }),
       ),
