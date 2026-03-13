@@ -17,3 +17,13 @@ module "github_repository" {
     environments             = ["prod", "psn-prod"]
   }
 }
+
+resource "github_actions_secret" "slack_webhook_url" {
+  repository      = local.repository.name
+  secret_name     = "SLACK_WEBHOOK_URL"
+  plaintext_value = "PLACEHOLDER"
+
+  lifecycle {
+    ignore_changes = [remote_updated_at]
+  }
+}

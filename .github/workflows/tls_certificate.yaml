@@ -24,6 +24,10 @@ on:
         description: 'Resource Group of the DNS Zone'
         required: true
         type: string
+      GITHUB_EVENT_NAME:
+        description: 'The event name that triggered the caller workflow'
+        required: true
+        type: string
 
 env:
   KEY_VAULT_NAME: ${{ inputs.KEY_VAULT_NAME }}
@@ -46,6 +50,15 @@ jobs:
       KV_CERT_NAME: ${{ steps.should_renew.outputs.KV_CERT_NAME }}
 
     steps:
+      - name: Ensure Slack Webhook is Set
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set. Please set the secret."
+            exit 1
+          fi
+
       - name: Azure Login (PSN)
         uses: azure/login@6b2456866fc08b011acb422a92a4aa20e2c4de32 # v2.1.0
         with:
@@ -81,6 +94,17 @@ jobs:
               fi
               rm -f certificate.pem
             fi
+
+      - name: Notify Slack on failure
+        if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
+        uses: pagopa/dx/.github/actions/slack-notification@main
+        env:
+          CERT_NAME: ${{ steps.calc_cert_name.outputs.kv_cert_name }}
+        with:
+          id: "TLS Certificate Renewal"
+          title: "*TLS Certificate Renewal Failure*"
+          text: "Certificate \"$CERT_NAME\" renewal process failed while checking for the certificate status. Please check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Set renew_certificate
         id: should_renew
@@ -199,3 +223,12 @@ jobs:
         if: always()
         run: |
           rm -f *.pem* *.json *.der *.key *.pfx
+
+      - name: Notify Slack on failure
+        if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
+        uses: pagopa/dx/.github/actions/slack-notification@main
+        with:
+          id: "TLS Certificate Renewal"
+          title: "*TLS Certificate Renewal Failure*"
+          text: "Certificate \"$KV_CERT_NAME\" renewal process failed. Please check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
