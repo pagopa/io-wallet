@@ -10,8 +10,8 @@ import { calculateJwkThumbprint } from "jose";
 
 type ClientDataInput =
   | {
-      attestedKeysThumbprints: readonly string[];
       challenge: NonEmptyString;
+      keysThumbprints: readonly string[];
     }
   | {
       challenge: NonEmptyString;
@@ -47,18 +47,18 @@ export const toKeysThumbprints = (
 export const toClientData = (
   input: ClientDataInput,
 ): TE.TaskEither<Error | ValidationError, string> =>
-  "attestedKeysThumbprints" in input
+  "keysThumbprints" in input
     ? pipe(
-        input.attestedKeysThumbprints,
+        input.keysThumbprints,
         E.fromPredicate(
           (thumbprints) => thumbprints.length > 0,
-          () => new ValidationError(["No attested key thumbprints provided"]),
+          () => new ValidationError(["No key thumbprints provided"]),
         ),
         TE.fromEither,
-        TE.chain((attestedKeysThumbprints) =>
+        TE.chain((keysThumbprints) =>
           serializeClientData({
             challenge: input.challenge,
-            jwk_thumbprints: attestedKeysThumbprints,
+            jwk_thumbprints: keysThumbprints,
           }),
         ),
       )

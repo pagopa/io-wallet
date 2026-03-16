@@ -190,11 +190,11 @@ const validateRequestHardwareAssertion: (input: {
     wuaRequest.keysToAttest.map(({ jwk }) => jwk),
     toKeysThumbprints,
     RTE.fromTaskEither,
-    RTE.chainW((attestedKeysThumbprints) =>
+    RTE.chainW((keysThumbprints) =>
       validateWalletUnitAssertionRequest({
         assertion: {
           ...wuaRequest,
-          attestedKeysThumbprints,
+          keysThumbprints,
         },
         userId,
       }),

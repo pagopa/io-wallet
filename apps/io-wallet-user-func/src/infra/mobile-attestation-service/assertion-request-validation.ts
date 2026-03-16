@@ -20,7 +20,7 @@ import { consumeNonce } from "@/wallet-instance-request";
 export type WalletInstanceAssertion = BaseAssertion;
 
 export interface WalletUnitAssertion extends BaseAssertion {
-  attestedKeysThumbprints: readonly string[];
+  keysThumbprints: readonly string[];
 }
 
 interface BaseAssertion {
@@ -108,8 +108,8 @@ const validateWalletUnitAssertion: (
 > = (assertion, hardwareKey, signCount, user) =>
   pipe(
     {
-      attestedKeysThumbprints: assertion.attestedKeysThumbprints,
       challenge: assertion.nonce,
+      keysThumbprints: assertion.keysThumbprints,
     },
     toClientData,
     RTE.fromTaskEither,
