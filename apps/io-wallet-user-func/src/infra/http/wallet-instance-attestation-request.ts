@@ -4,7 +4,7 @@ import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { Cnf, ECKeyWithKid } from "io-wallet-common/jwk";
+import { ECKey } from "io-wallet-common/jwk";
 
 import { Platform, PlatformFromRequest } from "@/infra/http/platform-codecs";
 import { verifyJwtWithInternalKey } from "@/verifier";
@@ -23,7 +23,9 @@ const AssertionJwtApi = t.type({
     typ: t.literal(headerTyp),
   }),
   payload: t.type({
-    cnf: Cnf,
+    cnf: t.type({
+      jwk: ECKey,
+    }),
     exp: t.number,
     hardware_key_tag: NonEmptyString,
     hardware_signature: NonEmptyString,
@@ -32,7 +34,7 @@ const AssertionJwtApi = t.type({
     iss: NonEmptyString,
     nonce: NonEmptyString,
     platform: PlatformFromRequest,
-    wallet_solution_id: NonEmptyString,
+    wallet_solution_id: t.literal("appio"),
     wallet_solution_version: NonEmptyString,
   }),
 });
@@ -45,7 +47,7 @@ const AssertionJwtDecoded = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKeyWithKid,
+      jwk: ECKey,
     }),
     exp: t.number,
     hardwareKeyTag: NonEmptyString,
@@ -55,7 +57,7 @@ const AssertionJwtDecoded = t.type({
     iss: NonEmptyString,
     nonce: NonEmptyString,
     platform: Platform,
-    walletSolutionId: NonEmptyString,
+    walletSolutionId: t.literal("appio"),
     walletSolutionVersion: NonEmptyString,
   }),
 });
@@ -117,7 +119,7 @@ const verifyAndDecodeWalletInstanceAttestationRequest = (
     walletInstanceAttestationRequest,
     verifyJwtWithInternalKey,
     TE.chainEitherKW(H.parse(AssertionJwt)),
-    TE.chainFirstEitherKW(({ header, payload }) =>
+    TE.chainFirstEitherKW(({ payload }) =>
       pipe(
         payload.iss === payload.hardwareKeyTag
           ? E.right(undefined)
@@ -126,15 +128,6 @@ const verifyAndDecodeWalletInstanceAttestationRequest = (
                 "Invalid jwt: payload.iss must match payload.hardware_key_tag",
               ),
             ),
-        E.chain(() =>
-          payload.cnf.jwk.kid === header.kid
-            ? E.right(undefined)
-            : E.left(
-                new Error(
-                  "Invalid jwt: header.kid must match payload.cnf.jwk.kid",
-                ),
-              ),
-        ),
       ),
     ),
     TE.map(({ payload }) => payload),

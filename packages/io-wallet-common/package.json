@@ -28,7 +28,8 @@
     "@pagopa/logger": "catalog:",
     "@pagopa/ts-commons": "catalog:",
     "fp-ts": "catalog:",
-    "io-ts": "catalog:"
+    "io-ts": "catalog:",
+    "jose": "5.10.0"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^5.1.2",

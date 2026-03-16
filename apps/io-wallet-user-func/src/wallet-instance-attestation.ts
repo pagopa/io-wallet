@@ -3,9 +3,8 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { CertificateRepository } from "./certificates";
 import { FederationEntity } from "./entity-configuration";
-import { Signer } from "./signer";
+import { SignerMetadataEnvironment } from "./infra/signer-metadata";
 import { removeTrailingSlash } from "./url";
 
 export interface WalletInstanceAttestationData {
@@ -13,7 +12,6 @@ export interface WalletInstanceAttestationData {
   kid: string;
   oauthClientSub: string;
   walletProviderName: string;
-  walletSolutionId: string;
   walletSolutionVersion: string;
   x5c: string[];
 }
@@ -44,7 +42,6 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     kid,
     oauthClientSub,
     walletProviderName,
-    walletSolutionId,
     walletSolutionVersion,
     x5c,
   }) => ({
@@ -54,7 +51,7 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     eudi_wallet_info: {
       general_info: {
         wallet_provider_name: removeTrailingSlash(walletProviderName),
-        wallet_solution_id: walletSolutionId,
+        wallet_solution_id: "appio",
         wallet_solution_version: walletSolutionVersion,
       },
     },
@@ -65,10 +62,8 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
   }),
 };
 
-export interface WalletInstanceAttestationEnvironment {
-  certificateRepository: CertificateRepository;
+export interface WalletInstanceAttestationEnvironment extends SignerMetadataEnvironment {
   federationEntity: FederationEntity;
-  signer: Signer;
   walletAttestationConfig: {
     oauthClientSub: string;
   };

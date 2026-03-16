@@ -5,7 +5,7 @@ import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { areJwksEqual, Cnf, ECKeyWithKid } from "io-wallet-common/jwk";
+import { areJwksEqual, ECKey } from "io-wallet-common/jwk";
 
 import { Platform, PlatformFromRequest } from "@/infra/http/platform-codecs";
 import { verifyJwtWithInternalKey } from "@/verifier";
@@ -25,7 +25,9 @@ const AssertionJwtApi = t.type({
     typ: t.literal(headerTyp),
   }),
   payload: t.type({
-    cnf: Cnf,
+    cnf: t.type({
+      jwk: ECKey,
+    }),
     exp: t.number,
     hardware_key_tag: NonEmptyString,
     hardware_signature: NonEmptyString,
@@ -35,14 +37,14 @@ const AssertionJwtApi = t.type({
     keys_to_attest: t.array(NonEmptyString),
     nonce: NonEmptyString,
     platform: PlatformFromRequest,
-    wallet_solution_id: NonEmptyString,
+    wallet_solution_id: t.literal("appio"),
     wallet_solution_version: NonEmptyString,
   }),
 });
 
 const AssertionJwtDecodedPayload = t.type({
   cnf: t.type({
-    jwk: ECKeyWithKid,
+    jwk: ECKey,
   }),
   hardwareKeyTag: NonEmptyString,
   hardwareSignature: NonEmptyString,
@@ -51,7 +53,7 @@ const AssertionJwtDecodedPayload = t.type({
   keysToAttest: t.array(NonEmptyString),
   nonce: NonEmptyString,
   platform: Platform,
-  walletSolutionId: NonEmptyString,
+  walletSolutionId: t.literal("appio"),
   walletSolutionVersion: NonEmptyString,
 });
 
@@ -127,7 +129,7 @@ const KeyAttestationJwtApi = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKeyWithKid,
+      jwk: ECKey,
     }),
     exp: t.number,
     iat: t.number,
@@ -146,7 +148,7 @@ const KeyAttestationJwtDecoded = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKeyWithKid,
+      jwk: ECKey,
     }),
     exp: t.number,
     iat: t.number,
@@ -200,7 +202,7 @@ const AssertionJwtDecodedAndroid = t.type({
   ...AssertionJwtDecodedPayload.props,
   keysToAttest: t.array(
     t.type({
-      jwk: ECKeyWithKid,
+      jwk: ECKey,
       keyAttestation: NonEmptyString,
       kid: NonEmptyString,
     }),
@@ -213,7 +215,7 @@ const AssertionJwtDecodedPayloadIos = t.type({
   ...AssertionJwtDecodedPayload.props,
   keysToAttest: t.array(
     t.type({
-      jwk: ECKeyWithKid,
+      jwk: ECKey,
       kid: NonEmptyString,
     }),
   ),
@@ -237,13 +239,26 @@ type AssertionJwtWithDecodedKeys =
 
 const verifyAssertionJwtProperties = (
   input: AssertionJwtWithDecodedKeys,
-): E.Either<Error, void> =>
-  input.iss === input.hardwareKeyTag &&
-  input.cnf.jwk.kid === input.kid &&
-  input.keysToAttest.length > 0 &&
-  areJwksEqual(input.cnf.jwk, input.keysToAttest[0].jwk)
-    ? E.right(undefined)
-    : E.left(new Error());
+): TE.TaskEither<Error, void> =>
+  pipe(
+    input,
+    E.fromPredicate(
+      (decodedAssertionJwt) =>
+        decodedAssertionJwt.iss === decodedAssertionJwt.hardwareKeyTag &&
+        decodedAssertionJwt.keysToAttest.length > 0,
+      () => new Error(),
+    ),
+    TE.fromEither,
+    TE.chain(() =>
+      TE.tryCatch(
+        () => areJwksEqual(input.cnf.jwk, input.keysToAttest[0].jwk),
+        E.toError,
+      ),
+    ),
+    TE.chain((areEqual) =>
+      areEqual ? TE.right(undefined) : TE.left(new Error()),
+    ),
+  );
 
 const verifyKeyAttestationJwtsProperties = (
   input: AssertionJwtWithDecodedKeys["keysToAttest"],
@@ -375,7 +390,7 @@ const verifyAndDecodeWalletUnitAttestationRequest = (
   pipe(
     walletUnitAttestationRequest,
     verifyAndDecodeAssertionJwt,
-    TE.chainFirstEitherKW(verifyAssertionJwtProperties),
+    TE.chainFirstW(verifyAssertionJwtProperties),
     TE.chainFirstEitherKW(({ keysToAttest }) =>
       verifyKeyAttestationJwtsProperties(keysToAttest),
     ),

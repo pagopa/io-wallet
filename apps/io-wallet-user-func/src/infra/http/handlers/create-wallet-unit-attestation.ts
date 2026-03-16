@@ -2,17 +2,10 @@ import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
-import * as O from "fp-ts/lib/Option";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import {
-  areJwksEqual,
-  ECKey,
-  ECKeyWithKid,
-  JwkPublicKey,
-  validateJwkKid,
-} from "io-wallet-common/jwk";
+import { areJwksEqual, ECKey, JwkPublicKey } from "io-wallet-common/jwk";
 
 import {
   AndroidAttestationValidationConfig,
@@ -22,6 +15,7 @@ import {
 } from "@/infra/mobile-attestation-service";
 import { verifyAndroidAttestation } from "@/infra/mobile-attestation-service";
 import { validateWalletUnitAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
+import { getSignerMetadata } from "@/infra/signer-metadata";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -42,43 +36,25 @@ const getWalletUnitAttestationData =
   ({
     attestedKeys,
     platform,
-    walletSolutionId,
     walletSolutionVersion,
   }: {
     attestedKeys: readonly AttestedKey[];
     platform: WUARequest["platform"];
-    walletSolutionId: NonEmptyString;
     walletSolutionVersion: NonEmptyString;
   }): RTE.ReaderTaskEither<
     WalletUnitAttestationEnvironment,
     Error,
     WalletUnitAttestationData
   > =>
-  ({ certificateRepository, federationEntity: { basePath }, signer }) =>
+  ({ federationEntity: { basePath }, ...signerMetadataEnv }) =>
     pipe(
-      "EC",
-      signer.getFirstPublicKeyByKty,
-      E.chainW(validateJwkKid),
-      TE.fromEither,
-      TE.chain(({ kid }) =>
-        pipe(
-          certificateRepository.getCertificateChainByKid(kid),
-          TE.chain(
-            flow(
-              O.match(
-                () => TE.left(new Error("Certificate chain not found")),
-                (chain) => TE.right({ kid, x5c: chain }),
-              ),
-            ),
-          ),
-        ),
-      ),
+      signerMetadataEnv,
+      getSignerMetadata,
       TE.map(({ kid, x5c }) => ({
         attestedKeys,
         kid,
         platform,
         walletProviderName: basePath.href,
-        walletSolutionId,
         walletSolutionVersion,
         x5c,
       })),
@@ -91,18 +67,20 @@ const verifyAttestedJwkMatchesCnf = ({
   cnfJwk,
 }: {
   attestedJwk: JwkPublicKey;
-  cnfJwk: ECKeyWithKid;
-}): E.Either<IntegrityCheckError, void> =>
+  cnfJwk: ECKey;
+}): TE.TaskEither<IntegrityCheckError, void> =>
   pipe(
     attestedJwk,
     ECKey.decode,
     E.mapLeft(() => new Error()),
-    E.chain((attestedEs256Jwk) =>
-      areJwksEqual(attestedEs256Jwk, cnfJwk)
-        ? E.right(undefined)
-        : E.left(new Error()),
+    TE.fromEither,
+    TE.chain((attestedEs256Jwk) =>
+      TE.tryCatch(() => areJwksEqual(attestedEs256Jwk, cnfJwk), E.toError),
     ),
-    E.mapLeft(() => new IntegrityCheckError(["Invalid key attestation"])),
+    TE.chain((areEqual) =>
+      areEqual ? TE.right(undefined) : TE.left(new Error()),
+    ),
+    TE.mapLeft(() => new IntegrityCheckError(["Invalid key attestation"])),
   );
 
 const generateWalletUnitAttestation: (request: {
@@ -123,7 +101,6 @@ const generateWalletUnitAttestation: (request: {
     RTE.map((attestedKeys) => ({
       attestedKeys,
       platform: wuaRequest.platform,
-      walletSolutionId: wuaRequest.walletSolutionId,
       walletSolutionVersion: wuaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletUnitAttestationData),
@@ -143,11 +120,14 @@ const validateAndroidKeysToAttest: (
     RTE.traverseArray(({ jwk, keyAttestation }) =>
       pipe(
         verifyAndroidAttestation(keyAttestation, nonce),
-        RTE.chainFirstEitherKW(({ jwk: attestedJwk }) =>
-          verifyAttestedJwkMatchesCnf({
-            attestedJwk,
-            cnfJwk: jwk,
-          }),
+        RTE.chainFirstW(({ jwk: attestedJwk }) =>
+          pipe(
+            verifyAttestedJwkMatchesCnf({
+              attestedJwk,
+              cnfJwk: jwk,
+            }),
+            RTE.fromTaskEither,
+          ),
         ),
         RTE.map(({ deviceDetails: { keymasterSecurityLevel }, jwk }) => ({
           jwk,
