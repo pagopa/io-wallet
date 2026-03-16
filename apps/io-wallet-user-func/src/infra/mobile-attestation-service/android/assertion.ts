@@ -59,7 +59,7 @@ export const verifyAssertion = async (
   const errors: string[] = [];
 
   // First check whether the clientData has been signed correctly with the hardware key
-  const signatureValidated = validateAssertionSignature(
+  const signatureValidated = await validateAssertionSignature(
     hardwareKey,
     clientData,
     hardwareSignature,
