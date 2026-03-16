@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.0
+
+### Minor Changes
+
+- ba8ca29: Added /wallet-unit-attestations endpoint
+
 ## 4.2.3
 
 ### Patch Changes
