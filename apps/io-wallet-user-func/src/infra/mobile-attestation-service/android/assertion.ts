@@ -156,11 +156,9 @@ export const validateAssertionSignature = async (
     throw new Error("Invalid Hardware Key format");
   }
   const publicHardwareKeyPem = await exportSPKI(joseHardwareKey);
-
-  const clientDataHash = createHash("sha256").update(clientData).digest();
-
   const verifier = createVerify("SHA256");
-  verifier.update(clientDataHash);
+  verifier.update(clientData);
+
   return verifier.verify(publicHardwareKeyPem, hardwareSignature, "base64");
 };
 
