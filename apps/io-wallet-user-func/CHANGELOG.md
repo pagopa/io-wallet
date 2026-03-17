@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.2
+
+### Patch Changes
+
+- d435a70: Updated Android Key Attestation validation
+
 ## 4.3.1
 
 ### Patch Changes
