@@ -89,7 +89,7 @@ resource "azurerm_storage_blob" "index" {
 
 module "cdn" {
   source  = "pagopa-dx/azure-cdn/azurerm"
-  version = "~> 0.3"
+  version = "~> 0.6"
 
   environment = merge(
     local.environment,
@@ -105,6 +105,10 @@ module "cdn" {
     primary = {
       host_name = azurerm_storage_account.cdn.primary_blob_host
     }
+  }
+
+  origin_health_probe = {
+    path = "/probes/healthcheck.txt"
   }
 
   custom_domains = [
