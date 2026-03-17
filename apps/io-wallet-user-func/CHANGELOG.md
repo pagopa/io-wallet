@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.1
+
+### Patch Changes
+
+- 091a1ec: Updated Android integrity assertion check
+
 ## 4.3.0
 
 ### Minor Changes
