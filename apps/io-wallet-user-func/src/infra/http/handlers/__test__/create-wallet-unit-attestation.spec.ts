@@ -493,13 +493,11 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     }
   });
 
-  it(
-    "should omit kid in attested_keys when cnf.jwk.kid is absent in the request for Android",
-    async () => {
-      const handler = CreateWalletUnitAttestationHandler({
-        androidAttestationValidationConfig,
-        assertionValidationConfig,
-        certificateRepository,
+  it("should omit kid in attested_keys when cnf.jwk.kid is absent in the request for Android", async () => {
+    const handler = CreateWalletUnitAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      certificateRepository,
       federationEntity,
       input: {
         ...H.request("https://wallet-provider.example.org"),
