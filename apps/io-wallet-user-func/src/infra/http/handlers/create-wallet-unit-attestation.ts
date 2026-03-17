@@ -117,20 +117,20 @@ const validateAndroidKeysToAttest: (
 > = (nonce, keysToAttest) =>
   pipe(
     keysToAttest,
-    RTE.traverseArray(({ jwk, keyAttestation }) =>
+    RTE.traverseArray(({ jwk: requestJwk, keyAttestation }) =>
       pipe(
         verifyAndroidAttestation(keyAttestation, nonce),
         RTE.chainFirstW(({ jwk: attestedJwk }) =>
           pipe(
             verifyAttestedJwkMatchesCnf({
               attestedJwk,
-              cnfJwk: jwk,
+              cnfJwk: requestJwk,
             }),
             RTE.fromTaskEither,
           ),
         ),
-        RTE.map(({ deviceDetails: { keymasterSecurityLevel }, jwk }) => ({
-          jwk,
+        RTE.map(({ deviceDetails: { keymasterSecurityLevel } }) => ({
+          jwk: requestJwk,
           keyStorage:
             keymasterSecurityLevel >= 2
               ? "iso_18045_moderate"

@@ -268,7 +268,9 @@ const verifyKeyAttestationJwtsProperties = (
     E.fromPredicate(
       (keysToAttest) =>
         keysToAttest.every(
-          (keyToAttest) => keyToAttest.kid === keyToAttest.jwk.kid,
+          (keyToAttest) =>
+            keyToAttest.jwk.kid === undefined ||
+            keyToAttest.jwk.kid === keyToAttest.kid,
         ),
       () => new Error(),
     ),
