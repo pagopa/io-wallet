@@ -532,12 +532,12 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         );
         const attestedKeys = t
           .array(
-              t.type({
-                crv: t.string,
-                kty: t.string,
-                x: t.string,
-                y: t.string,
-              }),
+            t.type({
+              crv: t.string,
+              kty: t.string,
+              x: t.string,
+              y: t.string,
+            }),
           )
           .decode(walletUnitAttestation.attested_keys);
 
