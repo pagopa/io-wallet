@@ -1,5 +1,35 @@
 # io-wallet-user-func
 
+## 4.3.2
+
+### Patch Changes
+
+- d435a70: Updated Android Key Attestation validation
+
+## 4.3.1
+
+### Patch Changes
+
+- 091a1ec: Updated Android integrity assertion check
+
+## 4.3.0
+
+### Minor Changes
+
+- ba8ca29: Added /wallet-unit-attestations endpoint
+
+## 4.2.3
+
+### Patch Changes
+
+- be03221: Update wallet instance creation revocation flow to call PID Issuer /revokeAll only when at least one previous valid wallet instance is actually revoked
+
+## 4.2.2
+
+### Patch Changes
+
+- beedc34: Removed PID Issuer health-check logic and extended PID Issuer credential revocation flow
+
 ## 4.2.1
 
 ### Patch Changes

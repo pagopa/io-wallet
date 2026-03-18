@@ -41,16 +41,6 @@ module "admins_roles" {
       roles = {
         secrets = "owner"
       }
-    },
-    {
-      name                = data.azurerm_key_vault.certificates.name
-      resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-      has_rbac_support    = false
-      description         = "Allow admins to manage infrastructure-scoped KeyVault"
-      roles = {
-        secrets      = "owner",
-        certificates = "owner"
-      }
     }
   ]
 }
@@ -64,42 +54,3 @@ resource "azurerm_role_assignment" "infra_cd_subscription_rbac_admin" {
   description          = "Allow io-wallet Infra CD identity to manage the wallet DNS zone"
 }
 
-module "key_vault_certificate_infra_ci" {
-  source  = "pagopa-dx/azure-role-assignments/azurerm"
-  version = "~> 1.3"
-
-  principal_id    = data.azurerm_user_assigned_identity.infra_ci_id.principal_id
-  subscription_id = data.azurerm_subscription.current.subscription_id
-
-  key_vault = [{
-    name                = data.azurerm_key_vault.certificates.name
-    resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-    has_rbac_support    = false
-    description         = "It is required so CI workflow can get the certificates stored in the key vault"
-
-    roles = {
-      certificates = "reader"
-      secrets      = "reader"
-    }
-  }]
-}
-
-module "key_vault_certificate_infra_cd" {
-  source  = "pagopa-dx/azure-role-assignments/azurerm"
-  version = "~> 1.3"
-
-  principal_id    = data.azurerm_user_assigned_identity.infra_cd_id.principal_id
-  subscription_id = data.azurerm_subscription.current.subscription_id
-
-  key_vault = [{
-    name                = data.azurerm_key_vault.certificates.name
-    resource_group_name = data.azurerm_key_vault.certificates.resource_group_name
-    has_rbac_support    = false
-    description         = "It is required so CD workflow can manage the certificates stored in the key vault"
-
-    roles = {
-      certificates = "reader"
-      secrets      = "reader"
-    }
-  }]
-}

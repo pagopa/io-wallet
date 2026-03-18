@@ -12,16 +12,14 @@ import { AttestationService, validateAssertion } from "@/attestation-service";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
+import { verifyJwtWithInternalKey } from "@/verifier";
 import {
   createWalletAttestationAsJwt,
   createWalletAttestationAsSdJwt,
   getWalletAttestationData,
 } from "@/wallet-attestation";
 import { createWalletAttestationAsMdoc } from "@/wallet-attestation-mdoc";
-import {
-  verifyAndDecodeWalletAttestationRequest,
-  WalletAttestationRequest,
-} from "@/wallet-attestation-request";
+import { WalletAttestationRequest } from "@/wallet-attestation-request";
 import {
   getValidWalletInstanceByUserId,
   WalletInstanceEnvironment,
@@ -172,7 +170,8 @@ const verifyAssertion = ({
 }) =>
   pipe(
     assertion,
-    verifyAndDecodeWalletAttestationRequest,
+    verifyJwtWithInternalKey,
+    TE.chainEitherKW(H.parse(WalletAttestationRequest)),
     TE.map((validatedAssertion) => ({
       assertion: validatedAssertion,
       userId: fiscalCode,

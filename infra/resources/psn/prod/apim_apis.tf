@@ -402,7 +402,16 @@ resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_a
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/nest_fiscal_code_into_assertion.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "create_wallet_unit_attestation_policy" {
+  api_name            = azurerm_api_management_api.user_ioapp_v1.name
+  operation_id        = "createWalletUnitAttestation"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/nest_fiscal_code_into_assertion.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_policy" {
@@ -465,7 +474,16 @@ resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_a
   resource_group_name = module.apim.resource_group_name
   api_management_name = module.apim.name
 
-  xml_content = file("${path.module}/apim/policies/inject_fiscal_code_into_body.xml")
+  xml_content = file("${path.module}/apim/policies/nest_fiscal_code_into_assertion.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "create_wallet_unit_attestation_uat_policy" {
+  api_name            = azurerm_api_management_api.user_uat_ioapp_v1.name
+  operation_id        = "createWalletUnitAttestation"
+  resource_group_name = module.apim.resource_group_name
+  api_management_name = module.apim.name
+
+  xml_content = file("${path.module}/apim/policies/nest_fiscal_code_into_assertion.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "create_wallet_instance_uat_policy" {

@@ -1,4 +1,4 @@
-import { createHash, createSign, generateKeyPairSync } from "crypto";
+import { createSign, generateKeyPairSync } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import { playintegrity_v1 } from "googleapis";
 import { ECKey } from "io-wallet-common/jwk";
@@ -21,10 +21,8 @@ describe("AndroidAssertionValidation", async () => {
   const hardwareKey = await exportJWK(hardwareKeyPair.publicKey);
 
   const clientData = JSON.stringify({ challenge, jwk: ephemeralKey });
-  const clientDataHash = createHash("SHA256").update(clientData).digest();
-
   const signer = createSign("SHA256");
-  signer.update(clientDataHash);
+  signer.update(clientData);
   const hardwareSignature = signer.sign(hardwareKeyPair.privateKey, "base64");
 
   it("should validate assertion signature", async () => {

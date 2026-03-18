@@ -229,7 +229,6 @@ const validateExtension = async (
     };
   }
 
-  // Check challenge
   const receivedChallenge = Buffer.from(
     keyDescription.attestationChallenge.buffer,
   ).toString("utf-8");
