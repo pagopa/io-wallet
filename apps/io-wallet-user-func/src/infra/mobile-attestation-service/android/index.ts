@@ -12,8 +12,8 @@ import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { getCrlFromUrl } from "@/certificates";
+import { ValidatedAttestation } from "@/infra/mobile-attestation-service";
 
-import { ValidatedAttestation } from "../../mobile-attestation-service";
 import { AndroidAssertionError, AndroidAttestationError } from "../errors";
 import { GoogleAppCredentials, verifyAssertion } from "./assertion";
 import { verifyAttestation } from "./attestation";

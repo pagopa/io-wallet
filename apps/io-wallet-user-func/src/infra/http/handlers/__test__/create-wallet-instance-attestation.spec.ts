@@ -573,7 +573,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     });
   });
 
-  it("should return a 422 HTTP response when payload.cnf.jwk.kid does not match header.kid", async () => {
+  it("should return a 200 HTTP response when payload.cnf.jwk.kid does not match header.kid", async () => {
     const publicEcKeyWithDifferentKid = {
       ...publicEcKey,
       kid: "different-cnf-kid",
@@ -627,14 +627,14 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
+          "Content-Type": "application/json",
         }),
-        statusCode: 422,
+        statusCode: 200,
       }),
     });
   });
 
-  it("should return a 422 HTTP response when payload.cnf.jwk.kid is missing", async () => {
+  it("should return a 200 HTTP response when payload.cnf.jwk.kid is missing", async () => {
     const publicEcKeyWithoutKid = { ...publicEcKey };
     delete (publicEcKeyWithoutKid as { kid?: unknown }).kid;
     const invalidCnfKidWalletAttestationRequest = await new jose.SignJWT({
@@ -686,9 +686,9 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
+          "Content-Type": "application/json",
         }),
-        statusCode: 422,
+        statusCode: 200,
       }),
     });
   });

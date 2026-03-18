@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  areJwksEqual,
   fromBase64ToJwks,
   JwkPrivateKey,
   JwkPublicKey,
@@ -131,5 +132,25 @@ describe("validateJwkKid", () => {
       _tag: "Left",
       left: expect.any(Error),
     });
+  });
+});
+
+describe("areJwksEqual", () => {
+  it("should ignore kid differences when thumbprint matches", () => {
+    expect(
+      areJwksEqual(publicEcKey, {
+        ...publicEcKey,
+        kid: "another-kid",
+      }),
+    ).resolves.toBe(true);
+  });
+
+  it("should return false when the thumbprint changes", () => {
+    expect(
+      areJwksEqual(publicEcKey, {
+        ...publicEcKey,
+        x: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      }),
+    ).resolves.toBe(false);
   });
 });
