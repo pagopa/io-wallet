@@ -1,0 +1,14 @@
+<policies>
+    <inbound>
+        <base />
+        <set-variable name="requestBody" value="@{ return context.Request.Body.As<string>(preserveContent: true); }" />
+        <set-body>@{
+            var assertionString = (string)context.Variables["requestBody"];
+            var fiscalCode = (string)context.Variables["fiscalCode"];
+            var newBody = new Newtonsoft.Json.Linq.JObject();
+            newBody["fiscal_code"] = fiscalCode;
+            newBody["assertion"] = assertionString;
+            return newBody.ToString();
+        }</set-body>
+    </inbound>
+</policies>

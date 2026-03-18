@@ -158,6 +158,24 @@ module "apim" {
   tags = local.tags
 }
 
+module "apim_roles" {
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 1.3"
+
+  principal_id    = module.apim.principal_id
+  subscription_id = data.azurerm_subscription.current.subscription_id
+
+  key_vault = [{
+    name                = module.key_vault_app.key_vault_wallet.name
+    resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
+    description         = "Allow ${module.apim.name} to read secrets on ${module.key_vault_app.key_vault_wallet.name}"
+    has_rbac_support    = true
+    roles = {
+      secrets = "reader"
+    }
+  }]
+}
+
 resource "azurerm_private_dns_a_record" "apim_internal_wallet_io_pagopa_it" {
   provider = azurerm.hub
 

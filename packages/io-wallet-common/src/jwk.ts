@@ -5,6 +5,7 @@ import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
 import * as O from "fp-ts/Option";
 import * as t from "io-ts";
+import { calculateJwkThumbprint } from "jose";
 
 export const ECKey = t.intersection([
   t.type({
@@ -19,18 +20,6 @@ export const ECKey = t.intersection([
 ]);
 
 export type ECKey = t.TypeOf<typeof ECKey>;
-
-export const ES256PublicJwk = t.intersection(
-  [
-    ECKey,
-    t.type({
-      kid: t.string,
-    }),
-  ],
-  "ES256PublicJwk",
-);
-
-export type ES256PublicJwk = t.TypeOf<typeof ES256PublicJwk>;
 
 export const ECPrivateKey = t.intersection([
   ECKey,
@@ -128,3 +117,15 @@ export const validateJwkKid: (
       kid,
     })),
   );
+
+export const areJwksEqual = async (
+  left: ECKey,
+  right: ECKey,
+): Promise<boolean> => {
+  const [leftThumb, rightThumb] = await Promise.all([
+    calculateJwkThumbprint(left, "sha256"),
+    calculateJwkThumbprint(right, "sha256"),
+  ]);
+
+  return leftThumb === rightThumb;
+};
