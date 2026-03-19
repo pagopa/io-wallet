@@ -4,7 +4,9 @@ resource "azurerm_api_management_named_value" "func_support_key" {
   resource_group_name = module.apim.resource_group_name
   display_name        = "SupportDefaultFunctionKey"
   secret              = true
-  value               = azurerm_key_vault_secret.func_support_default_key.value
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.support_fn_default_key.versionless_id
+  }
 }
 
 resource "azurerm_api_management_named_value" "func_user_uat_key" {
@@ -13,7 +15,9 @@ resource "azurerm_api_management_named_value" "func_user_uat_key" {
   resource_group_name = module.apim.resource_group_name
   display_name        = "UserUatDefaultFunctionKey"
   secret              = true
-  value               = azurerm_key_vault_secret.func_user_uat_default_key.value
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_uat_fn_default_key.versionless_id
+  }
 }
 
 resource "azurerm_api_management_named_value" "func_user_ioapp_key" {
@@ -22,7 +26,9 @@ resource "azurerm_api_management_named_value" "func_user_ioapp_key" {
   resource_group_name = module.apim.resource_group_name
   display_name        = "UserIOAppFunctionKey"
   secret              = true
-  value               = data.azurerm_key_vault_secret.function_user_ioapp_key.value
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_ioapp_fn_key.versionless_id
+  }
 }
 
 resource "azurerm_api_management_named_value" "func_user_ioweb_key" {
@@ -31,7 +37,9 @@ resource "azurerm_api_management_named_value" "func_user_ioweb_key" {
   resource_group_name = module.apim.resource_group_name
   display_name        = "UserIOWebFunctionKey"
   secret              = true
-  value               = data.azurerm_key_vault_secret.function_user_ioweb_key.value
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_ioweb_fn_key.versionless_id
+  }
 }
 
 resource "azurerm_api_management_backend" "func_support" {
