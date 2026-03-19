@@ -27,3 +27,13 @@ resource "github_actions_secret" "slack_webhook_url" {
     ignore_changes = [remote_updated_at]
   }
 }
+
+resource "github_repository_environment" "automation_prod_cd" {
+  environment = "automation-prod-cd"
+  repository  = module.github_repository.name
+
+  deployment_branch_policy {
+    protected_branches     = true
+    custom_branch_policies = false
+  }
+}
