@@ -38,6 +38,8 @@ resource "azurerm_key_vault_secret" "user_ioweb_fn_key" {
   key_vault_id     = module.key_vault_app.key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "user_ioapp_fn_key" {
@@ -45,6 +47,8 @@ resource "azurerm_key_vault_secret" "user_ioapp_fn_key" {
   key_vault_id     = module.key_vault_app.key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "user_uat_fn_default_key" {
@@ -52,6 +56,8 @@ resource "azurerm_key_vault_secret" "user_uat_fn_default_key" {
   key_vault_id     = module.key_vault_app.key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "support_fn_default_key" {
@@ -59,6 +65,8 @@ resource "azurerm_key_vault_secret" "support_fn_default_key" {
   key_vault_id     = module.key_vault_app.key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "application_insights_connection_string" {
@@ -66,4 +74,6 @@ resource "azurerm_key_vault_secret" "application_insights_connection_string" {
   key_vault_id     = module.key_vault_app.key_vault_wallet.id
   value_wo         = data.azurerm_application_insights.core.connection_string
   value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
