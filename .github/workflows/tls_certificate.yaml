@@ -28,6 +28,11 @@ on:
         description: 'The event name that triggered the caller workflow'
         required: true
         type: string
+      ENVIRONMENT:
+        description: 'Deployment environment'
+        required: false
+        default: "automation-prod"
+        type: string
 
 env:
   KEY_VAULT_NAME: ${{ inputs.KEY_VAULT_NAME }}
@@ -39,7 +44,7 @@ jobs:
   get-existing-certificate:
     name: Get Existing Certificate
     runs-on: ubuntu-latest
-    environment: infra-prod-cd
+    environment: ${{ inputs.ENVIRONMENT }}-cd
     env:
       ARM_PSN_CLIENT_ID: ${{ secrets.ARM_PSN_CLIENT_ID }}
       ARM_PSN_SUBSCRIPTION_ID: ${{ secrets.ARM_PSN_SUBSCRIPTION_ID}}
@@ -134,7 +139,7 @@ jobs:
     needs: get-existing-certificate
     if: needs.get-existing-certificate.outputs.renew_certificate == 'true'
     runs-on: 'io'
-    environment: infra-prod-cd
+    environment: ${{ inputs.ENVIRONMENT }}-cd
     env:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
