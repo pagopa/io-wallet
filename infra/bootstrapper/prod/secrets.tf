@@ -258,93 +258,93 @@ resource "github_actions_environment_secret" "automation_prod_cd_le_regr" {
 # Federated Identity
 # CI
 resource "azurerm_federated_identity_credential" "github_app_psn_ci" {
-  provider  = azurerm.psn
-  name      = format(local.ids.federated_identity_name, "app", "ci")
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.app_psn_ci.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.app_environment_name, "ci")}"
+  provider                  = azurerm.psn
+  name                      = format(local.ids.federated_identity_name, "app", "ci")
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.app_psn_ci.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.app_environment_name, "ci")}"
 }
 
 resource "azurerm_federated_identity_credential" "github_infra_psn_ci" {
-  provider  = azurerm.psn
-  name      = format(local.ids.federated_identity_name, "infra", "ci")
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.infra_psn_ci.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.infra_environment_name, "ci")}"
+  provider                  = azurerm.psn
+  name                      = format(local.ids.federated_identity_name, "infra", "ci")
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.infra_psn_ci.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.infra_environment_name, "ci")}"
 }
 
 resource "azurerm_federated_identity_credential" "github_infra_ci" {
-  provider  = azurerm.psn
-  name      = "iw-environment-infra-prod-ci"
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.infra_psn_ci.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:infra-prod-ci"
+  provider                  = azurerm.psn
+  name                      = "iw-environment-infra-prod-ci"
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.infra_psn_ci.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:infra-prod-ci"
 }
 
 resource "azurerm_federated_identity_credential" "github_opex_psn_ci" {
-  provider  = azurerm.psn
-  name      = format(local.ids.federated_identity_name, "opex", "ci")
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.opex_psn_ci.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.opex_environment_name, "ci")}"
+  provider                  = azurerm.psn
+  name                      = format(local.ids.federated_identity_name, "opex", "ci")
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.opex_psn_ci.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.opex_environment_name, "ci")}"
 }
 
 # CD
 
 resource "azurerm_federated_identity_credential" "github_app_psn_cd" {
-  provider  = azurerm.psn
-  name      = format(local.ids.federated_identity_name, "app", "cd")
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.app_psn_cd.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.app_environment_name, "cd")}"
+  provider                  = azurerm.psn
+  name                      = format(local.ids.federated_identity_name, "app", "cd")
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.app_psn_cd.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.app_environment_name, "cd")}"
 }
 
 resource "azurerm_federated_identity_credential" "github_infra_psn_cd" {
-  provider  = azurerm.psn
-  name      = format(local.ids.federated_identity_name, "infra", "cd")
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.infra_psn_cd.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.infra_environment_name, "cd")}"
+  provider                  = azurerm.psn
+  name                      = format(local.ids.federated_identity_name, "infra", "cd")
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.infra_psn_cd.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.infra_environment_name, "cd")}"
 }
 
 resource "azurerm_federated_identity_credential" "github_infra_cd" {
-  provider  = azurerm.psn
-  name      = "iw-environment-infra-prod-cd"
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.infra_psn_cd.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:infra-prod-cd"
+  provider                  = azurerm.psn
+  name                      = "iw-environment-infra-prod-cd"
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.infra_psn_cd.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:infra-prod-cd"
 }
 
 resource "azurerm_federated_identity_credential" "github_opex_psn_cd" {
-  provider  = azurerm.psn
-  name      = format(local.ids.federated_identity_name, "opex", "cd")
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.opex_psn_cd.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.opex_environment_name, "cd")}"
+  provider                  = azurerm.psn
+  name                      = format(local.ids.federated_identity_name, "opex", "cd")
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.opex_psn_cd.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.opex_environment_name, "cd")}"
 }
 
 resource "azurerm_federated_identity_credential" "github_automation_prod_cd" {
-  name      = "dx-environment-infra-prod-automation-prod-cd"
-  audience  = ["api://AzureADTokenExchange"]
-  issuer    = "https://token.actions.githubusercontent.com"
-  parent_id = module.repo.identities.infra.cd.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:automation-prod-cd"
+  name                      = "dx-environment-infra-prod-automation-prod-cd"
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = module.repo.identities.infra.cd.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:automation-prod-cd"
 }
 
 resource "azurerm_federated_identity_credential" "github_automation_prod_cd_psn" {
-  provider  = azurerm.psn
-  name      = "iw-environment-infra-psn-automation-prod-cd"
-  audience  = local.ids.audience
-  issuer    = local.ids.issuer
-  parent_id = azurerm_user_assigned_identity.infra_psn_cd.id
-  subject   = "repo:pagopa/${local.repository.name}:environment:automation-prod-cd"
+  provider                  = azurerm.psn
+  name                      = "iw-environment-infra-psn-automation-prod-cd"
+  audience                  = local.ids.audience
+  issuer                    = local.ids.issuer
+  user_assigned_identity_id = azurerm_user_assigned_identity.infra_psn_cd.id
+  subject                   = "repo:pagopa/${local.repository.name}:environment:automation-prod-cd"
 }
 
