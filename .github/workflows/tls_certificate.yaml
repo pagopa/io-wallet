@@ -29,7 +29,7 @@ on:
         required: true
         type: string
       ENVIRONMENT:
-        description: 'Deployment environment'
+        description: 'Deployment environment base name'
         required: false
         default: "automation-prod"
         type: string
