@@ -24,6 +24,7 @@
 | Name | Type |
 |------|------|
 | [github_actions_secret.slack_webhook_url](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/actions_secret) | resource |
+| [github_repository_environment.automation_prod_cd](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_environment) | resource |
 
 ## Inputs
 
