@@ -97,29 +97,49 @@ describe("SetWalletInstanceStatusHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on revokeAllCredentials error", async () => {
+  it("should return a 204 HTTP response and continue processing when revokeAllCredentials fails", async () => {
+    let batchPatchCalled = false;
+    let sendMessageCalled = false;
     const pidIssuerClientThatFailsOnRevoke: CredentialRepository = {
       revokeAllCredentials: () =>
         TE.left(new Error("failed on revokeAllCredentials!")),
     };
+    const walletInstanceRepositoryThatSucceeds: WalletInstanceRepository = {
+      batchPatch: () => {
+        batchPatchCalled = true;
+        return TE.right(undefined);
+      },
+      getByUserId: () => TE.left(new Error("not implemented")),
+      getLastByUserId: () => TE.left(new Error("not implemented")),
+      getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
+      insert: () => TE.left(new Error("not implemented")),
+    };
+    const queueClientThatSucceeds: QueueClient = {
+      sendMessage: () => {
+        sendMessageCalled = true;
+        return Promise.resolve({
+          errorCode: undefined,
+          messageId: "messageId",
+        } as QueueSendMessageResponse);
+      },
+    } as unknown as QueueClient;
     const handler = SetWalletInstanceStatusHandler({
       credentialRepository: pidIssuerClientThatFailsOnRevoke,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
-      queueClient,
-      walletInstanceRepository,
+      queueClient: queueClientThatSucceeds,
+      walletInstanceRepository: walletInstanceRepositoryThatSucceeds,
     });
 
     await expect(handler()).resolves.toEqual({
       _tag: "Right",
       right: expect.objectContaining({
-        headers: expect.objectContaining({
-          "Content-Type": "application/problem+json",
-        }),
-        statusCode: 500,
+        statusCode: 204,
       }),
     });
+    expect(batchPatchCalled).toBe(true);
+    expect(sendMessageCalled).toBe(true);
   });
 
   it("should return a 500 HTTP response on batchPatch error", async () => {

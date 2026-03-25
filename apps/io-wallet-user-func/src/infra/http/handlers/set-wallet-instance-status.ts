@@ -51,9 +51,12 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
       pipe(
         // invoke PID issuer services to revoke all credentials for that user
         revokeAllCredentials(fiscalCode),
+        // If revokeAllCredentials fails, continue revoking the wallet instance.
+        // This avoids blocking wallet revocation on external dependencies.
+        RTE.orElseW(() => RTE.right(undefined)),
         RTE.chainW(() =>
           pipe(
-            // access our database to revoke the wallet instance
+            // access database to revoke the wallet instance
             revokeUserWalletInstances(
               fiscalCode,
               [walletInstanceId],
