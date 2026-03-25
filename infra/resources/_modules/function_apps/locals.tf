@@ -115,7 +115,7 @@ locals {
         CosmosDbEndpoint__accountEndpoint         = var.cosmos_db_endpoint
         CosmosDbDatabaseName                      = var.cosmos_database_name_uat
         CosmosDbRequestTimeout                    = "5000"
-        PidIssuerApiRequestTimeout                = "10000"
+        PidIssuerApiRequestTimeout                = "1000"
         HttpRequestTimeout                        = "5000"
         WalletInstanceStorageAccountUrl           = var.wallet_instance_storage_account_uat_url
         WalletInstanceStorageAccount__accountName = var.wallet_instance_storage_account_uat_name
@@ -157,7 +157,7 @@ locals {
       CosmosDbDatabaseName   = var.cosmos_database_name
       CosmosDbRequestTimeout = "5000"
 
-      PidIssuerApiRequestTimeout = "10000"
+      PidIssuerApiRequestTimeout = "1000"
 
       HttpRequestTimeout = "5000"
     }
