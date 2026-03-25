@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.3
+
+### Patch Changes
+
+- 7240897: Made PID credential revocation non-blocking when updating wallet instance status
+
 ## 4.3.2
 
 ### Patch Changes
