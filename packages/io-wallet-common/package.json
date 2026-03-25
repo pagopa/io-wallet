@@ -32,8 +32,8 @@
     "jose": "5.10.0"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^5.1.2",
-    "eslint": "^9.39.2",
+    "@pagopa/eslint-config": "^6.0.0",
+    "eslint": "^10.1.0",
     "prettier": "^3.8.1",
     "typescript": "5.9.3",
     "vitest": "^3.2.4"
