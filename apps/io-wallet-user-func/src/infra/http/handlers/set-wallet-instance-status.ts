@@ -51,6 +51,23 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
       pipe(
         // invoke PID issuer services to revoke all credentials for that user
         revokeAllCredentials(fiscalCode),
+        // If revokeAllCredentials fails, emit telemetry and continue revoking the wallet instance.
+        // This avoids blocking wallet revocation on external dependencies.
+        RTE.orElseW(
+          flow(
+            sendTelemetryException({
+              fiscalCode,
+              functionName: "setWalletInstanceStatus",
+              pathParameter: req.path,
+              payload: req.body,
+            }),
+            E.fold(
+              () => E.right(undefined),
+              () => E.right(undefined),
+            ),
+            RTE.fromEither,
+          ),
+        ),
         RTE.chainW(() =>
           pipe(
             // access our database to revoke the wallet instance
@@ -60,17 +77,6 @@ export const SetWalletInstanceStatusHandler = H.of((req: H.HttpRequest) =>
               "REVOKED_BY_USER",
             ),
             RTE.chainW(() => sendEmail(fiscalCode)),
-          ),
-        ),
-        RTE.orElseFirstW(
-          flow(
-            sendTelemetryException({
-              fiscalCode,
-              functionName: "setWalletInstanceStatus",
-              pathParameter: req.path,
-              payload: req.body,
-            }),
-            RTE.fromEither,
           ),
         ),
       ),
