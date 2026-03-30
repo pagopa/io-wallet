@@ -196,7 +196,7 @@ paths:
       operationId: createWalletInstanceAttestation
       requestBody:
         content:
-          application/jwt:
+          text/plain:
             schema:
               $ref: "#/components/schemas/CreateWalletInstanceAttestationBody"
       responses:
@@ -225,7 +225,7 @@ paths:
       operationId: createWalletUnitAttestation
       requestBody:
         content:
-          application/jwt:
+          text/plain:
             schema:
               $ref: "#/components/schemas/CreateWalletUnitAttestationBody"
       responses:

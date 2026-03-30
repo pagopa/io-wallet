@@ -212,7 +212,7 @@ paths:
         - $ref: "#/components/parameters/XUserHeader"
       requestBody:
         content:
-          application/jwt:
+          text/plain:
             schema:
               $ref: "#/components/schemas/CreateWalletInstanceAttestationBody"
       responses:
@@ -244,7 +244,7 @@ paths:
         - $ref: "#/components/parameters/XUserHeader"
       requestBody:
         content:
-          application/jwt:
+          text/plain:
             schema:
               $ref: "#/components/schemas/CreateWalletUnitAttestationBody"
       responses:
