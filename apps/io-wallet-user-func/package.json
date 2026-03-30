@@ -22,12 +22,12 @@
     "@azure/identity": "catalog:",
     "@azure/storage-blob": "catalog:",
     "@azure/storage-queue": "catalog:",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/api-logs": "^0.213.0",
-    "@opentelemetry/instrumentation": "^0.213.0",
-    "@opentelemetry/instrumentation-undici": "^0.23.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/api-logs": "^0.214.0",
+    "@opentelemetry/instrumentation": "^0.214.0",
+    "@opentelemetry/instrumentation-undici": "^0.24.0",
     "@opentelemetry/semantic-conventions": "^1.40.0",
-    "@pagopa/azure-tracing": "^0.4.13",
+    "@pagopa/azure-tracing": "^0.4.16",
     "@pagopa/handler-kit": "catalog:",
     "@pagopa/handler-kit-azure-func": "catalog:",
     "@pagopa/io-app-email-templates": "^0.8.0",
@@ -50,18 +50,18 @@
     "jose": "5.10.0",
     "make-fetch-happen": "^15.0.5",
     "pkijs": "^3.4.0",
-    "undici": "^7.24.5"
+    "undici": "^7.24.6"
   },
   "devDependencies": {
-    "@pagopa/eslint-config": "^6.0.0",
+    "@pagopa/eslint-config": "^6.0.1",
     "@types/html-to-text": "9.0.4",
     "@types/make-fetch-happen": "^10.0.4",
-    "@vitest/coverage-v8": "^4.1.1",
+    "@vitest/coverage-v8": "^4.1.2",
     "eslint": "^10.1.0",
     "prettier": "^3.8.1",
     "tsup": "^8.5.1",
     "typescript": "5.9.3",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.2"
   },
   "main": "dist/main.js",
   "files": [

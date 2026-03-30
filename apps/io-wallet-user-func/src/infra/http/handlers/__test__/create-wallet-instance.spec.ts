@@ -349,7 +349,7 @@ describe("CreateWalletInstanceHandler", () => {
       }),
     });
 
-    expect(revokeAllCredentialsSpy).toHaveBeenCalled();
+    expect(revokeAllCredentialsSpy).toHaveBeenCalledWith();
   });
 
   it("should return a 204 HTTP response when revokeAllCredentials fails", async () => {
