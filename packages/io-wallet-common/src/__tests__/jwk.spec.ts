@@ -136,8 +136,8 @@ describe("validateJwkKid", () => {
 });
 
 describe("areJwksEqual", () => {
-  it("should ignore kid differences when thumbprint matches", () => {
-    expect(
+  it("should ignore kid differences when thumbprint matches", async () => {
+    await expect(
       areJwksEqual(publicEcKey, {
         ...publicEcKey,
         kid: "another-kid",
@@ -145,8 +145,8 @@ describe("areJwksEqual", () => {
     ).resolves.toBe(true);
   });
 
-  it("should return false when the thumbprint changes", () => {
-    expect(
+  it("should return false when the thumbprint changes", async () => {
+    await expect(
       areJwksEqual(publicEcKey, {
         ...publicEcKey,
         x: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
