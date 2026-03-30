@@ -6,7 +6,7 @@ evaluation_frequency: 10
 evaluation_time_window: 30
 event_occurrences: 4 # After 5*4=20 min
 data_source: /subscriptions/ec285037-c673-4f58-b594-d7c480da4e8b/resourceGroups/io-p-itn-common-rg-01/providers/Microsoft.Network/applicationGateways/io-p-itn-agw-01
-# action_groups:
+action_groups: []
 #   - /subscriptions/<REPLACE_WITH_PSN_SUBSCRIPTION_ID>/resourceGroups/<REPLACE_WITH_PSN_WALLET_RESOURCE_GROUP>/providers/Microsoft.Insights/actionGroups/iw-p-itn-ag-01
 overrides:
   hosts:
