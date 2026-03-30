@@ -307,7 +307,6 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
-
 components:
   securitySchemes:
     FunctionsKey:
