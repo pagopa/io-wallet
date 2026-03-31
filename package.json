@@ -2,11 +2,11 @@
   "name": "io-wallet",
   "private": true,
   "scripts": {
-    "test": "turbo run test --no-daemon",
-    "format": "turbo run format --no-daemon",
-    "lint": "turbo run lint --no-daemon",
-    "lint:fix": "turbo run lint:fix --no-daemon",
-    "build": "turbo run build --no-daemon",
+    "test": "turbo run test",
+    "format": "turbo run format",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "build": "turbo run build",
     "code-review": "turbo run typecheck lint test",
     "version": "changeset version",
     "release": "changeset tag"
