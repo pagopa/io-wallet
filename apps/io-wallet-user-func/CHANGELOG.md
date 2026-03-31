@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.4
+
+### Patch Changes
+
+- 4e0a4f4: Ignore PID issuer request timeouts during credential revocation
+
 ## 4.3.3
 
 ### Patch Changes
