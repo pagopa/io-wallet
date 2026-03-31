@@ -1,4 +1,5 @@
 /* eslint-disable max-lines-per-function */
+/* eslint-disable vitest/no-conditional-expect */
 import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
@@ -24,7 +25,7 @@ import { describe, expect, it } from "vitest";
 import { AttestationService } from "@/attestation-service";
 import { CertificateRepository } from "@/certificates";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
-import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 

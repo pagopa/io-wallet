@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AttestationService } from "@/attestation-service";
 import { CredentialRepository } from "@/credential";
 import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
-import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
@@ -349,7 +349,7 @@ describe("CreateWalletInstanceHandler", () => {
       }),
     });
 
-    expect(revokeAllCredentialsSpy).toHaveBeenCalled();
+    expect(revokeAllCredentialsSpy).toHaveBeenCalledWith(mockFiscalCode);
   });
 
   it("should return a 204 HTTP response when revokeAllCredentials fails", async () => {
