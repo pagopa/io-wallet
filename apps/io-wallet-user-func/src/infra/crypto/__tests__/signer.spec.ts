@@ -1,3 +1,4 @@
+/* eslint-disable vitest/no-conditional-expect */
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";

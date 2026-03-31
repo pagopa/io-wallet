@@ -1,4 +1,5 @@
 /* eslint-disable max-lines-per-function */
+/* eslint-disable vitest/no-conditional-expect */
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
 import {
@@ -24,7 +25,7 @@ import {
   verifyAndroidAttestation,
   verifyIosAssertion,
 } from "@/infra/mobile-attestation-service";
-import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__test__/config";
+import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 

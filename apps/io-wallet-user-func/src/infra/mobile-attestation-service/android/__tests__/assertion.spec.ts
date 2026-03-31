@@ -1,3 +1,4 @@
+/* eslint-disable vitest/no-conditional-expect */
 import { createSign, generateKeyPairSync } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import { playintegrity_v1 } from "googleapis";
