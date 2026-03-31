@@ -1,6 +1,5 @@
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
-import { ServiceUnavailableError } from "io-wallet-common/error";
 import { Agent, fetch, RequestInit } from "undici";
 
 import { Config, PidIssuerApiClientConfig } from "@/app/config";
@@ -43,33 +42,37 @@ export class PidIssuerClient implements CredentialRepository {
   revokeAllCredentials = (fiscalCode: FiscalCode) =>
     TE.tryCatch(
       async () => {
-        const result = await fetch(new URL("/revokeAll", this.#baseURL), {
-          body: JSON.stringify({
-            // TINIT is the CF international format: TIN (Tax Identification Number) and IT (Italy). It is required by the endpoint
-            unique_id: `TINIT-${fiscalCode}`,
-            wallet_provider: this.#walletProviderEntity,
-          }),
-          method: "POST",
-          signal: AbortSignal.timeout(this.#requestTimeout),
-          ...this.#init,
-        });
-        if (result.status === 404) {
-          // the endpoint returns 404 if the credentials have already been revoked or do not exist
-          // the credentials already revoked => the error is suppressed because our endpoint is idempotent
-          // the credentials do not exist => the error is suppressed because our endpoint returns 204 when attempting to revoke non-existent credentials
-          return undefined;
-        }
-        if (!result.ok) {
-          throw new Error(JSON.stringify(await result.json()));
+        try {
+          const result = await fetch(new URL("/revokeAll", this.#baseURL), {
+            body: JSON.stringify({
+              // TINIT is the CF international format: TIN (Tax Identification Number) and IT (Italy). It is required by the endpoint
+              unique_id: `TINIT-${fiscalCode}`,
+              wallet_provider: this.#walletProviderEntity,
+            }),
+            method: "POST",
+            signal: AbortSignal.timeout(this.#requestTimeout),
+            ...this.#init,
+          });
+          if (result.status === 404) {
+            // the endpoint returns 404 if the credentials have already been revoked or do not exist
+            // the credentials already revoked => the error is suppressed because our endpoint is idempotent
+            // the credentials do not exist => the error is suppressed because our endpoint returns 204 when attempting to revoke non-existent credentials
+            return undefined;
+          }
+          if (!result.ok) {
+            throw new Error(JSON.stringify(await result.json()));
+          }
+        } catch (error) {
+          // Treat request timeouts as success (no left value returned)
+          if (error instanceof Error && error.name === "TimeoutError") {
+            return undefined;
+          }
+          throw error;
         }
       },
       (error) =>
-        error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(
-              `The request to the PID issuer has timed out: ${error.message}`,
-            )
-          : new Error(
-              `Error occurred while making a request to the PID issuer: ${error}`,
-            ),
+        new Error(
+          `Error occurred while making a request to the PID issuer: ${error}`,
+        ),
     );
 }
