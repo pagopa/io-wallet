@@ -103,12 +103,10 @@ jobs:
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
         uses: pagopa/dx/.github/actions/slack-notification@main
-        env:
-          CERT_NAME: ${{ steps.calc_cert_name.outputs.kv_cert_name }}
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
-          text: "Certificate \"$CERT_NAME\" renewal process failed while checking for the certificate status. Please check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+          text: "Certificate '${{ steps.calc_cert_name.outputs.kv_cert_name }}' renewal process failed while checking for the certificate status. Please check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Set renew_certificate
@@ -235,5 +233,5 @@ jobs:
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
-          text: "Certificate \"$KV_CERT_NAME\" renewal process failed. Please check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+          text: "Certificate '${{ env.KV_CERT_NAME }}' renewal process failed. Please check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
