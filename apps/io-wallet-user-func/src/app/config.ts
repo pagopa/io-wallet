@@ -160,7 +160,8 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 >;
 
 const FederationEntityConfig = t.type({
-  basePath: UrlFromString,
+  basePathV10: UrlFromString,
+  basePathV13: UrlFromString,
   contacts: t.array(EmailString),
   homepageUri: UrlFromString,
   jwtSigningConfig: CryptoConfiguration,
@@ -215,7 +216,8 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
   EntityConfigurationConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    basePath: readFromEnvironment("FederationEntityBasePath"),
+    basePathV10: readFromEnvironment("FederationEntityBasePathV10"),
+    basePathV13: readFromEnvironment("FederationEntityBasePathV13"),
     contacts: pipe(
       readFromEnvironment("FederationEntityContacts"),
       RE.map((urls) => urls.split(",")),

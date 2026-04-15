@@ -103,7 +103,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.entityConfiguration.federationEntity.basePath.href,
+  config.entityConfiguration.federationEntity.basePathV10.href,
 );
 
 const mobileAttestationService = new MobileAttestationService(
@@ -145,7 +145,7 @@ const containerClient = blobServiceClient.getContainerClient(
 
 const certificateRepository = new CosmosDbCertificateRepository(database);
 
-const certificateIssuerAndSubject = `C=${config.walletProvider.certificate.country}, ST=${config.walletProvider.certificate.state}, L=${config.walletProvider.certificate.locality}, O=${config.entityConfiguration.federationEntity.organizationName}, CN=${config.entityConfiguration.federationEntity.basePath.hostname}`;
+const certificateIssuerAndSubject = `C=${config.walletProvider.certificate.country}, ST=${config.walletProvider.certificate.state}, L=${config.walletProvider.certificate.locality}, O=${config.entityConfiguration.federationEntity.organizationName}, CN=${config.entityConfiguration.federationEntity.basePathV10.hostname}`;
 
 app.http("healthCheck", {
   authLevel: "anonymous",

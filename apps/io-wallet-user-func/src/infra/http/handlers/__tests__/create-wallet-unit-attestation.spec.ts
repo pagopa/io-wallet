@@ -61,7 +61,8 @@ const email = flow(
 );
 
 const federationEntity = {
-  basePath: url("https://wallet-provider.example.org/foo/"),
+  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
+  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
   contacts: [email("foo@pec.bar.it")],
   homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
   logoUri: url("https://wallet-provider.example.org/logo.svg"),
@@ -407,7 +408,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(3);
+    expect.assertions(4);
 
     if (E.isRight(result)) {
       const body = t
@@ -421,6 +422,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       if (E.isRight(body)) {
         const walletUnitAttestation = jose.decodeJwt(
           body.right.wallet_unit_attestation,
+        );
+        expect(walletUnitAttestation.iss).toBe(
+          "https://wallet-provider-v13.example.org/bar",
         );
         const attestedKeys = t
           .array(

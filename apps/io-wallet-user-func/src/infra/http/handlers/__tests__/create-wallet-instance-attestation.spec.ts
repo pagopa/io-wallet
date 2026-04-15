@@ -59,7 +59,8 @@ const email = flow(
 );
 
 const federationEntity = {
-  basePath: url("https://wallet-provider.example.org/foo/"),
+  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
+  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
   contacts: [email("foo@pec.bar.it")],
   homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
   logoUri: url("https://wallet-provider.example.org/logo.svg"),
@@ -258,7 +259,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(6);
+    expect.assertions(7);
 
     if (E.isRight(result)) {
       const body = t
@@ -290,6 +291,9 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
             walletInstanceAttPayload.iss,
           );
         }
+        expect(walletInstanceAttPayload.iss).toBe(
+          "https://wallet-provider-v13.example.org/bar",
+        );
         // check trailing slashes are removed
         expect((walletInstanceAttPayload.iss || "").endsWith("/")).toBe(false);
         expect((walletInstanceAttPayload.sub || "").endsWith("/")).toBe(false);

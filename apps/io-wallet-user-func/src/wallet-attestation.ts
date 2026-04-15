@@ -47,7 +47,7 @@ export const getWalletAttestationData =
     WalletAttestationData
   > =>
   ({
-    federationEntity: { basePath },
+    federationEntity: { basePathV10: basePath },
     signer,
     walletAttestationConfig: { walletLink, walletName },
   }) =>

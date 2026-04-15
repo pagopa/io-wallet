@@ -52,7 +52,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   certificateRepository,
   entityConfiguration: {
     authorityHints,
-    federationEntity: { basePath, ...federationEntityMetadata },
+    federationEntity: { basePathV10: basePath, ...federationEntityMetadata },
   },
   entityConfigurationSigner,
   walletAttestationSigner,
