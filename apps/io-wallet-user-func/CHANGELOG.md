@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.5
+
+### Patch Changes
+
+- 051eb92: Add support for separate federation entity base path settings for spec 1.0 (Wallet Attestation) and 1.3 (Wallet Instance Attestation and Wallet Unit Attestation).
+
 ## 4.3.4
 
 ### Patch Changes
