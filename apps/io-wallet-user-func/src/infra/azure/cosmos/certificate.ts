@@ -16,8 +16,8 @@ const CertificateSchema = t.type({
 export class CosmosDbCertificateRepository implements CertificateRepository {
   #container: Container;
 
-  constructor(db: Database) {
-    this.#container = db.container("certificates");
+  constructor(db: Database, containerName = "certificates") {
+    this.#container = db.container(containerName);
   }
 
   getCertificateChainByKid(kid: string) {

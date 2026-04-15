@@ -64,6 +64,14 @@ locals {
       default_ttl = null
     },
     {
+      name               = "certificates-v-1.3"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.uat.certificates
+      }
+      default_ttl = null
+    },
+    {
       name               = "whitelisted-fiscal-codes"
       partition_key_path = "/id"
       autoscale_settings = {
