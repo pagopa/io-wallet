@@ -46,7 +46,7 @@ const getWalletUnitAttestationData =
     Error,
     WalletUnitAttestationData
   > =>
-  ({ federationEntity: { basePath }, ...signerMetadataEnv }) =>
+  ({ federationEntity: { basePathV13: basePath }, ...signerMetadataEnv }) =>
     pipe(
       signerMetadataEnv,
       getSignerMetadata,
