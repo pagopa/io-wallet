@@ -145,6 +145,11 @@ const containerClient = blobServiceClient.getContainerClient(
 
 const certificateRepository = new CosmosDbCertificateRepository(database);
 
+const certificateV13Repository = new CosmosDbCertificateRepository(
+  database,
+  "certificates-v-1.3",
+);
+
 const certificateIssuerAndSubject = `C=${config.walletProvider.certificate.country}, ST=${config.walletProvider.certificate.state}, L=${config.walletProvider.certificate.locality}, O=${config.entityConfiguration.federationEntity.organizationName}, CN=${config.entityConfiguration.federationEntity.basePathV10.hostname}`;
 
 app.http("healthCheck", {
@@ -300,7 +305,7 @@ app.http("createWalletInstanceAttestation", {
   authLevel: "function",
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
-    certificateRepository,
+    certificateRepository: certificateV13Repository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
     signer: walletAttestationSigner,
@@ -318,7 +323,7 @@ app.http("createWalletUnitAttestation", {
   handler: CreateWalletUnitAttestationFunction({
     androidAttestationValidationConfig,
     assertionValidationConfig,
-    certificateRepository,
+    certificateRepository: certificateV13Repository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
     signer: walletAttestationSigner,
