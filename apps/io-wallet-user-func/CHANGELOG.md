@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.8
+
+### Patch Changes
+
+- ad51f83: Wallet Instance Attestation: sub is now set to the SHA-256 thumbprint of the Wallet App Attestation JWK (wallet instance identifier)
+
 ## 4.3.7
 
 ### Patch Changes
