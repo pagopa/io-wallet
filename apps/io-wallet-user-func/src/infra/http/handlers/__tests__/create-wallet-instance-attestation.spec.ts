@@ -278,7 +278,15 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         const walletInstanceAttPayload = jose.decodeJwt(walletInstanceAtt);
         expect(Object.keys(walletInstanceAttPayload).sort()).toEqual(
           // ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
-          ["cnf", "exp", "iat", "iss", "sub"].sort(),
+          [
+            "cnf",
+            "exp",
+            "iat",
+            "iss",
+            "sub",
+            "wallet_link",
+            "wallet_name",
+          ].sort(),
         );
         // const eudiWalletInfo = t
         //   .type({

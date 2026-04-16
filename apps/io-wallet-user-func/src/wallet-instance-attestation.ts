@@ -19,7 +19,7 @@ export interface WalletInstanceAttestationData {
 interface WalletInstanceAttestationJwtModel {
   cnf: {
     jwk: JwkPublicKey & {
-      alg: string;
+      alg: "ES256";
     };
   };
   // eudi_wallet_info: {
@@ -32,6 +32,8 @@ interface WalletInstanceAttestationJwtModel {
   iss: string;
   kid: string;
   sub: string;
+  wallet_link: string;
+  wallet_name: string;
   x5c: string[];
 }
 
@@ -63,6 +65,8 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     iss: removeTrailingSlash(walletProviderName),
     kid,
     sub: removeTrailingSlash(oauthClientSub),
+    wallet_link: "https://ioapp.it/",
+    wallet_name: "App IO",
     x5c,
   }),
 };

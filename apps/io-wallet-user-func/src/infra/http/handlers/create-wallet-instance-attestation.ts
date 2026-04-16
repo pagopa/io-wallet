@@ -1,5 +1,5 @@
 import * as H from "@pagopa/handler-kit";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
@@ -28,7 +28,7 @@ const getWalletInstanceAttestationData =
     cnf: {
       jwk: WIARequest["cnf"]["jwk"];
     };
-    walletSolutionVersion: NonEmptyString;
+    // walletSolutionVersion: NonEmptyString;
   }): RTE.ReaderTaskEither<
     WalletInstanceAttestationEnvironment,
     Error,
@@ -47,7 +47,7 @@ const getWalletInstanceAttestationData =
         kid,
         oauthClientSub,
         walletProviderName: basePath.href,
-        walletSolutionVersion: input.walletSolutionVersion,
+        // walletSolutionVersion: input.walletSolutionVersion,
         x5c,
       })),
     );
@@ -74,7 +74,7 @@ const generateWalletInstanceAttestation: (request: {
     }),
     RTE.map(() => ({
       cnf: wiaRequest.cnf,
-      walletSolutionVersion: wiaRequest.walletSolutionVersion,
+      // walletSolutionVersion: wiaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletInstanceAttestationData),
     RTE.chainW(createWalletInstanceAttestation),
