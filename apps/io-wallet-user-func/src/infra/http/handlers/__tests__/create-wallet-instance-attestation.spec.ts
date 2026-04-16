@@ -280,13 +280,13 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
           // ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
           ["cnf", "exp", "iat", "iss", "sub"].sort(),
         );
-        const eudiWalletInfo = t
-          .type({
-            general_info: t.type({
-              wallet_provider_name: t.string,
-            }),
-          })
-          .decode(walletInstanceAttPayload.eudi_wallet_info);
+        // const eudiWalletInfo = t
+        //   .type({
+        //     general_info: t.type({
+        //       wallet_provider_name: t.string,
+        //     }),
+        //   })
+        //   .decode(walletInstanceAttPayload.eudi_wallet_info);
         // expect(E.isRight(eudiWalletInfo)).toBe(true);
         // if (E.isRight(eudiWalletInfo)) {
         //   expect(eudiWalletInfo.right.general_info.wallet_provider_name).toBe(
