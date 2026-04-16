@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.6
+
+### Patch Changes
+
+- ca1b779: Route Wallet Instance/Unit Attestation to new certificates-v-1.3 Cosmos container
+
 ## 4.3.5
 
 ### Patch Changes
