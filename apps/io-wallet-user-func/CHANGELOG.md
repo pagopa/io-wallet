@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.3.7
+
+### Patch Changes
+
+- 0cf2816: Updated wallet instance and unit attestation payloads: removed eudi_wallet_info, added alg to cnf.jwk, and included status in wallet unit attestation.
+
 ## 4.3.6
 
 ### Patch Changes
