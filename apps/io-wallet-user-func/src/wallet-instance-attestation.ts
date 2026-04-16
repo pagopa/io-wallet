@@ -10,7 +10,8 @@ import { removeTrailingSlash } from "./url";
 export interface WalletInstanceAttestationData {
   jwk: JwkPublicKey;
   kid: string;
-  oauthClientSub: string;
+  // oauthClientSub: string;
+  sub: string;
   walletProviderName: string;
   // walletSolutionVersion: string;
   x5c: string[];
@@ -44,7 +45,8 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
   encode: ({
     jwk,
     kid,
-    oauthClientSub,
+    // oauthClientSub,
+    sub,
     walletProviderName,
     // walletSolutionVersion,
     x5c,
@@ -64,7 +66,8 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     // },
     iss: removeTrailingSlash(walletProviderName),
     kid,
-    sub: removeTrailingSlash(oauthClientSub),
+    sub,
+    // sub: removeTrailingSlash(oauthClientSub),
     wallet_link: "https://ioapp.it/",
     wallet_name: "App IO",
     x5c,
