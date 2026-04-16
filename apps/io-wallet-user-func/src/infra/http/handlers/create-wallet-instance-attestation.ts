@@ -6,6 +6,7 @@ import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
+import { toThumbprint } from "@/infra/mobile-attestation-service";
 import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { getSignerMetadata } from "@/infra/signer-metadata";
 import { NonceEnvironment } from "@/nonce";
@@ -36,16 +37,17 @@ const getWalletInstanceAttestationData =
   > =>
   ({
     federationEntity: { basePathV13: basePath },
-    walletAttestationConfig: { oauthClientSub },
+    // walletAttestationConfig: { oauthClientSub },
     ...signerMetadataEnv
   }) =>
     pipe(
-      signerMetadataEnv,
-      getSignerMetadata,
-      TE.map(({ kid, x5c }) => ({
+      TE.Do,
+      TE.bindW("sub", () => toThumbprint(input.cnf.jwk)),
+      TE.bindW("signerMetadata", () => getSignerMetadata(signerMetadataEnv)),
+      TE.map(({ signerMetadata: { kid, x5c }, sub }) => ({
         jwk: input.cnf.jwk,
         kid,
-        oauthClientSub,
+        sub,
         walletProviderName: basePath.href,
         // walletSolutionVersion: input.walletSolutionVersion,
         x5c,
