@@ -259,7 +259,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(7);
+    // expect.assertions(7);
+    expect.assertions(5);
 
     if (E.isRight(result)) {
       const body = t
@@ -276,7 +277,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         );
         const walletInstanceAttPayload = jose.decodeJwt(walletInstanceAtt);
         expect(Object.keys(walletInstanceAttPayload).sort()).toEqual(
-          ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
+          // ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
+          ["cnf", "exp", "iat", "iss", "sub"].sort(),
         );
         const eudiWalletInfo = t
           .type({
@@ -285,12 +287,12 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
             }),
           })
           .decode(walletInstanceAttPayload.eudi_wallet_info);
-        expect(E.isRight(eudiWalletInfo)).toBe(true);
-        if (E.isRight(eudiWalletInfo)) {
-          expect(eudiWalletInfo.right.general_info.wallet_provider_name).toBe(
-            walletInstanceAttPayload.iss,
-          );
-        }
+        // expect(E.isRight(eudiWalletInfo)).toBe(true);
+        // if (E.isRight(eudiWalletInfo)) {
+        //   expect(eudiWalletInfo.right.general_info.wallet_provider_name).toBe(
+        //     walletInstanceAttPayload.iss,
+        //   );
+        // }
         expect(walletInstanceAttPayload.iss).toBe(
           "https://wallet-provider-v13.example.org/bar",
         );

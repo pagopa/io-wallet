@@ -19,26 +19,32 @@ export interface WalletUnitAttestationData {
   kid: string;
   platform: "android" | "ios";
   walletProviderName: string;
-  walletSolutionVersion: string;
+  // walletSolutionVersion: string;
   x5c: string[];
 }
 
 interface WalletUnitAttestationJwtModel {
   attested_keys: JwkPublicKey[];
-  eudi_wallet_info: {
-    general_info: {
-      wallet_provider_name: string;
-      wallet_solution_id: string;
-      wallet_solution_version: string;
-    };
-    key_storage_info: {
-      keys_exportable: boolean;
-      storage_type: string;
-    };
-  };
+  // eudi_wallet_info: {
+  //   general_info: {
+  //     wallet_provider_name: string;
+  //     wallet_solution_id: string;
+  //     wallet_solution_version: string;
+  //   };
+  //   key_storage_info: {
+  //     keys_exportable: boolean;
+  //     storage_type: string;
+  //   };
+  // };
   iss: string;
   key_storage: ("iso_18045_enhanced-basic" | "iso_18045_moderate")[];
   kid: string;
+  status: {
+    status_list: {
+      idx: number;
+      uri: string;
+    };
+  };
   user_authentication: string[];
   x5c: string[];
 }
@@ -51,24 +57,30 @@ const WalletUnitAttestationToJwtModel: E.Encoder<
     attestedKeys,
     kid,
     walletProviderName,
-    walletSolutionVersion,
+    // walletSolutionVersion,
     x5c,
   }) => ({
     attested_keys: attestedKeys.map(({ jwk }) => jwk),
-    eudi_wallet_info: {
-      general_info: {
-        wallet_provider_name: removeTrailingSlash(walletProviderName),
-        wallet_solution_id: "appio",
-        wallet_solution_version: walletSolutionVersion,
-      },
-      key_storage_info: {
-        keys_exportable: false,
-        storage_type: "LOCAL_NATIVE",
-      },
-    },
+    // eudi_wallet_info: {
+    //   general_info: {
+    //     wallet_provider_name: removeTrailingSlash(walletProviderName),
+    //     wallet_solution_id: "appio",
+    //     wallet_solution_version: walletSolutionVersion,
+    //   },
+    //   key_storage_info: {
+    //     keys_exportable: false,
+    //     storage_type: "LOCAL_NATIVE",
+    //   },
+    // },
     iss: removeTrailingSlash(walletProviderName),
     key_storage: attestedKeys.map(({ keyStorage }) => keyStorage),
     kid,
+    status: {
+      status_list: {
+        idx: 412,
+        uri: "https://revocation_url/statuslists/1",
+      },
+    },
     user_authentication: attestedKeys.map(
       ({ userAuthentication }) => userAuthentication,
     ),
