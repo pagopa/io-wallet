@@ -3,6 +3,7 @@ import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as A from "fp-ts/Array";
+import * as E from "fp-ts/Either";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
@@ -16,6 +17,10 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
+import {
+  getSlackConfigFromEnvironment,
+  SlackConfig,
+} from "io-wallet-common/infra/slack/config";
 import { fromBase64ToJwks, JwkPrivateKey } from "io-wallet-common/jwk";
 
 export const APPLE_APP_ATTESTATION_ROOT_CA =
@@ -130,7 +135,16 @@ const AzureFrontDoorConfig = t.type({
 
 type AzureFrontDoorConfig = t.TypeOf<typeof AzureFrontDoorConfig>;
 
+const AzureApplicationInsightsConfig = t.type({
+  resourceId: NonEmptyString,
+});
+
+type AzureApplicationInsightsConfig = t.TypeOf<
+  typeof AzureApplicationInsightsConfig
+>;
+
 const AzureConfig = t.type({
+  applicationInsights: AzureApplicationInsightsConfig,
   cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
@@ -138,6 +152,29 @@ const AzureConfig = t.type({
 });
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
+
+const StatusListAllocationConfig = t.type({
+  blockSize: t.number,
+});
+
+type StatusListAllocationConfig = t.TypeOf<typeof StatusListAllocationConfig>;
+
+const StatusListManagerConfig = t.type({
+  minimumAllocationConflictsForScaleUp: t.number,
+  minimumRemainingTotalCapacity: t.number,
+});
+
+type StatusListManagerConfig = t.TypeOf<typeof StatusListManagerConfig>;
+
+const StatusListConfig = t.type({
+  allocation: StatusListAllocationConfig,
+  capacityBits: t.number,
+  manager: StatusListManagerConfig,
+  pageBitsSize: t.number,
+  pageCount: t.number,
+});
+
+type StatusListConfig = t.TypeOf<typeof StatusListConfig>;
 
 const AuthProfileApiConfig = t.type({
   apiKey: t.string,
@@ -205,6 +242,8 @@ export const Config = t.type({
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
+  slack: SlackConfig,
+  statusList: StatusListConfig,
   walletProvider: WalletProviderConfig,
 });
 
@@ -389,6 +428,18 @@ const getAzureFrontDoorConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(parse(AzureFrontDoorConfig)),
 );
 
+const getAzureApplicationInsightsConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureApplicationInsightsConfig
+> = pipe(
+  readFromEnvironment("ApplicationInsightsResourceId"),
+  RE.chainEitherKW(parse(NonEmptyString)),
+  RE.map((resourceId) => ({
+    resourceId,
+  })),
+);
+
 const getAzureGenericConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -406,11 +457,96 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   Error,
   AzureConfig
 > = sequenceS(RE.Apply)({
+  applicationInsights: getAzureApplicationInsightsConfigFromEnvironment,
   cosmos: getAzureCosmosConfigFromEnvironment,
   frontDoor: getAzureFrontDoorConfigFromEnvironment,
   generic: getAzureGenericConfigFromEnvironment,
   storage: getAzureStorageConfigFromEnvironment,
 });
+
+const getStatusListManagerConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListManagerConfig
+> = sequenceS(RE.Apply)({
+  minimumAllocationConflictsForScaleUp: pipe(
+    readFromEnvironment("StatusListsMinimumAllocationConflictsForScaleUp"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+  minimumRemainingTotalCapacity: pipe(
+    readFromEnvironment("StatusListsMinimumRemainingTotalCapacity"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+});
+
+const getStatusListAllocationConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListAllocationConfig
+> = sequenceS(RE.Apply)({
+  blockSize: pipe(
+    readFromEnvironment("StatusListsIndexReservationSize"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+});
+
+const getStatusListConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    allocation: getStatusListAllocationConfigFromEnvironment,
+    capacityBits: pipe(
+      readFromEnvironment("StatusListCapacityBits"),
+      RE.chainW(stringToNumberDecoderRE),
+    ),
+    manager: getStatusListManagerConfigFromEnvironment,
+    pageCount: pipe(
+      readFromEnvironment("StatusListPageCount"),
+      RE.chainW(stringToNumberDecoderRE),
+    ),
+  }),
+  RE.chainEitherKW(({ capacityBits, pageCount, ...statusListConfig }) =>
+    pipe(
+      pageCount,
+      E.fromPredicate(
+        (value) => value > 0,
+        () => new Error("StatusListPageCount must be greater than zero"),
+      ),
+      E.chain((validPageCount) =>
+        pipe(
+          capacityBits,
+          E.fromPredicate(
+            (value) => value % validPageCount === 0,
+            () =>
+              new Error(
+                "StatusListCapacityBits must be divisible by StatusListPageCount",
+              ),
+          ),
+          E.chain((validCapacityBits) =>
+            pipe(
+              validCapacityBits / validPageCount,
+              E.fromPredicate(
+                (value) => value % 8 === 0,
+                () =>
+                  new Error(
+                    "StatusListCapacityBits / StatusListPageCount must be divisible by 8",
+                  ),
+              ),
+              E.map((validPageBitsSize) => ({
+                ...statusListConfig,
+                capacityBits: validCapacityBits,
+                pageBitsSize: validPageBitsSize,
+                pageCount: validPageCount,
+              })),
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
+);
 
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -537,6 +673,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     ),
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
+    slack: getSlackConfigFromEnvironment,
+    statusList: getStatusListConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
   }),
   RE.map(

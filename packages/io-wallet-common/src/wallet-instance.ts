@@ -17,6 +17,11 @@ const WalletInstanceBase = t.type({
   userId: FiscalCode,
 });
 
+const WalletInstanceStatus = t.type({
+  index: t.number,
+  statusListId: NonEmptyString,
+});
+
 export const WalletInstanceValid = t.intersection([
   WalletInstanceBase,
   t.type({
@@ -24,6 +29,7 @@ export const WalletInstanceValid = t.intersection([
   }),
   t.partial({
     deviceDetails: DeviceDetails,
+    status: WalletInstanceStatus,
   }),
 ]);
 
@@ -48,6 +54,7 @@ const WalletInstanceRevoked = t.intersection([
   t.partial({
     deviceDetails: DeviceDetailsStringOsPatchLevel,
     revocationReason: RevocationReason,
+    status: WalletInstanceStatus,
   }),
 ]);
 

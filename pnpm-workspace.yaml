@@ -14,11 +14,10 @@ catalog:
   '@pagopa/ts-commons': ^13.1.2
   fp-ts: ^2.16.11
   io-ts: ^2.2.22
-
-linkWorkspacePackages: true
-packageImportMethod: "clone-or-copy"
 cleanupUnusedCatalogs: true
 injectWorkspacePackages: true
+
+linkWorkspacePackages: true
 
 onlyBuiltDependencies:
   - azure-functions-core-tools
@@ -30,3 +29,4 @@ packageExtensions:
   '@azure/functions-opentelemetry-instrumentation':
     dependencies:
       '@opentelemetry/api-logs': 0.52.1
+packageImportMethod: "clone-or-copy"
