@@ -34,7 +34,7 @@
     "fp-ts": "catalog:",
     "io-ts": "catalog:",
     "io-wallet-common": "workspace:^",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "main": "dist/main.js",
   "files": [
