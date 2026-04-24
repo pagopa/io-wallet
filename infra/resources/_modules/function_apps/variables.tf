@@ -198,3 +198,8 @@ variable "wallet_instance_storage_account_uat_name" {
   type        = string
   description = "The name of the Wallet Instance Storage Account UAT"
 }
+
+variable "federation_entity_base_path_v13_uat" {
+  type        = string
+  description = "The Federation Entity base path for spec 1.3 in the UAT user function app"
+}

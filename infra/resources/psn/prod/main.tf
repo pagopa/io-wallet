@@ -195,6 +195,11 @@ module "function_apps" {
 
   wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
   wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
+  federation_entity_base_path_v13_uat      = format(
+    "%s/%s/",
+    trimsuffix(module.storage_accounts.trust_uat.primary_blob_endpoint, "/"),
+    module.storage_accounts.trust_uat_wallet_provider_container.name,
+  )
 
   tags = local.tags
 }
@@ -291,6 +296,11 @@ module "iam" {
   storage_account_uat = {
     name                = module.storage_accounts.wallet_uat.name
     resource_group_name = module.storage_accounts.wallet_uat.resource_group_name
+  }
+
+  trust_storage_account_uat = {
+    name                = module.storage_accounts.trust_uat.name
+    resource_group_name = module.storage_accounts.trust_uat.resource_group_name
   }
 
   appgw_identity_principal_id = data.azurerm_user_assigned_identity.app_gw.principal_id

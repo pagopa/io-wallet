@@ -17,7 +17,7 @@ resource "azurerm_api_management_backend" "wallet_user_uat_psn" {
 }
 
 locals {
-  wallet_authentication_fragment_name = "ioapp-authenticated"
+  wallet_authentication_fragment_name = "ioapp-authenticated-cache"
 }
 
 resource "azurerm_api_management_product" "wallet" {

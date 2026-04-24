@@ -17,7 +17,8 @@ export const FederationEntityMetadata = t.type({
 
 const FederationEntity = t.intersection([
   t.type({
-    basePath: UrlFromString,
+    basePathV10: UrlFromString,
+    basePathV13: UrlFromString,
   }),
   FederationEntityMetadata,
 ]);

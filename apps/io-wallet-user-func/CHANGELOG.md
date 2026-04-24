@@ -1,5 +1,29 @@
 # io-wallet-user-func
 
+## 4.3.8
+
+### Patch Changes
+
+- ad51f83: Wallet Instance Attestation: sub is now set to the SHA-256 thumbprint of the Wallet App Attestation JWK (wallet instance identifier)
+
+## 4.3.7
+
+### Patch Changes
+
+- 0cf2816: Updated wallet instance and unit attestation payloads: removed eudi_wallet_info, added alg to cnf.jwk, and included status in wallet unit attestation.
+
+## 4.3.6
+
+### Patch Changes
+
+- ca1b779: Route Wallet Instance/Unit Attestation to new certificates-v-1.3 Cosmos container
+
+## 4.3.5
+
+### Patch Changes
+
+- 051eb92: Add support for separate federation entity base path settings for spec 1.0 (Wallet Attestation) and 1.3 (Wallet Instance Attestation and Wallet Unit Attestation).
+
 ## 4.3.4
 
 ### Patch Changes

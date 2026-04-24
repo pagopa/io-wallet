@@ -59,7 +59,8 @@ const email = flow(
 );
 
 const federationEntity = {
-  basePath: url("https://wallet-provider.example.org/foo/"),
+  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
+  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
   contacts: [email("foo@pec.bar.it")],
   homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
   logoUri: url("https://wallet-provider.example.org/logo.svg"),
@@ -258,7 +259,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(6);
+    // expect.assertions(7);
+    expect.assertions(5);
 
     if (E.isRight(result)) {
       const body = t
@@ -275,21 +277,33 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         );
         const walletInstanceAttPayload = jose.decodeJwt(walletInstanceAtt);
         expect(Object.keys(walletInstanceAttPayload).sort()).toEqual(
-          ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
+          // ["cnf", "exp", "iat", "iss", "sub", "eudi_wallet_info"].sort(),
+          [
+            "cnf",
+            "exp",
+            "iat",
+            "iss",
+            "sub",
+            "wallet_link",
+            "wallet_name",
+          ].sort(),
         );
-        const eudiWalletInfo = t
-          .type({
-            general_info: t.type({
-              wallet_provider_name: t.string,
-            }),
-          })
-          .decode(walletInstanceAttPayload.eudi_wallet_info);
-        expect(E.isRight(eudiWalletInfo)).toBe(true);
-        if (E.isRight(eudiWalletInfo)) {
-          expect(eudiWalletInfo.right.general_info.wallet_provider_name).toBe(
-            walletInstanceAttPayload.iss,
-          );
-        }
+        // const eudiWalletInfo = t
+        //   .type({
+        //     general_info: t.type({
+        //       wallet_provider_name: t.string,
+        //     }),
+        //   })
+        //   .decode(walletInstanceAttPayload.eudi_wallet_info);
+        // expect(E.isRight(eudiWalletInfo)).toBe(true);
+        // if (E.isRight(eudiWalletInfo)) {
+        //   expect(eudiWalletInfo.right.general_info.wallet_provider_name).toBe(
+        //     walletInstanceAttPayload.iss,
+        //   );
+        // }
+        expect(walletInstanceAttPayload.iss).toBe(
+          "https://wallet-provider-v13.example.org/bar",
+        );
         // check trailing slashes are removed
         expect((walletInstanceAttPayload.iss || "").endsWith("/")).toBe(false);
         expect((walletInstanceAttPayload.sub || "").endsWith("/")).toBe(false);

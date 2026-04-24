@@ -25,3 +25,17 @@ output "wallet_uat" {
     resource_group_name = azurerm_storage_account.common_uat.resource_group_name
   }
 }
+
+output "trust_uat" {
+  value = {
+    name                = azurerm_storage_account.trust_uat.name
+    primary_blob_endpoint = azurerm_storage_account.trust_uat.primary_blob_endpoint
+    resource_group_name = azurerm_storage_account.trust_uat.resource_group_name
+  }
+}
+
+output "trust_uat_wallet_provider_container" {
+  value = {
+    name = azurerm_storage_container.wallet_provider.name
+  }
+}

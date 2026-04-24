@@ -19,7 +19,7 @@ export class PidIssuerClient implements CredentialRepository {
       requestTimeout,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
-    basePath: Config["entityConfiguration"]["federationEntity"]["basePath"]["href"],
+    basePath: Config["entityConfiguration"]["federationEntity"]["basePathV10"]["href"],
   ) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = removeTrailingSlash(basePath);

@@ -1,11 +1,12 @@
 import * as H from "@pagopa/handler-kit";
-import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
+import { toThumbprint } from "@/infra/mobile-attestation-service";
 import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { getSignerMetadata } from "@/infra/signer-metadata";
 import { NonceEnvironment } from "@/nonce";
@@ -28,26 +29,27 @@ const getWalletInstanceAttestationData =
     cnf: {
       jwk: WIARequest["cnf"]["jwk"];
     };
-    walletSolutionVersion: NonEmptyString;
+    // walletSolutionVersion: NonEmptyString;
   }): RTE.ReaderTaskEither<
     WalletInstanceAttestationEnvironment,
     Error,
     WalletInstanceAttestationData
   > =>
   ({
-    federationEntity: { basePath },
-    walletAttestationConfig: { oauthClientSub },
+    federationEntity: { basePathV13: basePath },
+    // walletAttestationConfig: { oauthClientSub },
     ...signerMetadataEnv
   }) =>
     pipe(
-      signerMetadataEnv,
-      getSignerMetadata,
-      TE.map(({ kid, x5c }) => ({
+      TE.Do,
+      TE.bindW("sub", () => toThumbprint(input.cnf.jwk)),
+      TE.bindW("signerMetadata", () => getSignerMetadata(signerMetadataEnv)),
+      TE.map(({ signerMetadata: { kid, x5c }, sub }) => ({
         jwk: input.cnf.jwk,
         kid,
-        oauthClientSub,
+        sub,
         walletProviderName: basePath.href,
-        walletSolutionVersion: input.walletSolutionVersion,
+        // walletSolutionVersion: input.walletSolutionVersion,
         x5c,
       })),
     );
@@ -74,7 +76,7 @@ const generateWalletInstanceAttestation: (request: {
     }),
     RTE.map(() => ({
       cnf: wiaRequest.cnf,
-      walletSolutionVersion: wiaRequest.walletSolutionVersion,
+      // walletSolutionVersion: wiaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletInstanceAttestationData),
     RTE.chainW(createWalletInstanceAttestation),

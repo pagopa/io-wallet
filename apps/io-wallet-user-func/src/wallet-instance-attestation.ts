@@ -10,26 +10,31 @@ import { removeTrailingSlash } from "./url";
 export interface WalletInstanceAttestationData {
   jwk: JwkPublicKey;
   kid: string;
-  oauthClientSub: string;
+  // oauthClientSub: string;
+  sub: string;
   walletProviderName: string;
-  walletSolutionVersion: string;
+  // walletSolutionVersion: string;
   x5c: string[];
 }
 
 interface WalletInstanceAttestationJwtModel {
   cnf: {
-    jwk: JwkPublicKey;
-  };
-  eudi_wallet_info: {
-    general_info: {
-      wallet_provider_name: string;
-      wallet_solution_id: string;
-      wallet_solution_version: string;
+    jwk: JwkPublicKey & {
+      alg: "ES256";
     };
   };
+  // eudi_wallet_info: {
+  //   general_info: {
+  //     wallet_provider_name: string;
+  //     wallet_solution_id: string;
+  //     wallet_solution_version: string;
+  //   };
+  // };
   iss: string;
   kid: string;
   sub: string;
+  wallet_link: string;
+  wallet_name: string;
   x5c: string[];
 }
 
@@ -40,24 +45,31 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
   encode: ({
     jwk,
     kid,
-    oauthClientSub,
+    // oauthClientSub,
+    sub,
     walletProviderName,
-    walletSolutionVersion,
+    // walletSolutionVersion,
     x5c,
   }) => ({
     cnf: {
-      jwk,
-    },
-    eudi_wallet_info: {
-      general_info: {
-        wallet_provider_name: removeTrailingSlash(walletProviderName),
-        wallet_solution_id: "appio",
-        wallet_solution_version: walletSolutionVersion,
+      jwk: {
+        ...jwk,
+        alg: "ES256",
       },
     },
+    // eudi_wallet_info: {
+    //   general_info: {
+    //     wallet_provider_name: removeTrailingSlash(walletProviderName),
+    //     wallet_solution_id: "appio",
+    //     wallet_solution_version: walletSolutionVersion,
+    //   },
+    // },
     iss: removeTrailingSlash(walletProviderName),
     kid,
-    sub: removeTrailingSlash(oauthClientSub),
+    sub,
+    // sub: removeTrailingSlash(oauthClientSub),
+    wallet_link: "https://ioapp.it/",
+    wallet_name: "App IO",
     x5c,
   }),
 };

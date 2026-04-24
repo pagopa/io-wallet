@@ -36,17 +36,17 @@ const getWalletUnitAttestationData =
   ({
     attestedKeys,
     platform,
-    walletSolutionVersion,
+    // walletSolutionVersion,
   }: {
     attestedKeys: readonly AttestedKey[];
     platform: WUARequest["platform"];
-    walletSolutionVersion: NonEmptyString;
+    // walletSolutionVersion: NonEmptyString;
   }): RTE.ReaderTaskEither<
     WalletUnitAttestationEnvironment,
     Error,
     WalletUnitAttestationData
   > =>
-  ({ federationEntity: { basePath }, ...signerMetadataEnv }) =>
+  ({ federationEntity: { basePathV13: basePath }, ...signerMetadataEnv }) =>
     pipe(
       signerMetadataEnv,
       getSignerMetadata,
@@ -55,7 +55,7 @@ const getWalletUnitAttestationData =
         kid,
         platform,
         walletProviderName: basePath.href,
-        walletSolutionVersion,
+        // walletSolutionVersion,
         x5c,
       })),
     );
@@ -101,7 +101,7 @@ const generateWalletUnitAttestation: (request: {
     RTE.map((attestedKeys) => ({
       attestedKeys,
       platform: wuaRequest.platform,
-      walletSolutionVersion: wuaRequest.walletSolutionVersion,
+      // walletSolutionVersion: wuaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletUnitAttestationData),
     RTE.chainW(createWalletUnitAttestation),

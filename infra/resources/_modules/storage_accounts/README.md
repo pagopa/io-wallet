@@ -26,6 +26,8 @@ No modules.
 | [azurerm_private_endpoint.storage_account_common_queue_uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_storage_account.common](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.common_uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_account.trust_uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_container.wallet_provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_queue.wallet-instance-creation-email-queue-01](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
 | [azurerm_storage_queue.wallet-instance-creation-email-queue-uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
 | [azurerm_storage_queue.wallet-instance-revocation-email-queue-01](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_queue) | resource |
@@ -48,6 +50,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_trust_uat"></a> [trust\_uat](#output\_trust\_uat) | n/a |
 | <a name="output_wallet"></a> [wallet](#output\_wallet) | n/a |
 | <a name="output_wallet_instance_creation_email_queue_name_01"></a> [wallet\_instance\_creation\_email\_queue\_name\_01](#output\_wallet\_instance\_creation\_email\_queue\_name\_01) | n/a |
 | <a name="output_wallet_instance_revocation_email_queue_name_01"></a> [wallet\_instance\_revocation\_email\_queue\_name\_01](#output\_wallet\_instance\_revocation\_email\_queue\_name\_01) | n/a |

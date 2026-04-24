@@ -80,6 +80,14 @@ variable "storage_account_uat" {
   description = "Generic Storage Account for Wallet UAT uses"
 }
 
+variable "trust_storage_account_uat" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  description = "Trust Storage Account for Wallet UAT uses"
+}
+
 variable "cicd_principal_ids" {
   type = object({
     infra = object({
