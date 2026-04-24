@@ -80,7 +80,7 @@ describe("CosmosDbStatusListRoutingRepository", () => {
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(
         Object.assign(new Error("not found"), {
-          statusCode: 404,
+          code: 404,
         }),
       );
 

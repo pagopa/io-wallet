@@ -147,7 +147,7 @@ describe("CosmosDbWalletInstanceStatusRepository", () => {
   it("maps a missing target document during revoke to a CosmosNotFoundError", async () => {
     const patch = vi.fn().mockRejectedValue(
       Object.assign(new Error("not found"), {
-        statusCode: 404,
+        code: 404,
       }),
     );
     const item = vi.fn().mockReturnValue({ patch });

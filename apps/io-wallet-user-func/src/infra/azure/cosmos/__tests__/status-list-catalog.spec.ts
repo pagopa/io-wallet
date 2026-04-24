@@ -106,7 +106,7 @@ describe("CosmosDbStatusListCatalogRepository", () => {
   it("treats a 412 conditional patch failure as already opened elsewhere", async () => {
     const patch = vi.fn().mockRejectedValue(
       Object.assign(new Error("precondition failed"), {
-        statusCode: 412,
+        code: 412,
       }),
     );
 
@@ -208,7 +208,7 @@ describe("CosmosDbStatusListCatalogRepository", () => {
   it("returns a conflict error when block reservation hits a Cosmos 412 conflict", async () => {
     const patch = vi.fn().mockRejectedValue(
       Object.assign(new Error("precondition failed"), {
-        statusCode: 412,
+        code: 412,
       }),
     );
 

@@ -1,6 +1,7 @@
 import { ServiceUnavailableError } from "io-wallet-common/error";
 
 type CosmosLikeError = Error & {
+  code?: number | string;
   statusCode?: number;
 };
 
@@ -19,8 +20,30 @@ export class InvalidCosmosResourceError extends Error {
   name = "InvalidCosmosResourceError";
 }
 
+const getCosmosStatusCode = (error: unknown): number | undefined => {
+  if (!isCosmosLikeError(error)) {
+    return undefined;
+  }
+
+  if (typeof error.statusCode === "number") {
+    return error.statusCode;
+  }
+
+  if (typeof error.code === "number") {
+    return error.code;
+  }
+
+  if (typeof error.code === "string") {
+    const parsedStatusCode = Number(error.code);
+
+    return Number.isFinite(parsedStatusCode) ? parsedStatusCode : undefined;
+  }
+
+  return undefined;
+};
+
 const hasCosmosStatusCode = (statusCode: number) => (error: unknown) =>
-  isCosmosLikeError(error) && error.statusCode === statusCode;
+  getCosmosStatusCode(error) === statusCode;
 
 export const toCosmosError =
   (genericMessage: string) =>
