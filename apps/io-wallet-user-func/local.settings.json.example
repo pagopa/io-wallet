@@ -55,9 +55,15 @@
     "FrontDoorProfileName": "FRONT_DOOR_PROFILE_NAME",
     "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "ApplicationInsightsResourceId": "APPLICATION_INSIGHTS_RESOURCE_ID",
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
     "WalletInstanceStorageAccountUrl": "WALLET_INSTANCE_STORAGE_ACCOUNT_URL",
     "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME",
-    "WalletAttestationOauthClientSub": "WALLET_ATTESTATION_OAUTH_CLIENT_SUB"
+    "WalletAttestationOauthClientSub": "WALLET_ATTESTATION_OAUTH_CLIENT_SUB",
+    "StatusListCapacityBits": "STATUS_LIST_CAPACITY_BITS",
+    "StatusListPageCount": "STATUS_LIST_PAGE_COUNT",
+    "StatusListsMinimumAllocationConflictsForScaleUp": "STATUS_LISTS_MINIMUM_ALLOCATION_CONFLICTS_FOR_SCALE_UP",
+    "StatusListsMinimumRemainingTotalCapacity": "STATUS_LISTS_MINIMUM_REMAINING_TOTAL_CAPACITY",
+    "StatusListsIndexReservationSize": "STATUS_LISTS_INDEX_RESERVATION_SIZE"
   }
 }

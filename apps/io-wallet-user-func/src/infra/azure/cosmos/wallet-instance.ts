@@ -11,6 +11,7 @@ import {
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 
+import { toCosmosError } from "@/infra/azure/cosmos/errors";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 const toError = (genericMessage: string) => (error: unknown) =>
@@ -49,7 +50,7 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
         }),
       );
       await this.#userIdKeyedContainer.items.batch(operations, userId);
-    }, toError("Error updating wallet instances"));
+    }, toCosmosError("Error updating wallet instances"));
   }
 
   getByUserId(id: WalletInstance["id"], userId: WalletInstance["userId"]) {
@@ -93,7 +94,7 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
           })
           .fetchAll();
         return items;
-      }, toError("Error getting wallet instance by user id")),
+      }, toCosmosError("Error getting wallet instance by user id")),
       TE.chain(
         flow(
           RA.head,
@@ -139,7 +140,7 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
           })
           .fetchAll();
         return items;
-      }, toError("Error getting wallet instances by user id")),
+      }, toCosmosError("Error getting wallet instances by user id")),
       TE.chain((items) =>
         pipe(
           items,
@@ -168,6 +169,6 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
   insert(walletInstance: WalletInstance) {
     return TE.tryCatch(async () => {
       await this.#userIdKeyedContainer.items.create(walletInstance);
-    }, toError("Error inserting wallet instance"));
+    }, toCosmosError("Error inserting wallet instance"));
   }
 }

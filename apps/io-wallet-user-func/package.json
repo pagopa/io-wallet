@@ -20,6 +20,7 @@
     "@azure/functions": "catalog:",
     "@azure/functions-opentelemetry-instrumentation": "^0.3.0",
     "@azure/identity": "catalog:",
+    "@azure/monitor-query-logs": "^1.0.0",
     "@azure/storage-blob": "catalog:",
     "@azure/storage-queue": "catalog:",
     "@opentelemetry/api": "^1.9.1",
@@ -50,7 +51,8 @@
     "jose": "5.10.0",
     "make-fetch-happen": "^15.0.5",
     "pkijs": "^3.4.0",
-    "undici": "^7.24.6"
+    "undici": "^7.24.6",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@pagopa/eslint-config": "^6.0.1",

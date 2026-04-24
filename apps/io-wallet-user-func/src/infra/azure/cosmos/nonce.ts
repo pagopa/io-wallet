@@ -3,6 +3,7 @@ import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 
+import { toCosmosError } from "@/infra/azure/cosmos/errors";
 import { NonceRepository } from "@/nonce";
 
 export class CosmosDbNonceRepository implements NonceRepository {
@@ -44,18 +45,10 @@ export class CosmosDbNonceRepository implements NonceRepository {
   }
 
   insert(nonce: string) {
-    return TE.tryCatch(
-      async () => {
-        await this.#container.items.create({
-          id: nonce,
-        });
-      },
-      (error) =>
-        error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(
-              `The request to the database has timed out: ${error.message}`,
-            )
-          : new Error(`Error inserting nonce: ${error}`),
-    );
+    return TE.tryCatch(async () => {
+      await this.#container.items.create({
+        id: nonce,
+      });
+    }, toCosmosError("Error inserting nonce"));
   }
 }
