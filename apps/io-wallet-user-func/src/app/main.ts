@@ -1,6 +1,6 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
-import { app } from "@azure/functions";
+import { app, output } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { BlobServiceClient } from "@azure/storage-blob";
@@ -25,6 +25,7 @@ import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-in
 import { CosmosDbWalletInstanceStatusRepository } from "@/infra/azure/cosmos/wallet-instance-status";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 import { BackfillWalletInstanceStatusFunction } from "@/infra/azure/functions/backfill-wallet-instance-status";
+import { CopyWalletInstancesToUatFunction } from "@/infra/azure/functions/copy-wallet-instances-to-uat";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
@@ -396,31 +397,50 @@ app.http("createWalletUnitAttestation", {
   route: "wallet-unit-attestations",
 });
 
-app.timer("statusListManager", {
-  handler: StatusListManagerFunction({
-    inputDecoder: t.unknown,
-    openStatusListsPolicyRepository,
-    statusListAllocationConflictRepository,
-    statusListLifecycle,
-    statusListManagerConfig: {
-      ...config.statusList.manager,
-      capacityPerNewStatusList: config.statusList.capacityBits,
-    },
-  }),
-  schedule: "0 */15 * * * *",
-});
+// app.timer("statusListManager", {
+//   handler: StatusListManagerFunction({
+//     inputDecoder: t.unknown,
+//     openStatusListsPolicyRepository,
+//     statusListAllocationConflictRepository,
+//     statusListLifecycle,
+//     statusListManagerConfig: {
+//       ...config.statusList.manager,
+//       capacityPerNewStatusList: config.statusList.capacityBits,
+//     },
+//   }),
+//   schedule: "0 */15 * * * *",
+// });
 
-app.cosmosDB("backfillWalletInstanceStatus", {
-  connection: "CosmosDbEndpoint",
+// app.cosmosDB("backfillWalletInstanceStatus", {
+//   connection: "CosmosDbEndpoint",
+//   containerName: "wallet-instances",
+//   createLeaseContainerIfNotExists: false,
+//   databaseName: config.azure.cosmos.dbName,
+//   handler: BackfillWalletInstanceStatusFunction({
+//     inputDecoder: t.array(t.unknown),
+//     statusListAllocator,
+//     walletInstanceStatusRepository,
+//   }),
+//   leaseContainerName: "wallet-instance-status-migration-leases",
+//   maxItemsPerInvocation: 50,
+//   startFromBeginning: true,
+// });
+
+app.cosmosDB("copyWalletInstancesToUat", {
+  connection: "PagoPACosmosDbConnectionString",
   containerName: "wallet-instances",
   createLeaseContainerIfNotExists: false,
-  databaseName: config.azure.cosmos.dbName,
-  handler: BackfillWalletInstanceStatusFunction({
+  databaseName: "db",
+  handler: CopyWalletInstancesToUatFunction({
     inputDecoder: t.array(t.unknown),
-    statusListAllocator,
-    walletInstanceStatusRepository,
   }),
-  leaseContainerName: "wallet-instance-status-migration-leases",
+  leaseContainerName: "wallet-instances-uat-copy-leases",
   maxItemsPerInvocation: 50,
+  return: output.cosmosDB({
+    connection: "CosmosDbEndpoint",
+    containerName: "wallet-instances",
+    createIfNotExists: false,
+    databaseName: "db-uat",
+  }),
   startFromBeginning: true,
 });
