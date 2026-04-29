@@ -55,10 +55,10 @@ class RevokedWalletInstance extends Error {
   }
 }
 
-export const addStatus = (
-  walletInstance: WalletInstance,
+export const addStatus = <T extends WalletInstance>(
+  walletInstance: T,
   statusBinding: Pick<WalletInstanceStatus, "index" | "statusListId">,
-): WalletInstance & { status: WalletInstanceStatus } => ({
+): T & { status: WalletInstanceStatus } => ({
   ...walletInstance,
   status: {
     index: statusBinding.index,
