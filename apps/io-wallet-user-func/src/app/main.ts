@@ -25,7 +25,6 @@ import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-in
 // import { CosmosDbWalletInstanceStatusRepository } from "@/infra/azure/cosmos/wallet-instance-status";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 // import { BackfillWalletInstanceStatusFunction } from "@/infra/azure/functions/backfill-wallet-instance-status";
-import { CopyWalletInstancesToUatFunction } from "@/infra/azure/functions/copy-wallet-instances-to-uat";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
@@ -428,22 +427,3 @@ app.timer("statusListManager", {
 //   maxItemsPerInvocation: 50,
 //   startFromBeginning: true,
 // });
-
-app.cosmosDB("copyWalletInstancesToUat", {
-  connection: "PagoPACosmosDbConnectionString",
-  containerName: "wallet-instances",
-  createLeaseContainerIfNotExists: false,
-  databaseName: "db",
-  handler: CopyWalletInstancesToUatFunction({
-    inputDecoder: t.array(t.unknown),
-  }),
-  leaseContainerName: "wallet-instances-uat-copy-leases",
-  maxItemsPerInvocation: 50,
-  return: output.cosmosDB({
-    connection: "CosmosDbEndpoint",
-    containerName: "wallet-instances",
-    createIfNotExists: false,
-    databaseName: "db-uat",
-  }),
-  startFromBeginning: true,
-});
