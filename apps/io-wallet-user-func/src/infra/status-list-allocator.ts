@@ -67,6 +67,9 @@ export class StatusListAllocatorService implements StatusListAllocator {
     (error) => (error instanceof Error ? error : new Error(String(error))),
   );
 
+  // in-flight reservation guard
+  private inFlightReservation: Promise<StatusListBinding> | undefined;
+
   constructor(
     private readonly catalogs: StatusListAllocatorCatalogDataSource,
     private readonly routing: StatusListAllocatorRoutingDataSource,
@@ -97,17 +100,44 @@ export class StatusListAllocatorService implements StatusListAllocator {
   }
 
   private async allocateStatusBindingInternal() {
-    const cachedBinding = this.allocateFromCache();
+    while (true) {
+      const cachedBinding = this.allocateFromCache();
 
-    if (cachedBinding) {
-      return cachedBinding;
+      if (cachedBinding) {
+        return cachedBinding;
+      }
+
+      if (this.inFlightReservation) {
+        await this.waitForInFlightReservation();
+        continue;
+      }
+
+      // in-flight reservation guard
+      const inFlightReservation = this.reserveNextAvailableBlock();
+      this.inFlightReservation = inFlightReservation;
+
+      try {
+        return await inFlightReservation;
+      } finally {
+        if (this.inFlightReservation === inFlightReservation) {
+          this.inFlightReservation = undefined;
+        }
+      }
     }
+  }
 
+  private async reserveNextAvailableBlock() {
     for (
       let attempt = 0;
       attempt <= statusListAllocatorDefaultMaxRetries;
       attempt += 1
     ) {
+      const cachedBinding = this.allocateFromCache();
+
+      if (cachedBinding) {
+        return cachedBinding;
+      }
+
       const openStatusListIds = await this.routing.getOpenStatusListIds();
 
       const { allocatedBinding, hadConflict } =
@@ -118,6 +148,12 @@ export class StatusListAllocatorService implements StatusListAllocator {
       // We found a free block in one of the OPEN lists.
       if (allocatedBinding) {
         return allocatedBinding;
+      }
+
+      const cachedBindingAfterConflict = this.allocateFromCache();
+
+      if (cachedBindingAfterConflict) {
+        return cachedBindingAfterConflict;
       }
 
       // No conflict means retrying would scan the same state again.
@@ -202,5 +238,14 @@ export class StatusListAllocatorService implements StatusListAllocator {
     }
 
     return this.storeReservedBlockAndAllocate(reservedStartIdx, statusListId);
+  }
+
+  private async waitForInFlightReservation() {
+    try {
+      await this.inFlightReservation;
+    } catch {
+      // Ignore the failing result here: the caller will either consume the
+      // cache populated by the winner or attempt a fresh reservation.
+    }
   }
 }

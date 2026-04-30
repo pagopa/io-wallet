@@ -22,9 +22,7 @@ import { CosmosDbStatusListCatalogRepository } from "@/infra/azure/cosmos/status
 import { CosmosDbStatusListPagesRepository } from "@/infra/azure/cosmos/status-list-pages";
 import { CosmosDbStatusListRoutingRepository } from "@/infra/azure/cosmos/status-list-routing";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
-// import { CosmosDbWalletInstanceStatusRepository } from "@/infra/azure/cosmos/wallet-instance-status";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
-// import { BackfillWalletInstanceStatusFunction } from "@/infra/azure/functions/backfill-wallet-instance-status";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
@@ -111,9 +109,6 @@ const walletAttestationSigner = new CryptoSigner(
 );
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
-
-// const walletInstanceStatusRepository =
-//   new CosmosDbWalletInstanceStatusRepository(database);
 
 const whitelistedFiscalCodeRepository =
   new CosmosDbWhitelistedFiscalCodeRepository(database);
@@ -412,18 +407,3 @@ app.timer("statusListManager", {
   }),
   schedule: "0 */15 * * * *",
 });
-
-// app.cosmosDB("backfillWalletInstanceStatus", {
-//   connection: "CosmosDbEndpoint",
-//   containerName: "wallet-instances",
-//   createLeaseContainerIfNotExists: false,
-//   databaseName: config.azure.cosmos.dbName,
-//   handler: BackfillWalletInstanceStatusFunction({
-//     inputDecoder: t.array(t.unknown),
-//     statusListAllocator,
-//     walletInstanceStatusRepository,
-//   }),
-//   leaseContainerName: "wallet-instance-status-migration-leases",
-//   maxItemsPerInvocation: 50,
-//   startFromBeginning: true,
-// });

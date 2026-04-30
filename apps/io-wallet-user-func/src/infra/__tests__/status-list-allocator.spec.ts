@@ -164,4 +164,54 @@ describe("StatusListAllocatorService", () => {
       allocationConflictEvent(),
     );
   });
+
+  it("serializes concurrent allocations while a block lease is in flight", async () => {
+    let resolveReservation: ((value: number) => void) | undefined;
+
+    const reserveNextBlock = vi
+      .fn<StatusListAllocatorCatalogDataSource["reserveNextBlock"]>()
+      .mockImplementation(
+        () =>
+          new Promise<number>((resolve) => {
+            resolveReservation = resolve;
+          }),
+      );
+
+    const allocator = new StatusListAllocatorService(
+      makeCatalogDataSource(reserveNextBlock),
+      makeRoutingDataSource(async () => ["list-a" as NonEmptyString]),
+      createStatusListAllocationCache(),
+      {
+        blockSize: 2,
+      },
+    );
+
+    const firstAllocation = allocator.allocateStatusBinding();
+    const secondAllocation = allocator.allocateStatusBinding();
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(reserveNextBlock).toHaveBeenCalledTimes(1);
+
+    resolveReservation?.(10);
+
+    await expect(firstAllocation).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        index: 10,
+        statusListId: "list-a",
+      },
+    });
+    await expect(secondAllocation).resolves.toEqual({
+      _tag: "Right",
+      right: {
+        index: 11,
+        statusListId: "list-a",
+      },
+    });
+
+    expect(reserveNextBlock).toHaveBeenCalledTimes(1);
+    expect(telemetryMocks.sendTelemetryCustomEvent).not.toHaveBeenCalled();
+  });
 });
