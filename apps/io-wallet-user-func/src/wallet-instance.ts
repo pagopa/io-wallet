@@ -46,12 +46,25 @@ export type WalletInstanceRevocationDetails = Pick<
   "id" | "isRevoked" | "revocationReason"
 >;
 
+type WalletInstanceStatus = NonNullable<WalletInstance["status"]>;
+
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
   constructor() {
     super("The wallet instance has been revoked.");
   }
 }
+
+export const addStatus = <T extends WalletInstance>(
+  walletInstance: T,
+  statusBinding: Pick<WalletInstanceStatus, "index" | "statusListId">,
+): T & { status: WalletInstanceStatus } => ({
+  ...walletInstance,
+  status: {
+    index: statusBinding.index,
+    statusListId: statusBinding.statusListId,
+  },
+});
 
 export const getWalletInstanceByUserId: (
   id: WalletInstance["id"],

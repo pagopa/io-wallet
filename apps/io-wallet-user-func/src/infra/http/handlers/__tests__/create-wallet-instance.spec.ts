@@ -12,6 +12,7 @@ import { CredentialRepository } from "@/credential";
 import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
 import { NonceRepository } from "@/nonce";
+import { StatusListAllocator } from "@/status-list";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { CreateWalletInstanceHandler } from "../create-wallet-instance";
@@ -33,12 +34,28 @@ describe("CreateWalletInstanceHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
+  const insertWalletInstanceSpy = vi.fn<WalletInstanceRepository["insert"]>(
+    () => TE.right(undefined),
+  );
+  const allocateStatusBindingSpy = vi.fn(() =>
+    TE.right({
+      index: 100,
+      statusListId: "status-list-a" as NonEmptyString,
+    }),
+  );
+
   const walletInstanceRepository: WalletInstanceRepository = {
     batchPatch: () => TE.right(undefined),
     getByUserId: () => TE.left(new Error("not implemented")),
     getLastByUserId: () => TE.left(new Error("not implemented")),
     getValidByUserIdExcludingOne: () => TE.right(O.some([])),
-    insert: () => TE.right(undefined),
+    insert: insertWalletInstanceSpy,
+  };
+
+  const statusListAllocator: StatusListAllocator = {
+    get allocateStatusBinding() {
+      return allocateStatusBindingSpy();
+    },
   };
 
   const logger = {
@@ -82,6 +99,8 @@ describe("CreateWalletInstanceHandler", () => {
   beforeEach(() => {
     sendMessageSpy.mockClear();
     revokeAllCredentialsSpy.mockClear();
+    insertWalletInstanceSpy.mockClear();
+    allocateStatusBindingSpy.mockClear();
   });
 
   it("should return a 204 HTTP response on success and enqueue email by default", async () => {
@@ -92,12 +111,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
@@ -109,6 +130,56 @@ describe("CreateWalletInstanceHandler", () => {
     });
 
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
+    expect(allocateStatusBindingSpy).toHaveBeenCalledTimes(1);
+    expect(insertWalletInstanceSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: keyId,
+        status: {
+          index: 100,
+          statusListId: "status-list-a",
+        },
+        userId: mockFiscalCode,
+      }),
+    );
+  });
+
+  it("should insert a wallet instance without status when the feature flag is disabled", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: false,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      statusListAllocator,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        statusCode: 204,
+      }),
+    });
+
+    expect(allocateStatusBindingSpy).not.toHaveBeenCalled();
+    expect(insertWalletInstanceSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: keyId,
+        userId: mockFiscalCode,
+      }),
+    );
+    const insertedWalletInstance = insertWalletInstanceSpy.mock.lastCall?.[0];
+
+    expect(insertedWalletInstance).toBeDefined();
+    expect(insertedWalletInstance).not.toHaveProperty("status");
   });
 
   it("should enqueue email when is_renewal is false", async () => {
@@ -122,12 +193,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
@@ -152,12 +225,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
@@ -181,12 +256,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
@@ -213,12 +290,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository: nonceRepositoryThatFailsOnDelete,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
@@ -250,12 +329,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnInsert,
     });
 
@@ -270,6 +351,43 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
+  it("should return a 500 HTTP response on allocateStatusBinding error", async () => {
+    const failingStatusListAllocator: StatusListAllocator = {
+      allocateStatusBinding: TE.left(
+        new Error("failed on allocateStatusBinding!"),
+      ),
+    };
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequest,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      statusListAllocator: failingStatusListAllocator,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+
+    expect(insertWalletInstanceSpy).not.toHaveBeenCalled();
+  });
+
   it("should not call revokeAllCredentials when there are no old wallet instances to revoke", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -278,12 +396,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
@@ -332,12 +452,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository:
         walletInstanceRepositoryWithOldValidWalletInstance,
     });
@@ -391,12 +513,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository: credentialRepositoryThatFailsOnRevoke,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository:
         walletInstanceRepositoryWithOldValidWalletInstance,
     });
@@ -425,12 +549,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository: walletInstanceRepositoryThatFails,
     });
 
@@ -462,12 +588,14 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository: walletInstanceRepositoryThatFailsOnBatchPatch,
     });
 
@@ -494,12 +622,14 @@ describe("CreateWalletInstanceHandler", () => {
         validateAttestation: () =>
           TE.left(new IntegrityCheckError(["foo", "bar"])),
       },
+      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
       queueClient,
+      statusListAllocator,
       walletInstanceRepository,
     });
 
