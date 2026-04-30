@@ -1,6 +1,6 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
-import { app, output } from "@azure/functions";
+import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
 import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { BlobServiceClient } from "@azure/storage-blob";
