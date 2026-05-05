@@ -34,7 +34,7 @@ const makeStatusListLifecycle = (
   closeAlmostFullStatusLists: TE.right(undefined),
   getCapacitySnapshot: TE.right({
     openStatusListsCount: 1,
-    remainingTotalCapacity: 1_000,
+    remainingTotalCapacity: 1000,
   }),
   provisionNewStatusLists: () => TE.right(undefined),
   reconcileStatusLists,
@@ -74,7 +74,7 @@ describe("StatusListManagerHandler", () => {
         },
         statusListLifecycle: makeStatusListLifecycle(TE.left(originalError)),
         statusListManagerConfig: {
-          capacityPerNewStatusList: 1_000,
+          capacityPerNewStatusList: 1000,
           minimumAllocationConflictsForScaleUp: 10,
           minimumRemainingTotalCapacity: 200,
         },
@@ -85,7 +85,7 @@ describe("StatusListManagerHandler", () => {
     });
 
     expect(telemetryMocks.sendTelemetryException).toHaveBeenCalledWith({
-      functionName: "StatusListManager",
+      functionName: "statusListManager",
     });
     expect(telemetryMocks.sendTelemetryExceptionEffect).toHaveBeenCalledWith(
       originalError,

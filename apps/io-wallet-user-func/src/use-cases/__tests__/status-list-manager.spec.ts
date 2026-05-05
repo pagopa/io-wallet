@@ -1,57 +1,62 @@
 /* eslint-disable max-lines-per-function */
 import * as TE from "fp-ts/TaskEither";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { StatusListLifecycle } from "@/status-list";
 
 import { manageStatusLists } from "../status-list-manager";
 
 const statusListManagerConfig = {
-  capacityPerNewStatusList: 1_000,
-  minimumAllocationConflictsForScaleUp: 10,
+  capacityPerNewStatusList: 1000,
+  minimumAllocationConflictsForScaleUp: 4,
   minimumRemainingTotalCapacity: 200,
 };
 
+const reconcileStatusLists = vi.fn(() => TE.right(undefined));
+const closeAlmostFullStatusLists = vi.fn(() => TE.right(undefined));
+const getCapacitySnapshot = vi.fn(() =>
+  TE.right({
+    openStatusListsCount: 1,
+    remainingTotalCapacity: 300,
+  }),
+);
+const provisionNewStatusLists = vi.fn(() => TE.right(undefined));
+
+const statusListLifecycle: StatusListLifecycle = {
+  get closeAlmostFullStatusLists() {
+    return closeAlmostFullStatusLists();
+  },
+  get getCapacitySnapshot() {
+    return getCapacitySnapshot();
+  },
+  provisionNewStatusLists,
+  get reconcileStatusLists() {
+    return reconcileStatusLists();
+  },
+};
+
+const openStatusListsPolicyRepository = {
+  loadOpenStatusListsPolicy: TE.right({
+    automaticMaximumOpenStatusLists: 3,
+    conflictAutoScaleEnabled: true,
+    minimumOpenStatusLists: 1,
+  }),
+};
+const getRecentConflictMetrics = vi.fn(TE.right(4));
+
+const statusListAllocationConflictRepository = {
+  getRecentConflictMetrics,
+};
+
 describe("manageStatusLists", () => {
-  it("runs reconciliation before normal close and provision steps", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
-      TE.right({
-        openStatusListsCount: 0,
-        remainingTotalCapacity: 100,
-      }),
-    );
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
 
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
-
+  it("runs reconciliation before normal close and provision steps and scales up to the automatic maximum when conflicts are high", async () => {
     const handler = manageStatusLists({
-      openStatusListsPolicyRepository: {
-        loadOpenStatusListsPolicy: TE.right({
-          automaticMaximumOpenStatusLists: 2,
-          conflictAutoScaleEnabled: true,
-          minimumOpenStatusLists: 1,
-        }),
-      },
-      statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right(0),
-      },
+      openStatusListsPolicyRepository,
+      statusListAllocationConflictRepository,
       statusListLifecycle,
       statusListManagerConfig,
     });
@@ -63,7 +68,7 @@ describe("manageStatusLists", () => {
 
     expect(reconcileStatusLists).toHaveBeenCalledTimes(1);
     expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
-    expect(provisionNewStatusLists).toHaveBeenCalledWith(1);
+    expect(provisionNewStatusLists).toHaveBeenCalledWith(2);
     expect(reconcileStatusLists.mock.invocationCallOrder[0]).toBeLessThan(
       closeAlmostFullStatusLists.mock.invocationCallOrder[0],
     );
@@ -72,93 +77,7 @@ describe("manageStatusLists", () => {
     );
   });
 
-  it("scales up to the automatic maximum when conflicts are high", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
-      TE.right({
-        openStatusListsCount: 0,
-        remainingTotalCapacity: 3_000,
-      }),
-    );
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
-
-    const handler = manageStatusLists({
-      openStatusListsPolicyRepository: {
-        loadOpenStatusListsPolicy: TE.right({
-          automaticMaximumOpenStatusLists: 3,
-          conflictAutoScaleEnabled: true,
-          minimumOpenStatusLists: 1,
-        }),
-      },
-      statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right(4),
-      },
-      statusListLifecycle,
-      statusListManagerConfig: {
-        ...statusListManagerConfig,
-        minimumAllocationConflictsForScaleUp: 4,
-      },
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: undefined,
-    });
-
-    expect(reconcileStatusLists).toHaveBeenCalledTimes(1);
-    expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
-    expect(provisionNewStatusLists).toHaveBeenCalledWith(3);
-  });
-
   it("does not change minimum target when conflict auto scale is disabled", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
-      TE.right({
-        openStatusListsCount: 0,
-        remainingTotalCapacity: 2_000,
-      }),
-    );
-    const getRecentConflictMetrics = vi
-      .fn()
-      .mockReturnValue(TE.left(new Error("should not be called")));
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
-
     const handler = manageStatusLists({
       openStatusListsPolicyRepository: {
         loadOpenStatusListsPolicy: TE.right({
@@ -167,9 +86,7 @@ describe("manageStatusLists", () => {
           minimumOpenStatusLists: 1,
         }),
       },
-      statusListAllocationConflictRepository: {
-        getRecentConflictMetrics,
-      },
+      statusListAllocationConflictRepository,
       statusListLifecycle,
       statusListManagerConfig,
     });
@@ -181,41 +98,11 @@ describe("manageStatusLists", () => {
 
     expect(reconcileStatusLists).toHaveBeenCalledTimes(1);
     expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
-    expect(provisionNewStatusLists).toHaveBeenCalledWith(1);
+    expect(provisionNewStatusLists).not.toHaveBeenCalled();
     expect(getRecentConflictMetrics).not.toHaveBeenCalled();
   });
 
   it("does not query conflict metrics when the policy cannot scale above the minimum", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
-      TE.right({
-        openStatusListsCount: 0,
-        remainingTotalCapacity: 3_000,
-      }),
-    );
-    const getRecentConflictMetrics = vi
-      .fn()
-      .mockReturnValue(TE.left(new Error("should not be called")));
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
-
     const handler = manageStatusLists({
       openStatusListsPolicyRepository: {
         loadOpenStatusListsPolicy: TE.right({
@@ -224,9 +111,7 @@ describe("manageStatusLists", () => {
           minimumOpenStatusLists: 3,
         }),
       },
-      statusListAllocationConflictRepository: {
-        getRecentConflictMetrics,
-      },
+      statusListAllocationConflictRepository,
       statusListLifecycle,
       statusListManagerConfig,
     });
@@ -238,46 +123,13 @@ describe("manageStatusLists", () => {
 
     expect(reconcileStatusLists).toHaveBeenCalledTimes(1);
     expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
-    expect(provisionNewStatusLists).toHaveBeenCalledWith(3);
+    expect(provisionNewStatusLists).toHaveBeenCalledWith(2);
     expect(getRecentConflictMetrics).not.toHaveBeenCalled();
   });
 
   it("does not scale down automatically when conflicts are low", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
-      TE.right({
-        openStatusListsCount: 1,
-        remainingTotalCapacity: 2_000,
-      }),
-    );
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
-
     const handler = manageStatusLists({
-      openStatusListsPolicyRepository: {
-        loadOpenStatusListsPolicy: TE.right({
-          automaticMaximumOpenStatusLists: 3,
-          conflictAutoScaleEnabled: true,
-          minimumOpenStatusLists: 1,
-        }),
-      },
+      openStatusListsPolicyRepository,
       statusListAllocationConflictRepository: {
         getRecentConflictMetrics: TE.right(0),
       },
@@ -296,32 +148,12 @@ describe("manageStatusLists", () => {
   });
 
   it("provisions enough new lists to recover missing capacity in one run", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
+    getCapacitySnapshot.mockReturnValue(
       TE.right({
         openStatusListsCount: 3,
         remainingTotalCapacity: 750,
       }),
     );
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
 
     const handler = manageStatusLists({
       openStatusListsPolicyRepository: {
@@ -337,7 +169,7 @@ describe("manageStatusLists", () => {
       statusListLifecycle,
       statusListManagerConfig: {
         ...statusListManagerConfig,
-        minimumRemainingTotalCapacity: 2_500,
+        minimumRemainingTotalCapacity: 2500,
       },
     });
 
@@ -352,33 +184,6 @@ describe("manageStatusLists", () => {
   });
 
   it("does not scale up automatically when conflicts stay below threshold", async () => {
-    const reconcileStatusLists = vi.fn().mockReturnValue(TE.right(undefined));
-    const closeAlmostFullStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-    const getCapacitySnapshot = vi.fn().mockReturnValue(
-      TE.right({
-        openStatusListsCount: 0,
-        remainingTotalCapacity: 3_000,
-      }),
-    );
-    const provisionNewStatusLists = vi
-      .fn()
-      .mockReturnValue(TE.right(undefined));
-
-    const statusListLifecycle: StatusListLifecycle = {
-      get closeAlmostFullStatusLists() {
-        return closeAlmostFullStatusLists();
-      },
-      get getCapacitySnapshot() {
-        return getCapacitySnapshot();
-      },
-      provisionNewStatusLists,
-      get reconcileStatusLists() {
-        return reconcileStatusLists();
-      },
-    };
-
     const handler = manageStatusLists({
       openStatusListsPolicyRepository: {
         loadOpenStatusListsPolicy: TE.right({
@@ -388,7 +193,7 @@ describe("manageStatusLists", () => {
         }),
       },
       statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right(9),
+        getRecentConflictMetrics: TE.right(3),
       },
       statusListLifecycle,
       statusListManagerConfig,
@@ -401,6 +206,6 @@ describe("manageStatusLists", () => {
 
     expect(reconcileStatusLists).toHaveBeenCalledTimes(1);
     expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
-    expect(provisionNewStatusLists).toHaveBeenCalledWith(1);
+    expect(provisionNewStatusLists).not.toHaveBeenCalled();
   });
 });

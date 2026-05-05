@@ -12,7 +12,7 @@ export const StatusListManagerHandler = H.of(() =>
     RTE.orElseFirstW(
       flow(
         sendTelemetryException({
-          functionName: "StatusListManager",
+          functionName: "statusListManager",
         }),
         E.orElseW(() => E.right(undefined)),
         RTE.fromEither,
