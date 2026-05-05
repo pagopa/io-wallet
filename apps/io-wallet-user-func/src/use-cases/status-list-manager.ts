@@ -1,3 +1,4 @@
+import { sequenceS } from "fp-ts/lib/Apply";
 import { pipe } from "fp-ts/lib/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
@@ -67,21 +68,6 @@ const shouldCheckRecentConflictMetrics = ({
   conflictAutoScaleEnabled &&
   minimumOpenStatusLists < automaticMaximumOpenStatusLists;
 
-const getEffectiveTargetOpenStatusLists = ({
-  currentPolicy,
-  minimumAllocationConflictsForScaleUp,
-  recentConflictMetrics,
-}: {
-  currentPolicy: OpenStatusListsPolicy;
-  minimumAllocationConflictsForScaleUp: number;
-  recentConflictMetrics: StatusListAllocationConflictMetrics;
-}) =>
-  shouldCheckRecentConflictMetrics(currentPolicy) &&
-  recentConflictMetrics.allocationConflicts >=
-    minimumAllocationConflictsForScaleUp
-    ? currentPolicy.automaticMaximumOpenStatusLists
-    : currentPolicy.minimumOpenStatusLists;
-
 const loadEffectiveTargetOpenStatusLists: RTE.ReaderTaskEither<
   StatusListManagerEnvironment,
   Error,
@@ -96,14 +82,12 @@ const loadEffectiveTargetOpenStatusLists: RTE.ReaderTaskEither<
         : pipe(
             environment,
             getRecentConflictMetrics,
-            TE.map((recentConflictMetrics) =>
-              getEffectiveTargetOpenStatusLists({
-                currentPolicy,
-                minimumAllocationConflictsForScaleUp:
-                  environment.statusListManagerConfig
-                    .minimumAllocationConflictsForScaleUp,
-                recentConflictMetrics,
-              }),
+            TE.map(({ allocationConflicts }) =>
+              allocationConflicts >=
+              environment.statusListManagerConfig
+                .minimumAllocationConflictsForScaleUp
+                ? currentPolicy.automaticMaximumOpenStatusLists
+                : currentPolicy.minimumOpenStatusLists,
             ),
           ),
     ),
@@ -136,20 +120,20 @@ const loadStatusListsToProvision: RTE.ReaderTaskEither<
   StatusListManagerEnvironment,
   Error,
   number
-> = (environment) =>
+> = (dependencies) =>
   pipe(
-    environment,
-    loadEffectiveTargetOpenStatusLists,
-    TE.bindTo("targetOpenStatusLists"),
-    TE.bindW("capacitySnapshot", () => getCapacitySnapshot(environment)),
-    TE.map(({ capacitySnapshot, targetOpenStatusLists }) =>
+    sequenceS(RTE.ApplyPar)({
+      capacitySnapshot: getCapacitySnapshot,
+      targetOpenStatusLists: loadEffectiveTargetOpenStatusLists,
+    }),
+    RTE.map(({ capacitySnapshot, targetOpenStatusLists }) =>
       computeStatusListsToProvisionCount(
         capacitySnapshot,
         targetOpenStatusLists,
-        environment.statusListManagerConfig,
+        dependencies.statusListManagerConfig,
       ),
     ),
-  );
+  )(dependencies);
 
 const ensureTargetOpenStatusLists: RTE.ReaderTaskEither<
   StatusListManagerEnvironment,
