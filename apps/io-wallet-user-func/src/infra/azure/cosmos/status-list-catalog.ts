@@ -51,7 +51,7 @@ const getStateTransitionPatchOperations = (
     OPEN: "openedAt",
     RETIRED: "retiredAt",
     SEALED: "sealedAt",
-  } as const;
+  };
 
   return [
     {
@@ -179,12 +179,26 @@ export class CosmosDbStatusListCatalogRepository
     return closableStatusListIds;
   };
 
-  readonly createInitializingStatusList = () =>
-    this.#createInitializingStatusList().catch((error) => {
-      throw toCosmosErrorOrInvalidResource(
-        "Error creating initializing status list",
-      )(error);
-    });
+  readonly createInitializingStatusList = async () => {
+    const id = uuidv4() as NonEmptyString;
+
+    await this.#container.items
+      .create({
+        capacityBits: this.#capacityBits,
+        id,
+        initializedAt: new Date().toISOString(),
+        nextFreeIndex: 0,
+        pageCount: this.#pageCount,
+        state: "INITIALIZING",
+      })
+      .catch((error) => {
+        throw toCosmosErrorOrInvalidResource(
+          "Error creating initializing status list",
+        )(error);
+      });
+
+    return id;
+  };
 
   readonly getCapacitySnapshot = async () => {
     const { resources } = await this.#container.items
@@ -221,8 +235,7 @@ export class CosmosDbStatusListCatalogRepository
             value: "OPEN",
           },
         ],
-        query:
-          "SELECT c.id FROM c WHERE c.state = @openState ORDER BY c.id ASC",
+        query: "SELECT c.id FROM c WHERE c.state = @openState",
       })
       .fetchAll()
       .catch((error) => {
@@ -382,20 +395,5 @@ export class CosmosDbStatusListCatalogRepository
 
       throw error;
     }
-  }
-
-  async #createInitializingStatusList(): Promise<NonEmptyString> {
-    const id = uuidv4() as NonEmptyString;
-
-    await this.#container.items.create({
-      capacityBits: this.#capacityBits,
-      id,
-      initializedAt: new Date().toISOString(),
-      nextFreeIndex: 0,
-      pageCount: this.#pageCount,
-      state: "INITIALIZING",
-    });
-
-    return id;
   }
 }
