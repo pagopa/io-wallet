@@ -12,31 +12,24 @@ import {
   StatusListsCapacitySnapshot,
 } from "@/status-list";
 
-export interface OpenStatusListsPolicy {
-  automaticMaximumOpenStatusLists: number;
-  conflictAutoScaleEnabled: boolean;
-  minimumOpenStatusLists: number;
-}
-
 export interface OpenStatusListsPolicyRepository {
   loadOpenStatusListsPolicy: TE.TaskEither<Error, OpenStatusListsPolicy>;
 }
 
-export interface StatusListAllocationConflictMetrics {
-  allocationConflicts: number;
-}
-
 export interface StatusListAllocationConflictRepository {
-  getRecentConflictMetrics: TE.TaskEither<
-    Error,
-    StatusListAllocationConflictMetrics
-  >;
+  getRecentConflictMetrics: TE.TaskEither<Error, number>;
 }
 
 export interface StatusListManagerConfig {
   capacityPerNewStatusList: number;
   minimumAllocationConflictsForScaleUp: number;
   minimumRemainingTotalCapacity: number;
+}
+
+interface OpenStatusListsPolicy {
+  automaticMaximumOpenStatusLists: number;
+  conflictAutoScaleEnabled: boolean;
+  minimumOpenStatusLists: number;
 }
 
 interface StatusListManagerEnvironment {
@@ -56,7 +49,7 @@ const loadOpenStatusListsPolicy: RTE.ReaderTaskEither<
 const getRecentConflictMetrics: RTE.ReaderTaskEither<
   Pick<StatusListManagerEnvironment, "statusListAllocationConflictRepository">,
   Error,
-  StatusListAllocationConflictMetrics
+  number
 > = ({ statusListAllocationConflictRepository }) =>
   statusListAllocationConflictRepository.getRecentConflictMetrics;
 
@@ -82,7 +75,7 @@ const loadEffectiveTargetOpenStatusLists: RTE.ReaderTaskEither<
         : pipe(
             environment,
             getRecentConflictMetrics,
-            TE.map(({ allocationConflicts }) =>
+            TE.map((allocationConflicts) =>
               allocationConflicts >=
               environment.statusListManagerConfig
                 .minimumAllocationConflictsForScaleUp

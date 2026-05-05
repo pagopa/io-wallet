@@ -4,10 +4,7 @@ import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 
-import type {
-  OpenStatusListsPolicy,
-  OpenStatusListsPolicyRepository,
-} from "@/use-cases/status-list-manager";
+import type { OpenStatusListsPolicyRepository } from "@/use-cases/status-list-manager";
 
 import {
   InvalidCosmosResourceError,
@@ -26,10 +23,7 @@ const OpenStatusListsPolicyDocument = t.type({
 export class CosmosDbOpenStatusListsPolicyRepository implements OpenStatusListsPolicyRepository {
   readonly #container: Container;
 
-  readonly loadOpenStatusListsPolicy: TE.TaskEither<
-    Error,
-    OpenStatusListsPolicy
-  > = pipe(
+  readonly loadOpenStatusListsPolicy = pipe(
     TE.tryCatch(async () => {
       const { resource } = await this.#container
         .item(OPEN_STATUS_LISTS_POLICY_ID, OPEN_STATUS_LISTS_POLICY_ID)

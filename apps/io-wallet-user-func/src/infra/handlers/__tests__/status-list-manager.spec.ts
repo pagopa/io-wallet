@@ -70,9 +70,7 @@ describe("StatusListManagerHandler", () => {
           }),
         },
         statusListAllocationConflictRepository: {
-          getRecentConflictMetrics: TE.right({
-            allocationConflicts: 0,
-          }),
+          getRecentConflictMetrics: TE.right(0),
         },
         statusListLifecycle: makeStatusListLifecycle(TE.left(originalError)),
         statusListManagerConfig: {

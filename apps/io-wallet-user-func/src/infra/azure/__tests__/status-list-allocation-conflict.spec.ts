@@ -23,9 +23,7 @@ describe("AzureMonitorLogsStatusListAllocationConflictRepository", () => {
 
     await expect(repository.getRecentConflictMetrics()).resolves.toEqual({
       _tag: "Right",
-      right: {
-        allocationConflicts: 0,
-      },
+      right: 0,
     });
 
     expect(queryResource).toHaveBeenCalledWith(
@@ -66,9 +64,7 @@ describe("AzureMonitorLogsStatusListAllocationConflictRepository", () => {
 
     await expect(repository.getRecentConflictMetrics()).resolves.toEqual({
       _tag: "Right",
-      right: {
-        allocationConflicts: 15,
-      },
+      right: 15,
     });
   });
 

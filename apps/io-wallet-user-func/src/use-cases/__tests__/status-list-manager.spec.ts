@@ -56,9 +56,7 @@ describe("manageStatusLists", () => {
         }),
       },
       statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right({
-          allocationConflicts: 0,
-        }),
+        getRecentConflictMetrics: TE.right(0),
       },
       statusListLifecycle,
       statusListManagerConfig: makeStatusListManagerConfig(),
@@ -117,9 +115,7 @@ describe("manageStatusLists", () => {
         }),
       },
       statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right({
-          allocationConflicts: 4,
-        }),
+        getRecentConflictMetrics: TE.right(4),
       },
       statusListLifecycle,
       statusListManagerConfig: makeStatusListManagerConfig({
@@ -288,9 +284,7 @@ describe("manageStatusLists", () => {
         }),
       },
       statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right({
-          allocationConflicts: 0,
-        }),
+        getRecentConflictMetrics: TE.right(0),
       },
       statusListLifecycle,
       statusListManagerConfig: makeStatusListManagerConfig(),
@@ -343,9 +337,7 @@ describe("manageStatusLists", () => {
         }),
       },
       statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right({
-          allocationConflicts: 0,
-        }),
+        getRecentConflictMetrics: TE.right(0),
       },
       statusListLifecycle,
       statusListManagerConfig: makeStatusListManagerConfig({
@@ -400,9 +392,7 @@ describe("manageStatusLists", () => {
         }),
       },
       statusListAllocationConflictRepository: {
-        getRecentConflictMetrics: TE.right({
-          allocationConflicts: 9,
-        }),
+        getRecentConflictMetrics: TE.right(9),
       },
       statusListLifecycle,
       statusListManagerConfig: makeStatusListManagerConfig(),

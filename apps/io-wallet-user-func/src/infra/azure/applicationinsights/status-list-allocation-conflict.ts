@@ -6,10 +6,7 @@ import {
 import { pipe } from "fp-ts/lib/function";
 import * as TE from "fp-ts/TaskEither";
 
-import type {
-  StatusListAllocationConflictMetrics,
-  StatusListAllocationConflictRepository,
-} from "@/use-cases/status-list-manager";
+import type { StatusListAllocationConflictRepository } from "@/use-cases/status-list-manager";
 
 const parseNumericMetric = (metricName: string, rawValue: unknown) => {
   if (rawValue === undefined) {
@@ -28,23 +25,14 @@ const parseNumericMetric = (metricName: string, rawValue: unknown) => {
   return numericValue;
 };
 
-const getConflictMetricsFromTables = (
-  tables: LogsTable[],
-): StatusListAllocationConflictMetrics => {
+const getConflictMetricsFromTables = (tables: LogsTable[]): number => {
   if (tables.length === 0 || tables[0].rows.length === 0) {
-    return {
-      allocationConflicts: 0,
-    };
+    return 0;
   }
 
   const [rawAllocationConflicts] = tables[0].rows[0];
 
-  return {
-    allocationConflicts: parseNumericMetric(
-      "allocationConflicts",
-      rawAllocationConflicts,
-    ),
-  };
+  return parseNumericMetric("allocationConflicts", rawAllocationConflicts);
 };
 
 export class AzureMonitorLogsStatusListAllocationConflictRepository implements StatusListAllocationConflictRepository {
