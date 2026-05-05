@@ -66,6 +66,7 @@
     "StatusListPageCount": "STATUS_LIST_PAGE_COUNT",
     "StatusListsMinimumAllocationConflictsForScaleUp": "STATUS_LISTS_MINIMUM_ALLOCATION_CONFLICTS_FOR_SCALE_UP",
     "StatusListsMinimumRemainingTotalCapacity": "STATUS_LISTS_MINIMUM_REMAINING_TOTAL_CAPACITY",
-    "StatusListsIndexReservationSize": "STATUS_LISTS_INDEX_RESERVATION_SIZE"
+    "StatusListsIndexReservationSize": "STATUS_LISTS_INDEX_RESERVATION_SIZE",
+    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK"
   }
 }
