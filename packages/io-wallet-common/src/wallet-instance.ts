@@ -14,6 +14,8 @@ const WalletInstanceStatus = t.type({
   statusListId: NonEmptyString,
 });
 
+export type WalletInstanceStatus = t.TypeOf<typeof WalletInstanceStatus>;
+
 const WalletInstanceBase = t.intersection([
   t.type({
     createdAt: IsoDateFromString,

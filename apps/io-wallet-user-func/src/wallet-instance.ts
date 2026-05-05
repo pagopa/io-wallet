@@ -8,6 +8,7 @@ import {
   RevocationReason,
   WalletInstance,
   WalletInstanceRevoked,
+  WalletInstanceStatus,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 
@@ -45,8 +46,6 @@ export type WalletInstanceRevocationDetails = Pick<
   WalletInstanceRevoked,
   "id" | "isRevoked" | "revocationReason"
 >;
-
-type WalletInstanceStatus = NonNullable<WalletInstance["status"]>;
 
 class RevokedWalletInstance extends Error {
   name = "WalletInstanceRevoked";
