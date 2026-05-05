@@ -4,19 +4,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import { StatusListLifecycle } from "@/status-list";
 
-import {
-  manageStatusLists,
-  type StatusListManagerConfig,
-} from "../status-list-manager";
+import { manageStatusLists } from "../status-list-manager";
 
-const makeStatusListManagerConfig = (
-  overrides: Partial<StatusListManagerConfig> = {},
-): StatusListManagerConfig => ({
+const statusListManagerConfig = {
   capacityPerNewStatusList: 1_000,
   minimumAllocationConflictsForScaleUp: 10,
   minimumRemainingTotalCapacity: 200,
-  ...overrides,
-});
+};
 
 describe("manageStatusLists", () => {
   it("runs reconciliation before normal close and provision steps", async () => {
@@ -59,7 +53,7 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics: TE.right(0),
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig(),
+      statusListManagerConfig,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -118,9 +112,10 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics: TE.right(4),
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig({
+      statusListManagerConfig: {
+        ...statusListManagerConfig,
         minimumAllocationConflictsForScaleUp: 4,
-      }),
+      },
     });
 
     await expect(handler()).resolves.toEqual({
@@ -176,7 +171,7 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics,
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig(),
+      statusListManagerConfig,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -233,7 +228,7 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics,
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig(),
+      statusListManagerConfig,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -287,7 +282,7 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics: TE.right(0),
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig(),
+      statusListManagerConfig,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -340,9 +335,10 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics: TE.right(0),
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig({
+      statusListManagerConfig: {
+        ...statusListManagerConfig,
         minimumRemainingTotalCapacity: 2_500,
-      }),
+      },
     });
 
     await expect(handler()).resolves.toEqual({
@@ -395,7 +391,7 @@ describe("manageStatusLists", () => {
         getRecentConflictMetrics: TE.right(9),
       },
       statusListLifecycle,
-      statusListManagerConfig: makeStatusListManagerConfig(),
+      statusListManagerConfig,
     });
 
     await expect(handler()).resolves.toEqual({

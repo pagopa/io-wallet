@@ -20,16 +20,16 @@ export interface StatusListAllocationConflictRepository {
   getRecentConflictMetrics: TE.TaskEither<Error, number>;
 }
 
-export interface StatusListManagerConfig {
-  capacityPerNewStatusList: number;
-  minimumAllocationConflictsForScaleUp: number;
-  minimumRemainingTotalCapacity: number;
-}
-
 interface OpenStatusListsPolicy {
   automaticMaximumOpenStatusLists: number;
   conflictAutoScaleEnabled: boolean;
   minimumOpenStatusLists: number;
+}
+
+interface StatusListManagerConfig {
+  capacityPerNewStatusList: number;
+  minimumAllocationConflictsForScaleUp: number;
+  minimumRemainingTotalCapacity: number;
 }
 
 interface StatusListManagerEnvironment {
