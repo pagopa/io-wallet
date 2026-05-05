@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as TE from "fp-ts/TaskEither";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
