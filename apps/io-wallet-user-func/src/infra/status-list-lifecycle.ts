@@ -49,8 +49,10 @@ const getMissingIds = (
   return expectedIds.filter((id) => !actualIdsSet.has(id));
 };
 
+// Provision in bounded parallel batches, and consider INITIALIZING lists stale
+// after 10 minutes so reconciliation can finish or retry them.
 const provisionBatchSize = 4;
-const staleInitializingMaxAgeMs = 10 * 60_000;
+const staleInitializingMaxAgeMs = 10 * 60000;
 
 export class StatusListLifecycleService implements StatusListLifecycle {
   readonly closeAlmostFullStatusLists = TE.tryCatch(
@@ -64,8 +66,6 @@ export class StatusListLifecycleService implements StatusListLifecycle {
         return undefined;
       }
 
-      // Catalog is the source of truth: only after lists are SEALED there do we
-      // remove their routing entries.
       await this.routing.removeRoutableStatusListIds(sealedStatusListIds);
     },
     (error) => (error instanceof Error ? error : new Error(String(error))),
@@ -90,7 +90,6 @@ export class StatusListLifecycleService implements StatusListLifecycle {
 
         await this.catalogs.openStatusList(statusListId);
 
-        // Routing is just a projection of the OPEN state stored in catalog.
         await this.routing.addRoutableStatusListIds([statusListId]);
       }
 
@@ -100,8 +99,6 @@ export class StatusListLifecycleService implements StatusListLifecycle {
       const routingOpenStatusListIds =
         await this.routing.getOpenStatusListIds();
 
-      // Catalog is authoritative for which lists are OPEN. Routing is reconciled
-      // to match it for allocation.
       const missingRoutingStatusListIds = getMissingIds(
         catalogOpenStatusListIds,
         routingOpenStatusListIds,
@@ -166,7 +163,6 @@ export class StatusListLifecycleService implements StatusListLifecycle {
 
     await this.catalogs.openStatusList(statusListId);
 
-    // New lists become routable only after catalog marks them OPEN.
     await this.routing.addRoutableStatusListIds([statusListId]);
 
     await this.notifications.sendMessage(
