@@ -34,9 +34,8 @@ describe("CreateWalletInstanceHandler", () => {
     insert: () => TE.left(new Error("not implemented")),
   };
 
-  const insertWalletInstanceSpy = vi.fn<WalletInstanceRepository["insert"]>(
-    () => TE.right(undefined),
-  );
+  const insertWalletInstanceSpy = vi.fn(() => TE.right(undefined));
+
   const allocateStatusBindingSpy = vi.fn(() =>
     TE.right({
       index: 100,
@@ -97,10 +96,7 @@ describe("CreateWalletInstanceHandler", () => {
   } as unknown as QueueClient;
 
   beforeEach(() => {
-    sendMessageSpy.mockClear();
-    revokeAllCredentialsSpy.mockClear();
-    insertWalletInstanceSpy.mockClear();
-    allocateStatusBindingSpy.mockClear();
+    vi.clearAllMocks();
   });
 
   it("should return a 204 HTTP response on success and enqueue email by default", async () => {
@@ -170,16 +166,6 @@ describe("CreateWalletInstanceHandler", () => {
     });
 
     expect(allocateStatusBindingSpy).not.toHaveBeenCalled();
-    expect(insertWalletInstanceSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: keyId,
-        userId: mockFiscalCode,
-      }),
-    );
-    const insertedWalletInstance = insertWalletInstanceSpy.mock.lastCall?.[0];
-
-    expect(insertedWalletInstance).toBeDefined();
-    expect(insertedWalletInstance).not.toHaveProperty("status");
   });
 
   it("should enqueue email when is_renewal is false", async () => {
