@@ -13,7 +13,7 @@ export interface StatusListAllocatorCatalogDataSource {
 }
 
 export interface StatusListAllocatorRoutingDataSource {
-  getOpenStatusListIds: () => Promise<readonly NonEmptyString[]>;
+  getRoutableStatusListIds: () => Promise<readonly NonEmptyString[]>;
 }
 
 interface CachedReservedStatusListBlock {
@@ -138,7 +138,7 @@ export class StatusListAllocatorService implements StatusListAllocator {
         return cachedBinding;
       }
 
-      const openStatusListIds = await this.routing.getOpenStatusListIds();
+      const openStatusListIds = await this.routing.getRoutableStatusListIds();
 
       const { allocatedBinding, hadConflict } =
         await this.scanOpenStatusListIds(

@@ -40,7 +40,7 @@ export class CosmosDbStatusListRoutingRepository
     });
   };
 
-  readonly getOpenStatusListIds = async () => {
+  readonly getRoutableStatusListIds = async () => {
     const { resources } = await this.#container.items
       .query({
         query: "SELECT c.id FROM c",
@@ -69,8 +69,6 @@ export class CosmosDbStatusListRoutingRepository
 
     return resources.map((r) => r.id);
   };
-
-  readonly getOpenStatusListIdsAsync = () => this.getOpenStatusListIds();
 
   readonly removeRoutableStatusListIds = async (
     statusListIds: readonly NonEmptyString[],

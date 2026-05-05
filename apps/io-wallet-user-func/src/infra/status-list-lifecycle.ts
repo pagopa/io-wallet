@@ -30,7 +30,7 @@ export interface StatusListLifecycleRoutingDataSource {
   addRoutableStatusListIds: (
     statusListIds: readonly NonEmptyString[],
   ) => Promise<void>;
-  getOpenStatusListIds: () => Promise<readonly NonEmptyString[]>;
+  getRoutableStatusListIds: () => Promise<readonly NonEmptyString[]>;
   removeRoutableStatusListIds: (
     statusListIds: readonly NonEmptyString[],
   ) => Promise<void>;
@@ -97,7 +97,7 @@ export class StatusListLifecycleService implements StatusListLifecycle {
         await this.catalogs.listOpenStatusListIds();
 
       const routingOpenStatusListIds =
-        await this.routing.getOpenStatusListIds();
+        await this.routing.getRoutableStatusListIds();
 
       const missingRoutingStatusListIds = getMissingIds(
         catalogOpenStatusListIds,
