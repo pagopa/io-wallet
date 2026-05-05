@@ -13,6 +13,15 @@ import {
 
 const OPEN_STATUS_LISTS_POLICY_ID = "open-status-lists-policy";
 
+// These runtime settings can be updated by editing the global document in the
+// `status-list-catalogs` container with id and partition key
+// `open-status-lists-policy`.
+// `minimumOpenStatusLists` is the minimum number of status lists to keep
+// available.
+// `automaticMaximumOpenStatusLists` is the temporary target used to scale up
+// when recent allocation conflicts are high.
+// `conflictAutoScaleEnabled` enables or disables that conflict-based auto
+// scale-up behavior.
 const OpenStatusListsPolicyDocument = t.type({
   automaticMaximumOpenStatusLists: t.number,
   conflictAutoScaleEnabled: t.boolean,

@@ -1,6 +1,6 @@
 import { Container, Database } from "@azure/cosmos";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { randomUUID } from "node:crypto";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import {
@@ -385,7 +385,7 @@ export class CosmosDbStatusListCatalogRepository
   }
 
   async #createInitializingStatusList(): Promise<NonEmptyString> {
-    const id = randomUUID() as NonEmptyString;
+    const id = uuidv4() as NonEmptyString;
 
     await this.#container.items.create({
       capacityBits: this.#capacityBits,
