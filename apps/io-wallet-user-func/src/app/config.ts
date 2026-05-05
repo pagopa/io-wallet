@@ -531,37 +531,30 @@ const getStatusListConfigFromEnvironment: RE.ReaderEither<
     pipe(
       pageCount,
       E.fromPredicate(
-        (value) => value > 0,
-        () => new Error("StatusListPageCount must be greater than zero"),
+        (value) => value > 0 && capacityBits % value === 0,
+        (value) =>
+          new Error(
+            value <= 0
+              ? "StatusListPageCount must be greater than zero"
+              : "StatusListCapacityBits must be divisible by StatusListPageCount",
+          ),
       ),
       E.chain((validPageCount) =>
         pipe(
-          capacityBits,
+          capacityBits / validPageCount,
           E.fromPredicate(
-            (value) => value % validPageCount === 0,
+            (value) => value % 8 === 0,
             () =>
               new Error(
-                "StatusListCapacityBits must be divisible by StatusListPageCount",
+                "StatusListCapacityBits / StatusListPageCount must be divisible by 8",
               ),
           ),
-          E.chain((validCapacityBits) =>
-            pipe(
-              validCapacityBits / validPageCount,
-              E.fromPredicate(
-                (value) => value % 8 === 0,
-                () =>
-                  new Error(
-                    "StatusListCapacityBits / StatusListPageCount must be divisible by 8",
-                  ),
-              ),
-              E.map((validPageBitsSize) => ({
-                ...statusListConfig,
-                capacityBits: validCapacityBits,
-                pageBitsSize: validPageBitsSize,
-                pageCount: validPageCount,
-              })),
-            ),
-          ),
+          E.map((validPageBitsSize) => ({
+            ...statusListConfig,
+            capacityBits,
+            pageBitsSize: validPageBitsSize,
+            pageCount: validPageCount,
+          })),
         ),
       ),
     ),
