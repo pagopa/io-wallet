@@ -10,16 +10,15 @@ import {
   toCosmosErrorOrInvalidResource,
 } from "@/infra/azure/cosmos/errors";
 import {
+  nonEmptyEntityIdsSchema,
+  nonEmptyStringSchema,
+} from "@/infra/azure/cosmos/schemas";
+import {
   StatusListAllocationConflictError,
   StatusListAllocatorCatalogDataSource,
 } from "@/infra/status-list-allocator";
 import { StatusListLifecycleCatalogDataSource } from "@/infra/status-list-lifecycle";
 import { StatusListsCapacitySnapshot } from "@/status-list";
-
-const nonEmptyStringSchema = z
-  .string()
-  .min(1)
-  .transform((value) => value as NonEmptyString);
 
 const isoDateStringSchema = z
   .string()
@@ -67,14 +66,6 @@ const getStateTransitionPatchOperations = (
   ];
 };
 
-const statusListIdsSchema = z
-  .array(
-    z.object({
-      id: nonEmptyStringSchema,
-    }),
-  )
-  .transform((documents) => documents.map(({ id }) => id));
-
 const capacitySnapshotRowSchema = z
   .object({
     openStatusListsCount: z.number(),
@@ -116,7 +107,7 @@ const parseStatusListIds = (
   resources: unknown,
   errorMessage: string,
 ): readonly NonEmptyString[] =>
-  parseWithSchema(statusListIdsSchema, resources, errorMessage);
+  parseWithSchema(nonEmptyEntityIdsSchema, resources, errorMessage);
 
 export class CosmosDbStatusListCatalogRepository
   implements

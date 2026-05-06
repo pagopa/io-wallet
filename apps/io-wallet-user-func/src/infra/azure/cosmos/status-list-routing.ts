@@ -6,6 +6,7 @@ import {
   InvalidCosmosResourceError,
   toCosmosErrorOrInvalidResource,
 } from "@/infra/azure/cosmos/errors";
+import { nonEmptyEntityIdsSchema } from "@/infra/azure/cosmos/schemas";
 import { StatusListAllocatorRoutingDataSource } from "@/infra/status-list-allocator";
 import { StatusListLifecycleRoutingDataSource } from "@/infra/status-list-lifecycle";
 
@@ -52,22 +53,15 @@ export class CosmosDbStatusListRoutingRepository
         )(error);
       });
 
-    if (
-      !Array.isArray(resources) ||
-      !resources.every(
-        (r) =>
-          r &&
-          typeof r === "object" &&
-          typeof r.id === "string" &&
-          r.id.length > 0,
-      )
-    ) {
+    const parsedResources = nonEmptyEntityIdsSchema.safeParse(resources);
+
+    if (!parsedResources.success) {
       throw new InvalidCosmosResourceError(
         "Error listing routable status lists: invalid result format",
       );
     }
 
-    return resources.map((r) => r.id);
+    return parsedResources.data;
   };
 
   readonly removeRoutableStatusListIds = async (
