@@ -67,7 +67,6 @@ export class StatusListAllocatorService implements StatusListAllocator {
     (error) => (error instanceof Error ? error : new Error(String(error))),
   );
 
-  // in-flight reservation guard
   private inFlightReservation: Promise<StatusListBinding> | undefined;
 
   constructor(
@@ -112,7 +111,6 @@ export class StatusListAllocatorService implements StatusListAllocator {
         continue;
       }
 
-      // in-flight reservation guard
       const inFlightReservation = this.reserveNextAvailableBlock();
       this.inFlightReservation = inFlightReservation;
 
