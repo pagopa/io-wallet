@@ -16,6 +16,7 @@ import {
   WalletInstanceEnvironment,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
+import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 export type WalletInstanceAssertion = BaseAssertion;
 
@@ -131,10 +132,7 @@ const consumeNonceAndGetValidWalletInstance = (input: {
 }): RTE.ReaderTaskEither<
   NonceEnvironment & WalletInstanceEnvironment,
   Error,
-  {
-    hardwareKey: JwkPublicKey;
-    signCount: number;
-  }
+  WalletInstanceValid
 > =>
   pipe(
     input.nonce,
@@ -142,10 +140,6 @@ const consumeNonceAndGetValidWalletInstance = (input: {
     RTE.chainW(() =>
       getValidWalletInstanceByUserId(input.hardwareKeyTag, input.userId),
     ),
-    RTE.map(({ hardwareKey, signCount }) => ({
-      hardwareKey,
-      signCount,
-    })),
   );
 
 export const validateWalletInstanceAssertionRequest: (input: {
@@ -175,7 +169,7 @@ export const validateWalletInstanceAssertionRequest: (input: {
     ),
   );
 
-export const validateWalletUnitAssertionRequest: (input: {
+export const validateWalletUnitAssertionAndGetWalletInstance: (input: {
   assertion: WalletUnitAssertion;
   userId: FiscalCode;
 }) => RTE.ReaderTaskEither<
@@ -184,7 +178,7 @@ export const validateWalletUnitAssertionRequest: (input: {
       assertionValidationConfig: AssertionValidationConfig;
     },
   Error,
-  void
+  WalletInstanceValid
 > = ({ assertion, userId }) =>
   pipe(
     consumeNonceAndGetValidWalletInstance({
@@ -192,7 +186,7 @@ export const validateWalletUnitAssertionRequest: (input: {
       nonce: assertion.nonce,
       userId,
     }),
-    RTE.chainW(({ hardwareKey, signCount }) =>
+    RTE.chainFirstW(({ hardwareKey, signCount }) =>
       validateWalletUnitAssertion(assertion, hardwareKey, signCount, userId),
     ),
   );

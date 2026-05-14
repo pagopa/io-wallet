@@ -432,6 +432,7 @@ app.http("createWalletUnitAttestation", {
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
     signer: walletAttestationSigner,
+    statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
   }),
   methods: ["POST"],
