@@ -114,8 +114,7 @@ describe("StatusListPublicationMonitorHandler", () => {
         signal: expect.any(AbortSignal),
       }),
     );
-    expect(telemetryEffect).toHaveBeenCalledOnce();
-    expect(telemetryEffect).toHaveBeenCalledWith(
+    expect(telemetryEffect).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
         message: `${statusListIdB} needs to be updated`,
       }),
@@ -157,8 +156,7 @@ describe("StatusListPublicationMonitorHandler", () => {
         signal: expect.any(AbortSignal),
       }),
     );
-    expect(telemetryEffect).toHaveBeenCalledOnce();
-    expect(telemetryEffect).toHaveBeenCalledWith(
+    expect(telemetryEffect).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
         message: `${statusListIdA} needs to be updated`,
       }),
@@ -188,15 +186,13 @@ describe("StatusListPublicationMonitorHandler", () => {
       statusListPublicationMonitorConfig,
     })();
 
-    expect(fetchMock).toHaveBeenCalledOnce();
-    expect(fetchMock).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
       getStatusListUrl(statusListIdA),
       expect.objectContaining({
         signal: expect.any(AbortSignal),
       }),
     );
-    expect(telemetryEffect).toHaveBeenCalledOnce();
-    expect(telemetryEffect).toHaveBeenCalledWith(
+    expect(telemetryEffect).toHaveBeenCalledExactlyOnceWith(
       expect.objectContaining({
         message: `${statusListIdA} needs to be updated`,
       }),
