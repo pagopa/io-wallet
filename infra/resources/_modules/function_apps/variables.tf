@@ -122,6 +122,11 @@ variable "wallet_instance_revocation_email_queue_name" {
   description = "Send Email on Wallet Instance Revocation Queue Name"
 }
 
+variable "status_list_publication_queue_name" {
+  type        = string
+  description = "Status List Publication Queue Name"
+}
+
 variable "cidr_subnet_user_uat_func" {
   type        = string
   description = "CIDR block for user uat function app subnet"

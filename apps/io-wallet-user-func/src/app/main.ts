@@ -6,7 +6,7 @@ import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
 import { registerAzureFunctionHooks } from "@pagopa/azure-tracing/azure-functions";
-import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
@@ -33,10 +33,14 @@ import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { RevokeWalletInstancesFunction } from "@/infra/azure/functions/revoke-wallet-instances";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
 import { StatusListManagerFunction } from "@/infra/azure/functions/status-list-manager";
+import { StatusListPublicationFunction } from "@/infra/azure/functions/status-list-publication";
+import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions/status-list-publication-dispatcher";
+import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
 import { CryptoSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
@@ -48,7 +52,9 @@ import {
 } from "@/infra/mobile-attestation-service";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { StatusListAllocatorService } from "@/infra/status-list-allocator";
+import { createStatusListBitRevocation } from "@/infra/status-list-bit-revocation";
 import { StatusListLifecycleService } from "@/infra/status-list-lifecycle";
+import { StatusListPublicationService } from "@/infra/status-list-publication";
 
 import { getConfigFromEnvironment } from "./config";
 
@@ -93,6 +99,10 @@ const walletInstanceRevocationEmailQueueClient =
   queueServiceClient.getQueueClient(
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
   );
+
+const statusListPublicationQueueClient = queueServiceClient.getQueueClient(
+  config.azure.storage.walletInstances.queues.statusListPublication.name,
+);
 
 const logsQueryClient = new LogsQueryClient(credential);
 
@@ -157,6 +167,16 @@ const containerClient = blobServiceClient.getContainerClient(
   config.azure.storage.entityConfiguration.containerName,
 );
 
+const statusListBlobServiceClient = new BlobServiceClient(
+  `https://${config.azure.storage.statusLists.accountName}.blob.core.windows.net`,
+  credential,
+);
+
+const statusListContainerClient =
+  statusListBlobServiceClient.getContainerClient(
+    config.azure.storage.statusLists.containerName,
+  );
+
 const certificateRepository = new CosmosDbCertificateRepository(database);
 
 const certificateV13Repository = new CosmosDbCertificateRepository(
@@ -182,6 +202,29 @@ const statusListRoutingRepository = new CosmosDbStatusListRoutingRepository(
   database,
 );
 
+const statusListBitRevocation = createStatusListBitRevocation(
+  statusListPagesRepository,
+);
+
+const statusListPublicationConfig = {
+  baseUrl: config.statusList.publication.baseUrl.href,
+  endpointName: config.azure.frontDoor.endpointName,
+  profileName: config.azure.frontDoor.profileName,
+  resourceGroupName: config.azure.generic.resourceGroupName,
+};
+
+const statusListPublication = new StatusListPublicationService(
+  statusListCatalogRepository,
+  statusListPagesRepository,
+  walletAttestationSigner,
+  statusListContainerClient,
+  cdnManagementClient,
+  statusListPublicationConfig,
+  Buffer.alloc(
+    (config.statusList.pageCount * config.statusList.pageBitsSize) / 8,
+  ),
+);
+
 const statusListAllocator = new StatusListAllocatorService(
   statusListCatalogRepository,
   statusListRoutingRepository,
@@ -194,6 +237,7 @@ const statusListAllocator = new StatusListAllocatorService(
 const statusListLifecycle = new StatusListLifecycleService(
   statusListCatalogRepository,
   statusListPagesRepository,
+  statusListPublication,
   statusListRoutingRepository,
   slackNotificationService,
   {
@@ -405,5 +449,48 @@ app.timer("statusListManager", {
       capacityPerNewStatusList: config.statusList.capacityBits,
     },
   }),
-  schedule: "0 */15 * * * *",
+  schedule: "0 */15 * * * *", // every 15 minutes
+});
+
+app.timer("statusListPublicationDispatcher", {
+  handler: StatusListPublicationDispatcherFunction({
+    inputDecoder: t.unknown,
+    queueClient: statusListPublicationQueueClient,
+    statusListPublication,
+  }),
+  schedule: "0 0 * * * *", // every hour
+});
+
+app.timer("statusListPublicationMonitor", {
+  handler: StatusListPublicationMonitorFunction({
+    inputDecoder: t.unknown,
+    statusListPublication,
+    statusListPublicationMonitorConfig: {
+      baseUrl: statusListPublicationConfig.baseUrl,
+    },
+  }),
+  schedule: "0 */10 * * * *", // every 10 minutes
+});
+
+app.storageQueue("statusListPublication", {
+  connection: "WalletInstanceStorageAccount",
+  handler: StatusListPublicationFunction({
+    inputDecoder: t.type({
+      statusListId: NonEmptyString,
+    }),
+    statusListPublication,
+  }),
+  queueName:
+    config.azure.storage.walletInstances.queues.statusListPublication.name,
+});
+
+app.cosmosDB("revokeWalletInstances", {
+  connection: "CosmosDbEndpoint",
+  containerName: "wallet-instances",
+  databaseName: config.azure.cosmos.dbName,
+  handler: RevokeWalletInstancesFunction({
+    inputDecoder: t.array(t.unknown),
+    statusListBitRevocation,
+  }),
+  leaseContainerName: "leases-revoke-wallet-instance",
 });

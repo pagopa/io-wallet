@@ -175,6 +175,7 @@ module "function_apps" {
   cosmos_database_name_uat                    = module.cosmos.apps.database_name_uat
   storage_account_cdn_name                    = azurerm_storage_account.cdn.name
   key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
+  status_list_publication_queue_name          = module.storage_accounts.status_list_publication_queue_name_01.name
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
   front_door_profile_name                     = module.cdn.name
