@@ -2,6 +2,7 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import { JwkPublicKey } from "io-wallet-common/jwk";
+import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 import {
   AssertionValidationConfig,
@@ -16,7 +17,6 @@ import {
   WalletInstanceEnvironment,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
-import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 export type WalletInstanceAssertion = BaseAssertion;
 
