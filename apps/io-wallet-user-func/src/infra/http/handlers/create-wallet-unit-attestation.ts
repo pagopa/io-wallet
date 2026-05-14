@@ -123,11 +123,9 @@ const generateWalletUnitAttestation: (request: {
 > = ({ userId, wuaRequest }) =>
   pipe(
     validateHardwareAssertionAndGetWalletInstance({ userId, wuaRequest }),
-    RTE.bindTo("walletInstance"),
+    RTE.chainW(flow(requireWalletInstanceStatus, RTE.fromEither)),
+    RTE.bindTo("walletInstanceStatus"),
     RTE.bindW("attestedKeys", () => validateKeysToAttest(wuaRequest)),
-    RTE.bindW("walletInstanceStatus", ({ walletInstance }) =>
-      pipe(walletInstance, requireWalletInstanceStatus, RTE.fromEither),
-    ),
     RTE.map(({ attestedKeys, walletInstanceStatus }) => ({
       attestedKeys,
       platform: wuaRequest.platform,
