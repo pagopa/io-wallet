@@ -101,7 +101,7 @@ const walletInstanceRevocationEmailQueueClient =
   );
 
 const statusListPublicationQueueClient = queueServiceClient.getQueueClient(
-  config.azure.storage.walletInstances.queues.statusListPublication.name,
+  config.azure.storage.statusLists.publicationQueue.name,
 );
 
 const logsQueryClient = new LogsQueryClient(credential);
@@ -481,8 +481,7 @@ app.storageQueue("statusListPublication", {
     }),
     statusListPublication,
   }),
-  queueName:
-    config.azure.storage.walletInstances.queues.statusListPublication.name,
+  queueName: config.azure.storage.statusLists.publicationQueue.name,
 });
 
 app.cosmosDB("revokeWalletInstances", {

@@ -123,6 +123,9 @@ const AzureStorageConfig = t.type({
   statusLists: t.type({
     accountName: t.string,
     containerName: t.string,
+    publicationQueue: t.type({
+      name: t.string,
+    }),
   }),
   walletInstances: t.type({
     queues: t.type({
@@ -130,9 +133,6 @@ const AzureStorageConfig = t.type({
         name: t.string,
       }),
       revocationSendEmail: t.type({
-        name: t.string,
-      }),
-      statusListPublication: t.type({
         name: t.string,
       }),
     }),
@@ -445,6 +445,9 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       statusLists: {
         accountName: statusListStorageAccountName,
         containerName: statusListStorageContainerName,
+        publicationQueue: {
+          name: statusListPublicationQueueName,
+        },
       },
       walletInstances: {
         queues: {
@@ -453,9 +456,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
           },
           revocationSendEmail: {
             name: walletInstanceRevocationEmailQueueName,
-          },
-          statusListPublication: {
-            name: statusListPublicationQueueName,
           },
         },
         url: walletInstanceStorageAccountUrl,
