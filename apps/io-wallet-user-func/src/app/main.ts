@@ -474,7 +474,7 @@ app.timer("statusListPublicationMonitor", {
 });
 
 app.storageQueue("statusListPublication", {
-  connection: "WalletInstanceStorageAccount",
+  connection: "StatusListStorageAccount",
   handler: StatusListPublicationFunction({
     inputDecoder: t.type({
       statusListId: NonEmptyString,
@@ -492,5 +492,6 @@ app.cosmosDB("revokeWalletInstances", {
     inputDecoder: t.array(t.unknown),
     statusListBitRevocation,
   }),
-  leaseContainerName: "leases-revoke-wallet-instance",
+  leaseContainerName: "leases-revoke-wallet-instances",
+  createLeaseCollectionIfNotExists: false,
 });

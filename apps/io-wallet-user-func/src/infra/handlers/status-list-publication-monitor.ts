@@ -25,6 +25,7 @@ interface StatusListPublicationMonitorEnvironment {
 const toError = (error: unknown): Error =>
   error instanceof Error ? error : new Error(String(error));
 
+// Require at least 12 hours of remaining validity.
 const maxTokenValiditySeconds = 12 * 60 * 60;
 
 const hasValidExpiration = (exp: number | undefined) => {
