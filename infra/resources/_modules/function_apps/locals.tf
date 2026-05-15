@@ -13,6 +13,9 @@ locals {
 
     EntityConfigurationStorageAccountName   = var.storage_account_cdn_name
     EntityConfigurationStorageContainerName = "well-known"
+    StatusListStorageAccountName            = var.storage_account_cdn_name
+    StatusListStorageContainerName          = "status-lists"
+    StatusListBaseUrl                       = "https://wallet.io.pagopa.it/status-lists/"
 
     FederationEntityOrganizationName = "PagoPA S.p.A."
     FederationEntityHomepageUri      = "https://io.italia.it"
@@ -32,6 +35,7 @@ locals {
 
     WalletInstanceCreationEmailQueueName   = var.wallet_instance_creation_email_queue_name
     WalletInstanceRevocationEmailQueueName = var.wallet_instance_revocation_email_queue_name
+    StatusListPublicationQueueName         = var.status_list_publication_queue_name
 
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
 

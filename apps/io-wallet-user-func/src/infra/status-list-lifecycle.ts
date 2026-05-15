@@ -1,9 +1,11 @@
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { NotificationService } from "io-wallet-common/notification";
 
 import {
   StatusListLifecycle,
+  StatusListPublication,
   StatusListsCapacitySnapshot,
 } from "@/status-list";
 
@@ -88,6 +90,13 @@ export class StatusListLifecycleService implements StatusListLifecycle {
       for (const statusListId of staleInitializingStatusListIds) {
         await this.pages.createEmptyPagesForStatusList(statusListId);
 
+        const publicationResult =
+          await this.publication.publishInitializingStatusList(statusListId)();
+
+        if (E.isLeft(publicationResult)) {
+          throw publicationResult.left;
+        }
+
         await this.catalogs.openStatusList(statusListId);
 
         await this.routing.addRoutableStatusListIds([statusListId]);
@@ -127,6 +136,7 @@ export class StatusListLifecycleService implements StatusListLifecycle {
   constructor(
     private readonly catalogs: StatusListLifecycleCatalogDataSource,
     private readonly pages: StatusListLifecyclePagesDataSource,
+    private readonly publication: StatusListPublication,
     private readonly routing: StatusListLifecycleRoutingDataSource,
     private readonly notifications: NotificationService,
     private readonly config: StatusListLifecycleConfig,
@@ -160,6 +170,13 @@ export class StatusListLifecycleService implements StatusListLifecycle {
     const statusListId = await this.catalogs.createInitializingStatusList();
 
     await this.pages.createEmptyPagesForStatusList(statusListId);
+
+    const publicationResult =
+      await this.publication.publishInitializingStatusList(statusListId)();
+
+    if (E.isLeft(publicationResult)) {
+      throw publicationResult.left;
+    }
 
     await this.catalogs.openStatusList(statusListId);
 

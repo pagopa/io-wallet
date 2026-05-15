@@ -18,6 +18,7 @@ import {
   StatusListAllocatorCatalogDataSource,
 } from "@/infra/status-list-allocator";
 import { StatusListLifecycleCatalogDataSource } from "@/infra/status-list-lifecycle";
+import { StatusListPublicationCatalogDataSource } from "@/infra/status-list-publication";
 import { StatusListsCapacitySnapshot } from "@/status-list";
 
 const isoDateStringSchema = z
@@ -112,7 +113,8 @@ const parseStatusListIds = (
 export class CosmosDbStatusListCatalogRepository
   implements
     StatusListAllocatorCatalogDataSource,
-    StatusListLifecycleCatalogDataSource
+    StatusListLifecycleCatalogDataSource,
+    StatusListPublicationCatalogDataSource
 {
   #capacityBits: number;
 
@@ -238,6 +240,35 @@ export class CosmosDbStatusListCatalogRepository
     return parseStatusListIds(
       resources,
       "Error listing OPEN status lists: invalid result format",
+    );
+  };
+
+  readonly listPublishableStatusListIds = async () => {
+    const { resources } = await this.#container.items
+      .query({
+        parameters: [
+          {
+            name: "@openState",
+            value: "OPEN",
+          },
+          {
+            name: "@sealedState",
+            value: "SEALED",
+          },
+        ],
+        query:
+          "SELECT c.id FROM c WHERE c.state = @openState OR c.state = @sealedState",
+      })
+      .fetchAll()
+      .catch((error) => {
+        throw toCosmosErrorOrInvalidResource(
+          "Error listing publishable status lists",
+        )(error);
+      });
+
+    return parseStatusListIds(
+      resources,
+      "Error listing publishable status lists: invalid result format",
     );
   };
 

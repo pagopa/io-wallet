@@ -207,4 +207,29 @@ describe("manageStatusLists", () => {
     expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
     expect(provisionNewStatusLists).not.toHaveBeenCalled();
   });
+
+  it("falls back to the minimum open status lists target when conflict metrics query fails", async () => {
+    const failingGetRecentConflictMetrics = vi.fn(
+      TE.left(new Error("Application Insights unavailable")),
+    );
+
+    const handler = manageStatusLists({
+      openStatusListsPolicyRepository,
+      statusListAllocationConflictRepository: {
+        getRecentConflictMetrics: failingGetRecentConflictMetrics,
+      },
+      statusListLifecycle,
+      statusListManagerConfig,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: undefined,
+    });
+
+    expect(failingGetRecentConflictMetrics).toHaveBeenCalledTimes(1);
+    expect(reconcileStatusLists).toHaveBeenCalledTimes(1);
+    expect(closeAlmostFullStatusLists).toHaveBeenCalledTimes(1);
+    expect(provisionNewStatusLists).not.toHaveBeenCalled();
+  });
 });

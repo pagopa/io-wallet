@@ -120,6 +120,13 @@ const AzureStorageConfig = t.type({
     accountName: t.string,
     containerName: t.string,
   }),
+  statusLists: t.type({
+    accountName: t.string,
+    containerName: t.string,
+    publicationQueue: t.type({
+      name: t.string,
+    }),
+  }),
   walletInstances: t.type({
     queues: t.type({
       creationSendEmail: t.type({
@@ -180,6 +187,12 @@ const StatusListManagerConfig = t.type({
 
 type StatusListManagerConfig = t.TypeOf<typeof StatusListManagerConfig>;
 
+const StatusListPublicationConfig = t.type({
+  baseUrl: UrlFromString,
+});
+
+type StatusListPublicationConfig = t.TypeOf<typeof StatusListPublicationConfig>;
+
 const StatusListConfig = t.type({
   allocation: StatusListAllocationConfig,
   capacityBits: t.number,
@@ -187,6 +200,7 @@ const StatusListConfig = t.type({
   manager: StatusListManagerConfig,
   pageBitsSize: t.number,
   pageCount: t.number,
+  publication: StatusListPublicationConfig,
 });
 
 type StatusListConfig = t.TypeOf<typeof StatusListConfig>;
@@ -394,6 +408,15 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
+    statusListPublicationQueueName: readFromEnvironment(
+      "StatusListPublicationQueueName",
+    ),
+    statusListStorageAccountName: readFromEnvironment(
+      "StatusListStorageAccountName",
+    ),
+    statusListStorageContainerName: readFromEnvironment(
+      "StatusListStorageContainerName",
+    ),
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
@@ -408,6 +431,9 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     ({
       entityConfigurationStorageAccountName,
       entityConfigurationStorageContainerName,
+      statusListPublicationQueueName,
+      statusListStorageAccountName,
+      statusListStorageContainerName,
       walletInstanceCreationEmailQueueName,
       walletInstanceRevocationEmailQueueName,
       walletInstanceStorageAccountUrl,
@@ -415,6 +441,13 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       entityConfiguration: {
         accountName: entityConfigurationStorageAccountName,
         containerName: entityConfigurationStorageContainerName,
+      },
+      statusLists: {
+        accountName: statusListStorageAccountName,
+        containerName: statusListStorageContainerName,
+        publicationQueue: {
+          name: statusListPublicationQueueName,
+        },
       },
       walletInstances: {
         queues: {
@@ -505,6 +538,16 @@ const getStatusListAllocationConfigFromEnvironment: RE.ReaderEither<
   ),
 });
 
+const getStatusListPublicationConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListPublicationConfig
+> = pipe(
+  readFromEnvironment("StatusListBaseUrl"),
+  RE.chainEitherKW(parse(UrlFromString)),
+  RE.map((baseUrl) => ({ baseUrl })),
+);
+
 const getStatusListConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -526,36 +569,25 @@ const getStatusListConfigFromEnvironment: RE.ReaderEither<
       readFromEnvironment("StatusListPageCount"),
       RE.chainW(stringToNumberDecoderRE),
     ),
+    publication: getStatusListPublicationConfigFromEnvironment,
   }),
   RE.chainEitherKW(({ capacityBits, pageCount, ...statusListConfig }) =>
     pipe(
       pageCount,
       E.fromPredicate(
-        (value) => value > 0 && capacityBits % value === 0,
-        (value) =>
+        (value) => value > 0 && capacityBits % (value * 64) === 0,
+        () =>
           new Error(
-            value <= 0
-              ? "StatusListPageCount must be greater than zero"
-              : "StatusListCapacityBits must be divisible by StatusListPageCount",
+            "StatusListPageCount must be greater than zero and StatusListCapacityBits / StatusListPageCount must be divisible by 64",
           ),
       ),
       E.chain((validPageCount) =>
-        pipe(
-          capacityBits / validPageCount,
-          E.fromPredicate(
-            (value) => value % 8 === 0,
-            () =>
-              new Error(
-                "StatusListCapacityBits / StatusListPageCount must be divisible by 8",
-              ),
-          ),
-          E.map((validPageBitsSize) => ({
-            ...statusListConfig,
-            capacityBits,
-            pageBitsSize: validPageBitsSize,
-            pageCount: validPageCount,
-          })),
-        ),
+        E.right({
+          ...statusListConfig,
+          capacityBits,
+          pageBitsSize: capacityBits / validPageCount,
+          pageCount: validPageCount,
+        }),
       ),
     ),
   ),

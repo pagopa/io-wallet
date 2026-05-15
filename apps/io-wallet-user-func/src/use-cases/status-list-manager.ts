@@ -82,6 +82,7 @@ const loadEffectiveTargetOpenStatusLists: RTE.ReaderTaskEither<
                 ? currentPolicy.automaticMaximumOpenStatusLists
                 : currentPolicy.minimumOpenStatusLists,
             ),
+            TE.orElse(() => TE.right(currentPolicy.minimumOpenStatusLists)),
           ),
     ),
   );

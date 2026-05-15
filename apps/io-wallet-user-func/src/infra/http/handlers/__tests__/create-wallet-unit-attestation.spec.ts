@@ -71,6 +71,13 @@ const federationEntity = {
   tosUri: url("https://wallet-provider.example.org/logo.svg"),
 };
 
+const statusListBaseUrl = "https://status-list.example.org";
+
+const walletInstanceStatus = {
+  index: 412,
+  statusListId: "status-list-a" as NonEmptyString,
+};
+
 const assertionValidationConfig: AssertionValidationConfig = {
   allowedDeveloperUsers: ["a"],
   androidBundleIdentifiers: [],
@@ -98,6 +105,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
         id: "123" as NonEmptyString,
         isRevoked: false,
         signCount: 0,
+        status: walletInstanceStatus,
         userId: mockFiscalCode,
       }),
     ),
@@ -301,6 +309,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -329,6 +338,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -364,6 +374,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -404,11 +415,12 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
     const result = await handler();
-    expect.assertions(4);
+    expect.assertions(5);
 
     if (E.isRight(result)) {
       const body = t
@@ -426,6 +438,12 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         expect(walletUnitAttestation.iss).toBe(
           "https://wallet-provider-v13.example.org/bar",
         );
+        expect(walletUnitAttestation.status).toEqual({
+          status_list: {
+            idx: walletInstanceStatus.index,
+            uri: `${statusListBaseUrl}/${walletInstanceStatus.statusListId}`,
+          },
+        });
         const attestedKeys = t
           .array(
             t.type({
@@ -458,6 +476,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -516,6 +535,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -576,6 +596,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -655,6 +676,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -704,6 +726,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -729,6 +752,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
@@ -760,6 +784,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       logger,
       nonceRepository,
       signer,
+      statusListBaseUrl,
       walletInstanceRepository,
     });
 
