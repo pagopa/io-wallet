@@ -487,11 +487,11 @@ app.storageQueue("statusListPublication", {
 app.cosmosDB("revokeWalletInstances", {
   connection: "CosmosDbEndpoint",
   containerName: "wallet-instances",
+  createLeaseCollectionIfNotExists: false,
   databaseName: config.azure.cosmos.dbName,
   handler: RevokeWalletInstancesFunction({
     inputDecoder: t.array(t.unknown),
     statusListBitRevocation,
   }),
   leaseContainerName: "leases-revoke-wallet-instances",
-  createLeaseCollectionIfNotExists: false,
 });
