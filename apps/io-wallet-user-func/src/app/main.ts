@@ -474,7 +474,7 @@ app.timer("statusListPublicationMonitor", {
 });
 
 app.storageQueue("statusListPublication", {
-  connection: "StatusListStorageAccount",
+  connection: "StatusListPublicationQueueStorageAccount",
   handler: StatusListPublicationFunction({
     inputDecoder: t.type({
       statusListId: NonEmptyString,

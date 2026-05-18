@@ -63,6 +63,7 @@
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
     "WalletInstanceStorageAccountUrl": "WALLET_INSTANCE_STORAGE_ACCOUNT_URL",
     "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME",
+    "StatusListPublicationQueueStorageAccount__accountName": "STATUS_LIST_PUBLICATION_QUEUE_STORAGE_ACCOUNT_NAME",
     "WalletAttestationOauthClientSub": "WALLET_ATTESTATION_OAUTH_CLIENT_SUB",
     "CreateWalletInstanceStatusEnabled": "false",
     "StatusListCapacityBits": "STATUS_LIST_CAPACITY_BITS",

@@ -81,6 +81,7 @@ locals {
       TrustAnchorUrl                            = "https://ta.wallet.ipzs.it",
       WalletInstanceStorageAccountUrl           = var.wallet_instance_storage_account_url
       WalletInstanceStorageAccount__accountName = var.wallet_instance_storage_account_name
+      StatusListPublicationQueueStorageAccount__accountName = var.wallet_instance_storage_account_name
     },
     {
       for s in var.user_func.app_settings :
@@ -138,6 +139,7 @@ locals {
         HttpRequestTimeout                        = "5000"
         WalletInstanceStorageAccountUrl           = var.wallet_instance_storage_account_uat_url
         WalletInstanceStorageAccount__accountName = var.wallet_instance_storage_account_uat_name
+        StatusListPublicationQueueStorageAccount__accountName = var.wallet_instance_storage_account_uat_name
       },
       {
         for s in var.user_func.app_settings :
