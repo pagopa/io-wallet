@@ -55,6 +55,12 @@ module "admins_roles" {
       role                 = "owner"
     },
     {
+      storage_account_name = var.cdn_storage_account_uat.name
+      resource_group_name  = var.cdn_storage_account_uat.resource_group_name
+      description          = "Allow admins to manage blobs"
+      role                 = "owner"
+    },
+    {
       storage_account_name = var.storage_account.name
       resource_group_name  = var.storage_account.resource_group_name
       description          = "Allow admins to manage blobs"

@@ -32,6 +32,7 @@ No requirements.
 | Name | Type |
 |------|------|
 | [azurerm_role_assignment.func_app_user_cdn_endpoint_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.func_app_user_uat_cdn_endpoint_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 
 ## Inputs
 
@@ -40,8 +41,10 @@ No requirements.
 | <a name="input_admin_ids"></a> [admin\_ids](#input\_admin\_ids) | Id of the Entra ID group with admin roles | `set(string)` | n/a | yes |
 | <a name="input_appgw_identity_principal_id"></a> [appgw\_identity\_principal\_id](#input\_appgw\_identity\_principal\_id) | Application Gateway resource ID | `string` | n/a | yes |
 | <a name="input_cdn_endpoint_id"></a> [cdn\_endpoint\_id](#input\_cdn\_endpoint\_id) | CDN endpoint id | `string` | n/a | yes |
+| <a name="input_cdn_endpoint_id_uat"></a> [cdn\_endpoint\_id\_uat](#input\_cdn\_endpoint\_id\_uat) | UAT CDN endpoint id | `string` | n/a | yes |
 | <a name="input_cdn_principal_id"></a> [cdn\_principal\_id](#input\_cdn\_principal\_id) | Principal ID of the CDN managed identity | `string` | n/a | yes |
 | <a name="input_cdn_storage_account"></a> [cdn\_storage\_account](#input\_cdn\_storage\_account) | Storage Account Id used for CDN | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
+| <a name="input_cdn_storage_account_uat"></a> [cdn\_storage\_account\_uat](#input\_cdn\_storage\_account\_uat) | Storage Account Id used for the UAT CDN | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>  })</pre> | n/a | yes |
 | <a name="input_cicd_principal_ids"></a> [cicd\_principal\_ids](#input\_cicd\_principal\_ids) | Principal ID of CICD pipelines | <pre>object({<br/>    infra = object({<br/>      ci = string<br/>      cd = string<br/>    })<br/>    app = object({<br/>      ci = optional(string, "")<br/>      cd = string<br/>    })<br/>  })</pre> | n/a | yes |
 | <a name="input_cosmos_db"></a> [cosmos\_db](#input\_cosmos\_db) | n/a | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>    database_name       = string<br/>  })</pre> | n/a | yes |
 | <a name="input_cosmos_db_uat"></a> [cosmos\_db\_uat](#input\_cosmos\_db\_uat) | n/a | <pre>object({<br/>    name                = string<br/>    resource_group_name = string<br/>    database_name       = string<br/>  })</pre> | n/a | yes |
