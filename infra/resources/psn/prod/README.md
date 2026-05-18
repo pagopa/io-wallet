@@ -51,6 +51,7 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 | <a name="module_apim"></a> [apim](#module\_apim) | pagopa-dx/azure-api-management/azurerm | ~> 2.1 |
 | <a name="module_apim_roles"></a> [apim\_roles](#module\_apim\_roles) | pagopa-dx/azure-role-assignments/azurerm | ~> 1.3 |
 | <a name="module_cdn"></a> [cdn](#module\_cdn) | pagopa-dx/azure-cdn/azurerm | ~> 0.6 |
+| <a name="module_cdn_uat"></a> [cdn\_uat](#module\_cdn\_uat) | pagopa-dx/azure-cdn/azurerm | ~> 0.6 |
 | <a name="module_cosmos"></a> [cosmos](#module\_cosmos) | ../../_modules/cosmos | n/a |
 | <a name="module_function_apps"></a> [function\_apps](#module\_function\_apps) | ../../_modules/function_apps | n/a |
 | <a name="module_iam"></a> [iam](#module\_iam) | ../../_modules/iam | n/a |
@@ -139,6 +140,7 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 | [azurerm_role_assignment.apim_kv_infra_secrets](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.infra_cd_kv_app_secrets_officer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_storage_account.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_account.cdn_uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account_static_website.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_static_website) | resource |
 | [azurerm_storage_blob.healthcheck](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_blob) | resource |
 | [azurerm_storage_blob.index](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_blob) | resource |
@@ -147,6 +149,7 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 | [azurerm_storage_container.pdnd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.probes](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.root](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_storage_container.status_lists_uat](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.well_known](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_subnet.apim](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet_route_table_association.apim_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |

@@ -64,6 +64,14 @@ variable "cdn_storage_account" {
   description = "Storage Account Id used for CDN"
 }
 
+variable "cdn_storage_account_uat" {
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  description = "Storage Account Id used for the UAT CDN"
+}
+
 variable "storage_account" {
   type = object({
     name                = string
@@ -118,4 +126,9 @@ variable "appgw_identity_principal_id" {
 variable "cdn_endpoint_id" {
   type        = string
   description = "CDN endpoint id"
+}
+
+variable "cdn_endpoint_id_uat" {
+  type        = string
+  description = "UAT CDN endpoint id"
 }

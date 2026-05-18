@@ -72,6 +72,16 @@ variable "storage_account_cdn_name" {
   description = "Name of the CDN storage account"
 }
 
+variable "status_list_storage_account_name" {
+  type        = string
+  description = "Name of the storage account used for status lists"
+}
+
+variable "status_list_storage_container_name" {
+  type        = string
+  description = "Name of the storage container used for status lists"
+}
+
 variable "user_func" {
   type = object({
     app_settings = list(object({
@@ -142,9 +152,19 @@ variable "front_door_profile_name" {
   description = "Front Door profile name"
 }
 
+variable "front_door_profile_name_uat" {
+  type        = string
+  description = "UAT Front Door profile name"
+}
+
 variable "front_door_endpoint_name" {
   type        = string
   description = "Front Door endpoint name"
+}
+
+variable "front_door_endpoint_name_uat" {
+  type        = string
+  description = "UAT Front Door endpoint name"
 }
 
 variable "subscription_id" {
@@ -207,4 +227,9 @@ variable "wallet_instance_storage_account_uat_name" {
 variable "federation_entity_base_path_v13_uat" {
   type        = string
   description = "The Federation Entity base path for spec 1.3 in the UAT user function app"
+}
+
+variable "application_insights_resource_id" {
+  type        = string
+  description = "The resource ID of the Application Insights instance"
 }

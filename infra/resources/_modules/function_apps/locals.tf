@@ -14,8 +14,13 @@ locals {
     EntityConfigurationStorageAccountName   = var.storage_account_cdn_name
     EntityConfigurationStorageContainerName = "well-known"
     StatusListStorageAccountName            = var.storage_account_cdn_name
-    StatusListStorageContainerName          = "status-lists"
     StatusListBaseUrl                       = "https://wallet.io.pagopa.it/status-lists/"
+    StatusListCapacityBits                          = "1048576"
+    StatusListPageCount                             = "256"
+    StatusListStorageContainerName                  = var.status_list_storage_container_name
+    StatusListsIndexReservationSize                 = "128"
+    StatusListsMinimumAllocationConflictsForScaleUp = "30"
+    StatusListsMinimumRemainingTotalCapacity        = "1000000"
 
     FederationEntityOrganizationName = "PagoPA S.p.A."
     FederationEntityHomepageUri      = "https://io.italia.it"
@@ -56,6 +61,8 @@ locals {
     AzureSubscriptionId    = var.subscription_id
 
     NODE_OPTIONS = "--import @pagopa/azure-tracing"
+
+    ApplicationInsightsResourceId = var.application_insights_resource_id
     },
   )
 
@@ -64,6 +71,7 @@ locals {
     local.function_apps.common_app_settings,
     local.function_app_user_envs_shared_app_settings,
     {
+      FederationEntityBasePath                  = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10               = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV13               = "https://wallet.io.pagopa.it"
       PidIssuerApiBaseURL                       = "https://util.wallet.ipzs.it"
@@ -112,8 +120,11 @@ locals {
       },
       {
         AndroidBundleIdentifiers                  = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
+        FederationEntityBasePath                  = "https://foo11.blob.core.windows.net/foo/"
         FederationEntityBasePathV10               = "https://foo11.blob.core.windows.net/foo/"
         FederationEntityBasePathV13               = var.federation_entity_base_path_v13_uat
+        FrontDoorEndpointName                     = var.front_door_endpoint_name_uat
+        FrontDoorProfileName                      = var.front_door_profile_name_uat
         PidIssuerApiBaseURL                       = "https://pre.util.wallet.ipzs.it"
         PidIssuerApiClientCertificate             = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVCekNDQXUrZ0F3SUJBZ0lVWUxoRXhVMUVHcEZabkFjTXZqTVNXbkozeHU0d0RRWUpLb1pJaHZjTkFRRUwKQlFBd2daSXhDekFKQmdOVkJBWVRBa2xVTVE0d0RBWURWUVFJREFWTVlYcHBiekVOTUFzR0ExVUVCd3dFVW05dApZVEVXTUJRR0ExVUVDZ3dOVUdGbmIxQkJJRk11Y0M1QkxqRWtNQ0lHQTFVRUF3d2JabTl2TVRFdVlteHZZaTVqCmIzSmxMbmRwYm1SdmQzTXVibVYwTVNZd0pBWUpLb1pJaHZjTkFRa0JGaGR3WVdkdmNHRnpjR0ZBY0dWakxuQmgKWjI5d1lTNXBkREFlRncweU5UQTNNVGd3TmpNMU1EVmFGdzB6TlRBM01UWXdOak0xTURWYU1JR1NNUXN3Q1FZRApWUVFHRXdKSlZERU9NQXdHQTFVRUNBd0ZUR0Y2YVc4eERUQUxCZ05WQkFjTUJGSnZiV0V4RmpBVUJnTlZCQW9NCkRWQmhaMjlRUVNCVExuQXVRUzR4SkRBaUJnTlZCQU1NRzJadmJ6RXhMbUpzYjJJdVkyOXlaUzUzYVc1a2IzZHoKTG01bGRERW1NQ1FHQ1NxR1NJYjNEUUVKQVJZWGNHRm5iM0JoYzNCaFFIQmxZeTV3WVdkdmNHRXVhWFF3Z2dFaQpNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURMbXFhd21NSzRRcFA5UVduU24xMmtoRlNCCnVpL2JjdXVtd3JPVkVNSHZSUVdnZmtUc2UyN0QwaHdlZ0Q0eXA4cFBDZGFURkpubWRIalFxVFFpdG5xQkdtbFcKdW1UYjd0N05xUFNyYmpaMU9XM3NsczU3VndQWjJjSHU0MU9YT0ZzYTlHdWptRjBTYXBWZVFLMVBLSTJLOXNTRApjVGdqKzl2QUNKS2tHcXVQeXlUL2JVazhWbzM4UC9wTlJiQ2ZqWXJJWTRGYkVuZllTWm9nSnZEbVpjL0xydytHClVyYTUxT3MvekdrckVRQ3ZZRGk2RnB4OHllVkNIclBqS3Nwa3FUY05veURXejQ3VjBGaS9yZ3lxSVlGQ1psZjUKWDI0Tk1sczBWZm1uZE8zdGN6cERqb2pBUXJ6TGt5bjlTblNhTFFQYTl2K3o0TEV1TWhiTXlUQkVnblV2QWdNQgpBQUdqVXpCUk1CMEdBMVVkRGdRV0JCUmFCSEpYdGRHMS9idVVYVFZ6WER5ZlJteS9FekFmQmdOVkhTTUVHREFXCmdCUmFCSEpYdGRHMS9idVVYVFZ6WER5ZlJteS9FekFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFBdlhiS0FhT015akF5VGN2N3Q3dWVxRG5BSTJXRmJwektyb2QyOW5JSG81Nlp2SUpNKwpMTWFEcDdvSEVXdUlPNEhwTTBRN2pOUU9HRjJtUzhGSHd4dlp3em4yS2RPc0RoMFhZYjJBc0ZGZ2pUVWgxOXRSClVaNXFmSHVBS2xPUFArbStKTXIrdUxUblNtSC81WEo1ZENYOEtVMldmUWJMby8raFhhMEJCMDFpWDRVU2ZOZEQKSk1QYUh0N3l6NHVSTzMrTlE5V2tza2VhU3YzZVlWYk51K2VNcUFPVjV4MHpaaHZ4ekVBRkJoaFNQb1oza1phTQorUXFWczBEMFRJMm9za3VRL3Y5cURrMkJ3NlNMV0xsSldjL1hSS3NGRkFqdGc2TWtJNGF0YXFJNFJ4L0xMTWlaCjE4bTdPTVdUeHcxZTIxMmRxS3JNZkRQcVdMLytTRmJVK2ZzcwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
         IosBundleIdentifiers                      = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet,it.pagopa.app.io.canary"
