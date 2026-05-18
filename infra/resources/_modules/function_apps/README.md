@@ -48,6 +48,7 @@ No requirements.
 | <a name="input_action_group_io_id"></a> [action\_group\_io\_id](#input\_action\_group\_io\_id) | Id of the Action Group shared among all IO teams | `string` | `null` | no |
 | <a name="input_action_group_wallet_id"></a> [action\_group\_wallet\_id](#input\_action\_group\_wallet\_id) | Id of the Action Group owned by the Wallet team | `string` | n/a | yes |
 | <a name="input_application_insights_connection_string"></a> [application\_insights\_connection\_string](#input\_application\_insights\_connection\_string) | Application Insights instrumentation key | `string` | n/a | yes |
+| <a name="input_application_insights_resource_id"></a> [application\_insights\_resource\_id](#input\_application\_insights\_resource\_id) | The resource ID of the Application Insights instance | `string` | n/a | yes |
 | <a name="input_cidr_subnet_support_func"></a> [cidr\_subnet\_support\_func](#input\_cidr\_subnet\_support\_func) | CIDR block for support function app subnet | `string` | n/a | yes |
 | <a name="input_cidr_subnet_user_func"></a> [cidr\_subnet\_user\_func](#input\_cidr\_subnet\_user\_func) | CIDR block for user function app subnet 02 | `string` | n/a | yes |
 | <a name="input_cidr_subnet_user_uat_func"></a> [cidr\_subnet\_user\_uat\_func](#input\_cidr\_subnet\_user\_uat\_func) | CIDR block for user uat function app subnet | `string` | n/a | yes |
@@ -69,6 +70,8 @@ No requirements.
 | <a name="input_private_dns_zone_resource_group_name"></a> [private\_dns\_zone\_resource\_group\_name](#input\_private\_dns\_zone\_resource\_group\_name) | Resource group name of the private DNS zone to use for private endpoints | `string` | `null` | no |
 | <a name="input_private_endpoint_subnet_id"></a> [private\_endpoint\_subnet\_id](#input\_private\_endpoint\_subnet\_id) | Private Endpoints subnet Id | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
+| <a name="input_status_list_storage_account_name"></a> [status\_list\_storage\_account\_name](#input\_status\_list\_storage\_account\_name) | Name of the storage account used for status lists | `string` | n/a | yes |
+| <a name="input_status_list_storage_container_name"></a> [status\_list\_storage\_container\_name](#input\_status\_list\_storage\_container\_name) | Name of the storage container used for status lists | `string` | n/a | yes |
 | <a name="input_storage_account_cdn_name"></a> [storage\_account\_cdn\_name](#input\_storage\_account\_cdn\_name) | Name of the CDN storage account | `string` | n/a | yes |
 | <a name="input_subnet_route_table_id"></a> [subnet\_route\_table\_id](#input\_subnet\_route\_table\_id) | Route table to associate with the subnets | `string` | `null` | no |
 | <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription ID | `string` | n/a | yes |

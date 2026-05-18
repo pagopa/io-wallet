@@ -13,6 +13,18 @@ locals {
 
     EntityConfigurationStorageAccountName   = var.storage_account_cdn_name
     EntityConfigurationStorageContainerName = "well-known"
+    StatusListBaseUrl = format(
+      "https://%s.blob.core.windows.net/%s/",
+      var.status_list_storage_account_name,
+      var.status_list_storage_container_name,
+    )
+    StatusListCapacityBits                          = "1048576"
+    StatusListPageCount                             = "256"
+    StatusListStorageAccountName                    = var.status_list_storage_account_name
+    StatusListStorageContainerName                  = var.status_list_storage_container_name
+    StatusListsIndexReservationSize                 = "128"
+    StatusListsMinimumAllocationConflictsForScaleUp = "30"
+    StatusListsMinimumRemainingTotalCapacity        = "1000000"
 
     FederationEntityOrganizationName = "PagoPA S.p.A."
     FederationEntityHomepageUri      = "https://io.italia.it"
@@ -52,6 +64,8 @@ locals {
     AzureSubscriptionId    = var.subscription_id
 
     NODE_OPTIONS = "--import @pagopa/azure-tracing"
+
+    ApplicationInsightsResourceId = var.application_insights_resource_id
     },
   )
 
@@ -60,6 +74,7 @@ locals {
     local.function_apps.common_app_settings,
     local.function_app_user_envs_shared_app_settings,
     {
+      FederationEntityBasePath                  = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10               = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV13               = "https://wallet.io.pagopa.it"
       PidIssuerApiBaseURL                       = "https://util.wallet.ipzs.it"
@@ -108,6 +123,7 @@ locals {
       },
       {
         AndroidBundleIdentifiers                  = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
+        FederationEntityBasePath                  = "https://foo11.blob.core.windows.net/foo/"
         FederationEntityBasePathV10               = "https://foo11.blob.core.windows.net/foo/"
         FederationEntityBasePathV13               = var.federation_entity_base_path_v13_uat
         FrontDoorEndpointName                     = var.front_door_endpoint_name_uat

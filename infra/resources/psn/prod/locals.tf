@@ -52,6 +52,10 @@ locals {
       {
         name                  = "MailupSecret"
         key_vault_secret_name = "MailupSecret"
+      },
+      {
+        name             = "SlackStatusChannelWebhook",
+        key_vault_secret = "SlackStatusChannelWebhook"
       }
     ]
   }

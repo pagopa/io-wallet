@@ -174,6 +174,8 @@ module "function_apps" {
   cosmos_database_name                        = module.cosmos.apps.database_name
   cosmos_database_name_uat                    = module.cosmos.apps.database_name_uat
   storage_account_cdn_name                    = azurerm_storage_account.cdn.name
+  status_list_storage_account_name            = azurerm_storage_account.cdn_uat.name
+  status_list_storage_container_name          = azurerm_storage_container.status_lists_uat.name
   key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
@@ -202,6 +204,8 @@ module "function_apps" {
     trimsuffix(module.storage_accounts.trust_uat.primary_blob_endpoint, "/"),
     module.storage_accounts.trust_uat_wallet_provider_container.name,
   )
+
+  application_insights_resource_id = data.azurerm_application_insights.core.id
 
   tags = local.tags
 }
