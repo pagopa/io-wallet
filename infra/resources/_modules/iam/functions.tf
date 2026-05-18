@@ -229,6 +229,12 @@ module "func_app_user_uat" {
 
   storage_blob = [
     {
+      storage_account_name = var.cdn_storage_account_uat.name
+      resource_group_name  = var.cdn_storage_account_uat.resource_group_name
+      description          = "Allow Function App user to write blobs to CDN Storage Account"
+      role                 = "writer"
+    },
+    {
       storage_account_name = var.storage_account_uat.name
       resource_group_name  = var.storage_account_uat.resource_group_name
       description          = "Allow Function App user slot to write blobs to Storage Account"
@@ -290,6 +296,12 @@ module "func_app_user_uat_slot" {
   ]
 
   storage_blob = [
+    {
+      storage_account_name = var.cdn_storage_account_uat.name
+      resource_group_name  = var.cdn_storage_account_uat.resource_group_name
+      description          = "Allow Function App user slot to write blobs to CDN Storage Account"
+      role                 = "writer"
+    },
     {
       storage_account_name = var.storage_account_uat.name
       resource_group_name  = var.storage_account_uat.resource_group_name

@@ -1,3 +1,9 @@
+locals {
+  cdn_uat_environment = merge(local.environment, {
+    environment = "u"
+  })
+}
+
 resource "azurerm_storage_account" "cdn" {
   name = provider::dx::resource_name(merge(
     local.environment,
@@ -8,6 +14,35 @@ resource "azurerm_storage_account" "cdn" {
   ))
   resource_group_name = data.azurerm_resource_group.wallet.name
   location            = local.environment.location
+
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
+  account_kind             = "StorageV2"
+
+  https_traffic_only_enabled      = true
+  allow_nested_items_to_be_public = true
+  public_network_access_enabled   = true
+  shared_access_key_enabled       = true
+  default_to_oauth_authentication = true
+  min_tls_version                 = "TLS1_2"
+
+  blob_properties {
+    versioning_enabled = true
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_storage_account" "cdn_uat" {
+  name = provider::dx::resource_name(merge(
+    local.cdn_uat_environment,
+    {
+      name          = "cdn"
+      resource_type = "storage_account"
+    }
+  ))
+  resource_group_name = data.azurerm_resource_group.wallet.name
+  location            = local.cdn_uat_environment.location
 
   account_replication_type = "ZRS"
   account_tier             = "Standard"
@@ -120,6 +155,29 @@ module "cdn" {
   tags = local.tags
 }
 
+module "cdn_uat" {
+  source  = "pagopa-dx/azure-cdn/azurerm"
+  version = "~> 0.6"
+
+  environment = merge(
+    local.cdn_uat_environment,
+    {
+      app_name  = "cdn",
+      env_short = local.cdn_uat_environment.environment
+    }
+  )
+
+  resource_group_name = data.azurerm_resource_group.wallet.name
+
+  origins = {
+    primary = {
+      host_name = azurerm_storage_account.cdn_uat.primary_blob_host
+    }
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
   name                      = "WellKnownRewrite"
   cdn_frontdoor_rule_set_id = module.cdn.rule_set_id
@@ -211,3 +269,4 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "cdn_requests_error_alert
 
   tags = local.tags
 }
+

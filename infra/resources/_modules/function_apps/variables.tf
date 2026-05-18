@@ -72,6 +72,11 @@ variable "storage_account_cdn_name" {
   description = "Name of the CDN storage account"
 }
 
+variable "storage_account_cdn_uat_name" {
+  type        = string
+  description = "Name of the UAT CDN storage account"
+}
+
 variable "user_func" {
   type = object({
     app_settings = list(object({
@@ -137,9 +142,19 @@ variable "front_door_profile_name" {
   description = "Front Door profile name"
 }
 
+variable "front_door_profile_name_uat" {
+  type        = string
+  description = "UAT Front Door profile name"
+}
+
 variable "front_door_endpoint_name" {
   type        = string
   description = "Front Door endpoint name"
+}
+
+variable "front_door_endpoint_name_uat" {
+  type        = string
+  description = "UAT Front Door endpoint name"
 }
 
 variable "subscription_id" {

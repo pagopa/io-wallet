@@ -55,8 +55,11 @@ No requirements.
 | <a name="input_cosmos_database_name_uat"></a> [cosmos\_database\_name\_uat](#input\_cosmos\_database\_name\_uat) | uat Wallet Cosmos DB database name | `string` | n/a | yes |
 | <a name="input_cosmos_db_endpoint"></a> [cosmos\_db\_endpoint](#input\_cosmos\_db\_endpoint) | Cosmos DB endpoint to use as application environment variable | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | n/a | <pre>object({<br/>    prefix          = string<br/>    environment     = string<br/>    location        = string<br/>    domain          = optional(string)<br/>    instance_number = string<br/>  })</pre> | n/a | yes |
+| <a name="input_federation_entity_base_path_v13_uat"></a> [federation\_entity\_base\_path\_v13\_uat](#input\_federation\_entity\_base\_path\_v13\_uat) | The Federation Entity base path for spec 1.3 in the UAT user function app | `string` | n/a | yes |
 | <a name="input_front_door_endpoint_name"></a> [front\_door\_endpoint\_name](#input\_front\_door\_endpoint\_name) | Front Door endpoint name | `string` | n/a | yes |
+| <a name="input_front_door_endpoint_name_uat"></a> [front\_door\_endpoint\_name\_uat](#input\_front\_door\_endpoint\_name\_uat) | UAT Front Door endpoint name | `string` | n/a | yes |
 | <a name="input_front_door_profile_name"></a> [front\_door\_profile\_name](#input\_front\_door\_profile\_name) | Front Door profile name | `string` | n/a | yes |
+| <a name="input_front_door_profile_name_uat"></a> [front\_door\_profile\_name\_uat](#input\_front\_door\_profile\_name\_uat) | UAT Front Door profile name | `string` | n/a | yes |
 | <a name="input_health_check_path_support"></a> [health\_check\_path\_support](#input\_health\_check\_path\_support) | Health check path for support function app | `string` | n/a | yes |
 | <a name="input_health_check_path_user"></a> [health\_check\_path\_user](#input\_health\_check\_path\_user) | Health check path for user function app | `string` | n/a | yes |
 | <a name="input_health_check_path_user_uat"></a> [health\_check\_path\_user\_uat](#input\_health\_check\_path\_user\_uat) | Health check path for user uat function app | `string` | n/a | yes |
@@ -67,6 +70,7 @@ No requirements.
 | <a name="input_private_endpoint_subnet_id"></a> [private\_endpoint\_subnet\_id](#input\_private\_endpoint\_subnet\_id) | Private Endpoints subnet Id | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
 | <a name="input_storage_account_cdn_name"></a> [storage\_account\_cdn\_name](#input\_storage\_account\_cdn\_name) | Name of the CDN storage account | `string` | n/a | yes |
+| <a name="input_storage_account_cdn_uat_name"></a> [storage\_account\_cdn\_uat\_name](#input\_storage\_account\_cdn\_uat\_name) | Name of the UAT CDN storage account | `string` | n/a | yes |
 | <a name="input_subnet_route_table_id"></a> [subnet\_route\_table\_id](#input\_subnet\_route\_table\_id) | Route table to associate with the subnets | `string` | `null` | no |
 | <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription ID | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Resource tags | `map(any)` | n/a | yes |

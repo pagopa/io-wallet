@@ -51,6 +51,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_trust_uat"></a> [trust\_uat](#output\_trust\_uat) | n/a |
+| <a name="output_trust_uat_wallet_provider_container"></a> [trust\_uat\_wallet\_provider\_container](#output\_trust\_uat\_wallet\_provider\_container) | n/a |
 | <a name="output_wallet"></a> [wallet](#output\_wallet) | n/a |
 | <a name="output_wallet_instance_creation_email_queue_name_01"></a> [wallet\_instance\_creation\_email\_queue\_name\_01](#output\_wallet\_instance\_creation\_email\_queue\_name\_01) | n/a |
 | <a name="output_wallet_instance_revocation_email_queue_name_01"></a> [wallet\_instance\_revocation\_email\_queue\_name\_01](#output\_wallet\_instance\_revocation\_email\_queue\_name\_01) | n/a |

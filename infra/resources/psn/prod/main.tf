@@ -174,11 +174,14 @@ module "function_apps" {
   cosmos_database_name                        = module.cosmos.apps.database_name
   cosmos_database_name_uat                    = module.cosmos.apps.database_name_uat
   storage_account_cdn_name                    = azurerm_storage_account.cdn.name
+  storage_account_cdn_uat_name                = azurerm_storage_account.cdn_uat.name
   key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
   front_door_profile_name                     = module.cdn.name
+  front_door_profile_name_uat                 = module.cdn_uat.name
   front_door_endpoint_name                    = module.cdn.endpoint_name
+  front_door_endpoint_name_uat                = module.cdn_uat.endpoint_name
 
   application_insights_connection_string = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.application_insights_connection_string.versionless_id})"
 
@@ -195,7 +198,7 @@ module "function_apps" {
 
   wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
   wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
-  federation_entity_base_path_v13_uat      = format(
+  federation_entity_base_path_v13_uat = format(
     "%s/%s/",
     trimsuffix(module.storage_accounts.trust_uat.primary_blob_endpoint, "/"),
     module.storage_accounts.trust_uat_wallet_provider_container.name,
@@ -288,6 +291,11 @@ module "iam" {
     resource_group_name = azurerm_storage_account.cdn.resource_group_name
   }
 
+  cdn_storage_account_uat = {
+    name                = azurerm_storage_account.cdn_uat.name
+    resource_group_name = azurerm_storage_account.cdn_uat.resource_group_name
+  }
+
   storage_account = {
     name                = module.storage_accounts.wallet.name
     resource_group_name = module.storage_accounts.wallet.resource_group_name
@@ -305,4 +313,5 @@ module "iam" {
 
   appgw_identity_principal_id = data.azurerm_user_assigned_identity.app_gw.principal_id
   cdn_endpoint_id             = module.cdn.endpoint_id
+  cdn_endpoint_id_uat         = module.cdn_uat.endpoint_id
 }

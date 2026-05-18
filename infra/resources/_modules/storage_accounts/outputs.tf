@@ -28,9 +28,9 @@ output "wallet_uat" {
 
 output "trust_uat" {
   value = {
-    name                = azurerm_storage_account.trust_uat.name
+    name                  = azurerm_storage_account.trust_uat.name
     primary_blob_endpoint = azurerm_storage_account.trust_uat.primary_blob_endpoint
-    resource_group_name = azurerm_storage_account.trust_uat.resource_group_name
+    resource_group_name   = azurerm_storage_account.trust_uat.resource_group_name
   }
 }
 
