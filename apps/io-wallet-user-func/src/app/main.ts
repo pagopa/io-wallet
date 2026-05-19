@@ -228,9 +228,6 @@ const statusListPublication = new StatusListPublicationService(
 const statusListAllocator = new StatusListAllocatorService(
   statusListCatalogRepository,
   statusListRoutingRepository,
-  {
-    reservedBlock: undefined,
-  },
   config.statusList.allocation,
 );
 

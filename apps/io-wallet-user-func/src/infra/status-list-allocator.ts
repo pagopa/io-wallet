@@ -69,10 +69,13 @@ export class StatusListAllocatorService implements StatusListAllocator {
 
   private inFlightReservation: Promise<StatusListBinding> | undefined;
 
+  private readonly cache: StatusListAllocationCache = {
+    reservedBlock: undefined,
+  };
+
   constructor(
     private readonly catalogs: StatusListAllocatorCatalogDataSource,
     private readonly routing: StatusListAllocatorRoutingDataSource,
-    private readonly cache: StatusListAllocationCache,
     private readonly config: StatusListAllocatorConfig,
   ) {}
 
