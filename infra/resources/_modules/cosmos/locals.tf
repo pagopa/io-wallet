@@ -36,6 +36,38 @@ locals {
       }
       default_ttl = null
     },
+    {
+      name               = "status-list-catalogs"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.status_list_catalogs
+      }
+      default_ttl = null
+    },
+    {
+      name               = "status-list-pages"
+      partition_key_path = "/statusListId"
+      autoscale_settings = {
+        max_throughput = var.throughput.status_list_pages
+      }
+      default_ttl = null
+    },
+    {
+      name               = "status-list-routing"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.status_list_routing
+      }
+      default_ttl = null
+    },
+    {
+      name               = "leases-revoke-wallet-instances"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.leases
+      }
+      default_ttl = null
+    },
   ]
 
   wallet_cosmosdb_uat_containers = [
@@ -76,6 +108,38 @@ locals {
       partition_key_path = "/id"
       autoscale_settings = {
         max_throughput = var.throughput.uat.whitelisted_fiscal_codes
+      }
+      default_ttl = null
+    },
+    {
+      name               = "status-list-catalogs"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.uat.status_list_catalogs
+      }
+      default_ttl = null
+    },
+    {
+      name               = "status-list-pages"
+      partition_key_path = "/statusListId"
+      autoscale_settings = {
+        max_throughput = var.throughput.uat.status_list_pages
+      }
+      default_ttl = null
+    },
+    {
+      name               = "status-list-routing"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.uat.status_list_routing
+      }
+      default_ttl = null
+    },
+    {
+      name               = "leases-revoke-wallet-instances"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.uat.leases
       }
       default_ttl = null
     },
