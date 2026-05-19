@@ -5,6 +5,7 @@ import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
 import * as jose from "jose";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   copyBlob,
@@ -195,7 +196,7 @@ export class StatusListPublicationService implements StatusListPublication {
     finalBlobName: string,
     tokenStatusList: string,
   ): TE.TaskEither<Error, void> =>
-    pipe(`.staging/${statusListId}`, (stagingBlobName) =>
+    pipe(`.staging/${statusListId}/${uuidv4()}`, (stagingBlobName) =>
       TE.bracket(
         uploadBlob({
           blobName: stagingBlobName,
