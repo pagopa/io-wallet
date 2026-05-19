@@ -23,7 +23,11 @@ module "function_app_user_uat" {
   }
 
   app_settings      = local.function_app_user_uat.app_settings
-  slot_app_settings = local.function_app_user_uat.app_settings
+  slot_app_settings = local.function_app_user_uat.slot_app_settings
+  sticky_app_setting_names = [
+    for to_disable in local.function_app_user_slot_disabled :
+    format("AzureWebJobs.%s.Disabled", to_disable)
+  ]
 
   action_group_ids = [
     var.action_group_wallet_id,
