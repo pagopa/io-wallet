@@ -67,11 +67,11 @@ export class StatusListAllocatorService implements StatusListAllocator {
     (error) => (error instanceof Error ? error : new Error(String(error))),
   );
 
-  private inFlightReservation: Promise<StatusListBinding> | undefined;
-
   private readonly cache: StatusListAllocationCache = {
     reservedBlock: undefined,
   };
+
+  private inFlightReservation: Promise<StatusListBinding> | undefined;
 
   constructor(
     private readonly catalogs: StatusListAllocatorCatalogDataSource,

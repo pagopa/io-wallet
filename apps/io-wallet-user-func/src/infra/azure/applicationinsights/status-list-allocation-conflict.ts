@@ -38,9 +38,9 @@ const getConflictMetricsFromTables = (tables: LogsTable[]): number => {
 export class AzureMonitorLogsStatusListAllocationConflictRepository implements StatusListAllocationConflictRepository {
   readonly #applicationInsightsResourceId: string;
   readonly #client: LogsQueryClient;
-  readonly #queryDuration: string;
-
   readonly #query = `AppEvents | where Name == "StatusListAllocation" | summarize allocationConflicts = count() | project allocationConflicts`;
+
+  readonly #queryDuration: string;
 
   getRecentConflictMetrics = pipe(
     TE.tryCatch(
