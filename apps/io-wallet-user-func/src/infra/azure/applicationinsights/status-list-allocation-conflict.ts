@@ -38,6 +38,7 @@ const getConflictMetricsFromTables = (tables: LogsTable[]): number => {
 export class AzureMonitorLogsStatusListAllocationConflictRepository implements StatusListAllocationConflictRepository {
   readonly #applicationInsightsResourceId: string;
   readonly #client: LogsQueryClient;
+  readonly #queryDuration: string;
 
   readonly #query = `AppEvents | where Name == "StatusListAllocation" | summarize allocationConflicts = count() | project allocationConflicts`;
 
@@ -48,7 +49,7 @@ export class AzureMonitorLogsStatusListAllocationConflictRepository implements S
           this.#applicationInsightsResourceId,
           this.#query,
           {
-            duration: "PT15M",
+            duration: this.#queryDuration,
           },
           {
             serverTimeoutInSeconds: 30,
@@ -75,11 +76,14 @@ export class AzureMonitorLogsStatusListAllocationConflictRepository implements S
   constructor({
     applicationInsightsResourceId,
     client,
+    queryDuration,
   }: {
     applicationInsightsResourceId: string;
     client: LogsQueryClient;
+    queryDuration: string;
   }) {
     this.#applicationInsightsResourceId = applicationInsightsResourceId;
     this.#client = client;
+    this.#queryDuration = queryDuration;
   }
 }

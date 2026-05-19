@@ -248,10 +248,13 @@ const statusListLifecycle = new StatusListLifecycleService(
 const openStatusListsPolicyRepository =
   new CosmosDbOpenStatusListsPolicyRepository(database);
 
+const statusListManagerIntervalMinutes = 15;
+
 const statusListAllocationConflictRepository =
   new AzureMonitorLogsStatusListAllocationConflictRepository({
     applicationInsightsResourceId: config.azure.applicationInsights.resourceId,
     client: logsQueryClient,
+    queryDuration: `PT${statusListManagerIntervalMinutes}M`,
   });
 
 app.http("healthCheck", {
@@ -450,7 +453,7 @@ app.timer("statusListManager", {
       capacityPerNewStatusList: config.statusList.capacityBits,
     },
   }),
-  schedule: "0 */15 * * * *", // every 15 minutes
+  schedule: `0 */${statusListManagerIntervalMinutes} * * * *`,
 });
 
 app.timer("statusListPublicationDispatcher", {
