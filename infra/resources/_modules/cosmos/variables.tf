@@ -54,7 +54,7 @@ variable "throughput" {
     whitelisted_fiscal_codes = optional(number, 8000)
     certificates             = optional(number, 8000)
     status_list_catalogs     = optional(number, 4000)
-    status_list_pages        = optional(number, 8000)
+    status_list_pages        = optional(number, 4000)
     status_list_routing      = optional(number, 4000)
     leases                   = optional(number, 1000)
     uat = optional(object({
@@ -63,7 +63,7 @@ variable "throughput" {
       certificates             = optional(number, 1000)
       whitelisted_fiscal_codes = optional(number, 1000)
       status_list_catalogs     = optional(number, 1000)
-      status_list_pages        = optional(number, 2000)
+      status_list_pages        = optional(number, 1000)
       status_list_routing      = optional(number, 1000)
       leases                   = optional(number, 1000)
     }), {})
