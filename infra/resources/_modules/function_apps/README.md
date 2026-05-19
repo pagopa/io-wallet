@@ -70,8 +70,10 @@ No requirements.
 | <a name="input_private_dns_zone_resource_group_name"></a> [private\_dns\_zone\_resource\_group\_name](#input\_private\_dns\_zone\_resource\_group\_name) | Resource group name of the private DNS zone to use for private endpoints | `string` | `null` | no |
 | <a name="input_private_endpoint_subnet_id"></a> [private\_endpoint\_subnet\_id](#input\_private\_endpoint\_subnet\_id) | Private Endpoints subnet Id | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where resources will be created | `string` | n/a | yes |
-| <a name="input_status_list_storage_account_name"></a> [status\_list\_storage\_account\_name](#input\_status\_list\_storage\_account\_name) | Name of the storage account used for status lists | `string` | n/a | yes |
+| <a name="input_status_list_publication_queue_name"></a> [status\_list\_publication\_queue\_name](#input\_status\_list\_publication\_queue\_name) | Status List Publication Queue Name | `string` | n/a | yes |
+| <a name="input_status_list_storage_account_name_uat"></a> [status\_list\_storage\_account\_name\_uat](#input\_status\_list\_storage\_account\_name\_uat) | Name of the uat storage account used for status lists | `string` | n/a | yes |
 | <a name="input_status_list_storage_container_name"></a> [status\_list\_storage\_container\_name](#input\_status\_list\_storage\_container\_name) | Name of the storage container used for status lists | `string` | n/a | yes |
+| <a name="input_status_list_storage_container_name_uat"></a> [status\_list\_storage\_container\_name\_uat](#input\_status\_list\_storage\_container\_name\_uat) | Name of the uat storage container used for status lists | `string` | n/a | yes |
 | <a name="input_storage_account_cdn_name"></a> [storage\_account\_cdn\_name](#input\_storage\_account\_cdn\_name) | Name of the CDN storage account | `string` | n/a | yes |
 | <a name="input_subnet_route_table_id"></a> [subnet\_route\_table\_id](#input\_subnet\_route\_table\_id) | Route table to associate with the subnets | `string` | `null` | no |
 | <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription ID | `string` | n/a | yes |

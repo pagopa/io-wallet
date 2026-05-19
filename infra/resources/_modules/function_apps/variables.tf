@@ -72,14 +72,19 @@ variable "storage_account_cdn_name" {
   description = "Name of the CDN storage account"
 }
 
-variable "status_list_storage_account_name" {
+variable "status_list_storage_account_name_uat" {
   type        = string
-  description = "Name of the storage account used for status lists"
+  description = "Name of the uat storage account used for status lists"
 }
 
 variable "status_list_storage_container_name" {
   type        = string
   description = "Name of the storage container used for status lists"
+}
+
+variable "status_list_storage_container_name_uat" {
+  type        = string
+  description = "Name of the uat storage container used for status lists"
 }
 
 variable "user_func" {
@@ -130,6 +135,11 @@ variable "wallet_instance_creation_email_queue_name" {
 variable "wallet_instance_revocation_email_queue_name" {
   type        = string
   description = "Send Email on Wallet Instance Revocation Queue Name"
+}
+
+variable "status_list_publication_queue_name" {
+  type        = string
+  description = "Status List Publication Queue Name"
 }
 
 variable "cidr_subnet_user_uat_func" {

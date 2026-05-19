@@ -104,6 +104,13 @@ resource "azurerm_storage_container" "root" {
   container_access_type = "container"
 }
 
+resource "azurerm_storage_container" "status_lists" {
+  name                  = "status-lists"
+  storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
+
 resource "azurerm_storage_container" "status_lists_uat" {
   name                  = "status-lists"
   storage_account_id    = azurerm_storage_account.cdn_uat.id

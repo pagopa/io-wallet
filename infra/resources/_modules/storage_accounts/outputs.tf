@@ -10,6 +10,12 @@ output "wallet_instance_revocation_email_queue_name_01" {
   }
 }
 
+output "status_list_publication_queue_name_01" {
+  value = {
+    name = azurerm_storage_queue.status-list-publication-queue-01.name
+  }
+}
+
 output "wallet" {
   value = {
     id                  = azurerm_storage_account.common.id
