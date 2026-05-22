@@ -3,12 +3,11 @@ lockfileVersion: '9.0'
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
-  injectWorkspacePackages: true
 
 catalogs:
   default:
     '@azure/cosmos':
-      specifier: ^4.9.2
+      specifier: 4.9.2
       version: 4.9.2
     '@azure/functions':
       specifier: ^4.12.0
@@ -91,7 +90,7 @@ importers:
         version: 2.2.22(fp-ts@2.16.11)
       io-wallet-common:
         specifier: workspace:^
-        version: file:packages/io-wallet-common(@azure/core-client@1.10.1)(encoding@0.1.13)(postcss@8.5.6)(typescript@5.9.3)
+        version: link:../../packages/io-wallet-common
       uuid:
         specifier: ^14.0.0
         version: 14.0.0
@@ -146,7 +145,7 @@ importers:
         version: 2.2.22(fp-ts@2.16.11)
       io-wallet-common:
         specifier: workspace:^
-        version: file:packages/io-wallet-common(@azure/core-client@1.10.1)(encoding@0.1.13)(postcss@8.5.6)(typescript@5.9.3)
+        version: link:../../packages/io-wallet-common
     devDependencies:
       '@pagopa/eslint-config':
         specifier: ^6.0.1
@@ -273,7 +272,7 @@ importers:
         version: 2.2.22(fp-ts@2.16.11)
       io-wallet-common:
         specifier: workspace:^
-        version: file:packages/io-wallet-common(@azure/core-client@1.10.1)(encoding@0.1.13)(postcss@8.5.6)(typescript@5.9.3)
+        version: link:../../packages/io-wallet-common
       jose:
         specifier: 5.10.0
         version: 5.10.0
@@ -3091,9 +3090,6 @@ packages:
     peerDependencies:
       fp-ts: ^2.5.0
 
-  io-wallet-common@file:packages/io-wallet-common:
-    resolution: {directory: packages/io-wallet-common, type: directory}
-
   ip-address@10.1.0:
     resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
     engines: {node: '>= 12'}
@@ -4782,6 +4778,12 @@ snapshots:
       '@azure/core-client': 1.10.1
       '@azure/core-rest-pipeline': 1.22.2
 
+  '@azure/core-http-compat@2.3.2(@azure/core-client@1.10.1)(@azure/core-rest-pipeline@1.23.0)':
+    dependencies:
+      '@azure/abort-controller': 2.1.2
+      '@azure/core-client': 1.10.1
+      '@azure/core-rest-pipeline': 1.23.0
+
   '@azure/core-lro@2.7.2':
     dependencies:
       '@azure/abort-controller': 2.1.2
@@ -4853,7 +4855,7 @@ snapshots:
     dependencies:
       '@azure/abort-controller': 2.1.2
       '@azure/core-auth': 1.10.1
-      '@azure/core-rest-pipeline': 1.22.2
+      '@azure/core-rest-pipeline': 1.23.0
       '@azure/core-tracing': 1.3.1
       '@azure/core-util': 1.13.1
       '@azure/keyvault-keys': 4.10.0(@azure/core-client@1.10.1)
@@ -4888,7 +4890,7 @@ snapshots:
       '@azure/core-auth': 1.10.1
       '@azure/core-client': 1.10.1
       '@azure/core-paging': 1.6.2
-      '@azure/core-rest-pipeline': 1.22.2
+      '@azure/core-rest-pipeline': 1.23.0
       '@azure/core-tracing': 1.3.1
       '@azure/core-util': 1.13.1
       '@azure/core-xml': 1.5.0
@@ -4933,7 +4935,7 @@ snapshots:
       '@azure/abort-controller': 2.1.2
       '@azure/core-auth': 1.10.1
       '@azure/core-client': 1.10.1
-      '@azure/core-rest-pipeline': 1.22.2
+      '@azure/core-rest-pipeline': 1.23.0
       '@azure/core-tracing': 1.3.1
       '@azure/core-util': 1.13.1
       '@azure/logger': 1.3.0
@@ -4946,10 +4948,10 @@ snapshots:
       '@azure-rest/core-client': 2.5.1
       '@azure/abort-controller': 2.1.2
       '@azure/core-auth': 1.10.1
-      '@azure/core-http-compat': 2.3.2(@azure/core-client@1.10.1)(@azure/core-rest-pipeline@1.22.2)
+      '@azure/core-http-compat': 2.3.2(@azure/core-client@1.10.1)(@azure/core-rest-pipeline@1.23.0)
       '@azure/core-lro': 2.7.2
       '@azure/core-paging': 1.6.2
-      '@azure/core-rest-pipeline': 1.22.2
+      '@azure/core-rest-pipeline': 1.23.0
       '@azure/core-tracing': 1.3.1
       '@azure/core-util': 1.13.1
       '@azure/keyvault-common': 2.0.0
@@ -6184,7 +6186,7 @@ snapshots:
 
   '@pagopa/io-functions-commons@31.0.0(@azure/core-client@1.10.1)(@azure/functions@4.12.0)(@pagopa/ts-commons@13.1.2(encoding@0.1.13)(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11)))(encoding@0.1.13)(express@4.21.2)(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))':
     dependencies:
-      '@azure/cosmos': 4.9.2(@azure/core-client@1.10.1)
+      '@azure/cosmos': 4.9.3(@azure/core-client@1.10.1)
       '@azure/data-tables': 13.3.2
       '@azure/functions': 4.12.0
       '@pagopa/ts-commons': 13.1.2(encoding@0.1.13)(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
@@ -8033,25 +8035,6 @@ snapshots:
   io-ts@2.2.22(fp-ts@2.16.11):
     dependencies:
       fp-ts: 2.16.11
-
-  io-wallet-common@file:packages/io-wallet-common(@azure/core-client@1.10.1)(encoding@0.1.13)(postcss@8.5.6)(typescript@5.9.3):
-    dependencies:
-      '@azure/cosmos': 4.9.3(@azure/core-client@1.10.1)
-      '@pagopa/handler-kit': 1.1.1(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))(postcss@8.5.6)(typescript@5.9.3)
-      '@pagopa/logger': 1.0.1
-      '@pagopa/ts-commons': 13.1.2(encoding@0.1.13)(fp-ts@2.16.11)(io-ts@2.2.22(fp-ts@2.16.11))
-      fp-ts: 2.16.11
-      io-ts: 2.2.22(fp-ts@2.16.11)
-      jose: 5.10.0
-    transitivePeerDependencies:
-      - '@azure/core-client'
-      - '@swc/core'
-      - applicationinsights-native-metrics
-      - encoding
-      - postcss
-      - supports-color
-      - ts-node
-      - typescript
 
   ip-address@10.1.0: {}
 
