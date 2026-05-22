@@ -18,6 +18,12 @@ export interface WalletUnitAttestationData {
   attestedKeys: readonly AttestedKey[];
   kid: string;
   platform: "android" | "ios";
+  status: {
+    statusList: {
+      idx: number;
+      uri: string;
+    };
+  };
   walletProviderName: string;
   // walletSolutionVersion: string;
   x5c: string[];
@@ -56,6 +62,7 @@ const WalletUnitAttestationToJwtModel: E.Encoder<
   encode: ({
     attestedKeys,
     kid,
+    status,
     walletProviderName,
     // walletSolutionVersion,
     x5c,
@@ -77,8 +84,8 @@ const WalletUnitAttestationToJwtModel: E.Encoder<
     kid,
     status: {
       status_list: {
-        idx: 412,
-        uri: "https://revocation_url/statuslists/1",
+        idx: status.statusList.idx,
+        uri: status.statusList.uri,
       },
     },
     user_authentication: attestedKeys.map(
@@ -89,6 +96,7 @@ const WalletUnitAttestationToJwtModel: E.Encoder<
 };
 export interface WalletUnitAttestationEnvironment extends SignerMetadataEnvironment {
   federationEntity: FederationEntity;
+  statusListBaseUrl: string;
 }
 
 export const createWalletUnitAttestation =

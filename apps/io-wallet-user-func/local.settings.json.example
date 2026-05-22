@@ -31,6 +31,9 @@
     "GoogleAppCredentialsEncoded": "GOOGLE_APP_CREDENTIALS_BASE64_ENCODED",
     "EntityConfigurationStorageAccountName": "ENTITY_CONFIGURATION_STORAGE_ACCOUNT_NAME",
     "EntityConfigurationStorageContainerName": "ENTITY_CONFIGURATION_STORAGE_CONTAINER_NAME",
+    "StatusListStorageAccountName": "STATUS_LIST_STORAGE_ACCOUNT_NAME",
+    "StatusListStorageContainerName": "STATUS_LIST_STORAGE_CONTAINER_NAME",
+    "StatusListPublicationQueueName": "STATUS_LIST_PUBLICATION_QUEUE_NAME",
     "WalletInstanceCreationEmailQueueName": "WALLET_INSTANCE_CREATION_EMAIL_QUEUE_NAME",
     "WalletInstanceRevocationEmailQueueName": "WALLET_INSTANCE_REVOCATION_EMAIL_QUEUE_NAME",
     "PidIssuerApiBaseURL": "PID_ISSUER_API_BASE_URL",
@@ -56,9 +59,19 @@
     "FrontDoorProfileName": "FRONT_DOOR_PROFILE_NAME",
     "FrontDoorEndpointName": "FRONT_DOOR_ENDPOINT_NAME",
     "APPLICATIONINSIGHTS_CONNECTION_STRING": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "ApplicationInsightsResourceId": "APPLICATION_INSIGHTS_RESOURCE_ID",
     "NODE_OPTIONS": "--import @pagopa/azure-tracing",
     "WalletInstanceStorageAccountUrl": "WALLET_INSTANCE_STORAGE_ACCOUNT_URL",
     "WalletInstanceStorageAccount__accountName": "WALLET_INSTANCE_STORAGE_ACCOUNT_NAME",
-    "WalletAttestationOauthClientSub": "WALLET_ATTESTATION_OAUTH_CLIENT_SUB"
+    "StatusListPublicationQueueStorageAccount__accountName": "STATUS_LIST_PUBLICATION_QUEUE_STORAGE_ACCOUNT_NAME",
+    "WalletAttestationOauthClientSub": "WALLET_ATTESTATION_OAUTH_CLIENT_SUB",
+    "CreateWalletInstanceStatusEnabled": "false",
+    "StatusListCapacityBits": "STATUS_LIST_CAPACITY_BITS",
+    "StatusListPageCount": "STATUS_LIST_PAGE_COUNT",
+    "StatusListBaseUrl": "STATUS_LIST_BASE_URL",
+    "StatusListsMinimumAllocationConflictsForScaleUp": "STATUS_LISTS_MINIMUM_ALLOCATION_CONFLICTS_FOR_SCALE_UP",
+    "StatusListsMinimumRemainingTotalCapacity": "STATUS_LISTS_MINIMUM_REMAINING_TOTAL_CAPACITY",
+    "StatusListsIndexReservationSize": "STATUS_LISTS_INDEX_RESERVATION_SIZE",
+    "SlackStatusChannelWebhook": "SLACK_STATUS_CHANNEL_WEBHOOK"
   }
 }

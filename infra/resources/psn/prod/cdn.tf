@@ -110,7 +110,6 @@ resource "azurerm_storage_container" "status_lists" {
   container_access_type = "container"
 }
 
-
 resource "azurerm_storage_container" "status_lists_uat" {
   name                  = "status-lists"
   storage_account_id    = azurerm_storage_account.cdn_uat.id

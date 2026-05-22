@@ -6,6 +6,10 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { areJwksEqual, ECKey, JwkPublicKey } from "io-wallet-common/jwk";
+import {
+  WalletInstanceStatus,
+  WalletInstanceValid,
+} from "io-wallet-common/wallet-instance";
 
 import {
   AndroidAttestationValidationConfig,
@@ -14,10 +18,11 @@ import {
   toKeysThumbprints,
 } from "@/infra/mobile-attestation-service";
 import { verifyAndroidAttestation } from "@/infra/mobile-attestation-service";
-import { validateWalletUnitAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
+import { validateWalletUnitAssertionAndGetWalletInstance } from "@/infra/mobile-attestation-service/assertion-request-validation";
 import { getSignerMetadata } from "@/infra/signer-metadata";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
+import { buildUrl } from "@/url";
 import { isLoadTestUser } from "@/user";
 import { WalletInstanceEnvironment } from "@/wallet-instance";
 import {
@@ -36,17 +41,23 @@ const getWalletUnitAttestationData =
   ({
     attestedKeys,
     platform,
+    walletInstanceStatus,
     // walletSolutionVersion,
   }: {
     attestedKeys: readonly AttestedKey[];
     platform: WUARequest["platform"];
+    walletInstanceStatus: WalletInstanceStatus;
     // walletSolutionVersion: NonEmptyString;
   }): RTE.ReaderTaskEither<
     WalletUnitAttestationEnvironment,
     Error,
     WalletUnitAttestationData
   > =>
-  ({ federationEntity: { basePathV13: basePath }, ...signerMetadataEnv }) =>
+  ({
+    federationEntity: { basePathV13: basePath },
+    statusListBaseUrl,
+    ...signerMetadataEnv
+  }) =>
     pipe(
       signerMetadataEnv,
       getSignerMetadata,
@@ -54,11 +65,25 @@ const getWalletUnitAttestationData =
         attestedKeys,
         kid,
         platform,
+        status: {
+          statusList: {
+            idx: walletInstanceStatus.index,
+            uri: buildUrl(walletInstanceStatus.statusListId, statusListBaseUrl),
+          },
+        },
         walletProviderName: basePath.href,
         // walletSolutionVersion,
         x5c,
       })),
     );
+
+const requireWalletInstanceStatus = (
+  walletInstance: WalletInstanceValid,
+): E.Either<Error, WalletInstanceStatus> =>
+  pipe(
+    walletInstance.status,
+    E.fromNullable(new Error("Wallet instance status not found")),
+  );
 
 const testWalletUnitAttestation = "this_is_a_test_wallet_unit_attestation";
 
@@ -97,10 +122,14 @@ const generateWalletUnitAttestation: (request: {
   string
 > = ({ userId, wuaRequest }) =>
   pipe(
-    validateAssertionRequestAndAttestKeys({ userId, wuaRequest }),
-    RTE.map((attestedKeys) => ({
+    validateHardwareAssertionAndGetWalletInstance({ userId, wuaRequest }),
+    RTE.chainW(flow(requireWalletInstanceStatus, RTE.fromEither)),
+    RTE.bindTo("walletInstanceStatus"),
+    RTE.bindW("attestedKeys", () => validateKeysToAttest(wuaRequest)),
+    RTE.map(({ attestedKeys, walletInstanceStatus }) => ({
       attestedKeys,
       platform: wuaRequest.platform,
+      walletInstanceStatus,
       // walletSolutionVersion: wuaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletUnitAttestationData),
@@ -155,7 +184,7 @@ const validateIosKeysToAttest: (
   }),
 );
 
-const validateRequestHardwareAssertion: (input: {
+const validateHardwareAssertionAndGetWalletInstance: (input: {
   userId: FiscalCode;
   wuaRequest: WUARequest;
 }) => RTE.ReaderTaskEither<
@@ -164,14 +193,14 @@ const validateRequestHardwareAssertion: (input: {
       assertionValidationConfig: AssertionValidationConfig;
     },
   Error,
-  void
+  WalletInstanceValid
 > = ({ userId, wuaRequest }) =>
   pipe(
     wuaRequest.keysToAttest.map(({ jwk }) => jwk),
     toKeysThumbprints,
     RTE.fromTaskEither,
     RTE.chainW((keysThumbprints) =>
-      validateWalletUnitAssertionRequest({
+      validateWalletUnitAssertionAndGetWalletInstance({
         assertion: {
           ...wuaRequest,
           keysThumbprints,
@@ -191,23 +220,6 @@ const validateKeysToAttest: (
   wuaRequest.platform === "android"
     ? validateAndroidKeysToAttest(wuaRequest.nonce, wuaRequest.keysToAttest)
     : validateIosKeysToAttest(wuaRequest.keysToAttest);
-
-const validateAssertionRequestAndAttestKeys: (input: {
-  userId: FiscalCode;
-  wuaRequest: WUARequest;
-}) => RTE.ReaderTaskEither<
-  NonceEnvironment &
-    WalletInstanceEnvironment & {
-      androidAttestationValidationConfig: AndroidAttestationValidationConfig;
-      assertionValidationConfig: AssertionValidationConfig;
-    },
-  Error,
-  readonly AttestedKey[]
-> = ({ userId, wuaRequest }) =>
-  pipe(
-    validateRequestHardwareAssertion({ userId, wuaRequest }),
-    RTE.chainW(() => validateKeysToAttest(wuaRequest)),
-  );
 
 export const CreateWalletUnitAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(

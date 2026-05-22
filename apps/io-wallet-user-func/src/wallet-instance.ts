@@ -8,6 +8,7 @@ import {
   RevocationReason,
   WalletInstance,
   WalletInstanceRevoked,
+  WalletInstanceStatus,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 
@@ -52,6 +53,14 @@ class RevokedWalletInstance extends Error {
     super("The wallet instance has been revoked.");
   }
 }
+
+export const addStatus = <T extends WalletInstance>(
+  walletInstance: T,
+  status: WalletInstanceStatus,
+): T & { status: WalletInstanceStatus } => ({
+  ...walletInstance,
+  status,
+});
 
 export const getWalletInstanceByUserId: (
   id: WalletInstance["id"],

@@ -7,6 +7,7 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 import {
   AttestationService,
@@ -15,9 +16,11 @@ import {
 } from "@/attestation-service";
 import { revokeAllCredentials } from "@/credential";
 import { enqueue } from "@/infra/azure/storage/queue";
+import { allocateStatusListBinding, StatusListAllocator } from "@/status-list";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import {
+  addStatus,
   insertWalletInstance,
   revokeUserValidWalletInstancesExceptOne,
 } from "@/wallet-instance";
@@ -62,6 +65,26 @@ const sendEmail: (
   fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = enqueue;
 
+const addStatusToWalletInstanceIfEnabled =
+  (
+    walletInstance: WalletInstanceValid,
+  ): RTE.ReaderTaskEither<
+    {
+      createWalletInstanceStatusEnabled: boolean;
+      statusListAllocator: StatusListAllocator;
+    },
+    Error,
+    WalletInstanceValid
+  > =>
+  ({ createWalletInstanceStatusEnabled, statusListAllocator }) =>
+    createWalletInstanceStatusEnabled
+      ? pipe(
+          { statusListAllocator },
+          allocateStatusListBinding,
+          TE.map((statusBinding) => addStatus(walletInstance, statusBinding)),
+        )
+      : TE.right(walletInstance);
+
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req,
@@ -88,7 +111,9 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
         ),
         RTE.chainW(({ walletInstance }) =>
           pipe(
-            insertWalletInstance(walletInstance),
+            walletInstance,
+            addStatusToWalletInstanceIfEnabled,
+            RTE.chainW(insertWalletInstance),
             RTE.chainW(() =>
               revokeUserValidWalletInstancesExceptOne(
                 walletInstanceRequest.fiscalCode,

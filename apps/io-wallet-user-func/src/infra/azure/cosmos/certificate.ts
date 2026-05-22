@@ -7,6 +7,7 @@ import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 
 import { CertificateRepository } from "@/certificates";
+import { toCosmosError } from "@/infra/azure/cosmos/errors";
 
 const CertificateSchema = t.type({
   certificateChain: t.array(t.string),
@@ -55,19 +56,11 @@ export class CosmosDbCertificateRepository implements CertificateRepository {
     certificateChain: string[];
     kid: string;
   }) {
-    return TE.tryCatch(
-      async () => {
-        await this.#container.items.create({
-          certificateChain,
-          id: kid,
-        });
-      },
-      (error) =>
-        error instanceof Error && error.name === "TimeoutError"
-          ? new ServiceUnavailableError(
-              `The request to the database has timed out: ${error.message}`,
-            )
-          : new Error(`Error inserting certificate: ${error}`),
-    );
+    return TE.tryCatch(async () => {
+      await this.#container.items.create({
+        certificateChain,
+        id: kid,
+      });
+    }, toCosmosError("Error inserting certificate"));
   }
 }

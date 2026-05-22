@@ -4,3 +4,9 @@ export const removeTrailingSlash = (value: string): string => {
   }
   return value;
 };
+
+const ensureTrailingSlash = (value: string) =>
+  value.endsWith("/") ? value : `${value}/`;
+
+export const buildUrl = (path: string, baseUrl: string) =>
+  new URL(path, ensureTrailingSlash(baseUrl)).href;

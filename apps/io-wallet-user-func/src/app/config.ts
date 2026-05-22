@@ -3,6 +3,7 @@ import { NumberFromString } from "@pagopa/ts-commons/lib/numbers";
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as A from "fp-ts/Array";
+import * as E from "fp-ts/Either";
 import { sequenceS } from "fp-ts/lib/Apply";
 import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
@@ -16,6 +17,10 @@ import {
   stringToNumberDecoderRE,
 } from "io-wallet-common/infra/env";
 import { getHttpRequestConfigFromEnvironment } from "io-wallet-common/infra/http/config";
+import {
+  getSlackConfigFromEnvironment,
+  SlackConfig,
+} from "io-wallet-common/infra/slack/config";
 import { fromBase64ToJwks, JwkPrivateKey } from "io-wallet-common/jwk";
 
 export const APPLE_APP_ATTESTATION_ROOT_CA =
@@ -29,6 +34,20 @@ export const HARDWARE_PUBLIC_TEST_KEY =
 
 export const decodeBase64String = (encodedString: string) =>
   Buffer.from(encodedString, "base64").toString();
+
+type BooleanString = "false" | "true";
+
+const stringToBooleanDecoder = (value: string): E.Either<Error, boolean> =>
+  pipe(
+    value.trim().toLowerCase(),
+    E.fromPredicate(
+      (normalizedValue): normalizedValue is BooleanString =>
+        normalizedValue === "true" || normalizedValue === "false",
+      () =>
+        new Error(`Invalid boolean value "${value}": expected true or false`),
+    ),
+    E.map((normalizedValue) => normalizedValue === "true"),
+  );
 
 /**
  * Certificate Revocation status List
@@ -101,6 +120,13 @@ const AzureStorageConfig = t.type({
     accountName: t.string,
     containerName: t.string,
   }),
+  statusLists: t.type({
+    accountName: t.string,
+    containerName: t.string,
+    publicationQueue: t.type({
+      name: t.string,
+    }),
+  }),
   walletInstances: t.type({
     queues: t.type({
       creationSendEmail: t.type({
@@ -130,7 +156,16 @@ const AzureFrontDoorConfig = t.type({
 
 type AzureFrontDoorConfig = t.TypeOf<typeof AzureFrontDoorConfig>;
 
+const AzureApplicationInsightsConfig = t.type({
+  resourceId: NonEmptyString,
+});
+
+type AzureApplicationInsightsConfig = t.TypeOf<
+  typeof AzureApplicationInsightsConfig
+>;
+
 const AzureConfig = t.type({
+  applicationInsights: AzureApplicationInsightsConfig,
   cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
@@ -138,6 +173,37 @@ const AzureConfig = t.type({
 });
 
 type AzureConfig = t.TypeOf<typeof AzureConfig>;
+
+const StatusListAllocationConfig = t.type({
+  blockSize: t.number,
+});
+
+type StatusListAllocationConfig = t.TypeOf<typeof StatusListAllocationConfig>;
+
+const StatusListManagerConfig = t.type({
+  minimumAllocationConflictsForScaleUp: t.number,
+  minimumRemainingTotalCapacity: t.number,
+});
+
+type StatusListManagerConfig = t.TypeOf<typeof StatusListManagerConfig>;
+
+const StatusListPublicationConfig = t.type({
+  baseUrl: UrlFromString,
+});
+
+type StatusListPublicationConfig = t.TypeOf<typeof StatusListPublicationConfig>;
+
+const StatusListConfig = t.type({
+  allocation: StatusListAllocationConfig,
+  capacityBits: t.number,
+  createWalletInstanceStatusEnabled: t.boolean,
+  manager: StatusListManagerConfig,
+  pageBitsSize: t.number,
+  pageCount: t.number,
+  publication: StatusListPublicationConfig,
+});
+
+type StatusListConfig = t.TypeOf<typeof StatusListConfig>;
 
 const AuthProfileApiConfig = t.type({
   apiKey: t.string,
@@ -205,6 +271,8 @@ export const Config = t.type({
   entityConfiguration: EntityConfigurationConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
+  slack: SlackConfig,
+  statusList: StatusListConfig,
   walletProvider: WalletProviderConfig,
 });
 
@@ -340,6 +408,15 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageContainerName: readFromEnvironment(
       "EntityConfigurationStorageContainerName",
     ),
+    statusListPublicationQueueName: readFromEnvironment(
+      "StatusListPublicationQueueName",
+    ),
+    statusListStorageAccountName: readFromEnvironment(
+      "StatusListStorageAccountName",
+    ),
+    statusListStorageContainerName: readFromEnvironment(
+      "StatusListStorageContainerName",
+    ),
     walletInstanceCreationEmailQueueName: readFromEnvironment(
       "WalletInstanceCreationEmailQueueName",
     ),
@@ -354,6 +431,9 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     ({
       entityConfigurationStorageAccountName,
       entityConfigurationStorageContainerName,
+      statusListPublicationQueueName,
+      statusListStorageAccountName,
+      statusListStorageContainerName,
       walletInstanceCreationEmailQueueName,
       walletInstanceRevocationEmailQueueName,
       walletInstanceStorageAccountUrl,
@@ -361,6 +441,13 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       entityConfiguration: {
         accountName: entityConfigurationStorageAccountName,
         containerName: entityConfigurationStorageContainerName,
+      },
+      statusLists: {
+        accountName: statusListStorageAccountName,
+        containerName: statusListStorageContainerName,
+        publicationQueue: {
+          name: statusListPublicationQueueName,
+        },
       },
       walletInstances: {
         queues: {
@@ -389,6 +476,18 @@ const getAzureFrontDoorConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(parse(AzureFrontDoorConfig)),
 );
 
+const getAzureApplicationInsightsConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureApplicationInsightsConfig
+> = pipe(
+  readFromEnvironment("ApplicationInsightsResourceId"),
+  RE.chainEitherKW(parse(NonEmptyString)),
+  RE.map((resourceId) => ({
+    resourceId,
+  })),
+);
+
 const getAzureGenericConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -406,11 +505,93 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   Error,
   AzureConfig
 > = sequenceS(RE.Apply)({
+  applicationInsights: getAzureApplicationInsightsConfigFromEnvironment,
   cosmos: getAzureCosmosConfigFromEnvironment,
   frontDoor: getAzureFrontDoorConfigFromEnvironment,
   generic: getAzureGenericConfigFromEnvironment,
   storage: getAzureStorageConfigFromEnvironment,
 });
+
+const getStatusListManagerConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListManagerConfig
+> = sequenceS(RE.Apply)({
+  minimumAllocationConflictsForScaleUp: pipe(
+    readFromEnvironment("StatusListsMinimumAllocationConflictsForScaleUp"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+  minimumRemainingTotalCapacity: pipe(
+    readFromEnvironment("StatusListsMinimumRemainingTotalCapacity"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+});
+
+const getStatusListAllocationConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListAllocationConfig
+> = sequenceS(RE.Apply)({
+  blockSize: pipe(
+    readFromEnvironment("StatusListsIndexReservationSize"),
+    RE.chainW(stringToNumberDecoderRE),
+  ),
+});
+
+const getStatusListPublicationConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListPublicationConfig
+> = pipe(
+  readFromEnvironment("StatusListBaseUrl"),
+  RE.chainEitherKW(parse(UrlFromString)),
+  RE.map((baseUrl) => ({ baseUrl })),
+);
+
+const getStatusListConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  StatusListConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    allocation: getStatusListAllocationConfigFromEnvironment,
+    capacityBits: pipe(
+      readFromEnvironment("StatusListCapacityBits"),
+      RE.chainW(stringToNumberDecoderRE),
+    ),
+    createWalletInstanceStatusEnabled: pipe(
+      readFromEnvironment("CreateWalletInstanceStatusEnabled"),
+      RE.orElse(() => RE.right("false")),
+      RE.chainEitherKW(stringToBooleanDecoder),
+    ),
+    manager: getStatusListManagerConfigFromEnvironment,
+    pageCount: pipe(
+      readFromEnvironment("StatusListPageCount"),
+      RE.chainW(stringToNumberDecoderRE),
+    ),
+    publication: getStatusListPublicationConfigFromEnvironment,
+  }),
+  RE.chainEitherKW(({ capacityBits, pageCount, ...statusListConfig }) =>
+    pipe(
+      pageCount,
+      E.fromPredicate(
+        (value) => value > 0 && capacityBits % (value * 64) === 0,
+        () =>
+          new Error(
+            "StatusListPageCount must be greater than zero and StatusListCapacityBits / StatusListPageCount must be divisible by 64",
+          ),
+      ),
+      E.chain((validPageCount) =>
+        E.right({
+          ...statusListConfig,
+          capacityBits,
+          pageBitsSize: capacityBits / validPageCount,
+          pageCount: validPageCount,
+        }),
+      ),
+    ),
+  ),
+);
 
 const getPidIssuerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -537,6 +718,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
     ),
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
+    slack: getSlackConfigFromEnvironment,
+    statusList: getStatusListConfigFromEnvironment,
     walletProvider: getWalletProviderConfigFromEnvironment,
   }),
   RE.map(

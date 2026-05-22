@@ -9,13 +9,25 @@ import {
 } from "./device-details";
 import { JwkPublicKey } from "./jwk";
 
-const WalletInstanceBase = t.type({
-  createdAt: IsoDateFromString,
-  hardwareKey: JwkPublicKey,
-  id: NonEmptyString,
-  signCount: t.number,
-  userId: FiscalCode,
+const WalletInstanceStatus = t.type({
+  index: t.number,
+  statusListId: NonEmptyString,
 });
+
+export type WalletInstanceStatus = t.TypeOf<typeof WalletInstanceStatus>;
+
+const WalletInstanceBase = t.intersection([
+  t.type({
+    createdAt: IsoDateFromString,
+    hardwareKey: JwkPublicKey,
+    id: NonEmptyString,
+    signCount: t.number,
+    userId: FiscalCode,
+  }),
+  t.partial({
+    status: WalletInstanceStatus,
+  }),
+]);
 
 export const WalletInstanceValid = t.intersection([
   WalletInstanceBase,
