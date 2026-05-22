@@ -1,8 +1,4 @@
-import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/ReaderTaskEither";
-import * as TE from "fp-ts/TaskEither";
-import { validateJwkKid } from "io-wallet-common/jwk";
 import { deflateSync } from "zlib";
 
 import { Signer } from "@/signer";
@@ -17,29 +13,28 @@ const encodeStatusListBitstring = (bitString: Buffer) =>
 export const createTokenStatusList =
   ({
     bitString,
+    kid,
     statusListCredentialUrl,
+    x5c,
   }: {
     bitString: Buffer;
+    kid: string;
     statusListCredentialUrl: string;
+    x5c: string[];
   }): RTE.ReaderTaskEither<Signer, Error, string> =>
   (signer) =>
-    pipe(
-      "EC",
-      signer.getFirstPublicKeyByKty,
-      E.chainW(validateJwkKid),
-      TE.fromEither,
-      TE.chain(({ kid }) =>
-        signer.createJwtAndSign(
-          { typ: statusListJwtType },
-          kid,
-          "ES256",
-          statusListJwtDuration,
-        )({
-          status_list: {
-            bits: statusListBits,
-            lst: encodeStatusListBitstring(bitString),
-          },
-          sub: statusListCredentialUrl,
-        }),
-      ),
-    );
+    signer.createJwtAndSign(
+      {
+        typ: statusListJwtType,
+        x5c,
+      },
+      kid,
+      "ES256",
+      statusListJwtDuration,
+    )({
+      status_list: {
+        bits: statusListBits,
+        lst: encodeStatusListBitstring(bitString),
+      },
+      sub: statusListCredentialUrl,
+    });

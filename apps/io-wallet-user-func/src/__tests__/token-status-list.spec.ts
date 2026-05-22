@@ -32,13 +32,17 @@ const signer = new CryptoSigner({
   jwtDefaultDuration: "1h",
 });
 
+const certificateChain = ["leaf-certificate", "issuer-certificate"];
+
 describe("status-list-jwt", () => {
   it("creates an OAuth status list JWT valid for exactly 24 hours", async () => {
     const bitString = Buffer.from([0xff, 0x00, 0x80, 0x01]);
     const statusListUrl = "https://cdn.example.com/statuslist/list-1";
     const jwtResult = await createTokenStatusList({
       bitString,
+      kid: privateEcKey.kid,
       statusListCredentialUrl: statusListUrl,
+      x5c: certificateChain,
     })(signer)();
 
     if (E.isLeft(jwtResult)) {
@@ -52,6 +56,7 @@ describe("status-list-jwt", () => {
     const lst = deflateSync(bitString, { level: 9 }).toString("base64url");
 
     expect(protectedHeader.typ).toBe("statuslist+jwt");
+    expect(protectedHeader.x5c).toEqual(certificateChain);
     expect(payload.exp - payload.iat).toBe(24 * 60 * 60);
     expect(payload.sub).toBe(statusListUrl);
     expect(payload.status_list).toEqual({

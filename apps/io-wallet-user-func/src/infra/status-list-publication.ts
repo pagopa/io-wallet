@@ -7,6 +7,7 @@ import * as TE from "fp-ts/TaskEither";
 import * as jose from "jose";
 import { v4 as uuidv4 } from "uuid";
 
+import { CertificateRepository } from "@/certificates";
 import {
   copyBlob,
   deleteBlob,
@@ -14,6 +15,7 @@ import {
   existsBlob,
   uploadBlob,
 } from "@/infra/azure/storage/blob";
+import { getSignerMetadata } from "@/infra/signer-metadata";
 import { Signer } from "@/signer";
 import { StatusListPublication } from "@/status-list";
 import { createTokenStatusList } from "@/token-status-list";
@@ -52,6 +54,7 @@ export class StatusListPublicationService implements StatusListPublication {
     protected readonly catalogs: StatusListPublicationCatalogDataSource,
     private readonly pages: StatusListPublicationPagesDataSource,
     protected readonly signer: Signer,
+    private readonly certificateRepository: CertificateRepository,
     protected readonly containerClient: ContainerClient,
     protected readonly cdnManagementClient: CdnManagementClient,
     protected readonly config: StatusListPublicationConfig,
@@ -93,9 +96,8 @@ export class StatusListPublicationService implements StatusListPublication {
           TE.right,
           TE.chainW((tokenStatusListUrl) =>
             pipe(
-              this.signer,
-              createTokenStatusList({
-                bitString: bitString,
+              this.signTokenStatusList({
+                bitString,
                 statusListCredentialUrl: tokenStatusListUrl,
               }),
               TE.chainW((tokenStatusList) =>
@@ -252,13 +254,35 @@ export class StatusListPublicationService implements StatusListPublication {
       TE.map(() => undefined),
     );
 
+  private readonly signTokenStatusList = ({
+    bitString,
+    statusListCredentialUrl,
+  }: {
+    bitString: Buffer;
+    statusListCredentialUrl: string;
+  }): TE.TaskEither<Error, string> =>
+    pipe(
+      {
+        certificateRepository: this.certificateRepository,
+        signer: this.signer,
+      },
+      getSignerMetadata,
+      TE.chainW(({ kid, x5c }) =>
+        createTokenStatusList({
+          bitString,
+          kid,
+          statusListCredentialUrl,
+          x5c,
+        })(this.signer),
+      ),
+    );
+
   private readonly uploadInitializingStatusList = (
     blobName: string,
     tokenStatusListUrl: string,
   ): TE.TaskEither<Error, void> =>
     pipe(
-      this.signer,
-      createTokenStatusList({
+      this.signTokenStatusList({
         bitString: Buffer.from(this.emptyBitstring),
         statusListCredentialUrl: tokenStatusListUrl,
       }),

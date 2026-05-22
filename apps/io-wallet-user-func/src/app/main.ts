@@ -217,6 +217,7 @@ const statusListPublication = new StatusListPublicationService(
   statusListCatalogRepository,
   statusListPagesRepository,
   walletAttestationSigner,
+  certificateRepository,
   statusListContainerClient,
   cdnManagementClient,
   statusListPublicationConfig,
