@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.6.0
+
+### Minor Changes
+
+- ff978fc: Updated the WalletInstance type to support status list references
+
 ## 1.5.4
 
 ### Patch Changes

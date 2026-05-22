@@ -1,5 +1,16 @@
 # io-wallet-user-func
 
+## 4.4.0
+
+### Minor Changes
+
+- ff978fc: Added TLS and updated wallet instance creation to include status list reference
+
+### Patch Changes
+
+- Updated dependencies [ff978fc]
+  - io-wallet-common@1.6.0
+
 ## 4.3.8
 
 ### Patch Changes
