@@ -65,25 +65,22 @@ const sendEmail: (
   fiscalCode: FiscalCode,
 ) => RTE.ReaderTaskEither<{ queueClient: QueueClient }, Error, void> = enqueue;
 
-const addStatusToWalletInstanceIfEnabled =
+const addStatusToWalletInstance =
   (
     walletInstance: WalletInstanceValid,
   ): RTE.ReaderTaskEither<
     {
-      createWalletInstanceStatusEnabled: boolean;
       statusListAllocator: StatusListAllocator;
     },
     Error,
     WalletInstanceValid
   > =>
-  ({ createWalletInstanceStatusEnabled, statusListAllocator }) =>
-    createWalletInstanceStatusEnabled
-      ? pipe(
-          { statusListAllocator },
-          allocateStatusListBinding,
-          TE.map((statusBinding) => addStatus(walletInstance, statusBinding)),
-        )
-      : TE.right(walletInstance);
+  ({ statusListAllocator }) =>
+    pipe(
+      { statusListAllocator },
+      allocateStatusListBinding,
+      TE.map((statusBinding) => addStatus(walletInstance, statusBinding)),
+    );
 
 export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
   pipe(
@@ -112,7 +109,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
         RTE.chainW(({ walletInstance }) =>
           pipe(
             walletInstance,
-            addStatusToWalletInstanceIfEnabled,
+            addStatusToWalletInstance,
             RTE.chainW(insertWalletInstance),
             RTE.chainW(() =>
               revokeUserValidWalletInstancesExceptOne(
