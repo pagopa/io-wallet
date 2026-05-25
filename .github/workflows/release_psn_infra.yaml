@@ -4,28 +4,27 @@ on:
   workflow_dispatch:
     inputs:
       hub:
-        description: 'Plan in Hub'
+        description: "Plan in Hub"
         required: false
         type: boolean
         default: false
       spoke:
-        description: 'Plan in Spoke'
+        description: "Plan in Spoke"
         required: false
         type: boolean
         default: false
       resources:
-        description: 'Plan in Resources PSN'
+        description: "Plan in Resources PSN"
         required: false
         type: boolean
         default: false
-  # TBD: Uncomment after permissions are set on identity
-  # push:
-  #   branches:
-  #     - master
-  #   paths:
-  #     - "infra/core/psn/hub/prod/**"
-  #     - "infra/core/psn/spoke/prod/**"
-  #     - "infra/resources/psn/prod/**"
+  push:
+    branches:
+      - master
+    paths:
+      - "infra/core/psn/hub/prod/**"
+      - "infra/core/psn/spoke/prod/**"
+      - "infra/resources/psn/prod/**"
 
 permissions:
   contents: read
