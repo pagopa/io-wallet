@@ -35,20 +35,6 @@ export const HARDWARE_PUBLIC_TEST_KEY =
 export const decodeBase64String = (encodedString: string) =>
   Buffer.from(encodedString, "base64").toString();
 
-type BooleanString = "false" | "true";
-
-const stringToBooleanDecoder = (value: string): E.Either<Error, boolean> =>
-  pipe(
-    value.trim().toLowerCase(),
-    E.fromPredicate(
-      (normalizedValue): normalizedValue is BooleanString =>
-        normalizedValue === "true" || normalizedValue === "false",
-      () =>
-        new Error(`Invalid boolean value "${value}": expected true or false`),
-    ),
-    E.map((normalizedValue) => normalizedValue === "true"),
-  );
-
 /**
  * Certificate Revocation status List
  * https://developer.android.com/privacy-and-security/security-key-attestation#certificate_status
@@ -196,7 +182,6 @@ type StatusListPublicationConfig = t.TypeOf<typeof StatusListPublicationConfig>;
 const StatusListConfig = t.type({
   allocation: StatusListAllocationConfig,
   capacityBits: t.number,
-  createWalletInstanceStatusEnabled: t.boolean,
   manager: StatusListManagerConfig,
   pageBitsSize: t.number,
   pageCount: t.number,
@@ -558,11 +543,6 @@ const getStatusListConfigFromEnvironment: RE.ReaderEither<
     capacityBits: pipe(
       readFromEnvironment("StatusListCapacityBits"),
       RE.chainW(stringToNumberDecoderRE),
-    ),
-    createWalletInstanceStatusEnabled: pipe(
-      readFromEnvironment("CreateWalletInstanceStatusEnabled"),
-      RE.orElse(() => RE.right("false")),
-      RE.chainEitherKW(stringToBooleanDecoder),
     ),
     manager: getStatusListManagerConfigFromEnvironment,
     pageCount: pipe(

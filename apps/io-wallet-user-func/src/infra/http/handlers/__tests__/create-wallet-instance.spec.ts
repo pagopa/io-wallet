@@ -107,7 +107,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -139,35 +138,6 @@ describe("CreateWalletInstanceHandler", () => {
     );
   });
 
-  it("should insert a wallet instance without status when the feature flag is disabled", async () => {
-    const req = {
-      ...H.request("https://wallet-provider.example.org"),
-      body: walletInstanceRequest,
-      method: "POST",
-    };
-    const handler = CreateWalletInstanceHandler({
-      attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: false,
-      credentialRepository,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      queueClient,
-      statusListAllocator,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        statusCode: 204,
-      }),
-    });
-
-    expect(allocateStatusBindingSpy).not.toHaveBeenCalled();
-  });
-
   it("should enqueue email when is_renewal is false", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
@@ -179,7 +149,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -211,7 +180,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -242,7 +210,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -276,7 +243,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -315,7 +281,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -350,7 +315,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -382,7 +346,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -438,7 +401,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -499,7 +461,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository: credentialRepositoryThatFailsOnRevoke,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -535,7 +496,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -574,7 +534,6 @@ describe("CreateWalletInstanceHandler", () => {
     };
     const handler = CreateWalletInstanceHandler({
       attestationService: mockAttestationService,
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -608,7 +567,6 @@ describe("CreateWalletInstanceHandler", () => {
         validateAttestation: () =>
           TE.left(new IntegrityCheckError(["foo", "bar"])),
       },
-      createWalletInstanceStatusEnabled: true,
       credentialRepository,
       input: req,
       inputDecoder: H.HttpRequest,

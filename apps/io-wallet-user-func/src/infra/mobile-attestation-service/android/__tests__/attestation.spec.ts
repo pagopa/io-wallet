@@ -1,5 +1,5 @@
 import { X509Certificate } from "crypto";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { decodeBase64String, GOOGLE_PUBLIC_KEY } from "@/app/config";
 
@@ -9,6 +9,7 @@ import { androidMockData } from "./config";
 
 describe("AndroidAttestationValidation", () => {
   const { attestation, hardwareKey, mockCrl } = androidMockData;
+  const validationDate = new Date("2026-01-01T00:00:00.000Z");
 
   const data = Buffer.from(attestation, "base64");
   const x509ChainString = data.toString("utf-8").split(",");
@@ -16,6 +17,15 @@ describe("AndroidAttestationValidation", () => {
   const x509Chain = x509ChainString.map(
     (el) => new X509Certificate(base64ToPem(el)),
   );
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(validationDate);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it("should return a validated attestation when the root public key is the first one", async () => {
     const result = verifyAttestation({

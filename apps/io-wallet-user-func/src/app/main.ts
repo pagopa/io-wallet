@@ -268,8 +268,6 @@ app.http("createWalletInstance", {
   authLevel: "function",
   handler: CreateWalletInstanceFunction({
     attestationService: mobileAttestationService,
-    createWalletInstanceStatusEnabled:
-      config.statusList.createWalletInstanceStatusEnabled,
     credentialRepository: pidIssuerClient,
     nonceRepository,
     queueClient: walletInstanceCreationEmailQueueClient,
