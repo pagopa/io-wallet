@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.4.1
+
+### Patch Changes
+
+- cd0a971: Removed CreateWalletInstanceStatusEnabled flag
+
 ## 4.4.0
 
 ### Minor Changes
