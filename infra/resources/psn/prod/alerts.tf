@@ -25,7 +25,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "create_wallet_instance_n
   }
 
   frequency   = 5
-  time_window = 5
+  time_window = 10
 
   tags = local.tags
 }
@@ -56,7 +56,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "status_list_manager_erro
   }
 
   frequency   = 5
-  time_window = 5
+  time_window = 10
 
   tags = local.tags
 }
@@ -87,7 +87,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "status_list_publication_
   }
 
   frequency   = 5
-  time_window = 5
+  time_window = 10
 
   tags = local.tags
 }
@@ -118,7 +118,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "status_list_publication_
   }
 
   frequency   = 5
-  time_window = 5
+  time_window = 10
 
   tags = local.tags
 }
