@@ -11,10 +11,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "create_wallet_instance_n
   }
 
   query = <<-EOT
-    exceptions
-    | where customDimensions["functionName"] == "createWalletInstance"
-    | where outerMessage == "No OPEN status lists available for allocation"
-    | summarize AggregatedValue = count()
+    AppExceptions
+    | where Properties["functionName"] == "createWalletInstance"
+    | where OuterMessage == "No OPEN status lists available for allocation"
+    | summarize AggregatedValue = sum(ItemCount)
     EOT
 
   data_source_id = data.azurerm_log_analytics_workspace.core.id
@@ -43,9 +43,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "status_list_manager_erro
   }
 
   query = <<-EOT
-    exceptions
-    | where customDimensions["functionName"] == "statusListManager"
-    | summarize AggregatedValue = count()
+    AppExceptions
+    | where Properties["functionName"] == "statusListManager"
+    | summarize AggregatedValue = sum(ItemCount)
     EOT
 
   data_source_id = data.azurerm_log_analytics_workspace.core.id
@@ -74,9 +74,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "status_list_publication_
   }
 
   query = <<-EOT
-  exceptions
-  | where customDimensions["functionName"] in ("statusListPublicationDispatcher", "statusListPublication")
-  | summarize AggregatedValue = count()
+    AppExceptions
+    | where Properties["functionName"] in ("statusListPublicationDispatcher", "statusListPublication")
+    | summarize AggregatedValue = sum(ItemCount)
     EOT
 
   data_source_id = data.azurerm_log_analytics_workspace.core.id
@@ -105,9 +105,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert" "status_list_publication_
   }
 
   query = <<-EOT
-    exceptions
-    | where customDimensions["functionName"] == "statusListPublicationMonitor"
-    | summarize AggregatedValue = count()
+    AppExceptions
+    | where Properties["functionName"] == "statusListPublicationMonitor"
+    | summarize AggregatedValue = sum(ItemCount)
     EOT
 
   data_source_id = data.azurerm_log_analytics_workspace.core.id
