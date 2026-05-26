@@ -86,12 +86,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_manager_e
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] == "statusListManager"
-      | summarize AggregatedValue = sum(ItemCount)
       EOT
-    time_aggregation_method = "Total"
-    metric_measure_column   = "AggregatedValue"
-    operator  = "GreaterThanOrEqual"
-    threshold = 1
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
@@ -121,12 +119,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_manager_e
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] == "statusListManager"
-      | summarize AggregatedValue = sum(ItemCount)
       EOT
-    time_aggregation_method = "Total"
-    metric_measure_column   = "AggregatedValue"
-    operator                = "GreaterThanOrEqual"
-    threshold               = 1
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
@@ -156,12 +152,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] in ("statusListPublicationDispatcher", "statusListPublication")
-      | summarize AggregatedValue = sum(ItemCount)
       EOT
-    time_aggregation_method = "Total"
-    metric_measure_column   = "AggregatedValue"
-    operator  = "GreaterThanOrEqual"
-    threshold = 1
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
@@ -191,12 +185,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] in ("statusListPublicationDispatcher", "statusListPublication")
-      | summarize AggregatedValue = sum(ItemCount)
       EOT
-    time_aggregation_method = "Total"
-    metric_measure_column   = "AggregatedValue"
-    operator                = "GreaterThanOrEqual"
-    threshold               = 1
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
@@ -226,12 +218,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] == "statusListPublicationMonitor"
-      | summarize AggregatedValue = sum(ItemCount)
       EOT
-    time_aggregation_method = "Total"
-    metric_measure_column   = "AggregatedValue"
-    operator  = "GreaterThanOrEqual"
-    threshold = 1
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
@@ -261,12 +251,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] == "statusListPublicationMonitor"
-      | summarize AggregatedValue = sum(ItemCount)
       EOT
-    time_aggregation_method = "Total"
-    metric_measure_column   = "AggregatedValue"
-    operator                = "GreaterThanOrEqual"
-    threshold               = 1
+    time_aggregation_method = "Count"
+    operator                = "GreaterThan"
+    threshold               = 0
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
