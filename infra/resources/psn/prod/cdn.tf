@@ -68,48 +68,64 @@ resource "azurerm_storage_account_static_website" "cdn" {
   error_404_document = "404.html"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "well_known" {
   name                  = "well-known"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "exchange" {
   name                  = "exchange"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "hub_spid_login" {
   name                  = "hub-spid-login"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "pdnd" {
   name                  = "pdnd"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "probes" {
   name                  = "probes"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "root" {
   name                  = "$root"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "status_lists" {
   name                  = "status-lists"
   storage_account_id    = azurerm_storage_account.cdn.id
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "status_lists_uat" {
   name                  = "status-lists"
   storage_account_id    = azurerm_storage_account.cdn_uat.id
@@ -266,16 +282,16 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "cdn_requests_error_al
       AzureDiagnostics
       | where ResourceId == toupper("%s")
       | where Category == "AzureCdnAccessLog"
-      | where isReceivedFromClient_b == true
-      | where requestUri_s == "https://wallet.io.pagopa.it:443/.well-known/openid-federation"
-      | where httpStatus_d >= 400
+      | where tobool(column_ifexists("isReceivedFromClient_b", false)) == true
+      | where tostring(column_ifexists("requestUri_s", "")) == "https://wallet.io.pagopa.it:443/.well-known/openid-federation"
+      | where toint(column_ifexists("httpStatus_d", 0)) >= 400
       | summarize AggregatedValue = count()
       EOT
     , module.cdn.id)
     time_aggregation_method = "Total"
     metric_measure_column   = "AggregatedValue"
-    operator  = "GreaterThanOrEqual"
-    threshold = 1
+    operator                = "GreaterThanOrEqual"
+    threshold               = 1
     failing_periods {
       minimum_failing_periods_to_trigger_alert = 1
       number_of_evaluation_periods             = 1
