@@ -246,38 +246,41 @@ resource "azurerm_monitor_metric_alert" "storage_account_low_availability" {
   tags = local.tags
 }
 
-resource "azurerm_monitor_scheduled_query_rules_alert" "cdn_requests_error_alert" {
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "cdn_requests_error_alert" {
   name                    = "[${module.cdn.name}] Request Errors"
   location                = local.environment.location
   resource_group_name     = data.azurerm_resource_group.wallet.name
   severity                = 0
   description             = "Elevated rate of 4xx and 5xx errors from the CDN"
   auto_mitigation_enabled = true
+  evaluation_frequency    = "PT5M"
+  window_duration         = "PT5M"
+  scopes                  = [data.azurerm_log_analytics_workspace.core.id]
 
   action {
-    action_group = [module.monitoring.action_group_wallet.id]
+    action_groups = [module.monitoring.action_group_wallet.id]
   }
 
-  query = format(<<-EOT
-    AzureDiagnostics
-    | where ResourceId == toupper("%s")
-    | where Category == "AzureCdnAccessLog"
-    | where isReceivedFromClient_b == true
-    | where requestUri_s == "https://wallet.io.pagopa.it:443/.well-known/openid-federation"
-    | where httpStatus_d >= 400
-    | summarize AggregatedValue = count()
-    EOT
-  , module.cdn.id)
-
-  data_source_id = data.azurerm_log_analytics_workspace.core.id
-
-  trigger {
+  criteria {
+    query = format(<<-EOT
+      AzureDiagnostics
+      | where ResourceId == toupper("%s")
+      | where Category == "AzureCdnAccessLog"
+      | where isReceivedFromClient_b == true
+      | where requestUri_s == "https://wallet.io.pagopa.it:443/.well-known/openid-federation"
+      | where httpStatus_d >= 400
+      | summarize AggregatedValue = count()
+      EOT
+    , module.cdn.id)
+    time_aggregation_method = "Total"
+    metric_measure_column   = "AggregatedValue"
     operator  = "GreaterThanOrEqual"
     threshold = 1
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods             = 1
+    }
   }
-
-  frequency   = 5
-  time_window = 5
 
   tags = local.tags
 }
