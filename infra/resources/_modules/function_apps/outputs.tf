@@ -25,6 +25,7 @@ output "function_app_support" {
 
 output "function_app_user_uat" {
   value = {
+    name                 = module.function_app_user_uat.function_app.function_app.name
     principal_id         = module.function_app_user_uat.function_app.function_app.principal_id
     staging_principal_id = module.function_app_user_uat.function_app.function_app.slot.principal_id
     resource_group_name  = module.function_app_user_uat.function_app.resource_group_name
