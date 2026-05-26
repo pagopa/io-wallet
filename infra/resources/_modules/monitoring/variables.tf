@@ -18,6 +18,11 @@ variable "resource_group_name" {
   description = "Name of the resource group where resources will be created"
 }
 
+variable "action_group_enabled" {
+  type        = bool
+  description = "Whether the Azure Monitor action group is enabled"
+}
+
 variable "notification_email" {
   type        = string
   description = "Email to use for the action group"

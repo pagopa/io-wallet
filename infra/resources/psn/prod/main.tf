@@ -49,6 +49,7 @@ module "monitoring" {
 
   project             = local.project
   resource_group_name = data.azurerm_resource_group.wallet.name
+  action_group_enabled = true
 
   display_name = "Wallet Group"
 
