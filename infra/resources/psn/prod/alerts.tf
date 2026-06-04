@@ -14,7 +14,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "create_wallet_instanc
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] == "createWalletInstance"
@@ -48,7 +48,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "create_wallet_instanc
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] == "createWalletInstance"
@@ -82,7 +82,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_manager_e
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] == "statusListManager"
@@ -115,7 +115,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_manager_e
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] == "statusListManager"
@@ -148,7 +148,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] in ("statusListPublicationDispatcher", "statusListPublication")
@@ -181,7 +181,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] in ("statusListPublicationDispatcher", "statusListPublication")
@@ -214,7 +214,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user.name}"
       | where Properties["functionName"] == "statusListPublicationMonitor"
@@ -247,7 +247,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "status_list_publicati
   }
 
   criteria {
-    query = <<-EOT
+    query                   = <<-EOT
       AppExceptions
       | where AppRoleName == "${module.function_apps.function_app_user_uat.name}"
       | where Properties["functionName"] == "statusListPublicationMonitor"

@@ -219,6 +219,16 @@ variable "wallet_instance_storage_account_name" {
   description = "The name of the Wallet Instance Storage Account"
 }
 
+variable "whitelisted_fiscal_codes_queue_url" {
+  type        = string
+  description = "The URL of the Whitelisted Fiscal Codes Storage Account"
+}
+
+variable "whitelisted_fiscal_codes_storage_account_name" {
+  type        = string
+  description = "The name of the Whitelisted Fiscal Codes Storage Account"
+}
+
 variable "wallet_instance_storage_account_uat_url" {
   type        = string
   description = "The URL of the Wallet Instance Storage Account UAT"
@@ -227,6 +237,16 @@ variable "wallet_instance_storage_account_uat_url" {
 variable "wallet_instance_storage_account_uat_name" {
   type        = string
   description = "The name of the Wallet Instance Storage Account UAT"
+}
+
+variable "whitelisted_fiscal_codes_queue_uat_url" {
+  type        = string
+  description = "The URL of the Whitelisted Fiscal Codes Storage Account UAT"
+}
+
+variable "whitelisted_fiscal_codes_storage_account_uat_name" {
+  type        = string
+  description = "The name of the Whitelisted Fiscal Codes Storage Account UAT"
 }
 
 variable "federation_entity_base_path_v13_uat" {

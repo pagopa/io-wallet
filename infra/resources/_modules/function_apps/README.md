@@ -88,6 +88,10 @@ No requirements.
 | <a name="input_wallet_instance_storage_account_uat_name"></a> [wallet\_instance\_storage\_account\_uat\_name](#input\_wallet\_instance\_storage\_account\_uat\_name) | The name of the Wallet Instance Storage Account UAT | `string` | n/a | yes |
 | <a name="input_wallet_instance_storage_account_uat_url"></a> [wallet\_instance\_storage\_account\_uat\_url](#input\_wallet\_instance\_storage\_account\_uat\_url) | The URL of the Wallet Instance Storage Account UAT | `string` | n/a | yes |
 | <a name="input_wallet_instance_storage_account_url"></a> [wallet\_instance\_storage\_account\_url](#input\_wallet\_instance\_storage\_account\_url) | The URL of the Wallet Instance Storage Account | `string` | n/a | yes |
+| <a name="input_whitelisted_fiscal_codes_queue_uat_url"></a> [whitelisted\_fiscal\_codes\_queue\_uat\_url](#input\_whitelisted\_fiscal\_codes\_queue\_uat\_url) | The URL of the Whitelisted Fiscal Codes Storage Account UAT | `string` | n/a | yes |
+| <a name="input_whitelisted_fiscal_codes_queue_url"></a> [whitelisted\_fiscal\_codes\_queue\_url](#input\_whitelisted\_fiscal\_codes\_queue\_url) | The URL of the Whitelisted Fiscal Codes Storage Account | `string` | n/a | yes |
+| <a name="input_whitelisted_fiscal_codes_storage_account_name"></a> [whitelisted\_fiscal\_codes\_storage\_account\_name](#input\_whitelisted\_fiscal\_codes\_storage\_account\_name) | The name of the Whitelisted Fiscal Codes Storage Account | `string` | n/a | yes |
+| <a name="input_whitelisted_fiscal_codes_storage_account_uat_name"></a> [whitelisted\_fiscal\_codes\_storage\_account\_uat\_name](#input\_whitelisted\_fiscal\_codes\_storage\_account\_uat\_name) | The name of the Whitelisted Fiscal Codes Storage Account UAT | `string` | n/a | yes |
 
 ## Outputs
 
