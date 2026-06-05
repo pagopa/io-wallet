@@ -47,8 +47,8 @@ module "key_vault_infra" {
 module "monitoring" {
   source = "../../_modules/monitoring"
 
-  project             = local.project
-  resource_group_name = data.azurerm_resource_group.wallet.name
+  project              = local.project
+  resource_group_name  = data.azurerm_resource_group.wallet.name
   action_group_enabled = true
 
   display_name = "Wallet Group"
@@ -197,11 +197,15 @@ module "function_apps" {
   health_check_path_user_uat = "/api/wallet/v1/health"
   health_check_path_support  = "/api/wallet/v1/health"
 
-  wallet_instance_storage_account_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
-  wallet_instance_storage_account_name = module.storage_accounts.wallet.name
+  wallet_instance_storage_account_url           = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
+  wallet_instance_storage_account_name          = module.storage_accounts.wallet.name
+  whitelisted_fiscal_codes_queue_url            = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
+  whitelisted_fiscal_codes_storage_account_name = module.storage_accounts.wallet.name
 
-  wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
-  wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
+  wallet_instance_storage_account_uat_name          = module.storage_accounts.wallet_uat.name
+  wallet_instance_storage_account_uat_url           = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
+  whitelisted_fiscal_codes_storage_account_uat_name = module.storage_accounts.wallet_uat.name
+  whitelisted_fiscal_codes_queue_uat_url            = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
   federation_entity_base_path_v13_uat = format(
     "%s/%s/",
     trimsuffix(module.storage_accounts.trust_uat.primary_blob_endpoint, "/"),

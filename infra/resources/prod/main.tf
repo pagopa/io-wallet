@@ -71,10 +71,10 @@ module "key_vaults" {
 module "monitoring" {
   source = "../_modules/monitoring"
 
-  project             = "${local.project}-wallet"
-  resource_group_name = data.azurerm_resource_group.wallet.name
+  project              = "${local.project}-wallet"
+  resource_group_name  = data.azurerm_resource_group.wallet.name
   action_group_enabled = false
-  display_name        = "wallet_ag_01"
+  display_name         = "wallet_ag_01"
 
   notification_email = data.azurerm_key_vault_secret.notification_email.value
   notification_slack = data.azurerm_key_vault_secret.notification_slack.value

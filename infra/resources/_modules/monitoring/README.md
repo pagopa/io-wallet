@@ -25,6 +25,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_action_group_enabled"></a> [action\_group\_enabled](#input\_action\_group\_enabled) | Whether the Azure Monitor action group is enabled | `bool` | n/a | yes |
 | <a name="input_display_name"></a> [display\_name](#input\_display\_name) | Display name for the action group | `string` | n/a | yes |
 | <a name="input_notification_email"></a> [notification\_email](#input\_notification\_email) | Email to use for the action group | `string` | n/a | yes |
 | <a name="input_notification_slack"></a> [notification\_slack](#input\_notification\_slack) | n/a | `string` | `"Slack channel id to use for the action group"` | no |

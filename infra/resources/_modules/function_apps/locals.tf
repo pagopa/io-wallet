@@ -52,6 +52,11 @@ locals {
 
     WalletAttestationOauthClientSub = "https://ioapp.it"
 
+    WhitelistedFiscalCodesQueueName                   = "whitelisted-fiscal-codes"
+    WhitelistedFiscalCodesQueueUrl                    = var.whitelisted_fiscal_codes_queue_url
+    WhitelistedFiscalCodesStorageAccount__accountName = var.whitelisted_fiscal_codes_storage_account_name
+    WhitelistedFiscalCodesContainerName               = "whitelisted-fiscal-codes"
+
     FrontDoorProfileName  = var.front_door_profile_name
     FrontDoorEndpointName = var.front_door_endpoint_name
 
@@ -103,10 +108,17 @@ locals {
     "sendEmailOnWalletInstanceRevocation",
   ]
 
+  function_app_user_both_slots_disabled = [
+    "enqueueWhitelistedFiscalCodes",
+    "insertWhitelistedFiscalCodes",
+  ]
+
   function_app_user_uat_both_slots_disabled = [
     "generateEntityConfiguration",
     "sendEmailOnWalletInstanceCreation",
     "sendEmailOnWalletInstanceRevocation",
+    "enqueueWhitelistedFiscalCodes",
+    "insertWhitelistedFiscalCodes",
   ]
 
   function_app_user = {
@@ -114,11 +126,19 @@ locals {
       {
         for to_disable in local.function_app_user_slot_disabled :
         format("AzureWebJobs.%s.Disabled", to_disable) => 0
+      },
+      {
+        for to_disable in local.function_app_user_both_slots_disabled :
+        format("AzureWebJobs.%s.Disabled", to_disable) => 1
       }
     )
     slot_app_settings = merge(local.function_app_user_common_app_settings,
       {
         for to_disable in local.function_app_user_slot_disabled :
+        format("AzureWebJobs.%s.Disabled", to_disable) => 1
+      },
+      {
+        for to_disable in local.function_app_user_both_slots_disabled :
         format("AzureWebJobs.%s.Disabled", to_disable) => 1
       }
     )
@@ -153,6 +173,10 @@ locals {
       WalletInstanceStorageAccountUrl                       = var.wallet_instance_storage_account_uat_url
       WalletInstanceStorageAccount__accountName             = var.wallet_instance_storage_account_uat_name
       StatusListPublicationQueueStorageAccount__accountName = var.wallet_instance_storage_account_uat_name
+      WhitelistedFiscalCodesQueueName                       = "whitelisted-fiscal-codes"
+      WhitelistedFiscalCodesQueueUrl                        = var.whitelisted_fiscal_codes_queue_uat_url
+      WhitelistedFiscalCodesStorageAccount__accountName     = var.whitelisted_fiscal_codes_storage_account_uat_name
+      WhitelistedFiscalCodesContainerName                   = "whitelisted-fiscal-codes"
     },
     {
       for s in var.user_func.app_settings :

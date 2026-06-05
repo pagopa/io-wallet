@@ -15,16 +15,19 @@ describe("IsFiscalCodeWhitelistedHandler", () => {
           whitelisted: true,
           whitelistedAt: new Date().toISOString(),
         }),
+      insertWhitelistedFiscalCodes: () => TE.right(undefined),
     };
 
   const whitelistedFiscalCodeRepositoryThatReturnsNonWhitelistedFiscalCode: WhitelistedFiscalCodeRepository =
     {
       checkIfFiscalCodeIsWhitelisted: () => TE.right({ whitelisted: false }),
+      insertWhitelistedFiscalCodes: () => TE.right(undefined),
     };
 
   const whitelistedFiscalCodeRepositoryThatFails: WhitelistedFiscalCodeRepository =
     {
       checkIfFiscalCodeIsWhitelisted: () => TE.left(new Error("generic error")),
+      insertWhitelistedFiscalCodes: () => TE.right(undefined),
     };
 
   const logger = {

@@ -27,12 +27,14 @@ import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
 import { CreateWalletUnitAttestationFunction } from "@/infra/azure/functions/create-wallet-unit-attestation";
+import { EnqueueWhitelistedFiscalCodesFunction } from "@/infra/azure/functions/enqueue-whitelisted-fiscal-codes";
 import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
 import { HealthFunction } from "@/infra/azure/functions/health";
+import { InsertWhitelistedFiscalCodesFunction } from "@/infra/azure/functions/insert-whitelisted-fiscal-codes";
 import { RevokeWalletInstancesFunction } from "@/infra/azure/functions/revoke-wallet-instances";
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
@@ -43,6 +45,7 @@ import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions
 import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
 import { CryptoSigner } from "@/infra/crypto/signer";
+import { BufferDecoder } from "@/infra/decoders/buffer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import {
@@ -103,6 +106,16 @@ const walletInstanceRevocationEmailQueueClient =
 const statusListPublicationQueueClient = queueServiceClient.getQueueClient(
   config.azure.storage.statusLists.publicationQueue.name,
 );
+
+const whitelistedFiscalCodesQueueServiceClient = new QueueServiceClient(
+  config.azure.storage.whitelistedFiscalCodes.queue.url,
+  credential,
+);
+
+const whitelistedFiscalCodesQueueClient =
+  whitelistedFiscalCodesQueueServiceClient.getQueueClient(
+    config.azure.storage.whitelistedFiscalCodes.queue.name,
+  );
 
 const logsQueryClient = new LogsQueryClient(credential);
 
@@ -360,6 +373,25 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
   }),
   queueName:
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,
+});
+
+app.storageBlob("enqueueWhitelistedFiscalCodes", {
+  connection: "WhitelistedFiscalCodesStorageAccount",
+  handler: EnqueueWhitelistedFiscalCodesFunction({
+    batchSize: config.azure.storage.whitelistedFiscalCodes.batchSize,
+    inputDecoder: BufferDecoder,
+    queueClient: whitelistedFiscalCodesQueueClient,
+  }),
+  path: `${config.azure.storage.whitelistedFiscalCodes.containerName}/fiscal-codes.csv`,
+});
+
+app.storageQueue("insertWhitelistedFiscalCodes", {
+  connection: "WhitelistedFiscalCodesStorageAccount",
+  handler: InsertWhitelistedFiscalCodesFunction({
+    inputDecoder: t.array(FiscalCode),
+    whitelistedFiscalCodeRepository,
+  }),
+  queueName: config.azure.storage.whitelistedFiscalCodes.queue.name,
 });
 
 app.http("createWalletAttestation", {

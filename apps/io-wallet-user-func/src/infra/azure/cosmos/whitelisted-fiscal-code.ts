@@ -3,6 +3,7 @@ import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ServiceUnavailableError } from "io-wallet-common/error";
 
+import { toCosmosError } from "@/infra/azure/cosmos/errors";
 import { WhitelistedFiscalCodeRepository } from "@/whitelisted-fiscal-code";
 
 const toError = (genericMessage: string) => (error: unknown) =>
@@ -37,5 +38,35 @@ export class CosmosDbWhitelistedFiscalCodeRepository implements WhitelistedFisca
         };
       }
     }, toError("Failed to check fiscal code"));
+  }
+
+  insertWhitelistedFiscalCodes(
+    fiscalCodes: FiscalCode[],
+  ): TE.TaskEither<Error, void> {
+    return TE.tryCatch(async () => {
+      if (fiscalCodes.length === 0) {
+        return;
+      }
+
+      const createdAt = new Date().toISOString();
+      const results = await this.#containerName.items.executeBulkOperations(
+        fiscalCodes.map((fiscalCode) => ({
+          operationType: "Create" as const,
+          partitionKey: fiscalCode,
+          resourceBody: {
+            createdAt,
+            id: fiscalCode,
+          },
+        })),
+      );
+
+      for (const { error } of results) {
+        if (error === undefined || error.code === 409) {
+          continue;
+        }
+
+        throw toCosmosError("Failed to insert fiscal codes")(error);
+      }
+    }, toCosmosError("Failed to insert fiscal codes"));
   }
 }
