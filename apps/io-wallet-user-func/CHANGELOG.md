@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.5.1
+
+### Patch Changes
+
+- c82a8fc: Updated insertWhitelistedFiscalCodes function
+
 ## 4.5.0
 
 ### Minor Changes
