@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.5.0
+
+### Minor Changes
+
+- 5bca962: Added functions enqueueWhitelistedFiscalCodes and insertWhitelistedFiscalCodes to insert fiscal codes in the whitelist"
+
 ## 4.4.1
 
 ### Patch Changes
