@@ -13,6 +13,39 @@ const toError = (genericMessage: string) => (error: unknown) =>
       )
     : new Error(`${genericMessage}: ${error}`);
 
+const maxBulkRetryAttempts = 5;
+const minRetryDelayMs = 200;
+const maxRetryDelayMs = 5000;
+
+const wait = (delayMs: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, delayMs));
+
+const getBulkRetryDelayMs = (
+  error: {
+    message?: string;
+    retryAfterInMilliseconds?: number;
+    retryAfterInMs?: number;
+  },
+  attempt: number,
+): number => {
+  const retryAfterFromSdk =
+    error.retryAfterInMilliseconds ?? error.retryAfterInMs;
+
+  if (retryAfterFromSdk !== undefined && Number.isFinite(retryAfterFromSdk)) {
+    return Math.max(retryAfterFromSdk, minRetryDelayMs);
+  }
+
+  const retryAfterFromMessage = Number(
+    error.message?.match(/RetryAfterMs=(\d+)/i)?.[1],
+  );
+
+  if (Number.isFinite(retryAfterFromMessage)) {
+    return Math.max(retryAfterFromMessage, minRetryDelayMs);
+  }
+
+  return Math.min(minRetryDelayMs * 2 ** (attempt - 1), maxRetryDelayMs);
+};
+
 export class CosmosDbWhitelistedFiscalCodeRepository implements WhitelistedFiscalCodeRepository {
   #containerName: Container;
 
@@ -49,23 +82,53 @@ export class CosmosDbWhitelistedFiscalCodeRepository implements WhitelistedFisca
       }
 
       const createdAt = new Date().toISOString();
-      const results = await this.#containerName.items.executeBulkOperations(
-        fiscalCodes.map((fiscalCode) => ({
-          operationType: "Create" as const,
-          partitionKey: fiscalCode,
-          resourceBody: {
-            createdAt,
-            id: fiscalCode,
-          },
-        })),
-      );
+      let pendingOperations = fiscalCodes.map((fiscalCode) => ({
+        operationType: "Create" as const,
+        partitionKey: fiscalCode,
+        resourceBody: {
+          createdAt,
+          id: fiscalCode,
+        },
+      }));
 
-      for (const { error } of results) {
-        if (error === undefined || error.code === 409) {
-          continue;
+      for (let attempt = 1; attempt <= maxBulkRetryAttempts; attempt++) {
+        const results =
+          await this.#containerName.items.executeBulkOperations(
+            pendingOperations,
+          );
+
+        const throttledOperations = [];
+        let maxRetryDelay = minRetryDelayMs;
+
+        for (const [index, { error }] of results.entries()) {
+          if (error === undefined || error.code === 409) {
+            continue;
+          }
+
+          if (error.code === 429) {
+            throttledOperations.push(pendingOperations[index]);
+            maxRetryDelay = Math.max(
+              maxRetryDelay,
+              getBulkRetryDelayMs(error, attempt),
+            );
+            continue;
+          }
+
+          throw error;
         }
 
-        throw toCosmosError("Failed to insert fiscal codes")(error);
+        if (throttledOperations.length === 0) {
+          return;
+        }
+
+        if (attempt === maxBulkRetryAttempts) {
+          throw new Error(
+            `Cosmos DB throttled ${throttledOperations.length} operations after ${maxBulkRetryAttempts} attempts`,
+          );
+        }
+
+        pendingOperations = throttledOperations;
+        await wait(maxRetryDelay);
       }
     }, toCosmosError("Failed to insert fiscal codes"));
   }

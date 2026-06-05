@@ -421,7 +421,7 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     ),
     whitelistedFiscalCodesBatchSize: pipe(
       readFromEnvironment("WhitelistedFiscalCodesBatchSize"),
-      RE.orElse(() => RE.right("1000")),
+      RE.orElse(() => RE.right("100")),
       RE.chainW(stringToNumberDecoderRE),
     ),
     whitelistedFiscalCodesContainerName: readFromEnvironment(

@@ -45,6 +45,35 @@ const getCosmosStatusCode = (error: unknown): number | undefined => {
 const hasCosmosStatusCode = (statusCode: number) => (error: unknown) =>
   getCosmosStatusCode(error) === statusCode;
 
+const toErrorDetails = (error: unknown): string => {
+  if (error instanceof Error) {
+    if (error.message && error.message !== "[object Object]") {
+      return error.message;
+    }
+
+    const cosmosError = isCosmosLikeError(error) ? error : undefined;
+    const serializedError = JSON.stringify({
+      code: cosmosError?.code,
+      name: error.name,
+      statusCode: cosmosError?.statusCode,
+    });
+
+    return serializedError && serializedError !== "{}"
+      ? serializedError
+      : error.toString();
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
+};
+
 export const toCosmosError =
   (genericMessage: string) =>
   (error: unknown): Error => {
@@ -62,9 +91,7 @@ export const toCosmosError =
       return new CosmosPreconditionFailedError(genericMessage);
     }
 
-    return new Error(
-      `${genericMessage}: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    return new Error(`${genericMessage}: ${toErrorDetails(error)}`);
   };
 
 export const toCosmosErrorOrInvalidResource =
