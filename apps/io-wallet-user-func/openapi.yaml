@@ -185,6 +185,7 @@ paths:
       description: |
         Revoke all valid Wallet Instances associated with the specified fiscal code.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
