@@ -35,6 +35,9 @@ export interface WalletInstanceRepository {
   getLastByUserId: (
     userId: WalletInstance["userId"],
   ) => TE.TaskEither<Error, O.Option<WalletInstance>>;
+  getValidByUserId: (
+    userId: WalletInstance["userId"],
+  ) => TE.TaskEither<Error, O.Option<WalletInstanceValid[]>>;
   getValidByUserIdExcludingOne: (
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],
@@ -217,3 +220,22 @@ export const revokeUserValidWalletInstancesExceptOne: (
       ),
     ),
   );
+
+export const getUserValidWalletInstancesId: (
+  userId: WalletInstance["userId"],
+) => RTE.ReaderTaskEither<
+  WalletInstanceEnvironment,
+  Error,
+  readonly WalletInstanceValid["id"][]
+> =
+  (userId) =>
+  ({ walletInstanceRepository }) =>
+    pipe(
+      walletInstanceRepository.getValidByUserId(userId),
+      TE.map(
+        O.match(
+          () => [],
+          RA.map((walletInstance) => walletInstance.id),
+        ),
+      ),
+    );

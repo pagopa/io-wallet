@@ -97,6 +97,7 @@ const walletInstanceRepository: WalletInstanceRepository = {
       }),
     ),
   getLastByUserId: () => TE.left(new Error("not implemented")),
+  getValidByUserId: () => TE.left(new Error("not implemented")),
   getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
 };
