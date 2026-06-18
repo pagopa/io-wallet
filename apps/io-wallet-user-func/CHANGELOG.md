@@ -1,5 +1,16 @@
 # io-wallet-user-func
 
+## 4.6.0
+
+### Minor Changes
+
+- 1659e7b: Added new http endpoint POST /wallet-instances/status
+
+### Patch Changes
+
+- Updated dependencies [1659e7b]
+  - io-wallet-common@1.6.1
+
 ## 4.5.1
 
 ### Patch Changes
