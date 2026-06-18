@@ -408,7 +408,7 @@ components:
           enum: ["REVOKED"]
         fiscal_code:
           $ref: "#/components/schemas/FiscalCode"
-        revocation_reason:
+        reason:
           type: string
           enum: ["USER_DECEASED"]
       required:
