@@ -88,39 +88,50 @@ resource "azurerm_api_management_api_tag" "wallet_support" {
 }
 
 // PDND API
-# module "apim_v2_wallet_pdnd_api" {
-#   source = "git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api?ref=v1.0.0"
+resource "azurerm_api_management_api" "wallet_pdnd_v1" {
+  name                  = "wallet-pdnd-api-v1"
+  api_management_name   = var.apim.name
+  resource_group_name   = var.apim.resource_group_name
+  subscription_required = false
 
-#   name                  = format("%s-wallet-pdnd-api", var.project_legacy)
-#   api_management_name   = var.apim.name
-#   resource_group_name   = var.apim.resource_group_name
-#   product_ids           = [module.apim_v2_wallet_pdnd_product.product_id]
-#   subscription_required = false
+  service_url = "https://api.internal.wallet.io.pagopa.it/api/wallet/pdnd/v1"
 
-#   service_url = format("https://%s/api/v1/wallet", var.function_apps.user_function.function_hostname)
+  description  = "API access limited by PDND token authentication"
+  display_name = "IO Wallet - PDND"
+  path         = "api/v1/wallet/pdnd"
+  protocols    = ["https"]
+  revision     = "1"
 
-#   description  = "API access limited by PDND token authentication"
-#   display_name = "IO Wallet - PDND"
-#   path         = "api/v1/wallet/pdnd"
-#   protocols    = ["https"]
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/api/pdnd/swagger.yaml")
+  }
+}
 
-#   content_format = "openapi"
+resource "azurerm_api_management_product_api" "wallet_pdnd_v1" {
+  api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
+  product_id          = module.apim_v2_wallet_pdnd_product.product_id
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+}
 
-#   content_value = file("${path.module}/api/pdnd/swagger.yaml")
+resource "azurerm_api_management_api_tag" "wallet_pdnd" {
+  api_id = azurerm_api_management_api.wallet_pdnd_v1.id
+  name   = azurerm_api_management_tag.wallet.name
+}
 
-#   xml_content = file("${path.module}/api/pdnd/base_policy.xml")
-# }
+resource "azurerm_api_management_api_policy" "wallet_pdnd_v1" {
+  api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  xml_content         = file("${path.module}/api/pdnd/base_policy.xml")
+}
 
-# resource "azurerm_api_management_api_tag" "wallet_pdnd" {
-#   api_id = module.apim_v2_wallet_pdnd_api.id
-#   name   = azurerm_api_management_tag.wallet.name
-# }
+resource "azurerm_api_management_api_operation_policy" "wallet_pdnd_health_check_policy" {
+  api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
+  operation_id        = "healthCheck"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
 
-# resource "azurerm_api_management_api_operation_policy" "health_check_pdnd_policy" {
-#   api_name            = module.apim_v2_wallet_pdnd_api.name
-#   operation_id        = "healthCheck"
-#   resource_group_name = var.apim.resource_group_name
-#   api_management_name = var.apim.name
-
-#   xml_content = file("${path.module}/api/pdnd/health_check_policy.xml")
-# }
+  xml_content = file("${path.module}/api/pdnd/health_check_policy.xml")
+}
