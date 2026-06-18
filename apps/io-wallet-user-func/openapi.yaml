@@ -414,7 +414,7 @@ components:
       required:
         - status
         - fiscal_code
-        - revocation_reason
+        - reason
 
     WalletInstanceData:
       description: |-
