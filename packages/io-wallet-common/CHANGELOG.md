@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.6.1
+
+### Patch Changes
+
+- 1659e7b: Added USER_DECEASED to the revocation reasons set
+
 ## 1.6.0
 
 ### Minor Changes
