@@ -176,6 +176,29 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
+  /wallet-instances/status:
+    post:
+      summary: Revoke Wallet Instances by fiscal code
+      operationId: setWalletInstancesStatus
+      security:
+        - FunctionsKey: []
+      description: |
+        Revoke all valid Wallet Instances associated with the specified fiscal code.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetWalletInstancesStatusData"
+      responses:
+        "204":
+          description: Wallet Instances status successfully set
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
   /certificate-chain:
     post:
       operationId: generateCertificateChain
@@ -377,6 +400,22 @@ components:
         - status
         - fiscal_code
 
+    SetWalletInstancesStatusData:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["REVOKED"]
+        fiscal_code:
+          $ref: "#/components/schemas/FiscalCode"
+        revocation_reason:
+          type: string
+          enum: ["USER_DECEASED"]
+      required:
+        - status
+        - fiscal_code
+        - revocation_reason
+
     WalletInstanceData:
       description: |-
         Describes the status of the wallet.
@@ -477,6 +516,7 @@ components:
           "NEW_WALLET_INSTANCE_CREATED",
           "WALLET_INSTANCE_RENEWAL",
           "REVOKED_BY_USER",
+          "USER_DECEASED",
         ]
 
     ProblemJson:
@@ -584,10 +624,10 @@ components:
       required:
         - assertion
         - fiscal_code
-    
+
     WalletInstanceAttestation:
       required:
-      - wallet_instance_attestation
+        - wallet_instance_attestation
       type: object
       properties:
         wallet_instance_attestation:
@@ -611,7 +651,7 @@ components:
 
     WalletUnitAttestation:
       required:
-      - wallet_unit_attestation
+        - wallet_unit_attestation
       type: object
       properties:
         wallet_unit_attestation:

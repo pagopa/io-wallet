@@ -117,6 +117,48 @@ export class CosmosDbWalletInstanceRepository implements WalletInstanceRepositor
     );
   }
 
+  getValidByUserId(userId: WalletInstance["userId"]) {
+    return pipe(
+      TE.tryCatch(async () => {
+        const { resources: items } = await this.#userIdKeyedContainer.items
+          .query({
+            parameters: [
+              {
+                name: "@partitionKey",
+                value: userId,
+              },
+            ],
+            query:
+              "SELECT * FROM c WHERE c.userId = @partitionKey AND c.isRevoked = false",
+          })
+          .fetchAll();
+        return items;
+      }, toCosmosError("Error getting wallet instances by user id")),
+      TE.chain((items) =>
+        pipe(
+          items,
+          RA.head,
+          O.fold(
+            () => TE.right(O.none),
+            () =>
+              pipe(
+                items,
+                t.array(WalletInstanceValid).decode,
+                E.map(O.some),
+                E.mapLeft(
+                  () =>
+                    new Error(
+                      "Error getting wallet instances: invalid result format",
+                    ),
+                ),
+                TE.fromEither,
+              ),
+          ),
+        ),
+      ),
+    );
+  }
+
   getValidByUserIdExcludingOne(
     walletInstanceId: WalletInstance["id"],
     userId: WalletInstance["userId"],

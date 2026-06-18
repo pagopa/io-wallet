@@ -39,6 +39,7 @@ import { RevokeWalletInstancesFunction } from "@/infra/azure/functions/revoke-wa
 import { SendEmailOnWalletInstanceCreationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-creation";
 import { SendEmailOnWalletInstanceRevocationFunction } from "@/infra/azure/functions/send-email-on-wallet-instance-revocation";
 import { SetWalletInstanceStatusFunction } from "@/infra/azure/functions/set-wallet-instance-status";
+import { SetWalletInstancesStatusFunction } from "@/infra/azure/functions/set-wallet-instances-status";
 import { StatusListManagerFunction } from "@/infra/azure/functions/status-list-manager";
 import { StatusListPublicationFunction } from "@/infra/azure/functions/status-list-publication";
 import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions/status-list-publication-dispatcher";
@@ -352,6 +353,15 @@ app.http("setWalletInstanceStatus", {
   }),
   methods: ["PUT"],
   route: "wallet-instances/{id}/status",
+});
+
+app.http("setWalletInstancesStatus", {
+  authLevel: "function",
+  handler: SetWalletInstancesStatusFunction({
+    walletInstanceRepository,
+  }),
+  methods: ["POST"],
+  route: "wallet-instances/status",
 });
 
 app.storageQueue("sendEmailOnWalletInstanceCreation", {
