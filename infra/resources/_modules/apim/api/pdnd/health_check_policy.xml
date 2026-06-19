@@ -7,8 +7,9 @@
         <base />
         <choose>
             <when condition="@(context.Response.StatusCode == 200)">
+                <set-status code="200" reason="OK" />
                 <set-body>@{
-                    return $"{{ \"type\": \"about:blank\", \"title\": \"OK\", \"status\": 200, \"detail\": \"The service is healthy\", \"instance\": \"/status\" }}";
+                    return "{ \"status\": \"healthy\" }";
                 }</set-body>
             </when>
         </choose>
