@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: IO Wallet API
+  title: IO Wallet - PDND API
   version: 1.0.0
 paths:
   /status:
@@ -11,7 +11,7 @@ paths:
         "200":
           description: The function is health
           content:
-            application/problem+json:
+            application/json:
               schema:
                 type: object
                 properties:
@@ -34,7 +34,7 @@ paths:
         "500":
           description: Internal Server Error
           content:
-            application/problem+json:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ProblemJson"
   /wallet-instances/status:
