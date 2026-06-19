@@ -5,5 +5,10 @@
             <openid-config url="https://wallet.io.pagopa.it/pdnd/openid-configuration" />
         </validate-jwt>
         <set-header name="Authorization" exists-action="delete" />
+        <set-body>@{
+            var body = context.Request.Body.As<JObject>(preserveContent: true);
+            body["reason"] = "USER_DECEASED";
+            return body.ToString();
+        }</set-body>
     </inbound>
 </policies>

@@ -131,7 +131,7 @@ resource "azurerm_api_management_api_operation_policy" "pdnd_health_check_policy
 
 resource "azurerm_api_management_api_operation_policy" "pdnd_set_wallet_instances_status_policy" {
   api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
-  operation_id        = "setWalletInstanceStatus"
+  operation_id        = "setWalletInstancesStatus"
   api_management_name = var.apim.name
   resource_group_name = var.apim.resource_group_name
 
