@@ -89,7 +89,7 @@ resource "azurerm_api_management_api_tag" "wallet_support" {
 
 // PDND API
 resource "azurerm_api_management_api" "wallet_pdnd_v1" {
-  name                  = "wallet-pdnd-api-v1"
+  name                  = "io-p-wallet-pdnd-api-v1"
   api_management_name   = var.apim.name
   resource_group_name   = var.apim.resource_group_name
   subscription_required = false
