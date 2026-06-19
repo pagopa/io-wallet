@@ -15,8 +15,6 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_apim_v2_wallet_admin_product"></a> [apim\_v2\_wallet\_admin\_product](#module\_apim\_v2\_wallet\_admin\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
-| <a name="module_apim_v2_wallet_app_product"></a> [apim\_v2\_wallet\_app\_product](#module\_apim\_v2\_wallet\_app\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
 | <a name="module_apim_v2_wallet_pdnd_product"></a> [apim\_v2\_wallet\_pdnd\_product](#module\_apim\_v2\_wallet\_pdnd\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_api"></a> [apim\_v2\_wallet\_support\_api](#module\_apim\_v2\_wallet\_support\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_product"></a> [apim\_v2\_wallet\_support\_product](#module\_apim\_v2\_wallet\_support\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
