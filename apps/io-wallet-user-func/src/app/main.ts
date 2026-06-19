@@ -360,7 +360,7 @@ app.http("setWalletInstancesStatus", {
   handler: SetWalletInstancesStatusFunction({
     walletInstanceRepository,
   }),
-  methods: ["POST"],
+  methods: ["PUT"],
   route: "wallet-instances/status",
 });
 

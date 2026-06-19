@@ -7,7 +7,7 @@ servers:
   - url: https://apim.internal.wallet.io.pagopa.it/api/wallet/pdnd/v1
 paths:
   "/wallet-instances/status":
-    post:
+    put:
       summary: SetWalletInstancesStatus
       operationId: setWalletInstancesStatus
       description: Revoke all valid Wallet Instances associated with the specified fiscal code.

@@ -38,14 +38,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemJson"
   /wallet-instances/status:
-    post:
-      summary: Revoke a Wallet Instance
+    put:
+      summary: Revoke the User Wallet Instances
       operationId: setWalletInstancesStatus
       security:
         - BearerAuth: []
       description: |
-        Revoke the Wallet Instance. 
-        If the Wallet Instance is already revoked, the operation succeed.
+        Revoke the User Wallet Instances in case of death
       requestBody:
         required: true
         content:
@@ -55,8 +54,6 @@ paths:
       responses:
         "204":
           description: Wallet Instance status successfully set
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "422":

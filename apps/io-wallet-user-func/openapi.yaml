@@ -177,7 +177,7 @@ paths:
           $ref: "#/components/responses/ServiceUnavailable"
 
   /wallet-instances/status:
-    post:
+    put:
       summary: Revoke Wallet Instances by fiscal code
       operationId: setWalletInstancesStatus
       security:
