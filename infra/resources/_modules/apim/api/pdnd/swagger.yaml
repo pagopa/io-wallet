@@ -14,23 +14,12 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - status
                 properties:
-                  type:
-                    type: string
-                    enum: [about:blank]
-                  title:
-                    type: string
-                    enum: [OK]
                   status:
-                    type: integer
-                    format: int32
-                    enum: [200]
-                  detail:
                     type: string
-                    enum: [The service is healthy]
-                  instance:
-                    type: string
-                    enum: [/status]
+                    enum: ["healthy"]
         "500":
           description: Internal Server Error
           content:
@@ -111,7 +100,7 @@ components:
       properties:
         status:
           type: string
-          enum: [REVOKED]
+          enum: ["REVOKED"]
         fiscal_code:
           $ref: "#/components/schemas/FiscalCode"
       required: [status, fiscal_code]
