@@ -88,19 +88,28 @@ resource "azurerm_api_management_api_tag" "wallet_support" {
 }
 
 // PDND API
+resource "azurerm_api_management_api_version_set" "wallet_pdnd" {
+  name                = "wallet-user-pdnd-apis"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "IO Wallet - PDND"
+  versioning_scheme   = "Segment"
+}
+
 resource "azurerm_api_management_api" "wallet_pdnd_v1" {
   name                  = "io-p-wallet-pdnd-api-v1"
   api_management_name   = var.apim.name
   resource_group_name   = var.apim.resource_group_name
   subscription_required = false
 
-  service_url = "https://api.internal.wallet.io.pagopa.it/api/wallet/pdnd/v1"
-
-  description  = "API access limited by PDND token authentication"
-  display_name = "IO Wallet - PDND"
-  path         = "api/v1/wallet/pdnd"
-  protocols    = ["https"]
-  revision     = "1"
+  service_url   = "https://api.internal.wallet.io.pagopa.it/api/wallet/pdnd/v1"
+  version_set_id = azurerm_api_management_api_version_set.wallet_pdnd.id
+  version       = "v1"
+  description   = "API access limited by PDND token authentication"
+  display_name  = "IO Wallet - PDND"
+  path          = "api/wallet/pdnd"
+  protocols     = ["https"]
+  revision      = 1
 
   import {
     content_format = "openapi"
