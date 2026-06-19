@@ -1,6 +1,7 @@
 <policies>
     <inbound>
         <base />
+        <!-- Validate JWT for protected operation -->
         <validate-jwt header-name="Authorization" require-scheme="Bearer">
             <openid-config url="https://wallet.io.pagopa.it/pdnd/openid-configuration" />
         </validate-jwt>

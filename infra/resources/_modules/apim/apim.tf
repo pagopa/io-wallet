@@ -120,18 +120,20 @@ resource "azurerm_api_management_api_tag" "wallet_pdnd" {
   name   = azurerm_api_management_tag.wallet.name
 }
 
-resource "azurerm_api_management_api_policy" "wallet_pdnd_v1" {
-  api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
-  xml_content         = file("${path.module}/api/pdnd/base_policy.xml")
-}
-
-resource "azurerm_api_management_api_operation_policy" "wallet_pdnd_health_check_policy" {
+resource "azurerm_api_management_api_operation_policy" "pdnd_health_check_policy" {
   api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
   operation_id        = "healthCheck"
   api_management_name = var.apim.name
   resource_group_name = var.apim.resource_group_name
 
   xml_content = file("${path.module}/api/pdnd/health_check_policy.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "pdnd_set_wallet_instances_status_policy" {
+  api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
+  operation_id        = "setWalletInstanceStatus"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+
+  xml_content = file("${path.module}/api/pdnd/set_wallet_instance_status_policy.xml")
 }
