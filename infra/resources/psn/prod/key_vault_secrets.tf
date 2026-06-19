@@ -7,6 +7,15 @@ resource "azurerm_key_vault_secret" "user_ioweb_fn_key" {
   depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
 
+resource "azurerm_key_vault_secret" "user_pdnd_fn_key" {
+  name             = "user-pdnd-fn-key"
+  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  value_wo         = ""
+  value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
+}
+
 resource "azurerm_key_vault_secret" "user_ioapp_fn_key" {
   name             = "user-ioapp-fn-key"
   key_vault_id     = module.key_vault_app.key_vault_wallet.id

@@ -2,8 +2,6 @@ openapi: 3.0.3
 info:
   title: IO Wallet API
   version: 1.0.0
-security:
-  - BearerAuth: []
 paths:
   /status:
     get:
@@ -38,38 +36,32 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ProblemJson'
-  /wallet-instances/{id}/status:
+                $ref: "#/components/schemas/ProblemJson"
+  /wallet-instances/status:
     put:
-      summary: Revoke a Wallet Instance
-      operationId: setWalletInstanceStatus
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      summary: Revoke the User Wallet Instances
+      operationId: setWalletInstancesStatus
+      security:
+        - BearerAuth: []
       description: |
-        Revoke the Wallet Instance. 
-        If the Wallet Instance is already revoked, the operation succeed.
+        Revoke the User Wallet Instances in case of death
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SetWalletInstanceStatusData'
+              $ref: "#/components/schemas/SetWalletInstancesStatusData"
       responses:
         "204":
           description: Wallet Instance status successfully set
-        "400":
-          $ref: '#/components/responses/BadRequest'
         "401":
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         "422":
-          $ref: '#/components/responses/UnprocessableContent'
+          $ref: "#/components/responses/UnprocessableContent"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
         "503":
-          $ref: '#/components/responses/ServiceUnavailable'
+          $ref: "#/components/responses/ServiceUnavailable"
 components:
   securitySchemes:
     BearerAuth:
@@ -82,52 +74,52 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProblemJson'
+            $ref: "#/components/schemas/ProblemJson"
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProblemJson'
+            $ref: "#/components/schemas/ProblemJson"
     NotFound:
       description: The specified resource was not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProblemJson'
+            $ref: "#/components/schemas/ProblemJson"
     UnprocessableContent:
       description: Unprocessable Content
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProblemJson'
+            $ref: "#/components/schemas/ProblemJson"
     InternalServerError:
       description: Internal Server Error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProblemJson'
+            $ref: "#/components/schemas/ProblemJson"
     ServiceUnavailable:
       description: Service Unavailable
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ProblemJson'
+            $ref: "#/components/schemas/ProblemJson"
   schemas:
-    SetWalletInstanceStatusData:
+    SetWalletInstancesStatusData:
       type: object
       properties:
         status:
           type: string
           enum: [REVOKED]
         fiscal_code:
-          $ref: '#/components/schemas/FiscalCode'
+          $ref: "#/components/schemas/FiscalCode"
       required: [status, fiscal_code]
     FiscalCode:
       type: string
       description: User's fiscal code.
       format: FiscalCode
-      x-import: '@pagopa/ts-commons/lib/strings'
+      x-import: "@pagopa/ts-commons/lib/strings"
       example: SPNDNL80R13C555X
     ProblemJson:
       type: object

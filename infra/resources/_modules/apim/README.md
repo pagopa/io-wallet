@@ -15,8 +15,6 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_apim_v2_wallet_admin_product"></a> [apim\_v2\_wallet\_admin\_product](#module\_apim\_v2\_wallet\_admin\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
-| <a name="module_apim_v2_wallet_app_product"></a> [apim\_v2\_wallet\_app\_product](#module\_apim\_v2\_wallet\_app\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
 | <a name="module_apim_v2_wallet_pdnd_product"></a> [apim\_v2\_wallet\_pdnd\_product](#module\_apim\_v2\_wallet\_pdnd\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_api"></a> [apim\_v2\_wallet\_support\_api](#module\_apim\_v2\_wallet\_support\_api) | git::https://github.com/pagopa/terraform-azurerm-v4//api_management_api | v1.0.0 |
 | <a name="module_apim_v2_wallet_support_product"></a> [apim\_v2\_wallet\_support\_product](#module\_apim\_v2\_wallet\_support\_product) | github.com/pagopa/terraform-azurerm-v4//api_management_product | v1.0.0 |
@@ -26,11 +24,16 @@ No requirements.
 
 | Name | Type |
 |------|------|
+| [azurerm_api_management_api.wallet_pdnd_v1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api) | resource |
 | [azurerm_api_management_api_operation_policy.get_current_wallet_instance_status_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.is_fiscal_code_whitelisted_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
+| [azurerm_api_management_api_operation_policy.pdnd_health_check_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
+| [azurerm_api_management_api_operation_policy.pdnd_set_wallet_instances_status_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
 | [azurerm_api_management_api_operation_policy.set_wallet_instance_status_policy](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_operation_policy) | resource |
+| [azurerm_api_management_api_tag.wallet_pdnd](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_support](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
 | [azurerm_api_management_api_tag.wallet_web](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_api_tag) | resource |
+| [azurerm_api_management_product_api.wallet_pdnd_v1](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_product_api) | resource |
 | [azurerm_api_management_tag.wallet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management_tag) | resource |
 
 ## Inputs

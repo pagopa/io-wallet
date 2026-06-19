@@ -42,6 +42,17 @@ resource "azurerm_api_management_named_value" "func_user_ioweb_key" {
   }
 }
 
+resource "azurerm_api_management_named_value" "func_user_pdnd_key" {
+  name                = "user-func-pdnd-key"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "UserPdndFunctionKey"
+  secret              = true
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_pdnd_fn_key.versionless_id
+  }
+}
+
 resource "azurerm_api_management_backend" "func_support" {
   name                = "function-support-01"
   description         = "Function App Support Backend"
@@ -110,6 +121,14 @@ resource "azurerm_api_management_api_version_set" "user_ioweb" {
   versioning_scheme   = "Segment"
 }
 
+resource "azurerm_api_management_api_version_set" "user_pdnd" {
+  name                = "wallet-user-pdnd-apis"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "Wallet User - PDND"
+  versioning_scheme   = "Segment"
+}
+
 resource "azurerm_api_management_api_version_set" "user_uat_ioapp" {
   name                = "wallet-user-uat-ioapp-apis"
   api_management_name = module.apim.name
@@ -168,6 +187,27 @@ resource "azurerm_api_management_api" "user_ioweb_v1" {
   }
 }
 
+resource "azurerm_api_management_api" "user_pdnd_v1" {
+  name                  = "user-pdnd-api-v1"
+  api_management_name   = module.apim.name
+  resource_group_name   = module.apim.resource_group_name
+  subscription_required = false
+
+  version_set_id = azurerm_api_management_api_version_set.user_pdnd.id
+  version        = "v1"
+  revision       = 1
+
+  description  = "REST APIs consumed by PDND"
+  display_name = "IT-Wallet User - PDND v1"
+  path         = "api/wallet/pdnd"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/apim/api/pdnd/swagger.yaml")
+  }
+}
+
 resource "azurerm_api_management_api" "user_uat_ioapp_v1" {
   name                  = "user-uat-ioapp-api-v1"
   api_management_name   = module.apim.name
@@ -219,6 +259,13 @@ resource "azurerm_api_management_product_api" "user_ioapp" {
 
 resource "azurerm_api_management_product_api" "user_ioweb" {
   api_name            = azurerm_api_management_api.user_ioweb_v1.name
+  product_id          = azurerm_api_management_product.public.product_id
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+}
+
+resource "azurerm_api_management_product_api" "user_pdnd" {
+  api_name            = azurerm_api_management_api.user_pdnd_v1.name
   product_id          = azurerm_api_management_product.public.product_id
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
@@ -283,6 +330,11 @@ resource "azurerm_api_management_api_tag" "user_ioweb_v1_user" {
   name   = azurerm_api_management_tag.user.name
 }
 
+resource "azurerm_api_management_api_tag" "user_pdnd_v1_user" {
+  api_id = azurerm_api_management_api.user_pdnd_v1.id
+  name   = azurerm_api_management_tag.user.name
+}
+
 resource "azurerm_api_management_api_tag" "user_uat_ioapp_v1_uat" {
   api_id = azurerm_api_management_api.user_uat_ioapp_v1.id
   name   = azurerm_api_management_tag.uat.name
@@ -330,6 +382,23 @@ resource "azurerm_api_management_api_policy" "user_ioweb_v1" {
       <base />
       <set-header name="x-functions-key" exists-action="override">
         <value>{{${azurerm_api_management_named_value.func_user_ioweb_key.display_name}}}</value>
+      </set-header>
+      <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "user_pdnd_v1" {
+  api_name            = azurerm_api_management_api.user_pdnd_v1.name
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <base />
+      <set-header name="x-functions-key" exists-action="override">
+        <value>{{${azurerm_api_management_named_value.func_user_pdnd_key.display_name}}}</value>
       </set-header>
       <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
   </inbound>

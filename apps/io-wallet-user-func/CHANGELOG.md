@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 1659e7b: Added new http endpoint POST /wallet-instances/status
+- 1659e7b: Added new http endpoint PUT /wallet-instances/status
 
 ### Patch Changes
 
