@@ -102,14 +102,14 @@ resource "azurerm_api_management_api" "wallet_pdnd_v1" {
   resource_group_name   = var.apim.resource_group_name
   subscription_required = false
 
-  service_url   = "https://api.internal.wallet.io.pagopa.it/api/wallet/pdnd/v1"
+  service_url    = "https://api.internal.wallet.io.pagopa.it/api/wallet/pdnd/v1"
   version_set_id = azurerm_api_management_api_version_set.wallet_pdnd.id
-  version       = "v1"
-  description   = "API access limited by PDND token authentication"
-  display_name  = "IO Wallet - PDND"
-  path          = "api/wallet/pdnd"
-  protocols     = ["https"]
-  revision      = 1
+  version        = "v1"
+  description    = "API access limited by PDND token authentication"
+  display_name   = "IO Wallet - PDND"
+  path           = "api/wallet/pdnd"
+  protocols      = ["https"]
+  revision       = 1
 
   import {
     content_format = "openapi"
@@ -127,15 +127,6 @@ resource "azurerm_api_management_product_api" "wallet_pdnd_v1" {
 resource "azurerm_api_management_api_tag" "wallet_pdnd" {
   api_id = azurerm_api_management_api.wallet_pdnd_v1.id
   name   = azurerm_api_management_tag.wallet.name
-}
-
-resource "azurerm_api_management_api_operation_policy" "pdnd_health_check_policy" {
-  api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
-  operation_id        = "healthCheck"
-  api_management_name = var.apim.name
-  resource_group_name = var.apim.resource_group_name
-
-  xml_content = file("${path.module}/api/pdnd/health_check_policy.xml")
 }
 
 resource "azurerm_api_management_api_operation_policy" "pdnd_set_wallet_instances_status_policy" {
