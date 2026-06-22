@@ -3,29 +3,6 @@ info:
   title: IO Wallet - PDND API
   version: v1
 paths:
-  /status:
-    get:
-      operationId: healthCheck
-      summary: Used to check if the function is healthy
-      responses:
-        "200":
-          description: The function is health
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - status
-                properties:
-                  status:
-                    type: string
-                    enum: ["healthy"]
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemJson"
   /wallet-instances/status:
     put:
       summary: Revoke the User Wallet Instances
