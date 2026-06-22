@@ -1,5 +1,5 @@
 oa3_spec: apps/io-wallet-user-func/openapi-external/user_v1/swagger.yaml
-name: opex_io_wallet
+name: opex_io_wallet_api_app
 location: Italy North
 timespan: 5m
 evaluation_frequency: 10
