@@ -96,6 +96,14 @@ resource "azurerm_api_management_api_version_set" "wallet_pdnd" {
   versioning_scheme   = "Segment"
 }
 
+resource "azurerm_api_management_api_version_set" "wallet_pdnd_uat" {
+  name                = "wallet-user-pdnd-uat-apis"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+  display_name        = "IO Wallet - PDND UAT"
+  versioning_scheme   = "Segment"
+}
+
 resource "azurerm_api_management_api" "wallet_pdnd_v1" {
   name                  = "io-p-wallet-pdnd-api-v1"
   api_management_name   = var.apim.name
@@ -117,8 +125,36 @@ resource "azurerm_api_management_api" "wallet_pdnd_v1" {
   }
 }
 
+resource "azurerm_api_management_api" "wallet_pdnd_uat_v1" {
+  name                  = "io-p-wallet-pdnd-uat-api-v1"
+  api_management_name   = var.apim.name
+  resource_group_name   = var.apim.resource_group_name
+  subscription_required = false
+
+  service_url    = "https://api-internal.io.italia.it/api/wallet/pdnd/uat/v1"
+  version_set_id = azurerm_api_management_api_version_set.wallet_pdnd_uat.id
+  version        = "v1"
+  description    = "API access limited by PDND token authentication"
+  display_name   = "IO Wallet - PDND UAT"
+  path           = "api/wallet/pdnd/uat"
+  protocols      = ["https"]
+  revision       = 1
+
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/api/pdnd-uat/swagger.yaml")
+  }
+}
+
 resource "azurerm_api_management_product_api" "wallet_pdnd_v1" {
   api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
+  product_id          = module.apim_v2_wallet_pdnd_product.product_id
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+}
+
+resource "azurerm_api_management_product_api" "wallet_pdnd_uat_v1" {
+  api_name            = azurerm_api_management_api.wallet_pdnd_uat_v1.name
   product_id          = module.apim_v2_wallet_pdnd_product.product_id
   api_management_name = var.apim.name
   resource_group_name = var.apim.resource_group_name
@@ -129,6 +165,11 @@ resource "azurerm_api_management_api_tag" "wallet_pdnd" {
   name   = azurerm_api_management_tag.wallet.name
 }
 
+resource "azurerm_api_management_api_tag" "wallet_pdnd_uat" {
+  api_id = azurerm_api_management_api.wallet_pdnd_uat_v1.id
+  name   = azurerm_api_management_tag.wallet.name
+}
+
 resource "azurerm_api_management_api_operation_policy" "pdnd_set_wallet_instances_status_policy" {
   api_name            = azurerm_api_management_api.wallet_pdnd_v1.name
   operation_id        = "setWalletInstancesStatus"
@@ -136,4 +177,13 @@ resource "azurerm_api_management_api_operation_policy" "pdnd_set_wallet_instance
   resource_group_name = var.apim.resource_group_name
 
   xml_content = file("${path.module}/api/pdnd/set_wallet_instance_status_policy.xml")
+}
+
+resource "azurerm_api_management_api_operation_policy" "pdnd_uat_set_wallet_instances_status_policy" {
+  api_name            = azurerm_api_management_api.wallet_pdnd_uat_v1.name
+  operation_id        = "setWalletInstancesStatus"
+  api_management_name = var.apim.name
+  resource_group_name = var.apim.resource_group_name
+
+  xml_content = file("${path.module}/api/pdnd-uat/set_wallet_instance_status_policy.xml")
 }
