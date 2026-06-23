@@ -131,7 +131,7 @@ resource "azurerm_api_management_api" "wallet_pdnd_uat_v1" {
   resource_group_name   = var.apim.resource_group_name
   subscription_required = false
 
-  service_url    = "https://api-internal.io.italia.it/api/wallet/pdnd/uat/v1"
+  service_url    = "https://api.internal.wallet.io.pagopa.it/api/wallet/pdnd/uat/v1"
   version_set_id = azurerm_api_management_api_version_set.wallet_pdnd_uat.id
   version        = "v1"
   description    = "API access limited by PDND token authentication"
