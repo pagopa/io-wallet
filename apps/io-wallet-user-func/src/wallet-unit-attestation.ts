@@ -1,11 +1,6 @@
-import { pipe } from "fp-ts/function";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { SignerMetadataEnvironment } from "@/infra/signer-metadata";
-
-import { FederationEntity } from "./entity-configuration";
 import { removeTrailingSlash } from "./url";
 
 export interface AttestedKey {
@@ -44,7 +39,6 @@ interface WalletUnitAttestationJwtModel {
   // };
   iss: string;
   key_storage: ("iso_18045_enhanced-basic" | "iso_18045_moderate")[];
-  kid: string;
   status: {
     status_list: {
       idx: number;
@@ -55,13 +49,12 @@ interface WalletUnitAttestationJwtModel {
   x5c: string[];
 }
 
-const WalletUnitAttestationToJwtModel: E.Encoder<
+export const WalletUnitAttestationToJwtModel: E.Encoder<
   WalletUnitAttestationJwtModel,
   WalletUnitAttestationData
 > = {
   encode: ({
     attestedKeys,
-    kid,
     status,
     walletProviderName,
     // walletSolutionVersion,
@@ -81,7 +74,6 @@ const WalletUnitAttestationToJwtModel: E.Encoder<
     // },
     iss: removeTrailingSlash(walletProviderName),
     key_storage: attestedKeys.map(({ keyStorage }) => keyStorage),
-    kid,
     status: {
       status_list: {
         idx: status.statusList.idx,
@@ -94,27 +86,3 @@ const WalletUnitAttestationToJwtModel: E.Encoder<
     x5c,
   }),
 };
-export interface WalletUnitAttestationEnvironment extends SignerMetadataEnvironment {
-  federationEntity: FederationEntity;
-  statusListBaseUrl: string;
-}
-
-export const createWalletUnitAttestation =
-  (
-    walletAttestationData: WalletUnitAttestationData,
-  ): RTE.ReaderTaskEither<WalletUnitAttestationEnvironment, Error, string> =>
-  (dep) =>
-    pipe(
-      walletAttestationData,
-      WalletUnitAttestationToJwtModel.encode,
-      ({ kid, x5c, ...payload }) =>
-        dep.signer.createJwtAndSign(
-          {
-            typ: "key-attestation+jwt",
-            x5c,
-          },
-          kid,
-          "ES256",
-          "1y",
-        )(payload),
-    );

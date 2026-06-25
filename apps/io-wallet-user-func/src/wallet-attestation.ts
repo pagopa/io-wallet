@@ -1,21 +1,15 @@
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
-import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as IOE from "fp-ts/IOEither";
 import { sequenceT } from "fp-ts/lib/Apply";
+import * as R from "fp-ts/Reader";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { validateJwkKid } from "io-wallet-common/jwk";
 
-import { CertificateRepository } from "./certificates";
-import {
-  WalletAttestationData,
-  WalletAttestationToJwtModel,
-} from "./encoders/wallet-attestation";
+import { WalletAttestationData } from "./encoders/wallet-attestation";
 import { FederationEntity } from "./entity-configuration";
 import { createHashBase64url } from "./infra/crypto/hashing";
 import { generateRandomHex } from "./infra/crypto/random";
-import { Signer } from "./signer";
 import { removeTrailingSlash } from "./url";
 import { WalletAttestationRequest } from "./wallet-attestation-request";
 import { getLoAUri, LoA } from "./wallet-provider";
@@ -26,9 +20,7 @@ const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
   );
 
 export interface WalletAttestationEnvironment {
-  certificateRepository: CertificateRepository;
   federationEntity: FederationEntity;
-  signer: Signer;
   walletAttestationConfig: WalletAttestationConfig;
 }
 
@@ -41,50 +33,20 @@ interface WalletAttestationConfig {
 export const getWalletAttestationData =
   (
     walletAttestationRequest: WalletAttestationRequest,
-  ): RTE.ReaderTaskEither<
-    WalletAttestationEnvironment,
-    Error,
-    WalletAttestationData
-  > =>
+    walletAttestationSigningKid: string,
+  ): R.Reader<WalletAttestationEnvironment, WalletAttestationData> =>
   ({
     federationEntity: { basePathV10: basePath },
-    signer,
     walletAttestationConfig: { walletLink, walletName },
-  }) =>
-    pipe(
-      "EC",
-      signer.getFirstPublicKeyByKty,
-      E.chainW(validateJwkKid),
-      TE.fromEither,
-      TE.map(({ kid }) => ({
-        aal: pipe(basePath, getLoAUri(LoA.basic)),
-        iss: basePath.href,
-        kid,
-        sub: walletAttestationRequest.header.kid,
-        walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
-        walletLink,
-        walletName,
-      })),
-    );
-
-export const createWalletAttestationAsJwt =
-  (
-    walletAttestationData: WalletAttestationData,
-  ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  (dep) =>
-    pipe(
-      walletAttestationData,
-      WalletAttestationToJwtModel.encode,
-      ({ kid, ...payload }) =>
-        dep.signer.createJwtAndSign(
-          {
-            typ: "oauth-client-attestation+jwt",
-          },
-          kid,
-          "ES256",
-          "1h",
-        )(payload),
-    );
+  }) => ({
+    aal: pipe(basePath, getLoAUri(LoA.basic)),
+    iss: basePath.href,
+    kid: walletAttestationSigningKid,
+    sub: walletAttestationRequest.header.kid,
+    walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
+    walletLink,
+    walletName,
+  });
 
 const getDisclosures = ({
   walletLink,
@@ -101,11 +63,30 @@ const getDisclosures = ({
     ]),
   );
 
-export const createWalletAttestationAsSdJwt =
+export interface WalletAttestationSdJwtClaims {
+  claims: {
+    _sd: string[];
+    _sd_alg: "sha-256";
+    aal: string;
+    cnf: {
+      jwk: WalletAttestationData["walletInstancePublicKey"];
+    };
+    iss: string;
+    sub: string;
+    vct: string;
+  };
+  disclosures: string[];
+}
+
+export const createWalletAttestationSdJwtClaims =
   (
     walletAttestationData: WalletAttestationData,
-  ): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  ({ signer, walletAttestationConfig: { trustAnchorUrl } }) =>
+  ): RTE.ReaderTaskEither<
+    WalletAttestationEnvironment,
+    Error,
+    WalletAttestationSdJwtClaims
+  > =>
+  ({ walletAttestationConfig: { trustAnchorUrl } }) =>
     pipe(
       walletAttestationData,
       ({ iss, sub, walletInstancePublicKey, ...rest }) => ({
@@ -125,10 +106,9 @@ export const createWalletAttestationAsSdJwt =
           },
           getDisclosures,
           TE.fromIOEither,
-          TE.chain((disclosures) =>
-            pipe(
-              sdJwtModel,
-              ({ aal, cnf, iss, sub, vct }) => ({
+          TE.map((disclosures) =>
+            pipe(sdJwtModel, ({ aal, cnf, iss, sub, vct }) => ({
+              claims: {
                 _sd: disclosures.map(createHashBase64url),
                 _sd_alg: "sha-256",
                 aal,
@@ -136,22 +116,9 @@ export const createWalletAttestationAsSdJwt =
                 iss,
                 sub,
                 vct,
-              }),
-              signer.createJwtAndSign(
-                {
-                  typ: "dc+sd-jwt",
-                },
-                sdJwtModel.kid,
-                "ES256",
-                "1h",
-                // TODO: SIW-2656. env var are not used
-              ),
-              TE.map((jwt) =>
-                pipe(disclosures, (base64Disclosures) =>
-                  [jwt, ...base64Disclosures].join("~"),
-                ),
-              ),
-            ),
+              },
+              disclosures,
+            })),
           ),
         ),
     );

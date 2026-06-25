@@ -28,7 +28,7 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { CreateWalletInstanceAttestationHandler } from "../create-wallet-instance-attestation";
-import { privateEcKey, publicEcKey, signer } from "./keys";
+import { privateEcKey, publicEcKey } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
@@ -72,6 +72,8 @@ const federationEntity = {
 const walletAttestationConfig = {
   oauthClientSub: "oauthClientSub",
 };
+
+const walletInstanceAttestationSigningKey = privateEcKey;
 
 const assertionValidationConfig: AssertionValidationConfig = {
   allowedDeveloperUsers: ["a"],
@@ -198,8 +200,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -226,8 +228,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -254,8 +256,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -326,8 +328,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -356,8 +358,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -388,8 +390,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -436,8 +438,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -478,8 +480,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
@@ -511,8 +513,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -573,8 +575,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -634,8 +636,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -693,8 +695,8 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletInstanceAttestationSigningKey,
       walletInstanceRepository,
     });
 

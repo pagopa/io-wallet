@@ -1,118 +1,65 @@
-import { parse } from "@pagopa/handler-kit";
-import { flow, pipe } from "fp-ts/function";
+import { pipe } from "fp-ts/function";
 import * as A from "fp-ts/lib/Array";
 import * as E from "fp-ts/lib/Either";
 import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
-import * as t from "io-ts";
-import { ECKey, Jwk, JwkPrivateKey, RSAKey } from "io-wallet-common/jwk";
+import { ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
-
-import { CryptoConfiguration } from "../../app/config";
-import { JwtHeader, Signer } from "../../signer";
 
 const supportedSignAlgorithms = ["ES256"];
 
-export class CryptoSigner implements Signer {
-  #configuration: CryptoConfiguration;
+interface JwtHeader {
+  alg?: string;
+  trustChain?: string[];
+  typ: string;
+  x5c?: string[];
+}
 
-  constructor(cnf: CryptoConfiguration) {
-    this.#configuration = cnf;
-  }
+interface SignJwtOptions {
+  duration?: string;
+  header: JwtHeader;
+  payload: jose.JWTPayload;
+}
 
-  // TODO: [SIW-260] Make algorithm management separate and not hard-coded
-  createJwtAndSign =
-    (
-      header: JwtHeader,
-      kid: string,
-      alg = this.#configuration.jwtDefaultAlg,
-      jwtDuration = this.#configuration.jwtDefaultDuration,
-    ) =>
-    (payload: jose.JWTPayload) =>
-      pipe(
-        alg,
-        TE.fromPredicate(
-          this.isAlgorithmSupported,
-          (a) => new Error(`The algorithm ${a} is not supported`),
-        ),
-        TE.chain((a) =>
-          pipe(
-            getPrivateKeyByKid(this.#configuration.jwks, kid),
-            TE.fromOption(
-              () => new Error(`No keys found for the algorithm ${a}`),
+const isAlgorithmSupported = (alg: string) =>
+  pipe(
+    supportedSignAlgorithms,
+    A.findFirst((supportedAlg) => supportedAlg === alg),
+    O.isSome,
+  );
+
+export const signJwt =
+  (privateKey: ECPrivateKeyWithKid) =>
+  ({
+    duration = "24h",
+    header: { alg = "ES256", trustChain, ...header },
+    payload,
+  }: SignJwtOptions) =>
+    pipe(
+      alg,
+      TE.fromPredicate(
+        isAlgorithmSupported,
+        (a) => new Error(`The algorithm ${a} is not supported`),
+      ),
+      TE.chain((alg) =>
+        pipe(
+          TE.tryCatch(() => jose.importJWK(privateKey), E.toError),
+          TE.chain((key) =>
+            TE.tryCatch(
+              () =>
+                new jose.SignJWT(payload)
+                  .setProtectedHeader({
+                    ...header,
+                    alg,
+                    kid: privateKey.kid,
+                    trust_chain: trustChain,
+                  })
+                  .setIssuedAt()
+                  .setExpirationTime(duration)
+                  .sign(key),
+              E.toError,
             ),
           ),
         ),
-        TE.chain((privateKey) =>
-          pipe(
-            TE.tryCatch(() => jose.importJWK(privateKey), E.toError),
-            TE.map((joseKey) => ({ joseKey, kid: privateKey.kid })),
-          ),
-        ),
-        TE.chain(({ joseKey, kid }) =>
-          TE.tryCatch(
-            () =>
-              new jose.SignJWT(payload)
-                .setProtectedHeader({
-                  ...header,
-                  alg,
-                  kid,
-                })
-                .setIssuedAt()
-                .setExpirationTime(jwtDuration)
-                .sign(joseKey),
-            E.toError,
-          ),
-        ),
-      );
-
-  // Return the first public key in Wallet Provider JWKS given the kty
-  getFirstPublicKeyByKty = (kty: Jwk["kty"]) =>
-    pipe(
-      this.getPublicKeys(),
-      E.chain(
-        flow(
-          A.findFirst((key) => key.kty === kty),
-          E.fromOption(
-            () => new Error(`First public key with kty ${kty} not found`),
-          ),
-        ),
       ),
     );
-
-  getPrivateKeyByKid = (kid: string): O.Option<JwkPrivateKey> =>
-    pipe(
-      this.#configuration.jwks,
-      A.findFirst((key) => key.kid === kid),
-      O.flatMap(
-        flow(
-          parse(JwkPrivateKey),
-          E.match(() => O.none, O.some),
-        ),
-      ),
-    );
-
-  getPublicKeys = () =>
-    pipe(
-      this.#configuration.jwks,
-      parse(
-        t.array(t.union([t.exact(ECKey), t.exact(RSAKey)])),
-        "JWKs appears to not be a public key array",
-      ),
-    );
-
-  getSupportedSignAlgorithms = () => E.right(supportedSignAlgorithms);
-
-  isAlgorithmSupported = (alg: string) =>
-    pipe(
-      supportedSignAlgorithms,
-      A.findFirst((supportedAlg) => supportedAlg === alg),
-      O.isSome,
-    );
-}
-
-const getPrivateKeyByKid = (jwks: CryptoConfiguration["jwks"], kid: string) =>
-  pipe(
-    jwks,
-    A.findFirst((key) => key.kid === kid),
-  );

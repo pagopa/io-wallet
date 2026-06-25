@@ -2,11 +2,10 @@ import { CdnManagementClient } from "@azure/arm-cdn";
 import * as H from "@pagopa/handler-kit";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { JwkPublicKey, validateJwkKid } from "io-wallet-common/jwk";
+import { ECPrivateKeyWithKid, JwkPublicKey } from "io-wallet-common/jwk";
 
 import {
   CertificateRepository,
@@ -15,8 +14,17 @@ import {
 import { EntityConfigurationToJwtModel } from "@/encoders/entity-configuration";
 import { EntityConfigurationEnvironment } from "@/entity-configuration";
 import { uploadFile } from "@/infra/azure/storage/blob";
+import { signJwt } from "@/infra/crypto/signer";
 import { sendTelemetryException } from "@/infra/telemetry";
 import { getLoAUri, LoA } from "@/wallet-provider";
+
+const toPublicJwk = ({ crv, kid, kty, x, y }: ECPrivateKeyWithKid) => ({
+  crv,
+  kid,
+  kty,
+  x,
+  y,
+});
 
 const addCertificateChainToJwk = (
   jwk: JwkPublicKey,
@@ -54,80 +62,69 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     authorityHints,
     federationEntity: { basePathV10: basePath, ...federationEntityMetadata },
   },
-  entityConfigurationSigner,
-  walletAttestationSigner,
+  entityConfigurationSigningJwk,
+  federationEntityJwks,
+  walletProviderJwks,
 }) =>
   pipe(
-    sequenceS(E.Apply)({
-      entityConfigurationPublicJwk: pipe(
-        entityConfigurationSigner.getFirstPublicKeyByKty("EC"),
-        E.chainW(validateJwkKid),
-      ),
-      federationEntityJwks: entityConfigurationSigner.getPublicKeys(),
-      walletProviderJwks: walletAttestationSigner.getPublicKeys(),
-    }),
-    TE.fromEither,
-    TE.chain(
-      ({
-        entityConfigurationPublicJwk,
-        federationEntityJwks,
-        walletProviderJwks,
-      }) =>
-        pipe(
-          TE.bindTo("federationEntityJwksWithX5c")(
-            pipe(
-              federationEntityJwks,
-              TE.traverseArray((jwk) =>
-                // TODO [SIW-2719]: Add certificate chain validation and ensure the system handles any issues appropriately
-                pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
-              ),
+    {
+      federationEntityPublicJwks: federationEntityJwks.map(toPublicJwk),
+      walletProviderPublicJwks: walletProviderJwks.map(toPublicJwk),
+    },
+    ({ federationEntityPublicJwks, walletProviderPublicJwks }) =>
+      pipe(
+        federationEntityPublicJwks,
+        TE.traverseArray((jwk) =>
+          // TODO [SIW-2719]: Add certificate chain validation and ensure the system handles any issues appropriately
+          pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
+        ),
+        TE.bindTo("federationEntityJwksWithX5c"),
+        TE.bind("walletProviderJwksWithX5c", () =>
+          pipe(
+            walletProviderPublicJwks,
+            TE.traverseArray((jwk) =>
+              pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
             ),
-          ),
-          TE.bind("walletProviderJwksWithX5c", () =>
-            pipe(
-              walletProviderJwks,
-              TE.traverseArray((jwk) =>
-                pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
-              ),
-            ),
-          ),
-          TE.chain(
-            ({ federationEntityJwksWithX5c, walletProviderJwksWithX5c }) =>
-              pipe(
-                {
-                  authorityHints,
-                  federationEntityMetadata: {
-                    contacts: federationEntityMetadata.contacts,
-                    homepageUri: federationEntityMetadata.homepageUri,
-                    logoUri: federationEntityMetadata.logoUri,
-                    organizationName: federationEntityMetadata.organizationName,
-                    policyUri: federationEntityMetadata.policyUri,
-                    tosUri: federationEntityMetadata.tosUri,
-                  },
-                  iss: basePath,
-                  jwks: [...federationEntityJwksWithX5c],
-                  sub: basePath,
-                  walletProviderMetadata: {
-                    ascValues: [
-                      pipe(basePath, getLoAUri(LoA.basic)),
-                      pipe(basePath, getLoAUri(LoA.medium)),
-                      pipe(basePath, getLoAUri(LoA.high)),
-                    ],
-                    jwks: [...walletProviderJwksWithX5c],
-                  },
-                },
-                EntityConfigurationToJwtModel.encode,
-                entityConfigurationSigner.createJwtAndSign(
-                  { typ: "entity-statement+jwt" },
-                  entityConfigurationPublicJwk.kid,
-                  "ES256",
-                  "24h",
-                  // TODO: SIW-2656. env var are not used
-                ),
-              ),
           ),
         ),
-    ),
+        TE.chain(({ federationEntityJwksWithX5c, walletProviderJwksWithX5c }) =>
+          pipe(
+            {
+              authorityHints,
+              federationEntityMetadata: {
+                contacts: federationEntityMetadata.contacts,
+                homepageUri: federationEntityMetadata.homepageUri,
+                logoUri: federationEntityMetadata.logoUri,
+                organizationName: federationEntityMetadata.organizationName,
+                policyUri: federationEntityMetadata.policyUri,
+                tosUri: federationEntityMetadata.tosUri,
+              },
+              iss: basePath,
+              jwks: [...federationEntityJwksWithX5c],
+              sub: basePath,
+              walletProviderMetadata: {
+                ascValues: [
+                  pipe(basePath, getLoAUri(LoA.basic)),
+                  pipe(basePath, getLoAUri(LoA.medium)),
+                  pipe(basePath, getLoAUri(LoA.high)),
+                ],
+                jwks: [...walletProviderJwksWithX5c],
+              },
+            },
+            EntityConfigurationToJwtModel.encode,
+            (payload) =>
+              signJwt(entityConfigurationSigningJwk)({
+                // TODO: SIW-2656. env var are not used
+                duration: "24h",
+                header: {
+                  alg: "ES256",
+                  typ: "entity-statement+jwt",
+                },
+                payload,
+              }),
+          ),
+        ),
+      ),
   );
 
 const purgeContent: () => RTE.ReaderTaskEither<

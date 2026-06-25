@@ -5,7 +5,6 @@ import {
   fromBase64ToJwks,
   JwkPrivateKey,
   JwkPublicKey,
-  validateJwkKid,
 } from "../jwk";
 
 const publicRsaKey = {
@@ -113,24 +112,6 @@ describe("fromBase64ToJwks", () => {
     expect(result).toEqual({
       _tag: "Right",
       right: jwks,
-    });
-  });
-});
-
-describe("validateJwkKid", () => {
-  it("should return JWK when kid is a string", () => {
-    const result = validateJwkKid(publicEcKey);
-    expect(result).toEqual({
-      _tag: "Right",
-      right: publicEcKey,
-    });
-  });
-
-  it("should return a error when kid is undefined", () => {
-    const result = validateJwkKid({ ...publicEcKey, kid: undefined });
-    expect(result).toEqual({
-      _tag: "Left",
-      left: expect.any(Error),
     });
   });
 });

@@ -45,7 +45,6 @@ import { StatusListPublicationFunction } from "@/infra/azure/functions/status-li
 import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions/status-list-publication-dispatcher";
 import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
-import { CryptoSigner } from "@/infra/crypto/signer";
 import { BufferDecoder } from "@/infra/decoders/buffer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
@@ -74,6 +73,16 @@ if (configOrError instanceof Error) {
 }
 
 const config = configOrError;
+
+const entityConfigurationSigningKey =
+  config.entityConfiguration.federationEntity.entityConfigurationSigningKey;
+
+const {
+  tokenStatusList: tokenStatusListSigningKey,
+  walletAttestation: walletAttestationSigningKey,
+  walletInstanceAttestation: walletInstanceAttestationSigningKey,
+  walletUnitAttestation: walletUnitAttestationSigningKey,
+} = config.walletProvider.resolvedSigningKeys;
 
 const credential = new DefaultAzureCredential();
 
@@ -123,14 +132,6 @@ const logsQueryClient = new LogsQueryClient(credential);
 const database = cosmosClient.database(config.azure.cosmos.dbName);
 
 const nonceRepository = new CosmosDbNonceRepository(database);
-
-const entityConfigurationSigner = new CryptoSigner(
-  config.entityConfiguration.federationEntity.jwtSigningConfig,
-);
-
-const walletAttestationSigner = new CryptoSigner(
-  config.walletProvider.jwtSigningConfig,
-);
 
 const walletInstanceRepository = new CosmosDbWalletInstanceRepository(database);
 
@@ -230,7 +231,7 @@ const statusListPublicationConfig = {
 const statusListPublication = new StatusListPublicationService(
   statusListCatalogRepository,
   statusListPagesRepository,
-  walletAttestationSigner,
+  tokenStatusListSigningKey,
   certificateRepository,
   statusListContainerClient,
   cdnManagementClient,
@@ -311,11 +312,13 @@ app.timer("generateEntityConfiguration", {
       ...config.entityConfiguration,
       authorityHints: [config.entityConfiguration.trustAnchorUrl],
     },
-    entityConfigurationSigner,
+    entityConfigurationSigningJwk: entityConfigurationSigningKey,
+    federationEntityJwks:
+      config.entityConfiguration.federationEntity.signingKeys,
     inputDecoder: t.unknown,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
-    walletAttestationSigner,
+    walletProviderJwks: config.walletProvider.signingKeys,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -411,11 +414,11 @@ app.http("createWalletAttestation", {
     certificateRepository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
-    signer: walletAttestationSigner,
     walletAttestationConfig: {
       ...config.walletProvider.walletAttestation,
       trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
     },
+    walletAttestationSigningKey,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -441,7 +444,7 @@ app.http("generateCertificateChain", {
     },
     certificateRepository,
     federationEntitySigningKeys:
-      config.entityConfiguration.federationEntity.jwtSigningConfig.jwks,
+      config.entityConfiguration.federationEntity.signingKeys,
   }),
   methods: ["POST"],
   route: "certificate-chain",
@@ -454,10 +457,10 @@ app.http("createWalletInstanceAttestation", {
     certificateRepository: certificateV13Repository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
-    signer: walletAttestationSigner,
     walletAttestationConfig: {
       oauthClientSub: config.walletProvider.walletAttestation.oauthClientSub,
     },
+    walletInstanceAttestationSigningKey,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -472,9 +475,9 @@ app.http("createWalletUnitAttestation", {
     certificateRepository: certificateV13Repository,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
-    signer: walletAttestationSigner,
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
+    walletUnitAttestationSigningKey,
   }),
   methods: ["POST"],
   route: "wallet-unit-attestations",

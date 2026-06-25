@@ -19,7 +19,6 @@ interface WalletAttestationJwtModel {
     jwk: JwkPublicKey;
   };
   iss: string;
-  kid: string;
   sub: string;
   wallet_link: string;
   wallet_name: string;
@@ -32,7 +31,6 @@ export const WalletAttestationToJwtModel: E.Encoder<
   encode: ({
     aal,
     iss,
-    kid,
     sub,
     walletInstancePublicKey,
     walletLink,
@@ -43,7 +41,6 @@ export const WalletAttestationToJwtModel: E.Encoder<
       jwk: walletInstancePublicKey,
     },
     iss: removeTrailingSlash(iss),
-    kid,
     sub: removeTrailingSlash(sub),
     wallet_link: walletLink,
     wallet_name: walletName,

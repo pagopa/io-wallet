@@ -2,12 +2,12 @@ import { Document, IssuerSignedDocument } from "@auth0/mdl";
 import { cborEncode as encode } from "@auth0/mdl/lib/cbor";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
-import { sequenceS } from "fp-ts/lib/Apply";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { JwkPrivateKey } from "io-wallet-common/jwk";
+import { ECPrivateKeyWithKid, JwkPrivateKey } from "io-wallet-common/jwk";
 
+import { CertificateRepository } from "./certificates";
 import { WalletAttestationData } from "./encoders/wallet-attestation";
 import { WalletAttestationEnvironment } from "./wallet-attestation";
 
@@ -75,37 +75,20 @@ const createCborEncodedMDoc =
   (
     walletAttestationData: WalletAttestationData,
   ): ((
-    dep: WalletAttestationEnvironment,
+    dep: WalletAttestationMdocEnvironment,
   ) => TE.TaskEither<Error, Buffer<ArrayBufferLike>>) =>
-  ({ certificateRepository, signer }) =>
+  ({ certificateRepository, walletAttestationSigningKey }) =>
     pipe(
-      sequenceS(TE.ApplyPar)({
-        maybeCert: certificateRepository.getCertificateChainByKid(
-          walletAttestationData.kid,
-        ),
-        maybePrivateKey: pipe(
-          signer.getPrivateKeyByKid(walletAttestationData.kid),
-          TE.right,
-        ),
-      }),
-      TE.chain(({ maybeCert, maybePrivateKey }) =>
-        pipe(
-          sequenceS(O.Apply)({
-            issuerCertificate: maybeCert,
-            issuerPrivateKey: maybePrivateKey,
-          }),
+      certificateRepository.getCertificateChainByKid(walletAttestationData.kid),
+      TE.chain(
+        flow(
           O.match(
-            () =>
-              TE.left(
-                new Error(
-                  "Missing private key or certificate for the given KID",
-                ),
-              ),
-            ({ issuerCertificate, issuerPrivateKey }) =>
+            () => TE.left(new Error("Certificate chain not found")),
+            (issuerCertificate) =>
               pipe(
                 {
                   issuerCertificate,
-                  issuerPrivateKey,
+                  issuerPrivateKey: walletAttestationSigningKey,
                   walletAttestationData,
                 },
                 createDocument,
@@ -116,9 +99,15 @@ const createCborEncodedMDoc =
       ),
     );
 
+interface WalletAttestationMdocEnvironment extends WalletAttestationEnvironment {
+  certificateRepository: CertificateRepository;
+  walletAttestationSigningKey: ECPrivateKeyWithKid;
+}
+
 export const createWalletAttestationAsMdoc: (
   walletAttestationData: WalletAttestationData,
-) => RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> = flow(
-  createCborEncodedMDoc,
-  RTE.map((buf) => Buffer.from(buf).toString("base64")),
-);
+) => RTE.ReaderTaskEither<WalletAttestationMdocEnvironment, Error, string> =
+  flow(
+    createCborEncodedMDoc,
+    RTE.map((buf) => Buffer.from(buf).toString("base64")),
+  );

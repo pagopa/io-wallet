@@ -6,11 +6,16 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { areJwksEqual, ECKey, JwkPublicKey } from "io-wallet-common/jwk";
+import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import {
   WalletInstanceStatus,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
+import { type JWTPayload } from "jose";
 
+import { CertificateRepository } from "@/certificates";
+import { FederationEntity } from "@/entity-configuration";
+import { signJwt } from "@/infra/crypto/signer";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -19,7 +24,6 @@ import {
 } from "@/infra/mobile-attestation-service";
 import { verifyAndroidAttestation } from "@/infra/mobile-attestation-service";
 import { validateWalletUnitAssertionAndGetWalletInstance } from "@/infra/mobile-attestation-service/assertion-request-validation";
-import { getSignerMetadata } from "@/infra/signer-metadata";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { buildUrl } from "@/url";
@@ -27,15 +31,40 @@ import { isLoadTestUser } from "@/user";
 import { WalletInstanceEnvironment } from "@/wallet-instance";
 import {
   AttestedKey,
-  createWalletUnitAttestation,
   WalletUnitAttestationData,
-  WalletUnitAttestationEnvironment,
+  WalletUnitAttestationToJwtModel,
 } from "@/wallet-unit-attestation";
 
 import {
   requireWalletUnitAttestationRequest,
   WUARequest,
 } from "../wallet-unit-attestation-request";
+
+interface WalletUnitAttestationEnvironment {
+  certificateRepository: CertificateRepository;
+  federationEntity: FederationEntity;
+  statusListBaseUrl: string;
+  walletUnitAttestationSigningKey: ECPrivateKeyWithKid;
+}
+
+const signWalletUnitAttestation =
+  ({
+    payload,
+    x5c,
+  }: {
+    payload: JWTPayload;
+    x5c: string[];
+  }): RTE.ReaderTaskEither<WalletUnitAttestationEnvironment, Error, string> =>
+  ({ walletUnitAttestationSigningKey }) =>
+    signJwt(walletUnitAttestationSigningKey)({
+      duration: "1y",
+      header: {
+        alg: "ES256",
+        typ: "key-attestation+jwt",
+        x5c,
+      },
+      payload,
+    });
 
 const getWalletUnitAttestationData =
   ({
@@ -54,16 +83,19 @@ const getWalletUnitAttestationData =
     WalletUnitAttestationData
   > =>
   ({
+    certificateRepository,
     federationEntity: { basePathV13: basePath },
     statusListBaseUrl,
-    ...signerMetadataEnv
+    walletUnitAttestationSigningKey,
   }) =>
     pipe(
-      signerMetadataEnv,
-      getSignerMetadata,
-      TE.map(({ kid, x5c }) => ({
+      certificateRepository.getCertificateChainByKid(
+        walletUnitAttestationSigningKey.kid,
+      ),
+      TE.chain(TE.fromOption(() => new Error("Certificate chain not found"))),
+      TE.map((x5c) => ({
         attestedKeys,
-        kid,
+        kid: walletUnitAttestationSigningKey.kid,
         platform,
         status: {
           statusList: {
@@ -133,7 +165,13 @@ const generateWalletUnitAttestation: (request: {
       // walletSolutionVersion: wuaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletUnitAttestationData),
-    RTE.chainW(createWalletUnitAttestation),
+    RTE.chainW((walletUnitAttestationData) =>
+      pipe(
+        WalletUnitAttestationToJwtModel.encode(walletUnitAttestationData),
+        ({ x5c, ...payload }) =>
+          signWalletUnitAttestation({ payload: { ...payload }, x5c }),
+      ),
+    ),
   );
 
 const validateAndroidKeysToAttest: (

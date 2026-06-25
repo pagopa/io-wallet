@@ -30,7 +30,7 @@ import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
 import { CreateWalletUnitAttestationHandler } from "../create-wallet-unit-attestation";
-import { privateEcKey, publicEcKey, signer } from "./keys";
+import { privateEcKey, publicEcKey } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
@@ -94,6 +94,8 @@ const androidAttestationValidationConfig: AndroidAttestationValidationConfig = {
   googlePublicKeys: [""],
   httpRequestTimeout: 1,
 };
+
+const walletUnitAttestationSigningKey = privateEcKey;
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
@@ -309,9 +311,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -338,9 +340,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -374,9 +376,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -415,9 +417,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     const result = await handler();
@@ -476,9 +478,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     const result = await handler();
@@ -535,9 +537,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     const result = await handler();
@@ -596,9 +598,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -676,9 +678,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -726,9 +728,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -752,9 +754,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -784,9 +786,9 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       statusListBaseUrl,
       walletInstanceRepository,
+      walletUnitAttestationSigningKey,
     });
 
     await expect(handler()).resolves.toEqual({

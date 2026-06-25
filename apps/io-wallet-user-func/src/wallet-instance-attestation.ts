@@ -1,10 +1,6 @@
-import { pipe } from "fp-ts/function";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
-import { FederationEntity } from "./entity-configuration";
-import { SignerMetadataEnvironment } from "./infra/signer-metadata";
 import { removeTrailingSlash } from "./url";
 
 export interface WalletInstanceAttestationData {
@@ -31,20 +27,18 @@ interface WalletInstanceAttestationJwtModel {
   //   };
   // };
   iss: string;
-  kid: string;
   sub: string;
   wallet_link: string;
   wallet_name: string;
   x5c: string[];
 }
 
-const WalletInstanceAttestationToJwtModel: E.Encoder<
+export const WalletInstanceAttestationToJwtModel: E.Encoder<
   WalletInstanceAttestationJwtModel,
   WalletInstanceAttestationData
 > = {
   encode: ({
     jwk,
-    kid,
     // oauthClientSub,
     sub,
     walletProviderName,
@@ -65,7 +59,6 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     //   },
     // },
     iss: removeTrailingSlash(walletProviderName),
-    kid,
     sub,
     // sub: removeTrailingSlash(oauthClientSub),
     wallet_link: "https://ioapp.it/",
@@ -73,34 +66,3 @@ const WalletInstanceAttestationToJwtModel: E.Encoder<
     x5c,
   }),
 };
-
-export interface WalletInstanceAttestationEnvironment extends SignerMetadataEnvironment {
-  federationEntity: FederationEntity;
-  walletAttestationConfig: {
-    oauthClientSub: string;
-  };
-}
-
-export const createWalletInstanceAttestation =
-  (
-    walletAttestationData: WalletInstanceAttestationData,
-  ): RTE.ReaderTaskEither<
-    WalletInstanceAttestationEnvironment,
-    Error,
-    string
-  > =>
-  (dep) =>
-    pipe(
-      walletAttestationData,
-      WalletInstanceAttestationToJwtModel.encode,
-      ({ kid, x5c, ...payload }) =>
-        dep.signer.createJwtAndSign(
-          {
-            typ: "oauth-client-attestation+jwt",
-            x5c,
-          },
-          kid,
-          "ES256",
-          "1h",
-        )(payload),
-    );
