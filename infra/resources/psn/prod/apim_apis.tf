@@ -129,6 +129,14 @@ resource "azurerm_api_management_api_version_set" "user_pdnd" {
   versioning_scheme   = "Segment"
 }
 
+resource "azurerm_api_management_api_version_set" "user_pdnd_uat" {
+  name                = "wallet-user-pdnd-uat-apis"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "Wallet User UAT - PDND"
+  versioning_scheme   = "Segment"
+}
+
 resource "azurerm_api_management_api_version_set" "user_uat_ioapp" {
   name                = "wallet-user-uat-ioapp-apis"
   api_management_name = module.apim.name
@@ -208,6 +216,27 @@ resource "azurerm_api_management_api" "user_pdnd_v1" {
   }
 }
 
+resource "azurerm_api_management_api" "user_pdnd_uat_v1" {
+  name                  = "user-pdnd-uat-api-v1"
+  api_management_name   = module.apim.name
+  resource_group_name   = module.apim.resource_group_name
+  subscription_required = false
+
+  version_set_id = azurerm_api_management_api_version_set.user_pdnd_uat.id
+  version        = "v1"
+  revision       = 1
+
+  description  = "REST APIs consumed by PDND in UAT"
+  display_name = "IT-Wallet User - PDND UAT v1"
+  path         = "api/wallet/pdnd/uat"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/apim/api/pdnd-uat/swagger.yaml")
+  }
+}
+
 resource "azurerm_api_management_api" "user_uat_ioapp_v1" {
   name                  = "user-uat-ioapp-api-v1"
   api_management_name   = module.apim.name
@@ -266,6 +295,13 @@ resource "azurerm_api_management_product_api" "user_ioweb" {
 
 resource "azurerm_api_management_product_api" "user_pdnd" {
   api_name            = azurerm_api_management_api.user_pdnd_v1.name
+  product_id          = azurerm_api_management_product.public.product_id
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+}
+
+resource "azurerm_api_management_product_api" "user_pdnd_uat" {
+  api_name            = azurerm_api_management_api.user_pdnd_uat_v1.name
   product_id          = azurerm_api_management_product.public.product_id
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
@@ -335,8 +371,18 @@ resource "azurerm_api_management_api_tag" "user_pdnd_v1_user" {
   name   = azurerm_api_management_tag.user.name
 }
 
+resource "azurerm_api_management_api_tag" "user_pdnd_uat_v1_user" {
+  api_id = azurerm_api_management_api.user_pdnd_uat_v1.id
+  name   = azurerm_api_management_tag.user.name
+}
+
 resource "azurerm_api_management_api_tag" "user_uat_ioapp_v1_uat" {
   api_id = azurerm_api_management_api.user_uat_ioapp_v1.id
+  name   = azurerm_api_management_tag.uat.name
+}
+
+resource "azurerm_api_management_api_tag" "user_pdnd_uat_v1_uat" {
+  api_id = azurerm_api_management_api.user_pdnd_uat_v1.id
   name   = azurerm_api_management_tag.uat.name
 }
 
@@ -401,6 +447,20 @@ resource "azurerm_api_management_api_policy" "user_pdnd_v1" {
         <value>{{${azurerm_api_management_named_value.func_user_pdnd_key.display_name}}}</value>
       </set-header>
       <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "user_pdnd_uat_v1" {
+  api_name            = azurerm_api_management_api.user_pdnd_uat_v1.name
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <base />
+      <set-backend-service backend-id="${azurerm_api_management_backend.func_user_uat.name}" />
   </inbound>
 </policies>
 XML

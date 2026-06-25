@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: IT-Wallet User - PDND v1
-  description: REST APIs consumed by PDND
+  title: IT-Wallet User - PDND UAT v1
+  description: REST APIs consumed by PDND in UAT
   version: v1
 paths:
   "/wallet-instances/status":
