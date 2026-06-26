@@ -232,7 +232,7 @@ const statusListPublication = new StatusListPublicationService(
   statusListCatalogRepository,
   statusListPagesRepository,
   tokenStatusListSigningKey,
-  certificateRepository,
+  certificateV13Repository,
   statusListContainerClient,
   cdnManagementClient,
   statusListPublicationConfig,
