@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.6.1
+
+### Patch Changes
+
+- ce2001c: Updated TSL x5c header
+
 ## 4.6.0
 
 ### Minor Changes
