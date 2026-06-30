@@ -1,5 +1,13 @@
 # io-wallet-user-func
 
+## 4.6.2
+
+### Patch Changes
+
+- 1877d44: Refactored JWT signing key
+- Updated dependencies [1877d44]
+  - io-wallet-common@1.7.0
+
 ## 4.6.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.7.0
+
+### Minor Changes
+
+- 1877d44: Added the ECPrivateKeyWithKid codec for EC signing keys and removed the unused JWK kid validation helper
+
 ## 1.6.1
 
 ### Patch Changes
