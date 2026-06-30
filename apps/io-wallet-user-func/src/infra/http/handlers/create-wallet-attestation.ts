@@ -3,7 +3,6 @@ import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
-import * as R from "fp-ts/lib/Reader";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
@@ -13,10 +12,7 @@ import { type JWTPayload } from "jose";
 
 import { AttestationService, validateAssertion } from "@/attestation-service";
 import { CertificateRepository } from "@/certificates";
-import {
-  WalletAttestationData,
-  WalletAttestationToJwtModel,
-} from "@/encoders/wallet-attestation";
+import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
 import { signJwt } from "@/infra/crypto/signer";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
