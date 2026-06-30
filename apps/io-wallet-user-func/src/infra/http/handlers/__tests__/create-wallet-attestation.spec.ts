@@ -33,7 +33,7 @@ import {
   CreateWalletAttestationHandler,
   WalletAttestations,
 } from "../create-wallet-attestation";
-import { privateEcKey, publicEcKey, signer } from "./keys";
+import { privateEcKey, publicEcKey } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
 
@@ -199,6 +199,8 @@ const walletAttestationConfig = {
   walletName: "Wallet name",
 };
 
+const walletAttestationSigningKey = privateEcKey;
+
 const mockAttestationService: AttestationService = {
   getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
   validateAssertion: () => TE.right(undefined),
@@ -288,8 +290,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -321,8 +323,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -381,8 +383,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -452,8 +454,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -571,8 +573,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -601,8 +603,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -633,8 +635,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 
@@ -681,8 +683,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -723,8 +725,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
@@ -776,8 +778,8 @@ describe("CreateWalletAttestationHandler", async () => {
       inputDecoder: H.HttpRequest,
       logger,
       nonceRepository,
-      signer,
       walletAttestationConfig,
+      walletAttestationSigningKey,
       walletInstanceRepository,
     });
 

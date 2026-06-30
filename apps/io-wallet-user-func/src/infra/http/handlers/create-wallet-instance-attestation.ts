@@ -4,25 +4,60 @@ import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
+import { type JWTPayload } from "jose";
 
+import { CertificateRepository } from "@/certificates";
+import { FederationEntity } from "@/entity-configuration";
+import { signJwt } from "@/infra/crypto/signer";
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
 import { toThumbprint } from "@/infra/mobile-attestation-service";
 import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
-import { getSignerMetadata } from "@/infra/signer-metadata";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { WalletInstanceEnvironment } from "@/wallet-instance";
 import {
-  createWalletInstanceAttestation,
   WalletInstanceAttestationData,
-  WalletInstanceAttestationEnvironment,
+  WalletInstanceAttestationToJwtModel,
 } from "@/wallet-instance-attestation";
 
 import {
   requireWalletInstanceAttestationRequest,
   WIARequest,
 } from "../wallet-instance-attestation-request";
+
+interface WalletInstanceAttestationEnvironment {
+  certificateRepository: CertificateRepository;
+  federationEntity: FederationEntity;
+  walletAttestationConfig: {
+    oauthClientSub: string;
+  };
+  walletInstanceAttestationSigningKey: ECPrivateKeyWithKid;
+}
+
+const signWalletInstanceAttestation =
+  ({
+    payload,
+    x5c,
+  }: {
+    payload: JWTPayload;
+    x5c: string[];
+  }): RTE.ReaderTaskEither<
+    WalletInstanceAttestationEnvironment,
+    Error,
+    string
+  > =>
+  ({ walletInstanceAttestationSigningKey }) =>
+    signJwt(walletInstanceAttestationSigningKey)({
+      duration: "1h",
+      header: {
+        alg: "ES256",
+        typ: "oauth-client-attestation+jwt",
+        x5c,
+      },
+      payload,
+    });
 
 const getWalletInstanceAttestationData =
   (input: {
@@ -36,17 +71,27 @@ const getWalletInstanceAttestationData =
     WalletInstanceAttestationData
   > =>
   ({
+    certificateRepository,
     federationEntity: { basePathV13: basePath },
+    walletInstanceAttestationSigningKey,
     // walletAttestationConfig: { oauthClientSub },
-    ...signerMetadataEnv
   }) =>
     pipe(
       TE.Do,
       TE.bindW("sub", () => toThumbprint(input.cnf.jwk)),
-      TE.bindW("signerMetadata", () => getSignerMetadata(signerMetadataEnv)),
-      TE.map(({ signerMetadata: { kid, x5c }, sub }) => ({
+      TE.bindW("x5c", () =>
+        pipe(
+          certificateRepository.getCertificateChainByKid(
+            walletInstanceAttestationSigningKey.kid,
+          ),
+          TE.chain(
+            TE.fromOption(() => new Error("Certificate chain not found")),
+          ),
+        ),
+      ),
+      TE.map(({ sub, x5c }) => ({
         jwk: input.cnf.jwk,
-        kid,
+        kid: walletInstanceAttestationSigningKey.kid,
         sub,
         walletProviderName: basePath.href,
         // walletSolutionVersion: input.walletSolutionVersion,
@@ -79,7 +124,15 @@ const generateWalletInstanceAttestation: (request: {
       // walletSolutionVersion: wiaRequest.walletSolutionVersion,
     })),
     RTE.chainW(getWalletInstanceAttestationData),
-    RTE.chainW(createWalletInstanceAttestation),
+    RTE.chainW((walletInstanceAttestationData) =>
+      pipe(
+        WalletInstanceAttestationToJwtModel.encode(
+          walletInstanceAttestationData,
+        ),
+        ({ x5c, ...payload }) =>
+          signWalletInstanceAttestation({ payload: { ...payload }, x5c }),
+      ),
+    ),
   );
 
 export const CreateWalletInstanceAttestationHandler = H.of(

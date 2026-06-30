@@ -15,7 +15,7 @@ describe("GenerateCertificateChainHandler", () => {
     log: () => () => void 0,
   };
 
-  const federationEntitySigningKeys = [
+  const intermediateSigningKeys = [
     {
       crv: "P-256",
       d: "vIZcXqDlb_heIreOc6_Lp0ztMDSLuh0viNjKAoDLO7A",
@@ -61,9 +61,9 @@ describe("GenerateCertificateChainHandler", () => {
         subject: "C=IT, ST=Lazio, L=Roma, O=Organization, CN=commonName.it",
       },
       certificateRepository,
-      federationEntitySigningKeys,
       input: req,
       inputDecoder: H.HttpRequest,
+      intermediateSigningKeys,
       logger,
     });
 
@@ -79,7 +79,7 @@ describe("GenerateCertificateChainHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response when kid parameter is not included in federationEntitySigningKeys", async () => {
+  it("should return a 500 HTTP response when kid parameter is not included in intermediateSigningKeys", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
       body: {
@@ -101,9 +101,9 @@ describe("GenerateCertificateChainHandler", () => {
         subject: "C=IT, ST=Lazio, L=Roma, O=Organization, CN=commonName.it",
       },
       certificateRepository,
-      federationEntitySigningKeys,
       input: req,
       inputDecoder: H.HttpRequest,
+      intermediateSigningKeys,
       logger,
     });
 

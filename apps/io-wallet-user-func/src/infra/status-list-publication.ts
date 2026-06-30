@@ -4,8 +4,11 @@ import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as TE from "fp-ts/TaskEither";
+import { ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
 import { v4 as uuidv4 } from "uuid";
+
+import type { TokenStatusList } from "@/token-status-list";
 
 import { CertificateRepository } from "@/certificates";
 import {
@@ -15,14 +18,23 @@ import {
   existsBlob,
   uploadBlob,
 } from "@/infra/azure/storage/blob";
-import { getSignerMetadata } from "@/infra/signer-metadata";
-import { Signer } from "@/signer";
+import { signJwt } from "@/infra/crypto/signer";
 import { StatusListPublication } from "@/status-list";
 import { createTokenStatusList } from "@/token-status-list";
 import { buildUrl } from "@/url";
 
 const statusListBlobContentType = "application/statuslist+jwt";
 const statusListBlobCacheControl = "public, max-age=43200";
+const statusListJwtDuration = "24h";
+const statusListJwtType = "statuslist+jwt";
+
+const encodeTokenStatusListJwtPayload = ({
+  statusList,
+  statusListCredentialUrl,
+}: TokenStatusList): jose.JWTPayload => ({
+  status_list: statusList,
+  sub: statusListCredentialUrl,
+});
 
 export interface StatusListPublicationCatalogDataSource {
   listPublishableStatusListIds: () => Promise<readonly NonEmptyString[]>;
@@ -41,7 +53,19 @@ interface StatusListPublicationConfig {
   resourceGroupName: string;
 }
 
+interface StatusListPublicationServiceDependencies {
+  catalogs: StatusListPublicationCatalogDataSource;
+  cdnManagementClient: CdnManagementClient;
+  certificateRepository: CertificateRepository;
+  config: StatusListPublicationConfig;
+  containerClient: ContainerClient;
+  emptyBitstring: Buffer;
+  pages: StatusListPublicationPagesDataSource;
+  tokenStatusListSigningKey: ECPrivateKeyWithKid;
+}
+
 export class StatusListPublicationService implements StatusListPublication {
+  protected readonly catalogs: StatusListPublicationCatalogDataSource;
   readonly listPublishableStatusListIds: TE.TaskEither<
     Error,
     readonly NonEmptyString[]
@@ -49,17 +73,35 @@ export class StatusListPublicationService implements StatusListPublication {
     () => this.catalogs.listPublishableStatusListIds(),
     this.toError,
   );
+  protected readonly cdnManagementClient: CdnManagementClient;
+  protected readonly config: StatusListPublicationConfig;
 
-  constructor(
-    protected readonly catalogs: StatusListPublicationCatalogDataSource,
-    private readonly pages: StatusListPublicationPagesDataSource,
-    protected readonly signer: Signer,
-    private readonly certificateRepository: CertificateRepository,
-    protected readonly containerClient: ContainerClient,
-    protected readonly cdnManagementClient: CdnManagementClient,
-    protected readonly config: StatusListPublicationConfig,
-    private readonly emptyBitstring: Buffer,
-  ) {}
+  protected readonly containerClient: ContainerClient;
+
+  private readonly certificateRepository: CertificateRepository;
+  private readonly emptyBitstring: Buffer;
+  private readonly pages: StatusListPublicationPagesDataSource;
+  private readonly tokenStatusListSigningKey: ECPrivateKeyWithKid;
+
+  constructor({
+    catalogs,
+    cdnManagementClient,
+    certificateRepository,
+    config,
+    containerClient,
+    emptyBitstring,
+    pages,
+    tokenStatusListSigningKey,
+  }: StatusListPublicationServiceDependencies) {
+    this.catalogs = catalogs;
+    this.cdnManagementClient = cdnManagementClient;
+    this.certificateRepository = certificateRepository;
+    this.config = config;
+    this.containerClient = containerClient;
+    this.emptyBitstring = emptyBitstring;
+    this.pages = pages;
+    this.tokenStatusListSigningKey = tokenStatusListSigningKey;
+  }
 
   readonly publishInitializingStatusList = (
     statusListId: NonEmptyString,
@@ -262,18 +304,25 @@ export class StatusListPublicationService implements StatusListPublication {
     statusListCredentialUrl: string;
   }): TE.TaskEither<Error, string> =>
     pipe(
-      {
-        certificateRepository: this.certificateRepository,
-        signer: this.signer,
-      },
-      getSignerMetadata,
-      TE.chainW(({ kid, x5c }) =>
-        createTokenStatusList({
-          bitString,
-          kid,
-          statusListCredentialUrl,
-          x5c,
-        })(this.signer),
+      this.certificateRepository.getCertificateChainByKid(
+        this.tokenStatusListSigningKey.kid,
+      ),
+      TE.chain(TE.fromOption(() => new Error("Certificate chain not found"))),
+      TE.chainW((x5c) =>
+        signJwt(this.tokenStatusListSigningKey)({
+          duration: statusListJwtDuration,
+          header: {
+            alg: "ES256",
+            typ: statusListJwtType,
+            x5c,
+          },
+          payload: encodeTokenStatusListJwtPayload(
+            createTokenStatusList({
+              bitString,
+              statusListCredentialUrl,
+            }),
+          ),
+        }),
       ),
     );
 

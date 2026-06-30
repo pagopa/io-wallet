@@ -7,16 +7,22 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
+import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
+import { type JWTPayload } from "jose";
 
 import { AttestationService, validateAssertion } from "@/attestation-service";
+import { CertificateRepository } from "@/certificates";
+import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
+import { signJwt } from "@/infra/crypto/signer";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { verifyJwtWithInternalKey } from "@/verifier";
 import {
-  createWalletAttestationAsJwt,
-  createWalletAttestationAsSdJwt,
+  createWalletAttestationSdJwtClaims,
   getWalletAttestationData,
+  type WalletAttestationEnvironment,
+  type WalletAttestationSdJwtClaims,
 } from "@/wallet-attestation";
 import { createWalletAttestationAsMdoc } from "@/wallet-attestation-mdoc";
 import { WalletAttestationRequest } from "@/wallet-attestation-request";
@@ -62,6 +68,52 @@ const testWalletAttestations: WalletAttestations = {
   ],
 };
 
+interface WalletAttestationGenerationEnvironment
+  extends WalletAttestationEnvironment, WalletAttestationSigningEnvironment {
+  certificateRepository: CertificateRepository;
+}
+
+interface WalletAttestationSigningEnvironment {
+  walletAttestationSigningKey: ECPrivateKeyWithKid;
+}
+
+const signWalletAttestationJwt =
+  (
+    payload: JWTPayload,
+  ): RTE.ReaderTaskEither<WalletAttestationSigningEnvironment, Error, string> =>
+  ({ walletAttestationSigningKey }) =>
+    signJwt(walletAttestationSigningKey)({
+      duration: "1h",
+      header: {
+        alg: "ES256",
+        typ: "oauth-client-attestation+jwt",
+      },
+      payload,
+    });
+
+const signWalletAttestationSdJwt =
+  ({
+    claims,
+    disclosures,
+  }: WalletAttestationSdJwtClaims): RTE.ReaderTaskEither<
+    WalletAttestationSigningEnvironment,
+    Error,
+    string
+  > =>
+  ({ walletAttestationSigningKey }) =>
+    pipe(
+      signJwt(walletAttestationSigningKey)({
+        // TODO: SIW-2656. env var are not used
+        duration: "1h",
+        header: {
+          alg: "ES256",
+          typ: "dc+sd-jwt",
+        },
+        payload: { ...claims },
+      }),
+      TE.map((jwt) => [jwt, ...disclosures].join("~")),
+    );
+
 /**
  * Validates the wallet attestation request by performing the following steps:
  * 1. Consumes the nonce from the request
@@ -101,22 +153,43 @@ const validateRequest: (input: {
     ),
   );
 
+const getWalletAttestationDataFromEnv =
+  (assertion: WalletAttestationRequest) =>
+  (environment: WalletAttestationGenerationEnvironment) =>
+    getWalletAttestationData(
+      assertion,
+      environment.walletAttestationSigningKey.kid,
+    )(environment);
+
 const generateWalletAttestations = ({
   assertion,
   isTestUser,
 }: {
   assertion: WalletAttestationRequest;
   isTestUser: boolean;
-}) =>
+}): RTE.ReaderTaskEither<
+  WalletAttestationGenerationEnvironment,
+  Error,
+  WalletAttestations
+> =>
   pipe(
     assertion,
-    getWalletAttestationData,
+    getWalletAttestationDataFromEnv,
+    RTE.fromReader,
     RTE.chainW((walletAttestationData) =>
       pipe(
         sequenceS(RTE.ApplyPar)({
-          jwt: createWalletAttestationAsJwt(walletAttestationData),
+          jwt: pipe(
+            walletAttestationData,
+            WalletAttestationToJwtModel.encode,
+            (payload) => signWalletAttestationJwt({ ...payload }),
+          ),
           msoMdoc: createWalletAttestationAsMdoc(walletAttestationData),
-          sdJwt: createWalletAttestationAsSdJwt(walletAttestationData),
+          sdJwt: pipe(
+            walletAttestationData,
+            createWalletAttestationSdJwtClaims,
+            RTE.chainW(signWalletAttestationSdJwt),
+          ),
         }),
         RTE.map(({ jwt, msoMdoc, sdJwt }) =>
           isTestUser

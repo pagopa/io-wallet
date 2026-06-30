@@ -1,9 +1,7 @@
 import * as H from "@pagopa/handler-kit";
-import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
-import * as O from "fp-ts/Option";
 import * as t from "io-ts";
 import { calculateJwkThumbprint } from "jose";
 
@@ -21,16 +19,22 @@ export const ECKey = t.intersection([
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
-export const ECPrivateKey = t.intersection([
+const ECPrivateKey = t.intersection([
   ECKey,
   t.type({
     d: t.string,
   }),
 ]);
 
-export type ECPrivateKey = t.TypeOf<typeof ECPrivateKey>;
+type ECPrivateKey = t.TypeOf<typeof ECPrivateKey>;
 
-export const RSAKey = t.intersection([
+export const ECPrivateKeyWithKid = t.intersection(
+  [ECPrivateKey, t.type({ kid: t.string })],
+  "ECPrivateKeyWithKid",
+);
+export type ECPrivateKeyWithKid = t.TypeOf<typeof ECPrivateKeyWithKid>;
+
+const RSAKey = t.intersection([
   t.type({
     e: t.string,
     kty: t.literal("RSA"),
@@ -42,9 +46,9 @@ export const RSAKey = t.intersection([
   }),
 ]);
 
-export type RSAKey = t.TypeOf<typeof RSAKey>;
+type RSAKey = t.TypeOf<typeof RSAKey>;
 
-export const RSAPrivateKey = t.intersection([
+const RSAPrivateKey = t.intersection([
   RSAKey,
   t.type({
     d: t.string,
@@ -59,7 +63,7 @@ export const RSAPrivateKey = t.intersection([
   }),
 ]);
 
-export type RSAPrivateKey = t.TypeOf<typeof RSAPrivateKey>;
+type RSAPrivateKey = t.TypeOf<typeof RSAPrivateKey>;
 
 /**
  * The Public Key JWK type. It could be either an ECKey or an RSAKey.
@@ -82,40 +86,12 @@ export type JwkPrivateKey = t.TypeOf<typeof JwkPrivateKey>;
 export const Jwk = t.union([JwkPublicKey, JwkPrivateKey], "Jwk");
 export type Jwk = t.TypeOf<typeof Jwk>;
 
-export const JwksMetadata = t.type({
-  keys: t.array(JwkPublicKey),
-});
-export type JwksMetadata = t.TypeOf<typeof JwksMetadata>;
-
 export const fromBase64ToJwks = (b64: string) =>
   pipe(
     E.tryCatch(() => Buffer.from(b64, "base64").toString(), E.toError),
     E.chain(J.parse),
     E.mapLeft(() => new Error("Unable to parse JWKs string")),
     E.chainW(H.parse(t.array(Jwk), "Invalid JWKs")),
-  );
-
-export const getKeyByKid =
-  (kid: string) =>
-  (jwks: JwkPublicKey[]): O.Option<JwkPublicKey> =>
-    pipe(
-      jwks,
-      A.findFirst((key) => key.kid === kid),
-    );
-
-export const validateJwkKid: (
-  jwk: JwkPublicKey,
-) => E.Either<
-  H.ValidationError,
-  JwkPublicKey & Required<Pick<JwkPublicKey, "kid">>
-> = (jwk) =>
-  pipe(
-    jwk.kid,
-    H.parse(t.string, "JWK Public Key kid is undefined"),
-    E.map((kid) => ({
-      ...jwk,
-      kid,
-    })),
   );
 
 export const areJwksEqual = async (

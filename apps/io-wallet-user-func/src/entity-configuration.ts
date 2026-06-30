@@ -1,10 +1,9 @@
 import { EmailString, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as t from "io-ts";
-import { JwkPublicKey } from "io-wallet-common/jwk";
+import { ECPrivateKeyWithKid, JwkPublicKey } from "io-wallet-common/jwk";
 
 import { CertificateRepository } from "./certificates";
-import { Signer } from "./signer";
 
 export const FederationEntityMetadata = t.type({
   contacts: t.array(EmailString),
@@ -26,8 +25,9 @@ const FederationEntity = t.intersection([
 export interface EntityConfigurationEnvironment {
   certificateRepository: CertificateRepository;
   entityConfiguration: EntityConfiguration;
-  entityConfigurationSigner: Signer;
-  walletAttestationSigner: Signer;
+  intermediateSigningKey: ECPrivateKeyWithKid;
+  intermediateSigningKeys: ECPrivateKeyWithKid[];
+  leafSigningKeys: ECPrivateKeyWithKid[];
 }
 
 export type FederationEntity = t.TypeOf<typeof FederationEntity>;
