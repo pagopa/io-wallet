@@ -214,12 +214,10 @@ const FederationEntityConfig = t.type({
   basePathV10: UrlFromString,
   basePathV13: UrlFromString,
   contacts: t.array(EmailString),
-  entityConfigurationSigningKey: ECPrivateKeyWithKid,
   homepageUri: UrlFromString,
   logoUri: UrlFromString,
   organizationName: NonEmptyString,
   policyUri: UrlFromString,
-  signingKeys: t.array(ECPrivateKeyWithKid),
   tosUri: UrlFromString,
 });
 
@@ -238,13 +236,15 @@ const WalletProviderConfig = t.type({
     locality: t.string,
     state: t.string,
   }),
-  resolvedSigningKeys: t.type({
+  intermediateSigningKey: ECPrivateKeyWithKid,
+  intermediateSigningKeys: t.array(ECPrivateKeyWithKid),
+  leafResolvedSigningKeys: t.type({
     tokenStatusList: ECPrivateKeyWithKid,
     walletAttestation: ECPrivateKeyWithKid,
     walletInstanceAttestation: ECPrivateKeyWithKid,
     walletUnitAttestation: ECPrivateKeyWithKid,
   }),
-  signingKeys: t.array(ECPrivateKeyWithKid),
+  leafSigningKeys: t.array(ECPrivateKeyWithKid),
   walletAttestation: t.type({
     oauthClientSub: t.string,
     walletLink: t.string,
@@ -293,31 +293,20 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
       readFromEnvironment("FederationEntityContacts"),
       RE.map((urls) => urls.split(",")),
     ),
-    federationEntityKeyId: readFromEnvironment("FederationEntityKeyId"),
     homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     organizationName: readFromEnvironment("FederationEntityOrganizationName"),
     policyUri: readFromEnvironment("FederationEntityPolicyUri"),
-    signingKeys: readJwksFromEnvironment("FederationEntitySigningKeys"),
     tosUri: readFromEnvironment("FederationEntityTosUri"),
     trustAnchorUrl: pipe(
       readFromEnvironment("TrustAnchorUrl"),
       RE.chainEitherKW(parse(UrlFromString)),
     ),
   }),
-  RE.chainEitherKW(
-    ({ federationEntityKeyId, trustAnchorUrl, ...federationEntity }) =>
-      pipe(
-        getSigningKeyByKid(federationEntity.signingKeys, federationEntityKeyId),
-        E.map((entityConfigurationSigningKey) => ({
-          federationEntity: {
-            ...federationEntity,
-            entityConfigurationSigningKey,
-          },
-          trustAnchorUrl,
-        })),
-      ),
-  ),
+  RE.map(({ trustAnchorUrl, ...federationEntity }) => ({
+    federationEntity,
+    trustAnchorUrl,
+  })),
   RE.chainEitherKW(
     parse(EntityConfigurationConfig, "Entity configuration config is invalid"),
   ),
@@ -661,6 +650,11 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       "WalletProviderCertificateLocality",
     ),
     certificateState: readFromEnvironment("WalletProviderCertificateState"),
+    intermediateSigningKeyId: readFromEnvironment("FederationEntityKeyId"),
+    intermediateSigningKeys: readJwksFromEnvironment(
+      "WalletProviderIntermediateSigningKeys",
+    ),
+    leafSigningKeys: readJwksFromEnvironment("WalletProviderLeafSigningKeys"),
     tokenStatusListKeyId: readFromEnvironment("TokenStatusListKeyId"),
     walletAttestationKeyId: readFromEnvironment("WalletAttestationKeyId"),
     walletAttestationOauthClientSub: readFromEnvironment(
@@ -675,9 +669,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletInstanceAttestationKeyId: readFromEnvironment(
       "WalletInstanceAttestationKeyId",
     ),
-    walletProviderSigningKeys: readJwksFromEnvironment(
-      "WalletProviderSigningKeys",
-    ),
     walletUnitAttestationKeyId: readFromEnvironment(
       "WalletUnitAttestationKeyId",
     ),
@@ -687,13 +678,15 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       certificateCountry,
       certificateLocality,
       certificateState,
+      intermediateSigningKeyId,
+      intermediateSigningKeys,
+      leafSigningKeys,
       tokenStatusListKeyId,
       walletAttestationKeyId,
       walletAttestationOauthClientSub,
       walletAttestationWalletLink,
       walletAttestationWalletName,
       walletInstanceAttestationKeyId,
-      walletProviderSigningKeys,
       walletUnitAttestationKeyId,
     }) => ({
       certificate: {
@@ -701,7 +694,9 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
         locality: certificateLocality,
         state: certificateState,
       },
-      signingKeys: walletProviderSigningKeys,
+      intermediateSigningKeyId,
+      intermediateSigningKeys,
+      leafSigningKeys,
       tokenStatusListKeyId,
       walletAttestation: {
         oauthClientSub: walletAttestationOauthClientSub,
@@ -716,7 +711,9 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(
     ({
       certificate,
-      signingKeys,
+      intermediateSigningKeyId,
+      intermediateSigningKeys,
+      leafSigningKeys,
       tokenStatusListKeyId,
       walletAttestation,
       walletAttestationKeyId,
@@ -725,27 +722,33 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     }) =>
       pipe(
         sequenceS(E.Apply)({
+          intermediateSigningKey: getSigningKeyByKid(
+            intermediateSigningKeys,
+            intermediateSigningKeyId,
+          ),
           tokenStatusList: getSigningKeyByKid(
-            signingKeys,
+            leafSigningKeys,
             tokenStatusListKeyId,
           ),
           walletAttestation: getSigningKeyByKid(
-            signingKeys,
+            leafSigningKeys,
             walletAttestationKeyId,
           ),
           walletInstanceAttestation: getSigningKeyByKid(
-            signingKeys,
+            leafSigningKeys,
             walletInstanceAttestationKeyId,
           ),
           walletUnitAttestation: getSigningKeyByKid(
-            signingKeys,
+            leafSigningKeys,
             walletUnitAttestationKeyId,
           ),
         }),
-        E.map((resolvedSigningKeys) => ({
+        E.map(({ intermediateSigningKey, ...leafResolvedSigningKeys }) => ({
           certificate,
-          resolvedSigningKeys,
-          signingKeys,
+          intermediateSigningKey,
+          intermediateSigningKeys,
+          leafResolvedSigningKeys,
+          leafSigningKeys,
           walletAttestation,
         })),
       ),

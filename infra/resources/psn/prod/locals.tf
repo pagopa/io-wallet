@@ -26,12 +26,12 @@ locals {
         key_vault_secret_name = "GoogleAppCredentialsEncoded"
       },
       {
-        name                  = "FederationEntitySigningKeys"
-        key_vault_secret_name = "FederationEntitySigningKeys"
+        name                  = "WalletProviderIntermediateSigningKeys"
+        key_vault_secret_name = "WalletProviderIntermediateSigningKeys"
       },
       {
-        name                  = "WalletProviderSigningKeys"
-        key_vault_secret_name = "WalletProviderSigningKeys"
+        name                  = "WalletProviderLeafSigningKeys"
+        key_vault_secret_name = "WalletProviderLeafSigningKeys"
       },
       {
         name                  = "PidIssuerApiClientPrivateKey"

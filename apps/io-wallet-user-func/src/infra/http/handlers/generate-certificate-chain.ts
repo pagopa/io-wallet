@@ -25,7 +25,7 @@ import { sendTelemetryException } from "@/infra/telemetry";
 interface CertificateEnvironment {
   certificate: { crypto: Crypto; issuer: string; subject: string };
   certificateRepository: CertificateRepository;
-  federationEntitySigningKeys: JwkPrivateKey[];
+  intermediateSigningKeys: JwkPrivateKey[];
 }
 
 const JwkPublicKeyWithRequiredKid = t.intersection([
@@ -44,9 +44,9 @@ const getSigningKey: (
   issuerKeyId: string,
 ) => RE.ReaderEither<CertificateEnvironment, Error, JwkPrivateKey> =
   (issuerKeyId: string) =>
-  ({ federationEntitySigningKeys }: CertificateEnvironment) =>
+  ({ intermediateSigningKeys }: CertificateEnvironment) =>
     pipe(
-      federationEntitySigningKeys,
+      intermediateSigningKeys,
       RA.findFirst(({ kid }) => kid === issuerKeyId),
       E.fromOption(() => new Error(`Key with kid "${issuerKeyId}" not found`)),
     );

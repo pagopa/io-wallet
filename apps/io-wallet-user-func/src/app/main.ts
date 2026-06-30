@@ -74,15 +74,12 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
-const entityConfigurationSigningKey =
-  config.entityConfiguration.federationEntity.entityConfigurationSigningKey;
-
 const {
   tokenStatusList: tokenStatusListSigningKey,
   walletAttestation: walletAttestationSigningKey,
   walletInstanceAttestation: walletInstanceAttestationSigningKey,
   walletUnitAttestation: walletUnitAttestationSigningKey,
-} = config.walletProvider.resolvedSigningKeys;
+} = config.walletProvider.leafResolvedSigningKeys;
 
 const credential = new DefaultAzureCredential();
 
@@ -312,13 +309,12 @@ app.timer("generateEntityConfiguration", {
       ...config.entityConfiguration,
       authorityHints: [config.entityConfiguration.trustAnchorUrl],
     },
-    entityConfigurationSigningJwk: entityConfigurationSigningKey,
-    federationEntityJwks:
-      config.entityConfiguration.federationEntity.signingKeys,
     inputDecoder: t.unknown,
+    intermediateSigningKey: config.walletProvider.intermediateSigningKey,
+    intermediateSigningKeys: config.walletProvider.intermediateSigningKeys,
+    leafSigningKeys: config.walletProvider.leafSigningKeys,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
-    walletProviderJwks: config.walletProvider.signingKeys,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -443,8 +439,7 @@ app.http("generateCertificateChain", {
       subject: certificateIssuerAndSubject,
     },
     certificateRepository,
-    federationEntitySigningKeys:
-      config.entityConfiguration.federationEntity.signingKeys,
+    intermediateSigningKeys: config.walletProvider.intermediateSigningKeys,
   }),
   methods: ["POST"],
   route: "certificate-chain",

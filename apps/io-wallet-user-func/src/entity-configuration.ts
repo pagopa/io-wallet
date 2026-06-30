@@ -25,9 +25,9 @@ const FederationEntity = t.intersection([
 export interface EntityConfigurationEnvironment {
   certificateRepository: CertificateRepository;
   entityConfiguration: EntityConfiguration;
-  entityConfigurationSigningJwk: ECPrivateKeyWithKid;
-  federationEntityJwks: ECPrivateKeyWithKid[];
-  walletProviderJwks: ECPrivateKeyWithKid[];
+  intermediateSigningKey: ECPrivateKeyWithKid;
+  intermediateSigningKeys: ECPrivateKeyWithKid[];
+  leafSigningKeys: ECPrivateKeyWithKid[];
 }
 
 export type FederationEntity = t.TypeOf<typeof FederationEntity>;

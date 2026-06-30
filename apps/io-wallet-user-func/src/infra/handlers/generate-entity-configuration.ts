@@ -62,32 +62,32 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     authorityHints,
     federationEntity: { basePathV10: basePath, ...federationEntityMetadata },
   },
-  entityConfigurationSigningJwk,
-  federationEntityJwks,
-  walletProviderJwks,
+  intermediateSigningKey,
+  intermediateSigningKeys,
+  leafSigningKeys,
 }) =>
   pipe(
     {
-      federationEntityPublicJwks: federationEntityJwks.map(toPublicJwk),
-      walletProviderPublicJwks: walletProviderJwks.map(toPublicJwk),
+      intermediatePublicJwks: intermediateSigningKeys.map(toPublicJwk),
+      leafPublicJwks: leafSigningKeys.map(toPublicJwk),
     },
-    ({ federationEntityPublicJwks, walletProviderPublicJwks }) =>
+    ({ intermediatePublicJwks, leafPublicJwks }) =>
       pipe(
-        federationEntityPublicJwks,
+        intermediatePublicJwks,
         TE.traverseArray((jwk) =>
           // TODO [SIW-2719]: Add certificate chain validation and ensure the system handles any issues appropriately
           pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
         ),
-        TE.bindTo("federationEntityJwksWithX5c"),
-        TE.bind("walletProviderJwksWithX5c", () =>
+        TE.bindTo("intermediateJwksWithX5c"),
+        TE.bind("leafJwksWithX5c", () =>
           pipe(
-            walletProviderPublicJwks,
+            leafPublicJwks,
             TE.traverseArray((jwk) =>
               pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
             ),
           ),
         ),
-        TE.chain(({ federationEntityJwksWithX5c, walletProviderJwksWithX5c }) =>
+        TE.chain(({ intermediateJwksWithX5c, leafJwksWithX5c }) =>
           pipe(
             {
               authorityHints,
@@ -100,7 +100,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                 tosUri: federationEntityMetadata.tosUri,
               },
               iss: basePath,
-              jwks: [...federationEntityJwksWithX5c],
+              jwks: [...intermediateJwksWithX5c],
               sub: basePath,
               walletProviderMetadata: {
                 ascValues: [
@@ -108,12 +108,12 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                   pipe(basePath, getLoAUri(LoA.medium)),
                   pipe(basePath, getLoAUri(LoA.high)),
                 ],
-                jwks: [...walletProviderJwksWithX5c],
+                jwks: [...leafJwksWithX5c],
               },
             },
             EntityConfigurationToJwtModel.encode,
             (payload) =>
-              signJwt(entityConfigurationSigningJwk)({
+              signJwt(intermediateSigningKey)({
                 // TODO: SIW-2656. env var are not used
                 duration: "24h",
                 header: {
