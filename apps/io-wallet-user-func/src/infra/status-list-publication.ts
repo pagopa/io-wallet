@@ -53,7 +53,19 @@ interface StatusListPublicationConfig {
   resourceGroupName: string;
 }
 
+interface StatusListPublicationServiceDependencies {
+  catalogs: StatusListPublicationCatalogDataSource;
+  cdnManagementClient: CdnManagementClient;
+  certificateRepository: CertificateRepository;
+  config: StatusListPublicationConfig;
+  containerClient: ContainerClient;
+  emptyBitstring: Buffer;
+  pages: StatusListPublicationPagesDataSource;
+  tokenStatusListSigningKey: ECPrivateKeyWithKid;
+}
+
 export class StatusListPublicationService implements StatusListPublication {
+  protected readonly catalogs: StatusListPublicationCatalogDataSource;
   readonly listPublishableStatusListIds: TE.TaskEither<
     Error,
     readonly NonEmptyString[]
@@ -61,17 +73,35 @@ export class StatusListPublicationService implements StatusListPublication {
     () => this.catalogs.listPublishableStatusListIds(),
     this.toError,
   );
+  protected readonly cdnManagementClient: CdnManagementClient;
+  protected readonly config: StatusListPublicationConfig;
 
-  constructor(
-    protected readonly catalogs: StatusListPublicationCatalogDataSource,
-    private readonly pages: StatusListPublicationPagesDataSource,
-    private readonly tokenStatusListSigningKey: ECPrivateKeyWithKid,
-    private readonly certificateRepository: CertificateRepository,
-    protected readonly containerClient: ContainerClient,
-    protected readonly cdnManagementClient: CdnManagementClient,
-    protected readonly config: StatusListPublicationConfig,
-    private readonly emptyBitstring: Buffer,
-  ) {}
+  protected readonly containerClient: ContainerClient;
+
+  private readonly certificateRepository: CertificateRepository;
+  private readonly emptyBitstring: Buffer;
+  private readonly pages: StatusListPublicationPagesDataSource;
+  private readonly tokenStatusListSigningKey: ECPrivateKeyWithKid;
+
+  constructor({
+    catalogs,
+    cdnManagementClient,
+    certificateRepository,
+    config,
+    containerClient,
+    emptyBitstring,
+    pages,
+    tokenStatusListSigningKey,
+  }: StatusListPublicationServiceDependencies) {
+    this.catalogs = catalogs;
+    this.cdnManagementClient = cdnManagementClient;
+    this.certificateRepository = certificateRepository;
+    this.config = config;
+    this.containerClient = containerClient;
+    this.emptyBitstring = emptyBitstring;
+    this.pages = pages;
+    this.tokenStatusListSigningKey = tokenStatusListSigningKey;
+  }
 
   readonly publishInitializingStatusList = (
     statusListId: NonEmptyString,

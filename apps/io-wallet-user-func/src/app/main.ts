@@ -228,18 +228,18 @@ const statusListPublicationConfig = {
   resourceGroupName: config.azure.generic.resourceGroupName,
 };
 
-const statusListPublication = new StatusListPublicationService(
-  statusListCatalogRepository,
-  statusListPagesRepository,
-  tokenStatusListSigningKey,
-  certificateV13Repository,
-  statusListContainerClient,
+const statusListPublication = new StatusListPublicationService({
+  catalogs: statusListCatalogRepository,
   cdnManagementClient,
-  statusListPublicationConfig,
-  Buffer.alloc(
+  certificateRepository: certificateV13Repository,
+  config: statusListPublicationConfig,
+  containerClient: statusListContainerClient,
+  emptyBitstring: Buffer.alloc(
     (config.statusList.pageCount * config.statusList.pageBitsSize) / 8,
   ),
-);
+  pages: statusListPagesRepository,
+  tokenStatusListSigningKey,
+});
 
 const statusListAllocator = new StatusListAllocatorService(
   statusListCatalogRepository,
