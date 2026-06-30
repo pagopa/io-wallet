@@ -13,7 +13,10 @@ import { type JWTPayload } from "jose";
 
 import { AttestationService, validateAssertion } from "@/attestation-service";
 import { CertificateRepository } from "@/certificates";
-import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
+import {
+  WalletAttestationData,
+  WalletAttestationToJwtModel,
+} from "@/encoders/wallet-attestation";
 import { signJwt } from "@/infra/crypto/signer";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
@@ -154,19 +157,28 @@ const validateRequest: (input: {
     ),
   );
 
+const getWalletAttestationDataFromEnv =
+  (assertion: WalletAttestationRequest) =>
+  (environment: WalletAttestationGenerationEnvironment) =>
+    getWalletAttestationData(
+      assertion,
+      environment.walletAttestationSigningKey.kid,
+    )(environment);
+
 const generateWalletAttestations = ({
   assertion,
   isTestUser,
 }: {
   assertion: WalletAttestationRequest;
   isTestUser: boolean;
-}) =>
+}): RTE.ReaderTaskEither<
+  WalletAttestationGenerationEnvironment,
+  Error,
+  WalletAttestations
+> =>
   pipe(
-    ({ walletAttestationSigningKey }: WalletAttestationGenerationEnvironment) =>
-      walletAttestationSigningKey.kid,
-    R.chainW((walletAttestationSigningKid) =>
-      getWalletAttestationData(assertion, walletAttestationSigningKid),
-    ),
+    assertion,
+    getWalletAttestationDataFromEnv,
     RTE.fromReader,
     RTE.chainW((walletAttestationData) =>
       pipe(
