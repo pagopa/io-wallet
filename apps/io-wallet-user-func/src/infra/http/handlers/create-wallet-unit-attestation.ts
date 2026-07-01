@@ -59,7 +59,6 @@ const signWalletUnitAttestation =
     signJwt(walletUnitAttestationSigningKey)({
       duration: "1y",
       header: {
-        alg: "ES256",
         typ: "key-attestation+jwt",
         x5c,
       },

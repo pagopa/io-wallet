@@ -117,7 +117,6 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                 // TODO: SIW-2656. env var are not used
                 duration: "24h",
                 header: {
-                  alg: "ES256",
                   typ: "entity-statement+jwt",
                 },
                 payload,

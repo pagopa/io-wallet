@@ -9,7 +9,7 @@ import { type JWTPayload } from "jose";
 
 import { CertificateRepository } from "@/certificates";
 import { FederationEntity } from "@/entity-configuration";
-import { signJwt } from "@/infra/crypto/signer";
+import { getSignAlgorithmFromCurve, signJwt } from "@/infra/crypto/signer";
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
 import { toThumbprint } from "@/infra/mobile-attestation-service";
 import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
@@ -52,7 +52,6 @@ const signWalletInstanceAttestation =
     signJwt(walletInstanceAttestationSigningKey)({
       duration: "1h",
       header: {
-        alg: "ES256",
         typ: "oauth-client-attestation+jwt",
         x5c,
       },
@@ -91,6 +90,7 @@ const getWalletInstanceAttestationData =
       ),
       TE.map(({ sub, x5c }) => ({
         jwk: input.cnf.jwk,
+        jwkAlg: getSignAlgorithmFromCurve(input.cnf.jwk.crv),
         kid: walletInstanceAttestationSigningKey.kid,
         sub,
         walletProviderName: basePath.href,

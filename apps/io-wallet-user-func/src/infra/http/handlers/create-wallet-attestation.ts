@@ -85,7 +85,6 @@ const signWalletAttestationJwt =
     signJwt(walletAttestationSigningKey)({
       duration: "1h",
       header: {
-        alg: "ES256",
         typ: "oauth-client-attestation+jwt",
       },
       payload,
@@ -106,7 +105,6 @@ const signWalletAttestationSdJwt =
         // TODO: SIW-2656. env var are not used
         duration: "1h",
         header: {
-          alg: "ES256",
           typ: "dc+sd-jwt",
         },
         payload: { ...claims },
