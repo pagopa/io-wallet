@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.6.3
+
+### Patch Changes
+
+- da93643: Derive JWT alg from EC curve
+
 ## 4.6.2
 
 ### Patch Changes
