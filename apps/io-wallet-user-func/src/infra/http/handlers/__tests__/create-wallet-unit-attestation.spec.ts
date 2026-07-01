@@ -10,10 +10,11 @@ import {
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
-import { flow } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
+import { ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
 import { describe, expect, it, vi } from "vitest";
 
@@ -124,6 +125,25 @@ const certificateRepository: CertificateRepository = {
 
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
+
+const generateP521PrivateJwk = (kid: string): Promise<ECPrivateKeyWithKid> =>
+  jose
+    .generateKeyPair("ES512", {
+      extractable: true,
+    })
+    .then(({ privateKey }) => jose.exportJWK(privateKey))
+    .then((jwk) =>
+      pipe(
+        {
+          ...jwk,
+          kid,
+        },
+        ECPrivateKeyWithKid.decode,
+        E.getOrElseW((_) => {
+          throw new Error(`Failed to decode P-521 private JWK ${_[0].value}`);
+        }),
+      ),
+    );
 
 vi.mock("@/infra/mobile-attestation-service", async (importOriginal) => {
   const actual =
@@ -356,6 +376,89 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         }),
         statusCode: 200,
       }),
+    });
+  });
+
+  it("should sign the jwt with the algorithm derived from the provider key curve - P-521", async () => {
+    const p521SigningKey = await generateP521PrivateJwk("p521#wua");
+    const handler = CreateWalletUnitAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      statusListBaseUrl,
+      walletInstanceRepository,
+      walletUnitAttestationSigningKey: p521SigningKey,
+    });
+
+    const result = await handler();
+
+    expect(E.isRight(result)).toBe(true);
+    if (E.isLeft(result)) {
+      throw result.left;
+    }
+
+    const body = t
+      .type({
+        wallet_unit_attestation: t.string,
+      })
+      .decode(result.right.body);
+
+    expect(E.isRight(body)).toBe(true);
+    if (E.isLeft(body)) {
+      throw new Error("Invalid response body");
+    }
+
+    expect(
+      jose.decodeProtectedHeader(body.right.wallet_unit_attestation),
+    ).toMatchObject({
+      alg: "ES512",
+      kid: p521SigningKey.kid,
+    });
+  });
+
+  it("should sign the jwt with the algorithm derived from the provider key curve - P-256", async () => {
+    const handler = CreateWalletUnitAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      certificateRepository,
+      federationEntity,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      statusListBaseUrl,
+      walletInstanceRepository,
+      walletUnitAttestationSigningKey: privateEcKey,
+    });
+
+    const result = await handler();
+
+    expect(E.isRight(result)).toBe(true);
+    if (E.isLeft(result)) {
+      throw result.left;
+    }
+
+    const body = t
+      .type({
+        wallet_unit_attestation: t.string,
+      })
+      .decode(result.right.body);
+
+    expect(E.isRight(body)).toBe(true);
+    if (E.isLeft(body)) {
+      throw new Error("Invalid response body");
+    }
+
+    expect(
+      jose.decodeProtectedHeader(body.right.wallet_unit_attestation),
+    ).toMatchObject({
+      alg: "ES256",
+      kid: privateEcKey.kid,
     });
   });
 

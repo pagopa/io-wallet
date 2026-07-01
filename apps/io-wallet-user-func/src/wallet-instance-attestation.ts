@@ -1,10 +1,13 @@
 import * as E from "io-ts/lib/Encoder";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
+import type { SignAlgorithm } from "./infra/crypto/signer";
+
 import { removeTrailingSlash } from "./url";
 
 export interface WalletInstanceAttestationData {
   jwk: JwkPublicKey;
+  jwkAlg: SignAlgorithm;
   kid: string;
   // oauthClientSub: string;
   sub: string;
@@ -16,7 +19,7 @@ export interface WalletInstanceAttestationData {
 interface WalletInstanceAttestationJwtModel {
   cnf: {
     jwk: JwkPublicKey & {
-      alg: "ES256";
+      alg: SignAlgorithm;
     };
   };
   // eudi_wallet_info: {
@@ -39,6 +42,7 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
 > = {
   encode: ({
     jwk,
+    jwkAlg,
     // oauthClientSub,
     sub,
     walletProviderName,
@@ -48,7 +52,7 @@ export const WalletInstanceAttestationToJwtModel: E.Encoder<
     cnf: {
       jwk: {
         ...jwk,
-        alg: "ES256",
+        alg: jwkAlg,
       },
     },
     // eudi_wallet_info: {

@@ -1,15 +1,12 @@
 import { pipe } from "fp-ts/function";
-import * as A from "fp-ts/lib/Array";
 import * as E from "fp-ts/lib/Either";
-import * as O from "fp-ts/lib/Option";
 import * as TE from "fp-ts/lib/TaskEither";
 import { ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
-const supportedSignAlgorithms = ["ES256"];
+export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
 interface JwtHeader {
-  alg?: string;
   trustChain?: string[];
   typ: string;
   x5c?: string[];
@@ -21,26 +18,29 @@ interface SignJwtOptions {
   payload: jose.JWTPayload;
 }
 
-const isAlgorithmSupported = (alg: string) =>
-  pipe(
-    supportedSignAlgorithms,
-    A.findFirst((supportedAlg) => supportedAlg === alg),
-    O.isSome,
-  );
+export const getSignAlgorithmFromCurve = (crv: string): SignAlgorithm => {
+  switch (crv) {
+    case "P-256":
+      return "ES256";
+    case "P-384":
+      return "ES384";
+    case "P-521":
+      return "ES512";
+    default:
+      throw new Error(`The curve ${crv} is not supported`);
+  }
+};
 
 export const signJwt =
   (privateKey: ECPrivateKeyWithKid) =>
   ({
     duration = "24h",
-    header: { alg = "ES256", trustChain, ...header },
+    header: { trustChain, ...header },
     payload,
   }: SignJwtOptions) =>
     pipe(
-      alg,
-      TE.fromPredicate(
-        isAlgorithmSupported,
-        (a) => new Error(`The algorithm ${a} is not supported`),
-      ),
+      E.tryCatch(() => getSignAlgorithmFromCurve(privateKey.crv), E.toError),
+      TE.fromEither,
       TE.chain((alg) =>
         pipe(
           TE.tryCatch(() => jose.importJWK(privateKey), E.toError),

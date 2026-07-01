@@ -312,7 +312,6 @@ export class StatusListPublicationService implements StatusListPublication {
         signJwt(this.tokenStatusListSigningKey)({
           duration: statusListJwtDuration,
           header: {
-            alg: "ES256",
             typ: statusListJwtType,
             x5c,
           },

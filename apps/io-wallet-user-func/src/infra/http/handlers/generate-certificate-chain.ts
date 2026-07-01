@@ -56,21 +56,23 @@ const jwkToCryptoKey: (
 ) => RTE.ReaderTaskEither<CertificateEnvironment, Error, CryptoKey> =
   (jwk) =>
   ({ certificate: { crypto } }) =>
-    TE.tryCatch(
-      () =>
-        crypto.subtle.importKey(
-          "jwk",
-          jwk,
-          {
-            name: "ECDSA",
-            namedCurve: "P-256",
-          },
-          true,
-          ["d" in jwk ? "sign" : "verify"], // "sign" if private; "verify" if public
-        ),
-      (reason) =>
-        reason instanceof Error ? reason : new Error(String(reason)),
-    );
+    jwk.kty !== "EC"
+      ? TE.left(new Error(`The key type ${jwk.kty} is not supported`))
+      : TE.tryCatch(
+          () =>
+            crypto.subtle.importKey(
+              "jwk",
+              jwk,
+              {
+                name: "ECDSA",
+                namedCurve: jwk.crv,
+              },
+              true,
+              ["d" in jwk ? "sign" : "verify"], // "sign" if private; "verify" if public
+            ),
+          (reason) =>
+            reason instanceof Error ? reason : new Error(String(reason)),
+        );
 
 const issueX509Certificate: (input: {
   publicKey: CryptoKey;
