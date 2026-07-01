@@ -230,21 +230,50 @@ const EntityConfigurationConfig = t.type({
 
 type EntityConfigurationConfig = t.TypeOf<typeof EntityConfigurationConfig>;
 
+const isSupportedSigningCurve = (
+  crv: string,
+): crv is "P-256" | "P-384" | "P-521" =>
+  crv === "P-256" || crv === "P-384" || crv === "P-521";
+
+const SupportedECPrivateKeyWithKid = new t.Type<
+  ECPrivateKeyWithKid,
+  ECPrivateKeyWithKid,
+  unknown
+>(
+  "SupportedECPrivateKeyWithKid",
+  (input): input is ECPrivateKeyWithKid =>
+    ECPrivateKeyWithKid.is(input) && isSupportedSigningCurve(input.crv),
+  (input, context) =>
+    pipe(
+      ECPrivateKeyWithKid.validate(input, context),
+      E.chain((key) =>
+        isSupportedSigningCurve(key.crv)
+          ? t.success(key)
+          : t.failure(
+              key.crv,
+              context,
+              `The curve ${key.crv} is not supported for signing keys`,
+            ),
+      ),
+    ),
+  t.identity,
+);
+
 const WalletProviderConfig = t.type({
   certificate: t.type({
     country: t.string,
     locality: t.string,
     state: t.string,
   }),
-  intermediateSigningKey: ECPrivateKeyWithKid,
-  intermediateSigningKeys: t.array(ECPrivateKeyWithKid),
+  intermediateSigningKey: SupportedECPrivateKeyWithKid,
+  intermediateSigningKeys: t.array(SupportedECPrivateKeyWithKid),
   leafResolvedSigningKeys: t.type({
-    tokenStatusList: ECPrivateKeyWithKid,
-    walletAttestation: ECPrivateKeyWithKid,
-    walletInstanceAttestation: ECPrivateKeyWithKid,
-    walletUnitAttestation: ECPrivateKeyWithKid,
+    tokenStatusList: SupportedECPrivateKeyWithKid,
+    walletAttestation: SupportedECPrivateKeyWithKid,
+    walletInstanceAttestation: SupportedECPrivateKeyWithKid,
+    walletUnitAttestation: SupportedECPrivateKeyWithKid,
   }),
-  leafSigningKeys: t.array(ECPrivateKeyWithKid),
+  leafSigningKeys: t.array(SupportedECPrivateKeyWithKid),
   walletAttestation: t.type({
     oauthClientSub: t.string,
     walletLink: t.string,
@@ -271,7 +300,7 @@ export type Config = t.TypeOf<typeof Config>;
 const readJwksFromEnvironment = flow(
   readFromEnvironment,
   RE.chainEitherKW(fromBase64ToJwks),
-  RE.chainEitherKW(parse(t.array(ECPrivateKeyWithKid))),
+  RE.chainEitherKW(parse(t.array(SupportedECPrivateKeyWithKid))),
 );
 
 const getSigningKeyByKid = (jwks: ECPrivateKeyWithKid[], kid: string) =>
