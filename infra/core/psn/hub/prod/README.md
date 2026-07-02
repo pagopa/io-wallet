@@ -90,5 +90,3 @@ The VPN is configured by using a Virtual Network Gateway to bridge connections, 
 ## TO DOs
 
 Application Gateway firewall is temporarily set to Detection mode while we complete the tuning phase. After that, it should be switched to Prevention mode.
-
-<!-- markdownlint-disable -->

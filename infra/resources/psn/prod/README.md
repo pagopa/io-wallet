@@ -24,5 +24,3 @@ Moreover, to receive connections from the Hub (e.g. Application Gateway), anothe
 - source: source subnet (e.g. Application Gateway subnet CIDR)
 - target: `<apim-custom-domain>` (e.g. apim.internal.wallet.io.pagopa.it)
 - protocol: `Https:443`
-
-<!-- markdownlint-disable -->
