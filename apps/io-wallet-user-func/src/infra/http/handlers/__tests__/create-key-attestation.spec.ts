@@ -30,7 +30,7 @@ import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/co
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
-import { CreateWalletUnitAttestationHandler } from "../create-wallet-unit-attestation";
+import { CreateKeyAttestationHandler } from "../create-key-attestation";
 import { privateEcKey, publicEcKey } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
@@ -168,7 +168,7 @@ vi.mock("@/infra/mobile-attestation-service", async (importOriginal) => {
   };
 });
 
-describe("CreateWalletUnitAttestationHandler", async () => {
+describe("CreateKeyAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
   const publicEcKeyWithoutKid = {
     crv: publicEcKey.crv,
@@ -194,7 +194,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     })
     .sign(josePrivateKey);
 
-  const walletUnitAttestationRequestIos = await new jose.SignJWT({
+  const keyAttestationRequestIos = await new jose.SignJWT({
     aud: "aud",
     cnf: {
       jwk: publicEcKey,
@@ -237,7 +237,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     })
     .sign(josePrivateKey);
 
-  const walletUnitAttestationRequestAndroid = await new jose.SignJWT({
+  const keyAttestationRequestAndroid = await new jose.SignJWT({
     aud: "aud",
     cnf: {
       jwk: publicEcKey,
@@ -280,7 +280,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     })
     .sign(josePrivateKey);
 
-  const walletUnitAttestationRequestAndroidWithoutKid = await new jose.SignJWT({
+  const keyAttestationRequestAndroidWithoutKid = await new jose.SignJWT({
     aud: "aud",
     cnf: {
       jwk: publicEcKeyWithoutKid,
@@ -308,14 +308,14 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   const req = {
     ...H.request("https://wallet-provider.example.org"),
     body: {
-      assertion: walletUnitAttestationRequestIos,
+      assertion: keyAttestationRequestIos,
       fiscal_code: mockFiscalCode,
     },
     method: "POST",
   };
 
   it("should return a 200 HTTP response on success if is a test user", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -323,7 +323,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestIos,
+          assertion: keyAttestationRequestIos,
           fiscal_code: "LVTEST00A00H501P",
         },
         method: "POST",
@@ -340,7 +340,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         body: expect.objectContaining({
-          wallet_unit_attestation: "this_is_a_test_wallet_unit_attestation",
+          key_attestation: "this_is_a_test_key_attestation",
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -351,7 +351,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should return a 200 HTTP response on success with iOS platform", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -369,7 +369,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         body: expect.objectContaining({
-          wallet_unit_attestation: expect.any(String),
+          key_attestation: expect.any(String),
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -380,8 +380,8 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should sign the jwt with the algorithm derived from the provider key curve - P-521", async () => {
-    const p521SigningKey = await generateP521PrivateJwk("p521#wua");
-    const handler = CreateWalletUnitAttestationHandler({
+    const p521SigningKey = await generateP521PrivateJwk("p521#key-attestation");
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -404,7 +404,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
 
     const body = t
       .type({
-        wallet_unit_attestation: t.string,
+        key_attestation: t.string,
       })
       .decode(result.right.body);
 
@@ -414,7 +414,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     }
 
     expect(
-      jose.decodeProtectedHeader(body.right.wallet_unit_attestation),
+      jose.decodeProtectedHeader(body.right.key_attestation),
     ).toMatchObject({
       alg: "ES512",
       kid: p521SigningKey.kid,
@@ -422,7 +422,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should sign the jwt with the algorithm derived from the provider key curve - P-256", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -445,7 +445,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
 
     const body = t
       .type({
-        wallet_unit_attestation: t.string,
+        key_attestation: t.string,
       })
       .decode(result.right.body);
 
@@ -455,7 +455,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     }
 
     expect(
-      jose.decodeProtectedHeader(body.right.wallet_unit_attestation),
+      jose.decodeProtectedHeader(body.right.key_attestation),
     ).toMatchObject({
       alg: "ES256",
       kid: privateEcKey.kid,
@@ -463,7 +463,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should return a 200 HTTP response on success with Android platform", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -471,7 +471,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestAndroid,
+          assertion: keyAttestationRequestAndroid,
           fiscal_code: mockFiscalCode,
         },
         method: "POST",
@@ -488,7 +488,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         body: expect.objectContaining({
-          wallet_unit_attestation: expect.any(String),
+          key_attestation: expect.any(String),
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -504,7 +504,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should include kid in attested_keys when present in the request for Android", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -512,7 +512,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestAndroid,
+          assertion: keyAttestationRequestAndroid,
           fiscal_code: mockFiscalCode,
         },
         method: "POST",
@@ -531,20 +531,18 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     if (E.isRight(result)) {
       const body = t
         .type({
-          wallet_unit_attestation: t.string,
+          key_attestation: t.string,
         })
         .decode(result.right.body);
 
       expect(E.isRight(body)).toBe(true);
 
       if (E.isRight(body)) {
-        const walletUnitAttestation = jose.decodeJwt(
-          body.right.wallet_unit_attestation,
-        );
-        expect(walletUnitAttestation.iss).toBe(
+        const keyAttestation = jose.decodeJwt(body.right.key_attestation);
+        expect(keyAttestation.iss).toBe(
           "https://wallet-provider-v13.example.org/bar",
         );
-        expect(walletUnitAttestation.status).toEqual({
+        expect(keyAttestation.status).toEqual({
           status_list: {
             idx: walletInstanceStatus.index,
             uri: `${statusListBaseUrl}/${walletInstanceStatus.statusListId}`,
@@ -560,7 +558,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
               y: t.string,
             }),
           )
-          .decode(walletUnitAttestation.attested_keys);
+          .decode(keyAttestation.attested_keys);
 
         expect(E.isRight(attestedKeys)).toBe(true);
 
@@ -572,7 +570,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should include kid in attested_keys when present in the request for iOS", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -592,16 +590,14 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     if (E.isRight(result)) {
       const body = t
         .type({
-          wallet_unit_attestation: t.string,
+          key_attestation: t.string,
         })
         .decode(result.right.body);
 
       expect(E.isRight(body)).toBe(true);
 
       if (E.isRight(body)) {
-        const walletUnitAttestation = jose.decodeJwt(
-          body.right.wallet_unit_attestation,
-        );
+        const keyAttestation = jose.decodeJwt(body.right.key_attestation);
         const attestedKeys = t
           .array(
             t.type({
@@ -612,7 +608,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
               y: t.string,
             }),
           )
-          .decode(walletUnitAttestation.attested_keys);
+          .decode(keyAttestation.attested_keys);
 
         expect(E.isRight(attestedKeys)).toBe(true);
 
@@ -624,7 +620,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should omit kid in attested_keys when cnf.jwk.kid is absent in the request for Android", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -632,7 +628,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestAndroidWithoutKid,
+          assertion: keyAttestationRequestAndroidWithoutKid,
           fiscal_code: mockFiscalCode,
         },
         method: "POST",
@@ -651,16 +647,14 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     if (E.isRight(result)) {
       const body = t
         .type({
-          wallet_unit_attestation: t.string,
+          key_attestation: t.string,
         })
         .decode(result.right.body);
 
       expect(E.isRight(body)).toBe(true);
 
       if (E.isRight(body)) {
-        const walletUnitAttestation = jose.decodeJwt(
-          body.right.wallet_unit_attestation,
-        );
+        const keyAttestation = jose.decodeJwt(body.right.key_attestation);
         const attestedKeys = t
           .array(
             t.type({
@@ -670,7 +664,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
               y: t.string,
             }),
           )
-          .decode(walletUnitAttestation.attested_keys);
+          .decode(keyAttestation.attested_keys);
 
         expect(E.isRight(attestedKeys)).toBe(true);
 
@@ -685,7 +679,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     vi.mocked(verifyAndroidAttestation).mockReturnValueOnce(() =>
       TE.left(new IntegrityCheckError(["foo"])),
     );
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -693,7 +687,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestAndroid,
+          assertion: keyAttestationRequestAndroid,
           fiscal_code: mockFiscalCode,
         },
         method: "POST",
@@ -740,7 +734,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       })
       .sign(josePrivateKey);
 
-    const walletUnitAttestationRequestAndroidWithoutAttestation =
+    const keyAttestationRequestAndroidWithoutAttestation =
       await new jose.SignJWT({
         aud: "aud",
         cnf: {
@@ -765,7 +759,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         .setExpirationTime("2h")
         .sign(josePrivateKey);
 
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -773,7 +767,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestAndroidWithoutAttestation,
+          assertion: keyAttestationRequestAndroidWithoutAttestation,
           fiscal_code: mockFiscalCode,
         },
         method: "POST",
@@ -815,7 +809,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
         }),
     );
 
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -823,7 +817,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
-          assertion: walletUnitAttestationRequestAndroid,
+          assertion: keyAttestationRequestAndroid,
           fiscal_code: mockFiscalCode,
         },
         method: "POST",
@@ -848,7 +842,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
   });
 
   it("should return 200 when platform is iOS and key attestation is absent", async () => {
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,
@@ -866,7 +860,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         body: expect.objectContaining({
-          wallet_unit_attestation: expect.any(String),
+          key_attestation: expect.any(String),
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
@@ -880,7 +874,7 @@ describe("CreateWalletUnitAttestationHandler", async () => {
     vi.mocked(verifyIosAssertion).mockReturnValueOnce(() =>
       TE.left(new IntegrityCheckError(["foo"])),
     );
-    const handler = CreateWalletUnitAttestationHandler({
+    const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
       certificateRepository,

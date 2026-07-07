@@ -22,7 +22,7 @@
     "WalletProviderLeafSigningKeys": "WALLET_PROVIDER_LEAF_SIGNING_KEYS",
     "WalletAttestationKeyId": "WALLET_ATTESTATION_KEY_ID",
     "WalletInstanceAttestationKeyId": "WALLET_INSTANCE_ATTESTATION_KEY_ID",
-    "WalletUnitAttestationKeyId": "WALLET_UNIT_ATTESTATION_KEY_ID",
+    "KeyAttestationKeyId": "KEY_ATTESTATION_KEY_ID",
     "TokenStatusListKeyId": "TOKEN_STATUS_LIST_KEY_ID",
     "IosBundleIdentifiers": "APPLE_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA",
     "AndroidBundleIdentifiers": "ANDROID_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA",

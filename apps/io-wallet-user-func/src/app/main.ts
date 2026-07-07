@@ -23,6 +23,7 @@ import { CosmosDbStatusListPagesRepository } from "@/infra/azure/cosmos/status-l
 import { CosmosDbStatusListRoutingRepository } from "@/infra/azure/cosmos/status-list-routing";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
+import { CreateKeyAttestationFunction } from "@/infra/azure/functions/create-key-attestation";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
@@ -75,10 +76,10 @@ if (configOrError instanceof Error) {
 const config = configOrError;
 
 const {
+  keyAttestation: keyAttestationSigningKey,
   tokenStatusList: tokenStatusListSigningKey,
   walletAttestation: walletAttestationSigningKey,
   walletInstanceAttestation: walletInstanceAttestationSigningKey,
-  walletUnitAttestation: walletUnitAttestationSigningKey,
 } = config.walletProvider.leafResolvedSigningKeys;
 
 const credential = new DefaultAzureCredential();
@@ -462,6 +463,22 @@ app.http("createWalletInstanceAttestation", {
   route: "wallet-instance-attestations",
 });
 
+app.http("createKeyAttestation", {
+  authLevel: "function",
+  handler: CreateKeyAttestationFunction({
+    androidAttestationValidationConfig,
+    assertionValidationConfig,
+    certificateRepository: certificateV13Repository,
+    federationEntity: config.entityConfiguration.federationEntity,
+    keyAttestationSigningKey,
+    nonceRepository,
+    statusListBaseUrl: statusListPublicationConfig.baseUrl,
+    walletInstanceRepository,
+  }),
+  methods: ["POST"],
+  route: "key-attestations",
+});
+
 app.http("createWalletUnitAttestation", {
   authLevel: "function",
   handler: CreateWalletUnitAttestationFunction({
@@ -469,10 +486,10 @@ app.http("createWalletUnitAttestation", {
     assertionValidationConfig,
     certificateRepository: certificateV13Repository,
     federationEntity: config.entityConfiguration.federationEntity,
+    keyAttestationSigningKey,
     nonceRepository,
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
-    walletUnitAttestationSigningKey,
   }),
   methods: ["POST"],
   route: "wallet-unit-attestations",
