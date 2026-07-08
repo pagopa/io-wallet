@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.7.1
+
+### Patch Changes
+
+- 5e60d01: Fix android root expiry handling and chain validation
+
 ## 4.7.0
 
 ### Minor Changes
