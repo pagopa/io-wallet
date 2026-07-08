@@ -62,6 +62,7 @@ export const verifyAttestation = async (
   const issuanceValidationResult = validateIssuance(
     x509Chain,
     publicKeys,
+    false,
     true,
   );
 

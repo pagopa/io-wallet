@@ -96,6 +96,7 @@ describe("CertificatesValidation", () => {
     const validation = validateIssuance(
       fakeChain,
       [rootPublicKey as never],
+      false,
       true,
     );
 
@@ -131,6 +132,7 @@ describe("CertificatesValidation", () => {
     const validation = validateIssuance(
       fakeChain,
       [rootPublicKey as never],
+      false,
       true,
     );
 
