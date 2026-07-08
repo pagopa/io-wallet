@@ -18,11 +18,11 @@ import {
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
 
-export type WalletInstanceAssertion = BaseAssertion;
-
-export interface WalletUnitAssertion extends BaseAssertion {
+export interface KeyAttestationAssertion extends BaseAssertion {
   keysThumbprints: readonly string[];
 }
+
+export type WalletInstanceAssertion = BaseAssertion;
 
 interface BaseAssertion {
   cnf: {
@@ -97,8 +97,8 @@ const validateWalletInstanceAssertion: (
     ),
   );
 
-const validateWalletUnitAssertion: (
-  assertion: WalletUnitAssertion,
+const validateKeyAttestationAssertion: (
+  assertion: KeyAttestationAssertion,
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
@@ -169,8 +169,8 @@ export const validateWalletInstanceAssertionRequest: (input: {
     ),
   );
 
-export const validateWalletUnitAssertionAndGetWalletInstance: (input: {
-  assertion: WalletUnitAssertion;
+export const validateKeyAttestationAssertionAndGetWalletInstance: (input: {
+  assertion: KeyAttestationAssertion;
   userId: FiscalCode;
 }) => RTE.ReaderTaskEither<
   NonceEnvironment &
@@ -187,6 +187,11 @@ export const validateWalletUnitAssertionAndGetWalletInstance: (input: {
       userId,
     }),
     RTE.chainFirstW(({ hardwareKey, signCount }) =>
-      validateWalletUnitAssertion(assertion, hardwareKey, signCount, userId),
+      validateKeyAttestationAssertion(
+        assertion,
+        hardwareKey,
+        signCount,
+        userId,
+      ),
     ),
   );

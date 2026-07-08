@@ -13,7 +13,7 @@ import { verifyJwtWithInternalKey } from "@/verifier";
 const headerTyp = "wua-request+jwt";
 const keyAttestationHeaderTyp = "key-attestation-request+jwt";
 
-const WalletUnitAttestationRequestBody = t.type({
+const KeyAttestationRequestBody = t.type({
   assertion: NonEmptyString,
   fiscal_code: FiscalCode,
 });
@@ -223,7 +223,7 @@ const AssertionJwtDecodedPayloadIos = t.type({
   platform: t.literal("ios"),
 });
 
-export type WUARequest =
+export type KeyAttestationRequest =
   | Omit<AssertionJwtDecodedAndroid, "iss" | "kid">
   | Omit<AssertionJwtDecodedPayloadIos, "iss" | "kid">;
 
@@ -386,11 +386,11 @@ const verifyAndDecodeAssertionJwt = (
     TE.chain(toPlatformDecodedAssertionJwt),
   );
 
-const verifyAndDecodeWalletUnitAttestationRequest = (
-  walletUnitAttestationRequest: string,
-): TE.TaskEither<H.ValidationError, WUARequest> =>
+const verifyAndDecodeKeyAttestationRequest = (
+  keyAttestationRequest: string,
+): TE.TaskEither<H.ValidationError, KeyAttestationRequest> =>
   pipe(
-    walletUnitAttestationRequest,
+    keyAttestationRequest,
     verifyAndDecodeAssertionJwt,
     TE.chainFirstW(verifyAssertionJwtProperties),
     TE.chainFirstEitherKW(({ keysToAttest }) =>
@@ -402,13 +402,13 @@ const verifyAndDecodeWalletUnitAttestationRequest = (
         : new H.ValidationError([
             error instanceof Error
               ? error.message
-              : "Invalid Wallet Unit Attestation request",
+              : "Invalid key attestation request",
           ]),
     ),
   );
 
-export const requireWalletUnitAttestationRequest = flow(
-  H.parse(WalletUnitAttestationRequestBody),
+export const requireKeyAttestationRequest = flow(
+  H.parse(KeyAttestationRequestBody),
   E.map(({ assertion, fiscal_code }) => ({
     assertion,
     fiscalCode: fiscal_code,
@@ -417,10 +417,10 @@ export const requireWalletUnitAttestationRequest = flow(
   TE.chain(({ assertion, fiscalCode }) =>
     pipe(
       assertion,
-      verifyAndDecodeWalletUnitAttestationRequest,
-      TE.map((wuaRequest) => ({
+      verifyAndDecodeKeyAttestationRequest,
+      TE.map((keyAttestationRequest) => ({
+        keyAttestationRequest,
         userId: fiscalCode,
-        wuaRequest,
       })),
     ),
   ),

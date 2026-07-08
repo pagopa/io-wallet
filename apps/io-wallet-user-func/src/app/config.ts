@@ -268,10 +268,10 @@ const WalletProviderConfig = t.type({
   intermediateSigningKey: SupportedECPrivateKeyWithKid,
   intermediateSigningKeys: t.array(SupportedECPrivateKeyWithKid),
   leafResolvedSigningKeys: t.type({
+    keyAttestation: SupportedECPrivateKeyWithKid,
     tokenStatusList: SupportedECPrivateKeyWithKid,
     walletAttestation: SupportedECPrivateKeyWithKid,
     walletInstanceAttestation: SupportedECPrivateKeyWithKid,
-    walletUnitAttestation: SupportedECPrivateKeyWithKid,
   }),
   leafSigningKeys: t.array(SupportedECPrivateKeyWithKid),
   walletAttestation: t.type({
@@ -683,6 +683,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     intermediateSigningKeys: readJwksFromEnvironment(
       "WalletProviderIntermediateSigningKeys",
     ),
+    keyAttestationKeyId: readFromEnvironment("KeyAttestationKeyId"),
     leafSigningKeys: readJwksFromEnvironment("WalletProviderLeafSigningKeys"),
     tokenStatusListKeyId: readFromEnvironment("TokenStatusListKeyId"),
     walletAttestationKeyId: readFromEnvironment("WalletAttestationKeyId"),
@@ -698,9 +699,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletInstanceAttestationKeyId: readFromEnvironment(
       "WalletInstanceAttestationKeyId",
     ),
-    walletUnitAttestationKeyId: readFromEnvironment(
-      "WalletUnitAttestationKeyId",
-    ),
   }),
   RE.map(
     ({
@@ -709,6 +707,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       certificateState,
       intermediateSigningKeyId,
       intermediateSigningKeys,
+      keyAttestationKeyId,
       leafSigningKeys,
       tokenStatusListKeyId,
       walletAttestationKeyId,
@@ -716,7 +715,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       walletAttestationWalletLink,
       walletAttestationWalletName,
       walletInstanceAttestationKeyId,
-      walletUnitAttestationKeyId,
     }) => ({
       certificate: {
         country: certificateCountry,
@@ -725,6 +723,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       },
       intermediateSigningKeyId,
       intermediateSigningKeys,
+      keyAttestationKeyId,
       leafSigningKeys,
       tokenStatusListKeyId,
       walletAttestation: {
@@ -734,7 +733,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       },
       walletAttestationKeyId,
       walletInstanceAttestationKeyId,
-      walletUnitAttestationKeyId,
     }),
   ),
   RE.chainEitherKW(
@@ -742,18 +740,22 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       certificate,
       intermediateSigningKeyId,
       intermediateSigningKeys,
+      keyAttestationKeyId,
       leafSigningKeys,
       tokenStatusListKeyId,
       walletAttestation,
       walletAttestationKeyId,
       walletInstanceAttestationKeyId,
-      walletUnitAttestationKeyId,
     }) =>
       pipe(
         sequenceS(E.Apply)({
           intermediateSigningKey: getSigningKeyByKid(
             intermediateSigningKeys,
             intermediateSigningKeyId,
+          ),
+          keyAttestation: getSigningKeyByKid(
+            leafSigningKeys,
+            keyAttestationKeyId,
           ),
           tokenStatusList: getSigningKeyByKid(
             leafSigningKeys,
@@ -766,10 +768,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
           walletInstanceAttestation: getSigningKeyByKid(
             leafSigningKeys,
             walletInstanceAttestationKeyId,
-          ),
-          walletUnitAttestation: getSigningKeyByKid(
-            leafSigningKeys,
-            walletUnitAttestationKeyId,
           ),
         }),
         E.map(({ intermediateSigningKey, ...leafResolvedSigningKeys }) => ({

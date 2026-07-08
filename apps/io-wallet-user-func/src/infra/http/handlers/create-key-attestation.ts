@@ -116,7 +116,7 @@ const requireWalletInstanceStatus = (
     E.fromNullable(new Error("Wallet instance status not found")),
   );
 
-const testKeyAttestation = "this_is_a_test_wallet_unit_attestation";
+const testKeyAttestation = "this_is_a_test_key_attestation";
 
 const verifyAttestedJwkMatchesCnf = ({
   attestedJwk,
@@ -272,7 +272,7 @@ const validateKeysToAttest: (
       )
     : validateIosKeysToAttest(keyAttestationRequest.keysToAttest);
 
-export const CreateWalletUnitAttestationHandler = H.of((req: H.HttpRequest) =>
+export const CreateKeyAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req.body,
     requireKeyAttestationRequest,
@@ -283,14 +283,14 @@ export const CreateWalletUnitAttestationHandler = H.of((req: H.HttpRequest) =>
         : generateKeyAttestation({ keyAttestationRequest, userId }),
     ),
     RTE.map((keyAttestation) => ({
-      wallet_unit_attestation: keyAttestation,
+      key_attestation: keyAttestation,
     })),
     RTE.map(H.successJson),
     RTE.orElseFirstW(
       flow(
         sendTelemetryExceptionWithBody({
           body: req.body,
-          functionName: "createWalletUnitAttestation",
+          functionName: "createKeyAttestation",
         }),
         RTE.fromEither,
       ),

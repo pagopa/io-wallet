@@ -9,7 +9,7 @@ export interface AttestedKey {
   userAuthentication: "iso_18045_moderate";
 }
 
-export interface WalletUnitAttestationData {
+export interface KeyAttestationData {
   attestedKeys: readonly AttestedKey[];
   kid: string;
   platform: "android" | "ios";
@@ -24,7 +24,7 @@ export interface WalletUnitAttestationData {
   x5c: string[];
 }
 
-interface WalletUnitAttestationJwtModel {
+interface KeyAttestationJwtModel {
   attested_keys: JwkPublicKey[];
   // eudi_wallet_info: {
   //   general_info: {
@@ -49,9 +49,9 @@ interface WalletUnitAttestationJwtModel {
   x5c: string[];
 }
 
-export const WalletUnitAttestationToJwtModel: E.Encoder<
-  WalletUnitAttestationJwtModel,
-  WalletUnitAttestationData
+export const KeyAttestationToJwtModel: E.Encoder<
+  KeyAttestationJwtModel,
+  KeyAttestationData
 > = {
   encode: ({
     attestedKeys,
