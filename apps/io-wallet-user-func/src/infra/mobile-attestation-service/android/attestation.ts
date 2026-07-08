@@ -59,7 +59,12 @@ export const verifyAttestation = async (
   // 3. Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
   const publicKeys = googlePublicKeys.map(createPublicKey);
 
-  const issuanceValidationResult = validateIssuance(x509Chain, publicKeys);
+  const issuanceValidationResult = validateIssuance(
+    x509Chain,
+    publicKeys,
+    false,
+    true,
+  );
 
   if (!issuanceValidationResult.success) {
     return issuanceValidationResult;
