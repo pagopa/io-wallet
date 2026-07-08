@@ -31,13 +31,13 @@ const getRootPublicKey: (
 /**
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
  * @param x509Chain - The chain of {@link X509Certificate} certificates. The root certificate must be the last element of the array.
- * @param rootPublicKey - The public key of root certificate.
- * @param skipExpirationvalidation - Skip validation of certificates expiration, default is false.
+ * @param rootPublicKeys - The public keys of the trusted root certificates.
+ * @param skipRootExpirationValidation - Skip validation of the root certificate expiration, default is false.
  */
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   rootPublicKeys: KeyObject[],
-  skipExpirationvalidation = false,
+  skipRootExpirationValidation = false,
 ): ValidationResult => {
   // Check the signature of root certificate with root public key
   const rootPublicKey = getRootPublicKey(x509Chain, rootPublicKeys);
@@ -48,33 +48,37 @@ export const validateIssuance = (
     };
   }
 
-  if (!skipExpirationvalidation) {
-    // Check certificates expiration dates
-    const now = new Date();
-    const datesValid = x509Chain.every(
-      (c) => new Date(c.validFrom) <= now && now <= new Date(c.validTo),
-    );
-    if (!datesValid) {
-      return {
-        reason: `Certificates expired: ${x509Chain}`,
-        success: false,
-      };
-    }
+  // Check certificates expiration dates
+  const now = new Date();
+  const datesValid = x509Chain.every(
+    (c, index) =>
+      (skipRootExpirationValidation && index === x509Chain.length - 1) ||
+      (new Date(c.validFrom) <= now && now <= new Date(c.validTo)),
+  );
+  if (!datesValid) {
+    return {
+      reason: `Certificates expired: ${x509Chain}`,
+      success: false,
+    };
   }
 
   // Check that each certificate, except for the last, is issued by the subsequent one.
   if (x509Chain.length >= 2) {
-    x509Chain.forEach((cert, index) => {
-      if (index < x509Chain.length - 1) {
-        const parent = x509Chain[index + 1];
-        if (!cert || !parent || !cert.verify(parent.publicKey)) {
-          return {
-            reason: `Certificates chain is invalid: ${x509Chain}`,
-            success: false,
-          };
-        }
+    const chainValid = x509Chain.every((cert, index) => {
+      if (index === x509Chain.length - 1) {
+        return true;
       }
+
+      const parent = x509Chain[index + 1];
+      return !!cert && !!parent && cert.verify(parent.publicKey);
     });
+
+    if (!chainValid) {
+      return {
+        reason: `Certificates chain is invalid: ${x509Chain}`,
+        success: false,
+      };
+    }
   }
 
   return { success: true };
