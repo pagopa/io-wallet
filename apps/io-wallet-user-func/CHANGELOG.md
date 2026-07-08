@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.7.0
+
+### Minor Changes
+
+- a0e1e5a: Added /key-attestations endpoint
+
 ## 4.6.3
 
 ### Patch Changes
