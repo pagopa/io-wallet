@@ -40,6 +40,36 @@ paths:
           description: Wallet instance successfully created
         "409":
           $ref: "#/components/responses/Conflict"
+
+  "/key-attestations":
+    post:
+      summary: CreateKeyAttestation
+      description: Create and return a Key Attestation
+      operationId: createKeyAttestation
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: "#/components/schemas/CreateKeyAttestationBody"
+      responses:
+        "200":
+          description: Key Attestation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyAttestation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
         "422":
           $ref: "#/components/responses/UnprocessableContent"
         "500":
@@ -358,6 +388,18 @@ components:
     CreateWalletUnitAttestationBody:
       type: string
       minLength: 1
+    CreateKeyAttestationBody:
+      type: string
+      minLength: 1
+    KeyAttestation:
+      required:
+      - key_attestation
+      type: object
+      properties:
+        key_attestation:
+          type: string
+      example:
+        key_attestation: string
     RevocationReason:
       enum:
       - CERTIFICATE_REVOKED_BY_ISSUER
