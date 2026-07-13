@@ -99,11 +99,11 @@ paths:
       description: Retrieve a Wallet Instance status
       operationId: getWalletInstanceStatus
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Wallet Instance status successfully retrieved
@@ -124,11 +124,11 @@ paths:
         If the Wallet Instance is already revoked, the operation will succeed.
       operationId: setWalletInstanceStatus
       parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -169,7 +169,8 @@ paths:
       operationId: isFiscalCodeWhitelisted
       responses:
         "200":
-          description: Returned when no issues were found in either case (fiscal code
+          description:
+            Returned when no issues were found in either case (fiscal code
             whitelisted, or not)
           content:
             application/json:
@@ -237,23 +238,53 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
+
+  "/key-attestations":
+    post:
+      summary: CreateKeyAttestation
+      description: Create and return a Key Attestation
+      operationId: createKeyAttestation
+      requestBody:
+        content:
+          text/plain:
+            schema:
+              $ref: "#/components/schemas/CreateKeyAttestationBody"
+      responses:
+        "200":
+          description: Key Attestation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyAttestation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 components:
   schemas:
     SetWalletInstanceStatusData:
       required:
-      - status
+        - status
       type: object
       properties:
         status:
           enum:
-          - REVOKED
+            - REVOKED
           type: string
       example:
         status: REVOKED
     WalletInstanceData:
       required:
-      - id
-      - is_revoked
+        - id
+        - is_revoked
       type: object
       properties:
         id:
@@ -269,14 +300,14 @@ components:
         revocation_reason: CERTIFICATE_REVOKED_BY_ISSUER
     NonceDetailView:
       required:
-      - nonce
+        - nonce
       type: object
       properties:
         nonce:
           type: string
     WalletAttestationsView:
       required:
-      - wallet_attestations
+        - wallet_attestations
       type: object
       properties:
         wallet_attestations:
@@ -285,20 +316,20 @@ components:
           type: array
           items:
             required:
-            - format
-            - wallet_attestation
+              - format
+              - wallet_attestation
             type: object
             properties:
               format:
                 enum:
-                - jwt
-                - dc+sd-jwt
+                  - jwt
+                  - dc+sd-jwt
                 type: string
               wallet_attestation:
                 type: string
     WalletInstanceAttestation:
       required:
-      - wallet_instance_attestation
+        - wallet_instance_attestation
       type: object
       properties:
         wallet_instance_attestation:
@@ -307,7 +338,7 @@ components:
         wallet_instance_attestation: string
     WalletUnitAttestation:
       required:
-      - wallet_unit_attestation
+        - wallet_unit_attestation
       type: object
       properties:
         wallet_unit_attestation:
@@ -316,9 +347,9 @@ components:
         wallet_unit_attestation: string
     CreateWalletInstanceBody:
       required:
-      - challenge
-      - key_attestation
-      - hardware_key_tag
+        - challenge
+        - key_attestation
+        - hardware_key_tag
       type: object
       properties:
         challenge:
@@ -358,12 +389,24 @@ components:
     CreateWalletUnitAttestationBody:
       type: string
       minLength: 1
+    CreateKeyAttestationBody:
+      type: string
+      minLength: 1
+    KeyAttestation:
+      required:
+      - key_attestation
+      type: object
+      properties:
+        key_attestation:
+          type: string
+      example:
+        key_attestation: string
     RevocationReason:
       enum:
-      - CERTIFICATE_REVOKED_BY_ISSUER
-      - NEW_WALLET_INSTANCE_CREATED
-      - WALLET_INSTANCE_RENEWAL
-      - REVOKED_BY_USER
+        - CERTIFICATE_REVOKED_BY_ISSUER
+        - NEW_WALLET_INSTANCE_CREATED
+        - WALLET_INSTANCE_RENEWAL
+        - REVOKED_BY_USER
       type: string
     ProblemJson:
       type: object
@@ -385,7 +428,8 @@ components:
           exclusiveMaximum: true
           minimum: 100
           type: integer
-          description: The HTTP status code generated by the origin server for this
+          description:
+            The HTTP status code generated by the origin server for this
             occurrence of the problem.
           format: int32
           example: 500
@@ -397,18 +441,20 @@ components:
           example: There was an error processing the request
         instance:
           type: string
-          description: An absolute URI that identifies the specific occurrence of
+          description:
+            An absolute URI that identifies the specific occurrence of
             the problem. It may or may not yield further information if dereferenced.
           format: uri
     WhitelistedFiscalCodeData:
       required:
-      - whitelisted
-      - fiscalCode
+        - whitelisted
+        - fiscalCode
       type: object
       properties:
         whitelisted:
           type: boolean
-          description: Boolean value that specifies whether the tax code is whitelisted
+          description:
+            Boolean value that specifies whether the tax code is whitelisted
             or not.
         whitelistedAt:
           type: string
