@@ -238,7 +238,6 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
-
   "/key-attestations":
     post:
       summary: CreateKeyAttestation
@@ -372,7 +371,7 @@ components:
           default: false
     CreateWalletAttestationBody:
       required:
-      - assertion
+        - assertion
       type: object
       properties:
         assertion:
@@ -394,7 +393,7 @@ components:
       minLength: 1
     KeyAttestation:
       required:
-      - key_attestation
+        - key_attestation
       type: object
       properties:
         key_attestation:

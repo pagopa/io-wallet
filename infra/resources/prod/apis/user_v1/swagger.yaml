@@ -40,6 +40,12 @@ paths:
           description: Wallet instance successfully created
         "409":
           $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
   "/key-attestations":
     post:
       summary: CreateKeyAttestation
