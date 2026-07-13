@@ -40,7 +40,6 @@ paths:
           description: Wallet instance successfully created
         "409":
           $ref: "#/components/responses/Conflict"
-
   "/key-attestations":
     post:
       summary: CreateKeyAttestation
