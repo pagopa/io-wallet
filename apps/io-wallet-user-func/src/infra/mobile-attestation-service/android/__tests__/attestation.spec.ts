@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { decodeBase64String, GOOGLE_PUBLIC_KEY } from "@/app/config";
 
 import { base64ToPem } from "..";
-import { verifyAttestation } from "../attestation";
+import { isNonRkpChain, verifyAttestation } from "../attestation";
 import { androidMockData } from "./config";
 
 describe("AndroidAttestationValidation", () => {
@@ -86,5 +86,23 @@ describe("AndroidAttestationValidation", () => {
     };
 
     await expect(result).resolves.toEqual(expectedResult);
+  });
+
+  it("should classify the legacy Google root subject as Non-RKP", () => {
+    const nonRkpChain = [
+      { subject: "CN=leaf" },
+      { subject: "SERIALNUMBER=f92009e853b6b045" },
+    ] as unknown as readonly X509Certificate[];
+
+    expect(isNonRkpChain(nonRkpChain)).toBe(true);
+  });
+
+  it("should classify chains with a different root subject as RKP", () => {
+    const rkpChain = [
+      { subject: "CN=leaf" },
+      { subject: "CN=Android Keystore Key Attestation Root" },
+    ] as unknown as readonly X509Certificate[];
+
+    expect(isNonRkpChain(rkpChain)).toBe(false);
   });
 });

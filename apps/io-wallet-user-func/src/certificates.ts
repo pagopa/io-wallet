@@ -33,13 +33,11 @@ const getRootPublicKey: (
  * @param x509Chain - The chain of {@link X509Certificate} certificates. The root certificate must be the last element of the array.
  * @param rootPublicKeys - The public keys of the trusted root certificates.
  * @param skipExpirationValidation - Skip validation of all certificates expiration, default is false.
- * @param skipRootExpirationValidation - Skip validation of the root certificate expiration, default is false.
  */
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   rootPublicKeys: KeyObject[],
   skipExpirationValidation = false,
-  skipRootExpirationValidation = false,
 ): ValidationResult => {
   // Check the signature of root certificate with root public key
   const rootPublicKey = getRootPublicKey(x509Chain, rootPublicKeys);
@@ -51,11 +49,12 @@ export const validateIssuance = (
   }
 
   if (!skipExpirationValidation) {
-    // Check certificates expiration dates
+    // Check intermediate certificates expiration dates.
     const now = new Date();
     const datesValid = x509Chain.every(
       (c, index) =>
-        (skipRootExpirationValidation && index === x509Chain.length - 1) ||
+        index === 0 ||
+        index === x509Chain.length - 1 ||
         (new Date(c.validFrom) <= now && now <= new Date(c.validTo)),
     );
     if (!datesValid) {
