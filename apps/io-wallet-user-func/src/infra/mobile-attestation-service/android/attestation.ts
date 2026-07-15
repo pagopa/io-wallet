@@ -38,6 +38,18 @@ interface VerifyAttestationParams {
   x509Chain: readonly X509Certificate[];
 }
 
+const NON_RKP_ROOT_SUBJECT = "serialnumber=f92009e853b6b045";
+
+export const isNonRkpChain = (x509Chain: readonly X509Certificate[]) => {
+  const rootCertificate = x509Chain[x509Chain.length - 1];
+
+  const normalizedSubject = rootCertificate.subject
+    .toLowerCase()
+    .replace(/\s+/g, "");
+
+  return normalizedSubject === NON_RKP_ROOT_SUBJECT;
+};
+
 /**
  * Verifies Android key attestation by validating the certificate chain,
  * checking revocation status, and examining the key attestation extension.
@@ -58,13 +70,12 @@ export const verifyAttestation = async (
 
   // 3. Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
   const publicKeys = googlePublicKeys.map(createPublicKey);
+  const isNonRkp = isNonRkpChain(x509Chain);
 
-  const issuanceValidationResult = validateIssuance(
-    x509Chain,
-    publicKeys,
-    false,
-    true,
-  );
+  const issuanceValidationResult = validateIssuance(x509Chain, publicKeys, {
+    skipIntermediateExpirationValidation: isNonRkp,
+    skipLeafAndRootExpirationValidation: true,
+  });
 
   if (!issuanceValidationResult.success) {
     return issuanceValidationResult;

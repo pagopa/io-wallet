@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { createPublicKey, X509Certificate } from "crypto";
 import { describe, expect, it } from "vitest";
 
@@ -67,6 +68,37 @@ describe("CertificatesValidation", () => {
     expect(validation).toHaveProperty("success", false);
   });
 
+  it("should reject expired root certificates by default", () => {
+    const rootPublicKey = {};
+    const rootKey = {};
+    const intermediateKey = {};
+    const now = Date.now();
+    const fakeChain = [
+      {
+        publicKey: {},
+        validFrom: new Date(now - 60_000).toISOString(),
+        validTo: new Date(now + 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === intermediateKey,
+      },
+      {
+        publicKey: intermediateKey,
+        validFrom: new Date(now - 60_000).toISOString(),
+        validTo: new Date(now + 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootKey,
+      },
+      {
+        publicKey: rootKey,
+        validFrom: new Date(now - 120_000).toISOString(),
+        validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootPublicKey,
+      },
+    ] as unknown as readonly X509Certificate[];
+
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never]);
+
+    expect(validation).toHaveProperty("success", false);
+  });
+
   it("should ignore expiration on the root certificate when requested", () => {
     const rootPublicKey = {};
     const rootKey = {};
@@ -93,17 +125,14 @@ describe("CertificatesValidation", () => {
       },
     ] as unknown as readonly X509Certificate[];
 
-    const validation = validateIssuance(
-      fakeChain,
-      [rootPublicKey as never],
-      false,
-      true,
-    );
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipLeafAndRootExpirationValidation: true,
+    });
 
     expect(validation).toHaveProperty("success", true);
   });
 
-  it("should still reject expired non-root certificates when skipping only root expiration", () => {
+  it("should reject expired intermediate certificates by default", () => {
     const rootPublicKey = {};
     const rootKey = {};
     const intermediateKey = {};
@@ -111,8 +140,108 @@ describe("CertificatesValidation", () => {
     const fakeChain = [
       {
         publicKey: {},
+        validFrom: new Date(now - 60_000).toISOString(),
+        validTo: new Date(now + 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === intermediateKey,
+      },
+      {
+        publicKey: intermediateKey,
         validFrom: new Date(now - 120_000).toISOString(),
         validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootKey,
+      },
+      {
+        publicKey: rootKey,
+        validFrom: new Date(now - 60_000).toISOString(),
+        validTo: new Date(now - 30_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootPublicKey,
+      },
+    ] as unknown as readonly X509Certificate[];
+
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never]);
+
+    expect(validation).toHaveProperty("success", false);
+  });
+
+  it("should ignore expiration on all certificates when requested", () => {
+    const rootPublicKey = {};
+    const rootKey = {};
+    const intermediateKey = {};
+    const now = Date.now();
+    const fakeChain = [
+      {
+        publicKey: {},
+        validFrom: new Date(now + 60_000).toISOString(),
+        validTo: new Date(now + 120_000).toISOString(),
+        verify: (publicKey: object) => publicKey === intermediateKey,
+      },
+      {
+        publicKey: intermediateKey,
+        validFrom: new Date(now - 120_000).toISOString(),
+        validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootKey,
+      },
+      {
+        publicKey: rootKey,
+        validFrom: new Date(now - 120_000).toISOString(),
+        validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootPublicKey,
+      },
+    ] as unknown as readonly X509Certificate[];
+
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipIntermediateExpirationValidation: true,
+      skipLeafAndRootExpirationValidation: true,
+    });
+
+    expect(validation).toHaveProperty("success", true);
+  });
+
+  it("should still reject invalid signatures when ignoring expiration", () => {
+    const rootPublicKey = {};
+    const rootKey = {};
+    const intermediateKey = {};
+    const wrongIntermediateKey = {};
+    const now = Date.now();
+    const fakeChain = [
+      {
+        publicKey: {},
+        validFrom: new Date(now + 60_000).toISOString(),
+        validTo: new Date(now + 120_000).toISOString(),
+        verify: (publicKey: object) => publicKey === wrongIntermediateKey,
+      },
+      {
+        publicKey: intermediateKey,
+        validFrom: new Date(now - 120_000).toISOString(),
+        validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootKey,
+      },
+      {
+        publicKey: rootKey,
+        validFrom: new Date(now - 120_000).toISOString(),
+        validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootPublicKey,
+      },
+    ] as unknown as readonly X509Certificate[];
+
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipIntermediateExpirationValidation: true,
+      skipLeafAndRootExpirationValidation: true,
+    });
+
+    expect(validation).toHaveProperty("success", false);
+  });
+
+  it("should ignore expiration on the leaf certificate", () => {
+    const rootPublicKey = {};
+    const rootKey = {};
+    const intermediateKey = {};
+    const now = Date.now();
+    const fakeChain = [
+      {
+        publicKey: {},
+        validFrom: new Date(now + 60_000).toISOString(),
+        validTo: new Date(now + 120_000).toISOString(),
         verify: (publicKey: object) => publicKey === intermediateKey,
       },
       {
@@ -124,19 +253,16 @@ describe("CertificatesValidation", () => {
       {
         publicKey: rootKey,
         validFrom: new Date(now - 60_000).toISOString(),
-        validTo: new Date(now - 30_000).toISOString(),
+        validTo: new Date(now + 60_000).toISOString(),
         verify: (publicKey: object) => publicKey === rootPublicKey,
       },
     ] as unknown as readonly X509Certificate[];
 
-    const validation = validateIssuance(
-      fakeChain,
-      [rootPublicKey as never],
-      false,
-      true,
-    );
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipLeafAndRootExpirationValidation: true,
+    });
 
-    expect(validation).toHaveProperty("success", false);
+    expect(validation).toHaveProperty("success", true);
   });
 
   it("should reject a chain when a certificate is not signed by its parent", () => {

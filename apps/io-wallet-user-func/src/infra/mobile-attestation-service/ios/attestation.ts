@@ -68,7 +68,10 @@ export const verifyAttestation = async (
   const issuanceValidation = validateIssuance(
     certificates,
     [rootCertificate.publicKey],
-    allowDevelopmentEnvironment,
+    {
+      skipIntermediateExpirationValidation: allowDevelopmentEnvironment,
+      skipLeafAndRootExpirationValidation: allowDevelopmentEnvironment,
+    },
   );
 
   if (!issuanceValidation.success) {
