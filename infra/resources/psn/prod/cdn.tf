@@ -141,19 +141,21 @@ resource "azurerm_storage_container" "well_known_uat" {
 }
 
 resource "azurerm_storage_blob" "healthcheck" {
-  name                 = "healthcheck.txt"
-  storage_container_id = azurerm_storage_container.probes.id
-  type                 = "Block"
-  source_content       = "OK"
-  content_type         = "text/plain"
+  name                   = "healthcheck.txt"
+  storage_account_name   = azurerm_storage_account.cdn.name
+  storage_container_name = azurerm_storage_container.probes.name
+  type                   = "Block"
+  source_content         = "OK"
+  content_type           = "text/plain"
 }
 
 resource "azurerm_storage_blob" "index" {
-  name                 = "index.html"
-  storage_container_id = azurerm_storage_container.root.id
-  type                 = "Block"
-  source_content       = ""
-  content_type         = "text/html"
+  name                   = "index.html"
+  storage_account_name   = azurerm_storage_account.cdn.name
+  storage_container_name = azurerm_storage_container.root.name
+  type                   = "Block"
+  source_content         = ""
+  content_type           = "text/html"
 }
 
 module "cdn" {
