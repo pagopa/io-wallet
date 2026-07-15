@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.8.0
+
+### Minor Changes
+
+- 7483b42: Updates Android Key Attestation certificate validation to apply the requested RKP/Non-RKP expiration policy
+
 ## 4.7.1
 
 ### Patch Changes
