@@ -99,7 +99,7 @@ describe("CertificatesValidation", () => {
     expect(validation).toHaveProperty("success", true);
   });
 
-  it("should reject expired intermediate certificates", () => {
+  it("should reject expired intermediate certificates when skipExpirationValidation flag is false", () => {
     const rootPublicKey = {};
     const rootKey = {};
     const intermediateKey = {};
