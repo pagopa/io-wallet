@@ -68,7 +68,7 @@ describe("CertificatesValidation", () => {
     expect(validation).toHaveProperty("success", false);
   });
 
-  it("should ignore expiration on the root certificate", () => {
+  it("should reject expired root certificates by default", () => {
     const rootPublicKey = {};
     const rootKey = {};
     const intermediateKey = {};
@@ -96,10 +96,43 @@ describe("CertificatesValidation", () => {
 
     const validation = validateIssuance(fakeChain, [rootPublicKey as never]);
 
+    expect(validation).toHaveProperty("success", false);
+  });
+
+  it("should ignore expiration on the root certificate when requested", () => {
+    const rootPublicKey = {};
+    const rootKey = {};
+    const intermediateKey = {};
+    const now = Date.now();
+    const fakeChain = [
+      {
+        publicKey: {},
+        validFrom: new Date(now - 60_000).toISOString(),
+        validTo: new Date(now + 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === intermediateKey,
+      },
+      {
+        publicKey: intermediateKey,
+        validFrom: new Date(now - 60_000).toISOString(),
+        validTo: new Date(now + 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootKey,
+      },
+      {
+        publicKey: rootKey,
+        validFrom: new Date(now - 120_000).toISOString(),
+        validTo: new Date(now - 60_000).toISOString(),
+        verify: (publicKey: object) => publicKey === rootPublicKey,
+      },
+    ] as unknown as readonly X509Certificate[];
+
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipLeafAndRootExpirationValidation: true,
+    });
+
     expect(validation).toHaveProperty("success", true);
   });
 
-  it("should reject expired intermediate certificates when skipExpirationValidation flag is false", () => {
+  it("should reject expired intermediate certificates by default", () => {
     const rootPublicKey = {};
     const rootKey = {};
     const intermediateKey = {};
@@ -156,11 +189,10 @@ describe("CertificatesValidation", () => {
       },
     ] as unknown as readonly X509Certificate[];
 
-    const validation = validateIssuance(
-      fakeChain,
-      [rootPublicKey as never],
-      true,
-    );
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipIntermediateExpirationValidation: true,
+      skipLeafAndRootExpirationValidation: true,
+    });
 
     expect(validation).toHaveProperty("success", true);
   });
@@ -192,11 +224,10 @@ describe("CertificatesValidation", () => {
       },
     ] as unknown as readonly X509Certificate[];
 
-    const validation = validateIssuance(
-      fakeChain,
-      [rootPublicKey as never],
-      true,
-    );
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipIntermediateExpirationValidation: true,
+      skipLeafAndRootExpirationValidation: true,
+    });
 
     expect(validation).toHaveProperty("success", false);
   });
@@ -227,7 +258,9 @@ describe("CertificatesValidation", () => {
       },
     ] as unknown as readonly X509Certificate[];
 
-    const validation = validateIssuance(fakeChain, [rootPublicKey as never]);
+    const validation = validateIssuance(fakeChain, [rootPublicKey as never], {
+      skipLeafAndRootExpirationValidation: true,
+    });
 
     expect(validation).toHaveProperty("success", true);
   });

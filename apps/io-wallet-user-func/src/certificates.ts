@@ -11,6 +11,11 @@ import * as path from "path";
 
 import { ValidationResult } from "@/attestation-service";
 
+interface ValidateIssuanceOptions {
+  skipIntermediateExpirationValidation?: boolean;
+  skipLeafAndRootExpirationValidation?: boolean;
+}
+
 const getRootPublicKey: (
   x509Chain: readonly X509Certificate[],
   googlePublicKeys: KeyObject[],
@@ -32,12 +37,12 @@ const getRootPublicKey: (
  * Verify that the root public certificate is trustworthy and that each certificate signs the next certificate in the chain.
  * @param x509Chain - The chain of {@link X509Certificate} certificates. The root certificate must be the last element of the array.
  * @param rootPublicKeys - The public keys of the trusted root certificates.
- * @param skipExpirationValidation - Skip validation of all certificates expiration, default is false.
+ * @param options - Configure certificate expiration validation skips.
  */
 export const validateIssuance = (
   x509Chain: readonly X509Certificate[],
   rootPublicKeys: KeyObject[],
-  skipExpirationValidation = false,
+  options: ValidateIssuanceOptions = {},
 ): ValidationResult => {
   // Check the signature of root certificate with root public key
   const rootPublicKey = getRootPublicKey(x509Chain, rootPublicKeys);
@@ -48,21 +53,23 @@ export const validateIssuance = (
     };
   }
 
-  if (!skipExpirationValidation) {
-    // Check intermediate certificates expiration dates.
-    const now = new Date();
-    const datesValid = x509Chain.every(
-      (c, index) =>
-        index === 0 ||
-        index === x509Chain.length - 1 ||
-        (new Date(c.validFrom) <= now && now <= new Date(c.validTo)),
+  const now = new Date();
+  const datesValid = x509Chain.every((c, index) => {
+    const isLeafOrRoot = index === 0 || index === x509Chain.length - 1;
+    const skipExpirationValidation = isLeafOrRoot
+      ? options.skipLeafAndRootExpirationValidation
+      : options.skipIntermediateExpirationValidation;
+
+    return (
+      skipExpirationValidation ||
+      (new Date(c.validFrom) <= now && now <= new Date(c.validTo))
     );
-    if (!datesValid) {
-      return {
-        reason: `Certificates expired: ${x509Chain}`,
-        success: false,
-      };
-    }
+  });
+  if (!datesValid) {
+    return {
+      reason: `Certificates expired: ${x509Chain}`,
+      success: false,
+    };
   }
 
   // Check that each certificate, except for the last, is issued by the subsequent one.
