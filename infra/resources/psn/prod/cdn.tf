@@ -132,6 +132,14 @@ resource "azurerm_storage_container" "status_lists_uat" {
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet images through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "images_uat" {
+  name                  = "images"
+  storage_account_id    = azurerm_storage_account.cdn_uat.id
+  container_access_type = "container"
+}
+
 # This container is intentionally public because it serves public wallet content through the CDN.
 #trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "well_known_uat" {
