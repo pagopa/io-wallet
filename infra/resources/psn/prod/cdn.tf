@@ -132,22 +132,28 @@ resource "azurerm_storage_container" "status_lists_uat" {
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "well_known_uat" {
+  name                  = "well-known"
+  storage_account_id    = azurerm_storage_account.cdn_uat.id
+  container_access_type = "container"
+}
+
 resource "azurerm_storage_blob" "healthcheck" {
-  name                   = "healthcheck.txt"
-  storage_account_name   = azurerm_storage_account.cdn.name
-  storage_container_name = azurerm_storage_container.probes.name
-  type                   = "Block"
-  source_content         = "OK"
-  content_type           = "text/plain"
+  name                 = "healthcheck.txt"
+  storage_container_id = azurerm_storage_container.probes.id
+  type                 = "Block"
+  source_content       = "OK"
+  content_type         = "text/plain"
 }
 
 resource "azurerm_storage_blob" "index" {
-  name                   = "index.html"
-  storage_account_name   = azurerm_storage_account.cdn.name
-  storage_container_name = azurerm_storage_container.root.name
-  type                   = "Block"
-  source_content         = ""
-  content_type           = "text/html"
+  name                 = "index.html"
+  storage_container_id = azurerm_storage_container.root.id
+  type                 = "Block"
+  source_content       = ""
+  content_type         = "text/html"
 }
 
 module "cdn" {
@@ -209,6 +215,30 @@ module "cdn_uat" {
 resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
   name                      = "WellKnownRewrite"
   cdn_frontdoor_rule_set_id = module.cdn.rule_set_id
+  order                     = 1
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = [".well-known"]
+      transforms       = []
+      negate_condition = false
+    }
+  }
+
+  actions {
+    url_rewrite_action {
+      source_pattern          = "/.well-known/"
+      destination             = "/well-known/"
+      preserve_unmatched_path = true
+    }
+  }
+}
+
+resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite_uat" {
+  name                      = "WellKnownRewrite"
+  cdn_frontdoor_rule_set_id = module.cdn_uat.rule_set_id
   order                     = 1
   behavior_on_match         = "Continue"
 
