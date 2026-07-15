@@ -132,6 +132,14 @@ resource "azurerm_storage_container" "status_lists_uat" {
   container_access_type = "container"
 }
 
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "well_known_uat" {
+  name                  = "well-known"
+  storage_account_id    = azurerm_storage_account.cdn_uat.id
+  container_access_type = "container"
+}
+
 resource "azurerm_storage_blob" "healthcheck" {
   name                   = "healthcheck.txt"
   storage_account_name   = azurerm_storage_account.cdn.name
@@ -209,6 +217,30 @@ module "cdn_uat" {
 resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
   name                      = "WellKnownRewrite"
   cdn_frontdoor_rule_set_id = module.cdn.rule_set_id
+  order                     = 1
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = [".well-known"]
+      transforms       = []
+      negate_condition = false
+    }
+  }
+
+  actions {
+    url_rewrite_action {
+      source_pattern          = "/.well-known/"
+      destination             = "/well-known/"
+      preserve_unmatched_path = true
+    }
+  }
+}
+
+resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite_uat" {
+  name                      = "WellKnownRewrite"
+  cdn_frontdoor_rule_set_id = module.cdn_uat.rule_set_id
   order                     = 1
   behavior_on_match         = "Continue"
 
