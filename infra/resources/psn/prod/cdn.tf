@@ -219,6 +219,12 @@ module "cdn_uat" {
     }
   }
 
+  custom_domains = [
+    {
+      host_name = "pre.wallet.io.pagopa.it"
+    }
+  ]
+
   tags = local.tags
 }
 
