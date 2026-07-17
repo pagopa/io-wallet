@@ -35,3 +35,14 @@ resource "azurerm_dns_cname_record" "wallet_io_pagopa_it" {
 
   tags = local.tags
 }
+
+resource "azurerm_dns_cname_record" "pre_wallet_io_pagopa_it" {
+  name                = "pre.wallet"
+  resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
+
+  zone_name = data.azurerm_dns_zone.io_pagopa_it.name
+  record    = "iw-u-itn-cdn-fde-01-gecpgqedgtcadffg.a02.azurefd.net"
+  ttl       = 60
+
+  tags = local.tags
+}
