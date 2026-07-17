@@ -221,7 +221,7 @@ module "cdn_uat" {
 
   custom_domains = [
     {
-      host_name = "pre-wallet.io.pagopa.it"
+      host_name = "pre.wallet.io.pagopa.it"
     }
   ]
 
