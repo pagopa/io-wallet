@@ -25,6 +25,19 @@ resource "azurerm_dns_txt_record" "wallet_io_pagopa_it" {
   tags = local.tags
 }
 
+resource "azurerm_dns_txt_record" "pre_wallet_io_pagopa_it" {
+  name                = "_dnsauth.pre.wallet"
+  zone_name           = data.azurerm_dns_zone.io_pagopa_it.name
+  resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
+  ttl                 = 3600
+
+  record {
+    value = "_loc0csg7l3ewrioobqg0mga9u1niqkr"
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_dns_cname_record" "wallet_io_pagopa_it" {
   name                = "wallet"
   resource_group_name = data.azurerm_dns_zone.io_pagopa_it.resource_group_name
