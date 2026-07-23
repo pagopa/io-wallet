@@ -41,8 +41,8 @@ const htmlContent = htmlTemplate(
 );
 
 const htmlContentGeneric = htmlTemplateGeneric(
-  { href: WALLET_ACTIVATION_EMAIL_FAQ_LINK } as ValidUrl,
   { href: WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK } as ValidUrl,
+  { href: WALLET_ACTIVATION_EMAIL_FAQ_LINK } as ValidUrl,
 );
 
 // it provides a message specific to Documenti su IO
