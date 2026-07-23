@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.8.1
+
+### Patch Changes
+
+- 65ed781: Fix ITW creation email
+
 ## 4.8.0
 
 ### Minor Changes
