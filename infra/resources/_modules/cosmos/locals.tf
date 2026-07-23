@@ -37,6 +37,14 @@ locals {
       default_ttl = null
     },
     {
+      name               = "keys"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.keys
+      }
+      default_ttl = null
+    },
+    {
       name               = "status-list-catalogs"
       partition_key_path = "/id"
       autoscale_settings = {
@@ -100,6 +108,14 @@ locals {
       partition_key_path = "/id"
       autoscale_settings = {
         max_throughput = var.throughput.uat.certificates
+      }
+      default_ttl = null
+    },
+    {
+      name               = "keys"
+      partition_key_path = "/id"
+      autoscale_settings = {
+        max_throughput = var.throughput.uat.keys
       }
       default_ttl = null
     },

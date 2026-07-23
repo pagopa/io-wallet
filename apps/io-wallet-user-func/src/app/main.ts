@@ -2,12 +2,12 @@ import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { CryptographyClient } from "@azure/keyvault-keys";
 import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
 import { registerAzureFunctionHooks } from "@pagopa/azure-tracing/azure-functions";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { Crypto } from "@peculiar/webcrypto";
 import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
@@ -15,7 +15,7 @@ import { SlackNotificationService } from "io-wallet-common/infra/slack/notificat
 
 import { getCrlFromUrl } from "@/certificates";
 import { AzureMonitorLogsStatusListAllocationConflictRepository } from "@/infra/azure/applicationinsights/status-list-allocation-conflict";
-import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
+import { CosmosDbKeyRepository } from "@/infra/azure/cosmos/key";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbOpenStatusListsPolicyRepository } from "@/infra/azure/cosmos/open-status-lists-policy";
 import { CosmosDbStatusListCatalogRepository } from "@/infra/azure/cosmos/status-list-catalog";
@@ -27,9 +27,7 @@ import { CreateKeyAttestationFunction } from "@/infra/azure/functions/create-key
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
-import { CreateWalletUnitAttestationFunction } from "@/infra/azure/functions/create-wallet-unit-attestation";
 import { EnqueueWhitelistedFiscalCodesFunction } from "@/infra/azure/functions/enqueue-whitelisted-fiscal-codes";
-import { GenerateCertificateChainFunction } from "@/infra/azure/functions/generate-certificate-chain";
 import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
@@ -75,14 +73,33 @@ if (configOrError instanceof Error) {
 
 const config = configOrError;
 
-const {
-  keyAttestation: keyAttestationSigningKey,
-  tokenStatusList: tokenStatusListSigningKey,
-  walletAttestation: walletAttestationSigningKey,
-  walletInstanceAttestation: walletInstanceAttestationSigningKey,
-} = config.walletProvider.leafResolvedSigningKeys;
-
 const credential = new DefaultAzureCredential();
+
+const createCryptographyClient = (keyName: string) =>
+  new CryptographyClient(
+    `${config.azure.keyVault.url.replace(/\/$/, "")}/keys/${keyName}`,
+    credential,
+  );
+
+const entityConfigurationCryptographyClient = createCryptographyClient(
+  config.walletProvider.intermediateSigningKeyName,
+);
+
+const keyAttestationCryptographyClient = createCryptographyClient(
+  config.walletProvider.keyAttestationSigningKeyName,
+);
+
+const tokenStatusListCryptographyClient = createCryptographyClient(
+  config.walletProvider.tokenStatusListSigningKeyName,
+);
+
+const walletAttestationCryptographyClient = createCryptographyClient(
+  config.walletProvider.walletAttestationKeyName,
+);
+
+const walletInstanceAttestationCryptographyClient = createCryptographyClient(
+  config.walletProvider.walletInstanceAttestationSigningKeyName,
+);
 
 const cosmosClient = new CosmosClient({
   aadCredentials: credential,
@@ -190,14 +207,7 @@ const statusListContainerClient =
     config.azure.storage.statusLists.containerName,
   );
 
-const certificateRepository = new CosmosDbCertificateRepository(database);
-
-const certificateV13Repository = new CosmosDbCertificateRepository(
-  database,
-  "certificates-v-1.3",
-);
-
-const certificateIssuerAndSubject = `C=${config.walletProvider.certificate.country}, ST=${config.walletProvider.certificate.state}, L=${config.walletProvider.certificate.locality}, O=${config.entityConfiguration.federationEntity.organizationName}, CN=${config.entityConfiguration.federationEntity.basePathV10.hostname}`;
+const keyRepository = new CosmosDbKeyRepository(database);
 
 const statusListCatalogRepository = new CosmosDbStatusListCatalogRepository(
   database,
@@ -229,14 +239,16 @@ const statusListPublicationConfig = {
 const statusListPublication = new StatusListPublicationService({
   catalogs: statusListCatalogRepository,
   cdnManagementClient,
-  certificateRepository: certificateV13Repository,
   config: statusListPublicationConfig,
   containerClient: statusListContainerClient,
+  cryptographyClient: tokenStatusListCryptographyClient,
   emptyBitstring: Buffer.alloc(
     (config.statusList.pageCount * config.statusList.pageBitsSize) / 8,
   ),
+  keyRepository,
   pages: statusListPagesRepository,
-  tokenStatusListSigningKey,
+  tokenStatusListSigningKeyName:
+    config.walletProvider.tokenStatusListSigningKeyName,
 });
 
 const statusListAllocator = new StatusListAllocatorService(
@@ -303,17 +315,24 @@ app.http("getNonce", {
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
     cdnManagementClient,
-    certificateRepository,
     containerClient,
+    cryptographyClient: entityConfigurationCryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
     entityConfiguration: {
       ...config.entityConfiguration,
       authorityHints: [config.entityConfiguration.trustAnchorUrl],
     },
     inputDecoder: t.unknown,
-    intermediateSigningKey: config.walletProvider.intermediateSigningKey,
-    intermediateSigningKeys: config.walletProvider.intermediateSigningKeys,
-    leafSigningKeys: config.walletProvider.leafSigningKeys,
+    intermediatePublishedKeyNames:
+      config.walletProvider.intermediatePublishedKeyNames,
+    intermediateSigningKeyName:
+      config.walletProvider.intermediateSigningKeyName,
+    keyRepository,
+    leafPublishedKeyNames: [
+      ...config.walletProvider.keyAttestationPublishedKeyNames,
+      ...config.walletProvider.tokenStatusListPublishedKeyNames,
+      ...config.walletProvider.walletInstanceAttestationPublishedKeyNames,
+    ],
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
   }),
@@ -408,14 +427,17 @@ app.http("createWalletAttestation", {
   authLevel: "function",
   handler: CreateWalletAttestationFunction({
     attestationService: mobileAttestationService,
-    certificateRepository,
+    cryptographyClient: walletAttestationCryptographyClient,
     federationEntity: config.entityConfiguration.federationEntity,
+    keyRepository,
     nonceRepository,
     walletAttestationConfig: {
       ...config.walletProvider.walletAttestation,
       trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
     },
-    walletAttestationSigningKey,
+    walletAttestationKeyName: config.walletProvider.walletAttestationKeyName,
+    walletAttestationSigningKey:
+      config.walletProvider.walletAttestationSigningKey,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -431,32 +453,19 @@ app.http("isFiscalCodeWhitelisted", {
   route: "whitelisted-fiscal-code/{fiscalCode}",
 });
 
-app.http("generateCertificateChain", {
-  authLevel: "function",
-  handler: GenerateCertificateChainFunction({
-    certificate: {
-      crypto: new Crypto(),
-      issuer: certificateIssuerAndSubject,
-      subject: certificateIssuerAndSubject,
-    },
-    certificateRepository,
-    intermediateSigningKeys: config.walletProvider.intermediateSigningKeys,
-  }),
-  methods: ["POST"],
-  route: "certificate-chain",
-});
-
 app.http("createWalletInstanceAttestation", {
   authLevel: "function",
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
-    certificateRepository: certificateV13Repository,
+    cryptographyClient: walletInstanceAttestationCryptographyClient,
     federationEntity: config.entityConfiguration.federationEntity,
+    keyRepository,
     nonceRepository,
     walletAttestationConfig: {
       oauthClientSub: config.walletProvider.walletAttestation.oauthClientSub,
     },
-    walletInstanceAttestationSigningKey,
+    walletInstanceAttestationSigningKeyName:
+      config.walletProvider.walletInstanceAttestationSigningKeyName,
     walletInstanceRepository,
   }),
   methods: ["POST"],
@@ -468,31 +477,17 @@ app.http("createKeyAttestation", {
   handler: CreateKeyAttestationFunction({
     androidAttestationValidationConfig,
     assertionValidationConfig,
-    certificateRepository: certificateV13Repository,
+    cryptographyClient: keyAttestationCryptographyClient,
     federationEntity: config.entityConfiguration.federationEntity,
-    keyAttestationSigningKey,
+    keyAttestationSigningKeyName:
+      config.walletProvider.keyAttestationSigningKeyName,
+    keyRepository,
     nonceRepository,
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
   }),
   methods: ["POST"],
   route: "key-attestations",
-});
-
-app.http("createWalletUnitAttestation", {
-  authLevel: "function",
-  handler: CreateWalletUnitAttestationFunction({
-    androidAttestationValidationConfig,
-    assertionValidationConfig,
-    certificateRepository: certificateV13Repository,
-    federationEntity: config.entityConfiguration.federationEntity,
-    keyAttestationSigningKey,
-    nonceRepository,
-    statusListBaseUrl: statusListPublicationConfig.baseUrl,
-    walletInstanceRepository,
-  }),
-  methods: ["POST"],
-  route: "wallet-unit-attestations",
 });
 
 app.timer("statusListManager", {

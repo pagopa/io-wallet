@@ -1,55 +1,27 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
 import * as H from "@pagopa/handler-kit";
+import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
-import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { ECPrivateKeyWithKid, JwkPublicKey } from "io-wallet-common/jwk";
+import { ECKeyWithKid } from "io-wallet-common/jwk";
 
-import {
-  CertificateRepository,
-  getCertificateChainByKid,
-} from "@/certificates";
 import { EntityConfigurationToJwtModel } from "@/encoders/entity-configuration";
 import { EntityConfigurationEnvironment } from "@/entity-configuration";
 import { uploadFile } from "@/infra/azure/storage/blob";
 import { signJwt } from "@/infra/crypto/signer";
 import { sendTelemetryException } from "@/infra/telemetry";
+import { getKey } from "@/keys";
 import { getLoAUri, LoA } from "@/wallet-provider";
 
-const toPublicJwk = ({ crv, kid, kty, x, y }: ECPrivateKeyWithKid) => ({
-  crv,
-  kid,
-  kty,
-  x,
-  y,
+const withX5c = ({
+  certificateChain,
+  ...jwk
+}: ECKeyWithKid & { certificateChain: string[] }) => ({
+  ...jwk,
+  x5c: certificateChain,
 });
-
-const addCertificateChainToJwk = (
-  jwk: JwkPublicKey,
-): RTE.ReaderTaskEither<
-  { certificateRepository: CertificateRepository },
-  Error,
-  JwkPublicKey
-> =>
-  pipe(
-    O.fromNullable(jwk.kid),
-    O.fold(
-      () => RTE.right(jwk),
-      (kid) =>
-        pipe(
-          kid,
-          getCertificateChainByKid,
-          RTE.map(
-            flow(
-              O.map((chain) => ({ ...jwk, x5c: chain })),
-              O.getOrElse(() => jwk),
-            ),
-          ),
-        ),
-    ),
-  );
 
 // Create the JWT payload for the entity configuration metadata and return the signed JWT
 const createEntityConfiguration: RTE.ReaderTaskEither<
@@ -57,37 +29,38 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   Error,
   string
 > = ({
-  certificateRepository,
+  cryptographyClient,
   entityConfiguration: {
     authorityHints,
     federationEntity: { basePathV10: basePath, ...federationEntityMetadata },
   },
-  intermediateSigningKey,
-  intermediateSigningKeys,
-  leafSigningKeys,
+  intermediatePublishedKeyNames,
+  intermediateSigningKeyName,
+  keyRepository,
+  leafPublishedKeyNames,
 }) =>
   pipe(
-    {
-      intermediatePublicJwks: intermediateSigningKeys.map(toPublicJwk),
-      leafPublicJwks: leafSigningKeys.map(toPublicJwk),
-    },
-    ({ intermediatePublicJwks, leafPublicJwks }) =>
+    sequenceS(TE.ApplyPar)({
+      intermediatePublishedKeys: pipe(
+        intermediatePublishedKeyNames,
+        TE.traverseArray((keyName) => getKey(keyName)({ keyRepository })),
+      ),
+      leafPublishedKeys: pipe(
+        leafPublishedKeyNames,
+        TE.traverseArray((keyName) => getKey(keyName)({ keyRepository })),
+      ),
+    }),
+    TE.chain(({ intermediatePublishedKeys, leafPublishedKeys }) =>
       pipe(
-        intermediatePublicJwks,
-        TE.traverseArray((jwk) =>
-          // TODO [SIW-2719]: Add certificate chain validation and ensure the system handles any issues appropriately
-          pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
+        intermediatePublishedKeys.find(
+          ({ keyName }) => keyName === intermediateSigningKeyName,
         ),
-        TE.bindTo("intermediateJwksWithX5c"),
-        TE.bind("leafJwksWithX5c", () =>
-          pipe(
-            leafPublicJwks,
-            TE.traverseArray((jwk) =>
-              pipe({ certificateRepository }, addCertificateChainToJwk(jwk)),
-            ),
+        TE.fromNullable(
+          new Error(
+            `Intermediate signing key "${intermediateSigningKeyName}" not found in published keys`,
           ),
         ),
-        TE.chain(({ intermediateJwksWithX5c, leafJwksWithX5c }) =>
+        TE.chain((intermediateSigningKey) =>
           pipe(
             {
               authorityHints,
@@ -100,7 +73,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                 tosUri: federationEntityMetadata.tosUri,
               },
               iss: basePath,
-              jwks: [...intermediateJwksWithX5c],
+              jwks: intermediatePublishedKeys.map(withX5c),
               sub: basePath,
               walletProviderMetadata: {
                 ascValues: [
@@ -108,22 +81,25 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                   pipe(basePath, getLoAUri(LoA.medium)),
                   pipe(basePath, getLoAUri(LoA.high)),
                 ],
-                jwks: [...leafJwksWithX5c],
+                jwks: leafPublishedKeys.map(withX5c),
               },
             },
             EntityConfigurationToJwtModel.encode,
             (payload) =>
-              signJwt(intermediateSigningKey)({
+              signJwt({
                 // TODO: SIW-2656. env var are not used
-                duration: "24h",
+                crv: intermediateSigningKey.crv,
+                duration: 24 * 60 * 60,
                 header: {
+                  kid: intermediateSigningKey.kid,
                   typ: "entity-statement+jwt",
                 },
                 payload,
-              }),
+              })({ cryptographyClient }),
           ),
         ),
       ),
+    ),
   );
 
 const purgeContent: () => RTE.ReaderTaskEither<

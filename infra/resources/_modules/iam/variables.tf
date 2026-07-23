@@ -41,6 +41,7 @@ variable "admin_ids" {
 
 variable "key_vault_app" {
   type = object({
+    id                  = string
     name                = string
     resource_group_name = string
   })

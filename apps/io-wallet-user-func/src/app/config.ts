@@ -150,11 +150,18 @@ type AzureApplicationInsightsConfig = t.TypeOf<
   typeof AzureApplicationInsightsConfig
 >;
 
+const AzureKeyVaultConfig = t.type({
+  url: NonEmptyString,
+});
+
+type AzureKeyVaultConfig = t.TypeOf<typeof AzureKeyVaultConfig>;
+
 const AzureConfig = t.type({
   applicationInsights: AzureApplicationInsightsConfig,
   cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
+  keyVault: AzureKeyVaultConfig,
   storage: AzureStorageConfig,
 });
 
@@ -265,20 +272,21 @@ const WalletProviderConfig = t.type({
     locality: t.string,
     state: t.string,
   }),
-  intermediateSigningKey: SupportedECPrivateKeyWithKid,
-  intermediateSigningKeys: t.array(SupportedECPrivateKeyWithKid),
-  leafResolvedSigningKeys: t.type({
-    keyAttestation: SupportedECPrivateKeyWithKid,
-    tokenStatusList: SupportedECPrivateKeyWithKid,
-    walletAttestation: SupportedECPrivateKeyWithKid,
-    walletInstanceAttestation: SupportedECPrivateKeyWithKid,
-  }),
-  leafSigningKeys: t.array(SupportedECPrivateKeyWithKid),
+  intermediatePublishedKeyNames: t.array(t.string),
+  intermediateSigningKeyName: t.string,
+  keyAttestationPublishedKeyNames: t.array(t.string),
+  keyAttestationSigningKeyName: t.string,
+  tokenStatusListPublishedKeyNames: t.array(t.string),
+  tokenStatusListSigningKeyName: t.string,
   walletAttestation: t.type({
     oauthClientSub: t.string,
     walletLink: t.string,
     walletName: t.string,
   }),
+  walletAttestationKeyName: t.string,
+  walletAttestationSigningKey: SupportedECPrivateKeyWithKid,
+  walletInstanceAttestationPublishedKeyNames: t.array(t.string),
+  walletInstanceAttestationSigningKeyName: t.string,
 });
 
 type WalletProviderConfig = t.TypeOf<typeof WalletProviderConfig>;
@@ -308,6 +316,14 @@ const getSigningKeyByKid = (jwks: ECPrivateKeyWithKid[], kid: string) =>
     jwks,
     A.findFirst((key) => key.kid === kid),
     E.fromOption(() => new Error(`No signing key found for kid ${kid}`)),
+  );
+
+const readCommaSeparatedStringArrayFromEnvironment = (name: string) =>
+  pipe(
+    name,
+    readFromEnvironment,
+    RE.map((value) => value.split(",").map((item) => item.trim())),
+    RE.map(A.filter((item) => item.length > 0)),
   );
 
 const getEntityConfigurationFromEnvironment: RE.ReaderEither<
@@ -531,6 +547,17 @@ const getAzureGenericConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(parse(AzureGenericConfig)),
 );
 
+const getAzureKeyVaultConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureKeyVaultConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    url: readFromEnvironment("KeyVaultUrl"),
+  }),
+  RE.chainEitherKW(parse(AzureKeyVaultConfig)),
+);
+
 export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -540,6 +567,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   cosmos: getAzureCosmosConfigFromEnvironment,
   frontDoor: getAzureFrontDoorConfigFromEnvironment,
   generic: getAzureGenericConfigFromEnvironment,
+  keyVault: getAzureKeyVaultConfigFromEnvironment,
   storage: getAzureStorageConfigFromEnvironment,
 });
 
@@ -679,16 +707,33 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       "WalletProviderCertificateLocality",
     ),
     certificateState: readFromEnvironment("WalletProviderCertificateState"),
-    intermediateSigningKeyId: readFromEnvironment("FederationEntityKeyId"),
-    intermediateSigningKeys: readJwksFromEnvironment(
-      "WalletProviderIntermediateSigningKeys",
+    intermediatePublishedKeyNames: readCommaSeparatedStringArrayFromEnvironment(
+      "IntermediatePublishedKeyNames",
     ),
-    keyAttestationKeyId: readFromEnvironment("KeyAttestationKeyId"),
-    leafSigningKeys: readJwksFromEnvironment("WalletProviderLeafSigningKeys"),
-    tokenStatusListKeyId: readFromEnvironment("TokenStatusListKeyId"),
+    intermediateSigningKeyName: readFromEnvironment(
+      "IntermediateSigningKeyName",
+    ),
+    keyAttestationPublishedKeyNames:
+      readCommaSeparatedStringArrayFromEnvironment(
+        "KeyAttestationPublishedKeyNames",
+      ),
+    keyAttestationSigningKeyName: readFromEnvironment(
+      "KeyAttestationSigningKeyName",
+    ),
+    tokenStatusListPublishedKeyNames:
+      readCommaSeparatedStringArrayFromEnvironment(
+        "TokenStatusListPublishedKeyNames",
+      ),
+    tokenStatusListSigningKeyName: readFromEnvironment(
+      "TokenStatusListSigningKeyName",
+    ),
     walletAttestationKeyId: readFromEnvironment("WalletAttestationKeyId"),
+    walletAttestationKeyName: readFromEnvironment("WalletAttestationKeyName"),
     walletAttestationOauthClientSub: readFromEnvironment(
       "WalletAttestationOauthClientSub",
+    ),
+    walletAttestationSigningKeys: readJwksFromEnvironment(
+      "WalletAttestationSigningKeys",
     ),
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
@@ -696,8 +741,12 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletAttestationWalletName: readFromEnvironment(
       "WalletAttestationWalletName",
     ),
-    walletInstanceAttestationKeyId: readFromEnvironment(
-      "WalletInstanceAttestationKeyId",
+    walletInstanceAttestationPublishedKeyNames:
+      readCommaSeparatedStringArrayFromEnvironment(
+        "WalletInstanceAttestationPublishedKeyNames",
+      ),
+    walletInstanceAttestationSigningKeyName: readFromEnvironment(
+      "WalletInstanceAttestationSigningKeyName",
     ),
   }),
   RE.map(
@@ -705,78 +754,78 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       certificateCountry,
       certificateLocality,
       certificateState,
-      intermediateSigningKeyId,
-      intermediateSigningKeys,
-      keyAttestationKeyId,
-      leafSigningKeys,
-      tokenStatusListKeyId,
+      intermediatePublishedKeyNames,
+      intermediateSigningKeyName,
+      keyAttestationPublishedKeyNames,
+      keyAttestationSigningKeyName,
+      tokenStatusListPublishedKeyNames,
+      tokenStatusListSigningKeyName,
       walletAttestationKeyId,
+      walletAttestationKeyName,
       walletAttestationOauthClientSub,
+      walletAttestationSigningKeys,
       walletAttestationWalletLink,
       walletAttestationWalletName,
-      walletInstanceAttestationKeyId,
+      walletInstanceAttestationPublishedKeyNames,
+      walletInstanceAttestationSigningKeyName,
     }) => ({
       certificate: {
         country: certificateCountry,
         locality: certificateLocality,
         state: certificateState,
       },
-      intermediateSigningKeyId,
-      intermediateSigningKeys,
-      keyAttestationKeyId,
-      leafSigningKeys,
-      tokenStatusListKeyId,
+      intermediatePublishedKeyNames,
+      intermediateSigningKeyName,
+      keyAttestationPublishedKeyNames,
+      keyAttestationSigningKeyName,
+      tokenStatusListPublishedKeyNames,
+      tokenStatusListSigningKeyName,
       walletAttestation: {
         oauthClientSub: walletAttestationOauthClientSub,
         walletLink: walletAttestationWalletLink,
         walletName: walletAttestationWalletName,
       },
       walletAttestationKeyId,
-      walletInstanceAttestationKeyId,
+      walletAttestationKeyName,
+      walletAttestationSigningKeys,
+      walletInstanceAttestationPublishedKeyNames,
+      walletInstanceAttestationSigningKeyName,
     }),
   ),
   RE.chainEitherKW(
     ({
       certificate,
-      intermediateSigningKeyId,
-      intermediateSigningKeys,
-      keyAttestationKeyId,
-      leafSigningKeys,
-      tokenStatusListKeyId,
+      intermediatePublishedKeyNames,
+      intermediateSigningKeyName,
+      keyAttestationPublishedKeyNames,
+      keyAttestationSigningKeyName,
+      tokenStatusListPublishedKeyNames,
+      tokenStatusListSigningKeyName,
       walletAttestation,
       walletAttestationKeyId,
-      walletInstanceAttestationKeyId,
+      walletAttestationKeyName,
+      walletAttestationSigningKeys,
+      walletInstanceAttestationPublishedKeyNames,
+      walletInstanceAttestationSigningKeyName,
     }) =>
       pipe(
-        sequenceS(E.Apply)({
-          intermediateSigningKey: getSigningKeyByKid(
-            intermediateSigningKeys,
-            intermediateSigningKeyId,
-          ),
-          keyAttestation: getSigningKeyByKid(
-            leafSigningKeys,
-            keyAttestationKeyId,
-          ),
-          tokenStatusList: getSigningKeyByKid(
-            leafSigningKeys,
-            tokenStatusListKeyId,
-          ),
-          walletAttestation: getSigningKeyByKid(
-            leafSigningKeys,
-            walletAttestationKeyId,
-          ),
-          walletInstanceAttestation: getSigningKeyByKid(
-            leafSigningKeys,
-            walletInstanceAttestationKeyId,
-          ),
-        }),
-        E.map(({ intermediateSigningKey, ...leafResolvedSigningKeys }) => ({
+        getSigningKeyByKid(
+          walletAttestationSigningKeys,
+          walletAttestationKeyId,
+        ),
+        E.map((walletAttestationSigningKey) => ({
           certificate,
-          intermediateSigningKey,
-          intermediateSigningKeys,
-          leafResolvedSigningKeys,
-          leafSigningKeys,
+          intermediatePublishedKeyNames,
+          intermediateSigningKeyName,
+          keyAttestationPublishedKeyNames,
+          keyAttestationSigningKeyName,
+          tokenStatusListPublishedKeyNames,
+          tokenStatusListSigningKeyName,
           walletAttestation,
+          walletAttestationKeyName,
+          walletAttestationSigningKey,
+          walletInstanceAttestationPublishedKeyNames,
+          walletInstanceAttestationSigningKeyName,
         })),
       ),
   ),

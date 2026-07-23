@@ -2,13 +2,13 @@ import { Document, IssuerSignedDocument } from "@auth0/mdl";
 import { cborEncode as encode } from "@auth0/mdl/lib/cbor";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
-import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { ECPrivateKeyWithKid, JwkPrivateKey } from "io-wallet-common/jwk";
 
-import { CertificateRepository } from "./certificates";
 import { WalletAttestationData } from "./encoders/wallet-attestation";
+import { SignJwtEnvironment } from "./infra/crypto/signer";
+import { getKey, KeyRepository } from "./keys";
 import { WalletAttestationEnvironment } from "./wallet-attestation";
 
 const docType = "org.iso.18013.5.1.IT.WalletAttestation";
@@ -77,30 +77,27 @@ const createCborEncodedMDoc =
   ): ((
     dep: WalletAttestationMdocEnvironment,
   ) => TE.TaskEither<Error, Buffer<ArrayBufferLike>>) =>
-  ({ certificateRepository, walletAttestationSigningKey }) =>
+  ({ keyRepository, walletAttestationKeyName, walletAttestationSigningKey }) =>
     pipe(
-      certificateRepository.getCertificateChainByKid(walletAttestationData.kid),
-      TE.chain(
-        flow(
-          O.match(
-            () => TE.left(new Error("Certificate chain not found")),
-            (issuerCertificate) =>
-              pipe(
-                {
-                  issuerCertificate,
-                  issuerPrivateKey: walletAttestationSigningKey,
-                  walletAttestationData,
-                },
-                createDocument,
-                TE.chain(flow(cborEncode, TE.fromEither)),
-              ),
-          ),
+      { keyRepository },
+      getKey(walletAttestationKeyName),
+      TE.chain(({ certificateChain: issuerCertificate }) =>
+        pipe(
+          {
+            issuerCertificate,
+            issuerPrivateKey: walletAttestationSigningKey,
+            walletAttestationData,
+          },
+          createDocument,
+          TE.chain(flow(cborEncode, TE.fromEither)),
         ),
       ),
     );
 
-interface WalletAttestationMdocEnvironment extends WalletAttestationEnvironment {
-  certificateRepository: CertificateRepository;
+interface WalletAttestationMdocEnvironment
+  extends SignJwtEnvironment, WalletAttestationEnvironment {
+  keyRepository: KeyRepository;
+  walletAttestationKeyName: string;
   walletAttestationSigningKey: ECPrivateKeyWithKid;
 }
 

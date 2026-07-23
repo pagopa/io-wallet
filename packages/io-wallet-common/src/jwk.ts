@@ -28,6 +28,16 @@ const ECPrivateKey = t.intersection([
 
 type ECPrivateKey = t.TypeOf<typeof ECPrivateKey>;
 
+const ECKeyWithKid = t.intersection([
+  ECKey,
+  t.type({
+    kid: t.string,
+  }),
+]);
+
+export type ECKeyWithKid = t.TypeOf<typeof ECKeyWithKid>;
+
+// TODO: can be removed when wallet attestation is removed
 export const ECPrivateKeyWithKid = t.intersection(
   [ECPrivateKey, t.type({ kid: t.string })],
   "ECPrivateKeyWithKid",
@@ -74,6 +84,7 @@ export type JwkPublicKey = t.TypeOf<typeof JwkPublicKey>;
 /**
  * The Private Key JWK type. It could be either an ECPrivateKey or an RSAPrivateKey.
  */
+// TODO: can be removed when wallet attestation is removed
 export const JwkPrivateKey = t.union(
   [RSAPrivateKey, ECPrivateKey],
   "JwkPrivateKey",
@@ -83,8 +94,8 @@ export type JwkPrivateKey = t.TypeOf<typeof JwkPrivateKey>;
 /**
  * A generic JWK. It could be either an ECPrivateKey,RSAPrivateKey,ECKey or RSAKey.
  */
-export const Jwk = t.union([JwkPublicKey, JwkPrivateKey], "Jwk");
-export type Jwk = t.TypeOf<typeof Jwk>;
+const Jwk = t.union([JwkPublicKey, JwkPrivateKey], "Jwk");
+type Jwk = t.TypeOf<typeof Jwk>;
 
 export const fromBase64ToJwks = (b64: string) =>
   pipe(
@@ -105,3 +116,12 @@ export const areJwksEqual = async (
 
   return leftThumb === rightThumb;
 };
+
+export const PublicKeyWithKid = t.intersection([
+  ECKey,
+  t.type({
+    kid: t.string,
+  }),
+]);
+
+export type PublicKeyWithKid = t.TypeOf<typeof PublicKeyWithKid>;

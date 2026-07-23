@@ -287,6 +287,7 @@ module "iam" {
   }
 
   key_vault_app = {
+    id                  = module.key_vault_app.key_vault_wallet.id
     name                = module.key_vault_app.key_vault_wallet.name
     resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
   }
