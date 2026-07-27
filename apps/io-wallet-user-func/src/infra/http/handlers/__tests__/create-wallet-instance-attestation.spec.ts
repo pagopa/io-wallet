@@ -418,6 +418,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         wallet_instance_attestation: t.string,
       })
       .decode(result.right.body);
+
     expect(E.isRight(body)).toBe(true);
     if (E.isLeft(body)) {
       throw new Error("Invalid response body");
