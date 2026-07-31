@@ -2,6 +2,8 @@ import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
+import { CertificateClient } from "@azure/keyvault-certificates";
+import { CryptographyClient, KeyClient } from "@azure/keyvault-keys";
 import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
@@ -16,6 +18,7 @@ import { SlackNotificationService } from "io-wallet-common/infra/slack/notificat
 import { getCrlFromUrl } from "@/certificates";
 import { AzureMonitorLogsStatusListAllocationConflictRepository } from "@/infra/azure/applicationinsights/status-list-allocation-conflict";
 import { CosmosDbCertificateRepository } from "@/infra/azure/cosmos/certificate";
+import { CosmosDbKeyRepository } from "@/infra/azure/cosmos/key";
 import { CosmosDbNonceRepository } from "@/infra/azure/cosmos/nonce";
 import { CosmosDbOpenStatusListsPolicyRepository } from "@/infra/azure/cosmos/open-status-lists-policy";
 import { CosmosDbStatusListCatalogRepository } from "@/infra/azure/cosmos/status-list-catalog";
@@ -23,7 +26,9 @@ import { CosmosDbStatusListPagesRepository } from "@/infra/azure/cosmos/status-l
 import { CosmosDbStatusListRoutingRepository } from "@/infra/azure/cosmos/status-list-routing";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
+import { CreateIntermediateKeyFunction } from "@/infra/azure/functions/create-intermediate-key";
 import { CreateKeyAttestationFunction } from "@/infra/azure/functions/create-key-attestation";
+import { CreateLeafKeyFunction } from "@/infra/azure/functions/create-leaf-key";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
@@ -83,6 +88,12 @@ const {
 } = config.walletProvider.leafResolvedSigningKeys;
 
 const credential = new DefaultAzureCredential();
+
+const createCryptographyClient = (keyName: string) =>
+  new CryptographyClient(
+    `${config.azure.keyVault.url.replace(/\/$/, "")}/keys/${keyName}`,
+    credential,
+  );
 
 const cosmosClient = new CosmosClient({
   aadCredentials: credential,
@@ -215,6 +226,8 @@ const statusListRoutingRepository = new CosmosDbStatusListRoutingRepository(
   database,
 );
 
+const keyRepository = new CosmosDbKeyRepository(database);
+
 const statusListBitRevocation = createStatusListBitRevocation(
   statusListPagesRepository,
 );
@@ -267,6 +280,13 @@ const statusListAllocationConflictRepository =
     client: logsQueryClient,
     queryDuration: `PT${statusListManagerIntervalMinutes}M`,
   });
+
+const keyClient = new KeyClient(config.azure.keyVault.url, credential);
+
+const certificateClient = new CertificateClient(
+  config.azure.keyVault.url,
+  credential,
+);
 
 app.http("healthCheck", {
   authLevel: "anonymous",
@@ -550,4 +570,27 @@ app.cosmosDB("revokeWalletInstances", {
     statusListBitRevocation,
   }),
   leaseContainerName: "leases-revoke-wallet-instances",
+});
+
+app.http("createLeafKey", {
+  authLevel: "function",
+  handler: CreateLeafKeyFunction({
+    createCryptographyClient,
+    cryptoProvider: new Crypto(),
+    keyClient,
+    keyRepository,
+  }),
+  methods: ["POST"],
+  route: "leaf-keys",
+});
+
+app.http("createIntermediateKey", {
+  authLevel: "function",
+  handler: CreateIntermediateKeyFunction({
+    certificateClient,
+    keyClient,
+    keyRepository,
+  }),
+  methods: ["POST"],
+  route: "intermediate-keys",
 });

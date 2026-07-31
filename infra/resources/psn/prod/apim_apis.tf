@@ -53,6 +53,17 @@ resource "azurerm_api_management_named_value" "func_user_pdnd_key" {
   }
 }
 
+resource "azurerm_api_management_named_value" "func_user_entity_intermediate_ca_key" {
+  name                = "user-func-entity-intermediate-ca-key"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "UserEntityIntermediateCAFunctionKey"
+  secret              = true
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_entity_intermediate_ca_fn_key.versionless_id
+  }
+}
+
 resource "azurerm_api_management_backend" "func_support" {
   name                = "function-support-01"
   description         = "Function App Support Backend"
@@ -105,6 +116,19 @@ resource "azurerm_api_management_product" "public" {
   approval_required     = false
 }
 
+resource "azurerm_api_management_product" "admin" {
+  product_id   = "internal-wallet-admin"
+  display_name = "Internal Wallet Administration"
+  description  = "Product for internal IT-Wallet administrative APIs"
+
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+
+  published             = true
+  subscription_required = true
+  approval_required     = true
+}
+
 resource "azurerm_api_management_api_version_set" "user_ioapp" {
   name                = "wallet-user-ioapp-apis"
   api_management_name = module.apim.name
@@ -150,6 +174,22 @@ resource "azurerm_api_management_api_version_set" "support" {
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
   display_name        = "Wallet Customer Support"
+  versioning_scheme   = "Segment"
+}
+
+resource "azurerm_api_management_api_version_set" "entity_intermediate_ca" {
+  name                = "entity-intermediate-ca-management-apis"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "Entity Intermediate CA Management"
+  versioning_scheme   = "Segment"
+}
+
+resource "azurerm_api_management_api_version_set" "entity_intermediate_ca_uat" {
+  name                = "entity-intermediate-ca-uat-management-apis"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "Entity Intermediate CA Management UAT"
   versioning_scheme   = "Segment"
 }
 
@@ -213,6 +253,48 @@ resource "azurerm_api_management_api" "user_pdnd_v1" {
   import {
     content_format = "openapi"
     content_value  = file("${path.module}/apim/api/pdnd/swagger.yaml")
+  }
+}
+
+resource "azurerm_api_management_api" "entity_intermediate_ca_v1" {
+  name                  = "entity-intermediate-ca-management-api-v1"
+  api_management_name   = module.apim.name
+  resource_group_name   = module.apim.resource_group_name
+  subscription_required = true
+
+  version_set_id = azurerm_api_management_api_version_set.entity_intermediate_ca.id
+  version        = "v1"
+  revision       = 1
+
+  description  = "Internal administrative APIs for Entity Intermediate CA certificate management"
+  display_name = "Entity Intermediate CA Management API"
+  path         = "api/wallet/entity-intermediate-ca"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/apim/api/entity-intermediate-ca/swagger.yaml")
+  }
+}
+
+resource "azurerm_api_management_api" "entity_intermediate_ca_uat_v1" {
+  name                  = "entity-intermediate-ca-uat-management-api-v1"
+  api_management_name   = module.apim.name
+  resource_group_name   = module.apim.resource_group_name
+  subscription_required = true
+
+  version_set_id = azurerm_api_management_api_version_set.entity_intermediate_ca_uat.id
+  version        = "v1"
+  revision       = 1
+
+  description  = "Internal administrative APIs for Entity Intermediate CA certificate management in UAT"
+  display_name = "Entity Intermediate CA Management UAT API"
+  path         = "api/wallet/entity-intermediate-ca/uat"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/apim/api/entity-intermediate-ca-uat/swagger.yaml")
   }
 }
 
@@ -321,6 +403,20 @@ resource "azurerm_api_management_product_api" "support" {
   resource_group_name = module.apim.resource_group_name
 }
 
+resource "azurerm_api_management_product_api" "entity_intermediate_ca" {
+  api_name            = azurerm_api_management_api.entity_intermediate_ca_v1.name
+  product_id          = azurerm_api_management_product.admin.product_id
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+}
+
+resource "azurerm_api_management_product_api" "entity_intermediate_ca_uat" {
+  api_name            = azurerm_api_management_api.entity_intermediate_ca_uat_v1.name
+  product_id          = azurerm_api_management_product.admin.product_id
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+}
+
 resource "azurerm_api_management_tag" "support" {
   api_management_id = module.apim.id
   name              = "customer-support"
@@ -344,6 +440,11 @@ resource "azurerm_api_management_tag" "user_ioapp" {
 resource "azurerm_api_management_tag" "user_ioweb" {
   api_management_id = module.apim.id
   name              = "user-ioweb"
+}
+
+resource "azurerm_api_management_tag" "entity_intermediate_ca" {
+  api_management_id = module.apim.id
+  name              = "entity-intermediate-ca"
 }
 
 resource "azurerm_api_management_api_tag" "support_v1_support" {
@@ -394,6 +495,16 @@ resource "azurerm_api_management_api_tag" "user_ioapp_v1_ioapp" {
 resource "azurerm_api_management_api_tag" "user_uat_ioapp_v1_ioapp" {
   api_id = azurerm_api_management_api.user_uat_ioapp_v1.id
   name   = azurerm_api_management_tag.user_ioapp.name
+}
+
+resource "azurerm_api_management_api_tag" "entity_intermediate_ca_v1" {
+  api_id = azurerm_api_management_api.entity_intermediate_ca_v1.id
+  name   = azurerm_api_management_tag.entity_intermediate_ca.name
+}
+
+resource "azurerm_api_management_api_tag" "entity_intermediate_ca_uat_v1" {
+  api_id = azurerm_api_management_api.entity_intermediate_ca_uat_v1.id
+  name   = azurerm_api_management_tag.entity_intermediate_ca.name
 }
 
 resource "azurerm_api_management_api_policy" "user_ioapp_v1" {
@@ -494,6 +605,37 @@ resource "azurerm_api_management_api_policy" "support" {
   <inbound>
       <base />
       <set-backend-service backend-id="${azurerm_api_management_backend.func_support.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "entity_intermediate_ca_v1" {
+  api_name            = azurerm_api_management_api.entity_intermediate_ca_v1.name
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <base />
+      <set-header name="x-functions-key" exists-action="override">
+        <value>{{${azurerm_api_management_named_value.func_user_entity_intermediate_ca_key.display_name}}}</value>
+      </set-header>
+      <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
+  </inbound>
+</policies>
+XML
+}
+
+resource "azurerm_api_management_api_policy" "entity_intermediate_ca_uat_v1" {
+  api_name            = azurerm_api_management_api.entity_intermediate_ca_uat_v1.name
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  xml_content         = <<XML
+<policies>
+  <inbound>
+      <base />
+      <set-backend-service backend-id="${azurerm_api_management_backend.func_user_uat.name}" />
   </inbound>
 </policies>
 XML

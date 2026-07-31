@@ -150,11 +150,18 @@ type AzureApplicationInsightsConfig = t.TypeOf<
   typeof AzureApplicationInsightsConfig
 >;
 
+const AzureKeyVaultConfig = t.type({
+  url: NonEmptyString,
+});
+
+type AzureKeyVaultConfig = t.TypeOf<typeof AzureKeyVaultConfig>;
+
 const AzureConfig = t.type({
   applicationInsights: AzureApplicationInsightsConfig,
   cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
+  keyVault: AzureKeyVaultConfig,
   storage: AzureStorageConfig,
 });
 
@@ -531,6 +538,17 @@ const getAzureGenericConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(parse(AzureGenericConfig)),
 );
 
+const getAzureKeyVaultConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  AzureKeyVaultConfig
+> = pipe(
+  sequenceS(RE.Apply)({
+    url: readFromEnvironment("KeyVaultUrl"),
+  }),
+  RE.chainEitherKW(parse(AzureKeyVaultConfig)),
+);
+
 export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -540,6 +558,7 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   cosmos: getAzureCosmosConfigFromEnvironment,
   frontDoor: getAzureFrontDoorConfigFromEnvironment,
   generic: getAzureGenericConfigFromEnvironment,
+  keyVault: getAzureKeyVaultConfigFromEnvironment,
   storage: getAzureStorageConfigFromEnvironment,
 });
 
