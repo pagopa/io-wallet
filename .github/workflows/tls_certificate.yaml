@@ -102,7 +102,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
-        uses: pagopa/dx/.github/actions/slack-notification@main
+        uses: pagopa/dx/.github/actions/slack-notification@e08d8ce496df31036c9b04f42178c04947415cfc # main
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
@@ -152,7 +152,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@main
+        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # main
 
       - name: Set LE Files
         run: |
@@ -229,7 +229,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
-        uses: pagopa/dx/.github/actions/slack-notification@main
+        uses: pagopa/dx/.github/actions/slack-notification@e08d8ce496df31036c9b04f42178c04947415cfc # main
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
