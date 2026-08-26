@@ -200,28 +200,6 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
-  /certificate-chain:
-    post:
-      operationId: generateCertificateChain
-      summary: Create a certificate chain
-      security:
-        - FunctionsKey: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GenerateCertificateChainBody"
-      responses:
-        "204":
-          description: Wallet instance successfully created
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-
   /health:
     get:
       operationId: healthCheck
@@ -286,38 +264,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WalletInstanceAttestation"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
-
-  "/wallet-unit-attestations":
-    post:
-      summary: CreateWalletUnitAttestation
-      description: Create and return a Wallet Unit Attestation (WUA)
-      operationId: createWalletUnitAttestation
-      security:
-        - FunctionsKey: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateWalletUnitAttestationBody"
-      responses:
-        "200":
-          description: Wallet Unit Attestation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WalletUnitAttestation"
         "403":
           $ref: "#/components/responses/Forbidden"
         "404":
@@ -529,17 +475,6 @@ components:
         - assertion
         - fiscal_code
 
-    GenerateCertificateChainBody:
-      type: object
-      properties:
-        issuer_key_id:
-          type: string
-        subject_key:
-          $ref: "#/components/schemas/JWK"
-      required:
-        - issuer_key_id
-        - subject_key
-
     RevocationReason:
       type: string
       enum:
@@ -666,19 +601,6 @@ components:
       example:
         wallet_instance_attestation: string
 
-    CreateWalletUnitAttestationBody:
-      type: object
-      properties:
-        assertion:
-          type: string
-          minLength: 1
-          format: binary
-        fiscal_code:
-          $ref: "#/components/schemas/FiscalCode"
-      required:
-        - assertion
-        - fiscal_code
-
     CreateKeyAttestationBody:
       type: object
       properties:
@@ -701,13 +623,3 @@ components:
           type: string
       example:
         key_attestation: string
-
-    WalletUnitAttestation:
-      required:
-        - wallet_unit_attestation
-      type: object
-      properties:
-        wallet_unit_attestation:
-          type: string
-      example:
-        wallet_unit_attestation: string

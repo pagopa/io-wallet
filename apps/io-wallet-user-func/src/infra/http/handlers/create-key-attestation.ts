@@ -6,16 +6,14 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { areJwksEqual, ECKey, JwkPublicKey } from "io-wallet-common/jwk";
-import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import {
   WalletInstanceStatus,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 import { type JWTPayload } from "jose";
 
-import { CertificateRepository } from "@/certificates";
 import { FederationEntity } from "@/entity-configuration";
-import { signJwt } from "@/infra/crypto/signer";
+import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -29,6 +27,7 @@ import {
   KeyAttestationData,
   KeyAttestationToJwtModel,
 } from "@/key-attestation";
+import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { buildUrl } from "@/url";
@@ -40,30 +39,36 @@ import {
   requireKeyAttestationRequest,
 } from "../key-attestation-request";
 
-interface KeyAttestationEnvironment {
-  certificateRepository: CertificateRepository;
+interface KeyAttestationEnvironment extends SignJwtEnvironment {
   federationEntity: FederationEntity;
-  keyAttestationSigningKey: ECPrivateKeyWithKid;
+  keyAttestationSigningKeyName: string;
+  keyRepository: KeyRepository;
   statusListBaseUrl: string;
 }
 
 const signKeyAttestation =
   ({
+    crv,
+    kid,
     payload,
     x5c,
   }: {
+    crv: string;
+    kid: string;
     payload: JWTPayload;
     x5c: string[];
   }): RTE.ReaderTaskEither<KeyAttestationEnvironment, Error, string> =>
-  ({ keyAttestationSigningKey }) =>
-    signJwt(keyAttestationSigningKey)({
-      duration: "1y",
+  ({ cryptographyClient }) =>
+    signJwt({
+      crv,
+      duration: 365 * 24 * 60 * 60,
       header: {
+        kid,
         typ: "key-attestation+jwt",
         x5c,
       },
       payload,
-    });
+    })({ cryptographyClient });
 
 const getKeyAttestationData =
   ({
@@ -82,19 +87,18 @@ const getKeyAttestationData =
     KeyAttestationData
   > =>
   ({
-    certificateRepository,
     federationEntity: { basePathV13: basePath },
-    keyAttestationSigningKey,
+    keyAttestationSigningKeyName,
+    keyRepository,
     statusListBaseUrl,
   }) =>
     pipe(
-      certificateRepository.getCertificateChainByKid(
-        keyAttestationSigningKey.kid,
-      ),
-      TE.chain(TE.fromOption(() => new Error("Certificate chain not found"))),
-      TE.map((x5c) => ({
+      { keyRepository },
+      getKey(keyAttestationSigningKeyName),
+      TE.map((signingKey) => ({
         attestedKeys,
-        kid: keyAttestationSigningKey.kid,
+        crv: signingKey.crv,
+        kid: signingKey.kid,
         platform,
         status: {
           statusList: {
@@ -104,7 +108,7 @@ const getKeyAttestationData =
         },
         walletProviderName: basePath.href,
         // walletSolutionVersion,
-        x5c,
+        x5c: signingKey.certificateChain,
       })),
     );
 
@@ -173,7 +177,12 @@ const generateKeyAttestation: (request: {
       pipe(
         KeyAttestationToJwtModel.encode(keyAttestationData),
         ({ x5c, ...payload }) =>
-          signKeyAttestation({ payload: { ...payload }, x5c }),
+          signKeyAttestation({
+            crv: keyAttestationData.crv,
+            kid: keyAttestationData.kid,
+            payload,
+            x5c,
+          }),
       ),
     ),
   );

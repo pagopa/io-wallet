@@ -22,10 +22,12 @@ import * as t from "io-ts";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
+import type { SignJwtEnvironment } from "@/infra/crypto/signer";
+
 import { AttestationService } from "@/attestation-service";
-import { CertificateRepository } from "@/certificates";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
+import { KeyRepository } from "@/keys";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
@@ -201,6 +203,11 @@ const walletAttestationConfig = {
 
 const walletAttestationSigningKey = privateEcKey;
 
+const cryptographyClient: SignJwtEnvironment["cryptographyClient"] = {
+  signData: (algorithm) =>
+    Promise.resolve({ algorithm, result: new Uint8Array(64) }),
+};
+
 const mockAttestationService: AttestationService = {
   getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
   validateAssertion: () => TE.right(undefined),
@@ -236,9 +243,17 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
-const certificateRepository: CertificateRepository = {
-  getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
-  insertCertificateChain: () => TE.right(undefined),
+const walletAttestationKeyName = "wallet-attestation-key-name";
+
+const keyRepository: KeyRepository = {
+  getKeyByName: () =>
+    TE.right(
+      O.some({
+        ...publicEcKey,
+        certificateChain: ["cert1", "cert2"],
+        keyName: walletAttestationKeyName,
+      }),
+    ),
 };
 
 const data = Buffer.from(assertion, "base64");
@@ -284,13 +299,15 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -317,13 +334,15 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -377,13 +396,15 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -448,13 +469,15 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a correctly encoded mdoc cbor on success", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -559,21 +582,22 @@ describe("CreateWalletAttestationHandler", async () => {
     await expect(newIssuerAuth.verify(publicKey)).resolves.toBe(true);
   });
 
-  it("should return a 500 HTTP response when getCertificateChainByKid returns an error", async () => {
-    const certificateRepositoryError: CertificateRepository = {
-      getCertificateChainByKid: () => TE.left(new Error()),
-      insertCertificateChain: () => TE.right(undefined),
+  it("should return a 500 HTTP response when getKeyByName returns an error", async () => {
+    const keyRepositoryError: KeyRepository = {
+      getKeyByName: () => TE.left(new Error()),
     };
 
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository: certificateRepositoryError,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository: keyRepositoryError,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -589,21 +613,22 @@ describe("CreateWalletAttestationHandler", async () => {
     });
   });
 
-  it("should return a 500 HTTP response when getCertificateChainByKid returns an O.none", async () => {
-    const certificateRepositoryNone: CertificateRepository = {
-      getCertificateChainByKid: () => TE.right(O.none),
-      insertCertificateChain: () => TE.right(undefined),
+  it("should return a 500 HTTP response when getKeyByName returns an O.none", async () => {
+    const keyRepositoryNone: KeyRepository = {
+      getKeyByName: () => TE.right(O.none),
     };
 
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository: certificateRepositoryNone,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository: keyRepositoryNone,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -629,13 +654,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -677,13 +704,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
@@ -719,13 +748,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
@@ -772,13 +803,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationServiceExternalServiceError,
-      certificateRepository,
+      cryptographyClient,
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
+      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });

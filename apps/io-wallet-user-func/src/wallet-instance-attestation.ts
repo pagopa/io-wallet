@@ -6,6 +6,7 @@ import type { SignAlgorithm } from "./infra/crypto/signer";
 import { removeTrailingSlash } from "./url";
 
 export interface WalletInstanceAttestationData {
+  crv: string;
   jwk: JwkPublicKey;
   jwkAlg: SignAlgorithm;
   kid: string;
