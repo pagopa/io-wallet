@@ -107,13 +107,6 @@ resource "azurerm_subnet_route_table_association" "support_func" {
   route_table_id = var.subnet_route_table_id
 }
 
-resource "azurerm_subnet_route_table_association" "whitelist_func" {
-  count = var.subnet_route_table_id == null ? 0 : 1
-
-  subnet_id      = data.azurerm_subnet.func_whitelist[0].id
-  route_table_id = var.subnet_route_table_id
-}
-
 resource "azurerm_subnet_route_table_association" "user_func_uat" {
   count = var.subnet_route_table_id == null ? 0 : 1
 
