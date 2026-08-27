@@ -50,7 +50,7 @@ resource "azurerm_subnet" "func_support" {
   }
 }
 
-resource "azurerm_subnet" "func_whitelist" {
+data "azurerm_subnet" "func_whitelist" {
   count = var.subnet_route_table_id == null ? 0 : 1
 
   name = provider::dx::resource_name(merge(
@@ -64,16 +64,6 @@ resource "azurerm_subnet" "func_whitelist" {
 
   resource_group_name  = var.virtual_network.resource_group_name
   virtual_network_name = var.virtual_network.name
-
-  address_prefixes = [var.cidr_subnet_whitelist_func]
-
-  delegation {
-    name = "default"
-    service_delegation {
-      name    = "Microsoft.Web/serverFarms"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
-    }
-  }
 }
 
 resource "azurerm_subnet" "func_user_uat" {
@@ -120,7 +110,7 @@ resource "azurerm_subnet_route_table_association" "support_func" {
 resource "azurerm_subnet_route_table_association" "whitelist_func" {
   count = var.subnet_route_table_id == null ? 0 : 1
 
-  subnet_id      = azurerm_subnet.func_whitelist[0].id
+  subnet_id      = data.azurerm_subnet.func_whitelist[0].id
   route_table_id = var.subnet_route_table_id
 }
 

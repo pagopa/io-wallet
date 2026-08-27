@@ -36,9 +36,10 @@ locals {
     GooglePublicKeys                 = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFyN2JIZ2l1eHB3SHNLN1F1aTh4VQpGbU9yNzVndk1zZC9kVEVEREpkU1N4dGY2QW43eHlxcFJSOTBQTDJhYnhNMWRFcWxYbmYydHF3MU5lNFh3bDVqCmxSZmRuSkxtTjBwVHkvNGxqNC83dHYwU2szaWlLa3lwbkVVdFI2V2ZNZ0gwUVpmS0hNMStkaSt5OVRGUnR2NnkKLy8wcmIrVCtXOGE5bnNOTC9nZ2puYXI4NjQ2MXFPMHJPczJjWGpwM2tPRzFGRUo1TVZtRm1CR3RucktwYTczWApwWHlUcVJ4Qi9NMG4xbi9XOW5HcUM0RlNZYTA0VDZONVJJWkdCTjJ6Mk1UNUlLR2JGbGJDOFVyVzBEeFc3QVlJCm1RUWNIdEdsL20wMFFMVld1dEhRb1ZKWW5GUGxYVGNIWXZBU0x1K1JoaHNiRG14TWdKSjBtY0RwdnNDNFBqdkIKK1R4eXdFbGdTNzB2RTBYbUxEK09KdHZzQnNsSFp2UEJLQ09kVDBNUyt0Z1NPSWZnYSt6MVoxZzcrRFZhZ2Y3cQp1dm1hZzhqZlBpb3lLdnhuSy9FZ3NUVVZpMmdoenE4d20yN3VkL21JTTdBWTJxRU9SUjhHbzNUVkI0SHpXUWdwClpydDNpNU1JbENhWTUwNEx6U1JpaWdIQ3pBUGxId3MrVzByQjVOK2VyNS8ycEpLbmZCU0RpQ2lGQVZ0Q0xPWjcKZ0xpTW0wamhPMkI2dFVYSEkvK01SUGp5MDJpNTlsSU5NUlJldjU2R0t0Y2Q5cU8vMGtVSldkWlRkQTJYb1M4MgppeFB2WnRYUXBVcHVMMTJhYis5RWFESzhaNFJISllZZkNUM1E1dk5BWGFpV1ErOFBUV20yUWdCUi9ia3dTV2MrCk5wVUZnTlBOOVB2UWk4V0VnNVVtQUdNQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==,LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVJOW9qY1U3ZlBsc0ZDanh5NklScXpnZU9vSzBiK1lzVgo5RlBReXdpeXc4RVFSVGtKOXUzcXdmbkk0REdvU0xsQnFDbFRYSmZnZkNjWnZzNjBGaWtOTUhudTRma1J6T2JmCmdEa1UyS05YZXpUOS9SUStYdk5zbHhQSHJIQ293aEdyCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
     HardwarePublicTestKey            = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMDFtMHhmNXVqUTVnMjJGdloyemJGcnZ5THg5YgpnTjJBaUxWRnRjYTJCVUh0a2dwV3Y5WUpDRElzNmxQS3hWU3NFb25QVXZPTTJVcmNNUGdwMDRZZU9nPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
 
-    WalletInstanceCreationEmailQueueName   = var.wallet_instance_creation_email_queue_name
-    WalletInstanceRevocationEmailQueueName = var.wallet_instance_revocation_email_queue_name
-    StatusListPublicationQueueName         = var.status_list_publication_queue_name
+    WalletInstanceCreationEmailQueueName                 = var.wallet_instance_creation_email_queue_name
+    WalletInstanceRevocationEmailQueueName               = var.wallet_instance_revocation_email_queue_name
+    StatusListPublicationQueueName                       = var.status_list_publication_queue_name
+    "AzureWebJobs.statusListPublicationMonitor.Disabled" = 1
 
     MailSender = "IO - l'app dei servizi pubblici <no-reply@io.italia.it>"
 
@@ -101,7 +102,6 @@ locals {
     "generateEntityConfiguration",
     "statusListManager",
     "statusListPublicationDispatcher",
-    "statusListPublicationMonitor",
     "statusListPublication",
     "revokeWalletInstances",
     "sendEmailOnWalletInstanceCreation",
@@ -203,7 +203,6 @@ locals {
     )
   }
 
-  /*
   function_app_whitelist = {
     app_settings = {
       FUNCTIONS_WORKER_PROCESS_COUNT = "1"
@@ -216,7 +215,6 @@ locals {
       StorageAccount__accountName    = var.whitelisted_fiscal_codes_storage_account_name
     }
   }
-  */
 
   function_app_support = {
     app_settings = merge({
