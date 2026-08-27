@@ -23,12 +23,14 @@ output "function_app_support" {
   }
 }
 
+/*
 output "function_app_whitelist" {
   value = {
     principal_id         = module.function_app_whitelist.function_app.function_app.principal_id
     staging_principal_id = module.function_app_whitelist.function_app.function_app.slot.principal_id
   }
 }
+*/
 
 output "function_app_user_uat" {
   value = {

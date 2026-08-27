@@ -132,6 +132,7 @@ module "func_app_user_slot" {
   ]
 }
 
+/*
 module "func_app_whitelist" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
@@ -217,6 +218,7 @@ module "func_app_whitelist_slot" {
     }
   ]
 }
+*/
 
 ### Function Support
 

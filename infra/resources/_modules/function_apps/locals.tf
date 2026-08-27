@@ -203,6 +203,7 @@ locals {
     )
   }
 
+  /*
   function_app_whitelist = {
     app_settings = {
       FUNCTIONS_WORKER_PROCESS_COUNT = "1"
@@ -215,6 +216,7 @@ locals {
       StorageAccount__accountName    = var.whitelisted_fiscal_codes_storage_account_name
     }
   }
+  */
 
   function_app_support = {
     app_settings = merge({

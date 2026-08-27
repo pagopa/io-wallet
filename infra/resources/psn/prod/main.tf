@@ -155,7 +155,7 @@ module "function_apps" {
   cidr_subnet_support_func   = "10.100.5.0/24"
   cidr_subnet_user_func      = "10.100.4.0/24"
   cidr_subnet_user_uat_func  = "10.100.7.0/24"
-  cidr_subnet_whitelist_func = "10.100.8.0/24"
+  cidr_subnet_whitelist_func = "10.100.9.0/24"
 
   subnet_route_table_id = data.azurerm_route_table.spoke.id
 
@@ -279,10 +279,12 @@ module "iam" {
       principal_id         = module.function_apps.function_app_support.principal_id
       staging_principal_id = module.function_apps.function_app_support.staging_principal_id
     }
+    /*
     whitelist_func = {
       principal_id         = module.function_apps.function_app_whitelist.principal_id
       staging_principal_id = module.function_apps.function_app_whitelist.staging_principal_id
     }
+    */
     user_func_uat = {
       principal_id         = module.function_apps.function_app_user_uat.principal_id
       staging_principal_id = module.function_apps.function_app_user_uat.staging_principal_id

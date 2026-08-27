@@ -1,3 +1,4 @@
+/*
 module "function_app_whitelist" {
   source  = "pagopa-dx/azure-function-app/azurerm"
   version = "~> 4.0"
@@ -34,3 +35,4 @@ module "function_app_whitelist" {
 
   tags = var.tags
 }
+*/
