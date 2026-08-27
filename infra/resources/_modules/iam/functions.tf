@@ -132,6 +132,92 @@ module "func_app_user_slot" {
   ]
 }
 
+module "func_app_whitelist" {
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 1.3"
+
+  principal_id    = var.function_app.whitelist_func.principal_id
+  subscription_id = var.subscription_id
+
+  cosmos = [
+    {
+      account_name        = var.cosmos_db.name
+      resource_group_name = var.cosmos_db.resource_group_name
+      database            = var.cosmos_db.database_name
+      description         = "Allow Function App whitelist to write fiscal codes to Cosmos DB"
+      role                = "writer"
+    }
+  ]
+
+  storage_blob = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App whitelist to read fiscal code blobs"
+      role                 = "reader"
+    }
+  ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App whitelist to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App whitelist to read messages from queues"
+      role                 = "reader"
+    }
+  ]
+}
+
+module "func_app_whitelist_slot" {
+  count = var.function_app.whitelist_func.staging_principal_id != null ? 1 : 0
+
+  source  = "pagopa-dx/azure-role-assignments/azurerm"
+  version = "~> 1.3"
+
+  principal_id    = var.function_app.whitelist_func.staging_principal_id
+  subscription_id = var.subscription_id
+
+  cosmos = [
+    {
+      account_name        = var.cosmos_db.name
+      resource_group_name = var.cosmos_db.resource_group_name
+      database            = var.cosmos_db.database_name
+      description         = "Allow Function App whitelist slot to write fiscal codes to Cosmos DB"
+      role                = "writer"
+    }
+  ]
+
+  storage_blob = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App whitelist slot to read fiscal code blobs"
+      role                 = "reader"
+    }
+  ]
+
+  storage_queue = [
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App whitelist slot to send messages to queues"
+      role                 = "writer"
+    },
+    {
+      storage_account_name = var.storage_account.name
+      resource_group_name  = var.storage_account.resource_group_name
+      description          = "Allow Function App whitelist slot to read messages from queues"
+      role                 = "reader"
+    }
+  ]
+}
+
 ### Function Support
 
 module "func_app_support" {
