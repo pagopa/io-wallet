@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pagopa/dx
-    rev: pre_commit_scripts@0.1.0
+    rev: self-hosted-runner@0.0.7
     hooks:
       - id: lock_modules
         exclude: ^.*/(_modules|modules|\.terraform)(/.*)?$
