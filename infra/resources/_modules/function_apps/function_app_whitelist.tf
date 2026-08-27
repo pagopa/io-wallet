@@ -1,4 +1,3 @@
-/*
 module "function_app_whitelist" {
   source  = "pagopa-dx/azure-function-app/azurerm"
   version = "~> 4.0"
@@ -13,7 +12,7 @@ module "function_app_whitelist" {
   health_check_path   = var.health_check_path_whitelist
   node_version        = 22
 
-  subnet_id   = try(azurerm_subnet.func_whitelist[0].id, null)
+  subnet_id   = try(data.azurerm_subnet.func_whitelist[0].id, null)
   subnet_cidr = var.subnet_route_table_id == null ? var.cidr_subnet_whitelist_func : null
 
   subnet_pep_id                        = var.private_endpoint_subnet_id
@@ -35,4 +34,3 @@ module "function_app_whitelist" {
 
   tags = var.tags
 }
-*/

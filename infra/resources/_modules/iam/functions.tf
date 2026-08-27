@@ -132,7 +132,6 @@ module "func_app_user_slot" {
   ]
 }
 
-/*
 module "func_app_whitelist" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
@@ -176,8 +175,6 @@ module "func_app_whitelist" {
 }
 
 module "func_app_whitelist_slot" {
-  count = var.function_app.whitelist_func.staging_principal_id != null ? 1 : 0
-
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
 
@@ -218,7 +215,6 @@ module "func_app_whitelist_slot" {
     }
   ]
 }
-*/
 
 ### Function Support
 
