@@ -206,11 +206,11 @@ locals {
   function_app_whitelist = {
     app_settings = {
       FUNCTIONS_WORKER_PROCESS_COUNT = "1"
-      BatchSize                      = "5000"
+      BatchSize                      = "10000"
       CosmosContainerName            = "whitelisted-fiscal-codes-test"
       StorageAccountContainerName    = "whitelisted-fiscal-codes"
-      BulkChunkSize                  = "50"
-      DelayMs                        = "1000"
+      BulkChunkSize                  = "200"
+      DelayMs                        = "250"
       QueueName                      = "whitelisted-fiscal-codes"
       StorageAccount__accountName    = var.whitelisted_fiscal_codes_storage_account_name
     }
