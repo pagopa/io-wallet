@@ -103,6 +103,7 @@ module "cosmos" {
   ]
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
+  log_analytics_workspace_id        = data.azurerm_log_analytics_workspace.core.id
 
   throughput = {
     wallet_instances         = 12000
@@ -327,4 +328,9 @@ module "iam" {
   appgw_identity_principal_id = data.azurerm_user_assigned_identity.app_gw.principal_id
   cdn_endpoint_id             = module.cdn.endpoint_id
   cdn_endpoint_id_uat         = module.cdn_uat.endpoint_id
+}
+
+import {
+  id = "/subscriptions/725dede2-879b-45c5-82fa-eb816875b10c/resourceGroups/iw-p-itn-wallet-rg-01/providers/Microsoft.DocumentDB/databaseAccounts/iw-p-itn-apps-cosno-01|cosno-logs-itwallet"
+  to = module.cosmos.azurerm_monitor_diagnostic_setting.cosno_apps
 }

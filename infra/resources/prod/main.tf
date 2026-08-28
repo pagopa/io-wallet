@@ -106,6 +106,7 @@ module "cosmos" {
 
   user_assigned_managed_identity_id = module.ids.psn_identity.id
   psn_service_principal_id          = data.azuread_service_principal.psn_app_id.client_id
+  log_analytics_workspace_id        = data.azurerm_application_insights.common.workspace_id
 
   tags = local.tags
 }

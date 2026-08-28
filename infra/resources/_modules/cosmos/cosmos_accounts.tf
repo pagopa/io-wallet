@@ -51,3 +51,14 @@ resource "azurerm_cosmosdb_account" "apps" {
 
   tags = var.tags
 }
+
+resource "azurerm_monitor_diagnostic_setting" "cosno_apps" {
+  name                           = "cosno-logs-itwallet"
+  target_resource_id              = azurerm_cosmosdb_account.apps.id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+  log_analytics_destination_type = "Dedicated"
+
+  enabled_log {
+    category = "DataPlaneRequests"
+  }
+}

@@ -71,3 +71,8 @@ variable "throughput" {
   description = "Max throughput (RU/s) configuration for Cosmos DB containers"
   default     = {}
 }
+
+variable "log_analytics_workspace_id" {
+  type        = string
+  description = "Id of the log analytics workspace to use for diagnostic settings"
+}
