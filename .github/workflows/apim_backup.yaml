@@ -36,7 +36,7 @@ jobs:
       - name: Cloud Login
         uses: pagopa/dx/actions/csp-login@main
 
-      - name: Back up APIM
+      - name: Backup APIM
         shell: bash
         run: |
           set -euo pipefail
