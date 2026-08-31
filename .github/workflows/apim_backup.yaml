@@ -1,12 +1,9 @@
 name: APIM Backup
 
 on:
-  # schedule:
-  #   - cron: "17 2 * * 0"
+  schedule:
+    - cron: "17 2 * * 0"
   workflow_dispatch:
-  push:
-    branches:
-      - feat-add-apim-backup-strategy # Remove after test
 
 permissions:
   contents: read
@@ -73,11 +70,11 @@ jobs:
 
           echo "APIM backup '$backup_name' completed."
 
-      # - name: Notify Slack on failure
-      #   if: failure()
-      #   uses: pagopa/dx/.github/actions/slack-notification@53f4c4a596dcfb846b933568ed5dd12fcadfd61e # main
-      #   with:
-      #     id: "APIM Backup"
-      #     title: "*APIM Backup Failure*"
-      #     text: "The backup of '${{ env.APIM_NAME }}' failed. Check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
-      #     slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Notify Slack on failure
+        if: failure()
+        uses: pagopa/dx/.github/actions/slack-notification@53f4c4a596dcfb846b933568ed5dd12fcadfd61e # main
+        with:
+          id: "APIM Backup"
+          title: "*APIM Backup Failure*"
+          text: "The backup of '${{ env.APIM_NAME }}' failed. Check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
