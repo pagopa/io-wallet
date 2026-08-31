@@ -61,7 +61,15 @@ jobs:
             --action backup \
             --ids "$apim_id" \
             --api-version "2024-05-01" \
-            --request-body "$request_body"
+            --request-body "$request_body" &
+          backup_pid=$!
+
+          while kill -0 "$backup_pid" 2>/dev/null; do
+            echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] APIM backup is still running..."
+            sleep 60
+          done
+
+          wait "$backup_pid"
 
           echo "APIM backup '$backup_name' completed."
 

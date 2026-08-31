@@ -81,7 +81,15 @@ jobs:
             --action restore \
             --ids "$apim_id" \
             --api-version "2024-05-01" \
-            --request-body "$request_body"
+            --request-body "$request_body" &
+          restore_pid=$!
+
+          while kill -0 "$restore_pid" 2>/dev/null; do
+            echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] APIM restore is still running..."
+            sleep 60
+          done
+
+          wait "$restore_pid"
 
           echo "APIM restore from '$BACKUP_NAME' completed."
 
