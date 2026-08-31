@@ -149,6 +149,18 @@ module "func_app_whitelist" {
     }
   ]
 
+  key_vault = [
+    {
+      name                = var.key_vault_app.name
+      resource_group_name = var.key_vault_app.resource_group_name
+      has_rbac_support    = true
+      description         = "Allow Function App whitelist to read secrets from Key Vault"
+      roles = {
+        secrets = "reader"
+      }
+    }
+  ]
+
   storage_blob = [
     {
       storage_account_name = var.storage_account.name
@@ -188,6 +200,18 @@ module "func_app_whitelist_slot" {
       database            = var.cosmos_db.database_name
       description         = "Allow Function App whitelist slot to write fiscal codes to Cosmos DB"
       role                = "writer"
+    }
+  ]
+
+  key_vault = [
+    {
+      name                = var.key_vault_app.name
+      resource_group_name = var.key_vault_app.resource_group_name
+      has_rbac_support    = true
+      description         = "Allow Function App whitelist slot to read secrets from Key Vault"
+      roles = {
+        secrets = "reader"
+      }
     }
   ]
 

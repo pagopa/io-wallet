@@ -205,14 +205,17 @@ locals {
 
   function_app_whitelist = {
     app_settings = {
-      FUNCTIONS_WORKER_PROCESS_COUNT = "1"
-      BatchSize                      = "10000"
-      CosmosContainerName            = "whitelisted-fiscal-codes-test"
-      StorageAccountContainerName    = "whitelisted-fiscal-codes"
-      BulkChunkSize                  = "200"
-      DelayMs                        = "250"
-      QueueName                      = "whitelisted-fiscal-codes"
-      StorageAccount__accountName    = var.whitelisted_fiscal_codes_storage_account_name
+      FUNCTIONS_WORKER_PROCESS_COUNT    = "1"
+      BatchSize                         = "10000"
+      CosmosDbEndpoint__accountEndpoint = var.cosmos_db_endpoint
+      CosmosDbDatabaseName              = var.cosmos_database_name
+      CosmosDbRequestTimeout            = "5000"
+      CosmosContainerName               = "whitelisted-fiscal-codes-test"
+      StorageAccountContainerName       = "whitelisted-fiscal-codes"
+      BulkChunkSize                     = "200"
+      DelayMs                           = "250"
+      QueueName                         = "whitelisted-fiscal-codes"
+      StorageAccount__accountName       = var.whitelisted_fiscal_codes_storage_account_name
     }
   }
 
