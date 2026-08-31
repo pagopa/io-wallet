@@ -91,3 +91,11 @@ resource "azurerm_storage_management_policy" "apim_backup_policy" {
     }
   }
 }
+
+resource "azurerm_role_assignment" "apim_backup_storage_blob_data_contributor" {
+  scope                = module.apim_backup_storage_account.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = module.apim.principal_id
+  principal_type       = "ServicePrincipal"
+  description          = "Allow APIM to create and restore backups using its managed identity"
+}
