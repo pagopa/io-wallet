@@ -206,7 +206,7 @@ locals {
   function_app_whitelist = {
     app_settings = {
       FUNCTIONS_WORKER_PROCESS_COUNT    = "1"
-      BatchSize                         = "10000"
+      BatchSize                         = "1000"
       CosmosDbEndpoint__accountEndpoint = var.cosmos_db_endpoint
       CosmosDbDatabaseName              = var.cosmos_database_name
       CosmosDbRequestTimeout            = "5000"
