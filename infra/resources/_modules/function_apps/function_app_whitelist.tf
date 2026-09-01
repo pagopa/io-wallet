@@ -23,8 +23,14 @@ module "function_app_whitelist" {
     resource_group_name = var.virtual_network.resource_group_name
   }
 
-  app_settings      = local.function_app_whitelist.app_settings
-  slot_app_settings = local.function_app_whitelist.app_settings
+  app_settings = local.function_app_whitelist.app_settings
+  slot_app_settings = merge(
+    local.function_app_whitelist.app_settings,
+    local.function_app_whitelist.slot_app_settings,
+  )
+  sticky_app_setting_names = keys(
+    local.function_app_whitelist.slot_app_settings,
+  )
 
   application_insights_connection_string   = var.application_insights_connection_string
   application_insights_sampling_percentage = 5

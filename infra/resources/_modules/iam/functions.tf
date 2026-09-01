@@ -174,14 +174,8 @@ module "func_app_whitelist" {
     {
       storage_account_name = var.storage_account.name
       resource_group_name  = var.storage_account.resource_group_name
-      description          = "Allow Function App whitelist to send messages to queues"
-      role                 = "writer"
-    },
-    {
-      storage_account_name = var.storage_account.name
-      resource_group_name  = var.storage_account.resource_group_name
-      description          = "Allow Function App whitelist to read messages from queues"
-      role                 = "reader"
+      description          = "Allow Function App whitelist to manage queues"
+      role                 = "owner"
     }
   ]
 }
@@ -228,14 +222,8 @@ module "func_app_whitelist_slot" {
     {
       storage_account_name = var.storage_account.name
       resource_group_name  = var.storage_account.resource_group_name
-      description          = "Allow Function App whitelist slot to send messages to queues"
-      role                 = "writer"
-    },
-    {
-      storage_account_name = var.storage_account.name
-      resource_group_name  = var.storage_account.resource_group_name
-      description          = "Allow Function App whitelist slot to read messages from queues"
-      role                 = "reader"
+      description          = "Allow Function App whitelist slot to manage queues"
+      role                 = "owner"
     }
   ]
 }
