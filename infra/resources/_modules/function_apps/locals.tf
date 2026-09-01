@@ -217,6 +217,10 @@ locals {
       QueueName                         = "whitelisted-fiscal-codes"
       StorageAccount__accountName       = var.whitelisted_fiscal_codes_storage_account_name
     }
+    slot_app_settings = {
+      "AzureWebJobs.enqueueWhitelistedFiscalCodes.Disabled" = 1
+      "AzureWebJobs.insertWhitelistedFiscalCodes.Disabled"  = 1
+    }
   }
 
   function_app_support = {
