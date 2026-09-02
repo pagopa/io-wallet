@@ -69,7 +69,7 @@ app.storageBlob("enqueueWhitelistedFiscalCodes", {
     inputDecoder: BufferDecoder,
     queueClient: whitelistedFiscalCodesQueueClient,
   }),
-  path: `${config.azure.storage.containerName}/fiscal-codes.csv`,
+  path: `${config.azure.storage.containerName}/{name}.csv`,
 });
 
 app.storageQueue("insertWhitelistedFiscalCodes", {

@@ -7,7 +7,7 @@
   "extensions": {
     "queues": {
       "visibilityTimeout": "00:10:00",
-      "batchSize": 1,
+      "batchSize": 10,
       "maxDequeueCount": 5
     }
   },
