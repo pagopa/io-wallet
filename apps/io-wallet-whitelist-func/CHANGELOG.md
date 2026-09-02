@@ -1,5 +1,11 @@
 # io-wallet-whitelist-func
 
+## 1.0.3
+
+### Patch Changes
+
+- be0e7bf: Updated host.json
+
 ## 1.0.2
 
 ### Patch Changes
