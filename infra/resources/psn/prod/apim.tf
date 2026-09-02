@@ -78,7 +78,7 @@ resource "azurerm_private_dns_a_record" "apim_scm_azure_api_net" {
 
 module "apim" {
   source  = "pagopa-dx/azure-api-management/azurerm"
-  version = "~> 2.1"
+  version = "~> 4.0"
 
   environment = merge(local.environment,
     {
@@ -102,6 +102,111 @@ module "apim" {
   action_group_id = module.monitoring.action_group_wallet.id
 
   use_case = "high_load"
+
+  metric_alerts = {
+    total_requests = {
+      description   = "APIM total requests exceeded 10000 in a 5-minute average. Monitor traffic and scale capacity as needed."
+      frequency     = "PT5M"
+      window_size   = "PT5M"
+      severity      = 2
+      auto_mitigate = false
+      criteria = [{
+        aggregation            = "Average"
+        metric_name            = "TotalRequests"
+        metric_namespace       = "Microsoft.ApiManagement/service"
+        operator               = "GreaterThan"
+        threshold              = 10000
+        dimension              = []
+        skip_metric_validation = false
+      }]
+      dynamic_criteria = []
+    }
+    successful_requests = {
+      description   = "APIM successful requests exceeded 9500 in a 5-minute average. Verify the success rate and service capacity remain within the expected operating range."
+      frequency     = "PT5M"
+      window_size   = "PT5M"
+      severity      = 2
+      auto_mitigate = false
+      criteria = [{
+        aggregation            = "Average"
+        metric_name            = "SuccessfulRequests"
+        metric_namespace       = "Microsoft.ApiManagement/service"
+        operator               = "GreaterThan"
+        threshold              = 9500
+        dimension              = []
+        skip_metric_validation = false
+      }]
+      dynamic_criteria = []
+    }
+    failed_requests = {
+      description   = "APIM failed requests exceeded 100 in a 5-minute average. Investigate backend and API configuration failures."
+      frequency     = "PT5M"
+      window_size   = "PT5M"
+      severity      = 2
+      auto_mitigate = false
+      criteria = [{
+        aggregation            = "Average"
+        metric_name            = "FailedRequests"
+        metric_namespace       = "Microsoft.ApiManagement/service"
+        operator               = "GreaterThan"
+        threshold              = 100
+        dimension              = []
+        skip_metric_validation = false
+      }]
+      dynamic_criteria = []
+    }
+    unauthorized_requests = {
+      description   = "APIM unauthorized requests exceeded 50 in a 5-minute average. Check authentication policies, tokens, and client configuration."
+      frequency     = "PT5M"
+      window_size   = "PT5M"
+      severity      = 2
+      auto_mitigate = false
+      criteria = [{
+        aggregation            = "Average"
+        metric_name            = "UnauthorizedRequests"
+        metric_namespace       = "Microsoft.ApiManagement/service"
+        operator               = "GreaterThan"
+        threshold              = 50
+        dimension              = []
+        skip_metric_validation = false
+      }]
+      dynamic_criteria = []
+    }
+    response_time = {
+      description   = "APIM response time exceeded 500 ms in a 5-minute average. Optimize backend performance and caching."
+      frequency     = "PT5M"
+      window_size   = "PT5M"
+      severity      = 2
+      auto_mitigate = false
+      criteria = [{
+        aggregation            = "Average"
+        metric_name            = "ResponseTime"
+        metric_namespace       = "Microsoft.ApiManagement/service"
+        operator               = "GreaterThan"
+        threshold              = 500
+        dimension              = []
+        skip_metric_validation = false
+      }]
+      dynamic_criteria = []
+    }
+    capacity = {
+      description   = "APIM capacity exceeded 80% in a 5-minute average. Scale out or upgrade the APIM tier."
+      frequency     = "PT5M"
+      window_size   = "PT5M"
+      severity      = 2
+      auto_mitigate = false
+      criteria = [{
+        aggregation            = "Average"
+        metric_name            = "Capacity"
+        metric_namespace       = "Microsoft.ApiManagement/service"
+        operator               = "GreaterThan"
+        threshold              = 80
+        dimension              = []
+        skip_metric_validation = false
+      }]
+      dynamic_criteria = []
+    }
+  }
 
   private_dns_zone_ids = {
     azure_api_net            = data.azurerm_private_dns_zone.azure_api_net.id
