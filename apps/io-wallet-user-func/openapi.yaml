@@ -222,6 +222,58 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
+  /intermediate-keys:
+    post:
+      operationId: createIntermediateKey
+      summary: Create an intermediate key
+      security:
+        - FunctionsKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateKeyBody"
+      responses:
+        "200":
+          description: Intermediate key successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyView"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+  /leaf-keys:
+    post:
+      operationId: createLeafKey
+      summary: Create a leaf key
+      security:
+        - FunctionsKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLeafKeyBody"
+      responses:
+        "200":
+          description: Leaf key successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyView"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
   /health:
     get:
       operationId: healthCheck
@@ -539,6 +591,44 @@ components:
       required:
         - issuer_key_id
         - subject_key
+
+    CreateKeyBody:
+      type: object
+      properties:
+        keyName:
+          type: string
+          minLength: 1
+      required:
+        - keyName
+
+    CreateLeafKeyBody:
+      type: object
+      properties:
+        issuerKeyName:
+          type: string
+          minLength: 1
+        leafKeyName:
+          type: string
+          minLength: 1
+      required:
+        - issuerKeyName
+        - leafKeyName
+
+    KeyView:
+      type: object
+      properties:
+        certificate_chain:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        public_key:
+          $ref: "#/components/schemas/JWK"
+      required:
+        - certificate_chain
+        - id
+        - public_key
 
     RevocationReason:
       type: string

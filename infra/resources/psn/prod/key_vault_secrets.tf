@@ -25,6 +25,15 @@ resource "azurerm_key_vault_secret" "user_ioapp_fn_key" {
   depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
 }
 
+resource "azurerm_key_vault_secret" "user_entity_intermediate_ca_fn_key" {
+  name             = "user-entity-intermediate-ca-fn-key"
+  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  value_wo         = ""
+  value_wo_version = 1
+
+  depends_on = [azurerm_role_assignment.infra_cd_kv_app_secrets_officer]
+}
+
 resource "azurerm_key_vault_secret" "user_uat_fn_default_key" {
   name             = "user-fn-uat-default-key"
   key_vault_id     = module.key_vault_app.key_vault_wallet.id

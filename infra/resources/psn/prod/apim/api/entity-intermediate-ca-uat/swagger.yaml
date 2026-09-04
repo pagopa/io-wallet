@@ -1,0 +1,158 @@
+openapi: 3.0.1
+info:
+  title: Entity Intermediate CA Management UAT API
+  description: Internal administrative APIs for Entity Intermediate CA certificate management in UAT
+  version: v1
+paths:
+  "/intermediate-keys":
+    post:
+      summary: CreateIntermediateKey
+      operationId: createIntermediateKey
+      description: Register an existing Entity Intermediate CA key and certificate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIntermediateKeyRequest"
+      responses:
+        "200":
+          description: Intermediate key successfully registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyResponse"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  "/leaf-keys":
+    post:
+      summary: CreateLeafKey
+      operationId: createLeafKey
+      description: Create a leaf key signed by the Entity Intermediate CA.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLeafKeyRequest"
+      responses:
+        "200":
+          description: Certificate successfully issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyResponse"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+components:
+  responses:
+    UnprocessableContent:
+      description: Unprocessable Content
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
+    ServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemJson"
+  schemas:
+    CreateIntermediateKeyRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        keyName:
+          type: string
+          minLength: 1
+          description: Azure Key Vault key or certificate name.
+      required:
+        - keyName
+    CreateLeafKeyRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        issuerKeyName:
+          type: string
+          minLength: 1
+          description: Entity Intermediate CA key name used to sign the leaf certificate.
+        leafKeyName:
+          type: string
+          minLength: 1
+          description: Azure Key Vault leaf key name to create.
+      required:
+        - issuerKeyName
+        - leafKeyName
+    KeyResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identifier of the generated operational leaf key.
+        public_key:
+          $ref: "#/components/schemas/PublicKey"
+        certificate_chain:
+          type: array
+          items:
+            type: string
+          minItems: 1
+      required:
+        - id
+        - public_key
+        - certificate_chain
+    PublicKey:
+      type: object
+      properties:
+        kty:
+          type: string
+          enum:
+            - EC
+        crv:
+          type: string
+        kid:
+          type: string
+        x:
+          type: string
+        y:
+          type: string
+      required:
+        - kty
+        - crv
+        - kid
+        - x
+        - y
+    ProblemJson:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          default: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
