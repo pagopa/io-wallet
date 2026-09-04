@@ -107,7 +107,7 @@ module "cosmos" {
   throughput = {
     wallet_instances         = 12000
     nonces                   = 4000
-    whitelisted_fiscal_codes = 8000
+    whitelisted_fiscal_codes = 12000
     certificates             = 10000
     uat = {
       wallet_instances         = 4000
@@ -152,9 +152,10 @@ module "function_apps" {
   resource_group_name = data.azurerm_resource_group.wallet.name
   subscription_id     = data.azurerm_subscription.current.subscription_id
 
-  cidr_subnet_support_func  = "10.100.5.0/24"
-  cidr_subnet_user_func     = "10.100.4.0/24"
-  cidr_subnet_user_uat_func = "10.100.7.0/24"
+  cidr_subnet_support_func   = "10.100.5.0/24"
+  cidr_subnet_user_func      = "10.100.4.0/24"
+  cidr_subnet_user_uat_func  = "10.100.7.0/24"
+  cidr_subnet_whitelist_func = "10.100.9.0/24"
 
   subnet_route_table_id = data.azurerm_route_table.spoke.id
 
@@ -193,19 +194,17 @@ module "function_apps" {
 
   user_func = local.user_func
 
-  health_check_path_user     = "/api/wallet/v1/health"
-  health_check_path_user_uat = "/api/wallet/v1/health"
-  health_check_path_support  = "/api/wallet/v1/health"
+  health_check_path_user      = "/api/wallet/v1/health"
+  health_check_path_user_uat  = "/api/wallet/v1/health"
+  health_check_path_support   = "/api/wallet/v1/health"
+  health_check_path_whitelist = "/api/health"
 
   wallet_instance_storage_account_url           = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
   wallet_instance_storage_account_name          = module.storage_accounts.wallet.name
-  whitelisted_fiscal_codes_queue_url            = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet.name)
   whitelisted_fiscal_codes_storage_account_name = module.storage_accounts.wallet.name
 
-  wallet_instance_storage_account_uat_name          = module.storage_accounts.wallet_uat.name
-  wallet_instance_storage_account_uat_url           = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
-  whitelisted_fiscal_codes_storage_account_uat_name = module.storage_accounts.wallet_uat.name
-  whitelisted_fiscal_codes_queue_uat_url            = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
+  wallet_instance_storage_account_uat_name = module.storage_accounts.wallet_uat.name
+  wallet_instance_storage_account_uat_url  = format("https://%s.queue.core.windows.net", module.storage_accounts.wallet_uat.name)
   federation_entity_base_path_v13_uat = format(
     "%s/%s/",
     trimsuffix(module.storage_accounts.trust_uat.primary_blob_endpoint, "/"),
@@ -279,6 +278,10 @@ module "iam" {
     support_func = {
       principal_id         = module.function_apps.function_app_support.principal_id
       staging_principal_id = module.function_apps.function_app_support.staging_principal_id
+    }
+    whitelist_func = {
+      principal_id         = module.function_apps.function_app_whitelist.principal_id
+      staging_principal_id = module.function_apps.function_app_whitelist.staging_principal_id
     }
     user_func_uat = {
       principal_id         = module.function_apps.function_app_user_uat.principal_id

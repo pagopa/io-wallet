@@ -116,14 +116,6 @@ const AzureStorageConfig = t.type({
     }),
     url: t.string,
   }),
-  whitelistedFiscalCodes: t.type({
-    batchSize: t.number,
-    containerName: t.string,
-    queue: t.type({
-      name: t.string,
-      url: t.string,
-    }),
-  }),
 });
 
 type AzureStorageConfig = t.TypeOf<typeof AzureStorageConfig>;
@@ -438,20 +430,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     walletInstanceStorageAccountUrl: readFromEnvironment(
       "WalletInstanceStorageAccountUrl",
     ),
-    whitelistedFiscalCodesBatchSize: pipe(
-      readFromEnvironment("WhitelistedFiscalCodesBatchSize"),
-      RE.orElse(() => RE.right("100")),
-      RE.chainW(stringToNumberDecoderRE),
-    ),
-    whitelistedFiscalCodesContainerName: readFromEnvironment(
-      "WhitelistedFiscalCodesContainerName",
-    ),
-    whitelistedFiscalCodesQueueName: readFromEnvironment(
-      "WhitelistedFiscalCodesQueueName",
-    ),
-    whitelistedFiscalCodesQueueUrl: readFromEnvironment(
-      "WhitelistedFiscalCodesQueueUrl",
-    ),
   }),
   RE.map(
     ({
@@ -463,10 +441,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstanceCreationEmailQueueName,
       walletInstanceRevocationEmailQueueName,
       walletInstanceStorageAccountUrl,
-      whitelistedFiscalCodesBatchSize,
-      whitelistedFiscalCodesContainerName,
-      whitelistedFiscalCodesQueueName,
-      whitelistedFiscalCodesQueueUrl,
     }) => ({
       entityConfiguration: {
         accountName: entityConfigurationStorageAccountName,
@@ -489,14 +463,6 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
           },
         },
         url: walletInstanceStorageAccountUrl,
-      },
-      whitelistedFiscalCodes: {
-        batchSize: whitelistedFiscalCodesBatchSize,
-        containerName: whitelistedFiscalCodesContainerName,
-        queue: {
-          name: whitelistedFiscalCodesQueueName,
-          url: whitelistedFiscalCodesQueueUrl,
-        },
       },
     }),
   ),
