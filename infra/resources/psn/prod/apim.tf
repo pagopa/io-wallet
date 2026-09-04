@@ -78,7 +78,7 @@ resource "azurerm_private_dns_a_record" "apim_scm_azure_api_net" {
 
 module "apim" {
   source  = "pagopa-dx/azure-api-management/azurerm"
-  version = "~> 2.1"
+  version = "~> 4.0"
 
   environment = merge(local.environment,
     {
