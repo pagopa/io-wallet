@@ -1,5 +1,11 @@
 # io-wallet-whitelist-func
 
+## 1.0.4
+
+### Patch Changes
+
+- c9bb7b6: Updated enqueueWhitelistedFiscalCodes function
+
 ## 1.0.3
 
 ### Patch Changes
