@@ -328,6 +328,9 @@ importers:
       '@azure/functions':
         specifier: 'catalog:'
         version: 4.12.0
+      '@azure/functions-extensions-blob':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@azure/identity':
         specifier: 'catalog:'
         version: 4.13.1
@@ -511,6 +514,10 @@ packages:
 
   '@azure/functions-extensions-base@0.2.0':
     resolution: {integrity: sha512-ncCkHBNQYJa93dBIh+toH0v1iSgCzSo9tr94s6SMBe7DPWREkaWh8cq33A5P4rPSFX1g5W+3SPvIzDr/6/VOWQ==}
+    engines: {node: '>=18.0'}
+
+  '@azure/functions-extensions-blob@0.3.0':
+    resolution: {integrity: sha512-yOOtdem1W988NwzwLg4IyFfZgPcx7gB+r9SAX3+Osj1HYLMqhoo3nh1FZjwKhEV6DxF/49tlxPzUpzQRFGi5YA==}
     engines: {node: '>=18.0'}
 
   '@azure/functions-opentelemetry-instrumentation@0.3.0':
@@ -5189,6 +5196,14 @@ snapshots:
       - supports-color
 
   '@azure/functions-extensions-base@0.2.0': {}
+
+  '@azure/functions-extensions-blob@0.3.0':
+    dependencies:
+      '@azure/functions-extensions-base': 0.2.0
+      '@azure/identity': 4.13.1
+      '@azure/storage-blob': 12.31.0
+    transitivePeerDependencies:
+      - supports-color
 
   '@azure/functions-opentelemetry-instrumentation@0.3.0(@opentelemetry/api@1.9.1)':
     dependencies:
