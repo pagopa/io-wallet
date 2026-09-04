@@ -212,10 +212,11 @@ locals {
       CosmosDbRequestTimeout            = "5000"
       CosmosContainerName               = "whitelisted-fiscal-codes-test"
       StorageAccountContainerName       = "whitelisted-fiscal-codes"
-      BulkChunkSize                     = "100"
-      DelayMs                           = "500"
+      BulkChunkSize                     = "150"
+      DelayMs                           = "250"
       QueueName                         = "whitelisted-fiscal-codes"
       StorageAccount__accountName       = var.whitelisted_fiscal_codes_storage_account_name
+      StorageAccount__blobServiceUri    = "https://${var.whitelisted_fiscal_codes_storage_account_name}.blob.core.windows.net"
     }
     slot_app_settings = {
       "AzureWebJobs.enqueueWhitelistedFiscalCodes.Disabled" = 1

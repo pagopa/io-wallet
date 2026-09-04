@@ -8,6 +8,7 @@
     "CosmosDbRequestTimeout": "5000",
     "CosmosContainerName": "whitelisted-fiscal-codes-test",
     "StorageAccount__accountName": "storageaccountname",
+    "StorageAccount__blobServiceUri": "https://storageaccountname.blob.core.windows.net",
     "StorageAccountContainerName": "fiscal-codes",
     "QueueName": "fiscal-codes",
     "BatchSize": "5000",
