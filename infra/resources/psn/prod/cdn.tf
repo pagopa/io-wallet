@@ -78,6 +78,14 @@ resource "azurerm_storage_container" "well_known" {
 
 # This container is intentionally public because it serves public wallet content through the CDN.
 #trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "entity_configuration_v2" {
+  name                  = "entity-configuration-v2"
+  storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "exchange" {
   name                  = "exchange"
   storage_account_id    = azurerm_storage_account.cdn.id
@@ -252,6 +260,30 @@ resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
   }
 }
 
+resource "azurerm_cdn_frontdoor_rule" "entity_configuration_v2_rewrite" {
+  name                      = "EntityConfigurationV2Rewrite"
+  cdn_frontdoor_rule_set_id = module.cdn.rule_set_id
+  order                     = 2
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = ["v2/.well-known"]
+      transforms       = []
+      negate_condition = false
+    }
+  }
+
+  actions {
+    url_rewrite_action {
+      source_pattern          = "/v2/.well-known/"
+      destination             = "/entity-configuration-v2/"
+      preserve_unmatched_path = true
+    }
+  }
+}
+
 resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite_uat" {
   name                      = "WellKnownRewrite"
   cdn_frontdoor_rule_set_id = module.cdn_uat.rule_set_id
@@ -329,7 +361,10 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "cdn_requests_error_al
       | where ResourceId == toupper("%s")
       | where Category == "AzureCdnAccessLog"
       | where tobool(column_ifexists("isReceivedFromClient_b", false)) == true
-      | where tostring(column_ifexists("requestUri_s", "")) == "https://wallet.io.pagopa.it:443/.well-known/openid-federation"
+      | where tostring(column_ifexists("requestUri_s", "")) in (
+          "https://wallet.io.pagopa.it:443/.well-known/openid-federation",
+          "https://wallet.io.pagopa.it:443/v2/.well-known/openid-federation"
+        )
       | where toint(column_ifexists("httpStatus_d", 0)) >= 400
       | summarize AggregatedValue = count()
       EOT

@@ -212,7 +212,7 @@ locals {
       CosmosDbRequestTimeout            = "5000"
       CosmosContainerName               = "whitelisted-fiscal-codes-test"
       StorageAccountContainerName       = "whitelisted-fiscal-codes"
-      BulkChunkSize                     = "150"
+      BulkChunkSize                     = "200"
       DelayMs                           = "250"
       QueueName                         = "whitelisted-fiscal-codes"
       StorageAccount__accountName       = var.whitelisted_fiscal_codes_storage_account_name
