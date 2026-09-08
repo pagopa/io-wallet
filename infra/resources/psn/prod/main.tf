@@ -109,10 +109,12 @@ module "cosmos" {
     nonces                   = 4000
     whitelisted_fiscal_codes = 12000
     certificates             = 10000
+    keys                     = 10000
     uat = {
       wallet_instances         = 4000
       nonces                   = 2000
       certificates             = 2000
+      keys                     = 2000
       whitelisted_fiscal_codes = 2000
     }
   }
