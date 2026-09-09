@@ -77,7 +77,7 @@ locals {
       )
       FederationEntityBasePath                              = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10                           = "https://wallet.io.pagopa.it"
-      FederationEntityBasePathV13                           = "https://wallet.io.pagopa.it"
+      FederationEntityBasePathV13                           = "https://wallet.io.pagopa.it/v2"
       FederationEntityKeyId                                 = "RspQM6Tb9B1GRKjt"
       TokenStatusListKeyId                                  = "Gsc_881JGHOVX9U9hNLODJf35bfTfFdbbv1xJiSCOCA"
       WalletAttestationKeyId                                = "Q1yVyGZQ9hFE2MEcsZN_r-2WccrhKPgirpZR-pCkoM0"
