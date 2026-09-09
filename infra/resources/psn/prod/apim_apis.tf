@@ -105,19 +105,6 @@ resource "azurerm_api_management_product" "public" {
   approval_required     = false
 }
 
-resource "azurerm_api_management_product" "admin" {
-  product_id   = "internal-wallet-admin"
-  display_name = "Internal Wallet Administration"
-  description  = "Product for internal IT-Wallet administrative APIs"
-
-  api_management_name = module.apim.name
-  resource_group_name = module.apim.resource_group_name
-
-  published             = true
-  subscription_required = true
-  approval_required     = true
-}
-
 resource "azurerm_api_management_api_version_set" "user_ioapp" {
   name                = "wallet-user-ioapp-apis"
   api_management_name = module.apim.name
