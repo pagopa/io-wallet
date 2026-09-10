@@ -1,14 +1,15 @@
-import { CosmosClient, Database } from "@azure/cosmos";
 import type { TokenCredential } from "@azure/identity";
+
+import { CosmosClient, Database } from "@azure/cosmos";
 import { CertificateClient } from "@azure/keyvault-certificates";
 import { CryptographyClient, KeyClient } from "@azure/keyvault-keys";
 import { ECDSASigValue } from "@peculiar/asn1-ecc";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1X509 from "@peculiar/asn1-x509";
 import * as x509 from "@peculiar/x509";
+import { createHash, randomBytes, webcrypto } from "crypto";
 import { ECKeyWithoutKid } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
-import { createHash, randomBytes, webcrypto } from "crypto";
 
 interface KeyDocument {
   certificateChain: string[];

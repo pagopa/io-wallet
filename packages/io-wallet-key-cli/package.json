@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**\"",
     "key-provisioning": "tsx src/cli.ts"
   },
   "dependencies": {
