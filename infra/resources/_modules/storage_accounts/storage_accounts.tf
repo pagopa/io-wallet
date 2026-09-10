@@ -41,6 +41,12 @@ resource "azurerm_storage_account" "common" {
   shared_access_key_enabled       = var.user_assigned_managed_identity_id == null
   default_to_oauth_authentication = var.user_assigned_managed_identity_id != null
 
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+  }
+
   dynamic "customer_managed_key" {
     for_each = var.customer_managed_key_url == null || var.user_assigned_managed_identity_id == null ? [] : [1]
 

@@ -50,6 +50,22 @@ resource "azurerm_subnet" "func_support" {
   }
 }
 
+data "azurerm_subnet" "func_whitelist" {
+  count = var.subnet_route_table_id == null ? 0 : 1
+
+  name = provider::dx::resource_name(merge(
+    var.environment,
+    {
+      name          = "whitelist"
+      resource_type = "function_subnet"
+    }
+    )
+  )
+
+  resource_group_name  = var.virtual_network.resource_group_name
+  virtual_network_name = var.virtual_network.name
+}
+
 resource "azurerm_subnet" "func_user_uat" {
   count = var.subnet_route_table_id == null ? 0 : 1
 

@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 4.9.0
+
+### Minor Changes
+
+- f5abc59: Removed enqueueWhitelistedFiscalCodes and insertWhitelistedFiscalCodes functions
+
 ## 4.8.1
 
 ### Patch Changes

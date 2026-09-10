@@ -110,6 +110,11 @@ variable "cidr_subnet_support_func" {
   description = "CIDR block for support function app subnet"
 }
 
+variable "cidr_subnet_whitelist_func" {
+  type        = string
+  description = "CIDR block for whitelist function app subnet"
+}
+
 variable "nat_gateway_id" {
   type        = string
   description = "NAT gateway Id"
@@ -209,6 +214,11 @@ variable "health_check_path_support" {
   description = "Health check path for support function app"
 }
 
+variable "health_check_path_whitelist" {
+  type        = string
+  description = "Health check path for whitelist function app"
+}
+
 variable "wallet_instance_storage_account_url" {
   type        = string
   description = "The URL of the Wallet Instance Storage Account"
@@ -217,11 +227,6 @@ variable "wallet_instance_storage_account_url" {
 variable "wallet_instance_storage_account_name" {
   type        = string
   description = "The name of the Wallet Instance Storage Account"
-}
-
-variable "whitelisted_fiscal_codes_queue_url" {
-  type        = string
-  description = "The URL of the Whitelisted Fiscal Codes Storage Account"
 }
 
 variable "whitelisted_fiscal_codes_storage_account_name" {
@@ -237,16 +242,6 @@ variable "wallet_instance_storage_account_uat_url" {
 variable "wallet_instance_storage_account_uat_name" {
   type        = string
   description = "The name of the Wallet Instance Storage Account UAT"
-}
-
-variable "whitelisted_fiscal_codes_queue_uat_url" {
-  type        = string
-  description = "The URL of the Whitelisted Fiscal Codes Storage Account UAT"
-}
-
-variable "whitelisted_fiscal_codes_storage_account_uat_name" {
-  type        = string
-  description = "The name of the Whitelisted Fiscal Codes Storage Account UAT"
 }
 
 variable "federation_entity_base_path_v13_uat" {

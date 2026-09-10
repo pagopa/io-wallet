@@ -11,9 +11,6 @@ export interface WhitelistedFiscalCodeRepository {
   checkIfFiscalCodeIsWhitelisted: (
     fiscalCode: FiscalCode,
   ) => TE.TaskEither<Error, { whitelisted: boolean; whitelistedAt?: string }>;
-  insertWhitelistedFiscalCodes: (
-    fiscalCodes: FiscalCode[],
-  ) => TE.TaskEither<Error, void>;
 }
 
 export const checkIfFiscalCodeIsWhitelisted: (
@@ -34,10 +31,3 @@ export const checkIfFiscalCodeIsWhitelisted: (
         whitelistedAt,
       })),
     );
-
-export const insertWhitelistedFiscalCodes: (
-  fiscalCodes: FiscalCode[],
-) => RTE.ReaderTaskEither<WhitelistedFiscalCodeEnvironment, Error, void> =
-  (fiscalCodes) =>
-  ({ whitelistedFiscalCodeRepository }) =>
-    whitelistedFiscalCodeRepository.insertWhitelistedFiscalCodes(fiscalCodes);
