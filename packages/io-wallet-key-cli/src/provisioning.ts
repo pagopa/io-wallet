@@ -95,12 +95,14 @@ const registerIntermediateKey = async (
 
 const positiveSerialNumber = () => {
   const serialNumber = randomBytes(16);
-  return serialNumber[0] < 0x80
-    ? serialNumber.buffer.slice(
-        serialNumber.byteOffset,
-        serialNumber.byteOffset + serialNumber.byteLength,
-      )
-    : Buffer.concat([Buffer.from([0]), serialNumber]).buffer;
+  const buffer =
+    serialNumber[0] < 0x80
+      ? serialNumber
+      : Buffer.concat([Buffer.from([0]), serialNumber]);
+  return buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength,
+  );
 };
 
 const signatureAlgorithm = new asn1X509.AlgorithmIdentifier({
