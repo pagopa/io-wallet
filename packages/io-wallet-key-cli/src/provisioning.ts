@@ -2,7 +2,11 @@ import type { TokenCredential } from "@azure/identity";
 
 import { CosmosClient, Database } from "@azure/cosmos";
 import { CertificateClient } from "@azure/keyvault-certificates";
-import { CryptographyClient, KeyClient } from "@azure/keyvault-keys";
+import {
+  CryptographyClient,
+  KeyClient,
+  KeyVaultKey,
+} from "@azure/keyvault-keys";
 import { ECDSASigValue } from "@peculiar/asn1-ecc";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1X509 from "@peculiar/asn1-x509";
@@ -30,7 +34,7 @@ const persistKey = async (database: Database, document: KeyDocument) => {
   await database.container("keys").items.create(document);
 };
 
-const toPublicEcJwk = (key: Awaited<ReturnType<KeyClient["getKey"]>>) => {
+const toPublicEcJwk = (key: KeyVaultKey) => {
   const material = key.key;
   if (
     material === undefined ||
