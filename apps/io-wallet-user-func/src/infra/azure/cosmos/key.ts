@@ -5,14 +5,14 @@ import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import { ServiceUnavailableError } from "io-wallet-common/error";
-import { ECKeyWithKid } from "io-wallet-common/jwk";
+import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 import { KeyRepository } from "@/keys";
 
 const KeySchema = t.type({
   certificateChain: t.array(t.string),
   id: t.string,
-  publicKey: ECKeyWithKid,
+  publicKey: ECPublicKeyWithKid,
 });
 
 export class CosmosDbKeyRepository implements KeyRepository {

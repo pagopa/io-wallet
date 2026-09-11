@@ -5,7 +5,7 @@ import { pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
-import { ECKey, JwkPublicKey } from "io-wallet-common/jwk";
+import { ECPublicKey, JwkPublicKey } from "io-wallet-common/jwk";
 import { calculateJwkThumbprint } from "jose";
 
 type ClientDataInput =
@@ -32,7 +32,7 @@ export const toThumbprint = (jwk: JwkPublicKey): TE.TaskEither<Error, string> =>
   TE.tryCatch(() => calculateJwkThumbprint(jwk, "sha256"), E.toError);
 
 export const toKeysThumbprints = (
-  jwks: readonly ECKey[],
+  jwks: readonly ECPublicKey[],
 ): TE.TaskEither<Error | ValidationError, readonly string[]> =>
   pipe(
     jwks,

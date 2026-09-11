@@ -5,7 +5,7 @@ import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { ECKeyWithKid } from "io-wallet-common/jwk";
+import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 import { EntityConfigurationToJwtModel } from "@/encoders/entity-configuration";
 import { EntityConfigurationEnvironment } from "@/entity-configuration";
@@ -18,7 +18,7 @@ import { getLoAUri, LoA } from "@/wallet-provider";
 const withX5c = ({
   certificateChain,
   ...jwk
-}: ECKeyWithKid & { certificateChain: string[] }) => ({
+}: ECPublicKeyWithKid & { certificateChain: string[] }) => ({
   ...jwk,
   x5c: certificateChain,
 });

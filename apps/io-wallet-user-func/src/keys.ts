@@ -2,13 +2,13 @@ import { pipe } from "fp-ts/function";
 import * as O from "fp-ts/Option";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { ECKeyWithKid } from "io-wallet-common/jwk";
+import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 export interface KeyRepository {
   getKeyByName: (keyName: string) => TE.TaskEither<Error, O.Option<Key>>;
 }
 
-type Key = ECKeyWithKid & {
+type Key = ECPublicKeyWithKid & {
   certificateChain: string[];
   keyName: string;
 };

@@ -5,7 +5,7 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { areJwksEqual, ECKey, JwkPublicKey } from "io-wallet-common/jwk";
+import { areJwksEqual, ECPublicKey, JwkPublicKey } from "io-wallet-common/jwk";
 import {
   WalletInstanceStatus,
   WalletInstanceValid,
@@ -127,11 +127,11 @@ const verifyAttestedJwkMatchesCnf = ({
   cnfJwk,
 }: {
   attestedJwk: JwkPublicKey;
-  cnfJwk: ECKey;
+  cnfJwk: ECPublicKey;
 }): TE.TaskEither<IntegrityCheckError, void> =>
   pipe(
     attestedJwk,
-    ECKey.decode,
+    ECPublicKey.decode,
     E.mapLeft(() => new Error()),
     TE.fromEither,
     TE.chain((attestedEs256Jwk) =>
