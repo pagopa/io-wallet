@@ -23,15 +23,6 @@ export const ECKey = t.intersection([
 
 export type ECKey = t.TypeOf<typeof ECKey>;
 
-export const ECKeyWithKid = t.intersection([
-  ECKey,
-  t.type({
-    kid: t.string,
-  }),
-]);
-
-export type ECKeyWithKid = t.TypeOf<typeof ECKeyWithKid>;
-
 const ECPrivateKey = t.intersection([
   ECKey,
   t.type({
@@ -41,7 +32,7 @@ const ECPrivateKey = t.intersection([
 
 type ECPrivateKey = t.TypeOf<typeof ECPrivateKey>;
 
-const ECKeyWithKid = t.intersection([
+export const ECKeyWithKid = t.intersection([
   ECKey,
   t.type({
     kid: t.string,
@@ -129,12 +120,3 @@ export const areJwksEqual = async (
 
   return leftThumb === rightThumb;
 };
-
-export const PublicKeyWithKid = t.intersection([
-  ECKey,
-  t.type({
-    kid: t.string,
-  }),
-]);
-
-export type PublicKeyWithKid = t.TypeOf<typeof PublicKeyWithKid>;
