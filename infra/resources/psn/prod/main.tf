@@ -109,6 +109,7 @@ module "cosmos" {
     nonces                   = 12000
     whitelisted_fiscal_codes = 12000
     certificates             = 10000
+    keys                     = 10000
     status_list_catalogs     = 10000
     status_list_pages        = 10000
     status_list_routing      = 10000
@@ -116,6 +117,7 @@ module "cosmos" {
       wallet_instances         = 4000
       nonces                   = 2000
       certificates             = 2000
+      keys                     = 2000
       whitelisted_fiscal_codes = 2000
       status_list_catalogs     = 2000
       status_list_pages        = 2000
