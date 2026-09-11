@@ -1,0 +1,37 @@
+{
+  "name": "io-wallet-key-cli",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "key-provisioning": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup src/cli.ts --format esm --target node20 --clean --dts",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**\"",
+    "key-provisioning": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@azure/cosmos": "catalog:",
+    "@azure/identity": "catalog:",
+    "@azure/keyvault-certificates": "^4.9.0",
+    "@azure/keyvault-keys": "^4.10.0",
+    "@peculiar/asn1-ecc": "^2.6.0",
+    "@peculiar/asn1-schema": "^2.6.0",
+    "@peculiar/asn1-x509": "^2.6.0",
+    "@peculiar/x509": "^1.14.3",
+    "io-wallet-common": "workspace:^",
+    "jose": "5.10.0"
+  },
+  "devDependencies": {
+    "@pagopa/eslint-config": "^6.0.1",
+    "eslint": "^10.1.0",
+    "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
+    "tsx": "^4.20.3",
+    "typescript": "5.9.3"
+  }
+}

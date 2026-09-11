@@ -5,19 +5,32 @@ import * as J from "fp-ts/Json";
 import * as t from "io-ts";
 import { calculateJwkThumbprint } from "jose";
 
+export const ECKeyWithoutKid = t.type({
+  crv: t.string,
+  kty: t.literal("EC"),
+  x: t.string,
+  y: t.string,
+});
+
+export type ECKeyWithoutKid = t.TypeOf<typeof ECKeyWithoutKid>;
+
 export const ECKey = t.intersection([
-  t.type({
-    crv: t.string,
-    kty: t.literal("EC"),
-    x: t.string,
-    y: t.string,
-  }),
+  ECKeyWithoutKid,
   t.partial({
     kid: t.string,
   }),
 ]);
 
 export type ECKey = t.TypeOf<typeof ECKey>;
+
+export const ECKeyWithKid = t.intersection([
+  ECKey,
+  t.type({
+    kid: t.string,
+  }),
+]);
+
+export type ECKeyWithKid = t.TypeOf<typeof ECKeyWithKid>;
 
 const ECPrivateKey = t.intersection([
   ECKey,
