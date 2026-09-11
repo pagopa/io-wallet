@@ -20,6 +20,7 @@
     "@azure/functions": "catalog:",
     "@azure/functions-opentelemetry-instrumentation": "^0.3.0",
     "@azure/identity": "catalog:",
+    "@azure/keyvault-keys": "^4.10.0",
     "@azure/monitor-query-logs": "^1.0.0",
     "@azure/storage-blob": "catalog:",
     "@azure/storage-queue": "catalog:",

@@ -5,7 +5,7 @@ import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { areJwksEqual, ECKey } from "io-wallet-common/jwk";
+import { areJwksEqual, ECPublicKey } from "io-wallet-common/jwk";
 
 import { Platform, PlatformFromRequest } from "@/infra/http/platform-codecs";
 import { verifyJwtWithInternalKey } from "@/verifier";
@@ -26,7 +26,7 @@ const AssertionJwtApi = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
     }),
     exp: t.number,
     hardware_key_tag: NonEmptyString,
@@ -44,7 +44,7 @@ const AssertionJwtApi = t.type({
 
 const AssertionJwtDecodedPayload = t.type({
   cnf: t.type({
-    jwk: ECKey,
+    jwk: ECPublicKey,
   }),
   hardwareKeyTag: NonEmptyString,
   hardwareSignature: NonEmptyString,
@@ -129,7 +129,7 @@ const KeyAttestationJwtApi = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
     }),
     exp: t.number,
     iat: t.number,
@@ -148,7 +148,7 @@ const KeyAttestationJwtDecoded = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
     }),
     exp: t.number,
     iat: t.number,
@@ -202,7 +202,7 @@ const AssertionJwtDecodedAndroid = t.type({
   ...AssertionJwtDecodedPayload.props,
   keysToAttest: t.array(
     t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
       keyAttestation: NonEmptyString,
       kid: NonEmptyString,
     }),
@@ -215,7 +215,7 @@ const AssertionJwtDecodedPayloadIos = t.type({
   ...AssertionJwtDecodedPayload.props,
   keysToAttest: t.array(
     t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
       kid: NonEmptyString,
     }),
   ),

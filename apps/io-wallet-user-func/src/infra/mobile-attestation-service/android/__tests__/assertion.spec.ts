@@ -2,7 +2,7 @@
 import { createSign, generateKeyPairSync } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import { playintegrity_v1 } from "googleapis";
-import { ECKey } from "io-wallet-common/jwk";
+import { ECPublicKey } from "io-wallet-common/jwk";
 import { exportJWK } from "jose";
 import { describe, expect, it } from "vitest";
 
@@ -27,13 +27,13 @@ describe("AndroidAssertionValidation", async () => {
   const hardwareSignature = signer.sign(hardwareKeyPair.privateKey, "base64");
 
   it("should validate assertion signature", async () => {
-    const ecKeyDecoded = ECKey.decode(hardwareKey);
+    const eCPublicKeyDecoded = ECPublicKey.decode(hardwareKey);
 
     expect.assertions(1);
 
-    if (E.isRight(ecKeyDecoded)) {
+    if (E.isRight(eCPublicKeyDecoded)) {
       const signatureValidated = validateAssertionSignature(
-        ecKeyDecoded.right,
+        eCPublicKeyDecoded.right,
         clientData,
         hardwareSignature,
       );

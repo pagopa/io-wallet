@@ -11,9 +11,9 @@ import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import { type JWTPayload } from "jose";
 
 import { AttestationService, validateAssertion } from "@/attestation-service";
-import { CertificateRepository } from "@/certificates";
 import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
-import { signJwt } from "@/infra/crypto/signer";
+import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
+import { KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -70,10 +70,11 @@ const testWalletAttestations: WalletAttestations = {
 
 interface WalletAttestationGenerationEnvironment
   extends WalletAttestationEnvironment, WalletAttestationSigningEnvironment {
-  certificateRepository: CertificateRepository;
+  keyRepository: KeyRepository;
+  walletAttestationKeyName: string;
 }
 
-interface WalletAttestationSigningEnvironment {
+interface WalletAttestationSigningEnvironment extends SignJwtEnvironment {
   walletAttestationSigningKey: ECPrivateKeyWithKid;
 }
 
@@ -81,14 +82,16 @@ const signWalletAttestationJwt =
   (
     payload: JWTPayload,
   ): RTE.ReaderTaskEither<WalletAttestationSigningEnvironment, Error, string> =>
-  ({ walletAttestationSigningKey }) =>
-    signJwt(walletAttestationSigningKey)({
-      duration: "1h",
+  ({ cryptographyClient, walletAttestationSigningKey }) =>
+    signJwt({
+      crv: walletAttestationSigningKey.crv,
+      duration: 60 * 60,
       header: {
+        kid: walletAttestationSigningKey.kid,
         typ: "oauth-client-attestation+jwt",
       },
       payload,
-    });
+    })({ cryptographyClient });
 
 const signWalletAttestationSdJwt =
   ({
@@ -99,16 +102,18 @@ const signWalletAttestationSdJwt =
     Error,
     string
   > =>
-  ({ walletAttestationSigningKey }) =>
+  ({ cryptographyClient, walletAttestationSigningKey }) =>
     pipe(
-      signJwt(walletAttestationSigningKey)({
+      signJwt({
         // TODO: SIW-2656. env var are not used
-        duration: "1h",
+        crv: walletAttestationSigningKey.crv,
+        duration: 60 * 60,
         header: {
+          kid: walletAttestationSigningKey.kid,
           typ: "dc+sd-jwt",
         },
         payload: { ...claims },
-      }),
+      })({ cryptographyClient }),
       TE.map((jwt) => [jwt, ...disclosures].join("~")),
     );
 

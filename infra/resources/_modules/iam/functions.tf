@@ -132,6 +132,20 @@ module "func_app_user_slot" {
   ]
 }
 
+resource "azurerm_role_assignment" "func_app_user_key_vault_crypto_user" {
+  scope                = var.key_vault_app.id
+  role_definition_name = "Key Vault Crypto User"
+  principal_id         = var.function_app.user_func.principal_id
+  description          = "Allow Function App user to sign data with wallet provider Key Vault keys"
+}
+
+resource "azurerm_role_assignment" "func_app_user_slot_key_vault_crypto_user" {
+  scope                = var.key_vault_app.id
+  role_definition_name = "Key Vault Crypto User"
+  principal_id         = var.function_app.user_func.staging_principal_id
+  description          = "Allow Function App user slot to sign data with wallet provider Key Vault keys"
+}
+  
 module "func_app_whitelist" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
@@ -426,4 +440,18 @@ module "func_app_user_uat_slot" {
       role                 = "owner"
     }
   ]
+}
+
+resource "azurerm_role_assignment" "func_app_user_uat_key_vault_crypto_user" {
+  scope                = var.key_vault_app.id
+  role_definition_name = "Key Vault Crypto User"
+  principal_id         = var.function_app.user_func_uat.principal_id
+  description          = "Allow Function App user UAT to sign data with wallet provider Key Vault keys"
+}
+
+resource "azurerm_role_assignment" "func_app_user_uat_slot_key_vault_crypto_user" {
+  scope                = var.key_vault_app.id
+  role_definition_name = "Key Vault Crypto User"
+  principal_id         = var.function_app.user_func_uat.staging_principal_id
+  description          = "Allow Function App user UAT slot to sign data with wallet provider Key Vault keys"
 }

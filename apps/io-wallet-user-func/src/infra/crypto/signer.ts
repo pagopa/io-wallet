@@ -1,22 +1,61 @@
+import { CryptographyClient } from "@azure/keyvault-keys";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
+import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
-import { ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
 export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
-interface JwtHeader {
+export interface SignJwtEnvironment {
+  cryptographyClient: Pick<CryptographyClient, "signData">;
+}
+
+interface JwtProtectedHeader extends SignJwtHeader {
+  alg: SignAlgorithm;
+  kid: string;
+}
+
+interface SignJwtHeader {
+  kid: string;
   trustChain?: string[];
   typ: string;
   x5c?: string[];
 }
 
 interface SignJwtOptions {
-  duration?: string;
-  header: JwtHeader;
+  crv: string;
+  duration: number;
+  header: SignJwtHeader;
   payload: jose.JWTPayload;
 }
+
+const createJwtSigningInput = ({
+  duration,
+  header,
+  payload,
+}: {
+  duration: number;
+  header: JwtProtectedHeader;
+  payload: jose.JWTPayload;
+}) => {
+  const iat = Math.floor(Date.now() / 1000);
+  const { trustChain, ...headerParameters } = header;
+  const protectedHeader = {
+    ...headerParameters,
+    trust_chain: trustChain,
+  };
+  const claims = {
+    ...payload,
+    exp: iat + duration,
+    iat,
+  };
+
+  return [
+    jose.base64url.encode(JSON.stringify(protectedHeader)),
+    jose.base64url.encode(JSON.stringify(claims)),
+  ].join(".");
+};
 
 export const getSignAlgorithmFromCurve = (crv: string): SignAlgorithm => {
   switch (crv) {
@@ -32,32 +71,49 @@ export const getSignAlgorithmFromCurve = (crv: string): SignAlgorithm => {
 };
 
 export const signJwt =
-  (privateKey: ECPrivateKeyWithKid) =>
   ({
-    duration = "24h",
-    header: { trustChain, ...header },
+    crv,
+    duration,
+    header,
     payload,
-  }: SignJwtOptions) =>
+  }: SignJwtOptions): RTE.ReaderTaskEither<SignJwtEnvironment, Error, string> =>
+  ({ cryptographyClient }) =>
     pipe(
-      E.tryCatch(() => getSignAlgorithmFromCurve(privateKey.crv), E.toError),
+      E.tryCatch(() => getSignAlgorithmFromCurve(crv), E.toError),
       TE.fromEither,
       TE.chain((alg) =>
         pipe(
-          TE.tryCatch(() => jose.importJWK(privateKey), E.toError),
-          TE.chain((key) =>
+          E.tryCatch(
+            () =>
+              createJwtSigningInput({
+                duration,
+                header: {
+                  ...header,
+                  alg,
+                },
+                payload,
+              }),
+            E.toError,
+          ),
+          TE.fromEither,
+          TE.chain((signingInput) =>
             TE.tryCatch(
-              () =>
-                new jose.SignJWT(payload)
-                  .setProtectedHeader({
-                    ...header,
-                    alg,
-                    kid: privateKey.kid,
-                    trust_chain: trustChain,
-                  })
-                  .setIssuedAt()
-                  .setExpirationTime(duration)
-                  .sign(key),
-              E.toError,
+              async () => {
+                const { result } = await cryptographyClient.signData(
+                  alg,
+                  Buffer.from(signingInput),
+                );
+
+                return `${signingInput}.${jose.base64url.encode(result)}`;
+              },
+              (reason) => {
+                const message =
+                  reason instanceof Error ? reason.message : String(reason);
+
+                return new Error(
+                  `Unable to sign JWT with Azure Key Vault: ${message}`,
+                );
+              },
             ),
           ),
         ),

@@ -4,15 +4,18 @@ import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import { type JWTPayload } from "jose";
 
-import { CertificateRepository } from "@/certificates";
 import { FederationEntity } from "@/entity-configuration";
-import { getSignAlgorithmFromCurve, signJwt } from "@/infra/crypto/signer";
+import {
+  getSignAlgorithmFromCurve,
+  signJwt,
+  SignJwtEnvironment,
+} from "@/infra/crypto/signer";
 import { AssertionValidationConfig } from "@/infra/mobile-attestation-service";
 import { toThumbprint } from "@/infra/mobile-attestation-service";
 import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestation-service/assertion-request-validation";
+import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -27,20 +30,24 @@ import {
   WIARequest,
 } from "../wallet-instance-attestation-request";
 
-interface WalletInstanceAttestationEnvironment {
-  certificateRepository: CertificateRepository;
+interface WalletInstanceAttestationEnvironment extends SignJwtEnvironment {
   federationEntity: FederationEntity;
+  keyRepository: KeyRepository;
   walletAttestationConfig: {
     oauthClientSub: string;
   };
-  walletInstanceAttestationSigningKey: ECPrivateKeyWithKid;
+  walletInstanceAttestationSigningKeyName: string;
 }
 
 const signWalletInstanceAttestation =
   ({
+    crv,
+    kid,
     payload,
     x5c,
   }: {
+    crv: string;
+    kid: string;
     payload: JWTPayload;
     x5c: string[];
   }): RTE.ReaderTaskEither<
@@ -48,15 +55,17 @@ const signWalletInstanceAttestation =
     Error,
     string
   > =>
-  ({ walletInstanceAttestationSigningKey }) =>
-    signJwt(walletInstanceAttestationSigningKey)({
-      duration: "1h",
+  ({ cryptographyClient }) =>
+    signJwt({
+      crv,
+      duration: 60 * 60,
       header: {
+        kid,
         typ: "oauth-client-attestation+jwt",
         x5c,
       },
       payload,
-    });
+    })({ cryptographyClient });
 
 const getWalletInstanceAttestationData =
   (input: {
@@ -70,33 +79,29 @@ const getWalletInstanceAttestationData =
     WalletInstanceAttestationData
   > =>
   ({
-    certificateRepository,
     federationEntity: { basePathV13: basePath },
-    walletInstanceAttestationSigningKey,
+    keyRepository,
+    walletInstanceAttestationSigningKeyName,
     // walletAttestationConfig: { oauthClientSub },
   }) =>
     pipe(
-      TE.Do,
-      TE.bindW("sub", () => toThumbprint(input.cnf.jwk)),
-      TE.bindW("x5c", () =>
+      { keyRepository },
+      getKey(walletInstanceAttestationSigningKeyName),
+      TE.chainW((signingKey) =>
         pipe(
-          certificateRepository.getCertificateChainByKid(
-            walletInstanceAttestationSigningKey.kid,
-          ),
-          TE.chain(
-            TE.fromOption(() => new Error("Certificate chain not found")),
-          ),
+          toThumbprint(input.cnf.jwk),
+          TE.map((sub) => ({
+            crv: signingKey.crv,
+            jwk: input.cnf.jwk,
+            jwkAlg: getSignAlgorithmFromCurve(input.cnf.jwk.crv),
+            kid: signingKey.kid,
+            sub,
+            walletProviderName: basePath.href,
+            // walletSolutionVersion: input.walletSolutionVersion,
+            x5c: signingKey.certificateChain,
+          })),
         ),
       ),
-      TE.map(({ sub, x5c }) => ({
-        jwk: input.cnf.jwk,
-        jwkAlg: getSignAlgorithmFromCurve(input.cnf.jwk.crv),
-        kid: walletInstanceAttestationSigningKey.kid,
-        sub,
-        walletProviderName: basePath.href,
-        // walletSolutionVersion: input.walletSolutionVersion,
-        x5c,
-      })),
     );
 
 const testWalletInstanceAttestation =
@@ -130,7 +135,12 @@ const generateWalletInstanceAttestation: (request: {
           walletInstanceAttestationData,
         ),
         ({ x5c, ...payload }) =>
-          signWalletInstanceAttestation({ payload: { ...payload }, x5c }),
+          signWalletInstanceAttestation({
+            crv: walletInstanceAttestationData.crv,
+            kid: walletInstanceAttestationData.kid,
+            payload: { ...payload },
+            x5c,
+          }),
       ),
     ),
   );

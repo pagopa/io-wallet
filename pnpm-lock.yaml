@@ -189,6 +189,9 @@ importers:
       '@azure/identity':
         specifier: 'catalog:'
         version: 4.13.1
+      '@azure/keyvault-keys':
+        specifier: ^4.10.0
+        version: 4.10.0(@azure/core-client@1.10.1)
       '@azure/monitor-query-logs':
         specifier: ^1.0.0
         version: 1.0.0
