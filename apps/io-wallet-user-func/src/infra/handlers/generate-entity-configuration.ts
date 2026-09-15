@@ -1,4 +1,5 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
+import { ContainerClient } from "@azure/storage-blob";
 import * as H from "@pagopa/handler-kit";
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
@@ -32,7 +33,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   cryptographyClient,
   entityConfiguration: {
     authorityHints,
-    federationEntity: { basePathV10: basePath, ...federationEntityMetadata },
+    federationEntity: { basePathV1: basePath, ...federationEntityMetadata },
   },
   intermediatePublishedKeyNames,
   intermediateSigningKeyName,
@@ -130,10 +131,33 @@ const purgeContent: () => RTE.ReaderTaskEither<
       TE.map(() => void 0),
     );
 
+const uploadV1File =
+  (
+    data: string,
+  ): RTE.ReaderTaskEither<
+    { entityConfigurationV1ContainerClient: ContainerClient },
+    Error,
+    void
+  > =>
+  ({ entityConfigurationV1ContainerClient }) =>
+    uploadFile(data)({ containerClient: entityConfigurationV1ContainerClient });
+
+const uploadV2File =
+  (
+    data: string,
+  ): RTE.ReaderTaskEither<
+    { entityConfigurationV2ContainerClient: ContainerClient },
+    Error,
+    void
+  > =>
+  ({ entityConfigurationV2ContainerClient }) =>
+    uploadFile(data)({ containerClient: entityConfigurationV2ContainerClient });
+
 export const GenerateEntityConfigurationHandler = H.of(() =>
   pipe(
     createEntityConfiguration,
-    RTE.chainW(uploadFile),
+    RTE.chainFirstW(uploadV1File),
+    RTE.chainFirstW(uploadV2File),
     RTE.chainW(purgeContent),
     RTE.orElseFirstW(
       flow(

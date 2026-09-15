@@ -185,8 +185,8 @@ const IssuerAuthPayloadSchema = t.type({
 });
 
 const federationEntity = {
-  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
-  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
+  basePathV1: url("https://wallet-provider-v1.example.org/foo/"),
+  basePathV2: url("https://wallet-provider-v2.example.org/bar/"),
   contacts: [email("foo@pec.bar.it")],
   homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
   logoUri: url("https://wallet-provider.example.org/logo.svg"),
@@ -380,10 +380,10 @@ describe("CreateWalletAttestationHandler", async () => {
             ].sort(),
           );
           expect(jwtPayload.iss).toBe(
-            "https://wallet-provider-v10.example.org/foo",
+            "https://wallet-provider-v1.example.org/foo",
           );
           expect(jwtPayload.aal).toBe(
-            "https://wallet-provider-v10.example.org/foo/LoA/basic",
+            "https://wallet-provider-v1.example.org/foo/LoA/basic",
           );
           // check trailing slashes are removed
           expect((jwtPayload.iss || "").endsWith("/")).toBe(false);

@@ -79,7 +79,7 @@ const getWalletInstanceAttestationData =
     WalletInstanceAttestationData
   > =>
   ({
-    federationEntity: { basePathV13: basePath },
+    federationEntity: { basePathV2: basePath },
     keyRepository,
     walletInstanceAttestationSigningKeyName,
     // walletAttestationConfig: { oauthClientSub },

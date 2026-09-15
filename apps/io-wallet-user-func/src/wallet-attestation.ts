@@ -36,7 +36,7 @@ export const getWalletAttestationData =
     walletAttestationSigningKid: string,
   ): R.Reader<WalletAttestationEnvironment, WalletAttestationData> =>
   ({
-    federationEntity: { basePathV10: basePath },
+    federationEntity: { basePathV1: basePath },
     walletAttestationConfig: { walletLink, walletName },
   }) => ({
     aal: pipe(basePath, getLoAUri(LoA.basic)),

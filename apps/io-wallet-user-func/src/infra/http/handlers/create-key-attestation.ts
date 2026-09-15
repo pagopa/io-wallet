@@ -87,7 +87,7 @@ const getKeyAttestationData =
     KeyAttestationData
   > =>
   ({
-    federationEntity: { basePathV13: basePath },
+    federationEntity: { basePathV2: basePath },
     keyAttestationSigningKeyName,
     keyRepository,
     statusListBaseUrl,
