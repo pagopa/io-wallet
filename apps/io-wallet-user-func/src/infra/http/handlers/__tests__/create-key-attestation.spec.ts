@@ -68,8 +68,8 @@ const email = flow(
 );
 
 const federationEntity = {
-  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
-  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
+  basePathV1: url("https://wallet-provider-v1.example.org/foo/"),
+  basePathV2: url("https://wallet-provider-v2.example.org/bar/"),
   contacts: [email("foo@pec.bar.it")],
   homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
   logoUri: url("https://wallet-provider.example.org/logo.svg"),
@@ -617,7 +617,7 @@ describe("CreateKeyAttestationHandler", async () => {
       if (E.isRight(body)) {
         const keyAttestation = jose.decodeJwt(body.right.key_attestation);
         expect(keyAttestation.iss).toBe(
-          "https://wallet-provider-v13.example.org/bar",
+          "https://wallet-provider-v2.example.org/bar",
         );
         expect(keyAttestation.status).toEqual({
           status_list: {

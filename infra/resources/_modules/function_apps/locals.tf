@@ -13,6 +13,8 @@ locals {
 
     EntityConfigurationStorageAccountName           = var.storage_account_cdn_name
     EntityConfigurationStorageContainerName         = "well-known"
+    EntityConfigurationV1StorageContainerName       = "entity-configuration-v1"
+    EntityConfigurationV2StorageContainerName       = "entity-configuration-v2"
     StatusListCapacityBits                          = "1048576"
     StatusListPageCount                             = "256"
     StatusListStorageContainerName                  = var.status_list_storage_container_name
@@ -77,7 +79,9 @@ locals {
         var.status_list_storage_container_name,
       )
       FederationEntityBasePath                              = "https://wallet.io.pagopa.it"
+      FederationEntityBasePathV1                            = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10                           = "https://wallet.io.pagopa.it"
+      FederationEntityBasePathV2                            = "https://wallet.io.pagopa.it/v2"
       FederationEntityBasePathV13                           = "https://wallet.io.pagopa.it/v2"
       FederationEntityKeyId                                 = "RspQM6Tb9B1GRKjt"
       TokenStatusListKeyId                                  = "Gsc_881JGHOVX9U9hNLODJf35bfTfFdbbv1xJiSCOCA"
@@ -119,7 +123,6 @@ locals {
   ]
 
   function_app_user_uat_both_slots_disabled = [
-    "generateEntityConfiguration",
     "sendEmailOnWalletInstanceCreation",
     "sendEmailOnWalletInstanceRevocation",
   ]
@@ -145,7 +148,9 @@ locals {
       KeyVaultUrl                 = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
       AndroidBundleIdentifiers    = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
       FederationEntityBasePath    = "https://foo11.blob.core.windows.net/foo/"
+      FederationEntityBasePathV1  = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV10 = "https://foo11.blob.core.windows.net/foo/"
+      FederationEntityBasePathV2  = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"
       FederationEntityBasePathV13 = var.federation_entity_base_path_v13_uat
       FrontDoorEndpointName       = var.front_door_endpoint_name_uat
       FrontDoorProfileName        = var.front_door_profile_name_uat
@@ -164,17 +169,17 @@ locals {
       FederationEntityKeyId                                 = "NsXymfIILEPR5Y0twNwFM-YYuJpZQP-6YjPhPRSYbl0"
       TokenStatusListKeyId                                  = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
       IntermediatePublishedKeyNames                         = "fake-wallet-provider-signing-key-pre"
-      IntermediateSigningKeyName                            = "fake-wallet-provider-signing-key-pre"
+      IntermediateSigningKeyName                            = "intermediate-key-pre"
       TokenStatusListPublishedKeyNames                      = "fake-wallet-provider-signing-key-pre"
-      TokenStatusListSigningKeyName                         = "fake-wallet-provider-signing-key-pre"
+      TokenStatusListSigningKeyName                         = "leaf-key-pre"
       WalletAttestationKeyId                                = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
       WalletInstanceAttestationKeyId                        = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
       KeyAttestationKeyId                                   = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
-      WalletAttestationKeyName                              = "fake-wallet-provider-signing-key-pre"
+      WalletAttestationKeyName                              = "leaf-key-pre"
       WalletInstanceAttestationPublishedKeyNames            = "fake-wallet-provider-signing-key-pre"
-      WalletInstanceAttestationSigningKeyName               = "fake-wallet-provider-signing-key-pre"
+      WalletInstanceAttestationSigningKeyName               = "leaf-key-pre"
       KeyAttestationPublishedKeyNames                       = "fake-wallet-provider-signing-key-pre"
-      KeyAttestationSigningKeyName                          = "fake-wallet-provider-signing-key-pre"
+      KeyAttestationSigningKeyName                          = "leaf-key-pre"
       CosmosDbEndpoint__accountEndpoint                     = var.cosmos_db_endpoint
       CosmosDbDatabaseName                                  = var.cosmos_database_name_uat
       CosmosDbRequestTimeout                                = "5000"

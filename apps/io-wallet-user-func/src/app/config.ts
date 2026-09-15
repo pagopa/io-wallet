@@ -96,6 +96,11 @@ export type AttestationServiceConfiguration = t.TypeOf<
 const AzureStorageConfig = t.type({
   entityConfiguration: t.type({
     accountName: t.string,
+  }),
+  entityConfigurationV1: t.type({
+    containerName: t.string,
+  }),
+  entityConfigurationV2: t.type({
     containerName: t.string,
   }),
   statusLists: t.type({
@@ -210,8 +215,8 @@ export type PidIssuerApiClientConfig = t.TypeOf<
 >;
 
 const FederationEntityConfig = t.type({
-  basePathV10: UrlFromString,
-  basePathV13: UrlFromString,
+  basePathV1: UrlFromString,
+  basePathV2: UrlFromString,
   contacts: t.array(EmailString),
   homepageUri: UrlFromString,
   logoUri: UrlFromString,
@@ -324,8 +329,8 @@ const getEntityConfigurationFromEnvironment: RE.ReaderEither<
   EntityConfigurationConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    basePathV10: readFromEnvironment("FederationEntityBasePathV10"),
-    basePathV13: readFromEnvironment("FederationEntityBasePathV13"),
+    basePathV1: readFromEnvironment("FederationEntityBasePathV1"),
+    basePathV2: readFromEnvironment("FederationEntityBasePathV2"),
     contacts: pipe(
       readFromEnvironment("FederationEntityContacts"),
       RE.map((urls) => urls.split(",")),
@@ -418,8 +423,11 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     entityConfigurationStorageAccountName: readFromEnvironment(
       "EntityConfigurationStorageAccountName",
     ),
-    entityConfigurationStorageContainerName: readFromEnvironment(
-      "EntityConfigurationStorageContainerName",
+    entityConfigurationV1StorageContainerName: readFromEnvironment(
+      "EntityConfigurationV1StorageContainerName",
+    ),
+    entityConfigurationV2StorageContainerName: readFromEnvironment(
+      "EntityConfigurationV2StorageContainerName",
     ),
     statusListPublicationQueueName: readFromEnvironment(
       "StatusListPublicationQueueName",
@@ -443,7 +451,8 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
   RE.map(
     ({
       entityConfigurationStorageAccountName,
-      entityConfigurationStorageContainerName,
+      entityConfigurationV1StorageContainerName,
+      entityConfigurationV2StorageContainerName,
       statusListPublicationQueueName,
       statusListStorageAccountName,
       statusListStorageContainerName,
@@ -453,7 +462,12 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
     }) => ({
       entityConfiguration: {
         accountName: entityConfigurationStorageAccountName,
-        containerName: entityConfigurationStorageContainerName,
+      },
+      entityConfigurationV1: {
+        containerName: entityConfigurationV1StorageContainerName,
+      },
+      entityConfigurationV2: {
+        containerName: entityConfigurationV2StorageContainerName,
       },
       statusLists: {
         accountName: statusListStorageAccountName,

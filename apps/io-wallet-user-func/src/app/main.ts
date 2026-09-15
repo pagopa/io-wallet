@@ -142,7 +142,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.entityConfiguration.federationEntity.basePathV10.href,
+  config.entityConfiguration.federationEntity.basePathV1.href,
 );
 
 const mobileAttestationService = new MobileAttestationService(
@@ -180,9 +180,15 @@ const blobServiceClient = new BlobServiceClient(
   credential,
 );
 
-const containerClient = blobServiceClient.getContainerClient(
-  config.azure.storage.entityConfiguration.containerName,
-);
+const entityConfigurationV1ContainerClient =
+  blobServiceClient.getContainerClient(
+    config.azure.storage.entityConfigurationV1.containerName,
+  );
+
+const entityConfigurationV2ContainerClient =
+  blobServiceClient.getContainerClient(
+    config.azure.storage.entityConfigurationV2.containerName,
+  );
 
 const statusListBlobServiceClient = new BlobServiceClient(
   `https://${config.azure.storage.statusLists.accountName}.blob.core.windows.net`,
@@ -304,13 +310,14 @@ app.http("getNonce", {
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationFunction({
     cdnManagementClient,
-    containerClient,
     cryptographyClient: entityConfigurationCryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
     entityConfiguration: {
       ...config.entityConfiguration,
       authorityHints: [config.entityConfiguration.trustAnchorUrl],
     },
+    entityConfigurationV1ContainerClient,
+    entityConfigurationV2ContainerClient,
     inputDecoder: t.unknown,
     intermediatePublishedKeyNames:
       config.walletProvider.intermediatePublishedKeyNames,
