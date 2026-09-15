@@ -554,30 +554,6 @@ components:
           description: |-
             The fiscal code, the same one passed in input.
 
-    JWK:
-      type: object
-      description: A JSON Web Key representation (public EC keys only)
-      properties:
-        kty:
-          type: string
-          enum: [EC]
-        use:
-          type: string
-        kid:
-          type: string
-        crv:
-          type: string
-        x:
-          type: string
-        y:
-          type: string
-      required:
-        - kty
-        - crv
-        - x
-        - y
-        - kid
-
     CreateWalletInstanceAttestationBody:
       type: object
       properties:
