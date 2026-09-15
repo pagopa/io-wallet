@@ -196,6 +196,8 @@ const statusListContainerClient =
 
 const keyRepository = new CosmosDbKeyRepository(database);
 
+const keyV10Repository = new CosmosDbKeyRepository(database, "keys-1.0");
+
 const statusListCatalogRepository = new CosmosDbStatusListCatalogRepository(
   database,
   config.statusList.pageCount,
@@ -314,7 +316,7 @@ app.timer("generateEntityConfiguration", {
       config.walletProvider.intermediatePublishedKeyNames,
     intermediateSigningKeyName:
       config.walletProvider.intermediateSigningKeyName,
-    keyRepository,
+    keyRepository: keyV10Repository,
     leafPublishedKeyNames: [
       ...config.walletProvider.keyAttestationPublishedKeyNames,
       ...config.walletProvider.tokenStatusListPublishedKeyNames,
@@ -397,7 +399,7 @@ app.http("createWalletAttestation", {
     attestationService: mobileAttestationService,
     cryptographyClient: walletAttestationCryptographyClient,
     federationEntity: config.entityConfiguration.federationEntity,
-    keyRepository,
+    keyRepository: keyV10Repository,
     nonceRepository,
     walletAttestationConfig: {
       ...config.walletProvider.walletAttestation,
