@@ -1,0 +1,103 @@
+name: APIM Restore
+
+on:
+  workflow_dispatch:
+    inputs:
+      backup_name:
+        description: Name of the .apimbackup blob to restore
+        required: true
+        type: string
+      confirmation:
+        description: Type "RESTORE iw-p-itn-apps-apim-01" to confirm
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: apim-production-maintenance
+  cancel-in-progress: false
+
+env:
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  AZURE_CORE_OUTPUT: none
+
+jobs:
+  restore:
+    name: Restore production APIM
+    runs-on: ubuntu-latest
+    environment: infra-psn-prod-cd
+    timeout-minutes: 180
+
+    env:
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      APIM_NAME: iw-p-itn-apps-apim-01
+      APIM_RESOURCE_GROUP: iw-p-itn-wallet-rg-01
+      BACKUP_STORAGE_ACCOUNT_NAME: iwpitnapimbackupst01
+      BACKUP_CONTAINER_NAME: apim-backups
+      BACKUP_NAME: ${{ inputs.backup_name }}
+      RESTORE_CONFIRMATION: ${{ inputs.confirmation }}
+
+    steps:
+      - name: Validate restore request
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ "$RESTORE_CONFIRMATION" != "RESTORE $APIM_NAME" ]; then
+            echo "Invalid confirmation. Type 'RESTORE $APIM_NAME' to proceed." >&2
+            exit 1
+          fi
+
+          if [[ ! "$BACKUP_NAME" =~ \.apimbackup$ ]]; then
+            echo "Backup name must end with '.apimbackup'." >&2
+            exit 1
+          fi
+
+      - name: Cloud Login
+        uses: pagopa/dx/actions/csp-login@main
+
+      - name: Restore APIM
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          apim_id="/subscriptions/${ARM_SUBSCRIPTION_ID}/resourceGroups/${APIM_RESOURCE_GROUP}/providers/Microsoft.ApiManagement/service/${APIM_NAME}"
+          request_body="$(jq -n \
+            --arg storage_account "$BACKUP_STORAGE_ACCOUNT_NAME" \
+            --arg container_name "$BACKUP_CONTAINER_NAME" \
+            --arg backup_name "$BACKUP_NAME" \
+            '{
+              storageAccount: $storage_account,
+              containerName: $container_name,
+              backupName: $backup_name,
+              accessType: "SystemAssignedManagedIdentity"
+            }')"
+
+          az resource invoke-action \
+            --action restore \
+            --ids "$apim_id" \
+            --api-version "2024-05-01" \
+            --request-body "$request_body" &
+          restore_pid=$!
+
+          while kill -0 "$restore_pid" 2>/dev/null; do
+            echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] APIM restore is still running..."
+            sleep 60
+          done
+
+          wait "$restore_pid"
+
+          echo "APIM restore from '$BACKUP_NAME' completed."
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: pagopa/dx/.github/actions/slack-notification@53f4c4a596dcfb846b933568ed5dd12fcadfd61e # main
+        with:
+          id: "APIM Restore"
+          title: "*APIM Restore Failure*"
+          text: "The restore of '${{ env.APIM_NAME }}' from '${{ inputs.backup_name }}' failed. Check the <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow run> for details."
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
