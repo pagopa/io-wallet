@@ -12,28 +12,26 @@ export const ECKeyWithoutKid = t.type({
   y: t.string,
 });
 
-export type ECKeyWithoutKid = t.TypeOf<typeof ECKeyWithoutKid>;
-
-export const ECKey = t.intersection([
+export const ECPublicKey = t.intersection([
   ECKeyWithoutKid,
   t.partial({
     kid: t.string,
   }),
 ]);
 
-export type ECKey = t.TypeOf<typeof ECKey>;
+export type ECPublicKey = t.TypeOf<typeof ECPublicKey>;
 
-export const ECKeyWithKid = t.intersection([
-  ECKey,
+export const ECPublicKeyWithKid = t.intersection([
+  ECPublicKey,
   t.type({
     kid: t.string,
   }),
 ]);
 
-export type ECKeyWithKid = t.TypeOf<typeof ECKeyWithKid>;
+export type ECPublicKeyWithKid = t.TypeOf<typeof ECPublicKeyWithKid>;
 
 const ECPrivateKey = t.intersection([
-  ECKey,
+  ECPublicKey,
   t.type({
     d: t.string,
   }),
@@ -41,6 +39,7 @@ const ECPrivateKey = t.intersection([
 
 type ECPrivateKey = t.TypeOf<typeof ECPrivateKey>;
 
+// TODO: can be removed when wallet attestation is removed
 export const ECPrivateKeyWithKid = t.intersection(
   [ECPrivateKey, t.type({ kid: t.string })],
   "ECPrivateKeyWithKid",
@@ -81,12 +80,13 @@ type RSAPrivateKey = t.TypeOf<typeof RSAPrivateKey>;
 /**
  * The Public Key JWK type. It could be either an ECKey or an RSAKey.
  */
-export const JwkPublicKey = t.union([RSAKey, ECKey], "JwkPublicKey");
+export const JwkPublicKey = t.union([RSAKey, ECPublicKey], "JwkPublicKey");
 export type JwkPublicKey = t.TypeOf<typeof JwkPublicKey>;
 
 /**
  * The Private Key JWK type. It could be either an ECPrivateKey or an RSAPrivateKey.
  */
+// TODO: can be removed when wallet attestation is removed
 export const JwkPrivateKey = t.union(
   [RSAPrivateKey, ECPrivateKey],
   "JwkPrivateKey",
@@ -96,8 +96,8 @@ export type JwkPrivateKey = t.TypeOf<typeof JwkPrivateKey>;
 /**
  * A generic JWK. It could be either an ECPrivateKey,RSAPrivateKey,ECKey or RSAKey.
  */
-export const Jwk = t.union([JwkPublicKey, JwkPrivateKey], "Jwk");
-export type Jwk = t.TypeOf<typeof Jwk>;
+const Jwk = t.union([JwkPublicKey, JwkPrivateKey], "Jwk");
+type Jwk = t.TypeOf<typeof Jwk>;
 
 export const fromBase64ToJwks = (b64: string) =>
   pipe(
@@ -108,8 +108,8 @@ export const fromBase64ToJwks = (b64: string) =>
   );
 
 export const areJwksEqual = async (
-  left: ECKey,
-  right: ECKey,
+  left: ECPublicKey,
+  right: ECPublicKey,
 ): Promise<boolean> => {
   const [leftThumb, rightThumb] = await Promise.all([
     calculateJwkThumbprint(left, "sha256"),

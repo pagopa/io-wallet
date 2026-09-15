@@ -34,6 +34,10 @@ locals {
         key_vault_secret_name = "WalletProviderLeafSigningKeys"
       },
       {
+        name                  = "WalletAttestationSigningKeys"
+        key_vault_secret_name = "WalletAttestationSigningKeys"
+      },
+      {
         name                  = "PidIssuerApiClientPrivateKey"
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
       },
