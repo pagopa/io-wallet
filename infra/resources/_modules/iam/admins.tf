@@ -33,6 +33,7 @@ module "admins_roles" {
       description         = "Allow admins to manage application-scoped KeyVault"
       roles = {
         secrets = "owner"
+        keys    = "owner"
       }
     },
     {
@@ -42,7 +43,8 @@ module "admins_roles" {
       description         = "Allow admins to manage infrastructure-scoped KeyVault"
       roles = {
         secrets      = "owner",
-        certificates = "owner"
+        certificates = "owner",
+        keys         = "owner"
       }
     }
   ]
