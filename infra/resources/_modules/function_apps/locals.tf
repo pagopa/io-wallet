@@ -76,6 +76,7 @@ locals {
         "https://wallet.io.pagopa.it/%s/",
         var.status_list_storage_container_name,
       )
+      FederationEntityBasePath                              = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10                           = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV13                           = "https://wallet.io.pagopa.it/v2"
       FederationEntityKeyId                                 = "RspQM6Tb9B1GRKjt"
@@ -143,6 +144,7 @@ locals {
     {
       KeyVaultUrl                 = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
       AndroidBundleIdentifiers    = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
+      FederationEntityBasePath    = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV10 = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV13 = var.federation_entity_base_path_v13_uat
       FrontDoorEndpointName       = var.front_door_endpoint_name_uat
