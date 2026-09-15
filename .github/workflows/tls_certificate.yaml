@@ -102,7 +102,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
-        uses: pagopa/dx/.github/actions/slack-notification@main
+        uses: pagopa/dx/.github/actions/slack-notification@a18d71062ddaaa09f8e145835a05aefd7701935e # main
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
@@ -229,7 +229,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
-        uses: pagopa/dx/.github/actions/slack-notification@main
+        uses: pagopa/dx/.github/actions/slack-notification@a18d71062ddaaa09f8e145835a05aefd7701935e # main
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
