@@ -20,7 +20,7 @@ module "apim_backup_storage_account" {
 
   resource_group_name = data.azurerm_resource_group.wallet.name
   use_case            = "default"
-  access_tier         = "Hot"
+  access_tier         = "Cool"
 
   force_public_network_access_enabled = true
 
@@ -96,6 +96,5 @@ resource "azurerm_role_assignment" "apim_backup_storage_blob_data_contributor" {
   scope                = module.apim_backup_storage_account.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = module.apim.principal_id
-  principal_type       = "ServicePrincipal"
   description          = "Allow APIM to create and restore backups using its managed identity"
 }
