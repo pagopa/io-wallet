@@ -95,7 +95,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure()
-        uses: pagopa/dx/.github/actions/slack-notification@53f4c4a596dcfb846b933568ed5dd12fcadfd61e # main
+        uses: pagopa/dx/.github/actions/slack-notification@main
         with:
           id: "APIM Restore"
           title: "*APIM Restore Failure*"
