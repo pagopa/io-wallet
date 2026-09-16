@@ -1,3 +1,4 @@
+import "@azure/functions-extensions-blob";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
@@ -9,10 +10,9 @@ import * as t from "io-ts";
 
 import { getConfigFromEnvironment } from "@/app/config";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
-import { EnqueueWhitelistedFiscalCodesFunction } from "@/infra/azure/functions/enqueue-whitelisted-fiscal-codes";
 import { HealthFunction } from "@/infra/azure/functions/health";
 import { InsertWhitelistedFiscalCodesFunction } from "@/infra/azure/functions/insert-whitelisted-fiscal-codes";
-import { BufferDecoder } from "@/infra/decoders/buffer";
+import { EnqueueWhitelistedFiscalCodesFunction } from "@/infra/handlers/enqueue-whitelisted-fiscal-codes";
 
 const config = pipe(
   process.env,
@@ -66,10 +66,10 @@ app.storageBlob("enqueueWhitelistedFiscalCodes", {
   connection: "StorageAccount",
   handler: EnqueueWhitelistedFiscalCodesFunction({
     batchSize: config.azure.storage.batchSize,
-    inputDecoder: BufferDecoder,
     queueClient: whitelistedFiscalCodesQueueClient,
   }),
   path: `${config.azure.storage.containerName}/{name}.csv`,
+  sdkBinding: true,
 });
 
 app.storageQueue("insertWhitelistedFiscalCodes", {

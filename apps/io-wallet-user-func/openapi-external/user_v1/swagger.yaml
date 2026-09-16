@@ -219,35 +219,6 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
-  "/wallet-unit-attestations":
-    post:
-      summary: CreateWalletUnitAttestation
-      description: Create and return a Wallet Unit Attestation (WUA)
-      operationId: createWalletUnitAttestation
-      requestBody:
-        content:
-          text/plain:
-            schema:
-              $ref: "#/components/schemas/CreateWalletUnitAttestationBody"
-      responses:
-        "200":
-          description: Wallet Unit Attestation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WalletUnitAttestation"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
   "/key-attestations":
     post:
       summary: CreateKeyAttestation
@@ -343,15 +314,6 @@ components:
           type: string
       example:
         wallet_instance_attestation: string
-    WalletUnitAttestation:
-      required:
-        - wallet_unit_attestation
-      type: object
-      properties:
-        wallet_unit_attestation:
-          type: string
-      example:
-        wallet_unit_attestation: string
     KeyAttestation:
       required:
         - key_attestation
@@ -392,9 +354,6 @@ components:
           type: string
           format: binary
     CreateWalletInstanceAttestationBody:
-      type: string
-      minLength: 1
-    CreateWalletUnitAttestationBody:
       type: string
       minLength: 1
     CreateKeyAttestationBody:

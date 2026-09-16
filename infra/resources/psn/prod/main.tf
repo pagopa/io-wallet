@@ -106,14 +106,22 @@ module "cosmos" {
 
   throughput = {
     wallet_instances         = 12000
-    nonces                   = 4000
-    whitelisted_fiscal_codes = 8000
+    nonces                   = 12000
+    whitelisted_fiscal_codes = 12000
     certificates             = 10000
+    keys                     = 10000
+    status_list_catalogs     = 10000
+    status_list_pages        = 10000
+    status_list_routing      = 10000
     uat = {
       wallet_instances         = 4000
       nonces                   = 2000
       certificates             = 2000
+      keys                     = 2000
       whitelisted_fiscal_codes = 2000
+      status_list_catalogs     = 2000
+      status_list_pages        = 2000
+      status_list_routing      = 2000
     }
   }
 
@@ -290,6 +298,7 @@ module "iam" {
   }
 
   key_vault_app = {
+    id                  = module.key_vault_app.key_vault_wallet.id
     name                = module.key_vault_app.key_vault_wallet.name
     resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
   }
