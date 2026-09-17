@@ -2,7 +2,7 @@ import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import * as TE from "fp-ts/lib/TaskEither";
 import { Agent, fetch, RequestInit } from "undici";
 
-import { Config, PidIssuerApiClientConfig } from "@/app/config";
+import { PidIssuerApiClientConfig } from "@/app/config";
 import { CredentialRepository } from "@/credential";
 import { removeTrailingSlash } from "@/url";
 export class PidIssuerClient implements CredentialRepository {
@@ -19,7 +19,7 @@ export class PidIssuerClient implements CredentialRepository {
       requestTimeout,
       rootCACertificate,
     }: PidIssuerApiClientConfig,
-    basePath: Config["entityConfiguration"]["federationEntity"]["basePathV1"]["href"],
+    basePath: string,
   ) {
     this.#baseURL = baseURL;
     this.#walletProviderEntity = removeTrailingSlash(basePath);

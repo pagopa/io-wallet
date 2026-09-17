@@ -31,7 +31,7 @@ import {
 } from "../wallet-instance-attestation-request";
 
 interface WalletInstanceAttestationEnvironment extends SignJwtEnvironment {
-  federationEntity: FederationEntity;
+  federationEntityBasePath: FederationEntity["basePathV2"];
   keyRepository: KeyRepository;
   walletAttestationConfig: {
     oauthClientSub: string;
@@ -79,7 +79,7 @@ const getWalletInstanceAttestationData =
     WalletInstanceAttestationData
   > =>
   ({
-    federationEntity: { basePathV2: basePath },
+    federationEntityBasePath,
     keyRepository,
     walletInstanceAttestationSigningKeyName,
     // walletAttestationConfig: { oauthClientSub },
@@ -96,7 +96,7 @@ const getWalletInstanceAttestationData =
             jwkAlg: getSignAlgorithmFromCurve(input.cnf.jwk.crv),
             kid: signingKey.kid,
             sub,
-            walletProviderName: basePath.href,
+            walletProviderName: federationEntityBasePath.href,
             // walletSolutionVersion: input.walletSolutionVersion,
             x5c: signingKey.certificateChain,
           })),

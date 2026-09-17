@@ -40,7 +40,7 @@ import {
 } from "../key-attestation-request";
 
 interface KeyAttestationEnvironment extends SignJwtEnvironment {
-  federationEntity: FederationEntity;
+  federationEntityBasePath: FederationEntity["basePathV2"];
   keyAttestationSigningKeyName: string;
   keyRepository: KeyRepository;
   statusListBaseUrl: string;
@@ -87,7 +87,7 @@ const getKeyAttestationData =
     KeyAttestationData
   > =>
   ({
-    federationEntity: { basePathV2: basePath },
+    federationEntityBasePath,
     keyAttestationSigningKeyName,
     keyRepository,
     statusListBaseUrl,
@@ -106,7 +106,7 @@ const getKeyAttestationData =
             uri: buildUrl(walletInstanceStatus.statusListId, statusListBaseUrl),
           },
         },
-        walletProviderName: basePath.href,
+        walletProviderName: federationEntityBasePath.href,
         // walletSolutionVersion,
         x5c: signingKey.certificateChain,
       })),
