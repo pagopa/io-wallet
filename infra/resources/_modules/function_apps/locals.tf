@@ -13,6 +13,12 @@ locals {
 
     EntityConfigurationStorageAccountName           = var.storage_account_cdn_name
     EntityConfigurationStorageContainerName         = "well-known"
+    EntityConfigurationV1StorageContainerName       = "entity-configuration-v1"
+    EntityConfigurationV2StorageContainerName       = "entity-configuration-v2"
+    FederationEntityV1IntermediatePublishedKeyNames = "fake-wallet-provider-signing-key"
+    FederationEntityV1IntermediateSigningKeyName = "fake-wallet-provider-signing-key"
+    FederationEntityV2IntermediatePublishedKeyNames = "fake-wallet-provider-signing-key"
+    FederationEntityV2IntermediateSigningKeyName = "fake-wallet-provider-signing-key"
     StatusListCapacityBits                          = "1048576"
     StatusListPageCount                             = "256"
     StatusListStorageContainerName                  = var.status_list_storage_container_name
@@ -25,6 +31,7 @@ locals {
     FederationEntityPolicyUri        = "https://io.italia.it/privacy-policy/"
     FederationEntityTosUri           = "https://io.italia.it/privacy-policy/"
     FederationEntityLogoUri          = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
+    FederationEntityV2WalletSolutionLogoUri = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
     FederationEntityContacts         = "pagopaspa@pec.pagopa.it"
     IosBundleIdentifiers             = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet"
     IosTeamIdentifier                = "M2X5YQ4BJ7"
@@ -46,6 +53,9 @@ locals {
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-func-02.azurewebsites.net"
 
     WalletAttestationWalletName = "IT Wallet"
+    FederationEntityV2WalletSolutionWalletName         = "App IO"
+    FederationEntityV2WalletSolutionAuthorizationEndpoint   = "https://continua.io.pagopa.it/itw/auth"
+    FederationEntityV2WalletSolutionCredentialOfferEndpoint = "https://continua.io.pagopa.it/itw/credential-offer"
 
     WalletProviderCertificateCountry  = "IT"
     WalletProviderCertificateState    = "Lazio"
@@ -77,12 +87,13 @@ locals {
         var.status_list_storage_container_name,
       )
       FederationEntityBasePath                              = "https://wallet.io.pagopa.it"
+      FederationEntityBasePathV1                            = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10                           = "https://wallet.io.pagopa.it"
+      FederationEntityBasePathV2                            = "https://wallet.io.pagopa.it/v2"
       FederationEntityBasePathV13                           = "https://wallet.io.pagopa.it/v2"
+      FederationEntityV2LogoUri                             = "https://wallet.io.pagopa.it/images/logo-pagopa.svg"
       FederationEntityKeyId                                 = "RspQM6Tb9B1GRKjt"
       TokenStatusListKeyId                                  = "Gsc_881JGHOVX9U9hNLODJf35bfTfFdbbv1xJiSCOCA"
-      IntermediatePublishedKeyNames                         = "fake-wallet-provider-signing-key"
-      IntermediateSigningKeyName                            = "fake-wallet-provider-signing-key"
       TokenStatusListPublishedKeyNames                      = "fake-wallet-provider-signing-key"
       TokenStatusListSigningKeyName                         = "fake-wallet-provider-signing-key"
       WalletAttestationKeyId                                = "Q1yVyGZQ9hFE2MEcsZN_r-2WccrhKPgirpZR-pCkoM0"
@@ -110,6 +121,7 @@ locals {
 
   function_app_user_slot_disabled = [
     "generateEntityConfiguration",
+    "generateEntityConfigurationV2",
     "statusListManager",
     "statusListPublicationDispatcher",
     "statusListPublication",
@@ -119,7 +131,6 @@ locals {
   ]
 
   function_app_user_uat_both_slots_disabled = [
-    "generateEntityConfiguration",
     "sendEmailOnWalletInstanceCreation",
     "sendEmailOnWalletInstanceRevocation",
   ]
@@ -142,11 +153,19 @@ locals {
   function_app_user_uat_common_app_settings = merge(
     local.function_app_user_envs_shared_app_settings,
     {
+      EntityConfigurationStorageAccountName = var.storage_account_cdn_name_uat
       KeyVaultUrl                 = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
       AndroidBundleIdentifiers    = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
       FederationEntityBasePath    = "https://foo11.blob.core.windows.net/foo/"
+      FederationEntityBasePathV1  = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV10 = "https://foo11.blob.core.windows.net/foo/"
+      FederationEntityBasePathV2  = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"
       FederationEntityBasePathV13 = var.federation_entity_base_path_v13_uat
+      FederationEntityV2LogoUri   = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider/logo-pagopa.svg"
+      FederationEntityV1IntermediatePublishedKeyNames = "intermediate-key-pre"
+      FederationEntityV1IntermediateSigningKeyName = "intermediate-key-pre"
+      FederationEntityV2IntermediatePublishedKeyNames = "intermediate-key-pre"
+      FederationEntityV2IntermediateSigningKeyName = "intermediate-key-pre"
       FrontDoorEndpointName       = var.front_door_endpoint_name_uat
       FrontDoorProfileName        = var.front_door_profile_name_uat
       PidIssuerApiBaseURL         = "https://pre.util.wallet.ipzs.it"
@@ -163,18 +182,16 @@ locals {
       TrustAnchorUrl                                        = "https://pre.ta.wallet.ipzs.it"
       FederationEntityKeyId                                 = "NsXymfIILEPR5Y0twNwFM-YYuJpZQP-6YjPhPRSYbl0"
       TokenStatusListKeyId                                  = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
-      IntermediatePublishedKeyNames                         = "fake-wallet-provider-signing-key-pre"
-      IntermediateSigningKeyName                            = "fake-wallet-provider-signing-key-pre"
-      TokenStatusListPublishedKeyNames                      = "fake-wallet-provider-signing-key-pre"
-      TokenStatusListSigningKeyName                         = "fake-wallet-provider-signing-key-pre"
+      TokenStatusListPublishedKeyNames                      = "leaf-key-pre"
+      TokenStatusListSigningKeyName                         = "leaf-key-pre"
       WalletAttestationKeyId                                = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
       WalletInstanceAttestationKeyId                        = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
       KeyAttestationKeyId                                   = "8UkfrvttLkpAQOOp4KYpaPsBLlvb2hhAAyTLBVN6NUc"
-      WalletAttestationKeyName                              = "fake-wallet-provider-signing-key-pre"
-      WalletInstanceAttestationPublishedKeyNames            = "fake-wallet-provider-signing-key-pre"
-      WalletInstanceAttestationSigningKeyName               = "fake-wallet-provider-signing-key-pre"
-      KeyAttestationPublishedKeyNames                       = "fake-wallet-provider-signing-key-pre"
-      KeyAttestationSigningKeyName                          = "fake-wallet-provider-signing-key-pre"
+      WalletAttestationKeyName                              = "leaf-key-pre"
+      WalletInstanceAttestationPublishedKeyNames            = "leaf-key-pre"
+      WalletInstanceAttestationSigningKeyName               = "leaf-key-pre"
+      KeyAttestationPublishedKeyNames                       = "leaf-key-pre"
+      KeyAttestationSigningKeyName                          = "leaf-key-pre"
       CosmosDbEndpoint__accountEndpoint                     = var.cosmos_db_endpoint
       CosmosDbDatabaseName                                  = var.cosmos_database_name_uat
       CosmosDbRequestTimeout                                = "5000"

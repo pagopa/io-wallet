@@ -1,19 +1,35 @@
 import { CdnManagementClient } from "@azure/arm-cdn";
+import { ContainerClient } from "@azure/storage-blob";
 import * as H from "@pagopa/handler-kit";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
-import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
+import { ECPrivateKeyWithKid, ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 import { EntityConfigurationToJwtModel } from "@/encoders/entity-configuration";
-import { EntityConfigurationEnvironment } from "@/entity-configuration";
+import { FederationEntityMetadata } from "@/entity-configuration";
 import { uploadFile } from "@/infra/azure/storage/blob";
-import { signJwt } from "@/infra/crypto/signer";
+import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
 import { sendTelemetryException } from "@/infra/telemetry";
-import { getKey } from "@/keys";
+import { getKey, KeyRepository } from "@/keys";
 import { getLoAUri, LoA } from "@/wallet-provider";
+
+interface EntityConfigurationV1Environment extends SignJwtEnvironment {
+  containerClient: ContainerClient;
+  entityConfigurationProperties: {
+    authorityHints: UrlFromString[];
+    federationEntity: FederationEntityMetadata & {
+      basePath: UrlFromString;
+    };
+  };
+  intermediatePublishedKeyNames: readonly string[];
+  intermediateSigningKeyName: string;
+  keyRepository: KeyRepository;
+  walletAttestationSigningKeys: readonly ECPrivateKeyWithKid[];
+}
 
 const withX5c = ({
   certificateChain,
@@ -25,19 +41,19 @@ const withX5c = ({
 
 // Create the JWT payload for the entity configuration metadata and return the signed JWT
 const createEntityConfiguration: RTE.ReaderTaskEither<
-  EntityConfigurationEnvironment,
+  EntityConfigurationV1Environment,
   Error,
   string
 > = ({
   cryptographyClient,
-  entityConfiguration: {
+  entityConfigurationProperties: {
     authorityHints,
-    federationEntity: { basePathV10: basePath, ...federationEntityMetadata },
+    federationEntity: { basePath, ...federationEntityMetadata },
   },
   intermediatePublishedKeyNames,
   intermediateSigningKeyName,
   keyRepository,
-  leafPublishedKeyNames,
+  walletAttestationSigningKeys,
 }) =>
   pipe(
     sequenceS(TE.ApplyPar)({
@@ -45,12 +61,8 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
         intermediatePublishedKeyNames,
         TE.traverseArray((keyName) => getKey(keyName)({ keyRepository })),
       ),
-      leafPublishedKeys: pipe(
-        leafPublishedKeyNames,
-        TE.traverseArray((keyName) => getKey(keyName)({ keyRepository })),
-      ),
     }),
-    TE.chain(({ intermediatePublishedKeys, leafPublishedKeys }) =>
+    TE.chain(({ intermediatePublishedKeys }) =>
       pipe(
         intermediatePublishedKeys.find(
           ({ keyName }) => keyName === intermediateSigningKeyName,
@@ -81,7 +93,12 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                   pipe(basePath, getLoAUri(LoA.medium)),
                   pipe(basePath, getLoAUri(LoA.high)),
                 ],
-                jwks: leafPublishedKeys.map(withX5c),
+                jwks: walletAttestationSigningKeys.map(
+                  ({ d, ...publicKey }) => {
+                    void d;
+                    return publicKey;
+                  },
+                ),
               },
             },
             EntityConfigurationToJwtModel.encode,
@@ -130,7 +147,7 @@ const purgeContent: () => RTE.ReaderTaskEither<
       TE.map(() => void 0),
     );
 
-export const GenerateEntityConfigurationHandler = H.of(() =>
+export const GenerateEntityConfigurationV1Handler = H.of(() =>
   pipe(
     createEntityConfiguration,
     RTE.chainW(uploadFile),

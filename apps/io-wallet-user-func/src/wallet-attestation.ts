@@ -20,7 +20,7 @@ const disclosureToBase64Url = (disclosure: [string, string, unknown]): string =>
   );
 
 export interface WalletAttestationEnvironment {
-  federationEntity: FederationEntity;
+  federationEntityBasePath: FederationEntity["basePathV1"];
   walletAttestationConfig: WalletAttestationConfig;
 }
 
@@ -36,11 +36,11 @@ export const getWalletAttestationData =
     walletAttestationSigningKid: string,
   ): R.Reader<WalletAttestationEnvironment, WalletAttestationData> =>
   ({
-    federationEntity: { basePathV10: basePath },
+    federationEntityBasePath,
     walletAttestationConfig: { walletLink, walletName },
   }) => ({
-    aal: pipe(basePath, getLoAUri(LoA.basic)),
-    iss: basePath.href,
+    aal: pipe(federationEntityBasePath, getLoAUri(LoA.basic)),
+    iss: federationEntityBasePath.href,
     kid: walletAttestationSigningKid,
     sub: walletAttestationRequest.header.kid,
     walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
