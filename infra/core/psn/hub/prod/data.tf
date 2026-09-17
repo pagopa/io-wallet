@@ -46,3 +46,15 @@ data "azurerm_public_ip" "appgw" {
   name                = "pagopa-ApplicationGW-PublicIp"
   resource_group_name = azurerm_resource_group.network.name
 }
+
+data "azurerm_firewall" "hub" {
+  provider = azurerm.hub
+
+  name                = "pagopa-afw-italynorth"
+  resource_group_name = azurerm_resource_group.network.name
+}
+
+data "azurerm_monitor_action_group" "wallet" {
+  name                = "iw-p-itn-ag-01"
+  resource_group_name = "iw-p-wallet-rg-01"
+}

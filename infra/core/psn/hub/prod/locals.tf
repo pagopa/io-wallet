@@ -45,4 +45,43 @@ locals {
     Environment  = "PROD"
     Source       = "https://github.com/pagopa/io-wallet/blob/main/infra/core/psn/hub/prod"
   }
+
+  firewall_alerts = {
+    cpu_utilization = {
+      display_name = "High CPU utilization"
+      description  = "Azure Firewall CPU utilization exceeded 80%. Consider scaling or optimizing rule sets."
+      metric_name  = "FirewallCPUUtilization"
+      threshold    = 80
+    }
+    throughput = {
+      display_name = "High throughput"
+      description  = "Azure Firewall throughput exceeded 1000000000 Bytes/sec. Monitor for traffic saturation and performance."
+      metric_name  = "FirewallThroughput"
+      threshold    = 1000000000
+    }
+    snat_port_usage = {
+      display_name = "High SNAT port usage"
+      description  = "Azure Firewall SNAT port usage exceeded 80%. Check for SNAT exhaustion and scale accordingly."
+      metric_name  = "SNATPortUsage"
+      threshold    = 80
+    }
+    dropped_packets = {
+      display_name = "High dropped packet count"
+      description  = "Azure Firewall dropped packets exceeded 1000. Investigate rule misconfigurations or threats."
+      metric_name  = "DroppedPackets"
+      threshold    = 1000
+    }
+    allowed_packets = {
+      display_name = "High allowed packet count"
+      description  = "Azure Firewall allowed packets exceeded 100000. Ensure traffic patterns align with expectations."
+      metric_name  = "AllowedPackets"
+      threshold    = 100000
+    }
+    denied_packets = {
+      display_name = "High denied packet count"
+      description  = "Azure Firewall denied packets exceeded 500. Review denied traffic for potential threats or misconfigurations."
+      metric_name  = "DeniedPackets"
+      threshold    = 500
+    }
+  }
 }
