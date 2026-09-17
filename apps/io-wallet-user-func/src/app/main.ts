@@ -181,18 +181,23 @@ const emailNotificationService = new EmailNotificationServiceClient({
 
 const slackNotificationService = new SlackNotificationService(config.slack);
 
-const blobServiceClient = new BlobServiceClient(
-  `https://${config.azure.storage.entityConfiguration.accountName}.blob.core.windows.net`,
+const entityConfigurationV1BlobServiceClient = new BlobServiceClient(
+  `https://${config.azure.storage.entityConfigurationV1.accountName}.blob.core.windows.net`,
+  credential,
+);
+
+const entityConfigurationV2BlobServiceClient = new BlobServiceClient(
+  `https://${config.azure.storage.entityConfigurationV2.accountName}.blob.core.windows.net`,
   credential,
 );
 
 const entityConfigurationV1ContainerClient =
-  blobServiceClient.getContainerClient(
+  entityConfigurationV1BlobServiceClient.getContainerClient(
     config.azure.storage.entityConfigurationV1.containerName,
   );
 
 const entityConfigurationV2ContainerClient =
-  blobServiceClient.getContainerClient(
+  entityConfigurationV2BlobServiceClient.getContainerClient(
     config.azure.storage.entityConfigurationV2.containerName,
   );
 

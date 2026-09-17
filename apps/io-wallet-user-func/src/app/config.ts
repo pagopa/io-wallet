@@ -94,13 +94,12 @@ export type AttestationServiceConfiguration = t.TypeOf<
 >;
 
 const AzureStorageConfig = t.type({
-  entityConfiguration: t.type({
-    accountName: t.string,
-  }),
   entityConfigurationV1: t.type({
+    accountName: t.string,
     containerName: t.string,
   }),
   entityConfigurationV2: t.type({
+    accountName: t.string,
     containerName: t.string,
   }),
   statusLists: t.type({
@@ -592,13 +591,12 @@ const getAzureStorageConfigFromEnvironment: RE.ReaderEither<
       walletInstanceRevocationEmailQueueName,
       walletInstanceStorageAccountUrl,
     }) => ({
-      entityConfiguration: {
-        accountName: entityConfigurationStorageAccountName,
-      },
       entityConfigurationV1: {
+        accountName: entityConfigurationStorageAccountName,
         containerName: entityConfigurationV1StorageContainerName,
       },
       entityConfigurationV2: {
+        accountName: entityConfigurationStorageAccountName,
         containerName: entityConfigurationV2StorageContainerName,
       },
       statusLists: {
