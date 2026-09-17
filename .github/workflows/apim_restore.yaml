@@ -58,7 +58,7 @@ jobs:
           fi
 
       - name: Cloud Login
-        uses: pagopa/dx/actions/csp-login@main
+        uses: pagopa/dx/actions/csp-login@2877a81f17cd9d1ec29efbb822d409d4f8bf3fca # main
 
       - name: Restore APIM
         shell: bash
@@ -95,7 +95,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure()
-        uses: pagopa/dx/.github/actions/slack-notification@main
+        uses: pagopa/dx/.github/actions/slack-notification@2877a81f17cd9d1ec29efbb822d409d4f8bf3fca # main
         with:
           id: "APIM Restore"
           title: "*APIM Restore Failure*"
