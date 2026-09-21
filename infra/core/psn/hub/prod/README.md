@@ -22,8 +22,20 @@ The **Hub is the only component that has access to internet**. In fact, each Spo
 ## List of resources
 
 - Application Gateway
+- Azure Firewall metric alerts
 - Private DNS zones
 - VPN configuration
+
+### Azure Firewall metric alerts
+
+The configuration creates alerts for the documented Azure Firewall metrics
+`Throughput` and `SNATPortUtilization`, routed to the existing IT-Wallet action
+group. The assessment also names CPU utilization and allowed, denied, and
+dropped packet counters, but those identifiers are not supported metrics in the
+`Microsoft.Network/azureFirewalls` namespace. They are intentionally not
+replaced with `ObservedCapacity` or rule-hit metrics because those signals have
+different units and semantics; they require a separate capacity or diagnostic
+log alert design.
 
 ### Application Gateway
 
