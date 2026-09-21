@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.7.1
+
+### Patch Changes
+
+- 3e75b3d: Updated `jwk` module in package `common`
+
 ## 1.7.0
 
 ### Minor Changes

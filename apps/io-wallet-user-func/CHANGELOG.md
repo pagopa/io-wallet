@@ -1,5 +1,16 @@
 # io-wallet-user-func
 
+## 5.0.0
+
+### Major Changes
+
+- 3e75b3d: Removed /wallet-unit-attestations endpoint and added the Key Vault JWT signing flow
+
+### Patch Changes
+
+- Updated dependencies [3e75b3d]
+  - io-wallet-common@1.7.1
+
 ## 4.9.0
 
 ### Minor Changes
