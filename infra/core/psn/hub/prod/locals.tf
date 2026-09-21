@@ -51,16 +51,28 @@ locals {
   # documented metrics here until those signals can be mapped to capacity or
   # diagnostic-log queries without changing their meaning.
   firewall_alerts = {
+    health = {
+      display_name = "Degraded or unhealthy state"
+      description  = "Azure Firewall health state fell below 100%. Investigate the Status and Reason dimensions."
+      metric_name  = "FirewallHealth"
+      aggregation  = "Average"
+      operator     = "LessThan"
+      threshold    = 100
+    }
     throughput = {
       display_name = "High throughput"
       description  = "Azure Firewall throughput exceeded 1000000000 Bytes/sec (8000000000 Bits/sec). Monitor for traffic saturation and performance."
       metric_name  = "Throughput"
+      aggregation  = "Average"
+      operator     = "GreaterThan"
       threshold    = 8000000000
     }
     snat_port_utilization = {
       display_name = "High SNAT port usage"
       description  = "Azure Firewall SNAT port usage exceeded 80%. Check for SNAT exhaustion and scale accordingly."
       metric_name  = "SNATPortUtilization"
+      aggregation  = "Average"
+      operator     = "GreaterThan"
       threshold    = 80
     }
   }

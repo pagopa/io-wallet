@@ -18,8 +18,8 @@ resource "azurerm_monitor_metric_alert" "firewall" {
   criteria {
     metric_namespace       = "Microsoft.Network/azureFirewalls"
     metric_name            = each.value.metric_name
-    aggregation            = "Average"
-    operator               = "GreaterThan"
+    aggregation            = each.value.aggregation
+    operator               = each.value.operator
     threshold              = each.value.threshold
     skip_metric_validation = false
   }
