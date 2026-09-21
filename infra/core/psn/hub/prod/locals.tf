@@ -53,7 +53,7 @@ locals {
   firewall_alerts = {
     health = {
       display_name = "Degraded or unhealthy state"
-      description  = "Azure Firewall health state fell below 100%. Investigate the Status and Reason dimensions."
+      description  = "Check Status/Reason, SNAT exhaustion, and recent firewall changes."
       metric_name  = "FirewallHealth"
       aggregation  = "Average"
       operator     = "LessThan"
@@ -61,7 +61,7 @@ locals {
     }
     throughput = {
       display_name = "High throughput"
-      description  = "Azure Firewall throughput exceeded 1000000000 Bytes/sec (8000000000 Bits/sec). Monitor for traffic saturation and performance."
+      description  = "Review traffic spikes and scale or optimize firewall capacity and rules."
       metric_name  = "Throughput"
       aggregation  = "Average"
       operator     = "GreaterThan"
@@ -69,7 +69,7 @@ locals {
     }
     snat_port_utilization = {
       display_name = "High SNAT port usage"
-      description  = "Azure Firewall SNAT port usage exceeded 80%. Check for SNAT exhaustion and scale accordingly."
+      description  = "Check outbound flows; add public IPs or a NAT Gateway if exhaustion persists."
       metric_name  = "SNATPortUtilization"
       aggregation  = "Average"
       operator     = "GreaterThan"
