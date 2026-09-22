@@ -13,7 +13,6 @@ import { type JWTPayload } from "jose";
 import { AttestationService, validateAssertion } from "@/attestation-service";
 import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
 import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
-import { KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
@@ -50,10 +49,7 @@ const testWalletAttestations: WalletAttestations = {
 };
 
 interface WalletAttestationGenerationEnvironment
-  extends WalletAttestationEnvironment, WalletAttestationSigningEnvironment {
-  keyRepository: KeyRepository;
-  walletAttestationKeyName: string;
-}
+  extends WalletAttestationEnvironment, WalletAttestationSigningEnvironment {}
 
 interface WalletAttestationSigningEnvironment extends SignJwtEnvironment {
   walletAttestationSigningKey: ECPrivateKeyWithKid;

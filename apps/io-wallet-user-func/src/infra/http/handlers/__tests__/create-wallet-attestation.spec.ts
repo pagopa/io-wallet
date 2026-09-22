@@ -21,7 +21,6 @@ import type { SignJwtEnvironment } from "@/infra/crypto/signer";
 import { AttestationService } from "@/attestation-service";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
-import { KeyRepository } from "@/keys";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
@@ -118,19 +117,6 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
-const walletAttestationKeyName = "wallet-attestation-key-name";
-
-const keyRepository: KeyRepository = {
-  getKeyByName: () =>
-    TE.right(
-      O.some({
-        ...publicEcKey,
-        certificateChain: ["cert1", "cert2"],
-        keyName: walletAttestationKeyName,
-      }),
-    ),
-};
-
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
 
@@ -174,11 +160,9 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -209,11 +193,9 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -278,11 +260,9 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
@@ -328,11 +308,9 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
@@ -372,11 +350,9 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
@@ -427,11 +403,9 @@ describe("CreateWalletAttestationHandler", async () => {
       federationEntity,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationKeyName,
       walletAttestationSigningKey,
       walletInstanceRepository,
     });
