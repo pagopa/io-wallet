@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.0.1
+
+### Patch Changes
+
+- 92c7950: Simplified /wallet-attestations endpoint
+
 ## 5.0.0
 
 ### Major Changes
