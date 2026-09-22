@@ -19,12 +19,9 @@ import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { verifyJwtWithInternalKey } from "@/verifier";
 import {
-  createWalletAttestationSdJwtClaims,
   getWalletAttestationData,
   type WalletAttestationEnvironment,
-  type WalletAttestationSdJwtClaims,
 } from "@/wallet-attestation";
-import { createWalletAttestationAsMdoc } from "@/wallet-attestation-mdoc";
 import { WalletAttestationRequest } from "@/wallet-attestation-request";
 import {
   getValidWalletInstanceByUserId,
@@ -33,20 +30,12 @@ import {
 import { consumeNonce } from "@/wallet-instance-request";
 
 export const WalletAttestations = t.type({
-  wallet_attestations: t.tuple([
+  wallet_attestations: t.array(
     t.type({
       format: t.literal("jwt"),
       wallet_attestation: t.string,
     }),
-    t.type({
-      format: t.literal("dc+sd-jwt"),
-      wallet_attestation: t.string,
-    }),
-    t.type({
-      format: t.literal("mso_mdoc"),
-      wallet_attestation: t.string,
-    }),
-  ]),
+  ),
 });
 
 type WalletAttestations = t.TypeOf<typeof WalletAttestations>;
@@ -56,14 +45,6 @@ const testWalletAttestations: WalletAttestations = {
     {
       format: "jwt",
       wallet_attestation: "this_is_a_test_jwt_attestation",
-    },
-    {
-      format: "dc+sd-jwt",
-      wallet_attestation: "this_is_a_test_sd_jwt_attestation",
-    },
-    {
-      format: "mso_mdoc",
-      wallet_attestation: "this_is_a_test_mdoc_attestation",
     },
   ],
 };
@@ -92,30 +73,6 @@ const signWalletAttestationJwt =
       },
       payload,
     })({ cryptographyClient });
-
-const signWalletAttestationSdJwt =
-  ({
-    claims,
-    disclosures,
-  }: WalletAttestationSdJwtClaims): RTE.ReaderTaskEither<
-    WalletAttestationSigningEnvironment,
-    Error,
-    string
-  > =>
-  ({ cryptographyClient, walletAttestationSigningKey }) =>
-    pipe(
-      signJwt({
-        // TODO: SIW-2656. env var are not used
-        crv: walletAttestationSigningKey.crv,
-        duration: 60 * 60,
-        header: {
-          kid: walletAttestationSigningKey.kid,
-          typ: "dc+sd-jwt",
-        },
-        payload: { ...claims },
-      })({ cryptographyClient }),
-      TE.map((jwt) => [jwt, ...disclosures].join("~")),
-    );
 
 /**
  * Validates the wallet attestation request by performing the following steps:
@@ -187,14 +144,8 @@ const generateWalletAttestations = ({
             WalletAttestationToJwtModel.encode,
             (payload) => signWalletAttestationJwt({ ...payload }),
           ),
-          msoMdoc: createWalletAttestationAsMdoc(walletAttestationData),
-          sdJwt: pipe(
-            walletAttestationData,
-            createWalletAttestationSdJwtClaims,
-            RTE.chainW(signWalletAttestationSdJwt),
-          ),
         }),
-        RTE.map(({ jwt, msoMdoc, sdJwt }) =>
+        RTE.map(({ jwt }) =>
           isTestUser
             ? testWalletAttestations
             : {
@@ -202,14 +153,6 @@ const generateWalletAttestations = ({
                   {
                     format: "jwt",
                     wallet_attestation: jwt,
-                  },
-                  {
-                    format: "dc+sd-jwt",
-                    wallet_attestation: sdJwt,
-                  },
-                  {
-                    format: "mso_mdoc",
-                    wallet_attestation: msoMdoc,
                   },
                 ],
               },
