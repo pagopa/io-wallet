@@ -108,10 +108,10 @@ const keyRepository: KeyRepository = {
   getKeyByName: () =>
     TE.right(
       O.some({
-        ...privateEcKey,
+        ...publicEcKey,
         certificateChain: ["cert1", "cert2"],
         keyName: keyAttestationKeyName,
-        kid: privateEcKey.kid,
+        kid: publicEcKey.kid,
       }),
     ),
 };
@@ -475,7 +475,7 @@ describe("CreateKeyAttestationHandler", async () => {
       jose.decodeProtectedHeader(body.right.key_attestation),
     ).toMatchObject({
       alg: "ES256",
-      kid: privateEcKey.kid,
+      kid: publicEcKey.kid,
     });
   });
 

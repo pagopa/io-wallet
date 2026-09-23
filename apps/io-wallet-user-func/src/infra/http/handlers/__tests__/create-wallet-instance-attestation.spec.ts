@@ -86,10 +86,10 @@ const keyRepository: KeyRepository = {
   getKeyByName: () =>
     TE.right(
       O.some({
-        ...privateEcKey,
+        ...publicEcKey,
         certificateChain: ["cert1", "cert2"],
         keyName: walletInstanceAttestationKeyName,
-        kid: privateEcKey.kid,
+        kid: publicEcKey.kid,
       }),
     ),
 };
@@ -428,7 +428,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     expect(jose.decodeProtectedHeader(walletInstanceAttestation)).toMatchObject(
       {
         alg: "ES256",
-        kid: privateEcKey.kid,
+        kid: publicEcKey.kid,
       },
     );
 

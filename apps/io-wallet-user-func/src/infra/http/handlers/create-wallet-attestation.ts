@@ -7,28 +7,27 @@ import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import { type JWTPayload } from "jose";
 
 import { AttestationService, validateAssertion } from "@/attestation-service";
 import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
+import { WalletAttestationData } from "@/encoders/wallet-attestation";
+import { FederationEntity } from "@/entity-configuration";
 import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
+import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
 import { verifyJwtWithInternalKey } from "@/verifier";
-import {
-  getWalletAttestationData,
-  type WalletAttestationEnvironment,
-} from "@/wallet-attestation";
 import { WalletAttestationRequest } from "@/wallet-attestation-request";
 import {
   getValidWalletInstanceByUserId,
   WalletInstanceEnvironment,
 } from "@/wallet-instance";
 import { consumeNonce } from "@/wallet-instance-request";
+import { getLoAUri, LoA } from "@/wallet-provider";
 
-export const WalletAttestations = t.type({
+const WalletAttestations = t.type({
   wallet_attestations: t.array(
     t.type({
       format: t.literal("jwt"),
@@ -48,23 +47,63 @@ const testWalletAttestations: WalletAttestations = {
   ],
 };
 
-interface WalletAttestationGenerationEnvironment
-  extends WalletAttestationEnvironment, WalletAttestationSigningEnvironment {}
-
-interface WalletAttestationSigningEnvironment extends SignJwtEnvironment {
-  walletAttestationSigningKey: ECPrivateKeyWithKid;
+interface WalletAttestationConfig {
+  walletLink: string;
+  walletName: string;
 }
 
-const signWalletAttestationJwt =
+interface WalletAttestationEnvironment extends SignJwtEnvironment {
+  federationEntity: FederationEntity;
+  keyRepository: KeyRepository;
+  walletAttestationConfig: WalletAttestationConfig;
+  walletAttestationSigningKeyName: string;
+}
+
+const getWalletAttestationData =
   (
-    payload: JWTPayload,
-  ): RTE.ReaderTaskEither<WalletAttestationSigningEnvironment, Error, string> =>
-  ({ cryptographyClient, walletAttestationSigningKey }) =>
+    walletAttestationRequest: WalletAttestationRequest,
+  ): RTE.ReaderTaskEither<
+    WalletAttestationEnvironment,
+    Error,
+    WalletAttestationData
+  > =>
+  ({
+    federationEntity: { basePathV10: basePath },
+    keyRepository,
+    walletAttestationConfig: { walletLink, walletName },
+    walletAttestationSigningKeyName,
+  }) =>
+    pipe(
+      { keyRepository },
+      getKey(walletAttestationSigningKeyName),
+      TE.map(({ crv, kid }) => ({
+        aal: pipe(basePath, getLoAUri(LoA.basic)),
+        crv,
+        iss: basePath.href,
+        kid,
+        sub: walletAttestationRequest.header.kid,
+        walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,
+        walletLink,
+        walletName,
+      })),
+    );
+
+const signWalletAttestation =
+  ({
+    crv,
+    kid,
+    payload,
+  }: {
+    crv: string;
+    kid: string;
+    payload: JWTPayload;
+  }): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
+  ({ cryptographyClient }) =>
     signJwt({
-      crv: walletAttestationSigningKey.crv,
+      crv,
       duration: 60 * 60,
       header: {
-        kid: walletAttestationSigningKey.kid,
+        kid,
         typ: "oauth-client-attestation+jwt",
       },
       payload,
@@ -109,14 +148,6 @@ const validateRequest: (input: {
     ),
   );
 
-const getWalletAttestationDataFromEnv =
-  (assertion: WalletAttestationRequest) =>
-  (environment: WalletAttestationGenerationEnvironment) =>
-    getWalletAttestationData(
-      assertion,
-      environment.walletAttestationSigningKey.kid,
-    )(environment);
-
 const generateWalletAttestations = ({
   assertion,
   isTestUser,
@@ -124,24 +155,24 @@ const generateWalletAttestations = ({
   assertion: WalletAttestationRequest;
   isTestUser: boolean;
 }): RTE.ReaderTaskEither<
-  WalletAttestationGenerationEnvironment,
+  WalletAttestationEnvironment,
   Error,
   WalletAttestations
 > =>
   pipe(
     assertion,
-    getWalletAttestationDataFromEnv,
-    RTE.fromReader,
+    getWalletAttestationData,
     RTE.chainW((walletAttestationData) =>
       pipe(
-        sequenceS(RTE.ApplyPar)({
-          jwt: pipe(
-            walletAttestationData,
-            WalletAttestationToJwtModel.encode,
-            (payload) => signWalletAttestationJwt({ ...payload }),
-          ),
-        }),
-        RTE.map(({ jwt }) =>
+        walletAttestationData,
+        WalletAttestationToJwtModel.encode,
+        (payload) =>
+          signWalletAttestation({
+            crv: walletAttestationData.crv,
+            kid: walletAttestationData.kid,
+            payload: { ...payload },
+          }),
+        RTE.map((jwt) =>
           isTestUser
             ? testWalletAttestations
             : {
