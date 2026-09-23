@@ -441,13 +441,9 @@ app.http("createWalletAttestation", {
   handler: CreateWalletAttestationFunction({
     attestationService: mobileAttestationService,
     cryptographyClient: walletAttestationCryptographyClient,
-    federationEntityBasePath:
-      config.entityConfigurationV1.federationEntity.basePath,
-    keyRepository: keyV1Repository,
+    federationEntityId: config.entityConfigurationV1.federationEntityId,
+    keyRepository,
     nonceRepository,
-    walletAttestationKeyName: config.walletProvider.walletAttestationKeyName,
-    walletAttestationSigningKey:
-      config.walletProvider.walletAttestationSigningKey,
     walletAttestationConfig: config.walletProvider.walletAttestation,
     walletAttestationSigningKeyName:
       config.walletProvider.walletAttestationSigningKeyName,

@@ -46,16 +46,7 @@ const url = flow(
   }),
 );
 
-const email = flow(
-  EmailString.decode,
-  E.getOrElseW((_) => {
-    throw new Error(`Failed to parse url ${_[0].value}`);
-  }),
-);
-
-const federationEntityBasePath = url(
-  "https://wallet-provider-v1.example.org/foo/",
-);
+const federationEntityId = url("https://wallet-provider-v1.example.org/foo/");
 
 const walletAttestationConfig = {
   walletLink: "https://foo.com",
@@ -156,7 +147,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -190,7 +181,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -264,7 +255,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository: keyRepositoryError,
@@ -294,7 +285,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository: keyRepositoryNone,
@@ -327,7 +318,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -376,7 +367,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -419,7 +410,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -473,7 +464,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationServiceExternalServiceError,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
