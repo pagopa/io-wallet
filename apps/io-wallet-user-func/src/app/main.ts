@@ -97,7 +97,7 @@ const tokenStatusListCryptographyClient = createCryptographyClient(
 );
 
 const walletAttestationCryptographyClient = createCryptographyClient(
-  config.walletProvider.walletAttestationKeyName,
+  config.walletProvider.walletAttestationSigningKeyName,
 );
 
 const walletInstanceAttestationCryptographyClient = createCryptographyClient(
@@ -445,13 +445,12 @@ app.http("createWalletAttestation", {
       config.entityConfigurationV1.federationEntity.basePath,
     keyRepository: keyV1Repository,
     nonceRepository,
-    walletAttestationConfig: {
-      ...config.walletProvider.walletAttestation,
-      trustAnchorUrl: config.entityConfigurationV1.trustAnchorUrl,
-    },
     walletAttestationKeyName: config.walletProvider.walletAttestationKeyName,
     walletAttestationSigningKey:
       config.walletProvider.walletAttestationSigningKey,
+    walletAttestationConfig: config.walletProvider.walletAttestation,
+    walletAttestationSigningKeyName:
+      config.walletProvider.walletAttestationSigningKeyName,
     walletInstanceRepository,
   }),
   methods: ["POST"],

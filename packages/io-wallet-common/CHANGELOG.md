@@ -1,5 +1,11 @@
 # io-wallet-common
 
+## 1.7.2
+
+### Patch Changes
+
+- 3a2367f: Removed unused schemas and types
+
 ## 1.7.1
 
 ### Patch Changes

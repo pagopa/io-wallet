@@ -1,5 +1,19 @@
 # io-wallet-user-func
 
+## 5.0.2
+
+### Patch Changes
+
+- 3a2367f: Updated createWalletAttestation function: removed wallet attestation signing key from env var
+- Updated dependencies [3a2367f]
+  - io-wallet-common@1.7.2
+
+## 5.0.1
+
+### Patch Changes
+
+- 92c7950: Simplified /wallet-attestations endpoint
+
 ## 5.0.0
 
 ### Major Changes

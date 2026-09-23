@@ -21,7 +21,7 @@ jobs:
   backup:
     name: Back up production APIM
     runs-on: ubuntu-latest
-    environment: infra-psn-prod-cd
+    environment: infra-psn-prod-ci
     timeout-minutes: 180
 
     env:

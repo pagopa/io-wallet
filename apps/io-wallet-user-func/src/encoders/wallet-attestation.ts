@@ -5,6 +5,7 @@ import { removeTrailingSlash } from "../url";
 
 export interface WalletAttestationData {
   aal: string;
+  crv: string;
   iss: string;
   kid: string;
   sub: string;

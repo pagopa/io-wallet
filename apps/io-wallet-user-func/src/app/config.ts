@@ -5,7 +5,7 @@ import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { flow, pipe } from "fp-ts/lib/function";
+import { pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
 import * as t from "io-ts";
 import {
@@ -21,11 +21,7 @@ import {
   getSlackConfigFromEnvironment,
   SlackConfig,
 } from "io-wallet-common/infra/slack/config";
-import {
-  ECPrivateKeyWithKid,
-  ECPublicKeyWithKid,
-  fromBase64ToJwks,
-} from "io-wallet-common/jwk";
+import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 export const APPLE_APP_ATTESTATION_ROOT_CA =
   "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t";
@@ -268,35 +264,6 @@ const EntityConfigurationV2Config = t.type({
 
 type EntityConfigurationV2Config = t.TypeOf<typeof EntityConfigurationV2Config>;
 
-const isSupportedSigningCurve = (
-  crv: string,
-): crv is "P-256" | "P-384" | "P-521" =>
-  crv === "P-256" || crv === "P-384" || crv === "P-521";
-
-const SupportedECPrivateKeyWithKid = new t.Type<
-  ECPrivateKeyWithKid,
-  ECPrivateKeyWithKid,
-  unknown
->(
-  "SupportedECPrivateKeyWithKid",
-  (input): input is ECPrivateKeyWithKid =>
-    ECPrivateKeyWithKid.is(input) && isSupportedSigningCurve(input.crv),
-  (input, context) =>
-    pipe(
-      ECPrivateKeyWithKid.validate(input, context),
-      E.chain((key) =>
-        isSupportedSigningCurve(key.crv)
-          ? t.success(key)
-          : t.failure(
-              key.crv,
-              context,
-              `The curve ${key.crv} is not supported for signing keys`,
-            ),
-      ),
-    ),
-  t.identity,
-);
-
 const WalletProviderConfig = t.type({
   certificate: t.type({
     country: t.string,
@@ -312,9 +279,8 @@ const WalletProviderConfig = t.type({
     walletLink: t.string,
     walletName: t.string,
   }),
-  walletAttestationKeyName: t.string,
-  walletAttestationSigningKey: SupportedECPrivateKeyWithKid,
-  walletAttestationSigningKeys: t.array(SupportedECPrivateKeyWithKid),
+  walletAttestationPublishedKeyNames: t.array(t.string),
+  walletAttestationSigningKeyName: t.string,
   walletInstanceAttestationPublishedKeyNames: t.array(t.string),
   walletInstanceAttestationSigningKeyName: t.string,
 });
@@ -335,19 +301,6 @@ export const Config = t.type({
 });
 
 export type Config = t.TypeOf<typeof Config>;
-
-const readJwksFromEnvironment = flow(
-  readFromEnvironment,
-  RE.chainEitherKW(fromBase64ToJwks),
-  RE.chainEitherKW(parse(t.array(SupportedECPrivateKeyWithKid))),
-);
-
-const getSigningKeyByKid = (jwks: ECPrivateKeyWithKid[], kid: string) =>
-  pipe(
-    jwks,
-    A.findFirst((key) => key.kid === kid),
-    E.fromOption(() => new Error(`No signing key found for kid ${kid}`)),
-  );
 
 const readCommaSeparatedStringArrayFromEnvironment = (name: string) =>
   pipe(
@@ -838,13 +791,15 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     tokenStatusListSigningKeyName: readFromEnvironment(
       "TokenStatusListSigningKeyName",
     ),
-    walletAttestationKeyId: readFromEnvironment("WalletAttestationKeyId"),
-    walletAttestationKeyName: readFromEnvironment("WalletAttestationKeyName"),
     walletAttestationOauthClientSub: readFromEnvironment(
       "WalletAttestationOauthClientSub",
     ),
-    walletAttestationSigningKeys: readJwksFromEnvironment(
-      "WalletAttestationSigningKeys",
+    walletAttestationPublishedKeyNames:
+      readCommaSeparatedStringArrayFromEnvironment(
+        "WalletAttestationPublishedKeyNames",
+      ),
+    walletAttestationSigningKeyName: readFromEnvironment(
+      "WalletAttestationSigningKeyName",
     ),
     walletAttestationWalletLink: readFromEnvironment(
       "WalletAttestationWalletLink",
@@ -869,10 +824,9 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       keyAttestationSigningKeyName,
       tokenStatusListPublishedKeyNames,
       tokenStatusListSigningKeyName,
-      walletAttestationKeyId,
-      walletAttestationKeyName,
       walletAttestationOauthClientSub,
-      walletAttestationSigningKeys,
+      walletAttestationPublishedKeyNames,
+      walletAttestationSigningKeyName,
       walletAttestationWalletLink,
       walletAttestationWalletName,
       walletInstanceAttestationPublishedKeyNames,
@@ -892,46 +846,11 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
         walletLink: walletAttestationWalletLink,
         walletName: walletAttestationWalletName,
       },
-      walletAttestationKeyId,
-      walletAttestationKeyName,
-      walletAttestationSigningKeys,
+      walletAttestationPublishedKeyNames,
+      walletAttestationSigningKeyName,
       walletInstanceAttestationPublishedKeyNames,
       walletInstanceAttestationSigningKeyName,
     }),
-  ),
-  RE.chainEitherKW(
-    ({
-      certificate,
-      keyAttestationPublishedKeyNames,
-      keyAttestationSigningKeyName,
-      tokenStatusListPublishedKeyNames,
-      tokenStatusListSigningKeyName,
-      walletAttestation,
-      walletAttestationKeyId,
-      walletAttestationKeyName,
-      walletAttestationSigningKeys,
-      walletInstanceAttestationPublishedKeyNames,
-      walletInstanceAttestationSigningKeyName,
-    }) =>
-      pipe(
-        getSigningKeyByKid(
-          walletAttestationSigningKeys,
-          walletAttestationKeyId,
-        ),
-        E.map((walletAttestationSigningKey) => ({
-          certificate,
-          keyAttestationPublishedKeyNames,
-          keyAttestationSigningKeyName,
-          tokenStatusListPublishedKeyNames,
-          tokenStatusListSigningKeyName,
-          walletAttestation,
-          walletAttestationKeyName,
-          walletAttestationSigningKey,
-          walletAttestationSigningKeys,
-          walletInstanceAttestationPublishedKeyNames,
-          walletInstanceAttestationSigningKeyName,
-        })),
-      ),
   ),
 );
 

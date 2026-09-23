@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "5.0.0",
+  "version": "5.0.2",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -14,7 +14,6 @@
     "start": "func start"
   },
   "dependencies": {
-    "@auth0/mdl": "^3.0.1",
     "@azure/arm-cdn": "^9.1.0",
     "@azure/cosmos": "catalog:",
     "@azure/functions": "catalog:",
@@ -42,7 +41,6 @@
     "@peculiar/x509": "^1.14.3",
     "asn1js": "^3.0.7",
     "cbor-x": "^1.6.4",
-    "cbor2": "^2.3.0",
     "dayjs": "^1.11.20",
     "fp-ts": "catalog:",
     "googleapis": "^171.4.0",
