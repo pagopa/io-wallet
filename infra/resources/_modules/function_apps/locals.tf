@@ -57,10 +57,6 @@ locals {
     FederationEntityV2WalletSolutionAuthorizationEndpoint   = "https://continua.io.pagopa.it/itw/auth"
     FederationEntityV2WalletSolutionCredentialOfferEndpoint = "https://continua.io.pagopa.it/itw/credential-offer"
 
-    WalletProviderCertificateCountry  = "IT"
-    WalletProviderCertificateState    = "Lazio"
-    WalletProviderCertificateLocality = "Roma"
-
     WalletAttestationOauthClientSub = "https://ioapp.it"
 
     FrontDoorProfileName  = var.front_door_profile_name
@@ -86,7 +82,6 @@ locals {
         "https://wallet.io.pagopa.it/%s/",
         var.status_list_storage_container_name,
       )
-      FederationEntityBasePath                              = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV1                            = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV10                           = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV2                            = "https://wallet.io.pagopa.it/v2"
@@ -158,7 +153,6 @@ locals {
       EntityConfigurationStorageAccountName = var.storage_account_cdn_name_uat
       KeyVaultUrl                 = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
       AndroidBundleIdentifiers    = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
-      FederationEntityBasePath    = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV1  = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV10 = "https://foo11.blob.core.windows.net/foo/"
       FederationEntityBasePathV2  = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"

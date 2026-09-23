@@ -265,11 +265,6 @@ const EntityConfigurationV2Config = t.type({
 type EntityConfigurationV2Config = t.TypeOf<typeof EntityConfigurationV2Config>;
 
 const WalletProviderConfig = t.type({
-  certificate: t.type({
-    country: t.string,
-    locality: t.string,
-    state: t.string,
-  }),
   keyAttestationPublishedKeyNames: t.array(t.string),
   keyAttestationSigningKeyName: t.string,
   tokenStatusListPublishedKeyNames: t.array(t.string),
@@ -339,9 +334,6 @@ const getEntityConfigurationV1FromEnvironment: RE.ReaderEither<
     ),
     federationEntityV1Id: readFromEnvironment("FederationEntityV1Id"),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
-    walletAttestationSigningKeys: readCommaSeparatedStringArrayFromEnvironment(
-      "walletAttestationSigningKeys",
-    ),
   }),
   RE.map(({ common, ...versionedConfiguration }) => ({
     ...common,
@@ -353,14 +345,12 @@ const getEntityConfigurationV1FromEnvironment: RE.ReaderEither<
       entityConfigurationV1SigningKeyName,
       federationEntityV1Id,
       trustAnchorUrl,
-      walletAttestationSigningKeys,
       ...federationEntityMetadata
     }) => ({
       federationEntityId: federationEntityV1Id,
       jwksKeyNames: entityConfigurationV1PublishedKeyNames,
       metadata: {
         federationEntity: federationEntityMetadata,
-        walletProviderJwks: walletAttestationSigningKeys,
       },
       signingKeyName: entityConfigurationV1SigningKeyName,
       trustAnchorUrl,
@@ -772,11 +762,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   WalletProviderConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    certificateCountry: readFromEnvironment("WalletProviderCertificateCountry"),
-    certificateLocality: readFromEnvironment(
-      "WalletProviderCertificateLocality",
-    ),
-    certificateState: readFromEnvironment("WalletProviderCertificateState"),
     keyAttestationPublishedKeyNames:
       readCommaSeparatedStringArrayFromEnvironment(
         "KeyAttestationPublishedKeyNames",
@@ -817,9 +802,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
-      certificateCountry,
-      certificateLocality,
-      certificateState,
       keyAttestationPublishedKeyNames,
       keyAttestationSigningKeyName,
       tokenStatusListPublishedKeyNames,
@@ -832,11 +814,6 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       walletInstanceAttestationPublishedKeyNames,
       walletInstanceAttestationSigningKeyName,
     }) => ({
-      certificate: {
-        country: certificateCountry,
-        locality: certificateLocality,
-        state: certificateState,
-      },
       keyAttestationPublishedKeyNames,
       keyAttestationSigningKeyName,
       tokenStatusListPublishedKeyNames,
