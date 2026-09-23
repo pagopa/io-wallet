@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  areJwksEqual,
-  fromBase64ToJwks,
-  JwkPrivateKey,
-  JwkPublicKey,
-} from "../jwk";
+import { areJwksEqual, JwkPublicKey } from "../jwk";
 
 const publicRsaKey = {
   e: "AQAB",
@@ -30,11 +25,6 @@ const publicEcKey = {
   kty: "EC" as const,
   x: "CakCjesDBwXeReRwLRzmhg6UwOKfM0NZpHYHjC0iucU",
   y: "a5cs0ywZzV6MGeBR8eIHyrs8KoAqv0DuW6qqSkZFCMM",
-};
-
-const privateEcKey = {
-  ...publicEcKey,
-  d: "vOTIOnH_rDol5cyaWL25DX4iGu_WU_l-AoTLmGIV_tg",
 };
 
 describe("JwkPublicKey", () => {
@@ -65,53 +55,6 @@ describe("JwkPublicKey", () => {
         ...publicRsaKey,
         kid: "KID#1",
       },
-    });
-  });
-});
-
-describe("JwkPrivateKey", () => {
-  it("should decode an ECKey with optional kid parameter", () => {
-    const result = JwkPrivateKey.decode({
-      ...privateEcKey,
-      kid: "KID#1",
-    });
-
-    expect(result).toEqual({
-      _tag: "Right",
-      right: {
-        ...privateEcKey,
-        kid: "KID#1",
-      },
-    });
-  });
-
-  it("should decode an RSAKey with optional kid parameter", () => {
-    const result = JwkPrivateKey.decode({
-      ...privateRsaKey,
-      kid: "KID#1",
-    });
-
-    expect(result).toEqual({
-      _tag: "Right",
-      right: {
-        ...privateRsaKey,
-        kid: "KID#1",
-      },
-    });
-  });
-});
-
-describe("fromBase64ToJwks", () => {
-  const jwks = [privateRsaKey, privateEcKey];
-
-  it("should return JWKs form base64 representation", () => {
-    const stringJwks = JSON.stringify(jwks);
-    const b64 = Buffer.from(stringJwks, "utf-8").toString("base64");
-    const result = fromBase64ToJwks(b64);
-
-    expect(result).toEqual({
-      _tag: "Right",
-      right: jwks,
     });
   });
 });
