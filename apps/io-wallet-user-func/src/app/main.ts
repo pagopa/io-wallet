@@ -400,10 +400,7 @@ app.http("createWalletAttestation", {
     cryptographyClient: walletAttestationCryptographyClient,
     federationEntity: config.entityConfiguration.federationEntity,
     nonceRepository,
-    walletAttestationConfig: {
-      ...config.walletProvider.walletAttestation,
-      trustAnchorUrl: config.entityConfiguration.trustAnchorUrl,
-    },
+    walletAttestationConfig: config.walletProvider.walletAttestation,
     walletAttestationSigningKey:
       config.walletProvider.walletAttestationSigningKey,
     walletInstanceRepository,

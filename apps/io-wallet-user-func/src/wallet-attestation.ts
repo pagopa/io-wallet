@@ -1,4 +1,3 @@
-import { ValidUrl } from "@pagopa/ts-commons/lib/url";
 import { pipe } from "fp-ts/function";
 import * as R from "fp-ts/Reader";
 
@@ -13,7 +12,6 @@ export interface WalletAttestationEnvironment {
 }
 
 interface WalletAttestationConfig {
-  trustAnchorUrl: ValidUrl;
   walletLink: string;
   walletName: string;
 }
