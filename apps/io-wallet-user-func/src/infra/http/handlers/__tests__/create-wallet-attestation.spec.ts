@@ -79,7 +79,7 @@ const keyRepository: KeyRepository = {
   getKeyByName: () =>
     TE.right(
       O.some({
-        ...privateEcKey,
+        ...publicEcKey,
         certificateChain: ["cert1", "cert2"],
         keyName: walletAttestationSigningKeyName,
         kid: privateEcKey.kid,
