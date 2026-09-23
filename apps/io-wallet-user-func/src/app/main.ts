@@ -81,7 +81,7 @@ const createCryptographyClient = (keyName: string) =>
   );
 
 const entityConfigurationV1CryptographyClient = createCryptographyClient(
-  config.entityConfigurationV1.federationEntity.intermediateSigningKeyName,
+  config.entityConfigurationV1.signingKeyName,
 );
 
 const entityConfigurationV2CryptographyClient = createCryptographyClient(
@@ -148,7 +148,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.entityConfigurationV1.federationEntity.basePath.href,
+  config.entityConfigurationV1.federationEntityId.href,
 );
 
 const mobileAttestationService = new MobileAttestationService(
@@ -321,27 +321,18 @@ app.http("getNonce", {
 });
 
 // V1 version
+// fetch signingKeyName from db to create header
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationV1Function({
     cdnManagementClient,
     containerClient: entityConfigurationV1ContainerClient,
     cryptographyClient: entityConfigurationV1CryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
-    entityConfigurationProperties: {
-      authorityHints: [config.entityConfigurationV1.trustAnchorUrl],
-      federationEntity: config.entityConfigurationV1.federationEntity,
-    },
+    entityConfigurationJwt: config.entityConfigurationV1,
     inputDecoder: t.unknown,
-    intermediatePublishedKeyNames:
-      config.entityConfigurationV1.federationEntity
-        .intermediatePublishedKeyNames,
-    intermediateSigningKeyName:
-      config.entityConfigurationV1.federationEntity.intermediateSigningKeyName,
     keyRepository: keyV1Repository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
-    walletAttestationSigningKeys:
-      config.walletProvider.walletAttestationSigningKeys,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });

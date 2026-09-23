@@ -21,7 +21,11 @@ import {
   getSlackConfigFromEnvironment,
   SlackConfig,
 } from "io-wallet-common/infra/slack/config";
-import { ECPrivateKeyWithKid, fromBase64ToJwks } from "io-wallet-common/jwk";
+import {
+  ECPrivateKeyWithKid,
+  ECPublicKeyWithKid,
+  fromBase64ToJwks,
+} from "io-wallet-common/jwk";
 
 export const APPLE_APP_ATTESTATION_ROOT_CA =
   "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t";
@@ -224,15 +228,20 @@ const FederationEntityConfig = t.type({
 type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
 
 const EntityConfigurationV1Config = t.type({
-  federationEntity: t.intersection([
-    FederationEntityConfig,
-    t.type({
-      basePath: UrlFromString,
-      intermediatePublishedKeyNames: t.array(t.string),
-      intermediateSigningKeyName: t.string,
+  federationEntityId: UrlFromString,
+  jwksKeyNames: t.array(t.string),
+  metadata: t.type({
+    federationEntity: t.type({
+      contacts: t.array(EmailString),
+      homepageUri: UrlFromString,
       logoUri: UrlFromString,
+      organizationName: NonEmptyString,
+      policyUri: UrlFromString,
+      tosUri: UrlFromString,
     }),
-  ]),
+    walletProviderJwks: t.array(ECPublicKeyWithKid),
+  }),
+  signingKeyName: t.string,
   trustAnchorUrl: UrlFromString,
 });
 
@@ -352,15 +361,13 @@ const getCommonEntityConfigurationFromEnvironment = sequenceS(RE.Apply)({
   contacts: pipe(
     readFromEnvironment("FederationEntityContacts"),
     RE.map((urls) => urls.split(",")),
+    RE.chainEitherKW(parse(t.array(EmailString))),
   ),
   homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
   organizationName: readFromEnvironment("FederationEntityOrganizationName"),
   policyUri: readFromEnvironment("FederationEntityPolicyUri"),
   tosUri: readFromEnvironment("FederationEntityTosUri"),
-  trustAnchorUrl: pipe(
-    readFromEnvironment("TrustAnchorUrl"),
-    RE.chainEitherKW(parse(UrlFromString)),
-  ),
+  trustAnchorUrl: readFromEnvironment("TrustAnchorUrl"),
 });
 
 const getEntityConfigurationV1FromEnvironment: RE.ReaderEither<
@@ -369,18 +376,18 @@ const getEntityConfigurationV1FromEnvironment: RE.ReaderEither<
   EntityConfigurationV1Config
 > = pipe(
   sequenceS(RE.Apply)({
-    basePathV1: readFromEnvironment("FederationEntityBasePathV1"),
     common: getCommonEntityConfigurationFromEnvironment,
-    federationEntityV1IntermediatePublishedKeyNames:
+    entityConfigurationV1PublishedKeyNames:
       readCommaSeparatedStringArrayFromEnvironment(
-        "FederationEntityV1IntermediatePublishedKeyNames",
+        "EntityConfigurationV1PublishedKeyNames",
       ),
-    federationEntityV1IntermediateSigningKeyName: readFromEnvironment(
-      "FederationEntityV1IntermediateSigningKeyName",
+    entityConfigurationV1SigningKeyName: readFromEnvironment(
+      "EntityConfigurationV1SigningKeyName",
     ),
-    logoUri: pipe(
-      readFromEnvironment("FederationEntityLogoUri"),
-      RE.chainEitherKW(parse(UrlFromString)),
+    federationEntityV1Id: readFromEnvironment("FederationEntityV1Id"),
+    logoUri: readFromEnvironment("FederationEntityLogoUri"),
+    walletAttestationSigningKeys: readCommaSeparatedStringArrayFromEnvironment(
+      "walletAttestationSigningKeys",
     ),
   }),
   RE.map(({ common, ...versionedConfiguration }) => ({
@@ -389,20 +396,20 @@ const getEntityConfigurationV1FromEnvironment: RE.ReaderEither<
   })),
   RE.map(
     ({
-      federationEntityV1IntermediatePublishedKeyNames,
-      federationEntityV1IntermediateSigningKeyName,
+      entityConfigurationV1PublishedKeyNames,
+      entityConfigurationV1SigningKeyName,
+      federationEntityV1Id,
       trustAnchorUrl,
-      ...federationEntity
+      walletAttestationSigningKeys,
+      ...federationEntityMetadata
     }) => ({
-      federationEntity: {
-        ...federationEntity,
-        basePath: federationEntity.basePathV1,
-        intermediatePublishedKeyNames:
-          federationEntityV1IntermediatePublishedKeyNames,
-        intermediateSigningKeyName:
-          federationEntityV1IntermediateSigningKeyName,
-        logoUri: federationEntity.logoUri,
+      federationEntityId: federationEntityV1Id,
+      jwksKeyNames: entityConfigurationV1PublishedKeyNames,
+      metadata: {
+        federationEntity: federationEntityMetadata,
+        walletProviderJwks: walletAttestationSigningKeys,
       },
+      signingKeyName: entityConfigurationV1SigningKeyName,
       trustAnchorUrl,
     }),
   ),
@@ -424,10 +431,10 @@ const getEntityConfigurationV2FromEnvironment: RE.ReaderEither<
     common: getCommonEntityConfigurationFromEnvironment,
     federationEntityV2IntermediatePublishedKeyNames:
       readCommaSeparatedStringArrayFromEnvironment(
-        "FederationEntityV2IntermediatePublishedKeyNames",
+        "EntityConfigurationV2PublishedKeyNames",
       ),
     federationEntityV2IntermediateSigningKeyName: readFromEnvironment(
-      "FederationEntityV2IntermediateSigningKeyName",
+      "EntityConfigurationV2SigningKeyName",
     ),
     logoUri: readFromEnvironment("FederationEntityLogoUri"),
     logoUriV2: readFromEnvironment("FederationEntityV2LogoUri"),
