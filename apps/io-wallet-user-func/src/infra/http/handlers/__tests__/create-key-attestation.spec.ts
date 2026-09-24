@@ -56,9 +56,7 @@ const url = flow(
   }),
 );
 
-const federationEntityBasePath = url(
-  "https://wallet-provider-v2.example.org/bar/",
-);
+const federationEntityId = url("https://wallet-provider-v2.example.org/bar/");
 
 const statusListBaseUrl = "https://status-list.example.org";
 
@@ -295,7 +293,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -332,7 +330,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -366,7 +364,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -397,7 +395,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -424,7 +422,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -482,7 +480,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -524,7 +522,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -566,7 +564,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -633,7 +631,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -684,7 +682,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -744,7 +742,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -825,7 +823,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -876,7 +874,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -910,7 +908,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
@@ -943,7 +941,7 @@ describe("CreateKeyAttestationHandler", async () => {
       androidAttestationValidationConfig,
       assertionValidationConfig,
       cryptographyClient,
-      federationEntityBasePath,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,

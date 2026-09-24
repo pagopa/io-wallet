@@ -467,8 +467,7 @@ app.http("createWalletInstanceAttestation", {
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
     cryptographyClient: walletInstanceAttestationCryptographyClient,
-    federationEntityBasePath:
-      config.entityConfigurationV2.federationEntity.basePath,
+    federationEntityId: config.entityConfigurationV2.federationEntity.basePath,
     keyRepository,
     nonceRepository,
     walletAttestationConfig: {
@@ -488,8 +487,7 @@ app.http("createKeyAttestation", {
     androidAttestationValidationConfig,
     assertionValidationConfig,
     cryptographyClient: keyAttestationCryptographyClient,
-    federationEntityBasePath:
-      config.entityConfigurationV2.federationEntity.basePath,
+    federationEntityId: config.entityConfigurationV2.federationEntity.basePath,
     keyAttestationSigningKeyName:
       config.walletProvider.keyAttestationSigningKeyName,
     keyRepository,

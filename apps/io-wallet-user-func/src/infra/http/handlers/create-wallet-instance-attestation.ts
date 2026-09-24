@@ -1,12 +1,12 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { flow, pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
 import { type JWTPayload } from "jose";
 
-import { FederationEntity } from "@/entity-configuration";
 import {
   getSignAlgorithmFromCurve,
   signJwt,
@@ -31,7 +31,7 @@ import {
 } from "../wallet-instance-attestation-request";
 
 interface WalletInstanceAttestationEnvironment extends SignJwtEnvironment {
-  federationEntityBasePath: FederationEntity["basePathV2"];
+  federationEntityId: UrlFromString;
   keyRepository: KeyRepository;
   walletAttestationConfig: {
     oauthClientSub: string;
@@ -79,7 +79,7 @@ const getWalletInstanceAttestationData =
     WalletInstanceAttestationData
   > =>
   ({
-    federationEntityBasePath,
+    federationEntityId,
     keyRepository,
     walletInstanceAttestationSigningKeyName,
     // walletAttestationConfig: { oauthClientSub },
@@ -96,7 +96,7 @@ const getWalletInstanceAttestationData =
             jwkAlg: getSignAlgorithmFromCurve(input.cnf.jwk.crv),
             kid: signingKey.kid,
             sub,
-            walletProviderName: federationEntityBasePath.href,
+            walletProviderName: federationEntityId.href,
             // walletSolutionVersion: input.walletSolutionVersion,
             x5c: signingKey.certificateChain,
           })),

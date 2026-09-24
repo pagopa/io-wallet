@@ -1,5 +1,6 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
@@ -12,7 +13,6 @@ import {
 } from "io-wallet-common/wallet-instance";
 import { type JWTPayload } from "jose";
 
-import { FederationEntity } from "@/entity-configuration";
 import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
 import {
   AndroidAttestationValidationConfig,
@@ -40,7 +40,7 @@ import {
 } from "../key-attestation-request";
 
 interface KeyAttestationEnvironment extends SignJwtEnvironment {
-  federationEntityBasePath: FederationEntity["basePathV2"];
+  federationEntityId: UrlFromString;
   keyAttestationSigningKeyName: string;
   keyRepository: KeyRepository;
   statusListBaseUrl: string;
@@ -87,7 +87,7 @@ const getKeyAttestationData =
     KeyAttestationData
   > =>
   ({
-    federationEntityBasePath,
+    federationEntityId,
     keyAttestationSigningKeyName,
     keyRepository,
     statusListBaseUrl,
@@ -106,7 +106,7 @@ const getKeyAttestationData =
             uri: buildUrl(walletInstanceStatus.statusListId, statusListBaseUrl),
           },
         },
-        walletProviderName: federationEntityBasePath.href,
+        walletProviderName: federationEntityId.href,
         // walletSolutionVersion,
         x5c: signingKey.certificateChain,
       })),
