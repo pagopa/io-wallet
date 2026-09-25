@@ -41,8 +41,6 @@
     "EntityConfigurationV2WalletSolutionMetadataCredentialOfferEndpoint": "ENTITY_CONFIGURATION_V2_WALLET_SOLUTION_METADATA_CREDENTIAL_OFFER_ENDPOINT",
     "EntityConfigurationV2WalletSolutionMetadataWalletName": "ENTITY_CONFIGURATION_V2_WALLET_SOLUTION_METADATA_WALLET_NAME",
     "KeyVaultUrl": "https://YOUR_KEY_VAULT_NAME.vault.azure.net/",
-    "WalletAttestationKeyId": "WALLET_ATTESTATION_KEY_ID",
-    "WalletAttestationKeyName": "WALLET_ATTESTATION_KEY_NAME",
     "IntermediateSigningKeyName": "INTERMEDIATE_SIGNING_KEY_NAME",
     "IntermediatePublishedKeyNames": "INTERMEDIATE_SIGNING_KEY_NAME,INTERMEDIATE_PREVIOUS_KEY_NAME",
     "WalletAttestationSigningKeyName": "WALLET_ATTESTATION_SIGNING_KEY_NAME",
