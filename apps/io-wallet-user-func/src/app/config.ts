@@ -21,7 +21,6 @@ import {
   getSlackConfigFromEnvironment,
   SlackConfig,
 } from "io-wallet-common/infra/slack/config";
-import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 export const APPLE_APP_ATTESTATION_ROOT_CA =
   "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t";
@@ -213,19 +212,9 @@ export type PidIssuerApiClientConfig = t.TypeOf<
   typeof PidIssuerApiClientConfig
 >;
 
-const FederationEntityConfig = t.type({
-  contacts: t.array(EmailString),
-  homepageUri: UrlFromString,
-  organizationName: NonEmptyString,
-  policyUri: UrlFromString,
-  tosUri: UrlFromString,
-});
-
-type FederationEntityConfig = t.TypeOf<typeof FederationEntityConfig>;
-
 const EntityConfigurationV1Config = t.type({
   federationEntityId: UrlFromString,
-  jwksKeyNames: t.array(t.string),
+  federationEntityJwksKeyNames: t.array(t.string),
   metadata: t.type({
     federationEntity: t.type({
       contacts: t.array(EmailString),
@@ -235,7 +224,7 @@ const EntityConfigurationV1Config = t.type({
       policyUri: UrlFromString,
       tosUri: UrlFromString,
     }),
-    walletProviderJwks: t.array(ECPublicKeyWithKid),
+    walletProviderJwksKeyNames: t.array(t.string),
   }),
   signingKeyName: t.string,
   trustAnchorUrl: UrlFromString,
@@ -244,21 +233,28 @@ const EntityConfigurationV1Config = t.type({
 type EntityConfigurationV1Config = t.TypeOf<typeof EntityConfigurationV1Config>;
 
 const EntityConfigurationV2Config = t.type({
-  federationEntity: t.intersection([
-    FederationEntityConfig,
-    t.type({
-      basePath: UrlFromString,
-      intermediatePublishedKeyNames: t.array(t.string),
-      intermediateSigningKeyName: t.string,
+  federationEntityId: UrlFromString,
+  federationEntityJwksKeyNames: t.array(t.string),
+  metadata: t.type({
+    federationEntity: t.type({
+      contacts: t.array(EmailString),
+      homepageUri: UrlFromString,
       logoUri: UrlFromString,
-      walletSolution: t.type({
+      organizationName: NonEmptyString,
+      policyUri: UrlFromString,
+      tosUri: UrlFromString,
+    }),
+    walletSolution: t.type({
+      jwksKeyNames: t.array(t.string),
+      logoUri: UrlFromString,
+      walletMetadata: t.type({
         authorizationEndpoint: UrlFromString,
         credentialOfferEndpoint: UrlFromString,
-        logoUri: UrlFromString,
         walletName: t.string,
       }),
     }),
-  ]),
+  }),
+  signingKeyName: t.string,
   trustAnchorUrl: UrlFromString,
 });
 
@@ -305,62 +301,79 @@ const readCommaSeparatedStringArrayFromEnvironment = (name: string) =>
     RE.map(A.filter((item) => item.length > 0)),
   );
 
-const getCommonEntityConfigurationFromEnvironment = sequenceS(RE.Apply)({
-  contacts: pipe(
-    readFromEnvironment("FederationEntityContacts"),
-    RE.map((urls) => urls.split(",")),
-    RE.chainEitherKW(parse(t.array(EmailString))),
-  ),
-  homepageUri: readFromEnvironment("FederationEntityHomepageUri"),
-  organizationName: readFromEnvironment("FederationEntityOrganizationName"),
-  policyUri: readFromEnvironment("FederationEntityPolicyUri"),
-  tosUri: readFromEnvironment("FederationEntityTosUri"),
-  trustAnchorUrl: readFromEnvironment("TrustAnchorUrl"),
-});
-
 const getEntityConfigurationV1FromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
   EntityConfigurationV1Config
 > = pipe(
   sequenceS(RE.Apply)({
-    common: getCommonEntityConfigurationFromEnvironment,
-    entityConfigurationV1PublishedKeyNames:
-      readCommaSeparatedStringArrayFromEnvironment(
-        "EntityConfigurationV1PublishedKeyNames",
-      ),
-    entityConfigurationV1SigningKeyName: readFromEnvironment(
-      "EntityConfigurationV1SigningKeyName",
+    contacts: pipe(
+      readFromEnvironment("EntityConfigurationV1FederationEntityContacts"),
+      RE.map((urls) => urls.split(",")),
+      RE.chainEitherKW(parse(t.array(EmailString))),
     ),
-    federationEntityV1Id: readFromEnvironment("FederationEntityV1Id"),
-    logoUri: readFromEnvironment("FederationEntityLogoUri"),
+    federationEntityId: pipe(
+      readFromEnvironment("EntityConfigurationV1FederationEntityId"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    federationEntityJwksKeyNames: readCommaSeparatedStringArrayFromEnvironment(
+      "EntityConfigurationV1FederationEntityJwksKeyNames",
+    ),
+    homepageUri: pipe(
+      readFromEnvironment("EntityConfigurationV1FederationEntityHomepageUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    logoUri: pipe(
+      readFromEnvironment("EntityConfigurationV1FederationEntityLogoUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    organizationName: pipe(
+      readFromEnvironment(
+        "EntityConfigurationV1FederationEntityOrganizationName",
+      ),
+      RE.chainEitherKW(parse(NonEmptyString)),
+    ),
+    policyUri: pipe(
+      readFromEnvironment("EntityConfigurationV1FederationEntityPolicyUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    signingKeyName: readFromEnvironment("EntityConfigurationV1SigningKeyName"),
+    tosUri: pipe(
+      readFromEnvironment("EntityConfigurationV1FederationEntityTosUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    trustAnchorUrl: pipe(
+      readFromEnvironment("TrustAnchorUrl"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    walletProviderJwksKeyNames: readCommaSeparatedStringArrayFromEnvironment(
+      "EntityConfigurationV1WalletProviderJwksKeyNames",
+    ),
   }),
-  RE.map(({ common, ...versionedConfiguration }) => ({
-    ...common,
-    ...versionedConfiguration,
-  })),
   RE.map(
     ({
-      entityConfigurationV1PublishedKeyNames,
-      entityConfigurationV1SigningKeyName,
-      federationEntityV1Id,
-      trustAnchorUrl,
-      ...federationEntityMetadata
+      contacts,
+      homepageUri,
+      logoUri,
+      organizationName,
+      policyUri,
+      tosUri,
+      walletProviderJwksKeyNames,
+      ...federationEntity
     }) => ({
-      federationEntityId: federationEntityV1Id,
-      jwksKeyNames: entityConfigurationV1PublishedKeyNames,
+      ...federationEntity,
       metadata: {
-        federationEntity: federationEntityMetadata,
+        federationEntity: {
+          contacts,
+          homepageUri,
+          logoUri,
+          organizationName,
+          policyUri,
+          tosUri,
+        },
+        walletProviderJwksKeyNames,
       },
-      signingKeyName: entityConfigurationV1SigningKeyName,
-      trustAnchorUrl,
     }),
-  ),
-  RE.chainEitherKW(
-    parse(
-      EntityConfigurationV1Config,
-      "Entity configuration V1 config is invalid",
-    ),
   ),
 );
 
@@ -370,68 +383,105 @@ const getEntityConfigurationV2FromEnvironment: RE.ReaderEither<
   EntityConfigurationV2Config
 > = pipe(
   sequenceS(RE.Apply)({
-    basePathV2: readFromEnvironment("FederationEntityBasePathV2"),
-    common: getCommonEntityConfigurationFromEnvironment,
-    federationEntityV2IntermediatePublishedKeyNames:
-      readCommaSeparatedStringArrayFromEnvironment(
-        "EntityConfigurationV2PublishedKeyNames",
+    contacts: pipe(
+      readFromEnvironment("EntityConfigurationV2FederationEntityContacts"),
+      RE.map((urls) => urls.split(",")),
+      RE.chainEitherKW(parse(t.array(EmailString))),
+    ),
+    federationEntityId: pipe(
+      readFromEnvironment("EntityConfigurationV2FederationEntityId"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    federationEntityJwksKeyNames: readCommaSeparatedStringArrayFromEnvironment(
+      "EntityConfigurationV2FederationEntityJwksKeyNames",
+    ),
+    homepageUri: pipe(
+      readFromEnvironment("EntityConfigurationV2FederationEntityHomepageUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    logoUri: pipe(
+      readFromEnvironment("EntityConfigurationV2FederationEntityLogoUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    organizationName: pipe(
+      readFromEnvironment(
+        "EntityConfigurationV2FederationEntityOrganizationName",
       ),
-    federationEntityV2IntermediateSigningKeyName: readFromEnvironment(
-      "EntityConfigurationV2SigningKeyName",
+      RE.chainEitherKW(parse(NonEmptyString)),
     ),
-    logoUri: readFromEnvironment("FederationEntityLogoUri"),
-    logoUriV2: readFromEnvironment("FederationEntityV2LogoUri"),
-    walletSolutionAuthorizationEndpoint: readFromEnvironment(
-      "FederationEntityV2WalletSolutionAuthorizationEndpoint",
+    policyUri: pipe(
+      readFromEnvironment("EntityConfigurationV2FederationEntityPolicyUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
     ),
-    walletSolutionCredentialOfferEndpoint: readFromEnvironment(
-      "FederationEntityV2WalletSolutionCredentialOfferEndpoint",
+    signingKeyName: readFromEnvironment("EntityConfigurationV2SigningKeyName"),
+    tosUri: pipe(
+      readFromEnvironment("EntityConfigurationV2FederationEntityTosUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
     ),
-    walletSolutionLogoUri: readFromEnvironment(
-      "FederationEntityV2WalletSolutionLogoUri",
+    trustAnchorUrl: pipe(
+      readFromEnvironment("TrustAnchorUrl"),
+      RE.chainEitherKW(parse(UrlFromString)),
     ),
-    walletSolutionWalletName: readFromEnvironment(
-      "FederationEntityV2WalletSolutionWalletName",
+    walletSolutionJwksKeyNames: readCommaSeparatedStringArrayFromEnvironment(
+      "EntityConfigurationV2WalletSolutionJwksKeyNames",
+    ),
+    walletSolutionLogoUri: pipe(
+      readFromEnvironment("EntityConfigurationV2WalletSolutionLogoUri"),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    walletSolutionMetadataAuthorizationEndpoint: pipe(
+      readFromEnvironment(
+        "EntityConfigurationV2WalletSolutionMetadataAuthorizationEndpoint",
+      ),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    walletSolutionMetadataCredentialOfferEndpoint: pipe(
+      readFromEnvironment(
+        "EntityConfigurationV2WalletSolutionMetadataCredentialOfferEndpoint",
+      ),
+      RE.chainEitherKW(parse(UrlFromString)),
+    ),
+    walletSolutionMetadataWalletName: readFromEnvironment(
+      "EntityConfigurationV2WalletSolutionMetadataWalletName",
     ),
   }),
-  RE.map(({ common, ...versionedConfiguration }) => ({
-    ...common,
-    ...versionedConfiguration,
-  })),
   RE.map(
     ({
-      federationEntityV2IntermediatePublishedKeyNames,
-      federationEntityV2IntermediateSigningKeyName,
-      trustAnchorUrl,
-      walletSolutionAuthorizationEndpoint,
-      walletSolutionCredentialOfferEndpoint,
+      contacts,
+      homepageUri,
+      logoUri,
+      organizationName,
+      policyUri,
+      tosUri,
+      walletSolutionJwksKeyNames,
       walletSolutionLogoUri,
-      walletSolutionWalletName,
+      walletSolutionMetadataAuthorizationEndpoint,
+      walletSolutionMetadataCredentialOfferEndpoint,
+      walletSolutionMetadataWalletName,
       ...federationEntity
     }) => ({
-      federationEntity: {
-        ...federationEntity,
-        basePath: federationEntity.basePathV2,
-        intermediatePublishedKeyNames:
-          federationEntityV2IntermediatePublishedKeyNames,
-        intermediateSigningKeyName:
-          federationEntityV2IntermediateSigningKeyName,
-        logoUri: federationEntity.logoUriV2,
+      ...federationEntity,
+      metadata: {
+        federationEntity: {
+          contacts,
+          homepageUri,
+          logoUri,
+          organizationName,
+          policyUri,
+          tosUri,
+        },
         walletSolution: {
-          authorizationEndpoint: walletSolutionAuthorizationEndpoint,
-          credentialOfferEndpoint: walletSolutionCredentialOfferEndpoint,
+          jwksKeyNames: walletSolutionJwksKeyNames,
           logoUri: walletSolutionLogoUri,
-          walletName: walletSolutionWalletName,
+          walletMetadata: {
+            authorizationEndpoint: walletSolutionMetadataAuthorizationEndpoint,
+            credentialOfferEndpoint:
+              walletSolutionMetadataCredentialOfferEndpoint,
+            walletName: walletSolutionMetadataWalletName,
+          },
         },
       },
-      trustAnchorUrl,
     }),
-  ),
-  RE.chainEitherKW(
-    parse(
-      EntityConfigurationV2Config,
-      "Entity configuration V2 config is invalid",
-    ),
   ),
 );
 

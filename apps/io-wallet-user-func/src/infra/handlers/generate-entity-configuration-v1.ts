@@ -21,7 +21,7 @@ interface EntityConfigurationV1Environment extends SignJwtEnvironment {
   containerClient: ContainerClient;
   entityConfigurationJwt: {
     federationEntityId: UrlFromString;
-    jwksKeyNames: string[];
+    federationEntityJwksKeyNames: string[];
     metadata: {
       federationEntity: {
         contacts: EmailString[];
@@ -31,7 +31,7 @@ interface EntityConfigurationV1Environment extends SignJwtEnvironment {
         policyUri: UrlFromString;
         tosUri: UrlFromString;
       };
-      walletProviderJwks: ECPublicKeyWithKid[];
+      walletProviderJwksKeyNames: string[];
     };
     signingKeyName: string;
     trustAnchorUrl: UrlFromString;
@@ -41,13 +41,17 @@ interface EntityConfigurationV1Environment extends SignJwtEnvironment {
 
 const withX5c = ({
   certificateChain,
+  keyName,
   ...jwk
-}: ECPublicKeyWithKid & { certificateChain: string[] }) => ({
-  ...jwk,
-  x5c: certificateChain,
-});
+}: ECPublicKeyWithKid & { certificateChain: string[]; keyName: string }) => {
+  void keyName;
 
-// Create the JWT payload for the entity configuration metadata and return the signed JWT
+  return {
+    ...jwk,
+    x5c: certificateChain,
+  };
+};
+
 const createEntityConfiguration: RTE.ReaderTaskEither<
   EntityConfigurationV1Environment,
   Error,
@@ -56,10 +60,10 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   cryptographyClient,
   entityConfigurationJwt: {
     federationEntityId,
-    jwksKeyNames,
+    federationEntityJwksKeyNames,
     metadata: {
       federationEntity: federationEntityMetadata,
-      walletProviderJwks,
+      walletProviderJwksKeyNames,
     },
     signingKeyName,
     trustAnchorUrl,
@@ -67,28 +71,31 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   keyRepository,
 }) =>
   pipe(
-    getKey(signingKeyName)({ keyRepository }),
-    TE.chain((signingKey) =>
+    sequenceS(TE.ApplyPar)({
+      federationEntityJwks: pipe(
+        federationEntityJwksKeyNames,
+        TE.traverseArray((keyName) => getKey(keyName)({ keyRepository })),
+      ),
+      walletProviderJwks: pipe(
+        walletProviderJwksKeyNames,
+        TE.traverseArray((keyName) => getKey(keyName)({ keyRepository })),
+      ),
+    }),
+    TE.chainW(({ federationEntityJwks, walletProviderJwks }) =>
       pipe(
-        sequenceS(TE.ApplyPar)({
-          jwksWithX5c: pipe(
-            jwksKeyNames,
-            TE.traverseArray((kid) => getKey(kid)({ keyRepository })),
-            TE.map((keys) => keys.map(withX5c)),
+        federationEntityJwks.find(({ keyName }) => keyName === signingKeyName),
+        TE.fromNullable(
+          new Error(
+            `Intermediate signing key "${signingKeyName}" not found in published keys`,
           ),
-          walletProviderJwksWithX5c: pipe(
-            walletProviderJwks,
-            TE.traverseArray((jwk) => getKey(jwk.kid)({ keyRepository })),
-            TE.map((keys) => keys.map(withX5c)),
-          ),
-        }),
-        TE.chain(({ jwksWithX5c, walletProviderJwksWithX5c }) =>
+        ),
+        TE.chain((signingKey) =>
           pipe(
             {
               authorityHints: [trustAnchorUrl],
               federationEntityMetadata,
               iss: federationEntityId,
-              jwks: jwksWithX5c,
+              jwks: federationEntityJwks.map(withX5c),
               sub: federationEntityId,
               walletProviderMetadata: {
                 ascValues: [
@@ -96,7 +103,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                   pipe(federationEntityId, getLoAUri(LoA.medium)),
                   pipe(federationEntityId, getLoAUri(LoA.high)),
                 ],
-                jwks: walletProviderJwksWithX5c,
+                jwks: walletProviderJwks.map(withX5c),
               },
             },
             EntityConfigurationToJwtModel.encode,

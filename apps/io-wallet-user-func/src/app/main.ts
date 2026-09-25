@@ -85,7 +85,7 @@ const entityConfigurationV1CryptographyClient = createCryptographyClient(
 );
 
 const entityConfigurationV2CryptographyClient = createCryptographyClient(
-  config.entityConfigurationV2.federationEntity.intermediateSigningKeyName,
+  config.entityConfigurationV2.signingKeyName,
 );
 
 const keyAttestationCryptographyClient = createCryptographyClient(
@@ -321,7 +321,6 @@ app.http("getNonce", {
 });
 
 // V1 version
-// fetch signingKeyName from db to create header
 app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationV1Function({
     cdnManagementClient,
@@ -344,28 +343,11 @@ app.timer("generateEntityConfigurationV2", {
     containerClient: entityConfigurationV2ContainerClient,
     cryptographyClient: entityConfigurationV2CryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
-    entityConfigurationProperties: {
-      authorityHints: [config.entityConfigurationV2.trustAnchorUrl],
-      federationEntity: config.entityConfigurationV2.federationEntity,
-      walletSolution: {
-        ...config.entityConfigurationV2.federationEntity.walletSolution,
-      },
-    },
+    entityConfigurationJwt: config.entityConfigurationV2,
     inputDecoder: t.unknown,
-    intermediatePublishedKeyNames:
-      config.entityConfigurationV2.federationEntity
-        .intermediatePublishedKeyNames,
-    intermediateSigningKeyName:
-      config.entityConfigurationV2.federationEntity.intermediateSigningKeyName,
     keyRepository: keyRepository,
-    leafPublishedKeyNames: [
-      ...config.walletProvider.tokenStatusListPublishedKeyNames,
-      ...config.walletProvider.walletInstanceAttestationPublishedKeyNames,
-      ...config.walletProvider.keyAttestationPublishedKeyNames,
-    ],
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
-    trustAnchorUrl: config.entityConfigurationV2.trustAnchorUrl,
     trustMarkRepository,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
@@ -467,7 +449,7 @@ app.http("createWalletInstanceAttestation", {
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
     cryptographyClient: walletInstanceAttestationCryptographyClient,
-    federationEntityId: config.entityConfigurationV2.federationEntity.basePath,
+    federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyRepository,
     nonceRepository,
     walletAttestationConfig: {
@@ -487,7 +469,7 @@ app.http("createKeyAttestation", {
     androidAttestationValidationConfig,
     assertionValidationConfig,
     cryptographyClient: keyAttestationCryptographyClient,
-    federationEntityId: config.entityConfigurationV2.federationEntity.basePath,
+    federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyAttestationSigningKeyName:
       config.walletProvider.keyAttestationSigningKeyName,
     keyRepository,

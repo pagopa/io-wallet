@@ -33,15 +33,34 @@ locals {
     FederationEntityLogoUri                 = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
     FederationEntityV2WalletSolutionLogoUri = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
     FederationEntityContacts                = "pagopaspa@pec.pagopa.it"
-    IosBundleIdentifiers                    = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet"
-    IosTeamIdentifier                       = "M2X5YQ4BJ7"
-    AndroidBundleIdentifiers                = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage"
-    AndroidCrlUrl                           = "https://android.googleapis.com/attestation/status"
-    AndroidPlayIntegrityUrl                 = "https://www.googleapis.com/auth/playintegrity"
-    AndroidPlayStoreCertificateHash         = "feT-Pqrgg__NiwcDAehlAtPx6tHdZqwUK618VEdVT4I"
-    AppleRootCertificate                    = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t"
-    GooglePublicKeys                        = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFyN2JIZ2l1eHB3SHNLN1F1aTh4VQpGbU9yNzVndk1zZC9kVEVEREpkU1N4dGY2QW43eHlxcFJSOTBQTDJhYnhNMWRFcWxYbmYydHF3MU5lNFh3bDVqCmxSZmRuSkxtTjBwVHkvNGxqNC83dHYwU2szaWlLa3lwbkVVdFI2V2ZNZ0gwUVpmS0hNMStkaSt5OVRGUnR2NnkKLy8wcmIrVCtXOGE5bnNOTC9nZ2puYXI4NjQ2MXFPMHJPczJjWGpwM2tPRzFGRUo1TVZtRm1CR3RucktwYTczWApwWHlUcVJ4Qi9NMG4xbi9XOW5HcUM0RlNZYTA0VDZONVJJWkdCTjJ6Mk1UNUlLR2JGbGJDOFVyVzBEeFc3QVlJCm1RUWNIdEdsL20wMFFMVld1dEhRb1ZKWW5GUGxYVGNIWXZBU0x1K1JoaHNiRG14TWdKSjBtY0RwdnNDNFBqdkIKK1R4eXdFbGdTNzB2RTBYbUxEK09KdHZzQnNsSFp2UEJLQ09kVDBNUyt0Z1NPSWZnYSt6MVoxZzcrRFZhZ2Y3cQp1dm1hZzhqZlBpb3lLdnhuSy9FZ3NUVVZpMmdoenE4d20yN3VkL21JTTdBWTJxRU9SUjhHbzNUVkI0SHpXUWdwClpydDNpNU1JbENhWTUwNEx6U1JpaWdIQ3pBUGxId3MrVzByQjVOK2VyNS8ycEpLbmZCU0RpQ2lGQVZ0Q0xPWjcKZ0xpTW0wamhPMkI2dFVYSEkvK01SUGp5MDJpNTlsSU5NUlJldjU2R0t0Y2Q5cU8vMGtVSldkWlRkQTJYb1M4MgppeFB2WnRYUXBVcHVMMTJhYis5RWFESzhaNFJISllZZkNUM1E1dk5BWGFpV1ErOFBUV20yUWdCUi9ia3dTV2MrCk5wVUZnTlBOOVB2UWk4V0VnNVVtQUdNQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==,LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVJOW9qY1U3ZlBsc0ZDanh5NklScXpnZU9vSzBiK1lzVgo5RlBReXdpeXc4RVFSVGtKOXUzcXdmbkk0REdvU0xsQnFDbFRYSmZnZkNjWnZzNjBGaWtOTUhudTRma1J6T2JmCmdEa1UyS05YZXpUOS9SUStYdk5zbHhQSHJIQ293aEdyCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
-    HardwarePublicTestKey                   = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMDFtMHhmNXVqUTVnMjJGdloyemJGcnZ5THg5YgpnTjJBaUxWRnRjYTJCVUh0a2dwV3Y5WUpDRElzNmxQS3hWU3NFb25QVXZPTTJVcmNNUGdwMDRZZU9nPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
+
+    EntityConfigurationV1FederationEntityContacts         = "pagopaspa@pec.pagopa.it"
+    EntityConfigurationV1FederationEntityHomepageUri      = "https://io.italia.it"
+    EntityConfigurationV1FederationEntityLogoUri          = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
+    EntityConfigurationV1FederationEntityPolicyUri        = "https://io.italia.it/privacy-policy"
+    EntityConfigurationV1FederationEntityTosUri           = "https://io.italia.it/privacy-policy"
+    EntityConfigurationV1FederationEntityOrganizationName = "PagoPA S.p.A."
+
+    EntityConfigurationV2FederationEntityContacts                      = "pagopaspa@pec.pagopa.it"
+    EntityConfigurationV2FederationEntityOrganizationName              = "PagoPA S.p.A."
+    EntityConfigurationV2FederationEntityHomepageUri                   = "https://io.italia.it"
+    EntityConfigurationV2FederationEntityLogoUri                       = "https://wallet.io.pagopa.it/images/logo-pagopa.svg"
+    EntityConfigurationV2FederationEntityPolicyUri                     = "https://io.italia.it/privacy-policy"
+    EntityConfigurationV2FederationEntityTosUri                        = "https://io.italia.it/privacy-policy"
+    EntityConfigurationV2WalletSolutionLogoUri                         = "https://io.italia.it/assets/img/io-it-logo-blue.svg"
+    EntityConfigurationV2WalletSolutionMetadataAuthorizationEndpoint   = "https://continua.io.pagopa.it/itw/auth"
+    EntityConfigurationV2WalletSolutionMetadataCredentialOfferEndpoint = "https://continua.io.pagopa.it/itw/credential-offer"
+    EntityConfigurationV2WalletSolutionMetadataWalletName              = "App IO"
+
+    IosBundleIdentifiers            = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet"
+    IosTeamIdentifier               = "M2X5YQ4BJ7"
+    AndroidBundleIdentifiers        = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage"
+    AndroidCrlUrl                   = "https://android.googleapis.com/attestation/status"
+    AndroidPlayIntegrityUrl         = "https://www.googleapis.com/auth/playintegrity"
+    AndroidPlayStoreCertificateHash = "feT-Pqrgg__NiwcDAehlAtPx6tHdZqwUK618VEdVT4I"
+    AppleRootCertificate            = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t"
+    GooglePublicKeys                = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFyN2JIZ2l1eHB3SHNLN1F1aTh4VQpGbU9yNzVndk1zZC9kVEVEREpkU1N4dGY2QW43eHlxcFJSOTBQTDJhYnhNMWRFcWxYbmYydHF3MU5lNFh3bDVqCmxSZmRuSkxtTjBwVHkvNGxqNC83dHYwU2szaWlLa3lwbkVVdFI2V2ZNZ0gwUVpmS0hNMStkaSt5OVRGUnR2NnkKLy8wcmIrVCtXOGE5bnNOTC9nZ2puYXI4NjQ2MXFPMHJPczJjWGpwM2tPRzFGRUo1TVZtRm1CR3RucktwYTczWApwWHlUcVJ4Qi9NMG4xbi9XOW5HcUM0RlNZYTA0VDZONVJJWkdCTjJ6Mk1UNUlLR2JGbGJDOFVyVzBEeFc3QVlJCm1RUWNIdEdsL20wMFFMVld1dEhRb1ZKWW5GUGxYVGNIWXZBU0x1K1JoaHNiRG14TWdKSjBtY0RwdnNDNFBqdkIKK1R4eXdFbGdTNzB2RTBYbUxEK09KdHZzQnNsSFp2UEJLQ09kVDBNUyt0Z1NPSWZnYSt6MVoxZzcrRFZhZ2Y3cQp1dm1hZzhqZlBpb3lLdnhuSy9FZ3NUVVZpMmdoenE4d20yN3VkL21JTTdBWTJxRU9SUjhHbzNUVkI0SHpXUWdwClpydDNpNU1JbENhWTUwNEx6U1JpaWdIQ3pBUGxId3MrVzByQjVOK2VyNS8ycEpLbmZCU0RpQ2lGQVZ0Q0xPWjcKZ0xpTW0wamhPMkI2dFVYSEkvK01SUGp5MDJpNTlsSU5NUlJldjU2R0t0Y2Q5cU8vMGtVSldkWlRkQTJYb1M4MgppeFB2WnRYUXBVcHVMMTJhYis5RWFESzhaNFJISllZZkNUM1E1dk5BWGFpV1ErOFBUV20yUWdCUi9ia3dTV2MrCk5wVUZnTlBOOVB2UWk4V0VnNVVtQUdNQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==,LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVJOW9qY1U3ZlBsc0ZDanh5NklScXpnZU9vSzBiK1lzVgo5RlBReXdpeXc4RVFSVGtKOXUzcXdmbkk0REdvU0xsQnFDbFRYSmZnZkNjWnZzNjBGaWtOTUhudTRma1J6T2JmCmdEa1UyS05YZXpUOS9SUStYdk5zbHhQSHJIQ293aEdyCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
+    HardwarePublicTestKey           = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMDFtMHhmNXVqUTVnMjJGdloyemJGcnZ5THg5YgpnTjJBaUxWRnRjYTJCVUh0a2dwV3Y5WUpDRElzNmxQS3hWU3NFb25QVXZPTTJVcmNNUGdwMDRZZU9nPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
 
     WalletInstanceCreationEmailQueueName                 = var.wallet_instance_creation_email_queue_name
     WalletInstanceRevocationEmailQueueName               = var.wallet_instance_revocation_email_queue_name
@@ -86,6 +105,8 @@ locals {
       FederationEntityBasePathV10                           = "https://wallet.io.pagopa.it"
       FederationEntityBasePathV2                            = "https://wallet.io.pagopa.it/v2"
       FederationEntityBasePathV13                           = "https://wallet.io.pagopa.it/v2"
+      EntityConfigurationV1FederationEntityId               = "https://wallet.io.pagopa.it"
+      EntityConfigurationV2FederationEntityId               = "https://wallet.io.pagopa.it/v2"
       FederationEntityV2LogoUri                             = "https://wallet.io.pagopa.it/images/logo-pagopa.svg"
       FederationEntityKeyId                                 = "RspQM6Tb9B1GRKjt"
       TokenStatusListKeyId                                  = "Gsc_881JGHOVX9U9hNLODJf35bfTfFdbbv1xJiSCOCA"
@@ -150,21 +171,23 @@ locals {
   function_app_user_uat_common_app_settings = merge(
     local.function_app_user_envs_shared_app_settings,
     {
-      EntityConfigurationStorageAccountName  = var.storage_account_cdn_name_uat
-      KeyVaultUrl                            = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
-      AndroidBundleIdentifiers               = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
-      FederationEntityBasePathV1             = "https://foo11.blob.core.windows.net/foo/"
-      FederationEntityBasePathV10            = "https://foo11.blob.core.windows.net/foo/"
-      FederationEntityBasePathV2             = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"
-      FederationEntityBasePathV13            = var.federation_entity_base_path_v13_uat
-      FederationEntityV2LogoUri              = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider/logo-pagopa.svg"
-      EntityConfigurationV1PublishedKeyNames = "intermediate-key-pre"
-      EntityConfigurationV1SigningKeyName    = "intermediate-key-pre"
-      EntityConfigurationV2PublishedKeyNames = "intermediate-key-pre"
-      EntityConfigurationV2SigningKeyName    = "intermediate-key-pre"
-      FrontDoorEndpointName                  = var.front_door_endpoint_name_uat
-      FrontDoorProfileName                   = var.front_door_profile_name_uat
-      PidIssuerApiBaseURL                    = "https://pre.util.wallet.ipzs.it"
+      EntityConfigurationStorageAccountName   = var.storage_account_cdn_name_uat
+      KeyVaultUrl                             = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
+      AndroidBundleIdentifiers                = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
+      FederationEntityBasePathV1              = "https://foo11.blob.core.windows.net/foo/"
+      FederationEntityBasePathV10             = "https://foo11.blob.core.windows.net/foo/"
+      FederationEntityBasePathV2              = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"
+      FederationEntityBasePathV13             = var.federation_entity_base_path_v13_uat
+      EntityConfigurationV1FederationEntityId = "https://foo11.blob.core.windows.net/foo/"
+      EntityConfigurationV2FederationEntityId = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"
+      FederationEntityV2LogoUri               = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider/logo-pagopa.svg"
+      EntityConfigurationV1PublishedKeyNames  = "intermediate-key-pre"
+      EntityConfigurationV1SigningKeyName     = "intermediate-key-pre"
+      EntityConfigurationV2PublishedKeyNames  = "intermediate-key-pre"
+      EntityConfigurationV2SigningKeyName     = "intermediate-key-pre"
+      FrontDoorEndpointName                   = var.front_door_endpoint_name_uat
+      FrontDoorProfileName                    = var.front_door_profile_name_uat
+      PidIssuerApiBaseURL                     = "https://pre.util.wallet.ipzs.it"
       StatusListBaseUrl = format(
         "https://%s.blob.core.windows.net/%s/",
         var.status_list_storage_account_name_uat,
