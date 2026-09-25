@@ -72,6 +72,10 @@ locals {
     AuthProfileApiBaseURL = "https://io-p-itn-auth-profile-func-02.azurewebsites.net"
 
     WalletAttestationWalletName                             = "IT Wallet"
+
+    WalletProviderCertificateCountry  = "IT"
+    WalletProviderCertificateState    = "Lazio"
+    WalletProviderCertificateLocality = "Roma"
     FederationEntityV2WalletSolutionWalletName              = "App IO"
     FederationEntityV2WalletSolutionAuthorizationEndpoint   = "https://continua.io.pagopa.it/itw/auth"
     FederationEntityV2WalletSolutionCredentialOfferEndpoint = "https://continua.io.pagopa.it/itw/credential-offer"
