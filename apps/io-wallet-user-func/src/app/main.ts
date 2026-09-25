@@ -345,7 +345,7 @@ app.timer("generateEntityConfigurationV2", {
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV2,
     inputDecoder: t.unknown,
-    keyRepository: keyRepository,
+    keyRepository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
     trustMarkRepository,
