@@ -110,6 +110,8 @@ locals {
       FederationEntityV2LogoUri                             = "https://wallet.io.pagopa.it/images/logo-pagopa.svg"
       FederationEntityKeyId                                 = "RspQM6Tb9B1GRKjt"
       TokenStatusListKeyId                                  = "Gsc_881JGHOVX9U9hNLODJf35bfTfFdbbv1xJiSCOCA"
+      IntermediatePublishedKeyNames                         = "fake-wallet-provider-signing-key"
+      IntermediateSigningKeyName                            = "fake-wallet-provider-signing-key"
       TokenStatusListPublishedKeyNames                      = "fake-wallet-provider-signing-key"
       TokenStatusListSigningKeyName                         = "fake-wallet-provider-signing-key"
       WalletAttestationKeyId                                = "Q1yVyGZQ9hFE2MEcsZN_r-2WccrhKPgirpZR-pCkoM0"
