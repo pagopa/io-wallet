@@ -27,7 +27,7 @@ interface SignJwtOptions {
   crv: string;
   duration: number;
   header: SignJwtHeader;
-  payload: jose.JWTPayload;
+  payload: unknown;
 }
 
 const createJwtSigningInput = ({
@@ -37,7 +37,7 @@ const createJwtSigningInput = ({
 }: {
   duration: number;
   header: JwtProtectedHeader;
-  payload: jose.JWTPayload;
+  payload: unknown;
 }) => {
   const iat = Math.floor(Date.now() / 1000);
   const { trustChain, ...headerParameters } = header;
@@ -45,8 +45,14 @@ const createJwtSigningInput = ({
     ...headerParameters,
     trust_chain: trustChain,
   };
+
+  const payloadObj =
+    payload && typeof payload === "object" && !Array.isArray(payload)
+      ? payload
+      : {};
+
   const claims = {
-    ...payload,
+    ...payloadObj,
     exp: iat + duration,
     iat,
   };

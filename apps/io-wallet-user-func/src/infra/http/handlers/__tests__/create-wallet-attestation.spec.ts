@@ -2,11 +2,7 @@
 /* eslint-disable vitest/no-conditional-expect */
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import {
-  EmailString,
-  FiscalCode,
-  NonEmptyString,
-} from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
@@ -50,23 +46,7 @@ const url = flow(
   }),
 );
 
-const email = flow(
-  EmailString.decode,
-  E.getOrElseW((_) => {
-    throw new Error(`Failed to parse url ${_[0].value}`);
-  }),
-);
-
-const federationEntity = {
-  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
-  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
-  contacts: [email("foo@pec.bar.it")],
-  homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
-  logoUri: url("https://wallet-provider.example.org/logo.svg"),
-  organizationName: "wallet provider" as NonEmptyString,
-  policyUri: url("https://wallet-provider.example.org/info_policy"),
-  tosUri: url("https://wallet-provider.example.org/logo.svg"),
-};
+const federationEntityId = url("https://wallet-provider-v1.example.org/foo/");
 
 const walletAttestationConfig = {
   walletLink: "https://foo.com",
@@ -167,7 +147,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -201,7 +181,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -254,10 +234,10 @@ describe("CreateWalletAttestationHandler", async () => {
             ].sort(),
           );
           expect(jwtPayload.iss).toBe(
-            "https://wallet-provider-v10.example.org/foo",
+            "https://wallet-provider-v1.example.org/foo",
           );
           expect(jwtPayload.aal).toBe(
-            "https://wallet-provider-v10.example.org/foo/LoA/basic",
+            "https://wallet-provider-v1.example.org/foo/LoA/basic",
           );
           // check trailing slashes are removed
           expect((jwtPayload.iss || "").endsWith("/")).toBe(false);
@@ -265,6 +245,66 @@ describe("CreateWalletAttestationHandler", async () => {
         }
       }
     }
+  });
+
+  it("should return a 500 HTTP response when getKeyByName returns an error", async () => {
+    const keyRepositoryError: KeyRepository = {
+      getKeyByName: () => TE.left(new Error()),
+    };
+
+    const handler = CreateWalletAttestationHandler({
+      attestationService: mockAttestationService,
+      cryptographyClient,
+      federationEntityId,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      keyRepository: keyRepositoryError,
+      logger,
+      nonceRepository,
+      walletAttestationConfig,
+      walletAttestationSigningKeyName,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response when getKeyByName returns an O.none", async () => {
+    const keyRepositoryNone: KeyRepository = {
+      getKeyByName: () => TE.right(O.none),
+    };
+
+    const handler = CreateWalletAttestationHandler({
+      attestationService: mockAttestationService,
+      cryptographyClient,
+      federationEntityId,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      keyRepository: keyRepositoryNone,
+      logger,
+      nonceRepository,
+      walletAttestationConfig,
+      walletAttestationSigningKeyName,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
   });
 
   it("should return a 422 HTTP response on invalid body", async () => {
@@ -278,7 +318,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -327,7 +367,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -370,7 +410,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -424,7 +464,7 @@ describe("CreateWalletAttestationHandler", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationServiceExternalServiceError,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,

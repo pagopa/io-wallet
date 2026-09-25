@@ -145,7 +145,7 @@ resource "azurerm_role_assignment" "func_app_user_slot_key_vault_crypto_user" {
   principal_id         = var.function_app.user_func.staging_principal_id
   description          = "Allow Function App user slot to sign data with wallet provider Key Vault keys"
 }
-  
+
 module "func_app_whitelist" {
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
