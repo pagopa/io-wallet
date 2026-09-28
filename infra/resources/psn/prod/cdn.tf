@@ -292,6 +292,55 @@ resource "azurerm_cdn_frontdoor_rule" "well_known_rewrite" {
   }
 }
 
+resource "azurerm_cdn_frontdoor_rule" "entity_configuration_v1_rewrite_uat" {
+  name                      = "EntityConfigurationV1UatRewrite"
+  cdn_frontdoor_rule_set_id = module.cdn_uat.rule_set_id
+  order                     = 2
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = ["v1/.well-known"]
+      transforms       = []
+      negate_condition = false
+    }
+  }
+
+  actions {
+    url_rewrite_action {
+      source_pattern          = "/v1/.well-known/"
+      destination             = "/entity-configuration-v1/"
+      preserve_unmatched_path = true
+    }
+  }
+}
+
+resource "azurerm_cdn_frontdoor_rule" "entity_configuration_v2_rewrite_uat" {
+  name                      = "EntityConfigurationV2UatRewrite"
+  cdn_frontdoor_rule_set_id = module.cdn_uat.rule_set_id
+  order                     = 3
+  behavior_on_match         = "Continue"
+
+  conditions {
+    url_path_condition {
+      operator         = "BeginsWith"
+      match_values     = ["v2/.well-known"]
+      transforms       = []
+      negate_condition = false
+    }
+  }
+
+  actions {
+    url_rewrite_action {
+      source_pattern          = "/v2/.well-known/"
+      destination             = "/entity-configuration-v2/"
+      preserve_unmatched_path = true
+    }
+  }
+}
+
+
 resource "azurerm_cdn_frontdoor_rule" "entity_configuration_v2_rewrite" {
   name                      = "EntityConfigurationV2Rewrite"
   cdn_frontdoor_rule_set_id = module.cdn.rule_set_id
