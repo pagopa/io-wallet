@@ -1,5 +1,6 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { flow, pipe } from "fp-ts/function";
 import { sequenceS } from "fp-ts/lib/Apply";
 import * as E from "fp-ts/lib/Either";
@@ -12,7 +13,6 @@ import { type JWTPayload } from "jose";
 import { AttestationService, validateAssertion } from "@/attestation-service";
 import { WalletAttestationToJwtModel } from "@/encoders/wallet-attestation";
 import { WalletAttestationData } from "@/encoders/wallet-attestation";
-import { FederationEntity } from "@/entity-configuration";
 import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
 import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
@@ -53,7 +53,7 @@ interface WalletAttestationConfig {
 }
 
 interface WalletAttestationEnvironment extends SignJwtEnvironment {
-  federationEntity: FederationEntity;
+  federationEntityId: UrlFromString;
   keyRepository: KeyRepository;
   walletAttestationConfig: WalletAttestationConfig;
   walletAttestationSigningKeyName: string;
@@ -68,7 +68,7 @@ const getWalletAttestationData =
     WalletAttestationData
   > =>
   ({
-    federationEntity: { basePathV10: basePath },
+    federationEntityId,
     keyRepository,
     walletAttestationConfig: { walletLink, walletName },
     walletAttestationSigningKeyName,
@@ -77,9 +77,9 @@ const getWalletAttestationData =
       { keyRepository },
       getKey(walletAttestationSigningKeyName),
       TE.map(({ crv, kid }) => ({
-        aal: pipe(basePath, getLoAUri(LoA.basic)),
+        aal: pipe(federationEntityId, getLoAUri(LoA.basic)),
         crv,
-        iss: basePath.href,
+        iss: federationEntityId.href,
         kid,
         sub: walletAttestationRequest.header.kid,
         walletInstancePublicKey: walletAttestationRequest.payload.cnf.jwk,

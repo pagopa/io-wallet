@@ -21,13 +21,15 @@ import { CosmosDbOpenStatusListsPolicyRepository } from "@/infra/azure/cosmos/op
 import { CosmosDbStatusListCatalogRepository } from "@/infra/azure/cosmos/status-list-catalog";
 import { CosmosDbStatusListPagesRepository } from "@/infra/azure/cosmos/status-list-pages";
 import { CosmosDbStatusListRoutingRepository } from "@/infra/azure/cosmos/status-list-routing";
+import { CosmosDbTrustMarkRepository } from "@/infra/azure/cosmos/trust-mark";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
 import { CreateKeyAttestationFunction } from "@/infra/azure/functions/create-key-attestation";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
-import { GenerateEntityConfigurationFunction } from "@/infra/azure/functions/generate-entity-configuration";
+import { GenerateEntityConfigurationV1Function } from "@/infra/azure/functions/generate-entity-configuration-v1";
+import { GenerateEntityConfigurationV2Function } from "@/infra/azure/functions/generate-entity-configuration-v2";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
 import { GetNonceFunction } from "@/infra/azure/functions/get-nonce";
 import { GetWalletInstanceStatusFunction } from "@/infra/azure/functions/get-wallet-instance-status";
@@ -78,8 +80,12 @@ const createCryptographyClient = (keyName: string) =>
     credential,
   );
 
-const entityConfigurationCryptographyClient = createCryptographyClient(
-  config.walletProvider.intermediateSigningKeyName,
+const entityConfigurationV1CryptographyClient = createCryptographyClient(
+  config.entityConfigurationV1.signingKeyName,
+);
+
+const entityConfigurationV2CryptographyClient = createCryptographyClient(
+  config.entityConfigurationV2.signingKeyName,
 );
 
 const keyAttestationCryptographyClient = createCryptographyClient(
@@ -142,7 +148,7 @@ const whitelistedFiscalCodeRepository =
 
 const pidIssuerClient = new PidIssuerClient(
   config.pidIssuer,
-  config.entityConfiguration.federationEntity.basePathV10.href,
+  config.entityConfigurationV1.federationEntityId.href,
 );
 
 const mobileAttestationService = new MobileAttestationService(
@@ -175,14 +181,25 @@ const emailNotificationService = new EmailNotificationServiceClient({
 
 const slackNotificationService = new SlackNotificationService(config.slack);
 
-const blobServiceClient = new BlobServiceClient(
-  `https://${config.azure.storage.entityConfiguration.accountName}.blob.core.windows.net`,
+const entityConfigurationV1BlobServiceClient = new BlobServiceClient(
+  `https://${config.azure.storage.entityConfigurationV1.accountName}.blob.core.windows.net`,
   credential,
 );
 
-const containerClient = blobServiceClient.getContainerClient(
-  config.azure.storage.entityConfiguration.containerName,
+const entityConfigurationV2BlobServiceClient = new BlobServiceClient(
+  `https://${config.azure.storage.entityConfigurationV2.accountName}.blob.core.windows.net`,
+  credential,
 );
+
+const entityConfigurationV1ContainerClient =
+  entityConfigurationV1BlobServiceClient.getContainerClient(
+    config.azure.storage.entityConfigurationV1.containerName,
+  );
+
+const entityConfigurationV2ContainerClient =
+  entityConfigurationV2BlobServiceClient.getContainerClient(
+    config.azure.storage.entityConfigurationV2.containerName,
+  );
 
 const statusListBlobServiceClient = new BlobServiceClient(
   `https://${config.azure.storage.statusLists.accountName}.blob.core.windows.net`,
@@ -196,7 +213,9 @@ const statusListContainerClient =
 
 const keyRepository = new CosmosDbKeyRepository(database);
 
-const keyV10Repository = new CosmosDbKeyRepository(database, "keys-1.0");
+const keyV1Repository = new CosmosDbKeyRepository(database, "keys-1.0");
+
+const trustMarkRepository = new CosmosDbTrustMarkRepository(database);
 
 const statusListCatalogRepository = new CosmosDbStatusListCatalogRepository(
   database,
@@ -301,29 +320,35 @@ app.http("getNonce", {
   route: "nonce",
 });
 
+// V1 version
 app.timer("generateEntityConfiguration", {
-  handler: GenerateEntityConfigurationFunction({
+  handler: GenerateEntityConfigurationV1Function({
     cdnManagementClient,
-    containerClient,
-    cryptographyClient: entityConfigurationCryptographyClient,
+    containerClient: entityConfigurationV1ContainerClient,
+    cryptographyClient: entityConfigurationV1CryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
-    entityConfiguration: {
-      ...config.entityConfiguration,
-      authorityHints: [config.entityConfiguration.trustAnchorUrl],
-    },
+    entityConfigurationJwt: config.entityConfigurationV1,
     inputDecoder: t.unknown,
-    intermediatePublishedKeyNames:
-      config.walletProvider.intermediatePublishedKeyNames,
-    intermediateSigningKeyName:
-      config.walletProvider.intermediateSigningKeyName,
-    keyRepository: keyV10Repository,
-    leafPublishedKeyNames: [
-      ...config.walletProvider.keyAttestationPublishedKeyNames,
-      ...config.walletProvider.tokenStatusListPublishedKeyNames,
-      ...config.walletProvider.walletInstanceAttestationPublishedKeyNames,
-    ],
+    keyRepository: keyV1Repository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
+  }),
+  schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
+});
+
+// V2 version
+app.timer("generateEntityConfigurationV2", {
+  handler: GenerateEntityConfigurationV2Function({
+    cdnManagementClient,
+    containerClient: entityConfigurationV2ContainerClient,
+    cryptographyClient: entityConfigurationV2CryptographyClient,
+    endpointName: config.azure.frontDoor.endpointName,
+    entityConfigurationJwt: config.entityConfigurationV2,
+    inputDecoder: t.unknown,
+    keyRepository,
+    profileName: config.azure.frontDoor.profileName,
+    resourceGroupName: config.azure.generic.resourceGroupName,
+    trustMarkRepository,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -398,7 +423,7 @@ app.http("createWalletAttestation", {
   handler: CreateWalletAttestationFunction({
     attestationService: mobileAttestationService,
     cryptographyClient: walletAttestationCryptographyClient,
-    federationEntity: config.entityConfiguration.federationEntity,
+    federationEntityId: config.entityConfigurationV1.federationEntityId,
     keyRepository,
     nonceRepository,
     walletAttestationConfig: config.walletProvider.walletAttestation,
@@ -424,7 +449,7 @@ app.http("createWalletInstanceAttestation", {
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
     cryptographyClient: walletInstanceAttestationCryptographyClient,
-    federationEntity: config.entityConfiguration.federationEntity,
+    federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyRepository,
     nonceRepository,
     walletAttestationConfig: {
@@ -444,7 +469,7 @@ app.http("createKeyAttestation", {
     androidAttestationValidationConfig,
     assertionValidationConfig,
     cryptographyClient: keyAttestationCryptographyClient,
-    federationEntity: config.entityConfiguration.federationEntity,
+    federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyAttestationSigningKeyName:
       config.walletProvider.keyAttestationSigningKeyName,
     keyRepository,

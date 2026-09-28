@@ -86,9 +86,33 @@ resource "azurerm_storage_container" "images" {
 
 # This container is intentionally public because it serves public wallet content through the CDN.
 #trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "entity_configuration_v1" {
+  name                  = "entity-configuration-v1"
+  storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "entity_configuration_v1_uat" {
+  name                  = "entity-configuration-v1"
+  storage_account_id    = azurerm_storage_account.cdn_uat.id
+  container_access_type = "container"
+}
+
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
 resource "azurerm_storage_container" "entity_configuration_v2" {
   name                  = "entity-configuration-v2"
   storage_account_id    = azurerm_storage_account.cdn.id
+  container_access_type = "container"
+}
+
+# This container is intentionally public because it serves public wallet content through the CDN.
+#trivy:ignore:AZU-0007 trivy:ignore:AVD-AZU-0007
+resource "azurerm_storage_container" "entity_configuration_v2_uat" {
+  name                  = "entity-configuration-v2"
+  storage_account_id    = azurerm_storage_account.cdn_uat.id
   container_access_type = "container"
 }
 

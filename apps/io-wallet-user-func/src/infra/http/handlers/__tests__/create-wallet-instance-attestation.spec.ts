@@ -2,11 +2,7 @@
 /* eslint-disable vitest/no-conditional-expect */
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import {
-  EmailString,
-  FiscalCode,
-  NonEmptyString,
-} from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
@@ -58,23 +54,7 @@ const url = flow(
   }),
 );
 
-const email = flow(
-  EmailString.decode,
-  E.getOrElseW((_) => {
-    throw new Error(`Failed to parse url ${_[0].value}`);
-  }),
-);
-
-const federationEntity = {
-  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
-  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
-  contacts: [email("foo@pec.bar.it")],
-  homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
-  logoUri: url("https://wallet-provider.example.org/logo.svg"),
-  organizationName: "wallet provider" as NonEmptyString,
-  policyUri: url("https://wallet-provider.example.org/info_policy"),
-  tosUri: url("https://wallet-provider.example.org/logo.svg"),
-};
+const federationEntityId = url("https://wallet-provider-v2.example.org/bar/");
 
 const walletAttestationConfig = {
   oauthClientSub: "oauthClientSub",
@@ -209,7 +189,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -238,7 +218,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: androidReq,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -271,7 +251,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository: failingKeyRepository,
@@ -301,7 +281,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository: emptyKeyRepository,
@@ -327,7 +307,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -382,7 +362,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
         //   );
         // }
         expect(walletInstanceAttPayload.iss).toBe(
-          "https://wallet-provider-v13.example.org/bar",
+          "https://wallet-provider-v2.example.org/bar",
         );
         // check trailing slashes are removed
         expect((walletInstanceAttPayload.iss || "").endsWith("/")).toBe(false);
@@ -395,7 +375,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -470,7 +450,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository: p521KeyRepository,
@@ -536,7 +516,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -585,7 +565,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -628,7 +608,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -662,7 +642,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: androidReq,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -725,7 +705,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: invalidReq,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -787,7 +767,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: invalidReq,
       inputDecoder: H.HttpRequest,
       keyRepository,
@@ -847,7 +827,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
       cryptographyClient,
-      federationEntity,
+      federationEntityId,
       input: invalidReq,
       inputDecoder: H.HttpRequest,
       keyRepository,

@@ -58,6 +58,7 @@ variable "throughput" {
     status_list_pages        = optional(number, 4000)
     status_list_routing      = optional(number, 4000)
     leases                   = optional(number, 1000)
+    trust_marks              = optional(number, 1000)
     uat = optional(object({
       wallet_instances         = optional(number, 1000)
       nonces                   = optional(number, 1000)
@@ -68,6 +69,7 @@ variable "throughput" {
       status_list_pages        = optional(number, 1000)
       status_list_routing      = optional(number, 1000)
       leases                   = optional(number, 1000)
+      trust_marks              = optional(number, 1000)
     }), {})
   })
   description = "Max throughput (RU/s) configuration for Cosmos DB containers"
