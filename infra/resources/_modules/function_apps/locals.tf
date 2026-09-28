@@ -189,8 +189,12 @@ locals {
       FederationEntityV2LogoUri               = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider/logo-pagopa.svg"
       EntityConfigurationV1PublishedKeyNames  = "intermediate-key-pre"
       EntityConfigurationV1SigningKeyName     = "intermediate-key-pre"
+      EntityConfigurationV1FederationEntityJwksKeyNames = "intermediate-key-pre"
+      EntityConfigurationV1WalletProviderJwksKeyNames = "leaf-key-pre"
       EntityConfigurationV2PublishedKeyNames  = "intermediate-key-pre"
       EntityConfigurationV2SigningKeyName     = "intermediate-key-pre"
+      EntityConfigurationV2FederationEntityJwksKeyNames = "intermediate-key-pre"
+      EntityConfigurationV2WalletSolutionJwksKeyNames = "leaf-key-pre"
       FrontDoorEndpointName                   = var.front_door_endpoint_name_uat
       FrontDoorProfileName                    = var.front_door_profile_name_uat
       PidIssuerApiBaseURL                     = "https://pre.util.wallet.ipzs.it"
