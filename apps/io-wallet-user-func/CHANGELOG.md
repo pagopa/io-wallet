@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.1.0
+
+### Minor Changes
+
+- e308227: Add V1/V2 entity configuration generation
+
 ## 5.0.2
 
 ### Patch Changes
