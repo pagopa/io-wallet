@@ -424,7 +424,7 @@ app.http("createWalletAttestation", {
     attestationService: mobileAttestationService,
     cryptographyClient: walletAttestationCryptographyClient,
     federationEntityId: config.entityConfigurationV1.federationEntityId,
-    keyRepository,
+    keyRepository: keyV1Repository,
     nonceRepository,
     walletAttestationConfig: config.walletProvider.walletAttestation,
     walletAttestationSigningKeyName:
