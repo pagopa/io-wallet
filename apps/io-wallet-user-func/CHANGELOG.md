@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.1.1
+
+### Patch Changes
+
+- 7dace66: Fix keyRepository dependency in CreateWalletAttestation
+
 ## 5.1.0
 
 ### Minor Changes
