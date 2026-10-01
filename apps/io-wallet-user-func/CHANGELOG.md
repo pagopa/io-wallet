@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.1.2
+
+### Patch Changes
+
+- 2463dfa: Remove env vars no longer needed
+
 ## 5.1.1
 
 ### Patch Changes
