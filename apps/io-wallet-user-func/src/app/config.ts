@@ -261,18 +261,14 @@ const EntityConfigurationV2Config = t.type({
 type EntityConfigurationV2Config = t.TypeOf<typeof EntityConfigurationV2Config>;
 
 const WalletProviderConfig = t.type({
-  keyAttestationPublishedKeyNames: t.array(t.string),
   keyAttestationSigningKeyName: t.string,
-  tokenStatusListPublishedKeyNames: t.array(t.string),
   tokenStatusListSigningKeyName: t.string,
   walletAttestation: t.type({
     oauthClientSub: t.string,
     walletLink: t.string,
     walletName: t.string,
   }),
-  walletAttestationPublishedKeyNames: t.array(t.string),
   walletAttestationSigningKeyName: t.string,
-  walletInstanceAttestationPublishedKeyNames: t.array(t.string),
   walletInstanceAttestationSigningKeyName: t.string,
 });
 
@@ -812,27 +808,15 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   WalletProviderConfig
 > = pipe(
   sequenceS(RE.Apply)({
-    keyAttestationPublishedKeyNames:
-      readCommaSeparatedStringArrayFromEnvironment(
-        "KeyAttestationPublishedKeyNames",
-      ),
     keyAttestationSigningKeyName: readFromEnvironment(
       "KeyAttestationSigningKeyName",
     ),
-    tokenStatusListPublishedKeyNames:
-      readCommaSeparatedStringArrayFromEnvironment(
-        "TokenStatusListPublishedKeyNames",
-      ),
     tokenStatusListSigningKeyName: readFromEnvironment(
       "TokenStatusListSigningKeyName",
     ),
     walletAttestationOauthClientSub: readFromEnvironment(
       "WalletAttestationOauthClientSub",
     ),
-    walletAttestationPublishedKeyNames:
-      readCommaSeparatedStringArrayFromEnvironment(
-        "WalletAttestationPublishedKeyNames",
-      ),
     walletAttestationSigningKeyName: readFromEnvironment(
       "WalletAttestationSigningKeyName",
     ),
@@ -842,40 +826,28 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
     walletAttestationWalletName: readFromEnvironment(
       "WalletAttestationWalletName",
     ),
-    walletInstanceAttestationPublishedKeyNames:
-      readCommaSeparatedStringArrayFromEnvironment(
-        "WalletInstanceAttestationPublishedKeyNames",
-      ),
     walletInstanceAttestationSigningKeyName: readFromEnvironment(
       "WalletInstanceAttestationSigningKeyName",
     ),
   }),
   RE.map(
     ({
-      keyAttestationPublishedKeyNames,
       keyAttestationSigningKeyName,
-      tokenStatusListPublishedKeyNames,
       tokenStatusListSigningKeyName,
       walletAttestationOauthClientSub,
-      walletAttestationPublishedKeyNames,
       walletAttestationSigningKeyName,
       walletAttestationWalletLink,
       walletAttestationWalletName,
-      walletInstanceAttestationPublishedKeyNames,
       walletInstanceAttestationSigningKeyName,
     }) => ({
-      keyAttestationPublishedKeyNames,
       keyAttestationSigningKeyName,
-      tokenStatusListPublishedKeyNames,
       tokenStatusListSigningKeyName,
       walletAttestation: {
         oauthClientSub: walletAttestationOauthClientSub,
         walletLink: walletAttestationWalletLink,
         walletName: walletAttestationWalletName,
       },
-      walletAttestationPublishedKeyNames,
       walletAttestationSigningKeyName,
-      walletInstanceAttestationPublishedKeyNames,
       walletInstanceAttestationSigningKeyName,
     }),
   ),
