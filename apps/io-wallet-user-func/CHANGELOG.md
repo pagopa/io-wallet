@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.1.3
+
+### Patch Changes
+
+- efb981e: Updated createWalletAttestation and createKeyAttestation for load tests
+
 ## 5.1.2
 
 ### Patch Changes
