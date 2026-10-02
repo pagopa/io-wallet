@@ -32,7 +32,11 @@ import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { buildUrl } from "@/url";
 import { isLoadTestUser } from "@/user";
-import { WalletInstanceEnvironment } from "@/wallet-instance";
+import {
+  getValidWalletInstanceByUserId,
+  WalletInstanceEnvironment,
+} from "@/wallet-instance";
+import { consumeNonce } from "@/wallet-instance-request";
 
 import {
   KeyAttestationRequest,
@@ -121,6 +125,36 @@ const requireWalletInstanceStatus = (
   );
 
 const testKeyAttestation = "this_is_a_test_key_attestation";
+
+const generateTestKeyAttestation: (request: {
+  keyAttestationRequest: KeyAttestationRequest;
+  userId: FiscalCode;
+}) => RTE.ReaderTaskEither<
+  KeyAttestationEnvironment & NonceEnvironment & WalletInstanceEnvironment,
+  Error,
+  string
+> = ({ keyAttestationRequest, userId }) =>
+  pipe(
+    consumeNonce(keyAttestationRequest.nonce),
+    RTE.chainW(() =>
+      getValidWalletInstanceByUserId(
+        keyAttestationRequest.hardwareKeyTag,
+        userId,
+      ),
+    ),
+    RTE.chainW((walletInstance) =>
+      RTE.fromEither(requireWalletInstanceStatus(walletInstance)),
+    ),
+    RTE.bindTo("walletInstanceStatus"),
+    RTE.chainW(({ walletInstanceStatus }) =>
+      getKeyAttestationData({
+        attestedKeys: [],
+        platform: keyAttestationRequest.platform,
+        walletInstanceStatus,
+      }),
+    ),
+    RTE.map(() => testKeyAttestation),
+  );
 
 const verifyAttestedJwkMatchesCnf = ({
   attestedJwk,
@@ -288,7 +322,7 @@ export const CreateKeyAttestationHandler = H.of((req: H.HttpRequest) =>
     RTE.fromTaskEither,
     RTE.chain(({ keyAttestationRequest, userId }) =>
       isLoadTestUser(userId)
-        ? RTE.right(testKeyAttestation)
+        ? generateTestKeyAttestation({ keyAttestationRequest, userId })
         : generateKeyAttestation({ keyAttestationRequest, userId }),
     ),
     RTE.map((keyAttestation) => ({

@@ -19,11 +19,15 @@ import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { isLoadTestUser } from "@/user";
-import { WalletInstanceEnvironment } from "@/wallet-instance";
+import {
+  getValidWalletInstanceByUserId,
+  WalletInstanceEnvironment,
+} from "@/wallet-instance";
 import {
   WalletInstanceAttestationData,
   WalletInstanceAttestationToJwtModel,
 } from "@/wallet-instance-attestation";
+import { consumeNonce } from "@/wallet-instance-request";
 
 import {
   requireWalletInstanceAttestationRequest,
@@ -107,6 +111,25 @@ const getWalletInstanceAttestationData =
 const testWalletInstanceAttestation =
   "this_is_a_test_wallet_instance_attestation";
 
+const generateTestWalletInstanceAttestation: (request: {
+  userId: FiscalCode;
+  wiaRequest: WIARequest;
+}) => RTE.ReaderTaskEither<
+  NonceEnvironment &
+    WalletInstanceAttestationEnvironment &
+    WalletInstanceEnvironment,
+  Error,
+  string
+> = ({ userId, wiaRequest }) =>
+  pipe(
+    consumeNonce(wiaRequest.nonce),
+    RTE.chainW(() =>
+      getValidWalletInstanceByUserId(wiaRequest.hardwareKeyTag, userId),
+    ),
+    RTE.chainW(() => getWalletInstanceAttestationData({ cnf: wiaRequest.cnf })),
+    RTE.map(() => testWalletInstanceAttestation),
+  );
+
 const generateWalletInstanceAttestation: (request: {
   userId: FiscalCode;
   wiaRequest: WIARequest;
@@ -153,7 +176,7 @@ export const CreateWalletInstanceAttestationHandler = H.of(
       RTE.fromTaskEither,
       RTE.chain(({ userId, wiaRequest }) =>
         isLoadTestUser(userId)
-          ? RTE.right(testWalletInstanceAttestation)
+          ? generateTestWalletInstanceAttestation({ userId, wiaRequest })
           : generateWalletInstanceAttestation({ userId, wiaRequest }),
       ),
       RTE.map((walletInstanceAttestation) => ({
