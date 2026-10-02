@@ -94,8 +94,6 @@ jobs:
     with:
       environment: prod
       base_path: infra/${{ matrix.infra }}
-      env_vars: |
-        GITHUB_TOKEN=${{ github.token }}
       use_private_agent: true
       override_github_environment: infra-psn-prod
       use_labels: true
