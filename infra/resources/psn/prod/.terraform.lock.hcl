@@ -49,7 +49,7 @@ provider "registry.terraform.io/hashicorp/azurerm" {
 
 provider "registry.terraform.io/pagopa-dx/azure" {
   version     = "0.12.6"
-  constraints = "~> 0.0, >= 0.0.6, >= 0.6.0, ~> 0.12, < 1.0.0"
+  constraints = ">= 0.0.6, >= 0.6.0, >= 0.8.3, ~> 0.12, < 1.0.0"
   hashes = [
     "h1:7qvHCNCDTfP3R+2MJmxBIAxdfK6ex+ePOSt7QPpVpfE=",
     "h1:NneAMNCYbGaLGJYQ2rL2EafXrbwWvkVw2NdKkr3Be5Y=",

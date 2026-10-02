@@ -65,7 +65,7 @@ jobs:
           fi
 
       - name: Azure Login (PSN)
-        uses: azure/login@6b2456866fc08b011acb422a92a4aa20e2c4de32 # v2.1.0
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ env.ARM_PSN_CLIENT_ID }}
           tenant-id: ${{ env.ARM_PSN_TENANT_ID }}
@@ -102,7 +102,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
-        uses: pagopa/dx/.github/actions/slack-notification@e08d8ce496df31036c9b04f42178c04947415cfc # main
+        uses: pagopa/dx/.github/actions/slack-notification@a18d71062ddaaa09f8e145835a05aefd7701935e # main
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"
@@ -152,7 +152,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a # main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set LE Files
         run: |
@@ -160,7 +160,7 @@ jobs:
           echo '${{ env.LE_REGR_JSON }}' > regr.json
 
       - name: Setup Python
-        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12.8"
 
@@ -180,7 +180,7 @@ jobs:
             --rsa-key-size 2048
 
       - name: Azure Login (IO)
-        uses: azure/login@6b2456866fc08b011acb422a92a4aa20e2c4de32 # v2.1.0
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ env.ARM_CLIENT_ID }}
           tenant-id: ${{ env.ARM_TENANT_ID }}
@@ -201,7 +201,7 @@ jobs:
             --out certificate_chain.pem
 
       - name: Azure Login (PSN)
-        uses: azure/login@6b2456866fc08b011acb422a92a4aa20e2c4de32 # v2.1.0
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ env.ARM_PSN_CLIENT_ID }}
           tenant-id: ${{ env.ARM_PSN_TENANT_ID }}
@@ -229,7 +229,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: failure() && inputs.GITHUB_EVENT_NAME == 'schedule'
-        uses: pagopa/dx/.github/actions/slack-notification@e08d8ce496df31036c9b04f42178c04947415cfc # main
+        uses: pagopa/dx/.github/actions/slack-notification@a18d71062ddaaa09f8e145835a05aefd7701935e # main
         with:
           id: "TLS Certificate Renewal"
           title: "*TLS Certificate Renewal Failure*"

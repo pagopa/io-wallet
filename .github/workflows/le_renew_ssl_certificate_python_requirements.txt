@@ -294,9 +294,9 @@ jwcrypto==1.5.7 \
     --hash=sha256:70204d7cca406eda8c82352e3c41ba2d946610dafd19e54403f0a1f4f18633c6 \
     --hash=sha256:729463fefe28b6de5cf1ebfda3e94f1a1b41d2799148ef98a01cb9678ebe2bb0
     # via -r /tmp/le-cert-reqs-in.txt
-msal==1.35.0 \
-    --hash=sha256:76ab7513dbdac88d76abdc6a50110f082b7ed3ff1080aca938c53fc88bc75b51 \
-    --hash=sha256:baf268172d2b736e5d409689424d2f321b4142cab231b4b96594c86762e7e01d
+msal==1.38.0 \
+    --hash=sha256:765b9b98b6aa380ee8b8f1c75636e08863edaf0a953498955bd668650dde5d49 \
+    --hash=sha256:4f10ff1257bacfd1781f22e85bd2b8d43ad1b490f3b6aafd7906671cadedd464
     # via
     #   azure-identity
     #   msal-extensions
@@ -308,9 +308,9 @@ pycparser==3.0 \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
     # via cffi
-PyJWT[crypto]==2.13.0 \
-    --hash=sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423 \
-    --hash=sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728
+PyJWT[crypto]==2.14.0 \
+    --hash=sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 \
+    --hash=sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc
     # via
     #   msal
     #   pyjwt

@@ -4,7 +4,9 @@ import argparse
 import logging
 import textwrap
 import sys
-import cryptography.hazmat.primitives
+import cryptography.hazmat.primitives.asymmetric.rsa
+import cryptography.hazmat.primitives.hashes
+import cryptography.hazmat.primitives.serialization
 import cryptography.x509
 
 

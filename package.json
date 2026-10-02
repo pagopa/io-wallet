@@ -8,6 +8,7 @@
     "lint:fix": "turbo run lint:fix",
     "build": "turbo run build",
     "code-review": "turbo run typecheck lint test",
+    "key-provisioning": "pnpm --filter io-wallet-key-cli key-provisioning",
     "version": "changeset version",
     "release": "changeset tag"
   },

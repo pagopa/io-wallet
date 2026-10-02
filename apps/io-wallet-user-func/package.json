@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "4.9.0",
+  "version": "5.1.2",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -14,12 +14,12 @@
     "start": "func start"
   },
   "dependencies": {
-    "@auth0/mdl": "^3.0.1",
     "@azure/arm-cdn": "^9.1.0",
     "@azure/cosmos": "catalog:",
     "@azure/functions": "catalog:",
     "@azure/functions-opentelemetry-instrumentation": "^0.3.0",
     "@azure/identity": "catalog:",
+    "@azure/keyvault-keys": "^4.10.0",
     "@azure/monitor-query-logs": "^1.0.0",
     "@azure/storage-blob": "catalog:",
     "@azure/storage-queue": "catalog:",
@@ -41,7 +41,6 @@
     "@peculiar/x509": "^1.14.3",
     "asn1js": "^3.0.7",
     "cbor-x": "^1.6.4",
-    "cbor2": "^2.3.0",
     "dayjs": "^1.11.20",
     "fp-ts": "catalog:",
     "googleapis": "^171.4.0",

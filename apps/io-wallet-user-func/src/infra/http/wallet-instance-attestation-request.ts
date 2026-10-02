@@ -4,7 +4,7 @@ import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as t from "io-ts";
-import { ECKey } from "io-wallet-common/jwk";
+import { ECPublicKey } from "io-wallet-common/jwk";
 
 import { Platform, PlatformFromRequest } from "@/infra/http/platform-codecs";
 import { verifyJwtWithInternalKey } from "@/verifier";
@@ -24,7 +24,7 @@ const AssertionJwtApi = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
     }),
     exp: t.number,
     hardware_key_tag: NonEmptyString,
@@ -47,7 +47,7 @@ const AssertionJwtDecoded = t.type({
   }),
   payload: t.type({
     cnf: t.type({
-      jwk: ECKey,
+      jwk: ECPublicKey,
     }),
     exp: t.number,
     hardwareKeyTag: NonEmptyString,

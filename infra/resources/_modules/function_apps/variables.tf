@@ -72,6 +72,11 @@ variable "storage_account_cdn_name" {
   description = "Name of the CDN storage account"
 }
 
+variable "storage_account_cdn_name_uat" {
+  type        = string
+  description = "Name of the UAT CDN storage account"
+}
+
 variable "status_list_storage_account_name_uat" {
   type        = string
   description = "Name of the uat storage account used for status lists"

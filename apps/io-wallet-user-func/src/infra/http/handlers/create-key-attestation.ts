@@ -1,21 +1,19 @@
 import * as H from "@pagopa/handler-kit";
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { flow, pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import { logErrorAndReturnResponse } from "io-wallet-common/infra/http/error";
-import { areJwksEqual, ECKey, JwkPublicKey } from "io-wallet-common/jwk";
-import { type ECPrivateKeyWithKid } from "io-wallet-common/jwk";
+import { areJwksEqual, ECPublicKey, JwkPublicKey } from "io-wallet-common/jwk";
 import {
   WalletInstanceStatus,
   WalletInstanceValid,
 } from "io-wallet-common/wallet-instance";
 import { type JWTPayload } from "jose";
 
-import { CertificateRepository } from "@/certificates";
-import { FederationEntity } from "@/entity-configuration";
-import { signJwt } from "@/infra/crypto/signer";
+import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -29,6 +27,7 @@ import {
   KeyAttestationData,
   KeyAttestationToJwtModel,
 } from "@/key-attestation";
+import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { buildUrl } from "@/url";
@@ -40,30 +39,36 @@ import {
   requireKeyAttestationRequest,
 } from "../key-attestation-request";
 
-interface KeyAttestationEnvironment {
-  certificateRepository: CertificateRepository;
-  federationEntity: FederationEntity;
-  keyAttestationSigningKey: ECPrivateKeyWithKid;
+interface KeyAttestationEnvironment extends SignJwtEnvironment {
+  federationEntityId: UrlFromString;
+  keyAttestationSigningKeyName: string;
+  keyRepository: KeyRepository;
   statusListBaseUrl: string;
 }
 
 const signKeyAttestation =
   ({
+    crv,
+    kid,
     payload,
     x5c,
   }: {
+    crv: string;
+    kid: string;
     payload: JWTPayload;
     x5c: string[];
   }): RTE.ReaderTaskEither<KeyAttestationEnvironment, Error, string> =>
-  ({ keyAttestationSigningKey }) =>
-    signJwt(keyAttestationSigningKey)({
-      duration: "1y",
+  ({ cryptographyClient }) =>
+    signJwt({
+      crv,
+      duration: 365 * 24 * 60 * 60,
       header: {
+        kid,
         typ: "key-attestation+jwt",
         x5c,
       },
       payload,
-    });
+    })({ cryptographyClient });
 
 const getKeyAttestationData =
   ({
@@ -82,19 +87,18 @@ const getKeyAttestationData =
     KeyAttestationData
   > =>
   ({
-    certificateRepository,
-    federationEntity: { basePathV13: basePath },
-    keyAttestationSigningKey,
+    federationEntityId,
+    keyAttestationSigningKeyName,
+    keyRepository,
     statusListBaseUrl,
   }) =>
     pipe(
-      certificateRepository.getCertificateChainByKid(
-        keyAttestationSigningKey.kid,
-      ),
-      TE.chain(TE.fromOption(() => new Error("Certificate chain not found"))),
-      TE.map((x5c) => ({
+      { keyRepository },
+      getKey(keyAttestationSigningKeyName),
+      TE.map((signingKey) => ({
         attestedKeys,
-        kid: keyAttestationSigningKey.kid,
+        crv: signingKey.crv,
+        kid: signingKey.kid,
         platform,
         status: {
           statusList: {
@@ -102,9 +106,9 @@ const getKeyAttestationData =
             uri: buildUrl(walletInstanceStatus.statusListId, statusListBaseUrl),
           },
         },
-        walletProviderName: basePath.href,
+        walletProviderName: federationEntityId.href,
         // walletSolutionVersion,
-        x5c,
+        x5c: signingKey.certificateChain,
       })),
     );
 
@@ -116,18 +120,16 @@ const requireWalletInstanceStatus = (
     E.fromNullable(new Error("Wallet instance status not found")),
   );
 
-const testKeyAttestation = "this_is_a_test_key_attestation";
-
 const verifyAttestedJwkMatchesCnf = ({
   attestedJwk,
   cnfJwk,
 }: {
   attestedJwk: JwkPublicKey;
-  cnfJwk: ECKey;
+  cnfJwk: ECPublicKey;
 }): TE.TaskEither<IntegrityCheckError, void> =>
   pipe(
     attestedJwk,
-    ECKey.decode,
+    ECPublicKey.decode,
     E.mapLeft(() => new Error()),
     TE.fromEither,
     TE.chain((attestedEs256Jwk) =>
@@ -160,7 +162,7 @@ const generateKeyAttestation: (request: {
     RTE.chainW(flow(requireWalletInstanceStatus, RTE.fromEither)),
     RTE.bindTo("walletInstanceStatus"),
     RTE.bindW("attestedKeys", () =>
-      validateKeysToAttest(keyAttestationRequest),
+      validateKeysToAttest(keyAttestationRequest, userId),
     ),
     RTE.map(({ attestedKeys, walletInstanceStatus }) => ({
       attestedKeys,
@@ -173,7 +175,12 @@ const generateKeyAttestation: (request: {
       pipe(
         KeyAttestationToJwtModel.encode(keyAttestationData),
         ({ x5c, ...payload }) =>
-          signKeyAttestation({ payload: { ...payload }, x5c }),
+          signKeyAttestation({
+            crv: keyAttestationData.crv,
+            kid: keyAttestationData.kid,
+            payload,
+            x5c,
+          }),
       ),
     ),
   );
@@ -215,23 +222,6 @@ const validateAndroidKeysToAttest: (
     ),
   );
 
-const validateIosKeysToAttest: (
-  keysToAttest: Extract<
-    KeyAttestationRequest,
-    { platform: "ios" }
-  >["keysToAttest"],
-) => RTE.ReaderTaskEither<
-  { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
-  Error | IntegrityCheckError,
-  readonly AttestedKey[]
-> = RTE.traverseArray(({ jwk }) =>
-  RTE.right({
-    jwk,
-    keyStorage: "iso_18045_moderate",
-    userAuthentication: "iso_18045_moderate",
-  }),
-);
-
 const validateHardwareAssertionAndGetWalletInstance: (input: {
   keyAttestationRequest: KeyAttestationRequest;
   userId: FiscalCode;
@@ -260,28 +250,31 @@ const validateHardwareAssertionAndGetWalletInstance: (input: {
 
 const validateKeysToAttest: (
   keyAttestationRequest: KeyAttestationRequest,
+  userId: FiscalCode,
 ) => RTE.ReaderTaskEither<
   { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
   Error | IntegrityCheckError,
   readonly AttestedKey[]
-> = (keyAttestationRequest) =>
-  keyAttestationRequest.platform === "android"
-    ? validateAndroidKeysToAttest(
+> = (keyAttestationRequest, userId) =>
+  isLoadTestUser(userId) || keyAttestationRequest.platform === "ios"
+    ? RTE.right(
+        keyAttestationRequest.keysToAttest.map(({ jwk }) => ({
+          jwk,
+          keyStorage: "iso_18045_moderate",
+          userAuthentication: "iso_18045_moderate",
+        })),
+      )
+    : validateAndroidKeysToAttest(
         keyAttestationRequest.nonce,
         keyAttestationRequest.keysToAttest,
-      )
-    : validateIosKeysToAttest(keyAttestationRequest.keysToAttest);
+      );
 
 export const CreateKeyAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
     req.body,
     requireKeyAttestationRequest,
     RTE.fromTaskEither,
-    RTE.chain(({ keyAttestationRequest, userId }) =>
-      isLoadTestUser(userId)
-        ? RTE.right(testKeyAttestation)
-        : generateKeyAttestation({ keyAttestationRequest, userId }),
-    ),
+    RTE.chain(generateKeyAttestation),
     RTE.map((keyAttestation) => ({
       key_attestation: keyAttestation,
     })),

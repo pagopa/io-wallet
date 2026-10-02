@@ -45,4 +45,35 @@ locals {
     Environment  = "PROD"
     Source       = "https://github.com/pagopa/io-wallet/blob/main/infra/core/psn/hub/prod"
   }
+
+  # The Microsoft assessment uses logical names for CPU and packet counters
+  # that are not exposed by the Azure Firewall metric namespace. Keep only
+  # documented metrics here until those signals can be mapped to capacity or
+  # diagnostic-log queries without changing their meaning.
+  firewall_alerts = {
+    health = {
+      display_name = "Degraded or unhealthy state"
+      description  = "Check Status/Reason, SNAT exhaustion, and recent firewall changes."
+      metric_name  = "FirewallHealth"
+      aggregation  = "Average"
+      operator     = "LessThan"
+      threshold    = 100
+    }
+    throughput = {
+      display_name = "High throughput"
+      description  = "Review traffic spikes and scale or optimize firewall capacity and rules."
+      metric_name  = "Throughput"
+      aggregation  = "Average"
+      operator     = "GreaterThan"
+      threshold    = 8000000000
+    }
+    snat_port_utilization = {
+      display_name = "High SNAT port usage"
+      description  = "Check outbound flows; add public IPs or a NAT Gateway if exhaustion persists."
+      metric_name  = "SNATPortUtilization"
+      aggregation  = "Average"
+      operator     = "GreaterThan"
+      threshold    = 80
+    }
+  }
 }

@@ -2,23 +2,19 @@
 /* eslint-disable vitest/no-conditional-expect */
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import {
-  EmailString,
-  FiscalCode,
-  NonEmptyString,
-} from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import { decode } from "cbor-x";
 import * as E from "fp-ts/Either";
-import { flow, pipe } from "fp-ts/lib/function";
+import { flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
-import { ECPrivateKeyWithKid } from "io-wallet-common/jwk";
 import * as jose from "jose";
 import { describe, expect, it, vi } from "vitest";
 
-import { CertificateRepository } from "@/certificates";
+import type { SignJwtEnvironment } from "@/infra/crypto/signer";
+
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -27,6 +23,7 @@ import {
   verifyIosAssertion,
 } from "@/infra/mobile-attestation-service";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
+import { KeyRepository } from "@/keys";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
@@ -47,6 +44,11 @@ const logger = {
   log: () => () => void 0,
 };
 
+const cryptographyClient: SignJwtEnvironment["cryptographyClient"] = {
+  signData: (algorithm) =>
+    Promise.resolve({ algorithm, result: new Uint8Array(64) }),
+};
+
 const url = flow(
   UrlFromString.decode,
   E.getOrElseW((_) => {
@@ -54,23 +56,7 @@ const url = flow(
   }),
 );
 
-const email = flow(
-  EmailString.decode,
-  E.getOrElseW((_) => {
-    throw new Error(`Failed to parse url ${_[0].value}`);
-  }),
-);
-
-const federationEntity = {
-  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
-  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
-  contacts: [email("foo@pec.bar.it")],
-  homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
-  logoUri: url("https://wallet-provider.example.org/logo.svg"),
-  organizationName: "wallet provider" as NonEmptyString,
-  policyUri: url("https://wallet-provider.example.org/info_policy"),
-  tosUri: url("https://wallet-provider.example.org/logo.svg"),
-};
+const federationEntityId = url("https://wallet-provider-v2.example.org/bar/");
 
 const statusListBaseUrl = "https://status-list.example.org";
 
@@ -96,7 +82,19 @@ const androidAttestationValidationConfig: AndroidAttestationValidationConfig = {
   httpRequestTimeout: 1,
 };
 
-const keyAttestationSigningKey = privateEcKey;
+const keyAttestationKeyName = "key-attestation-key-name";
+
+const keyRepository: KeyRepository = {
+  getKeyByName: () =>
+    TE.right(
+      O.some({
+        ...publicEcKey,
+        certificateChain: ["cert1", "cert2"],
+        keyName: keyAttestationKeyName,
+        kid: publicEcKey.kid,
+      }),
+    ),
+};
 
 const walletInstanceRepository: WalletInstanceRepository = {
   batchPatch: () => TE.left(new Error("not implemented")),
@@ -118,32 +116,8 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
-const certificateRepository: CertificateRepository = {
-  getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
-  insertCertificateChain: () => TE.right(undefined),
-};
-
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
-
-const generateP521PrivateJwk = (kid: string): Promise<ECPrivateKeyWithKid> =>
-  jose
-    .generateKeyPair("ES512", {
-      extractable: true,
-    })
-    .then(({ privateKey }) => jose.exportJWK(privateKey))
-    .then((jwk) =>
-      pipe(
-        {
-          ...jwk,
-          kid,
-        },
-        ECPrivateKeyWithKid.decode,
-        E.getOrElseW((_) => {
-          throw new Error(`Failed to decode P-521 private JWK ${_[0].value}`);
-        }),
-      ),
-    );
 
 vi.mock("@/infra/mobile-attestation-service", async (importOriginal) => {
   const actual =
@@ -318,8 +292,8 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -329,36 +303,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
-      logger,
-      nonceRepository,
-      statusListBaseUrl,
-      walletInstanceRepository,
-    });
-
-    await expect(handler()).resolves.toEqual({
-      _tag: "Right",
-      right: expect.objectContaining({
-        body: expect.objectContaining({
-          key_attestation: "this_is_a_test_key_attestation",
-        }),
-        headers: expect.objectContaining({
-          "Content-Type": "application/json",
-        }),
-        statusCode: 200,
-      }),
-    });
-  });
-
-  it("should return a 200 HTTP response on success with iOS platform", async () => {
-    const handler = CreateKeyAttestationHandler({
-      androidAttestationValidationConfig,
-      assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -379,16 +325,166 @@ describe("CreateKeyAttestationHandler", async () => {
     });
   });
 
-  it("should sign the jwt with the algorithm derived from the provider key curve - P-521", async () => {
-    const p521SigningKey = await generateP521PrivateJwk("p521#key-attestation");
+  it("should return a 200 HTTP response on success with iOS platform", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey: p521SigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
+      logger,
+      nonceRepository,
+      statusListBaseUrl,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        body: expect.objectContaining({
+          key_attestation: expect.any(String),
+        }),
+        headers: expect.objectContaining({
+          "Content-Type": "application/json",
+        }),
+        statusCode: 200,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response when KeyRepository.getKeyByName returns an error", async () => {
+    const failingKeyRepository: KeyRepository = {
+      getKeyByName: () => TE.left(new Error("key repository error")),
+    };
+
+    const handler = CreateKeyAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      cryptographyClient,
+      federationEntityId,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository: failingKeyRepository,
+      logger,
+      nonceRepository,
+      statusListBaseUrl,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  it("should return a 500 HTTP response when KeyRepository.getKeyByName returns an O.none", async () => {
+    const emptyKeyRepository: KeyRepository = {
+      getKeyByName: () => TE.right(O.none),
+    };
+
+    const handler = CreateKeyAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      cryptographyClient,
+      federationEntityId,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository: emptyKeyRepository,
+      logger,
+      nonceRepository,
+      statusListBaseUrl,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "application/problem+json",
+        }),
+        statusCode: 500,
+      }),
+    });
+  });
+
+  it("should sign the jwt with the algorithm derived from the provider key curve - P-256", async () => {
+    const handler = CreateKeyAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      cryptographyClient,
+      federationEntityId,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
+      logger,
+      nonceRepository,
+      statusListBaseUrl,
+      walletInstanceRepository,
+    });
+
+    const result = await handler();
+
+    expect(E.isRight(result)).toBe(true);
+    if (E.isLeft(result)) {
+      throw result.left;
+    }
+
+    const body = t
+      .type({
+        key_attestation: t.string,
+      })
+      .decode(result.right.body);
+
+    expect(E.isRight(body)).toBe(true);
+    if (E.isLeft(body)) {
+      throw new Error("Invalid response body");
+    }
+
+    expect(
+      jose.decodeProtectedHeader(body.right.key_attestation),
+    ).toMatchObject({
+      alg: "ES256",
+      kid: publicEcKey.kid,
+    });
+  });
+
+  it("should sign the jwt with the algorithm derived from the provider key curve - P-521", async () => {
+    const p521SigningKey = {
+      ...privateEcKey,
+      crv: "P-521",
+      kid: "p521#key-attestation",
+    };
+    const p521KeyRepository: KeyRepository = {
+      getKeyByName: () =>
+        TE.right(
+          O.some({
+            ...p521SigningKey,
+            certificateChain: ["cert1", "cert2"],
+            keyName: keyAttestationKeyName,
+          }),
+        ),
+    };
+
+    const handler = CreateKeyAttestationHandler({
+      androidAttestationValidationConfig,
+      assertionValidationConfig,
+      cryptographyClient,
+      federationEntityId,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository: p521KeyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -421,53 +517,12 @@ describe("CreateKeyAttestationHandler", async () => {
     });
   });
 
-  it("should sign the jwt with the algorithm derived from the provider key curve - P-256", async () => {
-    const handler = CreateKeyAttestationHandler({
-      androidAttestationValidationConfig,
-      assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey: privateEcKey,
-      logger,
-      nonceRepository,
-      statusListBaseUrl,
-      walletInstanceRepository,
-    });
-
-    const result = await handler();
-
-    expect(E.isRight(result)).toBe(true);
-    if (E.isLeft(result)) {
-      throw result.left;
-    }
-
-    const body = t
-      .type({
-        key_attestation: t.string,
-      })
-      .decode(result.right.body);
-
-    expect(E.isRight(body)).toBe(true);
-    if (E.isLeft(body)) {
-      throw new Error("Invalid response body");
-    }
-
-    expect(
-      jose.decodeProtectedHeader(body.right.key_attestation),
-    ).toMatchObject({
-      alg: "ES256",
-      kid: privateEcKey.kid,
-    });
-  });
-
   it("should return a 200 HTTP response on success with Android platform", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -477,7 +532,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -507,8 +563,8 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -518,7 +574,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -540,7 +597,7 @@ describe("CreateKeyAttestationHandler", async () => {
       if (E.isRight(body)) {
         const keyAttestation = jose.decodeJwt(body.right.key_attestation);
         expect(keyAttestation.iss).toBe(
-          "https://wallet-provider-v13.example.org/bar",
+          "https://wallet-provider-v2.example.org/bar",
         );
         expect(keyAttestation.status).toEqual({
           status_list: {
@@ -573,11 +630,12 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -623,8 +681,8 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -634,7 +692,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -682,8 +741,8 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -693,7 +752,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -762,8 +822,8 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -773,7 +833,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -812,8 +873,8 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
         body: {
@@ -823,7 +884,8 @@ describe("CreateKeyAttestationHandler", async () => {
         method: "POST",
       },
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -845,11 +907,12 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,
@@ -877,11 +940,12 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
-      keyAttestationSigningKey,
+      keyAttestationSigningKeyName: keyAttestationKeyName,
+      keyRepository,
       logger,
       nonceRepository,
       statusListBaseUrl,

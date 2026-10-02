@@ -1,5 +1,48 @@
 # io-wallet-user-func
 
+## 5.1.2
+
+### Patch Changes
+
+- 2463dfa: Remove env vars no longer needed
+
+## 5.1.1
+
+### Patch Changes
+
+- 7dace66: Fix keyRepository dependency in CreateWalletAttestation
+
+## 5.1.0
+
+### Minor Changes
+
+- e308227: Add V1/V2 entity configuration generation
+
+## 5.0.2
+
+### Patch Changes
+
+- 3a2367f: Updated createWalletAttestation function: removed wallet attestation signing key from env var
+- Updated dependencies [3a2367f]
+  - io-wallet-common@1.7.2
+
+## 5.0.1
+
+### Patch Changes
+
+- 92c7950: Simplified /wallet-attestations endpoint
+
+## 5.0.0
+
+### Major Changes
+
+- 3e75b3d: Removed /wallet-unit-attestations endpoint and added the Key Vault JWT signing flow
+
+### Patch Changes
+
+- Updated dependencies [3e75b3d]
+  - io-wallet-common@1.7.1
+
 ## 4.9.0
 
 ### Minor Changes

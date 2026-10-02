@@ -1,19 +1,10 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable vitest/no-conditional-expect */
-import IssuerAuth from "@auth0/mdl/lib/mdoc/model/IssuerAuth";
 import * as H from "@pagopa/handler-kit";
 import * as L from "@pagopa/logger";
-import { UtcOnlyIsoDateFromString } from "@pagopa/ts-commons/lib/dates";
-import {
-  EmailString,
-  FiscalCode,
-  NonEmptyString,
-} from "@pagopa/ts-commons/lib/strings";
+import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { UrlFromString } from "@pagopa/ts-commons/lib/url";
-import * as assert from "assert";
-import * as cbor from "cbor2";
 import { decode } from "cbor-x";
-import * as crypto from "crypto";
 import * as E from "fp-ts/Either";
 import { flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
@@ -22,17 +13,16 @@ import * as t from "io-ts";
 import * as jose from "jose";
 import { describe, expect, it } from "vitest";
 
+import type { SignJwtEnvironment } from "@/infra/crypto/signer";
+
 import { AttestationService } from "@/attestation-service";
-import { CertificateRepository } from "@/certificates";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
+import { KeyRepository } from "@/keys";
 import { NonceRepository } from "@/nonce";
 import { WalletInstanceRepository } from "@/wallet-instance";
 
-import {
-  CreateWalletAttestationHandler,
-  WalletAttestations,
-} from "../create-wallet-attestation";
+import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
 import { privateEcKey, publicEcKey } from "./keys";
 
 const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
@@ -56,150 +46,31 @@ const url = flow(
   }),
 );
 
-const email = flow(
-  EmailString.decode,
-  E.getOrElseW((_) => {
-    throw new Error(`Failed to parse url ${_[0].value}`);
-  }),
-);
-
-const Uint8ArrayType = new t.Type<Uint8Array, Uint8Array, unknown>(
-  "Uint8Array",
-  (u): u is Uint8Array => u instanceof Uint8Array,
-  (u, c) =>
-    u instanceof Uint8Array
-      ? t.success(u)
-      : t.failure(u, c, "Not a Uint8Array"),
-  t.identity,
-);
-
-const BufferFrom = new t.Type<Buffer, Buffer, unknown>(
-  "BufferFrom",
-  (u): u is Buffer => Buffer.isBuffer(u),
-  (u, c) => (Buffer.isBuffer(u) ? t.success(u) : t.failure(u, c)),
-  t.identity,
-);
-
-const MapNumberBuffer = new t.Type<
-  Map<number, Buffer | Buffer[]>,
-  Map<number, Buffer | Buffer[]>,
-  unknown
->(
-  "MapNumberBuffer",
-  (u): u is Map<number, Buffer | Buffer[]> =>
-    u instanceof Map &&
-    [...u.entries()].every(
-      ([k, v]) =>
-        typeof k === "number" &&
-        (Buffer.isBuffer(v) || (Array.isArray(v) && v.every(Buffer.isBuffer))),
-    ),
-  (u, c) =>
-    u instanceof Map &&
-    [...u.entries()].every(
-      ([k, v]) =>
-        typeof k === "number" &&
-        (Buffer.isBuffer(v) || (Array.isArray(v) && v.every(Buffer.isBuffer))),
-    )
-      ? t.success(u as Map<number, Buffer | Buffer[]>)
-      : t.failure(u, c),
-  t.identity,
-);
-
-const ValueType = new t.Type<
-  Buffer | number | string,
-  Buffer | number | string,
-  unknown
->(
-  "BufferNumberOrString",
-  (u): u is Buffer | number | string =>
-    typeof u === "number" || typeof u === "string" || Buffer.isBuffer(u),
-  (u, c) =>
-    typeof u === "number" || typeof u === "string" || Buffer.isBuffer(u)
-      ? t.success(u)
-      : t.failure(u, c),
-  t.identity,
-);
-
-const MapNumberToBufferNumberOrString = new t.Type<
-  Map<number, Buffer | number | string>,
-  Map<number, Buffer | number | string>,
-  unknown
->(
-  "MapNumberToBufferNumberOrString",
-  (u): u is Map<number, Buffer | number | string> =>
-    u instanceof Map &&
-    [...u.entries()].every(
-      ([k, v]) => typeof k === "number" && ValueType.is(v),
-    ),
-  (u, c) =>
-    u instanceof Map &&
-    [...u.entries()].every(([k, v]) => typeof k === "number" && ValueType.is(v))
-      ? t.success(u as Map<number, Buffer | number | string>)
-      : t.failure(u, c),
-  t.identity,
-);
-
-const Tag24WithUint8Array = t.type({
-  contents: Uint8ArrayType,
-  tag: t.literal(24),
-});
-
-const WalletAttestationMdocSchema = t.type({
-  issuerAuth: t.tuple([BufferFrom, MapNumberBuffer, BufferFrom, BufferFrom]),
-  nameSpaces: t.type({
-    "org.iso.18013.5.1.IT": t.tuple([
-      Tag24WithUint8Array,
-      Tag24WithUint8Array,
-      Tag24WithUint8Array,
-      Tag24WithUint8Array,
-    ]),
-  }),
-});
-
-const DecodedNameSpaceSchema = t.array(
-  t.type({
-    digestID: t.number,
-    elementIdentifier: t.string,
-    elementValue: t.string,
-    random: Uint8ArrayType,
-  }),
-);
-
-const IssuerAuthPayloadSchema = t.type({
-  deviceKeyInfo: t.type({
-    deviceKey: MapNumberToBufferNumberOrString,
-  }),
-  digestAlgorithm: t.literal("SHA-256"),
-  docType: t.literal("org.iso.18013.5.1.IT.WalletAttestation"),
-  validityInfo: t.type({
-    signed: UtcOnlyIsoDateFromString,
-    validFrom: UtcOnlyIsoDateFromString,
-    validUntil: UtcOnlyIsoDateFromString,
-  }),
-  valueDigests: t.type({
-    "org.iso.18013.5.1.IT": MapNumberBuffer,
-  }),
-  version: t.literal("1.0"),
-});
-
-const federationEntity = {
-  basePathV10: url("https://wallet-provider-v10.example.org/foo/"),
-  basePathV13: url("https://wallet-provider-v13.example.org/bar/"),
-  contacts: [email("foo@pec.bar.it")],
-  homepageUri: url("https://wallet-provider.example.org/privacy_policy"),
-  logoUri: url("https://wallet-provider.example.org/logo.svg"),
-  organizationName: "wallet provider" as NonEmptyString,
-  policyUri: url("https://wallet-provider.example.org/info_policy"),
-  tosUri: url("https://wallet-provider.example.org/logo.svg"),
-};
+const federationEntityId = url("https://wallet-provider-v1.example.org/foo/");
 
 const walletAttestationConfig = {
-  trustAnchorUrl: url("https://foo.com"),
   walletLink: "https://foo.com",
   walletName: "Wallet name",
 };
 
-const walletAttestationSigningKey = privateEcKey;
+const walletAttestationSigningKeyName = "wallet-attestation-signing-key-name";
+
+const keyRepository: KeyRepository = {
+  getKeyByName: () =>
+    TE.right(
+      O.some({
+        ...publicEcKey,
+        certificateChain: ["cert1", "cert2"],
+        keyName: walletAttestationSigningKeyName,
+        kid: privateEcKey.kid,
+      }),
+    ),
+};
+
+const cryptographyClient: SignJwtEnvironment["cryptographyClient"] = {
+  signData: (algorithm) =>
+    Promise.resolve({ algorithm, result: new Uint8Array(64) }),
+};
 
 const mockAttestationService: AttestationService = {
   getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
@@ -236,17 +107,8 @@ const walletInstanceRepository: WalletInstanceRepository = {
   insert: () => TE.left(new Error("not implemented")),
 };
 
-const certificateRepository: CertificateRepository = {
-  getCertificateChainByKid: () => TE.right(O.some(["cert1", "cert2"])),
-  insertCertificateChain: () => TE.right(undefined),
-};
-
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
-
-function isStringArray(u: unknown): u is string[] {
-  return Array.isArray(u) && u.every((item) => typeof item === "string");
-}
 
 describe("CreateWalletAttestationHandler", async () => {
   const josePrivateKey = await jose.importJWK(privateEcKey);
@@ -284,14 +146,15 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository,
     });
 
@@ -317,14 +180,15 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository,
     });
 
@@ -332,7 +196,16 @@ describe("CreateWalletAttestationHandler", async () => {
     expect.assertions(6);
 
     if (E.isRight(result)) {
-      const body = WalletAttestations.decode(result.right.body);
+      const body = t
+        .type({
+          wallet_attestations: t.array(
+            t.type({
+              format: t.literal("jwt"),
+              wallet_attestation: t.string,
+            }),
+          ),
+        })
+        .decode(result.right.body);
       if (E.isRight(body)) {
         const walletAttestations = body.right.wallet_attestations;
         const walletAttestationJwt = walletAttestations.find(
@@ -361,10 +234,10 @@ describe("CreateWalletAttestationHandler", async () => {
             ].sort(),
           );
           expect(jwtPayload.iss).toBe(
-            "https://wallet-provider-v10.example.org/foo",
+            "https://wallet-provider-v1.example.org/foo",
           );
           expect(jwtPayload.aal).toBe(
-            "https://wallet-provider-v10.example.org/foo/LoA/basic",
+            "https://wallet-provider-v1.example.org/foo/LoA/basic",
           );
           // check trailing slashes are removed
           expect((jwtPayload.iss || "").endsWith("/")).toBe(false);
@@ -374,207 +247,22 @@ describe("CreateWalletAttestationHandler", async () => {
     }
   });
 
-  it("should return a correctly encoded sdjwt with disclosures on success and URLs within the token should not have trailing slashes", async () => {
-    const handler = CreateWalletAttestationHandler({
-      attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      walletAttestationConfig,
-      walletAttestationSigningKey,
-      walletInstanceRepository,
-    });
-
-    const result = await handler();
-    expect.assertions(6);
-
-    if (E.isRight(result)) {
-      const body = WalletAttestations.decode(result.right.body);
-      if (E.isRight(body)) {
-        const walletAttestations = body.right.wallet_attestations;
-        const walletAttestationDcSdJwt = walletAttestations.find(
-          (walletAttestation) => walletAttestation.format === "dc+sd-jwt",
-        );
-        if (walletAttestationDcSdJwt) {
-          const splittedVpToken =
-            walletAttestationDcSdJwt.wallet_attestation.split("~");
-          const sdJwt = splittedVpToken[0];
-          const disclosures = splittedVpToken.slice(1);
-
-          // check the properties of the header and payload
-          const jwtHeader = jose.decodeProtectedHeader(sdJwt);
-          expect(Object.keys(jwtHeader).sort()).toEqual(
-            ["alg", "typ", "kid"].sort(),
-          );
-          const jwtPayload = jose.decodeJwt(sdJwt);
-          expect(Object.keys(jwtPayload).sort()).toEqual(
-            [
-              "aal",
-              "exp",
-              "iat",
-              "cnf",
-              "iss",
-              "sub",
-              "vct",
-              "_sd",
-              "_sd_alg",
-            ].sort(),
-          );
-
-          // check that the hashed disclosures are included in _sd
-          const _sd = jwtPayload._sd;
-          if (isStringArray(_sd)) {
-            disclosures.forEach((disclosure) => {
-              const disclosureDigest = crypto
-                .createHash("sha256")
-                .update(disclosure)
-                .digest("base64url");
-
-              expect(_sd.includes(disclosureDigest)).toBe(true);
-            });
-          }
-
-          // check trailing slashes are removed
-          expect((jwtPayload.iss || "").endsWith("/")).toBe(false);
-          expect((jwtPayload.sub || "").endsWith("/")).toBe(false);
-        }
-      }
-    }
-  });
-
-  it("should return a correctly encoded mdoc cbor on success", async () => {
-    const handler = CreateWalletAttestationHandler({
-      attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
-      input: req,
-      inputDecoder: H.HttpRequest,
-      logger,
-      nonceRepository,
-      walletAttestationConfig,
-      walletAttestationSigningKey,
-      walletInstanceRepository,
-    });
-
-    const result = await handler();
-
-    expect.assertions(6);
-
-    assert.ok(E.isRight(result));
-
-    const body = WalletAttestations.decode(result.right.body);
-
-    assert.ok(E.isRight(body));
-
-    const walletAttestations = body.right.wallet_attestations;
-    const walletAttestationMdoc = walletAttestations.find(
-      (walletAttestation) => walletAttestation.format === "mso_mdoc",
-    );
-
-    assert.ok(walletAttestationMdoc);
-
-    const buffer = Buffer.from(
-      walletAttestationMdoc.wallet_attestation,
-      "base64",
-    );
-
-    const cborDecoded = cbor.decode(buffer);
-
-    const decodedWalletAttestationMdoc =
-      WalletAttestationMdocSchema.decode(cborDecoded);
-
-    // test cborDecoded has expected structure and specific docType
-    assert.ok(E.isRight(decodedWalletAttestationMdoc));
-
-    const {
-      issuerAuth,
-      nameSpaces: { "org.iso.18013.5.1.IT": encodedDomesticNameSpace },
-    } = decodedWalletAttestationMdoc.right;
-
-    // nameSpaces
-    const decodedDomesticNameSpace = encodedDomesticNameSpace.map(
-      ({ contents }) => cbor.decode(contents),
-    );
-
-    const validatedDomesticNameSpace = DecodedNameSpaceSchema.decode(
-      decodedDomesticNameSpace,
-    );
-
-    // test domestic namespace has correct fields (digestID, elementIdentifier, elementValue, random)
-    assert.ok(E.isRight(validatedDomesticNameSpace));
-
-    const domesticNameSpace = validatedDomesticNameSpace.right;
-
-    const elementIdentifiers = domesticNameSpace.map(
-      ({ elementIdentifier }) => elementIdentifier,
-    );
-
-    // test domestic namespace has correct properties (wallet_name, wallet_link, sub, aal)
-    expect(elementIdentifiers.sort()).toEqual(
-      ["wallet_name", "wallet_link", "sub", "aal"].sort(),
-    );
-
-    // issuerAuth
-    const [protectedHeaderBytes, unprotectedHeader, payload, signature] =
-      issuerAuth;
-
-    // test issuerAuth has correct protected header
-    expect(cbor.decode(protectedHeaderBytes)).toEqual(new Map([[1, -7]]));
-
-    // test issuerAuth has correct unprotected header
-    const kid = Buffer.from(privateEcKey.kid);
-    expect(unprotectedHeader.has(4)).toBe(true);
-    expect(unprotectedHeader.get(4)).toEqual(Buffer.from(kid));
-    // TODO: add test for key 33
-
-    const decodedIssuerAuthBytes = cbor.decode(payload);
-
-    if (
-      decodedIssuerAuthBytes instanceof cbor.Tag &&
-      decodedIssuerAuthBytes.tag === 24 && // CBOR tag 24 is for a byte string containing encoded CBOR
-      decodedIssuerAuthBytes.contents instanceof Buffer
-    ) {
-      const decodedIssuerAuth = cbor.decode(decodedIssuerAuthBytes.contents);
-
-      const validatedIssuerAuthPayload =
-        IssuerAuthPayloadSchema.decode(decodedIssuerAuth);
-
-      // test issuerAuth has correct payload
-      expect(E.isRight(validatedIssuerAuthPayload)).toBe(true);
-    }
-
-    const publicKey = await jose.importJWK(publicEcKey);
-
-    const newIssuerAuth = new IssuerAuth(
-      protectedHeaderBytes,
-      unprotectedHeader,
-      payload,
-      signature,
-    );
-
-    // test issuerAuth signature is correct
-    await expect(newIssuerAuth.verify(publicKey)).resolves.toBe(true);
-  });
-
-  it("should return a 500 HTTP response when getCertificateChainByKid returns an error", async () => {
-    const certificateRepositoryError: CertificateRepository = {
-      getCertificateChainByKid: () => TE.left(new Error()),
-      insertCertificateChain: () => TE.right(undefined),
+  it("should return a 500 HTTP response when getKeyByName returns an error", async () => {
+    const keyRepositoryError: KeyRepository = {
+      getKeyByName: () => TE.left(new Error()),
     };
 
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository: certificateRepositoryError,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository: keyRepositoryError,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository,
     });
 
@@ -589,22 +277,22 @@ describe("CreateWalletAttestationHandler", async () => {
     });
   });
 
-  it("should return a 500 HTTP response when getCertificateChainByKid returns an O.none", async () => {
-    const certificateRepositoryNone: CertificateRepository = {
-      getCertificateChainByKid: () => TE.right(O.none),
-      insertCertificateChain: () => TE.right(undefined),
+  it("should return a 500 HTTP response when getKeyByName returns an O.none", async () => {
+    const keyRepositoryNone: KeyRepository = {
+      getKeyByName: () => TE.right(O.none),
     };
 
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository: certificateRepositoryNone,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository: keyRepositoryNone,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository,
     });
 
@@ -629,14 +317,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository,
     });
 
@@ -677,14 +366,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository: walletInstanceRepositoryWithRevokedWI,
     });
 
@@ -719,14 +409,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationService,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository: walletInstanceRepositoryWithNotFoundWI,
     });
 
@@ -772,14 +463,15 @@ describe("CreateWalletAttestationHandler", async () => {
     };
     const handler = CreateWalletAttestationHandler({
       attestationService: mockAttestationServiceExternalServiceError,
-      certificateRepository,
-      federationEntity,
+      cryptographyClient,
+      federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      keyRepository,
       logger,
       nonceRepository,
       walletAttestationConfig,
-      walletAttestationSigningKey,
+      walletAttestationSigningKeyName,
       walletInstanceRepository,
     });
 

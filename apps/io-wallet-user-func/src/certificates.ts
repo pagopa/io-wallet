@@ -1,9 +1,7 @@
 import { KeyObject, X509Certificate } from "crypto";
 import * as E from "fp-ts/lib/Either";
 import { pipe } from "fp-ts/lib/function";
-import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
-import * as O from "fp-ts/Option";
 import * as t from "io-ts";
 import fetch from "make-fetch-happen";
 import * as os from "os";
@@ -162,37 +160,3 @@ export const getCrlFromUrl = (
       ),
     ),
   );
-
-// TODO: move to another file
-export interface CertificateRepository {
-  getCertificateChainByKid: (
-    kid: string,
-  ) => TE.TaskEither<Error, O.Option<string[]>>;
-  insertCertificateChain: (input: {
-    certificateChain: string[];
-    kid: string;
-  }) => TE.TaskEither<Error, void>;
-}
-
-export const insertCertificateChain: (input: {
-  certificateChain: string[];
-  kid: string;
-}) => RTE.ReaderTaskEither<
-  { certificateRepository: CertificateRepository },
-  Error,
-  void
-> =
-  (input) =>
-  ({ certificateRepository }) =>
-    certificateRepository.insertCertificateChain(input);
-
-export const getCertificateChainByKid: (
-  kid: string,
-) => RTE.ReaderTaskEither<
-  { certificateRepository: CertificateRepository },
-  Error,
-  O.Option<string[]>
-> =
-  (kid) =>
-  ({ certificateRepository }) =>
-    certificateRepository.getCertificateChainByKid(kid);
