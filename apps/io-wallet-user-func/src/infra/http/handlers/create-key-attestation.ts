@@ -283,9 +283,7 @@ export const CreateKeyAttestationHandler = H.of((req: H.HttpRequest) =>
     req.body,
     requireKeyAttestationRequest,
     RTE.fromTaskEither,
-    RTE.chain(({ keyAttestationRequest, userId }) =>
-      generateKeyAttestation({ keyAttestationRequest, userId }),
-    ),
+    RTE.chain(generateKeyAttestation),
     RTE.map((keyAttestation) => ({
       key_attestation: keyAttestation,
     })),

@@ -147,9 +147,7 @@ export const CreateWalletInstanceAttestationHandler = H.of(
       req.body,
       requireWalletInstanceAttestationRequest,
       RTE.fromTaskEither,
-      RTE.chain(({ userId, wiaRequest }) =>
-        generateWalletInstanceAttestation({ userId, wiaRequest }),
-      ),
+      RTE.chain(generateWalletInstanceAttestation),
       RTE.map((walletInstanceAttestation) => ({
         wallet_instance_attestation: walletInstanceAttestation,
       })),
