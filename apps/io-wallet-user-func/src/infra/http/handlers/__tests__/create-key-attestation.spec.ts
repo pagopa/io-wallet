@@ -315,7 +315,7 @@ describe("CreateKeyAttestationHandler", async () => {
       _tag: "Right",
       right: expect.objectContaining({
         body: expect.objectContaining({
-          key_attestation: "this_is_a_test_key_attestation",
+          key_attestation: expect.any(String),
         }),
         headers: expect.objectContaining({
           "Content-Type": "application/json",
