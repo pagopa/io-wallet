@@ -31,6 +31,7 @@ import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
 import { buildUrl } from "@/url";
+import { isLoadTestUser } from "@/user";
 import { WalletInstanceEnvironment } from "@/wallet-instance";
 
 import {
@@ -161,7 +162,7 @@ const generateKeyAttestation: (request: {
     RTE.chainW(flow(requireWalletInstanceStatus, RTE.fromEither)),
     RTE.bindTo("walletInstanceStatus"),
     RTE.bindW("attestedKeys", () =>
-      validateKeysToAttest(keyAttestationRequest),
+      validateKeysToAttest(keyAttestationRequest, userId),
     ),
     RTE.map(({ attestedKeys, walletInstanceStatus }) => ({
       attestedKeys,
@@ -221,23 +222,6 @@ const validateAndroidKeysToAttest: (
     ),
   );
 
-const validateIosKeysToAttest: (
-  keysToAttest: Extract<
-    KeyAttestationRequest,
-    { platform: "ios" }
-  >["keysToAttest"],
-) => RTE.ReaderTaskEither<
-  { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
-  Error | IntegrityCheckError,
-  readonly AttestedKey[]
-> = RTE.traverseArray(({ jwk }) =>
-  RTE.right({
-    jwk,
-    keyStorage: "iso_18045_moderate",
-    userAuthentication: "iso_18045_moderate",
-  }),
-);
-
 const validateHardwareAssertionAndGetWalletInstance: (input: {
   keyAttestationRequest: KeyAttestationRequest;
   userId: FiscalCode;
@@ -266,17 +250,24 @@ const validateHardwareAssertionAndGetWalletInstance: (input: {
 
 const validateKeysToAttest: (
   keyAttestationRequest: KeyAttestationRequest,
+  userId: FiscalCode,
 ) => RTE.ReaderTaskEither<
   { androidAttestationValidationConfig: AndroidAttestationValidationConfig },
   Error | IntegrityCheckError,
   readonly AttestedKey[]
-> = (keyAttestationRequest) =>
-  keyAttestationRequest.platform === "android"
-    ? validateAndroidKeysToAttest(
+> = (keyAttestationRequest, userId) =>
+  isLoadTestUser(userId) || keyAttestationRequest.platform === "ios"
+    ? RTE.right(
+        keyAttestationRequest.keysToAttest.map(({ jwk }) => ({
+          jwk,
+          keyStorage: "iso_18045_moderate",
+          userAuthentication: "iso_18045_moderate",
+        })),
+      )
+    : validateAndroidKeysToAttest(
         keyAttestationRequest.nonce,
         keyAttestationRequest.keysToAttest,
-      )
-    : validateIosKeysToAttest(keyAttestationRequest.keysToAttest);
+      );
 
 export const CreateKeyAttestationHandler = H.of((req: H.HttpRequest) =>
   pipe(
