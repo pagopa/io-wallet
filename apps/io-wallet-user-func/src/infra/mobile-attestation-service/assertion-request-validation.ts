@@ -12,6 +12,7 @@ import {
   verifyIosAssertion,
 } from "@/infra/mobile-attestation-service";
 import { NonceEnvironment } from "@/nonce";
+import { isLoadTestUser } from "@/user";
 import {
   getValidWalletInstanceByUserId,
   WalletInstanceEnvironment,
@@ -160,12 +161,14 @@ export const validateWalletInstanceAssertionRequest: (input: {
       userId,
     }),
     RTE.chainW(({ hardwareKey, signCount }) =>
-      validateWalletInstanceAssertion(
-        assertion,
-        hardwareKey,
-        signCount,
-        userId,
-      ),
+      isLoadTestUser(userId)
+        ? RTE.right(undefined)
+        : validateWalletInstanceAssertion(
+            assertion,
+            hardwareKey,
+            signCount,
+            userId,
+          ),
     ),
   );
 
@@ -187,11 +190,13 @@ export const validateKeyAttestationAssertionAndGetWalletInstance: (input: {
       userId,
     }),
     RTE.chainFirstW(({ hardwareKey, signCount }) =>
-      validateKeyAttestationAssertion(
-        assertion,
-        hardwareKey,
-        signCount,
-        userId,
-      ),
+      isLoadTestUser(userId)
+        ? RTE.right(undefined)
+        : validateKeyAttestationAssertion(
+            assertion,
+            hardwareKey,
+            signCount,
+            userId,
+          ),
     ),
   );

@@ -18,7 +18,6 @@ import { validateWalletInstanceAssertionRequest } from "@/infra/mobile-attestati
 import { getKey, KeyRepository } from "@/keys";
 import { NonceEnvironment } from "@/nonce";
 import { sendTelemetryExceptionWithBody } from "@/telemetry";
-import { isLoadTestUser } from "@/user";
 import { WalletInstanceEnvironment } from "@/wallet-instance";
 import {
   WalletInstanceAttestationData,
@@ -104,9 +103,6 @@ const getWalletInstanceAttestationData =
       ),
     );
 
-const testWalletInstanceAttestation =
-  "this_is_a_test_wallet_instance_attestation";
-
 const generateWalletInstanceAttestation: (request: {
   userId: FiscalCode;
   wiaRequest: WIARequest;
@@ -151,11 +147,7 @@ export const CreateWalletInstanceAttestationHandler = H.of(
       req.body,
       requireWalletInstanceAttestationRequest,
       RTE.fromTaskEither,
-      RTE.chain(({ userId, wiaRequest }) =>
-        isLoadTestUser(userId)
-          ? RTE.right(testWalletInstanceAttestation)
-          : generateWalletInstanceAttestation({ userId, wiaRequest }),
-      ),
+      RTE.chain(generateWalletInstanceAttestation),
       RTE.map((walletInstanceAttestation) => ({
         wallet_instance_attestation: walletInstanceAttestation,
       })),
