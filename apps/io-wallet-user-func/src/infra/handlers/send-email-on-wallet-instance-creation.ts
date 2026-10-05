@@ -24,6 +24,7 @@ const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
   "https://io.italia.it/documenti-su-io/faq/";
 const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://account.ioapp.it/it/accedi/?refresh=true";
+const HELP_CENTER_LINK = "https://assistenza.ioapp.it/hc/it";
 
 const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
   selectors: [
@@ -41,6 +42,7 @@ const htmlContent = htmlTemplate(
 );
 
 const htmlContentGeneric = htmlTemplateGeneric(
+  { href: HELP_CENTER_LINK } as ValidUrl,
   { href: WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK } as ValidUrl,
   { href: WALLET_ACTIVATION_EMAIL_FAQ_LINK } as ValidUrl,
 );
