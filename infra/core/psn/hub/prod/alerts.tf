@@ -30,3 +30,70 @@ resource "azurerm_monitor_metric_alert" "firewall" {
 
   tags = local.tags
 }
+
+resource "azurerm_monitor_metric_alert" "appgw" {
+  for_each = local.appgw_alerts
+
+  name                = "${azurerm_application_gateway.hub.name}-ag${each.key}"
+  resource_group_name = azurerm_resource_group.network.name
+  scopes              = [azurerm_application_gateway.hub.id]
+  description         = each.value.description
+  severity            = each.value.severity
+  frequency           = "PT1M"
+  window_size         = "PT5M"
+  auto_mitigate       = true
+
+  dynamic "criteria" {
+    for_each = try(each.value.dynamic, false) ? [] : [each.value]
+    content {
+      metric_namespace = "Microsoft.Network/applicationgateways"
+      metric_name      = criteria.value.metric
+      aggregation      = criteria.value.aggregation
+      operator         = "GreaterThan"
+      threshold        = criteria.value.threshold
+
+      dynamic "dimension" {
+        for_each = try(criteria.value.dimensions, {})
+        content {
+          name     = dimension.key
+          operator = "Include"
+          values   = dimension.value
+        }
+      }
+    }
+  }
+
+  dynamic "dynamic_criteria" {
+    for_each = try(each.value.dynamic, false) ? [each.value] : []
+    content {
+      metric_namespace         = "Microsoft.Network/applicationgateways"
+      metric_name              = dynamic_criteria.value.metric
+      aggregation              = dynamic_criteria.value.aggregation
+      operator                 = "GreaterThan"
+      alert_sensitivity        = "Medium"
+      evaluation_total_count   = 2
+      evaluation_failure_count = 2
+
+      dynamic "dimension" {
+        for_each = try(dynamic_criteria.value.dimensions, {})
+        content {
+          name     = dimension.key
+          operator = "Include"
+          values   = dimension.value
+        }
+      }
+    }
+  }
+
+  action {
+    action_group_id = data.azurerm_monitor_action_group.wallet.id
+  }
+
+  tags = merge(local.tags, { _deployed_by_amba = "True" })
+}
+
+import {
+  for_each = local.appgw_alerts
+  to       = azurerm_monitor_metric_alert.appgw[each.key]
+  id       = "${azurerm_resource_group.network.id}/providers/Microsoft.Insights/metricAlerts/${azurerm_application_gateway.hub.name}-ag${each.key}"
+}
