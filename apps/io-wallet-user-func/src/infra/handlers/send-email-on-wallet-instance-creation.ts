@@ -18,10 +18,9 @@ import { checkIfFiscalCodeIsWhitelisted } from "@/whitelisted-fiscal-code";
 const WALLET_ACTIVATION_EMAIL_TITLE =
   "Documenti su IO - Aggiungi i tuoi documenti al Portafoglio";
 const WALLET_ACTIVATION_GENERIC_EMAIL_TITLE =
-  "Novità su IO - i tuoi documenti digitali";
+  "Ottieni il meglio del tuo portafoglio digitale su IO";
 
-const WALLET_ACTIVATION_EMAIL_FAQ_LINK =
-  "https://io.italia.it/documenti-su-io/faq/";
+const WALLET_ACTIVATION_EMAIL_FAQ_LINK = "https://ioapp.it/domande-frequenti";
 const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://account.ioapp.it/it/accedi/?refresh=true";
 const HELP_CENTER_LINK = "https://assistenza.ioapp.it/hc/it";
