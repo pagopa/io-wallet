@@ -1,5 +1,12 @@
 # io-wallet-user-func
 
+## 5.1.4
+
+### Patch Changes
+
+- 9f7f22a: Updated subject and link in welcome ITW email
+- 6e53dc4: Updated Email after Wallet Instance Creation (ITW)
+
 ## 5.1.3
 
 ### Patch Changes
