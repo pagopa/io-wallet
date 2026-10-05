@@ -34,7 +34,7 @@ resource "azurerm_monitor_metric_alert" "firewall" {
 resource "azurerm_monitor_metric_alert" "appgw" {
   for_each = local.appgw_alerts
 
-  name                = "${azurerm_application_gateway.hub.name}-ag${each.key}"
+  name                = "[${azurerm_application_gateway.hub.name}] ${each.value.display_name}"
   resource_group_name = azurerm_resource_group.network.name
   scopes              = [azurerm_application_gateway.hub.id]
   description         = each.value.description
@@ -89,11 +89,5 @@ resource "azurerm_monitor_metric_alert" "appgw" {
     action_group_id = data.azurerm_monitor_action_group.wallet.id
   }
 
-  tags = merge(local.tags, { _deployed_by_amba = "True" })
-}
-
-import {
-  for_each = local.appgw_alerts
-  to       = azurerm_monitor_metric_alert.appgw[each.key]
-  id       = "${azurerm_resource_group.network.id}/providers/Microsoft.Insights/metricAlerts/${azurerm_application_gateway.hub.name}-ag${each.key}"
+  tags = local.tags
 }
