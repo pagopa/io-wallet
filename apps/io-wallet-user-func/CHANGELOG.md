@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.1.5
+
+### Patch Changes
+
+- bbb0806: Updated @pagopa/io-app-email-templates dependency
+
 ## 5.1.4
 
 ### Patch Changes
