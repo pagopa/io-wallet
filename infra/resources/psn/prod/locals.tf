@@ -26,18 +26,6 @@ locals {
         key_vault_secret_name = "GoogleAppCredentialsEncoded"
       },
       {
-        name                  = "WalletProviderIntermediateSigningKeys"
-        key_vault_secret_name = "WalletProviderIntermediateSigningKeys"
-      },
-      {
-        name                  = "WalletProviderLeafSigningKeys"
-        key_vault_secret_name = "WalletProviderLeafSigningKeys"
-      },
-      {
-        name                  = "WalletAttestationSigningKeys"
-        key_vault_secret_name = "WalletAttestationSigningKeys"
-      },
-      {
         name                  = "PidIssuerApiClientPrivateKey"
         key_vault_secret_name = "PidIssuerApiClientPrivateKey"
       },
