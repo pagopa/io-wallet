@@ -42,11 +42,11 @@ jobs:
       changes: ${{ steps.changes.outputs.changes || steps.all.outputs.changes }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 #v6.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: github.event_name != 'workflow_dispatch'
 
       - name: Found changed PSN Infra modules
-        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 #v3.0.2
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         if: github.event_name != 'workflow_dispatch'
         id: changes
         with:
@@ -80,7 +80,7 @@ jobs:
 
   release_prod:
     needs: changes
-    uses: pagopa/dx/.github/workflows/infra_apply.yaml@e08d8ce496df31036c9b04f42178c04947415cfc # main
+    uses: pagopa/dx/.github/workflows/infra_apply.yaml@main
     name: Infrastructure Release
     secrets: inherit
 
