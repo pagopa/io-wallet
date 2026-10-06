@@ -76,4 +76,64 @@ locals {
       threshold    = 80
     }
   }
+
+  appgw_alerts = {
+    applicationgatewaytotaltime = {
+      display_name = "Application Gateway Total Time"
+      description  = "Metric Alert for App Gateway ApplicationGatewayTotalTime"
+      metric       = "ApplicationGatewayTotalTime"
+      aggregation  = "Average"
+      dynamic      = true
+      severity     = 2
+    }
+    backendlastbyteresponsetime = {
+      display_name = "Backend Last Byte Response Time"
+      description  = "Metric Alert for App Gateway BackendLastByteResponseTime"
+      metric       = "BackendLastByteResponseTime"
+      aggregation  = "Average"
+      dynamic      = true
+      severity     = 2
+    }
+    capacityunits = {
+      display_name = "Capacity Units"
+      description  = "Metric Alert for App Gateway Capacity Units"
+      metric       = "CapacityUnits"
+      aggregation  = "Average"
+      threshold    = 75
+      severity     = 2
+    }
+    computeunits = {
+      display_name = "Compute Units"
+      description  = "Metric Alert for App Gateway Compute Units"
+      metric       = "ComputeUnits"
+      aggregation  = "Average"
+      threshold    = 75
+      severity     = 2
+    }
+    failedrequests = {
+      display_name = "Failed Requests"
+      description  = "Metric Alert for App Gateway FailedRequests"
+      metric       = "FailedRequests"
+      aggregation  = "Total"
+      dynamic      = true
+      severity     = 1
+    }
+    responsestatus = {
+      display_name = "Response Status"
+      description  = "Metric Alert for App Gateway ResponseStatus"
+      metric       = "ResponseStatus"
+      aggregation  = "Total"
+      dynamic      = true
+      severity     = 2
+      dimensions   = { HttpStatusGroup = ["4xx", "5xx"] }
+    }
+    unhealthyhostcount = {
+      display_name = "Unhealthy Host Count"
+      description  = "Metric Alert for App Gateway Unhealthy Host Count"
+      metric       = "UnhealthyHostCount"
+      aggregation  = "Average"
+      threshold    = 20
+      severity     = 0
+    }
+  }
 }
