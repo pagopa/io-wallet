@@ -6,7 +6,7 @@ resource "azurerm_monitor_metric_alert" "firewall" {
   name                = "[${data.azurerm_firewall.hub.name}] ${each.value.display_name}"
   resource_group_name = azurerm_resource_group.network.name
   description         = each.value.description
-  severity            = 1
+  severity            = 2
   enabled             = true
   auto_mitigate       = true
 
