@@ -78,7 +78,7 @@ resource "azurerm_private_dns_a_record" "apim_scm_azure_api_net" {
 
 module "apim" {
   source  = "pagopa-dx/azure-api-management/azurerm"
-  version = "~> 4.1"
+  version = "~> 4.2"
 
   environment = merge(local.environment,
     {
@@ -153,6 +153,18 @@ module "apim" {
     scale_in_time_window = "PT5M"
     scale_in_value       = "2"
     scale_in_cooldown    = "PT5M"
+  }
+
+  # TODO: adjust after tests
+  metric_alert_thresholds = {
+    total_requests         = null # 25000
+    successful_requests    = null # 25000
+    failed_requests        = null # 200
+    unauthorized_requests  = null # 100
+    response_time          = null # 900
+    cpu_percent_gateway    = null # null
+    memory_percent_gateway = null # null
+    capacity               = null # 85
   }
 
   tags = local.tags
