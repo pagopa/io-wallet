@@ -1,6 +1,6 @@
 resource "azurerm_key_vault_secret" "user_ioweb_fn_key" {
   name             = "user-ioweb-fn-key"
-  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  key_vault_id     = module.key_vault_app["01"].key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
 
@@ -9,7 +9,7 @@ resource "azurerm_key_vault_secret" "user_ioweb_fn_key" {
 
 resource "azurerm_key_vault_secret" "user_pdnd_fn_key" {
   name             = "user-pdnd-fn-key"
-  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  key_vault_id     = module.key_vault_app["01"].key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
 
@@ -18,7 +18,7 @@ resource "azurerm_key_vault_secret" "user_pdnd_fn_key" {
 
 resource "azurerm_key_vault_secret" "user_ioapp_fn_key" {
   name             = "user-ioapp-fn-key"
-  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  key_vault_id     = module.key_vault_app["01"].key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
 
@@ -27,7 +27,7 @@ resource "azurerm_key_vault_secret" "user_ioapp_fn_key" {
 
 resource "azurerm_key_vault_secret" "user_uat_fn_default_key" {
   name             = "user-fn-uat-default-key"
-  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  key_vault_id     = module.key_vault_app["01"].key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
 
@@ -36,7 +36,7 @@ resource "azurerm_key_vault_secret" "user_uat_fn_default_key" {
 
 resource "azurerm_key_vault_secret" "support_fn_default_key" {
   name             = "support-fn-default-key"
-  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  key_vault_id     = module.key_vault_app["01"].key_vault_wallet.id
   value_wo         = ""
   value_wo_version = 1
 
@@ -45,7 +45,7 @@ resource "azurerm_key_vault_secret" "support_fn_default_key" {
 
 resource "azurerm_key_vault_secret" "application_insights_connection_string" {
   name             = "ApplicationInsightsConnectionString"
-  key_vault_id     = module.key_vault_app.key_vault_wallet.id
+  key_vault_id     = module.key_vault_app["01"].key_vault_wallet.id
   value_wo         = data.azurerm_application_insights.core.connection_string
   value_wo_version = 1
 
