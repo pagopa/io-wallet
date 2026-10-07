@@ -1,12 +1,17 @@
-- apps:
+changed-files-labels-limit: 3
+
+apps:
   - changed-files:
-    - any-glob-to-any-file: ["apps/**/*"]
-- ci:
+    - any-glob-to-any-file: 'apps/**/*'
+
+ci:
   - changed-files:
-    - any-glob-to-any-file: [".github/workflows/**/*"]
-- infra:
+    - any-glob-to-any-file: '.github/workflows/**/*'
+
+infra:
   - changed-files:
-    - any-glob-to-any-file: ["infra/**/*"]
-- changeset:
+    - any-glob-to-any-file: 'infra/**/*'
+
+changeset:
   - changed-files:
-    - any-glob-to-any-file: [".changeset/**/*"]
+    - any-glob-to-any-file: '.changeset/**/*'
