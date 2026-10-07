@@ -28,6 +28,7 @@ import { CreateKeyAttestationFunction } from "@/infra/azure/functions/create-key
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
 import { CreateWalletInstanceAttestationFunction } from "@/infra/azure/functions/create-wallet-instance-attestation";
+import { CreateWalletInstanceAttestationV2Function } from "@/infra/azure/functions/create-wallet-instance-attestation-v2";
 import { GenerateEntityConfigurationV1Function } from "@/infra/azure/functions/generate-entity-configuration-v1";
 import { GenerateEntityConfigurationV2Function } from "@/infra/azure/functions/generate-entity-configuration-v2";
 import { GetCurrentWalletInstanceStatusFunction } from "@/infra/azure/functions/get-current-wallet-instance-status";
@@ -46,6 +47,7 @@ import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/st
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
+import { createWalletInstanceAttestationV2Adapters } from "@/infra/http/wallet-instance-attestation-v2-adapters";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -461,6 +463,24 @@ app.http("createWalletInstanceAttestation", {
   }),
   methods: ["POST"],
   route: "wallet-instance-attestations",
+});
+
+app.http("createWalletInstanceAttestationV2", {
+  authLevel: "function",
+  handler: CreateWalletInstanceAttestationV2Function(
+    createWalletInstanceAttestationV2Adapters({
+      assertionValidationConfig,
+      cryptographyClient: walletInstanceAttestationCryptographyClient,
+      federationEntityId: config.entityConfigurationV2.federationEntityId,
+      keyRepository,
+      nonceRepository,
+      walletInstanceAttestationSigningKeyName:
+        config.walletProvider.walletInstanceAttestationSigningKeyName,
+      walletInstanceRepository,
+    }),
+  ),
+  methods: ["POST"],
+  route: "wia",
 });
 
 app.http("createKeyAttestation", {

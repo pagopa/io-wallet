@@ -277,6 +277,38 @@ paths:
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
 
+  "/wia":
+    post:
+      summary: CreateWalletInstanceAttestationV2
+      description: Create and return a Wallet Instance Attestation (WIA) using the V2 handler
+      operationId: createWalletInstanceAttestationV2
+      security:
+        - FunctionsKey: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWalletInstanceAttestationBody"
+      responses:
+        "200":
+          description: Wallet Instance Attestation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletInstanceAttestation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableContent"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
   "/key-attestations":
     post:
       summary: CreateKeyAttestation
