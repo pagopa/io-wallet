@@ -1,4 +1,12 @@
-apps: apps/**/*
-ci: .github/workflows/**/*
-infra: infra/**/*
-changeset: .changeset/**/*
+- apps:
+  - changed-files:
+    - any-glob-to-any-file: ["apps/**/*"]
+- ci:
+  - changed-files:
+    - any-glob-to-any-file: [".github/workflows/**/*"]
+- infra:
+  - changed-files:
+    - any-glob-to-any-file: ["infra/**/*"]
+- changeset:
+  - changed-files:
+    - any-glob-to-any-file: [".changeset/**/*"]
