@@ -1,0 +1,39 @@
+<policies>
+  <inbound>
+    <base />
+    <set-variable name="signingKeyName" value="{{WalletProviderLeafSigningKeys}}" />
+    <send-request mode="new" response-variable-name="latestKeyResponse" timeout="10">
+      <set-url>@("{{WalletProviderLeafSigningKeyVaultUri}}/keys/" + (string)context.Variables["signingKeyName"] + "?api-version=2025-07-01")</set-url>
+      <set-method>GET</set-method>
+      <authentication-managed-identity resource="https://vault.azure.net" />
+    </send-request>
+    <choose>
+      <when condition="@(((IResponse)context.Variables[&quot;latestKeyResponse&quot;]).StatusCode != 200)">
+        <return-response>
+          <set-status code="502" reason="Unable to resolve latest signing key" />
+          <set-header name="Content-Type" exists-action="override">
+            <value>application/json</value>
+          </set-header>
+          <set-body>{"error":"Unable to resolve latest signing key"}</set-body>
+        </return-response>
+      </when>
+    </choose>
+    <set-variable
+      name="latestKeyId"
+      value="@((string)((IResponse)context.Variables[&quot;latestKeyResponse&quot;]).Body.As&lt;JObject&gt;()[&quot;key&quot;][&quot;kid&quot;])" />
+    <set-variable name="keyVersion" value="@(((string)context.Variables[&quot;latestKeyId&quot;]).Split('/').Last())" />
+    <set-backend-service backend-id="wallet-key-vault-signing-pool" />
+    <rewrite-uri
+      template="@(&quot;/keys/&quot; + (string)context.Variables[&quot;signingKeyName&quot;] + &quot;/&quot; + (string)context.Variables[&quot;keyVersion&quot;] + &quot;/sign?api-version=2025-07-01&quot;)"
+      copy-unmatched-params="false" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

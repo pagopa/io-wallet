@@ -1,0 +1,52 @@
+openapi: 3.0.1
+info:
+  title: IT-Wallet User - JWT Signing v1
+  description: Sign JWT digests using a key in the application Key Vault pool
+  version: v1
+paths:
+  /sign-jwt:
+    post:
+      summary: Sign a JWT digest
+      description: Signs a base64url-encoded digest using the configured Key Vault key
+      operationId: sign-jwt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - alg
+                - value
+              properties:
+                alg:
+                  type: string
+                  description: Key Vault JSON Web Key signing algorithm
+                value:
+                  type: string
+                  description: Base64url-encoded digest to sign
+      responses:
+        "200":
+          description: Signature generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - kid
+                  - value
+                properties:
+                  kid:
+                    type: string
+                    description: Key identifier used for signing
+                  value:
+                    type: string
+                    description: Base64url-encoded signature
+        "400":
+          description: Invalid signing request
+        "401":
+          description: APIM managed identity is not authorized to access the Key Vault
+        "403":
+          description: The selected Key Vault key does not allow signing
+        "502":
+          description: APIM could not resolve the latest signing key version
