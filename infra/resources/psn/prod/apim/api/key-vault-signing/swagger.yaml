@@ -55,4 +55,4 @@ paths:
         "403":
           description: The selected Key Vault key does not allow signing
         "502":
-          description: APIM could not resolve the latest signing key version
+          description: The signing backend could not complete the request
