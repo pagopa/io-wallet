@@ -1,0 +1,19 @@
+<policies>
+  <inbound>
+    <base />
+    <set-variable name="signingKeyName" value="@((string)context.Request.MatchedParameters[&quot;keyName&quot;])" />
+    <set-backend-service backend-id="wallet-key-vault-signing-pool" />
+    <rewrite-uri
+      template="@(&quot;/keys/&quot; + (string)context.Variables[&quot;signingKeyName&quot;] + &quot;/sign?api-version=7.6&quot;)"
+      copy-unmatched-params="false" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>
