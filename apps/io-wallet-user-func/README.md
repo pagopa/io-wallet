@@ -20,7 +20,7 @@ pnpm --filter io-wallet-user-func run start
 3. Verify the function is running by visiting the health check API at:
 
 ```url
-http://localhost:7071/api/v1/wallet/health
+http://localhost:7071/api/wallet/v1/health
 ```
 
 If everything is working correctly, you should receive the following response:
