@@ -9,14 +9,20 @@ module "ids" {
   tags = local.tags
 }
 
+moved {
+  from = module.key_vault_app
+  to   = module.key_vault_app["01"]
+}
+
 module "key_vault_app" {
   source = "../../_modules/key_vaults"
 
-  environment = merge(local.environment,
-    {
-      name = "apps"
-    }
-  )
+  for_each = toset([for instance in range(1, 6) : format("%02d", instance)])
+
+  environment = merge(local.environment, {
+    name            = "apps"
+    instance_number = each.key
+  })
   resource_group_name = data.azurerm_resource_group.wallet.name
 
   tenant_id = data.azurerm_client_config.current.tenant_id
@@ -188,7 +194,7 @@ module "function_apps" {
   status_list_storage_account_name_uat        = azurerm_storage_account.cdn_uat.name
   status_list_storage_container_name          = azurerm_storage_container.status_lists.name
   status_list_storage_container_name_uat      = azurerm_storage_container.status_lists_uat.name
-  key_vault_wallet_name                       = module.key_vault_app.key_vault_wallet.name
+  key_vault_wallet_name                       = module.key_vault_app["01"].key_vault_wallet.name
   status_list_publication_queue_name          = module.storage_accounts.status_list_publication_queue_name_01.name
   wallet_instance_creation_email_queue_name   = module.storage_accounts.wallet_instance_creation_email_queue_name_01.name
   wallet_instance_revocation_email_queue_name = module.storage_accounts.wallet_instance_revocation_email_queue_name_01.name
@@ -235,7 +241,7 @@ resource "azurerm_role_assignment" "apim_kv_infra_secrets" {
 }
 
 resource "azurerm_role_assignment" "infra_cd_kv_app_secrets_officer" {
-  scope                = module.key_vault_app.key_vault_wallet.id
+  scope                = module.key_vault_app["01"].key_vault_wallet.id
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = data.azurerm_user_assigned_identity.infra_cd_id.principal_id
   description          = "Allow CD workflow to manage secrets in the application Key Vault"
@@ -294,9 +300,9 @@ module "iam" {
   }
 
   key_vault_app = {
-    id                  = module.key_vault_app.key_vault_wallet.id
-    name                = module.key_vault_app.key_vault_wallet.name
-    resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
+    id                  = module.key_vault_app["01"].key_vault_wallet.id
+    name                = module.key_vault_app["01"].key_vault_wallet.name
+    resource_group_name = module.key_vault_app["01"].key_vault_wallet.resource_group_name
   }
 
   key_vault_certificates = {
