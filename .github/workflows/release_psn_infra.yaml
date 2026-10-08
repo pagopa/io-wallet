@@ -80,7 +80,7 @@ jobs:
 
   release_prod:
     needs: changes
-    uses: pagopa/dx/.github/workflows/infra_apply.yaml@main
+    uses: pagopa/dx/.github/workflows/infra_apply.yaml@d222553e8a95174681009459bc91def4c8fdfc5b # main
     name: Infrastructure Release
     secrets: inherit
 
