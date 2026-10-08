@@ -66,7 +66,6 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
   Error,
   string
 > = ({
-  cryptographyClient,
   entityConfigurationJwt: {
     federationEntityId,
     federationEntityJwksKeyNames,
@@ -77,6 +76,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     signingKeyName,
     trustAnchorUrl,
   },
+  jwtSigningClient,
   keyRepository,
   trustMarkRepository,
 }) =>
@@ -134,8 +134,9 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                   kid: signingKey.kid,
                   typ: "entity-statement+jwt",
                 },
+                keyName: signingKey.keyName,
                 payload,
-              })({ cryptographyClient }),
+              })({ jwtSigningClient }),
           ),
         ),
       ),

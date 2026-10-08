@@ -1,14 +1,15 @@
-import { CryptographyClient } from "@azure/keyvault-keys";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
+import type { JwtSigner } from "@/infra/crypto/jwt-signing-client";
+
 export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
 export interface SignJwtEnvironment {
-  cryptographyClient: Pick<CryptographyClient, "signData">;
+  jwtSigningClient: JwtSigner;
 }
 
 interface JwtProtectedHeader extends SignJwtHeader {
@@ -27,6 +28,7 @@ interface SignJwtOptions {
   crv: string;
   duration: number;
   header: SignJwtHeader;
+  keyName: string;
   payload: unknown;
 }
 
@@ -81,9 +83,10 @@ export const signJwt =
     crv,
     duration,
     header,
+    keyName,
     payload,
   }: SignJwtOptions): RTE.ReaderTaskEither<SignJwtEnvironment, Error, string> =>
-  ({ cryptographyClient }) =>
+  ({ jwtSigningClient }) =>
     pipe(
       E.tryCatch(() => getSignAlgorithmFromCurve(crv), E.toError),
       TE.fromEither,
@@ -104,21 +107,13 @@ export const signJwt =
           TE.fromEither,
           TE.chain((signingInput) =>
             TE.tryCatch(
-              async () => {
-                const { result } = await cryptographyClient.signData(
-                  alg,
-                  Buffer.from(signingInput),
-                );
-
-                return `${signingInput}.${jose.base64url.encode(result)}`;
-              },
+              async () =>
+                await jwtSigningClient.sign(keyName, alg, signingInput),
               (reason) => {
                 const message =
                   reason instanceof Error ? reason.message : String(reason);
 
-                return new Error(
-                  `Unable to sign JWT with Azure Key Vault: ${message}`,
-                );
+                return new Error(`Unable to sign JWT: ${message}`);
               },
             ),
           ),

@@ -145,18 +145,11 @@ type AzureApplicationInsightsConfig = t.TypeOf<
   typeof AzureApplicationInsightsConfig
 >;
 
-const AzureKeyVaultConfig = t.type({
-  url: NonEmptyString,
-});
-
-type AzureKeyVaultConfig = t.TypeOf<typeof AzureKeyVaultConfig>;
-
 const AzureConfig = t.type({
   applicationInsights: AzureApplicationInsightsConfig,
   cosmos: AzureCosmosConfig,
   frontDoor: AzureFrontDoorConfig,
   generic: AzureGenericConfig,
-  keyVault: AzureKeyVaultConfig,
   storage: AzureStorageConfig,
 });
 
@@ -199,6 +192,13 @@ const AuthProfileApiConfig = t.type({
 });
 
 export type AuthProfileApiConfig = t.TypeOf<typeof AuthProfileApiConfig>;
+
+const JwtSigningApiConfig = t.type({
+  httpRequestTimeout: t.number,
+  url: UrlFromString,
+});
+
+type JwtSigningApiConfig = t.TypeOf<typeof JwtSigningApiConfig>;
 
 const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
@@ -280,6 +280,7 @@ export const Config = t.type({
   azure: AzureConfig,
   entityConfigurationV1: EntityConfigurationV1Config,
   entityConfigurationV2: EntityConfigurationV2Config,
+  jwtSigningApi: JwtSigningApiConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
@@ -653,17 +654,6 @@ const getAzureGenericConfigFromEnvironment: RE.ReaderEither<
   RE.chainEitherKW(parse(AzureGenericConfig)),
 );
 
-const getAzureKeyVaultConfigFromEnvironment: RE.ReaderEither<
-  NodeJS.ProcessEnv,
-  Error,
-  AzureKeyVaultConfig
-> = pipe(
-  sequenceS(RE.Apply)({
-    url: readFromEnvironment("KeyVaultUrl"),
-  }),
-  RE.chainEitherKW(parse(AzureKeyVaultConfig)),
-);
-
 export const getAzureConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
@@ -673,9 +663,18 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   cosmos: getAzureCosmosConfigFromEnvironment,
   frontDoor: getAzureFrontDoorConfigFromEnvironment,
   generic: getAzureGenericConfigFromEnvironment,
-  keyVault: getAzureKeyVaultConfigFromEnvironment,
   storage: getAzureStorageConfigFromEnvironment,
 });
+
+const getJwtSigningApiConfigFromEnvironment: RE.ReaderEither<
+  NodeJS.ProcessEnv,
+  Error,
+  Omit<JwtSigningApiConfig, "httpRequestTimeout">
+> = pipe(
+  readFromEnvironment("JwtSigningApiUrl"),
+  RE.chainEitherKW(parse(UrlFromString, "Invalid JWT signing API URL")),
+  RE.map((url) => ({ url })),
+);
 
 const getStatusListManagerConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
@@ -868,6 +867,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
+    jwtSigningApi: getJwtSigningApiConfigFromEnvironment,
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
@@ -879,6 +879,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       attestationService,
       authProfile,
       httpRequestTimeout,
+      jwtSigningApi,
       ...remainingConfigs
     }) => ({
       ...remainingConfigs,
@@ -888,6 +889,10 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       },
       authProfile: {
         ...authProfile,
+        httpRequestTimeout,
+      },
+      jwtSigningApi: {
+        ...jwtSigningApi,
         httpRequestTimeout,
       },
     }),
