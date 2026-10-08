@@ -40,7 +40,7 @@
     "EntityConfigurationV2WalletSolutionMetadataAuthorizationEndpoint": "ENTITY_CONFIGURATION_V2_WALLET_SOLUTION_METADATA_AUTHORIZATION_ENDPOINT",
     "EntityConfigurationV2WalletSolutionMetadataCredentialOfferEndpoint": "ENTITY_CONFIGURATION_V2_WALLET_SOLUTION_METADATA_CREDENTIAL_OFFER_ENDPOINT",
     "EntityConfigurationV2WalletSolutionMetadataWalletName": "ENTITY_CONFIGURATION_V2_WALLET_SOLUTION_METADATA_WALLET_NAME",
-    "JwtSigningApiUrl": "https://YOUR_APIM_HOST/api/wallet/keys/v1/signatures",
+    "JwtSigningApiUrl": "https://YOUR_APIM_HOST/api/wallet/keys/v1",
     "IntermediateSigningKeyName": "INTERMEDIATE_SIGNING_KEY_NAME",
     "IntermediatePublishedKeyNames": "INTERMEDIATE_SIGNING_KEY_NAME,INTERMEDIATE_PREVIOUS_KEY_NAME",
     "WalletAttestationSigningKeyName": "WALLET_ATTESTATION_SIGNING_KEY_NAME",

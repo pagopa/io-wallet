@@ -43,8 +43,7 @@ const logger = {
 };
 
 const jwtSigningClient: SignJwtEnvironment["jwtSigningClient"] = {
-  sign: (_keyName, _algorithm, signingInput) =>
-    Promise.resolve([signingInput, "AA"].join(".")),
+  sign: () => Promise.resolve("AA"),
 };
 
 const url = flow(

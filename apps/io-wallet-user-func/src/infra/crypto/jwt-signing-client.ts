@@ -1,3 +1,5 @@
+import { createHash } from "crypto";
+
 import type { SignAlgorithm } from "@/infra/crypto/signer";
 
 export interface JwtSigner {
@@ -19,8 +21,21 @@ export class JwtSigningClient implements JwtSigner {
     algorithm: SignAlgorithm,
     signingInput: string,
   ): Promise<string> => {
-    const response = await fetch(this.url, {
-      body: JSON.stringify({ algorithm, keyName, signingInput }),
+    const hashAlgorithm = {
+      ES256: "sha256",
+      ES384: "sha384",
+      ES512: "sha512",
+    }[algorithm];
+    const digest = createHash(hashAlgorithm)
+      .update(signingInput, "utf8")
+      .digest("base64url");
+    const endpoint = new URL(
+      `${encodeURIComponent(keyName)}/signatures`,
+      `${this.url.replace(/\/+$/, "")}/`,
+    );
+
+    const response = await fetch(endpoint, {
+      body: JSON.stringify({ alg: algorithm, value: digest }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -38,13 +53,15 @@ export class JwtSigningClient implements JwtSigner {
     if (
       typeof result !== "object" ||
       result === null ||
-      !("signedJwt" in result) ||
-      typeof result.signedJwt !== "string" ||
-      result.signedJwt.length === 0
+      !("kid" in result) ||
+      typeof result.kid !== "string" ||
+      !("value" in result) ||
+      typeof result.value !== "string" ||
+      result.value.length === 0
     ) {
-      throw new Error("Signing response did not contain a signedJwt");
+      throw new Error("Signing response did not contain a signature");
     }
 
-    return result.signedJwt;
+    return result.value;
   };
 }

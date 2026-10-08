@@ -65,7 +65,7 @@ resource "azurerm_api_management_api" "user_jwt_signing_v1" {
 
   description  = "Signs JWT digests using a key in the application Key Vault pool"
   display_name = "IT-Wallet User - JWT Signing v1"
-  path         = "api/wallet/signing"
+  path         = "api/wallet/keys"
   protocols    = ["https"]
 
   import {

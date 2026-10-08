@@ -107,8 +107,14 @@ export const signJwt =
           TE.fromEither,
           TE.chain((signingInput) =>
             TE.tryCatch(
-              async () =>
-                await jwtSigningClient.sign(keyName, alg, signingInput),
+              async () => {
+                const signature = await jwtSigningClient.sign(
+                  keyName,
+                  alg,
+                  signingInput,
+                );
+                return `${signingInput}.${signature}`;
+              },
               (reason) => {
                 const message =
                   reason instanceof Error ? reason.message : String(reason);
