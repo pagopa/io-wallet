@@ -583,7 +583,7 @@ describe("CreateKeyAttestationHandler", async () => {
     });
 
     const result = await handler();
-    expect.assertions(5);
+    expect.assertions(6);
 
     if (E.isRight(result)) {
       const body = t
@@ -605,6 +605,7 @@ describe("CreateKeyAttestationHandler", async () => {
             uri: `${statusListBaseUrl}/${walletInstanceStatus.statusListId}`,
           },
         });
+        expect(keyAttestation.client_status).toBeUndefined();
         const attestedKeys = t
           .array(
             t.type({

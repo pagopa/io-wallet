@@ -23,7 +23,13 @@ const parsedRequest: ParsedWiaRequest = {
   },
 };
 
-const createDependencies = (parsed: ParsedWiaRequest = parsedRequest) => {
+const createDependencies = (
+  parsed: ParsedWiaRequest = parsedRequest,
+  status: null | { index: number; statusListId: string } = {
+    index: 1337,
+    statusListId: "42",
+  },
+) => {
   const events: string[] = [];
   const dependencyMock = {
     clientData: vi.fn(
@@ -45,6 +51,7 @@ const createDependencies = (parsed: ParsedWiaRequest = parsedRequest) => {
       return {
         hardwareKey: publicEcKey,
         signCount: 4,
+        status,
       };
     }),
     parseRequest: vi.fn(async () => parsed),
@@ -53,6 +60,7 @@ const createDependencies = (parsed: ParsedWiaRequest = parsedRequest) => {
       events.push("sign");
       return "signed-token";
     }),
+    statusListBaseUrl: "https://revocation.example.org/prefix/wia-statuslists/",
     thumbprint: vi.fn(async () => "client-thumbprint"),
     verifyAndroid: vi.fn(async () => void events.push("android")),
     verifyIos: vi.fn(async () => void events.push("ios")),
@@ -87,6 +95,14 @@ describe("CreateWalletInstanceAttestationV2Handler", () => {
         crv: publicEcKey.crv,
         kid: publicEcKey.kid,
         payload: expect.objectContaining({
+          client_status: {
+            status: {
+              status_list: {
+                idx: 1337,
+                uri: "https://revocation.example.org/prefix/wia-statuslists/42",
+              },
+            },
+          },
           cnf: {
             jwk: expect.objectContaining({ alg: "ES256" }),
           },
@@ -122,6 +138,20 @@ describe("CreateWalletInstanceAttestationV2Handler", () => {
       user: fiscalCode,
     });
     expect(dependencyMock.verifyIos).not.toHaveBeenCalled();
+    expect(dependencyMock.sign).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          client_status: {
+            status: {
+              status_list: {
+                idx: 1337,
+                uri: "https://revocation.example.org/prefix/wia-statuslists/42",
+              },
+            },
+          },
+        }),
+      }),
+    );
   });
 
   it("skips only hardware verification for load test users", async () => {
@@ -141,8 +171,81 @@ describe("CreateWalletInstanceAttestationV2Handler", () => {
     expect(dependencyMock.getWalletInstance).toHaveBeenCalledOnce();
     expect(dependencyMock.verifyIos).not.toHaveBeenCalled();
     expect(dependencyMock.verifyAndroid).not.toHaveBeenCalled();
+    expect(dependencyMock.sign).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          client_status: {
+            status: {
+              status_list: {
+                idx: 1337,
+                uri: "https://revocation.example.org/prefix/wia-statuslists/42",
+              },
+            },
+          },
+        }),
+      }),
+    );
+  });
+});
+
+describe("CreateWalletInstanceAttestationV2Handler status list binding", () => {
+  it("accepts index zero and builds the status list URI with or without a trailing slash", async () => {
+    for (const baseUrl of [
+      "https://revocation.example.org/prefix/wia-statuslists",
+      "https://revocation.example.org/prefix/wia-statuslists/",
+    ]) {
+      const { dependencyMock } = createDependencies(parsedRequest, {
+        index: 0,
+        statusListId: "42",
+      });
+      dependencyMock.statusListBaseUrl = baseUrl;
+      const handler = CreateWalletInstanceAttestationV2Handler(
+        dependencyMock as never,
+      );
+
+      const response = await handler({}, vi.fn());
+
+      expect(response.statusCode).toBe(200);
+      expect(dependencyMock.sign).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            client_status: {
+              status: {
+                status_list: {
+                  idx: 0,
+                  uri: "https://revocation.example.org/prefix/wia-statuslists/42",
+                },
+              },
+            },
+          }),
+        }),
+      );
+    }
   });
 
+  it("rejects an instance without a status binding before getting the key or signing", async () => {
+    const { dependencyMock, events } = createDependencies(parsedRequest, null);
+    const logError = vi.fn();
+    const handler = CreateWalletInstanceAttestationV2Handler(
+      dependencyMock as never,
+    );
+
+    const response = await handler({}, logError);
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toEqual(
+      expect.objectContaining({ detail: "Error", status: 500 }),
+    );
+    expect(events).toEqual(["nonce", "instance", "ios", "telemetry"]);
+    expect(dependencyMock.getSigningKey).not.toHaveBeenCalled();
+    expect(dependencyMock.sign).not.toHaveBeenCalled();
+    expect(logError).toHaveBeenCalledWith(
+      new Error("Wallet instance status not found"),
+    );
+  });
+});
+
+describe("CreateWalletInstanceAttestationV2Handler error handling", () => {
   it("stops on the first failure, reports telemetry, and does not roll back the nonce", async () => {
     const { dependencyMock, events } = createDependencies();
     const failure = new Error("Invalid nonce");

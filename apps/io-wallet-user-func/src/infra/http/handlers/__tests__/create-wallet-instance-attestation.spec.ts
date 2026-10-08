@@ -94,6 +94,10 @@ const walletInstanceRepository: WalletInstanceRepository = {
         id: "123" as NonEmptyString,
         isRevoked: false,
         signCount: 0,
+        status: {
+          index: 1,
+          statusListId: "status-list-a" as NonEmptyString,
+        },
         userId: mockFiscalCode,
       }),
     ),

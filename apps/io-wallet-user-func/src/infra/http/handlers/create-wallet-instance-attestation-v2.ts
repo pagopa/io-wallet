@@ -1,6 +1,8 @@
 import * as H from "@pagopa/handler-kit";
+import { WalletInstanceStatus } from "io-wallet-common/wallet-instance";
 
 import { getSignAlgorithmFromCurve } from "@/infra/crypto/signer";
+import { buildUrl } from "@/url";
 import { isLoadTestUser } from "@/user";
 
 import {
@@ -98,6 +100,11 @@ const generateAttestation = async (
     }
   }
 
+  const status = instance.status;
+  if (status === undefined || status === null) {
+    throw new Error("Wallet instance status not found");
+  }
+
   const signingKey = await dependencies.getSigningKey();
   const sub = await dependencies.thumbprint(wiaRequest.cnf.jwk);
   const encoded = dependencies.encodeAttestation({
@@ -110,14 +117,27 @@ const generateAttestation = async (
     x5c: signingKey.certificateChain,
   });
   const { x5c, ...payload } = encoded;
+  const clientStatus = toClientStatus(status, dependencies.statusListBaseUrl);
 
   return dependencies.sign({
     crv: signingKey.crv,
     kid: signingKey.kid,
-    payload,
+    payload: { ...payload, client_status: clientStatus },
     x5c,
   });
 };
+
+const toClientStatus = (
+  status: WalletInstanceStatus,
+  statusListBaseUrl: string,
+) => ({
+  status: {
+    status_list: {
+      idx: status.index,
+      uri: buildUrl(status.statusListId, statusListBaseUrl),
+    },
+  },
+});
 
 export const CreateWalletInstanceAttestationV2Handler =
   (dependencies: WalletInstanceAttestationV2Dependencies) =>

@@ -51,6 +51,7 @@ export const createWalletInstanceAttestationV2Adapters = (input: {
   federationEntityId: { href: string };
   keyRepository: KeyRepository;
   nonceRepository: NonceRepository;
+  statusListBaseUrl: string;
   walletInstanceAttestationSigningKeyName: string;
   walletInstanceRepository: WalletInstanceRepository;
 }) => ({
@@ -121,6 +122,8 @@ export const createWalletInstanceAttestationV2Adapters = (input: {
       }),
       { cryptographyClient: input.cryptographyClient },
     ),
+
+  statusListBaseUrl: input.statusListBaseUrl,
 
   thumbprint: (jwk: JwkPublicKey): Promise<string> =>
     runTaskEither(toThumbprint(jwk)),

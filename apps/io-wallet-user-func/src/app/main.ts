@@ -474,6 +474,7 @@ app.http("createWalletInstanceAttestationV2", {
       federationEntityId: config.entityConfigurationV2.federationEntityId,
       keyRepository,
       nonceRepository,
+      statusListBaseUrl: statusListPublicationConfig.baseUrl,
       walletInstanceAttestationSigningKeyName:
         config.walletProvider.walletInstanceAttestationSigningKeyName,
       walletInstanceRepository,
