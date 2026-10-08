@@ -45,23 +45,6 @@ resource "azapi_resource" "apim_key_vault_signing_pool" {
   }
 }
 
-resource "azurerm_api_management_named_value" "wallet_provider_leaf_signing_key" {
-  name                = "wallet-provider-leaf-signing-key-name"
-  api_management_name = module.apim.name
-  resource_group_name = module.apim.resource_group_name
-  display_name        = "WalletProviderLeafSigningKeys"
-  secret              = true
-
-  value_from_key_vault {
-    secret_id = format(
-      "https://%s.vault.azure.net/secrets/WalletProviderLeafSigningKeys",
-      module.key_vault_app["01"].key_vault_wallet.name
-    )
-  }
-
-  depends_on = [module.apim_roles]
-}
-
 resource "azurerm_api_management_named_value" "wallet_provider_leaf_signing_key_vault_uri" {
   name                = "wallet-provider-leaf-signing-key-vault-uri"
   api_management_name = module.apim.name
@@ -101,7 +84,7 @@ resource "azurerm_api_management_api" "user_jwt_signing_v1" {
 
 resource "azurerm_api_management_api_operation_policy" "user_jwt_signing" {
   api_name            = azurerm_api_management_api.user_jwt_signing_v1.name
-  operation_id        = "sign-jwt"
+  operation_id        = "sign-digest"
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
 
@@ -109,7 +92,6 @@ resource "azurerm_api_management_api_operation_policy" "user_jwt_signing" {
 
   depends_on = [
     azapi_resource.apim_key_vault_signing_pool,
-    azurerm_api_management_named_value.wallet_provider_leaf_signing_key,
     azurerm_api_management_named_value.wallet_provider_leaf_signing_key_vault_uri,
   ]
 }

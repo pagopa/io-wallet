@@ -1,7 +1,7 @@
 <policies>
   <inbound>
     <base />
-    <set-variable name="signingKeyName" value="{{WalletProviderLeafSigningKeys}}" />
+    <set-variable name="signingKeyName" value="@((string)context.Request.MatchedParameters[&quot;keyName&quot;])" />
     <send-request mode="new" response-variable-name="latestKeyResponse" timeout="10">
       <set-url>@("{{WalletProviderLeafSigningKeyVaultUri}}/keys/" + (string)context.Variables["signingKeyName"] + "?api-version=2025-07-01")</set-url>
       <set-method>GET</set-method>

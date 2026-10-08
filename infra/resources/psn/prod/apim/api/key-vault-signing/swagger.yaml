@@ -1,14 +1,20 @@
 openapi: 3.0.1
 info:
-  title: IT-Wallet User - JWT Signing v1
-  description: Sign JWT digests using a key in the application Key Vault pool
+  title: IT-Wallet User - Signing v1
+  description: Sign digests using a key in the application Key Vault pool
   version: v1
 paths:
-  /sign-jwt:
+  /keys/{keyName}/signatures:
     post:
-      summary: Sign a JWT digest
-      description: Signs a base64url-encoded digest using the configured Key Vault key
-      operationId: sign-jwt
+      summary: Sign a digest
+      description: Signs an encoded digest using the specified Key Vault key
+      operationId: sign-digest
+      parameters:
+        - name: keyName
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -24,7 +30,7 @@ paths:
                   description: Key Vault JSON Web Key signing algorithm
                 value:
                   type: string
-                  description: Base64url-encoded digest to sign
+                  description: Encoded digest to sign
       responses:
         "200":
           description: Signature generated
@@ -41,7 +47,7 @@ paths:
                     description: Key identifier used for signing
                   value:
                     type: string
-                    description: Base64url-encoded signature
+                    description: Encoded signature
         "400":
           description: Invalid signing request
         "401":
