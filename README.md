@@ -31,24 +31,53 @@ Changelog and versioning are managed with [Changesets](https://github.com/change
 
 ### Setting the Azure Subscription to Access the Dev CosmosDB
 
-To start the function apps `io-wallet-support-func` and `io-wallet-user-func`, you must first log in on Azure and set the subscription you want to use. Ensure you have the Azure `az-cli` package installed. If not, follow the instructions on the [official website](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+To run `io-wallet-support-func` and `io-wallet-user-func` locally against the development resources, install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli), sign in, and select the `DEV-IO` subscription.
 
-This process is necessary for local function apps to connect to the development CosmosDB instance on Azure:
+Run the following commands in order. Replace each placeholder with the value described in its step.
 
 ```bash
-az login                                        # Redirects to your main browser for login.
+# Sign in to Azure.
+az login
 
-az account set --subscription DEV-IO            # Sets the DEV-IO subscription for backend apps to connect to the dev CosmosDB.
+# Select the development subscription used by the local function apps.
+az account set --subscription DEV-IO
 
-az ad user show --id YOUR_EMAIL                 # Retrieves user info by email. Copy the "id" value from the output and use it as PRINCIPAL_ID in the next command.
+# Find your Entra user object ID. Use the returned ID wherever PRINCIPAL_ID appears below.
+az ad user show --id YOUR_EMAIL --query id -o tsv
 
+# Grant your user read and write access to the development Cosmos DB account.
 az cosmosdb sql role assignment create
     --account-name io-d-itn-common-cosno-01
     --resource-group io-d-itn-common-rg-01
     --scope "/" --principal-id PRINCIPAL_ID
     --role-definition-id
-        00000000-0000-0000-0000-000000000002    # Grants read and write access to the dev CosmosDB.
+        00000000-0000-0000-0000-000000000002
+
+# Storage Queue access for status-list publication
+
+# Get STORAGE_ACCOUNT and STORAGE_RG from StatusListPublicationQueueStorageAccount__accountName
+# in the function app's local.settings.json. This command returns the storage account resource ID.
+az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$STORAGE_RG" --query id -o tsv
+
+# Use the PRINCIPAL_ID from the user lookup and the storage account ID returned above as STORAGE_ID.
+# This grants the user permission to access the status-list queue.
+az role assignment create \
+  --assignee PRINCIPAL_ID \
+  --role "Storage Queue Data Contributor" \
+  --scope STORAGE_ID
+
+# Key Vault access for signing
+# Get the Key Vault resource ID and use the returned value as KV_ID.
+az keyvault show --name "io-d-itn-wallet-kv" --resource-group "io-d-itn-wallet-rg" --query id -o tsv
+
+# Grant the user the listed Key Vault permissions, using the PRINCIPAL_ID from the user lookup
+# and the KV_ID returned above.
+az role assignment create --role "Key Vault Crypto Officer" --assignee PRINCIPAL_ID --scope KV_ID
+az role assignment create --role "Key Vault Certificates Officer" --assignee PRINCIPAL_ID --scope KV_ID
+az role assignment create --role "Key Vault Secrets Officer" --assignee PRINCIPAL_ID --scope KV_ID
+az role assignment create --role "Key Vault Crypto Officer" --assignee PRINCIPAL_ID --scope KV_ID
 ```
+
 
 ### Install the Azure Functions Core Tools
 
