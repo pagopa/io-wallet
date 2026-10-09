@@ -5,12 +5,12 @@ import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 import { createHash } from "node:crypto";
 
-import type { KeyOperations } from "@/infra/crypto/key-client";
+import type { KeyOperations } from "@/infra/crypto/key-operations-client";
 
 export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
 export interface SignJwtEnvironment {
-  keyClient: KeyOperations;
+  signJwt: KeyOperations["sign"];
 }
 
 interface JwtProtectedHeader extends SignJwtHeader {
@@ -93,7 +93,7 @@ export const signJwt =
     keyName,
     payload,
   }: SignJwtOptions): RTE.ReaderTaskEither<SignJwtEnvironment, Error, string> =>
-  ({ keyClient }) =>
+  ({ signJwt: signJwtEnv }) =>
     pipe(
       E.tryCatch(() => getSignAlgorithmFromCurve(crv), E.toError),
       TE.fromEither,
@@ -120,11 +120,7 @@ export const signJwt =
                 )
                   .update(signingInput, "utf8")
                   .digest("base64url");
-                const signature = await keyClient.sign(
-                  keyName,
-                  algorithm,
-                  digest,
-                );
+                const signature = await signJwtEnv(keyName, algorithm, digest);
 
                 return `${signingInput}.${signature}`;
               },

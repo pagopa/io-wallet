@@ -43,7 +43,7 @@ import { StatusListPublicationFunction } from "@/infra/azure/functions/status-li
 import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions/status-list-publication-dispatcher";
 import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
-import { KeyClient } from "@/infra/crypto/key-client";
+import { KeyOperationsClient } from "@/infra/crypto/key-operations-client";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import {
@@ -74,7 +74,7 @@ const config = configOrError;
 
 const credential = new DefaultAzureCredential();
 
-const keyClient = new KeyClient(
+const keyOperationsClient = new KeyOperationsClient(
   config.keyOperationsApi.url.href,
   config.keyOperationsApi.httpRequestTimeout,
 );
@@ -227,9 +227,9 @@ const statusListPublication = new StatusListPublicationService({
   emptyBitstring: Buffer.alloc(
     (config.statusList.pageCount * config.statusList.pageBitsSize) / 8,
   ),
-  keyClient,
   keyRepository,
   pages: statusListPagesRepository,
+  signJwt: keyOperationsClient.sign,
   tokenStatusListSigningKeyName:
     config.walletProvider.tokenStatusListSigningKeyName,
 });
@@ -303,10 +303,10 @@ app.timer("generateEntityConfiguration", {
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV1,
     inputDecoder: t.unknown,
-    keyClient,
     keyRepository: keyV1Repository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
+    signJwt: keyOperationsClient.sign,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -319,10 +319,10 @@ app.timer("generateEntityConfigurationV2", {
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV2,
     inputDecoder: t.unknown,
-    keyClient,
     keyRepository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
+    signJwt: keyOperationsClient.sign,
     trustMarkRepository,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
@@ -398,9 +398,9 @@ app.http("createWalletAttestation", {
   handler: CreateWalletAttestationFunction({
     attestationService: mobileAttestationService,
     federationEntityId: config.entityConfigurationV1.federationEntityId,
-    keyClient,
     keyRepository: keyV1Repository,
     nonceRepository,
+    signJwt: keyOperationsClient.sign,
     walletAttestationConfig: config.walletProvider.walletAttestation,
     walletAttestationSigningKeyName:
       config.walletProvider.walletAttestationSigningKeyName,
@@ -424,9 +424,9 @@ app.http("createWalletInstanceAttestation", {
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
     federationEntityId: config.entityConfigurationV2.federationEntityId,
-    keyClient,
     keyRepository,
     nonceRepository,
+    signJwt: keyOperationsClient.sign,
     walletAttestationConfig: {
       oauthClientSub: config.walletProvider.walletAttestation.oauthClientSub,
     },
@@ -446,9 +446,9 @@ app.http("createKeyAttestation", {
     federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyAttestationSigningKeyName:
       config.walletProvider.keyAttestationSigningKeyName,
-    keyClient,
     keyRepository,
     nonceRepository,
+    signJwt: keyOperationsClient.sign,
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
   }),

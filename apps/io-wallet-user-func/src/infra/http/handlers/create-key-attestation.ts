@@ -60,7 +60,7 @@ const signKeyAttestation =
     payload: JWTPayload;
     x5c: string[];
   }): RTE.ReaderTaskEither<KeyAttestationEnvironment, Error, string> =>
-  ({ keyClient }) =>
+  ({ signJwt: signJwtEnv }) =>
     signJwt({
       crv,
       duration: 365 * 24 * 60 * 60,
@@ -71,7 +71,7 @@ const signKeyAttestation =
       },
       keyName,
       payload,
-    })({ keyClient });
+    })({ signJwt: signJwtEnv });
 
 const getKeyAttestationData =
   ({

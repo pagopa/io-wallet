@@ -13,8 +13,7 @@ import * as t from "io-ts";
 import * as jose from "jose";
 import { describe, expect, it, vi } from "vitest";
 
-import type { SignJwtEnvironment } from "@/infra/crypto/signer";
-
+import { KeyOperations } from "@/infra/crypto/key-operations-client";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -44,7 +43,7 @@ const logger = {
   log: () => () => void 0,
 };
 
-const keyClient: SignJwtEnvironment["keyClient"] = {
+const keyOperationsClient: KeyOperations = {
   sign: () => Promise.resolve("AA"),
 };
 
@@ -302,10 +301,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -332,10 +331,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -366,10 +365,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository: failingKeyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -397,10 +396,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository: emptyKeyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -424,10 +423,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -482,10 +481,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository: p521KeyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -531,10 +530,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -573,10 +572,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -633,10 +632,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -691,10 +690,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -751,10 +750,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -832,10 +831,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -883,10 +882,10 @@ describe("CreateKeyAttestationHandler", async () => {
       },
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -910,10 +909,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -943,10 +942,10 @@ describe("CreateKeyAttestationHandler", async () => {
       input: req,
       inputDecoder: H.HttpRequest,
       keyAttestationSigningKeyName: keyAttestationKeyName,
-      keyClient,
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });

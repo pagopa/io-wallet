@@ -89,7 +89,7 @@ const signWalletAttestation =
     kid: string;
     payload: JWTPayload;
   }): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  ({ keyClient, walletAttestationSigningKeyName }) =>
+  ({ signJwt: signJwtEnv, walletAttestationSigningKeyName }) =>
     signJwt({
       crv,
       duration: 60 * 60,
@@ -99,7 +99,7 @@ const signWalletAttestation =
       },
       keyName: walletAttestationSigningKeyName,
       payload,
-    })({ keyClient });
+    })({ signJwt: signJwtEnv });
 
 /**
  * Validates the wallet attestation request by performing the following steps:

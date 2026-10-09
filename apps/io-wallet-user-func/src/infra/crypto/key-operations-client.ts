@@ -8,7 +8,7 @@ export interface KeyOperations {
   ) => Promise<string>;
 }
 
-export class KeyClient implements KeyOperations {
+export class KeyOperationsClient implements KeyOperations {
   constructor(
     private readonly url: string,
     private readonly requestTimeout: number,
