@@ -49,7 +49,7 @@ resource "azurerm_api_management_api_version_set" "user_jwt_signing" {
   name                = "wallet-user-jwt-signing-apis"
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
-  display_name        = "Wallet User - JWT Signing"
+  display_name        = "Wallet User - Keys"
   versioning_scheme   = "Segment"
 }
 
@@ -64,8 +64,8 @@ resource "azurerm_api_management_api" "user_jwt_signing_v1" {
   revision       = 1
 
   description  = "Signs JWT digests using a key in the application Key Vault pool"
-  display_name = "IT-Wallet User - JWT Signing v1"
-  path         = "api/wallet/signing"
+  display_name = "IT-Wallet User - Keys v1"
+  path         = "api/wallet/keys"
   protocols    = ["https"]
 
   import {

@@ -49,16 +49,18 @@ interface KeyAttestationEnvironment extends SignJwtEnvironment {
 const signKeyAttestation =
   ({
     crv,
+    keyName,
     kid,
     payload,
     x5c,
   }: {
     crv: string;
+    keyName: string;
     kid: string;
     payload: JWTPayload;
     x5c: string[];
   }): RTE.ReaderTaskEither<KeyAttestationEnvironment, Error, string> =>
-  ({ cryptographyClient }) =>
+  ({ jwtSigningClient }) =>
     signJwt({
       crv,
       duration: 365 * 24 * 60 * 60,
@@ -67,8 +69,9 @@ const signKeyAttestation =
         typ: "key-attestation+jwt",
         x5c,
       },
+      keyName,
       payload,
-    })({ cryptographyClient });
+    })({ jwtSigningClient });
 
 const getKeyAttestationData =
   ({
@@ -98,6 +101,7 @@ const getKeyAttestationData =
       TE.map((signingKey) => ({
         attestedKeys,
         crv: signingKey.crv,
+        keyName: signingKey.keyName,
         kid: signingKey.kid,
         platform,
         status: {
@@ -177,6 +181,7 @@ const generateKeyAttestation: (request: {
         ({ x5c, ...payload }) =>
           signKeyAttestation({
             crv: keyAttestationData.crv,
+            keyName: keyAttestationData.keyName,
             kid: keyAttestationData.kid,
             payload,
             x5c,

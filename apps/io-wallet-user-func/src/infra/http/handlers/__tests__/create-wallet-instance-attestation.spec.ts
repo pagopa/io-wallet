@@ -42,9 +42,8 @@ const logger = {
   log: () => () => void 0,
 };
 
-const cryptographyClient: SignJwtEnvironment["cryptographyClient"] = {
-  signData: (algorithm) =>
-    Promise.resolve({ algorithm, result: new Uint8Array(64) }),
+const jwtSigningClient: SignJwtEnvironment["jwtSigningClient"] = {
+  sign: () => Promise.resolve("AA"),
 };
 
 const url = flow(
@@ -188,10 +187,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -217,10 +216,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   it("should return a 200 HTTP response on android request success", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: androidReq,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -250,10 +249,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository: failingKeyRepository,
       logger,
       nonceRepository,
@@ -280,10 +279,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository: emptyKeyRepository,
       logger,
       nonceRepository,
@@ -306,10 +305,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   it("should return a correctly encoded jwt on success and URLs within the token should not have trailing slashes", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -374,10 +373,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
   it("should sign the jwt with the algorithm derived from the provider key curve - P-256", async () => {
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -449,10 +448,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository: p521KeyRepository,
       logger,
       nonceRepository,
@@ -515,10 +514,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -564,10 +563,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -607,10 +606,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     };
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -641,10 +640,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     );
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: androidReq,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -704,10 +703,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: invalidReq,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -766,10 +765,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: invalidReq,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
@@ -826,10 +825,10 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
 
     const handler = CreateWalletInstanceAttestationHandler({
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: invalidReq,
       inputDecoder: H.HttpRequest,
+      jwtSigningClient,
       keyRepository,
       logger,
       nonceRepository,
