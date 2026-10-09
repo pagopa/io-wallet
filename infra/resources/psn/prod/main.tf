@@ -305,6 +305,14 @@ module "iam" {
     resource_group_name = module.key_vault_app["01"].key_vault_wallet.resource_group_name
   }
 
+  key_vault_apps = [
+    for key_vault in values(module.key_vault_app) : {
+      id                  = key_vault.key_vault_wallet.id
+      name                = key_vault.key_vault_wallet.name
+      resource_group_name = key_vault.key_vault_wallet.resource_group_name
+    }
+  ]
+
   key_vault_certificates = {
     name                = module.key_vault_infra.key_vault_wallet.name
     resource_group_name = module.key_vault_infra.key_vault_wallet.resource_group_name
