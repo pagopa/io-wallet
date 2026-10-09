@@ -16,13 +16,6 @@ resource "azurerm_api_management_backend" "key_vault_app" {
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
   url                 = "https://${each.value.key_vault_wallet.name}.vault.azure.net"
-
-  credentials {
-    authorization {
-      scheme    = "ManagedIdentity"
-      parameter = "https://vault.azure.net"
-    }
-  }
 }
 
 resource "azapi_resource" "apim_key_vault_signing_pool" {
