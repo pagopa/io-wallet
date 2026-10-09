@@ -3,6 +3,7 @@
     <base />
     <set-variable name="signingKeyName" value="@((string)context.Request.MatchedParameters[&quot;keyName&quot;])" />
     <set-backend-service backend-id="wallet-key-vault-signing-pool" />
+    <authentication-managed-identity resource="https://vault.azure.net" />
     <rewrite-uri
       template="@(&quot;/keys/&quot; + (string)context.Variables[&quot;signingKeyName&quot;] + &quot;/sign?api-version=7.6&quot;)"
       copy-unmatched-params="false" />
