@@ -193,12 +193,12 @@ const AuthProfileApiConfig = t.type({
 
 export type AuthProfileApiConfig = t.TypeOf<typeof AuthProfileApiConfig>;
 
-const JwtSigningApiConfig = t.type({
+const KeyOperationsApiConfig = t.type({
   httpRequestTimeout: t.number,
   url: UrlFromString,
 });
 
-type JwtSigningApiConfig = t.TypeOf<typeof JwtSigningApiConfig>;
+type KeyOperationsApiConfig = t.TypeOf<typeof KeyOperationsApiConfig>;
 
 const PidIssuerApiClientConfig = t.type({
   baseURL: t.string,
@@ -280,7 +280,7 @@ export const Config = t.type({
   azure: AzureConfig,
   entityConfigurationV1: EntityConfigurationV1Config,
   entityConfigurationV2: EntityConfigurationV2Config,
-  jwtSigningApi: JwtSigningApiConfig,
+  keyOperationsApi: KeyOperationsApiConfig,
   mail: MailConfig,
   pidIssuer: PidIssuerApiClientConfig,
   slack: SlackConfig,
@@ -666,13 +666,13 @@ export const getAzureConfigFromEnvironment: RE.ReaderEither<
   storage: getAzureStorageConfigFromEnvironment,
 });
 
-const getJwtSigningApiConfigFromEnvironment: RE.ReaderEither<
+const getKeyOperationsApiConfigFromEnvironment: RE.ReaderEither<
   NodeJS.ProcessEnv,
   Error,
-  Omit<JwtSigningApiConfig, "httpRequestTimeout">
+  Omit<KeyOperationsApiConfig, "httpRequestTimeout">
 > = pipe(
-  readFromEnvironment("JwtSigningApiUrl"),
-  RE.chainEitherKW(parse(UrlFromString, "Invalid JWT signing API URL")),
+  readFromEnvironment("KeyOperationsApiBaseUrl"),
+  RE.chainEitherKW(parse(UrlFromString, "Invalid key operations API base URL")),
   RE.map((url) => ({ url })),
 );
 
@@ -867,7 +867,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       getHttpRequestConfigFromEnvironment,
       RE.map(({ timeout }) => timeout),
     ),
-    jwtSigningApi: getJwtSigningApiConfigFromEnvironment,
+    keyOperationsApi: getKeyOperationsApiConfigFromEnvironment,
     mail: getMailConfigFromEnvironment,
     pidIssuer: getPidIssuerConfigFromEnvironment,
     slack: getSlackConfigFromEnvironment,
@@ -879,7 +879,7 @@ export const getConfigFromEnvironment: RE.ReaderEither<
       attestationService,
       authProfile,
       httpRequestTimeout,
-      jwtSigningApi,
+      keyOperationsApi,
       ...remainingConfigs
     }) => ({
       ...remainingConfigs,
@@ -891,8 +891,8 @@ export const getConfigFromEnvironment: RE.ReaderEither<
         ...authProfile,
         httpRequestTimeout,
       },
-      jwtSigningApi: {
-        ...jwtSigningApi,
+      keyOperationsApi: {
+        ...keyOperationsApi,
         httpRequestTimeout,
       },
     }),

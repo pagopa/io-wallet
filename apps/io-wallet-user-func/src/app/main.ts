@@ -75,8 +75,8 @@ const config = configOrError;
 const credential = new DefaultAzureCredential();
 
 const keyClient = new KeyClient(
-  config.jwtSigningApi.url.href,
-  config.jwtSigningApi.httpRequestTimeout,
+  config.keyOperationsApi.url.href,
+  config.keyOperationsApi.httpRequestTimeout,
 );
 
 const cosmosClient = new CosmosClient({

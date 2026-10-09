@@ -79,3 +79,45 @@ resource "azurerm_api_management_api_operation_policy" "user_keys_sign_digest" {
     azapi_resource.apim_key_vault_signing_pool,
   ]
 }
+
+resource "azurerm_api_management_api_version_set" "user_keys_uat" {
+  name                = "wallet-user-keys-uat-apis"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "Wallet User UAT - Keys"
+  versioning_scheme   = "Segment"
+}
+
+resource "azurerm_api_management_api" "user_keys_uat_v1" {
+  name                  = "user-keys-uat-api-v1"
+  api_management_name   = module.apim.name
+  resource_group_name   = module.apim.resource_group_name
+  subscription_required = false
+
+  version_set_id = azurerm_api_management_api_version_set.user_keys_uat.id
+  version        = "v1"
+  revision       = 1
+
+  description  = "Provides cryptographic operations for keys in the application Key Vault pool"
+  display_name = "IT-Wallet User UAT - Keys v1"
+  path         = "api/wallet/keys/uat"
+  protocols    = ["https"]
+
+  import {
+    content_format = "openapi"
+    content_value  = file("${path.module}/apim/api/keys/swagger.yaml")
+  }
+}
+
+resource "azurerm_api_management_api_operation_policy" "user_keys_uat_sign_digest" {
+  api_name            = azurerm_api_management_api.user_keys_uat_v1.name
+  operation_id        = "sign-digest"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+
+  xml_content = file("${path.module}/apim/api/keys/sign_digest_policy.xml")
+
+  depends_on = [
+    azapi_resource.apim_key_vault_signing_pool,
+  ]
+}
