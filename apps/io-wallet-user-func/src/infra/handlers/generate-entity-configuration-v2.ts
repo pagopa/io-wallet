@@ -76,7 +76,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     signingKeyName,
     trustAnchorUrl,
   },
-  jwtSigningClient,
+  keyClient,
   keyRepository,
   trustMarkRepository,
 }) =>
@@ -136,7 +136,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                 },
                 keyName: signingKey.keyName,
                 payload,
-              })({ jwtSigningClient }),
+              })({ keyClient }),
           ),
         ),
       ),

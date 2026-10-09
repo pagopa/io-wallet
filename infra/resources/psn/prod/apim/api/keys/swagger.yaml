@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: IT-Wallet User - Signing v1
-  description: Sign digests using a key in the application Key Vault pool
+  title: IT-Wallet User - Keys v1
+  description: Provides cryptographic operations for keys in the application Key Vault pool
   version: v1
 paths:
   /{keyName}/signatures:

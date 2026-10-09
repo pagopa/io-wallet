@@ -3,13 +3,14 @@ import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
+import { createHash } from "node:crypto";
 
-import type { JwtSigner } from "@/infra/crypto/jwt-signing-client";
+import type { KeyOperations } from "@/infra/crypto/key-client";
 
 export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
 export interface SignJwtEnvironment {
-  jwtSigningClient: JwtSigner;
+  keyClient: KeyOperations;
 }
 
 interface JwtProtectedHeader extends SignJwtHeader {
@@ -31,6 +32,12 @@ interface SignJwtOptions {
   keyName: string;
   payload: unknown;
 }
+
+const hashAlgorithmBySignAlgorithm: Record<SignAlgorithm, string> = {
+  ES256: "sha256",
+  ES384: "sha384",
+  ES512: "sha512",
+};
 
 const createJwtSigningInput = ({
   duration,
@@ -86,11 +93,11 @@ export const signJwt =
     keyName,
     payload,
   }: SignJwtOptions): RTE.ReaderTaskEither<SignJwtEnvironment, Error, string> =>
-  ({ jwtSigningClient }) =>
+  ({ keyClient }) =>
     pipe(
       E.tryCatch(() => getSignAlgorithmFromCurve(crv), E.toError),
       TE.fromEither,
-      TE.chain((alg) =>
+      TE.chain((algorithm) =>
         pipe(
           E.tryCatch(
             () =>
@@ -98,7 +105,7 @@ export const signJwt =
                 duration,
                 header: {
                   ...header,
-                  alg,
+                  alg: algorithm,
                 },
                 payload,
               }),
@@ -108,11 +115,17 @@ export const signJwt =
           TE.chain((signingInput) =>
             TE.tryCatch(
               async () => {
-                const signature = await jwtSigningClient.sign(
+                const digest = createHash(
+                  hashAlgorithmBySignAlgorithm[algorithm],
+                )
+                  .update(signingInput, "utf8")
+                  .digest("base64url");
+                const signature = await keyClient.sign(
                   keyName,
-                  alg,
-                  signingInput,
+                  algorithm,
+                  digest,
                 );
+
                 return `${signingInput}.${signature}`;
               },
               (reason) => {

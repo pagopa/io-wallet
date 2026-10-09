@@ -16,13 +16,6 @@ resource "azurerm_api_management_backend" "key_vault_app" {
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
   url                 = "https://${each.value.key_vault_wallet.name}.vault.azure.net"
-
-  credentials {
-    authorization {
-      scheme    = "ManagedIdentity"
-      parameter = "https://vault.azure.net"
-    }
-  }
 }
 
 resource "azapi_resource" "apim_key_vault_signing_pool" {
@@ -45,42 +38,42 @@ resource "azapi_resource" "apim_key_vault_signing_pool" {
   }
 }
 
-resource "azurerm_api_management_api_version_set" "user_jwt_signing" {
-  name                = "wallet-user-jwt-signing-apis"
+resource "azurerm_api_management_api_version_set" "user_keys" {
+  name                = "wallet-user-keys-apis"
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
   display_name        = "Wallet User - Keys"
   versioning_scheme   = "Segment"
 }
 
-resource "azurerm_api_management_api" "user_jwt_signing_v1" {
-  name                  = "user-jwt-signing-api-v1"
+resource "azurerm_api_management_api" "user_keys_v1" {
+  name                  = "user-keys-api-v1"
   api_management_name   = module.apim.name
   resource_group_name   = module.apim.resource_group_name
   subscription_required = false
 
-  version_set_id = azurerm_api_management_api_version_set.user_jwt_signing.id
+  version_set_id = azurerm_api_management_api_version_set.user_keys.id
   version        = "v1"
   revision       = 1
 
-  description  = "Signs JWT digests using a key in the application Key Vault pool"
+  description  = "Provides cryptographic operations for keys in the application Key Vault pool"
   display_name = "IT-Wallet User - Keys v1"
   path         = "api/wallet/keys"
   protocols    = ["https"]
 
   import {
     content_format = "openapi"
-    content_value  = file("${path.module}/apim/api/key-vault-signing/swagger.yaml")
+    content_value  = file("${path.module}/apim/api/keys/swagger.yaml")
   }
 }
 
-resource "azurerm_api_management_api_operation_policy" "user_jwt_signing" {
-  api_name            = azurerm_api_management_api.user_jwt_signing_v1.name
+resource "azurerm_api_management_api_operation_policy" "user_keys_sign_digest" {
+  api_name            = azurerm_api_management_api.user_keys_v1.name
   operation_id        = "sign-digest"
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
 
-  xml_content = file("${path.module}/apim/api/key-vault-signing/sign_jwt_policy.xml")
+  xml_content = file("${path.module}/apim/api/keys/sign_digest_policy.xml")
 
   depends_on = [
     azapi_resource.apim_key_vault_signing_pool,

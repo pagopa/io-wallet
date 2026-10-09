@@ -54,7 +54,7 @@ const signWalletInstanceAttestation =
     Error,
     string
   > =>
-  ({ jwtSigningClient, walletInstanceAttestationSigningKeyName }) =>
+  ({ keyClient, walletInstanceAttestationSigningKeyName }) =>
     signJwt({
       crv,
       duration: 60 * 60,
@@ -65,7 +65,7 @@ const signWalletInstanceAttestation =
       },
       keyName: walletInstanceAttestationSigningKeyName,
       payload,
-    })({ jwtSigningClient });
+    })({ keyClient });
 
 const getWalletInstanceAttestationData =
   (input: {

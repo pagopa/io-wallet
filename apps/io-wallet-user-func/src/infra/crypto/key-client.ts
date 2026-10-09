@@ -1,16 +1,14 @@
-import { createHash } from "crypto";
-
 import type { SignAlgorithm } from "@/infra/crypto/signer";
 
-export interface JwtSigner {
+export interface KeyOperations {
   sign: (
     keyName: string,
     algorithm: SignAlgorithm,
-    signingInput: string,
+    digest: string,
   ) => Promise<string>;
 }
 
-export class JwtSigningClient implements JwtSigner {
+export class KeyClient implements KeyOperations {
   constructor(
     private readonly url: string,
     private readonly requestTimeout: number,
@@ -19,21 +17,12 @@ export class JwtSigningClient implements JwtSigner {
   sign = async (
     keyName: string,
     algorithm: SignAlgorithm,
-    signingInput: string,
+    digest: string,
   ): Promise<string> => {
-    const hashAlgorithm = {
-      ES256: "sha256",
-      ES384: "sha384",
-      ES512: "sha512",
-    }[algorithm];
-    const digest = createHash(hashAlgorithm)
-      .update(signingInput, "utf8")
-      .digest("base64url");
     const endpoint = new URL(
       `${encodeURIComponent(keyName)}/signatures`,
       `${this.url.replace(/\/+$/, "")}/`,
     );
-
     const response = await fetch(endpoint, {
       body: JSON.stringify({ alg: algorithm, value: digest }),
       headers: {
@@ -59,7 +48,9 @@ export class JwtSigningClient implements JwtSigner {
       typeof result.value !== "string" ||
       result.value.length === 0
     ) {
-      throw new Error("Signing response did not contain a signature");
+      throw new Error(
+        "Signing response did not contain a key ID and signature",
+      );
     }
 
     return result.value;

@@ -43,7 +43,7 @@ import { StatusListPublicationFunction } from "@/infra/azure/functions/status-li
 import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions/status-list-publication-dispatcher";
 import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
-import { JwtSigningClient } from "@/infra/crypto/jwt-signing-client";
+import { KeyClient } from "@/infra/crypto/key-client";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import {
@@ -74,7 +74,7 @@ const config = configOrError;
 
 const credential = new DefaultAzureCredential();
 
-const jwtSigningClient = new JwtSigningClient(
+const keyClient = new KeyClient(
   config.jwtSigningApi.url.href,
   config.jwtSigningApi.httpRequestTimeout,
 );
@@ -227,7 +227,7 @@ const statusListPublication = new StatusListPublicationService({
   emptyBitstring: Buffer.alloc(
     (config.statusList.pageCount * config.statusList.pageBitsSize) / 8,
   ),
-  jwtSigningClient,
+  keyClient,
   keyRepository,
   pages: statusListPagesRepository,
   tokenStatusListSigningKeyName:
@@ -303,7 +303,7 @@ app.timer("generateEntityConfiguration", {
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV1,
     inputDecoder: t.unknown,
-    jwtSigningClient,
+    keyClient,
     keyRepository: keyV1Repository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
@@ -319,7 +319,7 @@ app.timer("generateEntityConfigurationV2", {
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV2,
     inputDecoder: t.unknown,
-    jwtSigningClient,
+    keyClient,
     keyRepository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
@@ -398,7 +398,7 @@ app.http("createWalletAttestation", {
   handler: CreateWalletAttestationFunction({
     attestationService: mobileAttestationService,
     federationEntityId: config.entityConfigurationV1.federationEntityId,
-    jwtSigningClient,
+    keyClient,
     keyRepository: keyV1Repository,
     nonceRepository,
     walletAttestationConfig: config.walletProvider.walletAttestation,
@@ -424,7 +424,7 @@ app.http("createWalletInstanceAttestation", {
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
     federationEntityId: config.entityConfigurationV2.federationEntityId,
-    jwtSigningClient,
+    keyClient,
     keyRepository,
     nonceRepository,
     walletAttestationConfig: {
@@ -444,9 +444,9 @@ app.http("createKeyAttestation", {
     androidAttestationValidationConfig,
     assertionValidationConfig,
     federationEntityId: config.entityConfigurationV2.federationEntityId,
-    jwtSigningClient,
     keyAttestationSigningKeyName:
       config.walletProvider.keyAttestationSigningKeyName,
+    keyClient,
     keyRepository,
     nonceRepository,
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
