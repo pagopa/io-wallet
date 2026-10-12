@@ -16,6 +16,32 @@ resource "azurerm_api_management_backend" "key_vault_app" {
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
   url                 = "https://${each.value.key_vault_wallet.name}.vault.azure.net"
+
+  circuit_breaker_rule {
+    name                       = "key-vault-transient-failures"
+    trip_duration              = "PT30S"
+    accept_retry_after_enabled = true
+
+    failure_condition {
+      count             = 5
+      interval_duration = "PT30S"
+
+      status_code_range {
+        min = 408
+        max = 408
+      }
+
+      status_code_range {
+        min = 429
+        max = 429
+      }
+
+      status_code_range {
+        min = 500
+        max = 599
+      }
+    }
+  }
 }
 
 resource "azapi_resource" "apim_key_vault_pool" {
