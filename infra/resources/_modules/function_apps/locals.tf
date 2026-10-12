@@ -81,6 +81,7 @@ locals {
     local.function_apps.common_app_settings,
     local.function_app_user_envs_shared_app_settings,
     {
+      KeyVaultUrl                  = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
       StatusListStorageAccountName = var.storage_account_cdn_name
       StatusListBaseUrl = format(
         "https://wallet.io.pagopa.it/%s/",
@@ -151,6 +152,7 @@ locals {
     {
       EntityConfigurationStorageAccountName             = var.storage_account_cdn_name_uat
       EntityConfigurationV1StorageContainerName         = "entity-configuration-v1"
+      KeyVaultUrl                                       = format("https://%s.vault.azure.net/", var.key_vault_wallet_name)
       AndroidBundleIdentifiers                          = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
       EntityConfigurationV1FederationEntityId           = "https://foo11.blob.core.windows.net/foo/"
       EntityConfigurationV2FederationEntityId           = "https://iwuitntrustst01.blob.core.windows.net/wallet-provider"
