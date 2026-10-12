@@ -15,6 +15,11 @@ terraform {
       source  = "pagopa-dx/azure"
       version = "~> 0.12"
     }
+
+    azapi = {
+      source  = "azure/azapi"
+      version = "~> 2.13"
+    }
   }
 
   backend "azurerm" {

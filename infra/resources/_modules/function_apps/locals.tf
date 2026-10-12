@@ -96,6 +96,7 @@ locals {
       EntityConfigurationV2SigningKeyName                   = "intermediate-key-v2-prod"
       EntityConfigurationV2WalletSolutionJwksKeyNames       = "leaf-key-v2-prod"
       FederationEntityV2LogoUri                             = "https://wallet.io.pagopa.it/images/logo-pagopa.svg"
+      KeyOperationsApiBaseUrl                               = "https://apim.internal.wallet.io.pagopa.it/api/wallet/keys/v1"
       TokenStatusListSigningKeyName                         = "leaf-key-v2-prod"
       WalletAttestationSigningKeyName                       = "wa-key-v1-prod"
       WalletInstanceAttestationSigningKeyName               = "leaf-key-v2-prod"
@@ -161,6 +162,7 @@ locals {
       EntityConfigurationV2SigningKeyName               = "intermediate-key-pre"
       EntityConfigurationV2FederationEntityJwksKeyNames = "intermediate-key-pre"
       EntityConfigurationV2WalletSolutionJwksKeyNames   = "leaf-key-pre"
+      KeyOperationsApiBaseUrl                           = "https://apim.internal.wallet.io.pagopa.it/api/wallet/keys/uat/v1"
       FrontDoorEndpointName                             = var.front_door_endpoint_name_uat
       FrontDoorProfileName                              = var.front_door_profile_name_uat
       PidIssuerApiBaseURL                               = "https://pre.util.wallet.ipzs.it"

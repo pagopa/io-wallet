@@ -76,10 +76,10 @@ export class StatusListPublicationService implements StatusListPublication {
   protected readonly config: StatusListPublicationConfig;
   protected readonly containerClient: ContainerClient;
 
-  private readonly cryptographyClient: SignJwtEnvironment["cryptographyClient"];
   private readonly emptyBitstring: Buffer;
   private readonly keyRepository: KeyRepository;
   private readonly pages: StatusListPublicationPagesDataSource;
+  private readonly signJwtEnv: SignJwtEnvironment["signJwt"];
   private readonly tokenStatusListSigningKeyName: string;
 
   constructor({
@@ -87,17 +87,17 @@ export class StatusListPublicationService implements StatusListPublication {
     cdnManagementClient,
     config,
     containerClient,
-    cryptographyClient,
     emptyBitstring,
     keyRepository,
     pages,
+    signJwt: signJwtEnv,
     tokenStatusListSigningKeyName,
   }: StatusListPublicationServiceDependencies) {
     this.catalogs = catalogs;
     this.cdnManagementClient = cdnManagementClient;
     this.config = config;
     this.containerClient = containerClient;
-    this.cryptographyClient = cryptographyClient;
+    this.signJwtEnv = signJwtEnv;
     this.emptyBitstring = emptyBitstring;
     this.keyRepository = keyRepository;
     this.pages = pages;
@@ -318,13 +318,14 @@ export class StatusListPublicationService implements StatusListPublication {
             typ: statusListJwtType,
             x5c: signingKey.certificateChain,
           },
+          keyName: this.tokenStatusListSigningKeyName,
           payload: encodeTokenStatusListJwtPayload(
             createTokenStatusList({
               bitString,
               statusListCredentialUrl,
             }),
           ),
-        })({ cryptographyClient: this.cryptographyClient }),
+        })({ signJwt: this.signJwtEnv }),
       ),
     );
 

@@ -25,18 +25,20 @@ module "admins_roles" {
     }
   ]
 
-  key_vault = [
-    {
-      name                = var.key_vault_app.name
-      resource_group_name = var.key_vault_app.resource_group_name
-      has_rbac_support    = true
-      description         = "Allow admins to manage application-scoped KeyVault"
-      roles = {
-        secrets = "owner"
-        keys    = "owner"
+  key_vault = concat(
+    [
+      for key_vault in var.key_vault_apps : {
+        name                = key_vault.name
+        resource_group_name = key_vault.resource_group_name
+        has_rbac_support    = true
+        description         = "Allow admins to manage application-scoped KeyVault"
+        roles = {
+          secrets = "owner"
+          keys    = "owner"
+        }
       }
-    },
-    {
+    ],
+    [{
       name                = var.key_vault_certificates.name
       resource_group_name = var.key_vault_certificates.resource_group_name
       has_rbac_support    = true
@@ -46,8 +48,8 @@ module "admins_roles" {
         certificates = "owner",
         keys         = "owner"
       }
-    }
-  ]
+    }],
+  )
 
   storage_blob = [
     {

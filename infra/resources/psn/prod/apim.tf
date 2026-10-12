@@ -1,6 +1,6 @@
 data "azurerm_key_vault_secret" "wallet_email" {
   name         = "wallet-tech-team-email"
-  key_vault_id = module.key_vault_app.key_vault_wallet.id
+  key_vault_id = module.key_vault_app["01"].key_vault_wallet.id
 }
 
 resource "dx_available_subnet_cidr" "apim_apps" {
@@ -178,9 +178,9 @@ module "apim_roles" {
   subscription_id = data.azurerm_subscription.current.subscription_id
 
   key_vault = [{
-    name                = module.key_vault_app.key_vault_wallet.name
-    resource_group_name = module.key_vault_app.key_vault_wallet.resource_group_name
-    description         = "Allow ${module.apim.name} to read secrets on ${module.key_vault_app.key_vault_wallet.name}"
+    name                = module.key_vault_app["01"].key_vault_wallet.name
+    resource_group_name = module.key_vault_app["01"].key_vault_wallet.resource_group_name
+    description         = "Allow ${module.apim.name} to read secrets on ${module.key_vault_app["01"].key_vault_wallet.name}"
     has_rbac_support    = true
     roles = {
       secrets = "reader"

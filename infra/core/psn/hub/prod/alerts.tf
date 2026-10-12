@@ -32,6 +32,7 @@ resource "azurerm_monitor_metric_alert" "firewall" {
 }
 
 resource "azurerm_monitor_metric_alert" "appgw" {
+  provider = azurerm.hub
   for_each = local.appgw_alerts
 
   name                = "[${azurerm_application_gateway.hub.name}] ${each.value.display_name}"
