@@ -1,9 +1,9 @@
+import { createHash } from "crypto";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
-import { createHash } from "node:crypto";
 
 import type { KeyOperations } from "@/infra/crypto/key-operations-client";
 
@@ -33,7 +33,7 @@ interface SignJwtOptions {
   payload: unknown;
 }
 
-const hashAlgorithmBySignAlgorithm: Record<SignAlgorithm, string> = {
+const hashAlgorithmBySignAlgorithm = {
   ES256: "sha256",
   ES384: "sha384",
   ES512: "sha512",
@@ -120,7 +120,11 @@ export const signJwt =
                 )
                   .update(signingInput, "utf8")
                   .digest("base64url");
-                const signature = await signJwtEnv(keyName, algorithm, digest);
+                const signature = await signJwtEnv({
+                  algorithm,
+                  digest,
+                  keyName,
+                });
 
                 return `${signingInput}.${signature}`;
               },

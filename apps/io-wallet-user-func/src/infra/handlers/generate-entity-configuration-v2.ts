@@ -76,8 +76,8 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
     signingKeyName,
     trustAnchorUrl,
   },
-  signJwt: signJwtEnv,
   keyRepository,
+  signJwt: signJwtEnv,
   trustMarkRepository,
 }) =>
   pipe(

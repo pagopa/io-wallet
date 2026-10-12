@@ -1,11 +1,13 @@
 import type { SignAlgorithm } from "@/infra/crypto/signer";
 
 export interface KeyOperations {
-  sign: (
-    keyName: string,
-    algorithm: SignAlgorithm,
-    digest: string,
-  ) => Promise<string>;
+  sign: (request: KeySignatureRequest) => Promise<string>;
+}
+
+interface KeySignatureRequest {
+  algorithm: SignAlgorithm;
+  digest: string;
+  keyName: string;
 }
 
 export class KeyOperationsClient implements KeyOperations {
@@ -14,13 +16,13 @@ export class KeyOperationsClient implements KeyOperations {
     private readonly requestTimeout: number,
   ) {}
 
-  sign = async (
-    keyName: string,
-    algorithm: SignAlgorithm,
-    digest: string,
-  ): Promise<string> => {
+  sign = async ({
+    algorithm,
+    digest,
+    keyName,
+  }: KeySignatureRequest): Promise<string> => {
     const endpoint = new URL(
-      `${encodeURIComponent(keyName)}/signatures`,
+      `${keyName}/signatures`,
       `${this.url.replace(/\/+$/, "")}/`,
     );
     const response = await fetch(endpoint, {
