@@ -53,6 +53,16 @@ variable "key_vault_app" {
   description = "KeyVault Id and list of Entra groups who are administrator of Key Vaults"
 }
 
+variable "key_vault_apps" {
+  type = list(object({
+    id                  = string
+    name                = string
+    resource_group_name = string
+  }))
+
+  description = "Application Key Vaults administered by the wallet admin group"
+}
+
 variable "key_vault_certificates" {
   type = object({
     name                = string
