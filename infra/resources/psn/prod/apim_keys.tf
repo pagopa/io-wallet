@@ -73,7 +73,7 @@ resource "azurerm_api_management_api_operation_policy" "user_keys_sign_digest" {
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
 
-  xml_content = file("${path.module}/apim/api/keys/sign_digest_policy.xml")
+  xml_content = file("${path.module}/apim/policies/sign_digest_policy.xml")
 
   depends_on = [
     azapi_resource.apim_key_vault_signing_pool,
@@ -115,7 +115,7 @@ resource "azurerm_api_management_api_operation_policy" "user_keys_uat_sign_diges
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
 
-  xml_content = file("${path.module}/apim/api/keys/sign_digest_policy.xml")
+  xml_content = file("${path.module}/apim/policies/sign_digest_policy.xml")
 
   depends_on = [
     azapi_resource.apim_key_vault_signing_pool,
