@@ -20,7 +20,7 @@ resource "azurerm_api_management_backend" "key_vault_app" {
 
 resource "azapi_resource" "apim_key_vault_signing_pool" {
   type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
-  name      = "wallet-key-vault-signing-pool"
+  name      = "wallet-key-vault-pool"
   parent_id = module.apim.id
 
   body = {
