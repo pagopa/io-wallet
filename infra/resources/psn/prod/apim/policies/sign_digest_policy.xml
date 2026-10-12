@@ -10,7 +10,7 @@
   </inbound>
   <backend>
     <retry
-      condition="@(context.Response != null &amp;&amp; (context.Response.StatusCode == 408 || context.Response.StatusCode &gt;= 500))"
+      condition="@(context.Response != null &amp;&amp; context.Response.StatusCode == 429)"
       count="2"
       interval="1"
       max-interval="5"
