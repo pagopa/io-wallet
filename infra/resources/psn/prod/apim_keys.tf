@@ -11,21 +11,21 @@ resource "azurerm_api_management_backend" "key_vault_app" {
   for_each = module.key_vault_app
 
   name                = "wallet-key-vault-${each.key}"
-  description         = "Application Key Vault ${each.key} signing backend"
+  description         = "Application Key Vault ${each.key} backend"
   api_management_name = module.apim.name
   resource_group_name = module.apim.resource_group_name
   protocol            = "http"
   url                 = "https://${each.value.key_vault_wallet.name}.vault.azure.net"
 }
 
-resource "azapi_resource" "apim_key_vault_signing_pool" {
+resource "azapi_resource" "apim_key_vault_pool" {
   type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
   name      = "wallet-key-vault-pool"
   parent_id = module.apim.id
 
   body = {
     properties = {
-      description = "Round-robin pool of application Key Vault signing backends"
+      description = "Round-robin pool of application Key Vault backends"
       type        = "Pool"
       pool = {
         services = [
@@ -76,7 +76,7 @@ resource "azurerm_api_management_api_operation_policy" "user_keys_sign_digest" {
   xml_content = file("${path.module}/apim/policies/sign_digest_policy.xml")
 
   depends_on = [
-    azapi_resource.apim_key_vault_signing_pool,
+    azapi_resource.apim_key_vault_pool,
   ]
 }
 
@@ -118,6 +118,6 @@ resource "azurerm_api_management_api_operation_policy" "user_keys_uat_sign_diges
   xml_content = file("${path.module}/apim/policies/sign_digest_policy.xml")
 
   depends_on = [
-    azapi_resource.apim_key_vault_signing_pool,
+    azapi_resource.apim_key_vault_pool,
   ]
 }
