@@ -13,8 +13,7 @@ import * as t from "io-ts";
 import * as jose from "jose";
 import { describe, expect, it, vi } from "vitest";
 
-import type { SignJwtEnvironment } from "@/infra/crypto/signer";
-
+import { KeyOperations } from "@/infra/crypto/key-operations-client";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -44,9 +43,8 @@ const logger = {
   log: () => () => void 0,
 };
 
-const cryptographyClient: SignJwtEnvironment["cryptographyClient"] = {
-  signData: (algorithm) =>
-    Promise.resolve({ algorithm, result: new Uint8Array(64) }),
+const keyOperationsClient: KeyOperations = {
+  sign: () => Promise.resolve("AA"),
 };
 
 const url = flow(
@@ -292,7 +290,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -307,6 +304,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -329,7 +327,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -337,6 +334,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -363,7 +361,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -371,6 +368,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository: failingKeyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -394,7 +392,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -402,6 +399,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository: emptyKeyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -421,7 +419,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -429,6 +426,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -479,7 +477,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -487,6 +484,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository: p521KeyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -521,7 +519,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -536,6 +533,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -563,7 +561,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -578,6 +575,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -630,7 +628,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -638,6 +635,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -681,7 +679,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -696,6 +693,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -741,7 +739,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -756,6 +753,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -822,7 +820,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -837,6 +834,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -873,7 +871,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: {
         ...H.request("https://wallet-provider.example.org"),
@@ -888,6 +885,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -907,7 +905,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -915,6 +912,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -940,7 +938,6 @@ describe("CreateKeyAttestationHandler", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
       assertionValidationConfig,
-      cryptographyClient,
       federationEntityId,
       input: req,
       inputDecoder: H.HttpRequest,
@@ -948,6 +945,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
+      signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
       walletInstanceRepository,
     });

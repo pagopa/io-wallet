@@ -36,17 +36,6 @@ const WalletAttestations = t.type({
   ),
 });
 
-type WalletAttestations = t.TypeOf<typeof WalletAttestations>;
-
-const testWalletAttestations: WalletAttestations = {
-  wallet_attestations: [
-    {
-      format: "jwt",
-      wallet_attestation: "this_is_a_test_jwt_attestation",
-    },
-  ],
-};
-
 interface WalletAttestationConfig {
   walletLink: string;
   walletName: string;
@@ -58,6 +47,8 @@ interface WalletAttestationEnvironment extends SignJwtEnvironment {
   walletAttestationConfig: WalletAttestationConfig;
   walletAttestationSigningKeyName: string;
 }
+
+type WalletAttestations = t.TypeOf<typeof WalletAttestations>;
 
 const getWalletAttestationData =
   (
@@ -98,7 +89,7 @@ const signWalletAttestation =
     kid: string;
     payload: JWTPayload;
   }): RTE.ReaderTaskEither<WalletAttestationEnvironment, Error, string> =>
-  ({ cryptographyClient }) =>
+  ({ signJwt: signJwtEnv, walletAttestationSigningKeyName }) =>
     signJwt({
       crv,
       duration: 60 * 60,
@@ -106,8 +97,9 @@ const signWalletAttestation =
         kid,
         typ: "oauth-client-attestation+jwt",
       },
+      keyName: walletAttestationSigningKeyName,
       payload,
-    })({ cryptographyClient });
+    })({ signJwt: signJwtEnv });
 
 /**
  * Validates the wallet attestation request by performing the following steps:
@@ -150,10 +142,8 @@ const validateRequest: (input: {
 
 const generateWalletAttestations = ({
   assertion,
-  isTestUser,
 }: {
   assertion: WalletAttestationRequest;
-  isTestUser: boolean;
 }): RTE.ReaderTaskEither<
   WalletAttestationEnvironment,
   Error,
@@ -172,18 +162,14 @@ const generateWalletAttestations = ({
             kid: walletAttestationData.kid,
             payload: { ...payload },
           }),
-        RTE.map((jwt) =>
-          isTestUser
-            ? testWalletAttestations
-            : {
-                wallet_attestations: [
-                  {
-                    format: "jwt",
-                    wallet_attestation: jwt,
-                  },
-                ],
-              },
-        ),
+        RTE.map((jwt) => ({
+          wallet_attestations: [
+            {
+              format: "jwt",
+              wallet_attestation: jwt,
+            },
+          ],
+        })),
       ),
     ),
   );

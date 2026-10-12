@@ -2,7 +2,6 @@ import { CdnManagementClient } from "@azure/arm-cdn";
 import { CosmosClient } from "@azure/cosmos";
 import { app } from "@azure/functions";
 import { DefaultAzureCredential } from "@azure/identity";
-import { CryptographyClient } from "@azure/keyvault-keys";
 import { LogsQueryClient } from "@azure/monitor-query-logs";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { QueueServiceClient } from "@azure/storage-queue";
@@ -44,6 +43,7 @@ import { StatusListPublicationFunction } from "@/infra/azure/functions/status-li
 import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions/status-list-publication-dispatcher";
 import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
+import { KeyOperationsClient } from "@/infra/crypto/key-operations-client";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import {
@@ -74,34 +74,9 @@ const config = configOrError;
 
 const credential = new DefaultAzureCredential();
 
-const createCryptographyClient = (keyName: string) =>
-  new CryptographyClient(
-    `${config.azure.keyVault.url.replace(/\/$/, "")}/keys/${keyName}`,
-    credential,
-  );
-
-const entityConfigurationV1CryptographyClient = createCryptographyClient(
-  config.entityConfigurationV1.signingKeyName,
-);
-
-const entityConfigurationV2CryptographyClient = createCryptographyClient(
-  config.entityConfigurationV2.signingKeyName,
-);
-
-const keyAttestationCryptographyClient = createCryptographyClient(
-  config.walletProvider.keyAttestationSigningKeyName,
-);
-
-const tokenStatusListCryptographyClient = createCryptographyClient(
-  config.walletProvider.tokenStatusListSigningKeyName,
-);
-
-const walletAttestationCryptographyClient = createCryptographyClient(
-  config.walletProvider.walletAttestationSigningKeyName,
-);
-
-const walletInstanceAttestationCryptographyClient = createCryptographyClient(
-  config.walletProvider.walletInstanceAttestationSigningKeyName,
+const keyOperationsClient = new KeyOperationsClient(
+  config.keyOperationsApi.url.href,
+  config.keyOperationsApi.httpRequestTimeout,
 );
 
 const cosmosClient = new CosmosClient({
@@ -249,12 +224,12 @@ const statusListPublication = new StatusListPublicationService({
   cdnManagementClient,
   config: statusListPublicationConfig,
   containerClient: statusListContainerClient,
-  cryptographyClient: tokenStatusListCryptographyClient,
   emptyBitstring: Buffer.alloc(
     (config.statusList.pageCount * config.statusList.pageBitsSize) / 8,
   ),
   keyRepository,
   pages: statusListPagesRepository,
+  signJwt: keyOperationsClient.sign,
   tokenStatusListSigningKeyName:
     config.walletProvider.tokenStatusListSigningKeyName,
 });
@@ -325,13 +300,13 @@ app.timer("generateEntityConfiguration", {
   handler: GenerateEntityConfigurationV1Function({
     cdnManagementClient,
     containerClient: entityConfigurationV1ContainerClient,
-    cryptographyClient: entityConfigurationV1CryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV1,
     inputDecoder: t.unknown,
     keyRepository: keyV1Repository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
+    signJwt: keyOperationsClient.sign,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
@@ -341,13 +316,13 @@ app.timer("generateEntityConfigurationV2", {
   handler: GenerateEntityConfigurationV2Function({
     cdnManagementClient,
     containerClient: entityConfigurationV2ContainerClient,
-    cryptographyClient: entityConfigurationV2CryptographyClient,
     endpointName: config.azure.frontDoor.endpointName,
     entityConfigurationJwt: config.entityConfigurationV2,
     inputDecoder: t.unknown,
     keyRepository,
     profileName: config.azure.frontDoor.profileName,
     resourceGroupName: config.azure.generic.resourceGroupName,
+    signJwt: keyOperationsClient.sign,
     trustMarkRepository,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
@@ -422,10 +397,10 @@ app.http("createWalletAttestation", {
   authLevel: "function",
   handler: CreateWalletAttestationFunction({
     attestationService: mobileAttestationService,
-    cryptographyClient: walletAttestationCryptographyClient,
     federationEntityId: config.entityConfigurationV1.federationEntityId,
     keyRepository: keyV1Repository,
     nonceRepository,
+    signJwt: keyOperationsClient.sign,
     walletAttestationConfig: config.walletProvider.walletAttestation,
     walletAttestationSigningKeyName:
       config.walletProvider.walletAttestationSigningKeyName,
@@ -448,10 +423,10 @@ app.http("createWalletInstanceAttestation", {
   authLevel: "function",
   handler: CreateWalletInstanceAttestationFunction({
     assertionValidationConfig,
-    cryptographyClient: walletInstanceAttestationCryptographyClient,
     federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyRepository,
     nonceRepository,
+    signJwt: keyOperationsClient.sign,
     walletAttestationConfig: {
       oauthClientSub: config.walletProvider.walletAttestation.oauthClientSub,
     },
@@ -468,12 +443,12 @@ app.http("createKeyAttestation", {
   handler: CreateKeyAttestationFunction({
     androidAttestationValidationConfig,
     assertionValidationConfig,
-    cryptographyClient: keyAttestationCryptographyClient,
     federationEntityId: config.entityConfigurationV2.federationEntityId,
     keyAttestationSigningKeyName:
       config.walletProvider.keyAttestationSigningKeyName,
     keyRepository,
     nonceRepository,
+    signJwt: keyOperationsClient.sign,
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
   }),

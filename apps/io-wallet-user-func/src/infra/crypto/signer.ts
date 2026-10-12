@@ -1,14 +1,16 @@
-import { CryptographyClient } from "@azure/keyvault-keys";
+import { createHash } from "crypto";
 import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
 import * as jose from "jose";
 
+import type { KeyOperations } from "@/infra/crypto/key-operations-client";
+
 export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
 export interface SignJwtEnvironment {
-  cryptographyClient: Pick<CryptographyClient, "signData">;
+  signJwt: KeyOperations["sign"];
 }
 
 interface JwtProtectedHeader extends SignJwtHeader {
@@ -27,8 +29,15 @@ interface SignJwtOptions {
   crv: string;
   duration: number;
   header: SignJwtHeader;
+  keyName: string;
   payload: unknown;
 }
+
+const hashAlgorithmBySignAlgorithm = {
+  ES256: "sha256",
+  ES384: "sha384",
+  ES512: "sha512",
+};
 
 const createJwtSigningInput = ({
   duration,
@@ -81,13 +90,14 @@ export const signJwt =
     crv,
     duration,
     header,
+    keyName,
     payload,
   }: SignJwtOptions): RTE.ReaderTaskEither<SignJwtEnvironment, Error, string> =>
-  ({ cryptographyClient }) =>
+  ({ signJwt: signJwtEnv }) =>
     pipe(
       E.tryCatch(() => getSignAlgorithmFromCurve(crv), E.toError),
       TE.fromEither,
-      TE.chain((alg) =>
+      TE.chain((algorithm) =>
         pipe(
           E.tryCatch(
             () =>
@@ -95,7 +105,7 @@ export const signJwt =
                 duration,
                 header: {
                   ...header,
-                  alg,
+                  alg: algorithm,
                 },
                 payload,
               }),
@@ -105,20 +115,24 @@ export const signJwt =
           TE.chain((signingInput) =>
             TE.tryCatch(
               async () => {
-                const { result } = await cryptographyClient.signData(
-                  alg,
-                  Buffer.from(signingInput),
-                );
+                const digest = createHash(
+                  hashAlgorithmBySignAlgorithm[algorithm],
+                )
+                  .update(signingInput, "utf8")
+                  .digest("base64url");
+                const signature = await signJwtEnv({
+                  algorithm,
+                  digest,
+                  keyName,
+                });
 
-                return `${signingInput}.${jose.base64url.encode(result)}`;
+                return `${signingInput}.${signature}`;
               },
               (reason) => {
                 const message =
                   reason instanceof Error ? reason.message : String(reason);
 
-                return new Error(
-                  `Unable to sign JWT with Azure Key Vault: ${message}`,
-                );
+                return new Error(`Unable to sign JWT: ${message}`);
               },
             ),
           ),
