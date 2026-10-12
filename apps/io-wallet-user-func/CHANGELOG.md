@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.1.6
+
+### Patch Changes
+
+- 2fb89f8: JWT signing delegated to the configured signing API
+
 ## 5.1.5
 
 ### Patch Changes
