@@ -75,7 +75,6 @@ az keyvault show --name "io-d-itn-wallet-kv" --resource-group "io-d-itn-wallet-r
 az role assignment create --role "Key Vault Crypto Officer" --assignee PRINCIPAL_ID --scope KV_ID
 az role assignment create --role "Key Vault Certificates Officer" --assignee PRINCIPAL_ID --scope KV_ID
 az role assignment create --role "Key Vault Secrets Officer" --assignee PRINCIPAL_ID --scope KV_ID
-az role assignment create --role "Key Vault Crypto Officer" --assignee PRINCIPAL_ID --scope KV_ID
 ```
 
 
