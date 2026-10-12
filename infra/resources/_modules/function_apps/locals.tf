@@ -43,7 +43,7 @@ locals {
 
     IosBundleIdentifiers            = "it.pagopa.app.io,it.pagopa.app.io.poc.itwallet"
     IosTeamIdentifier               = "M2X5YQ4BJ7"
-    AndroidBundleIdentifiers        = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage"
+    AndroidBundleIdentifiers        = "it.pagopa.io.app,it.pagopa.app.io.poc.itwallet,UnknownPackage,it.pagopa.io.app.canary"
     AndroidCrlUrl                   = "https://android.googleapis.com/attestation/status"
     AndroidPlayIntegrityUrl         = "https://www.googleapis.com/auth/playintegrity"
     AndroidPlayStoreCertificateHash = "feT-Pqrgg__NiwcDAehlAtPx6tHdZqwUK618VEdVT4I"
