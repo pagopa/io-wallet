@@ -12,7 +12,6 @@ export interface AttestedKey {
 export interface KeyAttestationData {
   attestedKeys: readonly AttestedKey[];
   crv: string;
-  keyName: string;
   kid: string;
   platform: "android" | "ios";
   status: {

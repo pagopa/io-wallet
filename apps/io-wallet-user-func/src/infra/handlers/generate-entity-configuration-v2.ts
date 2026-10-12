@@ -134,7 +134,7 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
                   kid: signingKey.kid,
                   typ: "entity-statement+jwt",
                 },
-                keyName: signingKey.keyName,
+                keyName: signingKeyName,
                 payload,
               })({ signJwt: signJwtEnv }),
           ),
