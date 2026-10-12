@@ -98,14 +98,14 @@ resource "azurerm_api_management_api" "user_keys_uat_v1" {
   version        = "v1"
   revision       = 1
 
-  description  = "Provides cryptographic operations for keys in the application Key Vault pool"
+  description  = "Provides cryptographic operations for keys in the application Key Vault pool in UAT"
   display_name = "IT-Wallet User UAT - Keys v1"
   path         = "api/wallet/keys/uat"
   protocols    = ["https"]
 
   import {
     content_format = "openapi"
-    content_value  = file("${path.module}/apim/api/keys/swagger.yaml")
+    content_value  = file("${path.module}/apim/api/keys-uat/swagger.yaml")
   }
 }
 
