@@ -141,9 +141,9 @@ module "apim" {
   # Autoscale
   autoscale = {
     enabled                       = true
-    default_instances             = 4
-    minimum_instances             = 4
-    maximum_instances             = 8
+    default_instances             = 8
+    minimum_instances             = 8
+    maximum_instances             = 16
     scale_out_capacity_percentage = 40
     scale_out_time_window         = "PT3M"
     scale_out_value               = "2"
