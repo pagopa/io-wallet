@@ -30,8 +30,12 @@ interface KeyDocument {
 const certificateToBase64 = (certificate: Uint8Array) =>
   Buffer.from(certificate).toString("base64");
 
-const persistKey = async (database: Database, document: KeyDocument) => {
-  await database.container("keys").items.create(document);
+const persistKey = async (
+  database: Database,
+  containerName: string,
+  document: KeyDocument,
+) => {
+  await database.container(containerName).items.create(document);
 };
 
 const toPublicEcJwk = (key: KeyVaultKey) => {
@@ -69,6 +73,7 @@ const registerIntermediateKey = async (
   certificateClient: CertificateClient,
   keyClient: KeyClient,
   database: Database,
+  containerName: string,
   keyName: string,
   trustAnchorCertificate: string,
 ): Promise<KeyDocument> => {
@@ -89,7 +94,7 @@ const registerIntermediateKey = async (
     id: keyName,
     publicKey,
   };
-  await persistKey(database, document);
+  await persistKey(database, containerName, document);
   return document;
 };
 
@@ -221,13 +226,14 @@ const createLeafCertificate = async (
 
 export const createLeafKey = async (
   database: Database,
+  containerName: string,
   keyClient: KeyClient,
   cryptographyClient: (keyName: string) => CryptographyClient,
   issuerKeyName: string,
   leafKeyName: string,
 ): Promise<KeyDocument> => {
   const issuer = await database
-    .container("keys")
+    .container(containerName)
     .item(issuerKeyName, issuerKeyName)
     .read<KeyDocument>();
   if (issuer.resource === undefined) {
@@ -262,7 +268,7 @@ export const createLeafKey = async (
     id: leaf.name,
     publicKey: { ...publicKey, kid },
   };
-  await persistKey(database, document);
+  await persistKey(database, containerName, document);
   return document;
 };
 
@@ -270,6 +276,7 @@ export const completeIntermediate = async (
   certificateClient: CertificateClient,
   keyClient: KeyClient,
   database: Database,
+  containerName: string,
   keyName: string,
   certificate: Uint8Array,
   trustAnchorCertificate: string,
@@ -279,6 +286,7 @@ export const completeIntermediate = async (
     certificateClient,
     keyClient,
     database,
+    containerName,
     keyName,
     trustAnchorCertificate,
   );

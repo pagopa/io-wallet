@@ -36,6 +36,7 @@ const printUsage = () => {
     KEY_PROVISIONING_VAULT_NAME
     KEY_PROVISIONING_COSMOS_ENDPOINT
     KEY_PROVISIONING_DATABASE
+    KEY_PROVISIONING_CONTAINER
 
   key-provisioning complete-intermediate --name <name> --intermediate-certificate <base64-or-pem> --trust-anchor-certificate <base64-or-pem>
   key-provisioning create-leaf --issuer-key-name <name> --name <name>
@@ -71,8 +72,9 @@ const main = async () => {
   const vaultName = requiredEnv("KEY_PROVISIONING_VAULT_NAME");
   const cosmosEndpoint = requiredEnv("KEY_PROVISIONING_COSMOS_ENDPOINT");
   const databaseName = requiredEnv("KEY_PROVISIONING_DATABASE");
+  const containerName = requiredEnv("KEY_PROVISIONING_CONTAINER");
   process.stdout.write(
-    `Using vault-name=${vaultName} cosmos-endpoint=${cosmosEndpoint} database=${databaseName}\n`,
+    `Using vault-name=${vaultName} cosmos-endpoint=${cosmosEndpoint} database=${databaseName} container=${containerName}\n`,
   );
   const vault = `https://${vaultName}.vault.azure.net`;
   const credential = new DefaultAzureCredential();
@@ -94,6 +96,7 @@ const main = async () => {
       certificateClient,
       keyClient,
       database,
+      containerName,
       name,
       certificate,
       trustAnchor,
@@ -107,6 +110,7 @@ const main = async () => {
     const name = required(values, "name");
     const result = await createLeafKey(
       database,
+      containerName,
       keyClient,
       cryptographyClient,
       issuer,
