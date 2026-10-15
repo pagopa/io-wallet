@@ -59,4 +59,4 @@ pnpm key-provisioning create-leaf \
   --name <leaf-key-name>
 ```
 
-The CLI stores the leaf key document in the Cosmos DB `keys` container.
+The CLI reads and stores key documents in the Cosmos DB container specified by `KEY_PROVISIONING_CONTAINER`.
