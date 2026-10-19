@@ -33,20 +33,12 @@ module "admins_roles" {
         has_rbac_support    = true
         description         = "Allow admins to manage application-scoped KeyVault"
         roles = {
-          secrets = "owner"
-          keys    = "owner"
+          secrets      = "owner"
+          keys         = "owner"
+          certificates = "owner"
         }
       }
     ],
-    [{
-      name                = var.key_vault_app.name
-      resource_group_name = var.key_vault_app.resource_group_name
-      has_rbac_support    = true
-      description         = "Allow admins to manage certificates in the primary application KeyVault"
-      roles = {
-        certificates = "owner"
-      }
-    }],
     [{
       name                = var.key_vault_certificates.name
       resource_group_name = var.key_vault_certificates.resource_group_name
