@@ -151,8 +151,9 @@ const createLeafCertificate = async (
   );
   const subjectSpki = await webcrypto.subtle.exportKey("spki", subjectKey);
   const subjectName = issuer.subjectName;
-  const subjectDns = subjectName.getField("CN")[0];
-  const subjectUri = `https://${subjectDns}`;
+  const commonName = subjectName.getField("CN")[0];
+  const subjectUri = `https://${commonName}`;
+  const subjectDns = new URL(subjectUri).hostname;
   const nameConstraints = new asn1X509.NameConstraints({
     permittedSubtrees: new asn1X509.GeneralSubtrees([
       new asn1X509.GeneralSubtree({
