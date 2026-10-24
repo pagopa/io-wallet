@@ -110,14 +110,20 @@ export const verifyAssertion = async (
       tokenPayloadExternal = token;
 
       try {
-        responseValidated = validateIntegrityResponse(
+        const validationResult = validateIntegrityResponse(
           tokenPayloadExternal,
           bundleIdentifier,
           clientData,
           allowDevelopmentEnvironment,
           androidPlayStoreCertificateHash,
         );
-        break;
+        // validateIntegrityResponse returns a failed result instead of throwing,
+        // so it must be checked explicitly before accepting the verdict
+        if (validationResult.success) {
+          responseValidated = validationResult;
+          break;
+        }
+        errors.push(validationResult.reason);
       } catch (error) {
         /* If it fails I continue the for loop anyway to try other bundleIdentifiers.
          * The check is still done at the end on the value of responseValidated
