@@ -1,11 +1,14 @@
 import {
   AttestationApplicationId,
   NonStandardKeyDescription,
+  RootOfTrust,
 } from "@peculiar/asn1-android";
 import { AsnConvert } from "@peculiar/asn1-schema";
 import * as asn1js from "asn1js";
 import { createPublicKey, X509Certificate } from "crypto";
+import * as E from "fp-ts/Either";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
+import { JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 import * as pkijs from "pkijs";
 
@@ -16,6 +19,18 @@ import { CRL, validateIssuance, validateRevocation } from "@/certificates";
  * https://developer.android.com/privacy-and-security/security-key-attestation#key_attestation_ext_schema
  */
 const KEY_OID = "1.3.6.1.4.1.11129.2.1.17";
+
+/**
+ * Requirements on the app attest key (API 31+) which can attest the key.
+ * Its public key is pinned at the wallet instance registration, so that fresh key attestations
+ * sent along with the integrity assertions can be verified to come from the registered device.
+ */
+export interface AttestKeyRequirement {
+  /** The attest key pinned at registration: the attestation must have been signed by it. */
+  pinned?: JwkPublicKey;
+  /** Whether an attest key is required for devices running an allowed self-signed OS (GrapheneOS). */
+  requiredForSelfSigned?: boolean;
+}
 
 type AndroidAttestationValidationResult =
   | {
@@ -32,11 +47,33 @@ interface CertWithExtension {
 
 interface VerifyAttestationParams {
   attestationCrl: CRL;
+  attestKey?: AttestKeyRequirement;
   bundleIdentifiers: string[];
   challenge: string;
   googlePublicKeys: string[];
+  /**
+   * Hex encoded SHA-256 digests of the app signing certificates, enforced for a self-signed OS only,
+   * which is rejected when they are empty as its app integrity can't be verified otherwise.
+   */
+  signatureDigests?: string[];
+  /** Hex encoded verified boot keys of the allowed self-signed OS (GrapheneOS). */
+  trustedSelfSignedBootKeys?: ReadonlySet<string>;
   x509Chain: readonly X509Certificate[];
 }
+
+/**
+ * Verified boot state values.
+ * https://source.android.com/docs/security/features/keystore/attestation#verifiedbootstate-values
+ */
+const VERIFIED_BOOT_STATE_VERIFIED = 0;
+const VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
+
+/**
+ * Key origin and purpose values.
+ * https://source.android.com/docs/security/features/keystore/tags
+ */
+const KEY_ORIGIN_GENERATED = 0;
+const KEY_PURPOSE_ATTEST_KEY = 7;
 
 const NON_RKP_ROOT_SUBJECT = "serialnumber=f92009e853b6b045";
 
@@ -91,19 +128,33 @@ export const verifyAttestation = async (
     return revocationValidationResult;
   }
 
-  const certWithExtension = validateKeyAttestationExtension(x509Chain, KEY_OID);
-
-  const validateExtensionResult = await validateExtension(
-    certWithExtension,
-    params,
+  const { attestKey, leaf } = validateKeyAttestationExtension(
+    x509Chain,
+    KEY_OID,
   );
+
+  const validateExtensionResult = await validateExtension(leaf, params);
 
   if (!validateExtensionResult.success) {
     return validateExtensionResult;
   }
 
+  const validateAttestKeyResult = await validateAttestKey(
+    leaf,
+    attestKey,
+    validateExtensionResult.deviceDetails,
+    params,
+  );
+
+  if (!validateAttestKeyResult.success) {
+    return validateAttestKeyResult;
+  }
+
   const deviceDetails = {
     ...validateExtensionResult.deviceDetails,
+    ...(validateAttestKeyResult.attestKey && {
+      attestKey: validateAttestKeyResult.attestKey,
+    }),
     x509Chain: x509Chain.map((x509) => x509.toString()),
   };
 
@@ -115,36 +166,214 @@ export const verifyAttestation = async (
 };
 
 /**
- * Finds the nearest certificate to the root that contains the key attestation certificate extension.
- * Parse the attestation record that is closest to the root. This prevents an adversary from
- * attesting an attestation record of their choice with an otherwise trusted chain using the
- * following attack:
+ * Finds the certificates that contain the key attestation certificate extension.
+ * Only the leaf certificate and, when the key has been attested by an app attest key (API 31+),
+ * the attest key certificate which immediately follows it can contain the extension.
+ * Any other position is rejected. This prevents an adversary from attesting an attestation record
+ * of their choice with an otherwise trusted chain using the following attack:
  * 1) having the TEE attest a key under the adversary's control,
  * 2) using that key to sign a new leaf certificate with an attestation extension that has their chosen attestation record, then
  * 3) appending that certificate to the original certificate chain.
- *
- * If the provisioning information certificate extension was present, the key attestation certificate extension must be in the immediately subsequent certificate.
- * Use the parser to extract the key attestation certificate extension data from that certificate.
+ * The attest key is also required to have only the ATTEST_KEY purpose, which the secure hardware
+ * enforces by using it only to sign attestations, see {@link validateAttestKey}.
  * @param x509Chain - The chain of X509Certificate certificates
  * @param keyOid - The OID of the key attestation extension
- * @returns The certificate with the key attestation extension
- * @throws {Error} If no key attestation extension is found
+ * @returns The leaf certificate with the key attestation extension and the attest key one, if any
+ * @throws {Error} If no key attestation extension is found or it is in an unexpected position
  */
 function validateKeyAttestationExtension(
   x509Chain: readonly X509Certificate[],
   keyOid: string,
-): CertWithExtension {
-  for (let i = x509Chain.length - 1; i >= 0; i--) {
-    const extension = extractExtension(x509Chain[i], keyOid);
-    if (extension) {
+): { attestKey?: CertWithExtension; leaf: CertWithExtension } {
+  const certificatesWithExtension = x509Chain.map((certificate) => {
+    const extension = extractExtension(certificate, keyOid);
+    return extension ? { certificate, extension } : undefined;
+  });
+  const [leaf, attestKey, ...others] = certificatesWithExtension;
+  if (!leaf) {
+    throw new Error("No key attestation extension found");
+  }
+  if (others.some((certificate) => certificate !== undefined)) {
+    throw new Error("Unexpected key attestation extension in the chain");
+  }
+  return { attestKey, leaf };
+}
+
+/**
+ * Parses the key attestation extension of a certificate.
+ * @param certWithExtension - The certificate containing the key attestation extension
+ * @returns The parsed key description
+ */
+const parseKeyDescription = (certWithExtension: CertWithExtension) =>
+  AsnConvert.parse(
+    certWithExtension.extension.extnValue.getValue(),
+    NonStandardKeyDescription,
+  );
+
+/**
+ * Parses the attestation application id of a key description.
+ * @param keyDescription - The parsed key description
+ * @returns The package names and the hex encoded signature digests
+ */
+const parseApplicationId = (keyDescription: NonStandardKeyDescription) => {
+  const encoded = keyDescription.softwareEnforced.findProperty(
+    "attestationApplicationId",
+  );
+  if (!encoded) {
+    return undefined;
+  }
+  const applicationId = AsnConvert.parse(
+    Buffer.from(encoded.buffer),
+    AttestationApplicationId,
+  );
+  return {
+    packageNames: applicationId.packageInfos.map((packageInfo) =>
+      Buffer.from(packageInfo.packageName as unknown as ArrayBuffer).toString(
+        "utf-8",
+      ),
+    ),
+    // An empty SET OF is decoded as undefined
+    signatureDigests: (applicationId.signatureDigests ?? []).map((digest) =>
+      Buffer.from(digest as unknown as ArrayBuffer).toString("hex"),
+    ),
+  };
+};
+
+/**
+ * Checks that the attest key is consistent with the key it attested.
+ * @param leafDescription - The key description of the attested key
+ * @param attestKeyDescription - The key description of the attest key
+ * @returns The reason of the inconsistency, undefined if consistent
+ */
+const checkAttestKeyConsistency = (
+  leafDescription: NonStandardKeyDescription,
+  attestKeyDescription: NonStandardKeyDescription,
+): string | undefined => {
+  const purposes = attestKeyDescription.teeEnforced.findProperty("purpose");
+  if (purposes?.length !== 1 || purposes[0] !== KEY_PURPOSE_ATTEST_KEY) {
+    return "Attest key has invalid purposes.";
+  }
+  if (
+    attestKeyDescription.teeEnforced.findProperty("origin") !==
+    KEY_ORIGIN_GENERATED
+  ) {
+    return "Attest key has not been generated by the device.";
+  }
+  if (
+    attestKeyDescription.attestationSecurityLevel !==
+      leafDescription.attestationSecurityLevel ||
+    attestKeyDescription.keymasterSecurityLevel !==
+      leafDescription.keymasterSecurityLevel
+  ) {
+    return "Attest key security level does not match.";
+  }
+  const leafRootOfTrust =
+    leafDescription.teeEnforced.findProperty("rootOfTrust");
+  const attestKeyRootOfTrust =
+    attestKeyDescription.teeEnforced.findProperty("rootOfTrust");
+  if (
+    !leafRootOfTrust ||
+    !attestKeyRootOfTrust ||
+    attestKeyRootOfTrust.deviceLocked !== leafRootOfTrust.deviceLocked ||
+    attestKeyRootOfTrust.verifiedBootState !==
+      leafRootOfTrust.verifiedBootState ||
+    !Buffer.from(attestKeyRootOfTrust.verifiedBootKey.buffer).equals(
+      Buffer.from(leafRootOfTrust.verifiedBootKey.buffer),
+    )
+  ) {
+    return "Attest key root of trust does not match.";
+  }
+  if (
+    JSON.stringify(parseApplicationId(attestKeyDescription)) !==
+    JSON.stringify(parseApplicationId(leafDescription))
+  ) {
+    return "Attest key application does not match.";
+  }
+  return undefined;
+};
+
+/**
+ * Validates the app attest key which signed the attested key, as done by the GrapheneOS Auditor app:
+ * it must be a generated key which can only be used to attest other keys, with the same security level,
+ * root of trust and app of the attested key. When the attest key has been pinned at registration, the
+ * attestation must have been signed by it, otherwise it must have been generated with the same challenge.
+ * An attest key is required for devices running an allowed self-signed OS when configured.
+ * https://github.com/GrapheneOS/Auditor
+ * @param leaf - The certificate of the attested key
+ * @param attestKey - The certificate of the attest key, if any
+ * @param deviceDetails - The device details of the attested key
+ * @param params - The verify attestation parameters
+ * @returns The validation result with the attest key public key, if any
+ */
+const validateAttestKey = async (
+  leaf: CertWithExtension,
+  attestKey: CertWithExtension | undefined,
+  deviceDetails: AndroidDeviceDetails,
+  params: VerifyAttestationParams,
+): Promise<
+  | { attestKey?: JwkPublicKey; success: true }
+  | { reason: string; success: false }
+> => {
+  const requirement = params.attestKey ?? {};
+  if (!attestKey) {
+    if (requirement.pinned) {
       return {
-        certificate: x509Chain[i],
-        extension,
+        reason: "The key has not been attested by the registered attest key.",
+        success: false,
       };
     }
+    if (
+      requirement.requiredForSelfSigned &&
+      deviceDetails.verifiedBootState === VERIFIED_BOOT_STATE_SELF_SIGNED
+    ) {
+      return {
+        reason: "An attest key is required for a self-signed OS.",
+        success: false,
+      };
+    }
+    return { success: true };
   }
-  throw new Error("No key attestation extension found");
-}
+
+  const leafDescription = parseKeyDescription(leaf);
+  const attestKeyDescription = parseKeyDescription(attestKey);
+  const inconsistency = checkAttestKeyConsistency(
+    leafDescription,
+    attestKeyDescription,
+  );
+  if (inconsistency) {
+    return { reason: inconsistency, success: false };
+  }
+
+  const attestKeyJwk = JwkPublicKey.decode(
+    await jose.exportJWK(attestKey.certificate.publicKey),
+  );
+  if (E.isLeft(attestKeyJwk)) {
+    return { reason: "Invalid attest key.", success: false };
+  }
+  if (requirement.pinned) {
+    const [pinnedThumbprint, attestKeyThumbprint] = await Promise.all([
+      jose.calculateJwkThumbprint(requirement.pinned),
+      jose.calculateJwkThumbprint(attestKeyJwk.right),
+    ]);
+    if (pinnedThumbprint !== attestKeyThumbprint) {
+      return {
+        reason: "The key has not been attested by the registered attest key.",
+        success: false,
+      };
+    }
+  } else if (
+    Buffer.from(attestKeyDescription.attestationChallenge.buffer).toString(
+      "utf-8",
+    ) !== params.challenge
+  ) {
+    return {
+      reason: "The attest key challenge does not match.",
+      success: false,
+    };
+  }
+
+  return { attestKey: attestKeyJwk.right, success: true };
+};
 
 /**
  * Extracts a specific extension from an X509 certificate by OID.
@@ -156,6 +385,67 @@ const extractExtension = (certificate: X509Certificate, oid: string) => {
   const asn1 = asn1js.fromBER(certificate.raw);
   const parsedCertificate = new pkijs.Certificate({ schema: asn1.result });
   return parsedCertificate.extensions?.find((e) => e.extnID === oid);
+};
+
+/**
+ * Checks the app signing certificate and the verified boot state.
+ *
+ * The verified boot state represents the level of protection provided to the user and to apps after
+ * the device finishes booting. It takes on exactly one of the following values:
+ * 0) Verified
+ * 1) SelfSigned
+ * 2) Unverified
+ * 3) Failed
+ *
+ * Following the GrapheneOS attestation compatibility guide, a self-signed OS is accepted when its
+ * verified boot key is one of the official GrapheneOS ones, while no patch level is enforced.
+ * The app signing certificate is the only app integrity proof for a self-signed OS, as the
+ * Play Integrity app recognition verdict is not available, thus it is required in that case.
+ * https://grapheneos.org/articles/attestation-compatibility-guide
+ * @param attestationApplicationId - The attestation application id
+ * @param rootOfTrust - The root of trust
+ * @param attestationParams - The verify attestation parameters
+ * @returns The reason of the failure, undefined if the checks pass
+ */
+const checkAppSigningAndBootState = (
+  attestationApplicationId: AttestationApplicationId,
+  rootOfTrust: RootOfTrust,
+  attestationParams: VerifyAttestationParams,
+): string | undefined => {
+  const allowedSignatureDigests = new Set(
+    (attestationParams.signatureDigests ?? []).map((digest) =>
+      digest.toLowerCase(),
+    ),
+  );
+  const signatureDigests = (
+    attestationApplicationId.signatureDigests ?? []
+  ).map((digest) =>
+    Buffer.from(digest as unknown as ArrayBuffer).toString("hex"),
+  );
+
+  if (rootOfTrust.verifiedBootState === VERIFIED_BOOT_STATE_SELF_SIGNED) {
+    const verifiedBootKey = Buffer.from(
+      rootOfTrust.verifiedBootKey.buffer,
+    ).toString("hex");
+    // For the stock OS the app integrity is verified with Play Integrity, so the digests
+    // are only enforced for a self-signed OS to avoid affecting the existing builds
+    if (allowedSignatureDigests.size === 0) {
+      return "App signing certificate digests are required to accept a self-signed OS.";
+    }
+    if (
+      !signatureDigests.some((digest) => allowedSignatureDigests.has(digest))
+    ) {
+      return "The app signing certificate does not match the expected ones.";
+    }
+    if (!attestationParams.trustedSelfSignedBootKeys?.has(verifiedBootKey)) {
+      return `VerifiedBootKey of the self-signed OS is not allowed: ${verifiedBootKey}`;
+    }
+    return undefined;
+  }
+  if (rootOfTrust.verifiedBootState !== VERIFIED_BOOT_STATE_VERIFIED) {
+    return `VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`;
+  }
+  return undefined;
 };
 
 /**
@@ -205,6 +495,9 @@ const validateExtension = async (
         return {
           ...detailObj,
           deviceLocked: rootOfTrust.deviceLocked,
+          verifiedBootKey: Buffer.from(
+            rootOfTrust.verifiedBootKey.buffer,
+          ).toString("hex"),
           verifiedBootState: rootOfTrust.verifiedBootState,
         };
       }
@@ -323,22 +616,13 @@ const validateExtension = async (
     };
   }
 
-  /*
-   * This data structure provides the device's current boot state,
-   * which represents the level of protection provided to the user and to
-   * apps after the device finishes booting.
-   *
-   * This data structure is an enumeration, so it takes on exactly one of the following values:
-   * 0) Verified
-   * 1) SelfSigned
-   * 2) Unverified
-   * 3) Failed
-   */
-  if (rootOfTrust.verifiedBootState !== 0) {
-    return {
-      reason: `VerifiedBootState is not verified: ${rootOfTrust.verifiedBootState}`,
-      success: false,
-    };
+  const appAndBootStateError = checkAppSigningAndBootState(
+    attestationApplicationId,
+    rootOfTrust,
+    attestationParams,
+  );
+  if (appAndBootStateError) {
+    return { reason: appAndBootStateError, success: false };
   }
 
   const hardwareKey = await jose.exportJWK(

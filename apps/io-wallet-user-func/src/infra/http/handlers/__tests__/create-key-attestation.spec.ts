@@ -66,18 +66,25 @@ const walletInstanceStatus = {
 const assertionValidationConfig: AssertionValidationConfig = {
   allowedDeveloperUsers: ["a"],
   androidBundleIdentifiers: [],
+  androidCrlUrl: "",
   androidPlayIntegrityUrl: "",
   androidPlayStoreCertificateHash: "",
+  androidSigningCertificateDigests: [],
   googleAppCredentialsEncoded: "",
+  googlePublicKeys: [""],
+  httpRequestTimeout: 1,
   iosBundleIdentifiers: [],
   iOsTeamIdentifier: "",
+  trustedSelfSignedBootKeys: () => new Set(),
 };
 
 const androidAttestationValidationConfig: AndroidAttestationValidationConfig = {
   androidBundleIdentifiers: ["a"],
   androidCrlUrl: "",
+  androidSigningCertificateDigests: [],
   googlePublicKeys: [""],
   httpRequestTimeout: 1,
+  trustedSelfSignedBootKeys: () => new Set(),
 };
 
 const keyAttestationKeyName = "key-attestation-key-name";

@@ -79,6 +79,7 @@ export const AttestationServiceConfiguration = t.type({
   androidCrlUrl: t.string,
   androidPlayIntegrityUrl: t.string,
   androidPlayStoreCertificateHash: t.string,
+  androidSigningCertificateDigests: t.array(t.string),
   appleRootCertificate: t.string,
   googleAppCredentialsEncoded: t.string,
   googlePublicKeys: t.array(t.string),
@@ -510,6 +511,20 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     ),
     androidPlayStoreCertificateHash: readFromEnvironment(
       "AndroidPlayStoreCertificateHash",
+    ),
+    // Hex encoded SHA-256 digests of the app signing certificates, comma separated.
+    // They are checked against the key attestation and required to accept devices running GrapheneOS.
+    androidSigningCertificateDigests: pipe(
+      readFromEnvironment("AndroidSigningCertificateDigests"),
+      RE.map((digests) =>
+        digests
+          .split(",")
+          .map((digest) => digest.trim().replace(/:/g, "").toLowerCase())
+          .filter((digest) => digest.length > 0),
+      ),
+      RE.orElse(
+        (): RE.ReaderEither<NodeJS.ProcessEnv, Error, string[]> => RE.right([]),
+      ),
     ),
     appleRootCertificate: pipe(
       readFromEnvironment("AppleRootCertificate"),

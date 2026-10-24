@@ -9,7 +9,10 @@ import * as RTE from "fp-ts/ReaderTaskEither";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import { PathReporter } from "io-ts/PathReporter";
-import { AndroidDeviceDetails } from "io-wallet-common/device-details";
+import {
+  AndroidDeviceDetails,
+  DeviceDetails,
+} from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
@@ -21,12 +24,14 @@ import {
 } from "@/attestation-service";
 
 import {
+  AndroidKeyAttestationConfig,
   parseAndroidAttestation,
   parseGoogleAppCredentials,
   validateAndroidAssertion,
   validateAndroidAttestation,
 } from "./android";
 import { ExternalServiceError } from "./android/assertion";
+import { GRAPHENEOS_ALLOWLIST_SNAPSHOT } from "./android/grapheneos-allowlist";
 import { toClientData, toThumbprint } from "./client-data";
 import {
   parseIosAssertion,
@@ -67,9 +72,19 @@ const decodeBase64ToBuffer = (value: NonEmptyString): E.Either<Error, Buffer> =>
 
 export class MobileAttestationService implements AttestationService {
   #configuration: AttestationServiceConfiguration;
+  #trustedSelfSignedBootKeys: () => ReadonlySet<string>;
 
-  constructor(cnf: AttestationServiceConfiguration) {
+  /**
+   * @param cnf - The attestation service configuration
+   * @param trustedSelfSignedBootKeys - Getter of the allowed GrapheneOS verified boot keys
+   */
+  constructor(
+    cnf: AttestationServiceConfiguration,
+    trustedSelfSignedBootKeys: () => ReadonlySet<string> = () =>
+      new Set(GRAPHENEOS_ALLOWLIST_SNAPSHOT.verifiedBootKeys),
+  ) {
     this.#configuration = cnf;
+    this.#trustedSelfSignedBootKeys = trustedSelfSignedBootKeys;
   }
 
   allowDevelopmentEnvironmentForUser = (user: FiscalCode) =>
@@ -92,7 +107,9 @@ export class MobileAttestationService implements AttestationService {
     );
 
   validateAssertion = ({
+    deviceDetails,
     hardwareKey,
+    hardwareKeyAttestation,
     hardwareSignature,
     integrityAssertion,
     jwk,
@@ -104,10 +121,12 @@ export class MobileAttestationService implements AttestationService {
       toSingleKeyClientData(nonce, jwk),
       TE.chainW((clientData) =>
         pipe(
-          parseIosAssertion({
-            hardwareSignature,
-            integrityAssertion,
-          }),
+          integrityAssertion
+            ? parseIosAssertion({
+                hardwareSignature,
+                integrityAssertion,
+              })
+            : E.left(new Error("Missing iOS integrity assertion")),
           TE.fromEither,
           TE.chainW((decodedAssertion) =>
             validateiOSAssertion(
@@ -126,17 +145,24 @@ export class MobileAttestationService implements AttestationService {
               ),
               TE.fromEither,
               TE.chain((googleAppCredentials) =>
-                validateAndroidAssertion(
-                  integrityAssertion,
-                  hardwareSignature,
+                validateAndroidAssertion({
+                  allowDevelopmentEnvironment:
+                    this.allowDevelopmentEnvironmentForUser(user),
+                  androidPlayIntegrityUrl:
+                    this.#configuration.androidPlayIntegrityUrl,
+                  androidPlayStoreCertificateHash:
+                    this.#configuration.androidPlayStoreCertificateHash,
+                  bundleIdentifiers:
+                    this.#configuration.androidBundleIdentifiers,
                   clientData,
-                  hardwareKey,
-                  this.#configuration.androidBundleIdentifiers,
-                  this.#configuration.androidPlayStoreCertificateHash,
+                  deviceDetails,
                   googleAppCredentials,
-                  this.#configuration.androidPlayIntegrityUrl,
-                  this.allowDevelopmentEnvironmentForUser(user),
-                ),
+                  hardwareKey,
+                  hardwareKeyAttestation,
+                  hardwareSignature,
+                  integrityAssertion,
+                  keyAttestationConfig: this.#keyAttestationConfig(),
+                }),
               ),
               TE.orElseW((androidErr) =>
                 androidErr instanceof ExternalServiceError
@@ -184,11 +210,11 @@ export class MobileAttestationService implements AttestationService {
               TE.fromEither,
               TE.chainW((x509Chain) =>
                 validateAndroidAttestation({
-                  androidCrlUrl: this.#configuration.androidCrlUrl,
+                  ...this.#keyAttestationConfig(),
+                  // The attest key is pinned at registration and required for a self-signed OS
+                  attestKey: { requiredForSelfSigned: true },
                   bundleIdentifiers:
                     this.#configuration.androidBundleIdentifiers,
-                  googlePublicKeys: this.#configuration.googlePublicKeys,
-                  httpRequestTimeout: this.#configuration.httpRequestTimeout,
                   nonce,
                   x509Chain,
                 }),
@@ -204,6 +230,14 @@ export class MobileAttestationService implements AttestationService {
         ),
       ),
     );
+
+  #keyAttestationConfig = (): AndroidKeyAttestationConfig => ({
+    androidCrlUrl: this.#configuration.androidCrlUrl,
+    googlePublicKeys: this.#configuration.googlePublicKeys,
+    httpRequestTimeout: this.#configuration.httpRequestTimeout,
+    signatureDigests: this.#configuration.androidSigningCertificateDigests,
+    trustedSelfSignedBootKeys: this.#trustedSelfSignedBootKeys(),
+  });
 }
 
 export { ValidatedAttestation };
@@ -217,49 +251,79 @@ const allowDevelopmentEnvironmentForUser: (
 export interface AndroidAttestationValidationConfig {
   androidBundleIdentifiers: string[];
   androidCrlUrl: string;
+  androidSigningCertificateDigests: string[];
   googlePublicKeys: string[];
   httpRequestTimeout: number;
+  /** Getter of the allowed GrapheneOS verified boot keys. */
+  trustedSelfSignedBootKeys: () => ReadonlySet<string>;
 }
 
 export interface AssertionValidationConfig {
   allowedDeveloperUsers: string[];
   androidBundleIdentifiers: string[];
+  androidCrlUrl: string;
   androidPlayIntegrityUrl: string;
   androidPlayStoreCertificateHash: string;
+  androidSigningCertificateDigests: string[];
   googleAppCredentialsEncoded: string;
+  googlePublicKeys: string[];
+  httpRequestTimeout: number;
   iosBundleIdentifiers: string[];
   iOsTeamIdentifier: string;
+  /** Getter of the allowed GrapheneOS verified boot keys. */
+  trustedSelfSignedBootKeys: () => ReadonlySet<string>;
 }
 
 export const verifyAndroidAssertion: (input: {
   clientData: string;
+  deviceDetails?: DeviceDetails;
   hardwareKey: JwkPublicKey;
+  hardwareKeyAttestation?: NonEmptyString;
   hardwareSignature: NonEmptyString;
-  integrityAssertion: NonEmptyString;
+  integrityAssertion?: NonEmptyString;
   user: FiscalCode;
 }) => RTE.ReaderTaskEither<
   { assertionValidationConfig: AssertionValidationConfig },
   ExternalServiceError | IntegrityCheckError,
   void
 > =
-  ({ clientData, hardwareKey, hardwareSignature, integrityAssertion, user }) =>
+  ({
+    clientData,
+    deviceDetails,
+    hardwareKey,
+    hardwareKeyAttestation,
+    hardwareSignature,
+    integrityAssertion,
+    user,
+  }) =>
   ({ assertionValidationConfig: config }) =>
     pipe(
       config.googleAppCredentialsEncoded,
       parseGoogleAppCredentials,
       TE.fromEither,
       TE.chain((googleAppCredentials) =>
-        validateAndroidAssertion(
-          integrityAssertion,
-          hardwareSignature,
+        validateAndroidAssertion({
+          allowDevelopmentEnvironment:
+            allowDevelopmentEnvironmentForUser(user)(config),
+          androidPlayIntegrityUrl: config.androidPlayIntegrityUrl,
+          androidPlayStoreCertificateHash:
+            config.androidPlayStoreCertificateHash,
+          bundleIdentifiers: config.androidBundleIdentifiers,
           clientData,
-          hardwareKey,
-          config.androidBundleIdentifiers,
-          config.androidPlayStoreCertificateHash,
+          deviceDetails,
           googleAppCredentials,
-          config.androidPlayIntegrityUrl,
-          allowDevelopmentEnvironmentForUser(user)(config),
-        ),
+          hardwareKey,
+          hardwareKeyAttestation,
+          hardwareSignature,
+          integrityAssertion,
+          keyAttestationConfig: {
+            androidCrlUrl: config.androidCrlUrl,
+            googlePublicKeys: config.googlePublicKeys,
+            httpRequestTimeout: config.httpRequestTimeout,
+            signatureDigests: config.androidSigningCertificateDigests,
+            trustedSelfSignedBootKeys: config.trustedSelfSignedBootKeys(),
+          },
+        }),
       ),
       TE.mapLeft((androidErr) =>
         androidErr instanceof ExternalServiceError
@@ -272,7 +336,7 @@ export const verifyIosAssertion: (input: {
   clientData: string;
   hardwareKey: JwkPublicKey;
   hardwareSignature: NonEmptyString;
-  integrityAssertion: NonEmptyString;
+  integrityAssertion?: NonEmptyString;
   signCount: number;
 }) => RTE.ReaderTaskEither<
   { assertionValidationConfig: AssertionValidationConfig },
@@ -288,10 +352,12 @@ export const verifyIosAssertion: (input: {
   }) =>
   ({ assertionValidationConfig: config }) =>
     pipe(
-      parseIosAssertion({
-        hardwareSignature,
-        integrityAssertion,
-      }),
+      integrityAssertion
+        ? parseIosAssertion({
+            hardwareSignature,
+            integrityAssertion,
+          })
+        : E.left(new Error("Missing iOS integrity assertion")),
       TE.fromEither,
       TE.chainW((decodedAssertion) =>
         validateiOSAssertion(
@@ -328,6 +394,8 @@ export const verifyAndroidAttestation: (
           googlePublicKeys: config.googlePublicKeys,
           httpRequestTimeout: config.httpRequestTimeout,
           nonce,
+          signatureDigests: config.androidSigningCertificateDigests,
+          trustedSelfSignedBootKeys: config.trustedSelfSignedBootKeys(),
           x509Chain,
         }),
       ),

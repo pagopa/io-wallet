@@ -1,6 +1,7 @@
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
 import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
+import { DeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
@@ -29,9 +30,12 @@ interface BaseAssertion {
   cnf: {
     jwk: JwkPublicKey;
   };
+  /** ANDROID ONLY: the fresh key attestation, the fallback when Play Integrity is not available or fails. */
+  hardwareKeyAttestation?: NonEmptyString;
   hardwareKeyTag: NonEmptyString;
   hardwareSignature: NonEmptyString;
-  integrityAssertion: NonEmptyString;
+  /** Required on iOS, on Android it is the Play Integrity token which may be missing. */
+  integrityAssertion?: NonEmptyString;
   nonce: NonEmptyString;
   platform: "android" | "ios";
 }
@@ -39,6 +43,7 @@ interface BaseAssertion {
 const validateHardwareAssertion = (input: {
   assertion: BaseAssertion;
   clientData: string;
+  deviceDetails?: DeviceDetails;
   hardwareKey: JwkPublicKey;
   signCount: number;
   user: FiscalCode;
@@ -57,7 +62,9 @@ const validateHardwareAssertion = (input: {
       })
     : verifyAndroidAssertion({
         clientData: input.clientData,
+        deviceDetails: input.deviceDetails,
         hardwareKey: input.hardwareKey,
+        hardwareKeyAttestation: input.assertion.hardwareKeyAttestation,
         hardwareSignature: input.assertion.hardwareSignature,
         integrityAssertion: input.assertion.integrityAssertion,
         user: input.user,
@@ -68,11 +75,12 @@ const validateWalletInstanceAssertion: (
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
+  deviceDetails?: DeviceDetails,
 ) => RTE.ReaderTaskEither<
   { assertionValidationConfig: AssertionValidationConfig },
   Error,
   void
-> = (assertion, hardwareKey, signCount, user) =>
+> = (assertion, hardwareKey, signCount, user, deviceDetails) =>
   pipe(
     assertion.cnf.jwk,
     toThumbprint,
@@ -89,6 +97,7 @@ const validateWalletInstanceAssertion: (
           validateHardwareAssertion({
             assertion,
             clientData,
+            deviceDetails,
             hardwareKey,
             signCount,
             user,
@@ -103,11 +112,12 @@ const validateKeyAttestationAssertion: (
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
+  deviceDetails?: DeviceDetails,
 ) => RTE.ReaderTaskEither<
   { assertionValidationConfig: AssertionValidationConfig },
   Error,
   void
-> = (assertion, hardwareKey, signCount, user) =>
+> = (assertion, hardwareKey, signCount, user, deviceDetails) =>
   pipe(
     {
       challenge: assertion.nonce,
@@ -119,6 +129,7 @@ const validateKeyAttestationAssertion: (
       validateHardwareAssertion({
         assertion,
         clientData,
+        deviceDetails,
         hardwareKey,
         signCount,
         user,
@@ -160,7 +171,7 @@ export const validateWalletInstanceAssertionRequest: (input: {
       nonce: assertion.nonce,
       userId,
     }),
-    RTE.chainW(({ hardwareKey, signCount }) =>
+    RTE.chainW(({ deviceDetails, hardwareKey, signCount }) =>
       isLoadTestUser(userId)
         ? RTE.right(undefined)
         : validateWalletInstanceAssertion(
@@ -168,6 +179,7 @@ export const validateWalletInstanceAssertionRequest: (input: {
             hardwareKey,
             signCount,
             userId,
+            deviceDetails,
           ),
     ),
   );
@@ -189,7 +201,7 @@ export const validateKeyAttestationAssertionAndGetWalletInstance: (input: {
       nonce: assertion.nonce,
       userId,
     }),
-    RTE.chainFirstW(({ hardwareKey, signCount }) =>
+    RTE.chainFirstW(({ deviceDetails, hardwareKey, signCount }) =>
       isLoadTestUser(userId)
         ? RTE.right(undefined)
         : validateKeyAttestationAssertion(
@@ -197,6 +209,7 @@ export const validateKeyAttestationAssertionAndGetWalletInstance: (input: {
             hardwareKey,
             signCount,
             userId,
+            deviceDetails,
           ),
     ),
   );

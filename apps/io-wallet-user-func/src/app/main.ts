@@ -11,6 +11,8 @@ import * as E from "fp-ts/Either";
 import { identity, pipe } from "fp-ts/function";
 import * as t from "io-ts";
 import { SlackNotificationService } from "io-wallet-common/infra/slack/notification";
+import * as os from "os";
+import * as path from "path";
 
 import { getCrlFromUrl } from "@/certificates";
 import { AzureMonitorLogsStatusListAllocationConflictRepository } from "@/infra/azure/applicationinsights/status-list-allocation-conflict";
@@ -51,6 +53,7 @@ import {
   AssertionValidationConfig,
   MobileAttestationService,
 } from "@/infra/mobile-attestation-service";
+import { GrapheneOsAllowlist } from "@/infra/mobile-attestation-service/android/grapheneos-allowlist";
 import { PidIssuerClient } from "@/infra/pid-issuer/client";
 import { StatusListAllocatorService } from "@/infra/status-list-allocator";
 import { createStatusListBitRevocation } from "@/infra/status-list-bit-revocation";
@@ -126,27 +129,45 @@ const pidIssuerClient = new PidIssuerClient(
   config.entityConfigurationV1.federationEntityId.href,
 );
 
+// Official GrapheneOS verified boot keys, downloaded from https://grapheneos.org/attestation.json
+// and accepted only when signed by the pinned GrapheneOS key
+const grapheneOsAllowlist = new GrapheneOsAllowlist({
+  cacheFile: path.join(os.tmpdir(), "grapheneos-attestation-keys.json"),
+});
+grapheneOsAllowlist.startAutoRefresh();
+const trustedSelfSignedBootKeys = () => grapheneOsAllowlist.getKeys();
+
 const mobileAttestationService = new MobileAttestationService(
   config.attestationService,
+  trustedSelfSignedBootKeys,
 );
 
 const assertionValidationConfig: AssertionValidationConfig = {
   allowedDeveloperUsers: config.attestationService.allowedDeveloperUsers,
   androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
+  androidCrlUrl: config.attestationService.androidCrlUrl,
   androidPlayIntegrityUrl: config.attestationService.androidPlayIntegrityUrl,
   androidPlayStoreCertificateHash:
     config.attestationService.androidPlayStoreCertificateHash,
+  androidSigningCertificateDigests:
+    config.attestationService.androidSigningCertificateDigests,
   googleAppCredentialsEncoded:
     config.attestationService.googleAppCredentialsEncoded,
+  googlePublicKeys: config.attestationService.googlePublicKeys,
+  httpRequestTimeout: config.attestationService.httpRequestTimeout,
   iosBundleIdentifiers: config.attestationService.iosBundleIdentifiers,
   iOsTeamIdentifier: config.attestationService.iOsTeamIdentifier,
+  trustedSelfSignedBootKeys,
 };
 
 const androidAttestationValidationConfig: AndroidAttestationValidationConfig = {
   androidBundleIdentifiers: config.attestationService.androidBundleIdentifiers,
   androidCrlUrl: config.attestationService.androidCrlUrl,
+  androidSigningCertificateDigests:
+    config.attestationService.androidSigningCertificateDigests,
   googlePublicKeys: config.attestationService.googlePublicKeys,
   httpRequestTimeout: config.attestationService.httpRequestTimeout,
+  trustedSelfSignedBootKeys,
 };
 
 const emailNotificationService = new EmailNotificationServiceClient({

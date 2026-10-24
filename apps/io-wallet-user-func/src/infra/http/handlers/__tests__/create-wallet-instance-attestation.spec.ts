@@ -75,11 +75,16 @@ const keyRepository: KeyRepository = {
 const assertionValidationConfig: AssertionValidationConfig = {
   allowedDeveloperUsers: ["a"],
   androidBundleIdentifiers: [],
+  androidCrlUrl: "",
   androidPlayIntegrityUrl: "",
   androidPlayStoreCertificateHash: "",
+  androidSigningCertificateDigests: [],
   googleAppCredentialsEncoded: "",
+  googlePublicKeys: [""],
+  httpRequestTimeout: 1,
   iosBundleIdentifiers: [],
   iOsTeamIdentifier: "",
+  trustedSelfSignedBootKeys: () => new Set(),
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
