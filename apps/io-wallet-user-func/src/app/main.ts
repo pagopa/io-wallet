@@ -25,6 +25,8 @@ import { CosmosDbStatusListRoutingRepository } from "@/infra/azure/cosmos/status
 import { CosmosDbTrustMarkRepository } from "@/infra/azure/cosmos/trust-mark";
 import { CosmosDbWalletInstanceRepository } from "@/infra/azure/cosmos/wallet-instance";
 import { CosmosDbWhitelistedFiscalCodeRepository } from "@/infra/azure/cosmos/whitelisted-fiscal-code";
+import { CreateEntityConfigurationV1Function } from "@/infra/azure/functions/create-entity-configuration-v1";
+import { CreateEntityConfigurationV2Function } from "@/infra/azure/functions/create-entity-configuration-v2";
 import { CreateKeyAttestationFunction } from "@/infra/azure/functions/create-key-attestation";
 import { CreateWalletAttestationFunction } from "@/infra/azure/functions/create-wallet-attestation";
 import { CreateWalletInstanceFunction } from "@/infra/azure/functions/create-wallet-instance";
@@ -332,6 +334,22 @@ app.timer("generateEntityConfiguration", {
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
 });
 
+app.http("createEntityConfigurationV1", {
+  authLevel: "function",
+  handler: CreateEntityConfigurationV1Function({
+    cdnManagementClient,
+    containerClient: entityConfigurationV1ContainerClient,
+    endpointName: config.azure.frontDoor.endpointName,
+    entityConfigurationJwt: config.entityConfigurationV1,
+    keyRepository: keyV1Repository,
+    profileName: config.azure.frontDoor.profileName,
+    resourceGroupName: config.azure.generic.resourceGroupName,
+    signJwt: keyOperationsClient.sign,
+  }),
+  methods: ["POST"],
+  route: "entity-configuration-v1",
+});
+
 // V2 version
 app.timer("generateEntityConfigurationV2", {
   handler: GenerateEntityConfigurationV2Function({
@@ -347,6 +365,23 @@ app.timer("generateEntityConfigurationV2", {
     trustMarkRepository,
   }),
   schedule: "0 0 */12 * * *", // the function returns a jwt that is valid for 24 hours, so the trigger is set every 12 hours
+});
+
+app.http("createEntityConfigurationV2", {
+  authLevel: "function",
+  handler: CreateEntityConfigurationV2Function({
+    cdnManagementClient,
+    containerClient: entityConfigurationV2ContainerClient,
+    endpointName: config.azure.frontDoor.endpointName,
+    entityConfigurationJwt: config.entityConfigurationV2,
+    keyRepository,
+    profileName: config.azure.frontDoor.profileName,
+    resourceGroupName: config.azure.generic.resourceGroupName,
+    signJwt: keyOperationsClient.sign,
+    trustMarkRepository,
+  }),
+  methods: ["POST"],
+  route: "entity-configuration-v2",
 });
 
 app.http("getWalletInstanceStatus", {
