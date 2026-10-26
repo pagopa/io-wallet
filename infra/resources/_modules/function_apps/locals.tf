@@ -51,8 +51,13 @@ locals {
     GooglePublicKeys                = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUFyN2JIZ2l1eHB3SHNLN1F1aTh4VQpGbU9yNzVndk1zZC9kVEVEREpkU1N4dGY2QW43eHlxcFJSOTBQTDJhYnhNMWRFcWxYbmYydHF3MU5lNFh3bDVqCmxSZmRuSkxtTjBwVHkvNGxqNC83dHYwU2szaWlLa3lwbkVVdFI2V2ZNZ0gwUVpmS0hNMStkaSt5OVRGUnR2NnkKLy8wcmIrVCtXOGE5bnNOTC9nZ2puYXI4NjQ2MXFPMHJPczJjWGpwM2tPRzFGRUo1TVZtRm1CR3RucktwYTczWApwWHlUcVJ4Qi9NMG4xbi9XOW5HcUM0RlNZYTA0VDZONVJJWkdCTjJ6Mk1UNUlLR2JGbGJDOFVyVzBEeFc3QVlJCm1RUWNIdEdsL20wMFFMVld1dEhRb1ZKWW5GUGxYVGNIWXZBU0x1K1JoaHNiRG14TWdKSjBtY0RwdnNDNFBqdkIKK1R4eXdFbGdTNzB2RTBYbUxEK09KdHZzQnNsSFp2UEJLQ09kVDBNUyt0Z1NPSWZnYSt6MVoxZzcrRFZhZ2Y3cQp1dm1hZzhqZlBpb3lLdnhuSy9FZ3NUVVZpMmdoenE4d20yN3VkL21JTTdBWTJxRU9SUjhHbzNUVkI0SHpXUWdwClpydDNpNU1JbENhWTUwNEx6U1JpaWdIQ3pBUGxId3MrVzByQjVOK2VyNS8ycEpLbmZCU0RpQ2lGQVZ0Q0xPWjcKZ0xpTW0wamhPMkI2dFVYSEkvK01SUGp5MDJpNTlsSU5NUlJldjU2R0t0Y2Q5cU8vMGtVSldkWlRkQTJYb1M4MgppeFB2WnRYUXBVcHVMMTJhYis5RWFESzhaNFJISllZZkNUM1E1dk5BWGFpV1ErOFBUV20yUWdCUi9ia3dTV2MrCk5wVUZnTlBOOVB2UWk4V0VnNVVtQUdNQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==,LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUVJOW9qY1U3ZlBsc0ZDanh5NklScXpnZU9vSzBiK1lzVgo5RlBReXdpeXc4RVFSVGtKOXUzcXdmbkk0REdvU0xsQnFDbFRYSmZnZkNjWnZzNjBGaWtOTUhudTRma1J6T2JmCmdEa1UyS05YZXpUOS9SUStYdk5zbHhQSHJIQ293aEdyCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
     HardwarePublicTestKey           = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFMDFtMHhmNXVqUTVnMjJGdloyemJGcnZ5THg5YgpnTjJBaUxWRnRjYTJCVUh0a2dwV3Y5WUpDRElzNmxQS3hWU3NFb25QVXZPTTJVcmNNUGdwMDRZZU9nPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
 
-    # Hex encoded AndroidPlayStoreCertificateHash, required to accept devices running GrapheneOS
-    AndroidSigningCertificateDigests = "7de4fe3eaae083ffcd8b070301e86502d3f1ead1dd66ac142bad7c5447554f82"
+    # Hex encoded SHA-256 digests of the trusted app signing certificates, comma separated. They are required
+    # to accept devices running GrapheneOS and any hardware key attestation sent as integrity assertion proof.
+    # Only the official public releases distributed on Google Play Store and GitHub are authorized for now:
+    # - it.pagopa.io.app (same certificate of AndroidPlayStoreCertificateHash)
+    # - it.pagopa.io.app.canary
+    # The other packages listed in AndroidBundleIdentifiers (e.g. the POC builds) are not authorized yet.
+    AndroidSigningCertificateDigests = "7de4fe3eaae083ffcd8b070301e86502d3f1ead1dd66ac142bad7c5447554f82,681fba07171e4a0b09ddde905e74fd559a8f401ec371c7cd76af16090cf8e18f"
 
     WalletInstanceCreationEmailQueueName                 = var.wallet_instance_creation_email_queue_name
     WalletInstanceRevocationEmailQueueName               = var.wallet_instance_revocation_email_queue_name
