@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.0
+
+### Minor Changes
+
+- 9d4f589: Added createEntityConfigurationV1 and createEntityConfigurationV2 functions
+
 ## 5.1.6
 
 ### Patch Changes
