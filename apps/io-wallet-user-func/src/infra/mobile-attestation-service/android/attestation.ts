@@ -52,8 +52,15 @@ interface VerifyAttestationParams {
   challenge: string;
   googlePublicKeys: string[];
   /**
-   * Hex encoded SHA-256 digests of the app signing certificates, enforced for a self-signed OS only,
-   * which is rejected when they are empty as its app integrity can't be verified otherwise.
+   * Whether the app signing certificate digests are enforced for any verified boot state.
+   * It is required for the fresh key attestations accepted as integrity assertion proofs, as they
+   * replace the Play Integrity app recognition verdict.
+   */
+  requireSignatureDigests?: boolean;
+  /**
+   * Hex encoded SHA-256 digests of the app signing certificates. At registration they are enforced
+   * for a self-signed OS only, which is rejected when they are empty as its app integrity can't be
+   * verified otherwise. See also {@link VerifyAttestationParams.requireSignatureDigests}.
    */
   signatureDigests?: string[];
   /** Hex encoded verified boot keys of the allowed self-signed OS (GrapheneOS). */
@@ -423,20 +430,26 @@ const checkAppSigningAndBootState = (
     Buffer.from(digest as unknown as ArrayBuffer).toString("hex"),
   );
 
-  if (rootOfTrust.verifiedBootState === VERIFIED_BOOT_STATE_SELF_SIGNED) {
-    const verifiedBootKey = Buffer.from(
-      rootOfTrust.verifiedBootKey.buffer,
-    ).toString("hex");
-    // For the stock OS the app integrity is verified with Play Integrity, so the digests
-    // are only enforced for a self-signed OS to avoid affecting the existing builds
+  const isSelfSigned =
+    rootOfTrust.verifiedBootState === VERIFIED_BOOT_STATE_SELF_SIGNED;
+  // At registration the app integrity of the stock OS is later verified with Play Integrity, so the
+  // digests are only enforced for a self-signed OS to avoid affecting the existing builds. They are
+  // always enforced for the attestations accepted as assertion proofs instead of Play Integrity.
+  if (isSelfSigned || attestationParams.requireSignatureDigests) {
     if (allowedSignatureDigests.size === 0) {
-      return "App signing certificate digests are required to accept a self-signed OS.";
+      return "App signing certificate digests are required to accept a hardware key attestation.";
     }
     if (
       !signatureDigests.some((digest) => allowedSignatureDigests.has(digest))
     ) {
       return "The app signing certificate does not match the expected ones.";
     }
+  }
+
+  if (isSelfSigned) {
+    const verifiedBootKey = Buffer.from(
+      rootOfTrust.verifiedBootKey.buffer,
+    ).toString("hex");
     if (!attestationParams.trustedSelfSignedBootKeys?.has(verifiedBootKey)) {
       return `VerifiedBootKey of the self-signed OS is not allowed: ${verifiedBootKey}`;
     }

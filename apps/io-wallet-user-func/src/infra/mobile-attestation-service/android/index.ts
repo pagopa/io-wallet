@@ -54,6 +54,7 @@ export const validateAndroidAttestation = ({
   googlePublicKeys,
   httpRequestTimeout,
   nonce,
+  requireSignatureDigests,
   signatureDigests,
   trustedSelfSignedBootKeys,
   x509Chain,
@@ -64,6 +65,7 @@ export const validateAndroidAttestation = ({
   googlePublicKeys: string[];
   httpRequestTimeout: number;
   nonce: NonEmptyString;
+  requireSignatureDigests?: boolean;
   signatureDigests?: string[];
   trustedSelfSignedBootKeys?: ReadonlySet<string>;
   x509Chain: readonly X509Certificate[];
@@ -79,6 +81,7 @@ export const validateAndroidAttestation = ({
             bundleIdentifiers,
             challenge: nonce,
             googlePublicKeys,
+            requireSignatureDigests,
             signatureDigests,
             trustedSelfSignedBootKeys,
             x509Chain,
@@ -164,11 +167,14 @@ const validatePlayIntegrityAssertion = ({
 
 /**
  * Validates the fresh key attestation sent along with the assertion:
+ * - the wallet instance must have been registered with an attest key: without it the attestation can't be
+ *   bound to the registered device, so Play Integrity remains mandatory;
  * - the client data must be signed by the registered hardware key;
  * - the attestation must satisfy the same policy of the registration, with the SHA-256 hex digest
- *   of the client data as challenge;
- * - it must have been signed by the attest key pinned at registration, if any, which proves it comes from
- *   the registered device (a self-signed OS always requires it);
+ *   of the client data as challenge, and its app signing certificate must be one of the trusted ones
+ *   for any verified boot state, as it replaces the Play Integrity app recognition verdict;
+ * - it must have been signed by the attest key pinned at registration, which proves it comes from
+ *   the registered device;
  * - the verified boot state and key must match the ones of the registration.
  * @param params - The assertion parameters
  * @returns A TaskEither which is right when the key attestation is valid
@@ -181,6 +187,14 @@ const validateKeyAttestationAssertion = (
     params.deviceDetails?.platform === "android"
       ? params.deviceDetails
       : undefined;
+  if (!registered?.attestKey) {
+    return TE.left(
+      new AndroidAssertionError(
+        "No attest key registered with the wallet instance, the hardware key attestation can't be accepted",
+      ),
+    );
+  }
+  const pinned = registered.attestKey;
   return pipe(
     TE.tryCatch(
       () =>
@@ -205,20 +219,17 @@ const validateKeyAttestationAssertion = (
     TE.chainW((x509Chain) =>
       validateAndroidAttestation({
         ...params.keyAttestationConfig,
-        attestKey: {
-          pinned: registered?.attestKey,
-          requiredForSelfSigned: true,
-        },
+        attestKey: { pinned },
         bundleIdentifiers: params.bundleIdentifiers,
         nonce: createHash("sha256")
           .update(params.clientData)
           .digest("hex") as NonEmptyString,
+        requireSignatureDigests: true,
         x509Chain,
       }),
     ),
     TE.chainW(({ deviceDetails }) =>
       deviceDetails.platform === "android" &&
-      registered !== undefined &&
       deviceDetails.verifiedBootState === registered.verifiedBootState &&
       (registered.verifiedBootKey === undefined ||
         deviceDetails.verifiedBootKey === registered.verifiedBootKey)

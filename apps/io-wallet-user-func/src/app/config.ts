@@ -512,8 +512,9 @@ const getAttestationServiceConfigFromEnvironment: RE.ReaderEither<
     androidPlayStoreCertificateHash: readFromEnvironment(
       "AndroidPlayStoreCertificateHash",
     ),
-    // Hex encoded SHA-256 digests of the app signing certificates, comma separated.
-    // They are checked against the key attestation and required to accept devices running GrapheneOS.
+    // Hex encoded SHA-256 digests of the trusted app signing certificates, comma separated.
+    // They are required to accept devices running GrapheneOS and any hardware key attestation sent as
+    // integrity assertion proof: when empty, Play Integrity is the only accepted assertion proof.
     androidSigningCertificateDigests: pipe(
       readFromEnvironment("AndroidSigningCertificateDigests"),
       RE.map((digests) =>

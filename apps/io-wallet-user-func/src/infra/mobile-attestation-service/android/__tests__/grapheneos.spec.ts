@@ -25,6 +25,7 @@ vi.mock("@/certificates", async (importOriginal) => ({
 }));
 
 const trustedSelfSignedBootKeys = new Set([GRAPHENEOS_BOOT_KEY]);
+const STOCK_BOOT_KEY = "ab".repeat(32);
 
 describe("GrapheneOS key attestation", () => {
   let root: TestRoot;
@@ -168,9 +169,34 @@ describe("Android assertion with key attestation fallback", () => {
 
   /**
    * Registers a device and prepares an assertion with a fresh key attestation.
+   * @param options.appSignatureDigest - The signing certificate digest of the app, e.g. of a re-signed app
+   * @param options.freshAttestKey - The attest key of the fresh attestation
+   * @param options.os - The OS of the device
+   * @param options.registeredAttestKey - Whether the device has been registered with an attest key
    */
-  const setup = async (freshAttestKey: "new" | "registered" = "registered") => {
-    const registration = await createAttestation(root, grapheneOsParams());
+  const setup = async ({
+    appSignatureDigest = SIGNATURE_DIGEST,
+    freshAttestKey = "registered",
+    os = "grapheneos",
+    registeredAttestKey = true,
+  }: {
+    appSignatureDigest?: string;
+    freshAttestKey?: "new" | "none" | "registered";
+    os?: "grapheneos" | "stock";
+    registeredAttestKey?: boolean;
+  } = {}) => {
+    const deviceParams = {
+      signatureDigests: [appSignatureDigest],
+      ...(os === "stock" && {
+        verifiedBootKey: STOCK_BOOT_KEY,
+        verifiedBootState: 0,
+      }),
+    };
+    const registration = await createAttestation(
+      root,
+      grapheneOsParams(deviceParams),
+      registeredAttestKey ? {} : { attestKey: null },
+    );
     const verified = await verifyAttestation({
       attestationCrl: { entries: {} },
       attestKey: { requiredForSelfSigned: true },
@@ -186,10 +212,14 @@ describe("Android assertion with key attestation fallback", () => {
     }
     const fresh = await createAttestation(
       root,
-      grapheneOsParams({ challenge: requestHash }),
+      grapheneOsParams({ ...deviceParams, challenge: requestHash }),
       {
         attestKey:
-          freshAttestKey === "registered" ? registration.attestKey : undefined,
+          freshAttestKey === "registered"
+            ? (registration.attestKey ?? null)
+            : freshAttestKey === "none"
+              ? null
+              : undefined,
       },
     );
     const hardwareSignature = createSign("SHA256")
@@ -223,7 +253,9 @@ describe("Android assertion with key attestation fallback", () => {
   });
 
   it("should reject a fresh key attestation relayed from another device", async () => {
-    const result = await validateAndroidAssertion(await setup("new"))();
+    const result = await validateAndroidAssertion(
+      await setup({ freshAttestKey: "new" }),
+    )();
     expect(E.isLeft(result) && result.left.message).toContain(
       "The key has not been attested by the registered attest key",
     );
@@ -248,6 +280,72 @@ describe("Android assertion with key attestation fallback", () => {
     })();
     expect(E.isLeft(result) && result.left.message).toContain(
       "Play Integrity token not provided",
+    );
+  });
+
+  it("should accept a stock device registered with an attest key", async () => {
+    const result = await validateAndroidAssertion(
+      await setup({ os: "stock" }),
+    )();
+    expect(result).toEqual(E.right(undefined));
+  });
+
+  it.each([
+    ["the stock OS", "stock"],
+    ["GrapheneOS", "grapheneos"],
+  ] as const)(
+    "should require Play Integrity for %s without a registered attest key",
+    async (_, os) => {
+      // The registered device details are tampered to test the check, as GrapheneOS can't be registered without attest key
+      const params = await setup({ os });
+      const result = await validateAndroidAssertion({
+        ...params,
+        deviceDetails: {
+          ...(params.deviceDetails as AndroidDeviceDetails),
+          attestKey: undefined,
+        },
+      })();
+      expect(E.isLeft(result) && result.left.message).toContain(
+        "No attest key registered with the wallet instance",
+      );
+    },
+  );
+
+  it("should require Play Integrity for a stock device registered without attest key", async () => {
+    const result = await validateAndroidAssertion(
+      await setup({
+        freshAttestKey: "none",
+        os: "stock",
+        registeredAttestKey: false,
+      }),
+    )();
+    expect(E.isLeft(result) && result.left.message).toContain(
+      "No attest key registered with the wallet instance",
+    );
+  });
+
+  it("should reject an app re-signed with another certificate on a stock device", async () => {
+    // The registration of the stock OS doesn't enforce the app signing certificate, which is then
+    // enforced by Play Integrity or by the hardware key attestation fallback
+    const result = await validateAndroidAssertion(
+      await setup({ appSignatureDigest: "cd".repeat(32), os: "stock" }),
+    )();
+    expect(E.isLeft(result) && result.left.message).toContain(
+      "The app signing certificate does not match",
+    );
+  });
+
+  it("should reject the hardware key attestation of a stock device without app signing certificate digests", async () => {
+    const params = await setup({ os: "stock" });
+    const result = await validateAndroidAssertion({
+      ...params,
+      keyAttestationConfig: {
+        ...params.keyAttestationConfig,
+        signatureDigests: [],
+      },
+    })();
+    expect(E.isLeft(result) && result.left.message).toContain(
+      "App signing certificate digests are required",
     );
   });
 });
