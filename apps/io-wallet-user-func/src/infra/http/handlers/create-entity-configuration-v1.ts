@@ -162,7 +162,7 @@ export const CreateEntityConfigurationV1Handler = H.of(() =>
     RTE.orElseFirstW(
       flow(
         sendTelemetryException({
-          functionName: "createEntityConfiguration",
+          functionName: "createEntityConfigurationV1",
         }),
         RTE.fromEither,
       ),
