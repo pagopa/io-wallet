@@ -5,6 +5,34 @@ info:
 servers:
   - url: https://iw-p-itn-user-func-01.azurewebsites.net/api/wallet/v1
 paths:
+  /entity-configuration-v1:
+    post:
+      operationId: createEntityConfigurationV1
+      summary: Generate and publish the V1 Entity Configuration
+      security:
+        - FunctionsKey: []
+      responses:
+        "204":
+          description: V1 Entity Configuration successfully published and CDN cache purge initiated
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
+  /entity-configuration-v2:
+    post:
+      operationId: createEntityConfigurationV2
+      summary: Generate and publish the V2 Entity Configuration
+      security:
+        - FunctionsKey: []
+      responses:
+        "204":
+          description: V2 Entity Configuration successfully published and CDN cache purge initiated
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+
   /nonce:
     get:
       operationId: getNonce
