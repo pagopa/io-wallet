@@ -109,7 +109,6 @@ const createEntityConfiguration: RTE.ReaderTaskEither<
             },
             EntityConfigurationToJwtModel.encode,
             (payload) =>
-              // TODO: SIW-2656. env var are not used
               signJwt({
                 crv: signingKey.crv,
                 duration: 24 * 60 * 60,
