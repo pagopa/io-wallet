@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.1
+
+### Patch Changes
+
+- b40b64d: Fix Play Integrity bug and validate attestation request platform against wallet instance in createWIA, createKA and createWA when possible
+
 ## 5.2.0
 
 ### Minor Changes
