@@ -28,9 +28,13 @@ export interface AttestationService {
 }
 
 export interface ValidateAssertionRequest {
+  /** The device details stored at the wallet instance registration. */
+  deviceDetails?: DeviceDetails;
   hardwareKey: JwkPublicKey;
+  /** ANDROID ONLY: the fresh key attestation sent along with the assertion. */
+  hardwareKeyAttestation?: NonEmptyString;
   hardwareSignature: NonEmptyString;
-  integrityAssertion: NonEmptyString;
+  integrityAssertion?: NonEmptyString;
   jwk: JwkPublicKey;
   nonce: NonEmptyString;
   signCount: number;
@@ -67,17 +71,20 @@ export const validateAssertion: (
   hardwareKey: JwkPublicKey,
   signCount: number,
   user: FiscalCode,
-  platform?: DeviceDetails["platform"],
+  deviceDetails?: DeviceDetails,
 ) => RTE.ReaderTaskEither<
   { attestationService: AttestationService },
   Error,
   void
 > =
-  (walletAttestationRequest, hardwareKey, signCount, user, platform) =>
+  (walletAttestationRequest, hardwareKey, signCount, user, deviceDetails) =>
   ({ attestationService }) =>
     pipe(
       {
+        deviceDetails,
         hardwareKey,
+        hardwareKeyAttestation:
+          walletAttestationRequest.payload.hardware_key_attestation,
         hardwareSignature: walletAttestationRequest.payload.hardware_signature,
         integrityAssertion:
           walletAttestationRequest.payload.integrity_assertion,
@@ -86,9 +93,9 @@ export const validateAssertion: (
         signCount,
         user,
       },
-      platform === "ios"
+      deviceDetails?.platform === "ios"
         ? attestationService.validateIosAssertion
-        : platform === "android"
+        : deviceDetails?.platform === "android"
           ? attestationService.validateAndroidAssertion
           : attestationService.validateAssertion,
     );

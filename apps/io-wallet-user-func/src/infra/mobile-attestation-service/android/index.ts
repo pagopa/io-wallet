@@ -1,6 +1,6 @@
 import { parse, ValidationError } from "@pagopa/handler-kit";
 import { NonEmptyString } from "@pagopa/ts-commons/lib/strings";
-import { X509Certificate } from "crypto";
+import { createHash, X509Certificate } from "crypto";
 import * as E from "fp-ts/Either";
 import { flow, pipe } from "fp-ts/function";
 import * as J from "fp-ts/Json";
@@ -8,15 +8,28 @@ import * as S from "fp-ts/lib/string";
 import * as RA from "fp-ts/ReadonlyArray";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
-import { AndroidDeviceDetails } from "io-wallet-common/device-details";
+import {
+  AndroidDeviceDetails,
+  DeviceDetails,
+} from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { getCrlFromUrl } from "@/certificates";
 import { ValidatedAttestation } from "@/infra/mobile-attestation-service";
+import { emitTelemetryCustomEvent } from "@/infra/telemetry";
 
 import { AndroidAssertionError, AndroidAttestationError } from "../errors";
-import { GoogleAppCredentials, verifyAssertion } from "./assertion";
-import { verifyAttestation } from "./attestation";
+import {
+  ExternalServiceError,
+  GoogleAppCredentials,
+  validateAssertionSignature,
+  verifyAssertion,
+} from "./assertion";
+import {
+  AttestKeyRequirement,
+  VERIFIED_BOOT_STATE_SELF_SIGNED,
+  verifyAttestation,
+} from "./attestation";
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -41,17 +54,25 @@ export const parseAndroidAttestation = (data: Buffer) =>
 
 export const validateAndroidAttestation = ({
   androidCrlUrl,
+  attestKey,
   bundleIdentifiers,
   googlePublicKeys,
   httpRequestTimeout,
   nonce,
+  requireSignatureDigests,
+  signatureDigests,
+  trustedSelfSignedBootKeys,
   x509Chain,
 }: {
   androidCrlUrl: string;
+  attestKey?: AttestKeyRequirement;
   bundleIdentifiers: string[];
   googlePublicKeys: string[];
   httpRequestTimeout: number;
   nonce: NonEmptyString;
+  requireSignatureDigests?: boolean;
+  signatureDigests?: string[];
+  trustedSelfSignedBootKeys?: ReadonlySet<string>;
   x509Chain: readonly X509Certificate[];
 }): TE.TaskEither<Error | ValidationError, ValidatedAttestation> =>
   pipe(
@@ -61,9 +82,13 @@ export const validateAndroidAttestation = ({
         () =>
           verifyAttestation({
             attestationCrl,
+            attestKey,
             bundleIdentifiers,
             challenge: nonce,
             googlePublicKeys,
+            requireSignatureDigests,
+            signatureDigests,
+            trustedSelfSignedBootKeys,
             x509Chain,
           }),
         E.toError,
@@ -97,36 +122,206 @@ export const parseGoogleAppCredentials = (
     ),
   );
 
-export const validateAndroidAssertion = (
-  integrityAssertion: NonEmptyString,
-  hardwareSignature: NonEmptyString,
-  clientData: string,
-  hardwareKey: JwkPublicKey,
-  bundleIdentifiers: string[],
-  androidPlayStoreCertificateHash: string,
-  googleAppCredentials: GoogleAppCredentials,
-  androidPlayIntegrityUrl: string,
-  allowDevelopmentEnvironment: boolean,
-) =>
-  pipe(
+export interface AndroidAssertionParams {
+  allowDevelopmentEnvironment: boolean;
+  androidPlayIntegrityUrl: string;
+  androidPlayStoreCertificateHash: string;
+  bundleIdentifiers: string[];
+  clientData: string;
+  /** The device details stored at the wallet instance registration. */
+  deviceDetails?: DeviceDetails;
+  googleAppCredentials: GoogleAppCredentials;
+  hardwareKey: JwkPublicKey;
+  /** The fresh key attestation generated with the SHA-256 hex digest of the client data as challenge. */
+  hardwareKeyAttestation?: NonEmptyString;
+  hardwareSignature: NonEmptyString;
+  integrityAssertion?: NonEmptyString;
+  keyAttestationConfig: AndroidKeyAttestationConfig;
+}
+
+/**
+ * Configuration to verify the fresh key attestation sent along with an integrity assertion.
+ */
+export interface AndroidKeyAttestationConfig {
+  androidCrlUrl: string;
+  googlePublicKeys: string[];
+  httpRequestTimeout: number;
+  signatureDigests: string[];
+  trustedSelfSignedBootKeys: ReadonlySet<string>;
+}
+
+const validatePlayIntegrityAssertion = ({
+  integrityAssertion,
+  ...params
+}: AndroidAssertionParams): TE.TaskEither<Error, void> =>
+  integrityAssertion
+    ? pipe(
+        TE.tryCatch(
+          () => verifyAssertion({ ...params, integrityAssertion }),
+          E.toError,
+        ),
+        TE.chain((assertionValidationResult) =>
+          assertionValidationResult.success
+            ? TE.right(undefined)
+            : TE.left(
+                new AndroidAssertionError(assertionValidationResult.reason),
+              ),
+        ),
+      )
+    : TE.left(new AndroidAssertionError("Play Integrity token not provided"));
+
+/**
+ * Validates the fresh key attestation sent along with the assertion:
+ * - the wallet instance must have been registered with an attest key: without it the attestation can't be
+ *   bound to the registered device, so Play Integrity remains mandatory;
+ * - the client data must be signed by the registered hardware key;
+ * - the attestation must satisfy the same policy of the registration, with the SHA-256 hex digest
+ *   of the client data as challenge, and its app signing certificate must be one of the trusted ones
+ *   for any verified boot state, as it replaces the Play Integrity app recognition verdict;
+ * - it must have been signed by the attest key pinned at registration, which proves it comes from
+ *   the registered device;
+ * - the verified boot state and key must match the ones of the registration.
+ * @param params - The assertion parameters
+ * @returns A TaskEither with the device details of the accepted key attestation
+ */
+const validateKeyAttestationAssertion = (
+  hardwareKeyAttestation: NonEmptyString,
+  params: AndroidAssertionParams,
+): TE.TaskEither<Error, AndroidDeviceDetails> => {
+  const registered =
+    params.deviceDetails?.platform === "android"
+      ? params.deviceDetails
+      : undefined;
+  if (!registered?.attestKey) {
+    return TE.left(
+      new AndroidAssertionError(
+        "No attest key registered with the wallet instance, the hardware key attestation can't be accepted",
+      ),
+    );
+  }
+  const pinned = registered.attestKey;
+  return pipe(
     TE.tryCatch(
       () =>
-        verifyAssertion({
-          allowDevelopmentEnvironment,
-          androidPlayIntegrityUrl,
-          androidPlayStoreCertificateHash,
-          bundleIdentifiers,
-          clientData,
-          googleAppCredentials,
-          hardwareKey,
-          hardwareSignature,
-          integrityAssertion,
-        }),
+        validateAssertionSignature(
+          params.hardwareKey,
+          params.clientData,
+          params.hardwareSignature,
+        ),
       E.toError,
     ),
-    TE.chain((assertionValidationResult) =>
-      assertionValidationResult.success
-        ? TE.right(undefined)
-        : TE.left(new AndroidAssertionError(assertionValidationResult.reason)),
+    TE.filterOrElse(
+      (isSignatureValid) => isSignatureValid,
+      () => new AndroidAssertionError("Invalid hardware signature"),
+    ),
+    TE.chainEitherKW(() =>
+      pipe(
+        hardwareKeyAttestation,
+        (value) => E.tryCatch(() => Buffer.from(value, "base64"), E.toError),
+        E.chainW(parseAndroidAttestation),
+      ),
+    ),
+    TE.chainW((x509Chain) =>
+      validateAndroidAttestation({
+        ...params.keyAttestationConfig,
+        attestKey: { pinned },
+        bundleIdentifiers: params.bundleIdentifiers,
+        nonce: createHash("sha256")
+          .update(params.clientData)
+          .digest("hex") as NonEmptyString,
+        requireSignatureDigests: true,
+        x509Chain,
+      }),
+    ),
+    TE.chainW(({ deviceDetails }) =>
+      deviceDetails.platform === "android" &&
+      deviceDetails.verifiedBootState === registered.verifiedBootState &&
+      (registered.verifiedBootKey === undefined ||
+        deviceDetails.verifiedBootKey === registered.verifiedBootKey)
+        ? TE.right(deviceDetails)
+        : TE.left(
+            new AndroidAssertionError(
+              "Device state differs from the registration",
+            ),
+          ),
+    ),
+    TE.mapLeft((error) =>
+      error instanceof ValidationError
+        ? new AndroidAssertionError(error.violations.join(", "))
+        : error,
+    ),
+  );
+};
+
+/**
+ * Emits the ANDROID_INTEGRITY_FALLBACK_SUCCEEDED telemetry event when an assertion is accepted through the
+ * hardware key attestation fallback. Along with ANDROID_INTEGRITY_CHECK_FAILED, emitted for the Play Integrity
+ * verdicts that are not valid, it allows to tell the Play Integrity failures from the fallback recoveries:
+ * - playIntegrity: why the fallback was used, i.e. the token was missing, its verdict was not valid or the
+ *   Play Integrity service was not available;
+ * - os: the OS running on the device, i.e. GrapheneOS or the stock OS.
+ * @param params - The assertion parameters
+ * @param playIntegrityError - The error of the Play Integrity verification
+ * @param deviceDetails - The device details of the accepted key attestation
+ */
+const emitFallbackSucceeded = (
+  params: AndroidAssertionParams,
+  playIntegrityError: Error,
+  deviceDetails: AndroidDeviceDetails,
+) =>
+  emitTelemetryCustomEvent({
+    name: "ANDROID_INTEGRITY_FALLBACK_SUCCEEDED",
+    properties: {
+      os:
+        deviceDetails.verifiedBootState === VERIFIED_BOOT_STATE_SELF_SIGNED
+          ? "grapheneos"
+          : "stock",
+      playIntegrity: !params.integrityAssertion
+        ? "missing"
+        : playIntegrityError instanceof ExternalServiceError
+          ? "service_error"
+          : "failed",
+    },
+  });
+
+/**
+ * Validates an Android integrity assertion. The Play Integrity token is verified first and, as fallback
+ * when it is not provided or not valid, the fresh key attestation sent along with it, following the
+ * GrapheneOS attestation compatibility guide: this allows devices running GrapheneOS with a locked
+ * bootloader, for which the Play Integrity verdict is not available.
+ * https://grapheneos.org/articles/attestation-compatibility-guide
+ * @param params - The assertion parameters
+ * @returns A TaskEither which is right when the assertion is valid
+ */
+export const validateAndroidAssertion = (
+  params: AndroidAssertionParams,
+): TE.TaskEither<Error, void> =>
+  pipe(
+    validatePlayIntegrityAssertion(params),
+    TE.orElse((playIntegrityError) =>
+      params.hardwareKeyAttestation
+        ? pipe(
+            validateKeyAttestationAssertion(
+              params.hardwareKeyAttestation,
+              params,
+            ),
+            TE.chainIOK(
+              (deviceDetails) => () =>
+                emitFallbackSucceeded(
+                  params,
+                  playIntegrityError,
+                  deviceDetails,
+                ),
+            ),
+            TE.mapLeft((keyAttestationError) =>
+              // Keep the external service error so that the request can be retried
+              playIntegrityError instanceof ExternalServiceError
+                ? playIntegrityError
+                : new AndroidAssertionError(
+                    `${playIntegrityError.message} | Key attestation: ${keyAttestationError.message}`,
+                  ),
+            ),
+          )
+        : TE.left(playIntegrityError),
     ),
   );
