@@ -13,7 +13,7 @@ import {
 } from "io-wallet-common/wallet-instance";
 import { type JWTPayload } from "jose";
 
-import { signJwt, SignJwtEnvironment } from "@/infra/crypto/signer";
+import { LocalJwtSigner } from "@/infra/crypto/signer";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -39,10 +39,11 @@ import {
   requireKeyAttestationRequest,
 } from "../key-attestation-request";
 
-interface KeyAttestationEnvironment extends SignJwtEnvironment {
+interface KeyAttestationEnvironment {
   federationEntityId: UrlFromString;
   keyAttestationSigningKeyName: string;
   keyRepository: KeyRepository;
+  signJwt: LocalJwtSigner;
   statusListBaseUrl: string;
 }
 
@@ -58,18 +59,24 @@ const signKeyAttestation =
     payload: JWTPayload;
     x5c: string[];
   }): RTE.ReaderTaskEither<KeyAttestationEnvironment, Error, string> =>
-  ({ keyAttestationSigningKeyName, signJwt: signJwtEnv }) =>
-    signJwt({
-      crv,
-      duration: 365 * 24 * 60 * 60,
-      header: {
-        kid,
-        typ: "key-attestation+jwt",
-        x5c,
-      },
-      keyName: keyAttestationSigningKeyName,
-      payload,
-    })({ signJwt: signJwtEnv });
+  ({ signJwt }) =>
+    TE.tryCatch(
+      () =>
+        signJwt({
+          crv,
+          duration: 365 * 24 * 60 * 60,
+          header: {
+            kid,
+            typ: "key-attestation+jwt",
+            x5c,
+          },
+          payload,
+        }),
+      (reason) =>
+        new Error(
+          `Unable to sign key attestation JWT: ${E.toError(reason).message}`,
+        ),
+    );
 
 const getKeyAttestationData =
   ({

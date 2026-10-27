@@ -5,7 +5,7 @@ import { UrlFromString } from "@pagopa/ts-commons/lib/url";
 import * as A from "fp-ts/Array";
 import * as E from "fp-ts/Either";
 import { sequenceS } from "fp-ts/lib/Apply";
-import { pipe } from "fp-ts/lib/function";
+import { flow, pipe } from "fp-ts/lib/function";
 import * as RE from "fp-ts/lib/ReaderEither";
 import * as t from "io-ts";
 import {
@@ -21,6 +21,7 @@ import {
   getSlackConfigFromEnvironment,
   SlackConfig,
 } from "io-wallet-common/infra/slack/config";
+import { ECPublicKeyWithKid } from "io-wallet-common/jwk";
 
 export const APPLE_APP_ATTESTATION_ROOT_CA =
   "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNJVENDQWFlZ0F3SUJBZ0lRQy9PK0R2SE4wdUQ3akc1eUgySVhtREFLQmdncWhrak9QUVFEQXpCU01TWXdKQVlEVlFRRERCMUJjSEJzWlNCQmNIQWdRWFIwWlhOMFlYUnBiMjRnVW05dmRDQkRRVEVUTUJFR0ExVUVDZ3dLUVhCd2JHVWdTVzVqTGpFVE1CRUdBMVVFQ0F3S1EyRnNhV1p2Y201cFlUQWVGdzB5TURBek1UZ3hPRE15TlROYUZ3MDBOVEF6TVRVd01EQXdNREJhTUZJeEpqQWtCZ05WQkFNTUhVRndjR3hsSUVGd2NDQkJkSFJsYzNSaGRHbHZiaUJTYjI5MElFTkJNUk13RVFZRFZRUUtEQXBCY0hCc1pTQkpibU11TVJNd0VRWURWUVFJREFwRFlXeHBabTl5Ym1saE1IWXdFQVlIS29aSXpqMENBUVlGSzRFRUFDSURZZ0FFUlRIaG1MVzA3QVRhRlFJRVZ3VHRUNGR5Y3RkaE5iSmhGcy9JaTJGZENnQUhHYnBwaFkzK2Q4cWp1RG5nSU4zV1ZoUVVCSEFvTWVRL2NMaVAxc09VdGdqcUs5YXVZZW4xbU1FdlJxOVNrM0ptNVg4VTYySCt4VEQzRkU5VGdTNDFvMEl3UURBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJTc2tSQlRNNzIrYUVIL3B3eXA1ZnJxNWVXS29UQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0NnWUlLb1pJemowRUF3TURhQUF3WlFJd1FnRkduQnl2c2lWYnBUS3dTZ2Ewa1AwZThFZURTNCtzUW1UdmI3dm41M081K0ZSWGdlTGhwSjA2eXNDNVByT3lBakVBcDVVNHhEZ0VnbGxGN0VuM1ZjRTNpZXhaWnRLZVlucHF0aWpWb3lGcmFXVkl5ZC9kZ2FubXJkdUMxYm1UQkd3RAotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t";
@@ -260,7 +261,13 @@ const EntityConfigurationV2Config = t.type({
 
 type EntityConfigurationV2Config = t.TypeOf<typeof EntityConfigurationV2Config>;
 
+const PrivateJwk = t.intersection([
+  ECPublicKeyWithKid,
+  t.type({ d: NonEmptyString }),
+]);
+
 const WalletProviderConfig = t.type({
+  keyAttestationSigningJwk: PrivateJwk,
   keyAttestationSigningKeyName: t.string,
   tokenStatusListSigningKeyName: t.string,
   walletAttestation: t.type({
@@ -807,6 +814,24 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   WalletProviderConfig
 > = pipe(
   sequenceS(RE.Apply)({
+    keyAttestationSigningJwk: pipe(
+      readFromEnvironment("KeyAttestationSigningJwk"),
+      RE.chainEitherKW((encoded) =>
+        E.tryCatch(
+          () => JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")),
+          () => new Error("Private JWK must contain valid JSON"),
+        ),
+      ),
+      RE.chainEitherKW(
+        flow(
+          PrivateJwk.decode,
+          E.mapLeft(
+            () =>
+              new Error("Key attestation signing key must be a private EC JWK"),
+          ),
+        ),
+      ),
+    ),
     keyAttestationSigningKeyName: readFromEnvironment(
       "KeyAttestationSigningKeyName",
     ),
@@ -831,6 +856,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
   }),
   RE.map(
     ({
+      keyAttestationSigningJwk,
       keyAttestationSigningKeyName,
       tokenStatusListSigningKeyName,
       walletAttestationOauthClientSub,
@@ -839,6 +865,7 @@ const getWalletProviderConfigFromEnvironment: RE.ReaderEither<
       walletAttestationWalletName,
       walletInstanceAttestationSigningKeyName,
     }) => ({
+      keyAttestationSigningJwk,
       keyAttestationSigningKeyName,
       tokenStatusListSigningKeyName,
       walletAttestation: {

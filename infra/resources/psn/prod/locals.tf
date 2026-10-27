@@ -22,6 +22,10 @@ locals {
   user_func = {
     app_settings = [
       {
+        name                  = "KeyAttestationSigningJwk"
+        key_vault_secret_name = "KeyAttestationSigningJwk"
+      },
+      {
         name                  = "GoogleAppCredentialsEncoded"
         key_vault_secret_name = "GoogleAppCredentialsEncoded"
       },

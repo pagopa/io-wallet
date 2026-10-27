@@ -3,9 +3,17 @@ import { pipe } from "fp-ts/function";
 import * as E from "fp-ts/lib/Either";
 import * as RTE from "fp-ts/lib/ReaderTaskEither";
 import * as TE from "fp-ts/lib/TaskEither";
+import { ECPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 
 import type { KeyOperations } from "@/infra/crypto/key-operations-client";
+
+export type LocalJwtSigner = (options: {
+  crv: string;
+  duration: number;
+  header: SignJwtHeader;
+  payload: jose.JWTPayload;
+}) => Promise<string>;
 
 export type SignAlgorithm = "ES256" | "ES384" | "ES512";
 
@@ -84,6 +92,24 @@ export const getSignAlgorithmFromCurve = (crv: string): SignAlgorithm => {
       throw new Error(`The curve ${crv} is not supported`);
   }
 };
+
+export const createLocalJwtSigner =
+  (privateJwk: ECPublicKey & { d: string }): LocalJwtSigner =>
+  async ({ crv, duration, header, payload }) => {
+    const algorithm = getSignAlgorithmFromCurve(crv);
+    const privateKey = await jose.importJWK(privateJwk, algorithm);
+    const { trustChain, ...headerParameters } = header;
+    const iat = Math.floor(Date.now() / 1000);
+    return new jose.SignJWT(payload)
+      .setProtectedHeader({
+        ...headerParameters,
+        alg: algorithm,
+        trust_chain: trustChain,
+      })
+      .setIssuedAt(iat)
+      .setExpirationTime(iat + duration)
+      .sign(privateKey);
+  };
 
 export const signJwt =
   ({

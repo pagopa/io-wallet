@@ -46,6 +46,7 @@
     "WalletAttestationSigningKeyName": "WALLET_ATTESTATION_SIGNING_KEY_NAME",
     "WalletInstanceAttestationSigningKeyName": "WALLET_INSTANCE_ATTESTATION_SIGNING_KEY_NAME",
     "KeyAttestationSigningKeyName": "KEY_ATTESTATION_SIGNING_KEY_NAME",
+    "KeyAttestationSigningJwk": "KEY_ATTESTATION_SIGNING_JWK",
     "TokenStatusListSigningKeyName": "TOKEN_STATUS_LIST_SIGNING_KEY_NAME",
     "IosBundleIdentifiers": "APPLE_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA",
     "AndroidBundleIdentifiers": "ANDROID_WALLET_INSTANCE_BUNDLE_IDENTIFIERS_SEPARATED_BY_COMMA",

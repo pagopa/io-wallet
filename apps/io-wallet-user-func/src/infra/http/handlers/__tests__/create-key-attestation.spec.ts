@@ -10,10 +10,14 @@ import { flow } from "fp-ts/lib/function";
 import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
+import { ECPublicKey } from "io-wallet-common/jwk";
 import * as jose from "jose";
 import { describe, expect, it, vi } from "vitest";
 
-import { KeyOperations } from "@/infra/crypto/key-operations-client";
+import {
+  createLocalJwtSigner,
+  getSignAlgorithmFromCurve,
+} from "@/infra/crypto/signer";
 import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
@@ -43,9 +47,21 @@ const logger = {
   log: () => () => void 0,
 };
 
-const keyOperationsClient: KeyOperations = {
-  sign: () => Promise.resolve("AA"),
-};
+const signJwt = vi.fn(async ({ crv, duration, header, payload }) => {
+  const iat = Math.floor(Date.now() / 1000);
+  return [
+    jose.base64url.encode(
+      JSON.stringify({
+        ...header,
+        alg: getSignAlgorithmFromCurve(crv),
+      }),
+    ),
+    jose.base64url.encode(
+      JSON.stringify({ ...payload, exp: iat + duration, iat }),
+    ),
+    "AA",
+  ].join(".");
+});
 
 const url = flow(
   UrlFromString.decode,
@@ -89,7 +105,6 @@ const keyRepository: KeyRepository = {
         ...publicEcKey,
         certificateChain: ["cert1", "cert2"],
         keyName: keyAttestationKeyName,
-        kid: publicEcKey.kid,
       }),
     ),
 };
@@ -286,6 +301,60 @@ describe("CreateKeyAttestationHandler", async () => {
     method: "POST",
   };
 
+  it.each([
+    {
+      expectedStatus: 200,
+      privateJwk: privateEcKey,
+    },
+    {
+      expectedStatus: 500,
+      privateJwk: { ...privateEcKey, crv: "P-521" },
+    },
+  ])(
+    "returns $expectedStatus with the configured local signer",
+    async ({ expectedStatus, privateJwk }) => {
+      const handler = CreateKeyAttestationHandler({
+        androidAttestationValidationConfig,
+        assertionValidationConfig,
+        federationEntityId,
+        input: req,
+        inputDecoder: H.HttpRequest,
+        keyAttestationSigningKeyName: keyAttestationKeyName,
+        keyRepository,
+        logger,
+        nonceRepository,
+        signJwt: createLocalJwtSigner(privateJwk),
+        statusListBaseUrl,
+        walletInstanceRepository,
+      });
+      const result = await handler();
+      if (E.isLeft(result)) {
+        throw result.left;
+      }
+      expect(result.right.statusCode).toBe(expectedStatus);
+      if (expectedStatus === 200) {
+        const body = t
+          .type({ key_attestation: t.string })
+          .decode(result.right.body);
+        if (E.isLeft(body)) {
+          throw new Error("Invalid response body");
+        }
+        const verificationKey = await jose.importJWK(publicEcKey);
+        const { payload, protectedHeader } = await jose.jwtVerify(
+          body.right.key_attestation,
+          verificationKey,
+        );
+        expect(payload.iss).toBe("https://wallet-provider-v2.example.org/bar");
+        expect(protectedHeader).toMatchObject({
+          alg: "ES256",
+          kid: publicEcKey.kid,
+          typ: "key-attestation+jwt",
+          x5c: ["cert1", "cert2"],
+        });
+      }
+    },
+  );
+
   it("should return a 200 HTTP response on success if is a test user", async () => {
     const handler = CreateKeyAttestationHandler({
       androidAttestationValidationConfig,
@@ -304,7 +373,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -334,7 +403,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -368,7 +437,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository: failingKeyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -399,7 +468,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository: emptyKeyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -426,7 +495,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -455,12 +524,30 @@ describe("CreateKeyAttestationHandler", async () => {
       alg: "ES256",
       kid: publicEcKey.kid,
     });
+    expect(signJwt).toHaveBeenLastCalledWith({
+      crv: publicEcKey.crv,
+      duration: 365 * 24 * 60 * 60,
+      header: {
+        kid: publicEcKey.kid,
+        typ: "key-attestation+jwt",
+        x5c: ["cert1", "cert2"],
+      },
+      payload: expect.any(Object),
+    });
   });
 
   it("should sign the jwt with the algorithm derived from the provider key curve - P-521", async () => {
+    const { publicKey } = await jose.generateKeyPair("ES512", {
+      extractable: true,
+    });
+    const decodedPublicKey = ECPublicKey.decode(
+      await jose.exportJWK(publicKey),
+    );
+    if (E.isLeft(decodedPublicKey)) {
+      throw new Error("Invalid test public key");
+    }
     const p521SigningKey = {
-      ...privateEcKey,
-      crv: "P-521",
+      ...decodedPublicKey.right,
       kid: "p521#key-attestation",
     };
     const p521KeyRepository: KeyRepository = {
@@ -484,7 +571,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository: p521KeyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -533,7 +620,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -575,7 +662,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -635,7 +722,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -693,7 +780,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -753,7 +840,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -834,7 +921,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -885,7 +972,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -912,7 +999,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });
@@ -945,7 +1032,7 @@ describe("CreateKeyAttestationHandler", async () => {
       keyRepository,
       logger,
       nonceRepository,
-      signJwt: keyOperationsClient.sign,
+      signJwt,
       statusListBaseUrl,
       walletInstanceRepository,
     });

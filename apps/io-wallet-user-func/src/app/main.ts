@@ -46,6 +46,7 @@ import { StatusListPublicationDispatcherFunction } from "@/infra/azure/functions
 import { StatusListPublicationMonitorFunction } from "@/infra/azure/functions/status-list-publication-monitor";
 import { IsFiscalCodeWhitelistedFunction } from "@/infra/azure/functions/whitelisted-fiscal-code";
 import { KeyOperationsClient } from "@/infra/crypto/key-operations-client";
+import { createLocalJwtSigner } from "@/infra/crypto/signer";
 import { EmailNotificationServiceClient } from "@/infra/email";
 import { WalletInstanceRevocationQueueItem } from "@/infra/handlers/send-email-on-wallet-instance-revocation";
 import {
@@ -483,7 +484,9 @@ app.http("createKeyAttestation", {
       config.walletProvider.keyAttestationSigningKeyName,
     keyRepository,
     nonceRepository,
-    signJwt: keyOperationsClient.sign,
+    signJwt: createLocalJwtSigner(
+      config.walletProvider.keyAttestationSigningJwk,
+    ),
     statusListBaseUrl: statusListPublicationConfig.baseUrl,
     walletInstanceRepository,
   }),
