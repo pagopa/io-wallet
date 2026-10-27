@@ -4,13 +4,38 @@ import * as E from "fp-ts/lib/Either";
 import { playintegrity_v1 } from "googleapis";
 import { ECPublicKey } from "io-wallet-common/jwk";
 import { exportJWK } from "jose";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+import { emitTelemetryCustomEvent } from "@/infra/telemetry";
 
 import {
+  GoogleAppCredentials,
   validateAssertionSignature,
   validateIntegrityResponse,
+  verifyAssertion,
 } from "../assertion";
 import { androidMockData } from "./config";
+
+vi.mock("@/infra/telemetry", () => ({
+  emitTelemetryCustomEvent: vi.fn(),
+}));
+
+vi.mock("googleapis", () => ({
+  google: {
+    auth: {
+      JWT: vi.fn(function () {
+        return { authorize: vi.fn().mockResolvedValue(undefined) };
+      }),
+    },
+    playintegrity: vi.fn(() => ({
+      v1: {
+        decodeIntegrityToken: vi.fn().mockResolvedValue({
+          data: { tokenPayloadExternal: {} },
+        }),
+      },
+    })),
+  },
+}));
 
 describe("AndroidAssertionValidation", async () => {
   const { bundleIdentifier, challenge, ephemeralKey } = androidMockData;
@@ -25,6 +50,53 @@ describe("AndroidAssertionValidation", async () => {
   const signer = createSign("SHA256");
   signer.update(clientData);
   const hardwareSignature = signer.sign(hardwareKeyPair.privateKey, "base64");
+
+  it("should fail assertion verification for an invalid integrity payload", async () => {
+    vi.mocked(emitTelemetryCustomEvent).mockClear();
+
+    const googleAppCredentials = E.getOrElseW(() => {
+      throw new Error("Invalid test Google credentials");
+    })(
+      GoogleAppCredentials.decode({
+        auth_provider_x509_cert_url: "https://example.com/certs",
+        auth_uri: "https://example.com/auth",
+        client_email: "test@example.com",
+        client_id: "client-id",
+        client_x509_cert_url: "https://example.com/client-certs",
+        private_key: "private-key",
+        private_key_id: "private-key-id",
+        project_id: "project-id",
+        token_uri: "https://example.com/token",
+        type: "service_account",
+        universe_domain: "googleapis.com",
+      }),
+    );
+    const decodedHardwareKey = E.getOrElseW(() => {
+      throw new Error("Invalid test hardware key");
+    })(ECPublicKey.decode(hardwareKey));
+
+    await expect(
+      verifyAssertion({
+        allowDevelopmentEnvironment: false,
+        androidPlayIntegrityUrl: "https://playintegrity.googleapis.com",
+        androidPlayStoreCertificateHash: "certificate-hash",
+        bundleIdentifiers: [bundleIdentifier],
+        clientData,
+        googleAppCredentials,
+        hardwareKey: decodedHardwareKey,
+        hardwareSignature,
+        integrityAssertion: androidMockData.integrityAssertion,
+      }),
+    ).resolves.toEqual({
+      reason:
+        "Integrity Response did not pass validation: Invalid requestDetails",
+      success: false,
+    });
+
+    expect(emitTelemetryCustomEvent).toHaveBeenCalledExactlyOnceWith({
+      name: "ANDROID_INTEGRITY_CHECK_FAILED",
+    });
+  });
 
   it("should validate assertion signature", async () => {
     const eCPublicKeyDecoded = ECPublicKey.decode(hardwareKey);

@@ -65,6 +65,7 @@ describe("CreateWalletInstanceHandler", () => {
 
   const mockAttestationService: AttestationService = {
     getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
+    validateAndroidAssertion: () => TE.right(undefined),
     validateAssertion: () => TE.right(undefined),
     validateAttestation: () =>
       TE.right({
@@ -77,6 +78,7 @@ describe("CreateWalletInstanceHandler", () => {
           y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
         },
       }),
+    validateIosAssertion: () => TE.right(undefined),
   };
 
   const sendMessageSpy = vi.fn(() =>
