@@ -1,4 +1,5 @@
 import { FiscalCode, NonEmptyString } from "@pagopa/ts-commons/lib/strings";
+import { pipe } from "fp-ts/function";
 import * as RTE from "fp-ts/ReaderTaskEither";
 import * as TE from "fp-ts/TaskEither";
 import { DeviceDetails } from "io-wallet-common/device-details";
@@ -9,6 +10,9 @@ import { WalletInstanceRequest } from "./wallet-instance-request";
 
 export interface AttestationService {
   getHardwarePublicTestKey: () => TE.TaskEither<Error, JwkPublicKey>;
+  validateAndroidAssertion: (
+    request: ValidateAssertionRequest,
+  ) => TE.TaskEither<Error, void>;
   validateAssertion: (
     request: ValidateAssertionRequest,
   ) => TE.TaskEither<Error, void>;
@@ -18,6 +22,9 @@ export interface AttestationService {
     hardwareKeyTag: NonEmptyString,
     user: FiscalCode,
   ) => TE.TaskEither<Error, ValidatedAttestation>;
+  validateIosAssertion: (
+    request: ValidateAssertionRequest,
+  ) => TE.TaskEither<Error, void>;
 }
 
 export interface ValidateAssertionRequest {
@@ -72,15 +79,23 @@ export const validateAssertion: (
 > =
   (walletAttestationRequest, hardwareKey, signCount, user, deviceDetails) =>
   ({ attestationService }) =>
-    attestationService.validateAssertion({
-      deviceDetails,
-      hardwareKey,
-      hardwareKeyAttestation:
-        walletAttestationRequest.payload.hardware_key_attestation,
-      hardwareSignature: walletAttestationRequest.payload.hardware_signature,
-      integrityAssertion: walletAttestationRequest.payload.integrity_assertion,
-      jwk: walletAttestationRequest.payload.cnf.jwk,
-      nonce: walletAttestationRequest.payload.nonce,
-      signCount,
-      user,
-    });
+    pipe(
+      {
+        deviceDetails,
+        hardwareKey,
+        hardwareKeyAttestation:
+          walletAttestationRequest.payload.hardware_key_attestation,
+        hardwareSignature: walletAttestationRequest.payload.hardware_signature,
+        integrityAssertion:
+          walletAttestationRequest.payload.integrity_assertion,
+        jwk: walletAttestationRequest.payload.cnf.jwk,
+        nonce: walletAttestationRequest.payload.nonce,
+        signCount,
+        user,
+      },
+      deviceDetails?.platform === "ios"
+        ? attestationService.validateIosAssertion
+        : deviceDetails?.platform === "android"
+          ? attestationService.validateAndroidAssertion
+          : attestationService.validateAssertion,
+    );

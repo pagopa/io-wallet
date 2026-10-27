@@ -7,6 +7,7 @@ import { WalletInstanceValid } from "io-wallet-common/wallet-instance";
 
 import {
   AssertionValidationConfig,
+  IntegrityCheckError,
   toClientData,
   toThumbprint,
   verifyAndroidAssertion,
@@ -140,6 +141,7 @@ const validateKeyAttestationAssertion: (
 const consumeNonceAndGetValidWalletInstance = (input: {
   hardwareKeyTag: NonEmptyString;
   nonce: NonEmptyString;
+  platform: BaseAssertion["platform"];
   userId: FiscalCode;
 }): RTE.ReaderTaskEither<
   NonceEnvironment & WalletInstanceEnvironment,
@@ -151,6 +153,15 @@ const consumeNonceAndGetValidWalletInstance = (input: {
     consumeNonce,
     RTE.chainW(() =>
       getValidWalletInstanceByUserId(input.hardwareKeyTag, input.userId),
+    ),
+    RTE.filterOrElseW(
+      ({ deviceDetails }) => deviceDetails?.platform === input.platform,
+      ({ deviceDetails }) =>
+        new IntegrityCheckError([
+          deviceDetails
+            ? "Request platform does not match wallet instance platform"
+            : "Wallet instance device details not found",
+        ]),
     ),
   );
 
@@ -169,6 +180,7 @@ export const validateWalletInstanceAssertionRequest: (input: {
     consumeNonceAndGetValidWalletInstance({
       hardwareKeyTag: assertion.hardwareKeyTag,
       nonce: assertion.nonce,
+      platform: assertion.platform,
       userId,
     }),
     RTE.chainW(({ deviceDetails, hardwareKey, signCount }) =>
@@ -199,6 +211,7 @@ export const validateKeyAttestationAssertionAndGetWalletInstance: (input: {
     consumeNonceAndGetValidWalletInstance({
       hardwareKeyTag: assertion.hardwareKeyTag,
       nonce: assertion.nonce,
+      platform: assertion.platform,
       userId,
     }),
     RTE.chainFirstW(({ deviceDetails, hardwareKey, signCount }) =>

@@ -17,6 +17,7 @@ import { KeyOperations } from "@/infra/crypto/key-operations-client";
 import {
   AssertionValidationConfig,
   verifyAndroidAssertion,
+  verifyIosAssertion,
 } from "@/infra/mobile-attestation-service";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
@@ -87,12 +88,26 @@ const assertionValidationConfig: AssertionValidationConfig = {
   trustedSelfSignedBootKeys: () => new Set(),
 };
 
-const walletInstanceRepository: WalletInstanceRepository = {
+const createWalletInstanceRepository = (
+  platform?: "android" | "ios",
+): WalletInstanceRepository => ({
   batchPatch: () => TE.left(new Error("not implemented")),
   getByUserId: () =>
     TE.right(
       O.some({
         createdAt: new Date(),
+        deviceDetails:
+          platform === "android"
+            ? {
+                attestationSecurityLevel: 2,
+                attestationVersion: 3,
+                keymasterSecurityLevel: 2,
+                keymasterVersion: 4,
+                platform,
+              }
+            : platform === "ios"
+              ? { platform }
+              : undefined,
         hardwareKey,
         id: "123" as NonEmptyString,
         isRevoked: false,
@@ -104,7 +119,11 @@ const walletInstanceRepository: WalletInstanceRepository = {
   getValidByUserId: () => TE.left(new Error("not implemented")),
   getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
-};
+});
+
+const walletInstanceRepository = createWalletInstanceRepository("ios");
+const androidWalletInstanceRepository =
+  createWalletInstanceRepository("android");
 
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
@@ -229,7 +248,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       signJwt: keyOperationsClient.sign,
       walletAttestationConfig,
       walletInstanceAttestationSigningKeyName: walletInstanceAttestationKeyName,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -245,6 +264,56 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       }),
     });
   });
+
+  it.each([
+    ["android", mockFiscalCode],
+    ["ios", mockFiscalCode],
+    [undefined, mockFiscalCode],
+    ["android", "LVTEST00A00H501P" as FiscalCode],
+    ["ios", "LVTEST00A00H501P" as FiscalCode],
+    [undefined, "LVTEST00A00H501P" as FiscalCode],
+  ] as const)(
+    "should reject incompatible stored platform %s for user %s",
+    async (storedPlatform, userId) => {
+      vi.mocked(verifyAndroidAssertion).mockClear();
+      vi.mocked(verifyIosAssertion).mockClear();
+      const request = storedPlatform === "ios" ? androidReq : req;
+      const signJwt = vi.fn(keyOperationsClient.sign);
+      const handler = CreateWalletInstanceAttestationHandler({
+        assertionValidationConfig,
+        federationEntityId,
+        input: {
+          ...request,
+          body: { ...request.body, fiscal_code: userId },
+        },
+        inputDecoder: H.HttpRequest,
+        keyRepository,
+        logger,
+        nonceRepository,
+        signJwt,
+        walletAttestationConfig,
+        walletInstanceAttestationSigningKeyName:
+          walletInstanceAttestationKeyName,
+        walletInstanceRepository:
+          createWalletInstanceRepository(storedPlatform),
+      });
+
+      await expect(handler()).resolves.toEqual({
+        _tag: "Right",
+        right: expect.objectContaining({
+          body: expect.objectContaining({
+            detail: storedPlatform
+              ? "Request platform does not match wallet instance platform"
+              : "Wallet instance device details not found",
+          }),
+          statusCode: 409,
+        }),
+      });
+      expect(verifyAndroidAssertion).not.toHaveBeenCalled();
+      expect(verifyIosAssertion).not.toHaveBeenCalled();
+      expect(signJwt).not.toHaveBeenCalled();
+    },
+  );
 
   it("should return a 500 HTTP response when KeyRepository.getKeyByName returns an error", async () => {
     const failingKeyRepository: KeyRepository = {
@@ -653,7 +722,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       signJwt: keyOperationsClient.sign,
       walletAttestationConfig,
       walletInstanceAttestationSigningKeyName: walletInstanceAttestationKeyName,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({

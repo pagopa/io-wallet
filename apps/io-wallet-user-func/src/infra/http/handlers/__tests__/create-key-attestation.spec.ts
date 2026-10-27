@@ -18,6 +18,7 @@ import {
   AndroidAttestationValidationConfig,
   AssertionValidationConfig,
   IntegrityCheckError,
+  verifyAndroidAssertion,
   verifyAndroidAttestation,
   verifyIosAssertion,
 } from "@/infra/mobile-attestation-service";
@@ -101,12 +102,26 @@ const keyRepository: KeyRepository = {
     ),
 };
 
-const walletInstanceRepository: WalletInstanceRepository = {
+const createWalletInstanceRepository = (
+  platform?: "android" | "ios",
+): WalletInstanceRepository => ({
   batchPatch: () => TE.left(new Error("not implemented")),
   getByUserId: () =>
     TE.right(
       O.some({
         createdAt: new Date(),
+        deviceDetails:
+          platform === "android"
+            ? {
+                attestationSecurityLevel: 2,
+                attestationVersion: 3,
+                keymasterSecurityLevel: 2,
+                keymasterVersion: 4,
+                platform,
+              }
+            : platform === "ios"
+              ? { platform }
+              : undefined,
         hardwareKey,
         id: "123" as NonEmptyString,
         isRevoked: false,
@@ -119,7 +134,11 @@ const walletInstanceRepository: WalletInstanceRepository = {
   getValidByUserId: () => TE.left(new Error("not implemented")),
   getValidByUserIdExcludingOne: () => TE.left(new Error("not implemented")),
   insert: () => TE.left(new Error("not implemented")),
-};
+});
+
+const walletInstanceRepository = createWalletInstanceRepository("ios");
+const androidWalletInstanceRepository =
+  createWalletInstanceRepository("android");
 
 const data = Buffer.from(assertion, "base64");
 const { authenticatorData, signature } = decode(data);
@@ -292,6 +311,63 @@ describe("CreateKeyAttestationHandler", async () => {
     },
     method: "POST",
   };
+
+  it.each([
+    ["android", mockFiscalCode],
+    ["ios", mockFiscalCode],
+    [undefined, mockFiscalCode],
+    ["android", "LVTEST00A00H501P" as FiscalCode],
+    ["ios", "LVTEST00A00H501P" as FiscalCode],
+    [undefined, "LVTEST00A00H501P" as FiscalCode],
+  ] as const)(
+    "should reject incompatible stored platform %s for user %s",
+    async (storedPlatform, userId) => {
+      vi.mocked(verifyAndroidAssertion).mockClear();
+      vi.mocked(verifyIosAssertion).mockClear();
+      vi.mocked(verifyAndroidAttestation).mockClear();
+      const signJwt = vi.fn(keyOperationsClient.sign);
+      const handler = CreateKeyAttestationHandler({
+        androidAttestationValidationConfig,
+        assertionValidationConfig,
+        federationEntityId,
+        input: {
+          ...req,
+          body: {
+            assertion:
+              storedPlatform === "ios"
+                ? keyAttestationRequestAndroid
+                : keyAttestationRequestIos,
+            fiscal_code: userId,
+          },
+        },
+        inputDecoder: H.HttpRequest,
+        keyAttestationSigningKeyName: keyAttestationKeyName,
+        keyRepository,
+        logger,
+        nonceRepository,
+        signJwt,
+        statusListBaseUrl,
+        walletInstanceRepository:
+          createWalletInstanceRepository(storedPlatform),
+      });
+
+      await expect(handler()).resolves.toEqual({
+        _tag: "Right",
+        right: expect.objectContaining({
+          body: expect.objectContaining({
+            detail: storedPlatform
+              ? "Request platform does not match wallet instance platform"
+              : "Wallet instance device details not found",
+          }),
+          statusCode: 409,
+        }),
+      });
+      expect(verifyAndroidAssertion).not.toHaveBeenCalled();
+      expect(verifyIosAssertion).not.toHaveBeenCalled();
+      expect(verifyAndroidAttestation).not.toHaveBeenCalled();
+      expect(signJwt).not.toHaveBeenCalled();
+    },
+  );
 
   it("should return a 200 HTTP response on success if is a test user", async () => {
     const handler = CreateKeyAttestationHandler({
@@ -542,7 +618,7 @@ describe("CreateKeyAttestationHandler", async () => {
       nonceRepository,
       signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -584,7 +660,7 @@ describe("CreateKeyAttestationHandler", async () => {
       nonceRepository,
       signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     const result = await handler();
@@ -702,7 +778,7 @@ describe("CreateKeyAttestationHandler", async () => {
       nonceRepository,
       signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     const result = await handler();
@@ -762,7 +838,7 @@ describe("CreateKeyAttestationHandler", async () => {
       nonceRepository,
       signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -843,7 +919,7 @@ describe("CreateKeyAttestationHandler", async () => {
       nonceRepository,
       signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({
@@ -894,7 +970,7 @@ describe("CreateKeyAttestationHandler", async () => {
       nonceRepository,
       signJwt: keyOperationsClient.sign,
       statusListBaseUrl,
-      walletInstanceRepository,
+      walletInstanceRepository: androidWalletInstanceRepository,
     });
 
     await expect(handler()).resolves.toEqual({

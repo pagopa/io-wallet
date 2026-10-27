@@ -6,6 +6,7 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
 
 import { ValidationResult } from "@/attestation-service";
+import { emitTelemetryCustomEvent } from "@/infra/telemetry";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
@@ -110,20 +111,17 @@ export const verifyAssertion = async (
       tokenPayloadExternal = token;
 
       try {
-        const validationResult = validateIntegrityResponse(
+        responseValidated = validateIntegrityResponse(
           tokenPayloadExternal,
           bundleIdentifier,
           clientData,
           allowDevelopmentEnvironment,
           androidPlayStoreCertificateHash,
         );
-        // validateIntegrityResponse returns a failed result instead of throwing,
-        // so it must be checked explicitly before accepting the verdict
-        if (validationResult.success) {
-          responseValidated = validationResult;
-          break;
+        if (!responseValidated.success) {
+          errors.push(responseValidated.reason);
         }
-        errors.push(validationResult.reason);
+        break;
       } catch (error) {
         /* If it fails I continue the for loop anyway to try other bundleIdentifiers.
          * The check is still done at the end on the value of responseValidated
@@ -142,7 +140,11 @@ export const verifyAssertion = async (
     };
   }
 
-  if (!responseValidated) {
+  if (!responseValidated?.success) {
+    emitTelemetryCustomEvent({
+      name: "ANDROID_INTEGRITY_CHECK_FAILED",
+    });
+
     return {
       reason: `Integrity Response did not pass validation: ${errors.join(",")}`,
       success: false,

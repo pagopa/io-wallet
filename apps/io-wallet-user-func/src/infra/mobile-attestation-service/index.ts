@@ -106,6 +106,31 @@ export class MobileAttestationService implements AttestationService {
       TE.mapLeft(() => new Error("Invalid test hardware public key")),
     );
 
+  validateAndroidAssertion = ({
+    deviceDetails,
+    hardwareKey,
+    hardwareKeyAttestation,
+    hardwareSignature,
+    integrityAssertion,
+    jwk,
+    nonce,
+    user,
+  }: ValidateAssertionRequest) =>
+    pipe(
+      toSingleKeyClientData(nonce, jwk),
+      TE.chainW((clientData) =>
+        verifyAndroidAssertion({
+          clientData,
+          deviceDetails,
+          hardwareKey,
+          hardwareKeyAttestation,
+          hardwareSignature,
+          integrityAssertion,
+          user,
+        })({ assertionValidationConfig: this.#assertionValidationConfig() }),
+      ),
+    );
+
   validateAssertion = ({
     deviceDetails,
     hardwareKey,
@@ -230,6 +255,32 @@ export class MobileAttestationService implements AttestationService {
         ),
       ),
     );
+
+  validateIosAssertion = ({
+    hardwareKey,
+    hardwareSignature,
+    integrityAssertion,
+    jwk,
+    nonce,
+    signCount,
+  }: ValidateAssertionRequest) =>
+    pipe(
+      toSingleKeyClientData(nonce, jwk),
+      TE.chainW((clientData) =>
+        verifyIosAssertion({
+          clientData,
+          hardwareKey,
+          hardwareSignature,
+          integrityAssertion,
+          signCount,
+        })({ assertionValidationConfig: this.#assertionValidationConfig() }),
+      ),
+    );
+
+  #assertionValidationConfig = (): AssertionValidationConfig => ({
+    ...this.#configuration,
+    trustedSelfSignedBootKeys: this.#trustedSelfSignedBootKeys,
+  });
 
   #keyAttestationConfig = (): AndroidKeyAttestationConfig => ({
     androidCrlUrl: this.#configuration.androidCrlUrl,
