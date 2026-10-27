@@ -73,7 +73,7 @@ interface VerifyAttestationParams {
  * https://source.android.com/docs/security/features/keystore/attestation#verifiedbootstate-values
  */
 const VERIFIED_BOOT_STATE_VERIFIED = 0;
-const VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
+export const VERIFIED_BOOT_STATE_SELF_SIGNED = 1;
 
 /**
  * Key origin and purpose values.

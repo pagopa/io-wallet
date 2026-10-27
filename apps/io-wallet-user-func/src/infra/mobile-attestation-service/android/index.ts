@@ -16,6 +16,7 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 
 import { getCrlFromUrl } from "@/certificates";
 import { ValidatedAttestation } from "@/infra/mobile-attestation-service";
+import { emitTelemetryCustomEvent } from "@/infra/telemetry";
 
 import { AndroidAssertionError, AndroidAttestationError } from "../errors";
 import {
@@ -24,7 +25,11 @@ import {
   validateAssertionSignature,
   verifyAssertion,
 } from "./assertion";
-import { AttestKeyRequirement, verifyAttestation } from "./attestation";
+import {
+  AttestKeyRequirement,
+  VERIFIED_BOOT_STATE_SELF_SIGNED,
+  verifyAttestation,
+} from "./attestation";
 
 export const base64ToPem = (b64cert: string) =>
   `-----BEGIN CERTIFICATE-----\n${b64cert}-----END CERTIFICATE-----`;
@@ -177,12 +182,12 @@ const validatePlayIntegrityAssertion = ({
  *   the registered device;
  * - the verified boot state and key must match the ones of the registration.
  * @param params - The assertion parameters
- * @returns A TaskEither which is right when the key attestation is valid
+ * @returns A TaskEither with the device details of the accepted key attestation
  */
 const validateKeyAttestationAssertion = (
   hardwareKeyAttestation: NonEmptyString,
   params: AndroidAssertionParams,
-): TE.TaskEither<Error, void> => {
+): TE.TaskEither<Error, AndroidDeviceDetails> => {
   const registered =
     params.deviceDetails?.platform === "android"
       ? params.deviceDetails
@@ -233,7 +238,7 @@ const validateKeyAttestationAssertion = (
       deviceDetails.verifiedBootState === registered.verifiedBootState &&
       (registered.verifiedBootKey === undefined ||
         deviceDetails.verifiedBootKey === registered.verifiedBootKey)
-        ? TE.right(undefined)
+        ? TE.right(deviceDetails)
         : TE.left(
             new AndroidAssertionError(
               "Device state differs from the registration",
@@ -247,6 +252,37 @@ const validateKeyAttestationAssertion = (
     ),
   );
 };
+
+/**
+ * Emits the ANDROID_INTEGRITY_FALLBACK_SUCCEEDED telemetry event when an assertion is accepted through the
+ * hardware key attestation fallback. Along with ANDROID_INTEGRITY_CHECK_FAILED, emitted for the Play Integrity
+ * verdicts that are not valid, it allows to tell the Play Integrity failures from the fallback recoveries:
+ * - playIntegrity: why the fallback was used, i.e. the token was missing, its verdict was not valid or the
+ *   Play Integrity service was not available;
+ * - os: the OS running on the device, i.e. GrapheneOS or the stock OS.
+ * @param params - The assertion parameters
+ * @param playIntegrityError - The error of the Play Integrity verification
+ * @param deviceDetails - The device details of the accepted key attestation
+ */
+const emitFallbackSucceeded = (
+  params: AndroidAssertionParams,
+  playIntegrityError: Error,
+  deviceDetails: AndroidDeviceDetails,
+) =>
+  emitTelemetryCustomEvent({
+    name: "ANDROID_INTEGRITY_FALLBACK_SUCCEEDED",
+    properties: {
+      os:
+        deviceDetails.verifiedBootState === VERIFIED_BOOT_STATE_SELF_SIGNED
+          ? "grapheneos"
+          : "stock",
+      playIntegrity: !params.integrityAssertion
+        ? "missing"
+        : playIntegrityError instanceof ExternalServiceError
+          ? "service_error"
+          : "failed",
+    },
+  });
 
 /**
  * Validates an Android integrity assertion. The Play Integrity token is verified first and, as fallback
@@ -268,6 +304,14 @@ export const validateAndroidAssertion = (
             validateKeyAttestationAssertion(
               params.hardwareKeyAttestation,
               params,
+            ),
+            TE.chainIOK(
+              (deviceDetails) => () =>
+                emitFallbackSucceeded(
+                  params,
+                  playIntegrityError,
+                  deviceDetails,
+                ),
             ),
             TE.mapLeft((keyAttestationError) =>
               // Keep the external service error so that the request can be retried

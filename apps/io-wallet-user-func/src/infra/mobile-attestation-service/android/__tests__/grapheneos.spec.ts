@@ -4,10 +4,16 @@ import * as E from "fp-ts/Either";
 import * as TE from "fp-ts/TaskEither";
 import { AndroidDeviceDetails } from "io-wallet-common/device-details";
 import { JwkPublicKey } from "io-wallet-common/jwk";
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { emitTelemetryCustomEvent } from "@/infra/telemetry";
 
 import { AndroidAssertionParams, validateAndroidAssertion } from "..";
-import { GoogleAppCredentials } from "../assertion";
+import {
+  ExternalServiceError,
+  GoogleAppCredentials,
+  verifyAssertion,
+} from "../assertion";
 import { verifyAttestation } from "../attestation";
 import {
   createAttestation,
@@ -18,6 +24,15 @@ import {
   SIGNATURE_DIGEST,
   TestRoot,
 } from "./key-attestation-chain";
+
+vi.mock("@/infra/telemetry", () => ({
+  emitTelemetryCustomEvent: vi.fn(),
+}));
+
+vi.mock("../assertion", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../assertion")>()),
+  verifyAssertion: vi.fn(),
+}));
 
 vi.mock("@/certificates", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/certificates")>()),
@@ -347,5 +362,153 @@ describe("Android assertion with key attestation fallback", () => {
     expect(E.isLeft(result) && result.left.message).toContain(
       "App signing certificate digests are required",
     );
+  });
+});
+
+describe("Telemetry of the key attestation fallback", () => {
+  let root: TestRoot;
+
+  beforeAll(async () => {
+    root = await createTestRoot();
+  });
+
+  beforeEach(() => {
+    vi.mocked(emitTelemetryCustomEvent).mockClear();
+    vi.mocked(verifyAssertion).mockReset();
+  });
+
+  const clientData = JSON.stringify({ challenge: "telemetry-challenge" });
+  const requestHash = createHash("sha256").update(clientData).digest("hex");
+
+  /**
+   * Registers a device with an attest key and prepares an assertion with a fresh key attestation.
+   */
+  const setup = async ({
+    freshAttestKey = "registered",
+    os = "grapheneos",
+  }: {
+    freshAttestKey?: "new" | "registered";
+    os?: "grapheneos" | "stock";
+  } = {}): Promise<AndroidAssertionParams> => {
+    const deviceParams =
+      os === "stock"
+        ? { verifiedBootKey: STOCK_BOOT_KEY, verifiedBootState: 0 }
+        : {};
+    const registration = await createAttestation(
+      root,
+      grapheneOsParams(deviceParams),
+    );
+    const verified = await verifyAttestation({
+      attestationCrl: { entries: {} },
+      attestKey: { requiredForSelfSigned: true },
+      bundleIdentifiers: [PACKAGE_NAME],
+      challenge: "challenge",
+      googlePublicKeys: [root.publicKeyPem],
+      signatureDigests: [SIGNATURE_DIGEST],
+      trustedSelfSignedBootKeys,
+      x509Chain: registration.x509Chain,
+    });
+    if (!verified.success) {
+      throw new Error(verified.reason);
+    }
+    const fresh = await createAttestation(
+      root,
+      grapheneOsParams({ ...deviceParams, challenge: requestHash }),
+      {
+        attestKey:
+          freshAttestKey === "registered" ? registration.attestKey : undefined,
+      },
+    );
+    return {
+      allowDevelopmentEnvironment: false,
+      androidPlayIntegrityUrl: "",
+      androidPlayStoreCertificateHash: "",
+      bundleIdentifiers: [PACKAGE_NAME],
+      clientData,
+      deviceDetails: verified.deviceDetails as AndroidDeviceDetails,
+      googleAppCredentials: {} as GoogleAppCredentials,
+      hardwareKey: verified.hardwareKey as JwkPublicKey,
+      hardwareKeyAttestation: fresh.encoded as NonEmptyString,
+      hardwareSignature: createSign("SHA256")
+        .update(clientData)
+        .sign(registration.privateKey, "base64") as NonEmptyString,
+      keyAttestationConfig: {
+        androidCrlUrl: "",
+        googlePublicKeys: [root.publicKeyPem],
+        httpRequestTimeout: 1,
+        signatureDigests: [SIGNATURE_DIGEST],
+        trustedSelfSignedBootKeys,
+      },
+    };
+  };
+
+  it.each([
+    {
+      expected: { os: "grapheneos", playIntegrity: "missing" },
+      name: "GrapheneOS without Play Integrity token",
+      os: "grapheneos",
+      playIntegrity: undefined,
+    },
+    {
+      expected: { os: "stock", playIntegrity: "failed" },
+      name: "a stock device with a failed Play Integrity verdict",
+      os: "stock",
+      playIntegrity: "failed",
+    },
+    {
+      expected: { os: "grapheneos", playIntegrity: "service_error" },
+      name: "GrapheneOS when the Play Integrity service is not available",
+      os: "grapheneos",
+      playIntegrity: "service_error",
+    },
+  ] as const)(
+    "should emit ANDROID_INTEGRITY_FALLBACK_SUCCEEDED for $name",
+    async ({ expected, os, playIntegrity }) => {
+      if (playIntegrity === "failed") {
+        vi.mocked(verifyAssertion).mockResolvedValue({
+          reason: "Device doesn't meet integrity check.",
+          success: false,
+        });
+      } else if (playIntegrity === "service_error") {
+        vi.mocked(verifyAssertion).mockRejectedValue(
+          new ExternalServiceError(),
+        );
+      }
+      const params = await setup({ os });
+
+      const result = await validateAndroidAssertion({
+        ...params,
+        integrityAssertion: playIntegrity && ("token" as NonEmptyString),
+      })();
+
+      expect(result).toEqual(E.right(undefined));
+      expect(emitTelemetryCustomEvent).toHaveBeenCalledTimes(1);
+      expect(emitTelemetryCustomEvent).toHaveBeenCalledWith({
+        name: "ANDROID_INTEGRITY_FALLBACK_SUCCEEDED",
+        properties: expected,
+      });
+    },
+  );
+
+  it("should not emit the event when the fallback fails", async () => {
+    const result = await validateAndroidAssertion(
+      await setup({ freshAttestKey: "new" }),
+    )();
+
+    expect(E.isLeft(result)).toBe(true);
+    expect(emitTelemetryCustomEvent).not.toHaveBeenCalled();
+  });
+
+  it("should not emit the event when Play Integrity is valid", async () => {
+    vi.mocked(verifyAssertion).mockResolvedValue({ success: true });
+    const params = await setup();
+
+    const result = await validateAndroidAssertion({
+      ...params,
+      integrityAssertion: "token" as NonEmptyString,
+    })();
+
+    expect(result).toEqual(E.right(undefined));
+    expect(emitTelemetryCustomEvent).not.toHaveBeenCalled();
   });
 });
