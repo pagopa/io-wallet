@@ -36,6 +36,7 @@ export const sendTelemetryCustomEvent: (event: {
     E.toError,
   );
 
+// Non fp-ts version of sendTelemetryCustomEvent
 export const emitTelemetryCustomEvent = ({
   name,
   properties,
