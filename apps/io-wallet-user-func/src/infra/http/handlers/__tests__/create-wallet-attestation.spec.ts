@@ -11,10 +11,11 @@ import * as O from "fp-ts/Option";
 import * as TE from "fp-ts/TaskEither";
 import * as t from "io-ts";
 import * as jose from "jose";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { AttestationService } from "@/attestation-service";
 import { KeyOperations } from "@/infra/crypto/key-operations-client";
+import { IntegrityCheckError } from "@/infra/mobile-attestation-service";
 import { ExternalServiceError } from "@/infra/mobile-attestation-service/android/assertion";
 import { iOSMockData } from "@/infra/mobile-attestation-service/ios/__tests__/config";
 import { KeyRepository } from "@/keys";
@@ -72,6 +73,7 @@ const keyOperationsClient: KeyOperations = {
 
 const mockAttestationService: AttestationService = {
   getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
+  validateAndroidAssertion: () => TE.right(undefined),
   validateAssertion: () => TE.right(undefined),
   validateAttestation: () =>
     TE.right({
@@ -84,6 +86,7 @@ const mockAttestationService: AttestationService = {
         y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
       },
     }),
+  validateIosAssertion: () => TE.right(undefined),
 };
 
 const walletInstanceRepository: WalletInstanceRepository = {
@@ -140,6 +143,80 @@ describe("CreateWalletAttestationHandler", async () => {
     },
     method: "POST",
   };
+
+  it.each([
+    undefined,
+    { platform: "ios" } as const,
+    {
+      attestationSecurityLevel: 2,
+      attestationVersion: 3,
+      keymasterSecurityLevel: 2,
+      keymasterVersion: 4,
+      platform: "android",
+    } as const,
+  ])(
+    "should pass stored device details %j to assertion validation and return 409 on failure",
+    async (deviceDetails) => {
+      const attestationService = {
+        ...mockAttestationService,
+        validateAndroidAssertion: vi.fn(() =>
+          TE.left(new IntegrityCheckError(["Invalid assertion"])),
+        ),
+        validateAssertion: vi.fn(() =>
+          TE.left(new IntegrityCheckError(["Invalid assertion"])),
+        ),
+        validateIosAssertion: vi.fn(() =>
+          TE.left(new IntegrityCheckError(["Invalid assertion"])),
+        ),
+      };
+      const signJwt = vi.fn(keyOperationsClient.sign);
+      const handler = CreateWalletAttestationHandler({
+        attestationService,
+        federationEntityId,
+        input: req,
+        inputDecoder: H.HttpRequest,
+        keyRepository,
+        logger,
+        nonceRepository,
+        signJwt,
+        walletAttestationConfig,
+        walletAttestationSigningKeyName,
+        walletInstanceRepository: {
+          ...walletInstanceRepository,
+          getByUserId: () =>
+            TE.right(
+              O.some({
+                createdAt: new Date(),
+                deviceDetails,
+                hardwareKey,
+                id: "123" as NonEmptyString,
+                isRevoked: false,
+                signCount: 0,
+                userId: mockFiscalCode,
+              }),
+            ),
+        },
+      });
+
+      await expect(handler()).resolves.toEqual({
+        _tag: "Right",
+        right: expect.objectContaining({
+          body: expect.objectContaining({ detail: "Invalid assertion" }),
+          statusCode: 409,
+        }),
+      });
+      expect(attestationService.validateIosAssertion).toHaveBeenCalledTimes(
+        deviceDetails?.platform === "ios" ? 1 : 0,
+      );
+      expect(attestationService.validateAndroidAssertion).toHaveBeenCalledTimes(
+        deviceDetails?.platform === "android" ? 1 : 0,
+      );
+      expect(attestationService.validateAssertion).toHaveBeenCalledTimes(
+        deviceDetails === undefined ? 1 : 0,
+      );
+      expect(signJwt).not.toHaveBeenCalled();
+    },
+  );
 
   it("should return a 200 HTTP response on success", async () => {
     const handler = CreateWalletAttestationHandler({
@@ -438,6 +515,7 @@ describe("CreateWalletAttestationHandler", async () => {
   it("should return a 500 HTTP response when validateAssertion returns ExternalServiceError", async () => {
     const mockAttestationServiceExternalServiceError: AttestationService = {
       getHardwarePublicTestKey: () => TE.left(new Error("not implemented")),
+      validateAndroidAssertion: () => TE.left(new ExternalServiceError("foo")),
       validateAssertion: () => TE.left(new ExternalServiceError("foo")),
       validateAttestation: () =>
         TE.right({
@@ -450,6 +528,7 @@ describe("CreateWalletAttestationHandler", async () => {
             y: "7ZIKVr_WCQgyLOpTysVUrBKJz1LzjNlK3DD4KdOGHjo",
           },
         }),
+      validateIosAssertion: () => TE.left(new ExternalServiceError("foo")),
     };
     const req = {
       ...H.request("https://wallet-provider.example.org"),

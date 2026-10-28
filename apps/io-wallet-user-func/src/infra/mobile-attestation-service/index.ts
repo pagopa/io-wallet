@@ -91,6 +91,27 @@ export class MobileAttestationService implements AttestationService {
       TE.mapLeft(() => new Error("Invalid test hardware public key")),
     );
 
+  validateAndroidAssertion = ({
+    hardwareKey,
+    hardwareSignature,
+    integrityAssertion,
+    jwk,
+    nonce,
+    user,
+  }: ValidateAssertionRequest) =>
+    pipe(
+      toSingleKeyClientData(nonce, jwk),
+      TE.chainW((clientData) =>
+        verifyAndroidAssertion({
+          clientData,
+          hardwareKey,
+          hardwareSignature,
+          integrityAssertion,
+          user,
+        })({ assertionValidationConfig: this.#configuration }),
+      ),
+    );
+
   validateAssertion = ({
     hardwareKey,
     hardwareSignature,
@@ -202,6 +223,27 @@ export class MobileAttestationService implements AttestationService {
             ),
           ),
         ),
+      ),
+    );
+
+  validateIosAssertion = ({
+    hardwareKey,
+    hardwareSignature,
+    integrityAssertion,
+    jwk,
+    nonce,
+    signCount,
+  }: ValidateAssertionRequest) =>
+    pipe(
+      toSingleKeyClientData(nonce, jwk),
+      TE.chainW((clientData) =>
+        verifyIosAssertion({
+          clientData,
+          hardwareKey,
+          hardwareSignature,
+          integrityAssertion,
+          signCount,
+        })({ assertionValidationConfig: this.#configuration }),
       ),
     );
 }

@@ -35,3 +35,18 @@ export const sendTelemetryCustomEvent: (event: {
     () => emitCustomEvent(name, properties)(DEFAULT_LOGGER),
     E.toError,
   );
+
+// Non fp-ts version of sendTelemetryCustomEvent
+export const emitTelemetryCustomEvent = ({
+  name,
+  properties,
+}: {
+  name: string;
+  properties?: Record<string, string>;
+}): void => {
+  try {
+    emitCustomEvent(name, properties)(DEFAULT_LOGGER);
+  } catch {
+    // fails silently
+  }
+};

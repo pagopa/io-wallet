@@ -6,6 +6,7 @@ import { JwkPublicKey } from "io-wallet-common/jwk";
 import { exportSPKI, importJWK } from "jose";
 
 import { ValidationResult } from "@/attestation-service";
+import { emitTelemetryCustomEvent } from "@/infra/telemetry";
 
 const ALLOWED_WINDOW_MILLIS = 1000 * 60 * 15; // 15 minutes
 
@@ -117,6 +118,9 @@ export const verifyAssertion = async (
           allowDevelopmentEnvironment,
           androidPlayStoreCertificateHash,
         );
+        if (!responseValidated.success) {
+          errors.push(responseValidated.reason);
+        }
         break;
       } catch (error) {
         /* If it fails I continue the for loop anyway to try other bundleIdentifiers.
@@ -136,7 +140,11 @@ export const verifyAssertion = async (
     };
   }
 
-  if (!responseValidated) {
+  if (!responseValidated?.success) {
+    emitTelemetryCustomEvent({
+      name: "ANDROID_INTEGRITY_CHECK_FAILED",
+    });
+
     return {
       reason: `Integrity Response did not pass validation: ${errors.join(",")}`,
       success: false,
