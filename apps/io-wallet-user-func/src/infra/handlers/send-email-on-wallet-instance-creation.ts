@@ -20,7 +20,7 @@ const WALLET_ACTIVATION_EMAIL_TITLE =
 const WALLET_ACTIVATION_GENERIC_EMAIL_TITLE =
   "Ottieni il meglio del tuo portafoglio digitale su IO";
 
-const WALLET_ACTIVATION_EMAIL_FAQ_LINK = "https://ioapp.it/domande-frequenti";
+const WALLET_ACTIVATION_EMAIL_FAQ_LINK = "https://ioapp.it";
 const WALLET_ACTIVATION_EMAIL_HANDLE_ACCESS_LINK =
   "https://account.ioapp.it/it/accedi/?refresh=true";
 const HELP_CENTER_LINK = "https://assistenza.ioapp.it/hc/it";
