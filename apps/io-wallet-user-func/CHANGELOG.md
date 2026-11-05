@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.2
+
+### Patch Changes
+
+- 57f1958: fix: update wallet activation email FAQ link
+
 ## 5.2.1
 
 ### Patch Changes
