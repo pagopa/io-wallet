@@ -29,10 +29,13 @@ const AssertionJwtApi = t.type({
       jwk: ECPublicKey,
     }),
     exp: t.number,
+    // ANDROID ONLY: fresh key attestation, the fallback when Play Integrity is not available or fails
+    hardware_key_attestation: t.union([NonEmptyString, t.undefined]),
     hardware_key_tag: NonEmptyString,
     hardware_signature: NonEmptyString,
     iat: t.number,
-    integrity_assertion: NonEmptyString,
+    // Required on iOS, on Android it is the Play Integrity token which may be missing
+    integrity_assertion: t.union([NonEmptyString, t.undefined]),
     iss: NonEmptyString,
     keys_to_attest: t.array(NonEmptyString),
     nonce: NonEmptyString,
@@ -46,9 +49,10 @@ const AssertionJwtDecodedPayload = t.type({
   cnf: t.type({
     jwk: ECPublicKey,
   }),
+  hardwareKeyAttestation: t.union([NonEmptyString, t.undefined]),
   hardwareKeyTag: NonEmptyString,
   hardwareSignature: NonEmptyString,
-  integrityAssertion: NonEmptyString,
+  integrityAssertion: t.union([NonEmptyString, t.undefined]),
   iss: NonEmptyString,
   keysToAttest: t.array(NonEmptyString),
   nonce: NonEmptyString,
@@ -87,6 +91,7 @@ const AssertionJwt = new t.Type<
         payload: {
           cnf: payload.cnf,
           exp: payload.exp,
+          hardwareKeyAttestation: payload.hardware_key_attestation,
           hardwareKeyTag: payload.hardware_key_tag,
           hardwareSignature: payload.hardware_signature,
           iat: payload.iat,
@@ -105,6 +110,7 @@ const AssertionJwt = new t.Type<
     payload: {
       cnf: payload.cnf,
       exp: payload.exp,
+      hardware_key_attestation: payload.hardwareKeyAttestation,
       hardware_key_tag: payload.hardwareKeyTag,
       hardware_signature: payload.hardwareSignature,
       iat: payload.iat,
@@ -311,6 +317,7 @@ const toPlatformDecodedAssertionJwt = (
         ),
         E.map((keysToAttest) => ({
           cnf: input.payload.cnf,
+          hardwareKeyAttestation: input.payload.hardwareKeyAttestation,
           hardwareKeyTag: input.payload.hardwareKeyTag,
           hardwareSignature: input.payload.hardwareSignature,
           integrityAssertion: input.payload.integrityAssertion,
@@ -343,6 +350,7 @@ const toPlatformDecodedAssertionJwt = (
         ),
         E.map((keysToAttest) => ({
           cnf: input.payload.cnf,
+          hardwareKeyAttestation: input.payload.hardwareKeyAttestation,
           hardwareKeyTag: input.payload.hardwareKeyTag,
           hardwareSignature: input.payload.hardwareSignature,
           integrityAssertion: input.payload.integrityAssertion,

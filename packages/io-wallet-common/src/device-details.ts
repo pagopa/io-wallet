@@ -1,5 +1,7 @@
 import * as t from "io-ts";
 
+import { JwkPublicKey } from "./jwk";
+
 export const IosDeviceDetails = t.type({
   platform: t.literal("ios"),
 });
@@ -15,11 +17,15 @@ export const AndroidDeviceDetails = t.intersection([
     platform: t.literal("android"),
   }),
   t.partial({
+    /** Public key of the app attest key pinned at registration, used to verify fresh key attestations. */
+    attestKey: JwkPublicKey,
     bootPatchLevel: t.string,
     deviceLocked: t.boolean,
     osPatchLevel: t.number,
     osVersion: t.number,
     vendorPatchLevel: t.string,
+    /** Hex encoded verified boot key of the root of trust. */
+    verifiedBootKey: t.string,
     verifiedBootState: t.number,
     x509Chain: t.array(t.string),
   }),
@@ -40,11 +46,13 @@ export const AndroidDeviceDetailsStringOsPatchLevel = t.intersection([
     platform: t.literal("android"),
   }),
   t.partial({
+    attestKey: JwkPublicKey,
     bootPatchLevel: t.string,
     deviceLocked: t.boolean,
     osPatchLevel: t.union([t.number, t.string]),
     osVersion: t.number,
     vendorPatchLevel: t.string,
+    verifiedBootKey: t.string,
     verifiedBootState: t.number,
     x509Chain: t.array(t.string),
   }),

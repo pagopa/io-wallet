@@ -47,6 +47,8 @@ describe("AndroidAttestationValidation", () => {
         osVersion: 130000,
         platform: "android",
         vendorPatchLevel: "20230805",
+        verifiedBootKey:
+          "879cd3f18ea76e244d4d4ac3bcb9c337c13b4667190b19035afe2536550050f1",
         verifiedBootState: 0,
         x509Chain: x509Chain.map((el) => el.toString()),
       },
@@ -78,6 +80,8 @@ describe("AndroidAttestationValidation", () => {
         osVersion: 130000,
         platform: "android",
         vendorPatchLevel: "20230805",
+        verifiedBootKey:
+          "879cd3f18ea76e244d4d4ac3bcb9c337c13b4667190b19035afe2536550050f1",
         verifiedBootState: 0,
         x509Chain: x509Chain.map((el) => el.toString()),
       },
