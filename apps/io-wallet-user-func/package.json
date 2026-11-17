@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -30,7 +30,7 @@
     "@pagopa/azure-tracing": "^0.4.16",
     "@pagopa/handler-kit": "catalog:",
     "@pagopa/handler-kit-azure-func": "catalog:",
-    "@pagopa/io-app-email-templates": "0.8.3",
+    "@pagopa/io-app-email-templates": "0.8.5",
     "@pagopa/io-functions-commons": "^31.0.0",
     "@pagopa/logger": "catalog:",
     "@pagopa/ts-commons": "catalog:",

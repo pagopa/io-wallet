@@ -73,6 +73,13 @@ module "function_app_user_autoscaler_02" {
 
   scheduler = {
     maximum = 30
+    spot_load = {
+      name       = "main-gate"
+      start_date = "2026-11-23T06:00:00Z"
+      end_date   = "2026-11-24T06:00:00Z"
+      default    = 30
+      minimum    = 30
+    }
     normal_load = {
       default = 15
       minimum = 10

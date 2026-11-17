@@ -412,7 +412,6 @@ app.storageQueue("sendEmailOnWalletInstanceCreation", {
   handler: SendEmailOnWalletInstanceCreationFunction({
     emailNotificationService,
     inputDecoder: FiscalCode,
-    whitelistedFiscalCodeRepository,
   }),
   queueName: config.azure.storage.walletInstances.queues.creationSendEmail.name,
 });
@@ -422,7 +421,6 @@ app.storageQueue("sendEmailOnWalletInstanceRevocation", {
   handler: SendEmailOnWalletInstanceRevocationFunction({
     emailNotificationService,
     inputDecoder: WalletInstanceRevocationQueueItem,
-    whitelistedFiscalCodeRepository,
   }),
   queueName:
     config.azure.storage.walletInstances.queues.revocationSendEmail.name,

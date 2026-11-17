@@ -1,6 +1,5 @@
 import * as H from "@pagopa/handler-kit";
 import { apply as htmlTemplateGeneric } from "@pagopa/io-app-email-templates/ItWalletInstanceRevocation/index";
-import { apply as htmlTemplate } from "@pagopa/io-app-email-templates/WalletInstanceRevocation/index";
 import { IsoDateFromString } from "@pagopa/ts-commons/lib/dates";
 import { FiscalCode } from "@pagopa/ts-commons/lib/strings";
 import { ValidUrl } from "@pagopa/ts-commons/lib/url";
@@ -16,7 +15,6 @@ import {
   sendEmailToUser,
 } from "@/email";
 import { sendTelemetryException } from "@/infra/telemetry";
-import { checkIfFiscalCodeIsWhitelisted } from "@/whitelisted-fiscal-code";
 
 export const WalletInstanceRevocationQueueItem = t.type({
   fiscalCode: FiscalCode,
@@ -27,8 +25,6 @@ type WalletInstanceRevocationQueueItem = t.TypeOf<
   typeof WalletInstanceRevocationQueueItem
 >;
 
-const WALLET_REVOCATION_EMAIL_TITLE =
-  "Messaggio da IO: Documenti su IO disattivato";
 const WALLET_REVOCATION_GENERIC_EMAIL_TITLE =
   "Messaggio da IO: documenti digitali rimossi";
 
@@ -44,30 +40,6 @@ const HTML_TO_TEXT_OPTIONS: HtmlToText.HtmlToTextOptions = {
   ],
   tables: true,
 };
-
-// it provides a message specific to Documenti su IO
-const sendEmail: (input: {
-  emailAddress: string;
-  revokedAt: Date;
-}) => RTE.ReaderTaskEither<
-  { emailNotificationService: EmailNotificationService },
-  Error,
-  void
-> = ({ emailAddress, revokedAt }) =>
-  pipe(
-    htmlTemplate(
-      formatDate(revokedAt, "HH:mm", DEFAULT_TIMEZONE),
-      formatDate(revokedAt, "DD/MM/YYYY", DEFAULT_TIMEZONE),
-      { href: WALLET_REVOCATION_EMAIL_BLOCK_ACCESS_LINK } as ValidUrl,
-    ),
-    (htmlContent) =>
-      sendEmailToUser({
-        html: htmlContent,
-        subject: WALLET_REVOCATION_EMAIL_TITLE,
-        text: HtmlToText.htmlToText(htmlContent, HTML_TO_TEXT_OPTIONS),
-        to: emailAddress,
-      }),
-  );
 
 // it provides a generic message that works for both IT Wallet and Documenti su IO
 const sendGenericEmail: (input: {
@@ -99,15 +71,7 @@ export const SendEmailOnWalletInstanceRevocationHandler = H.of(
       fiscalCode,
       getUserEmailByFiscalCode,
       RTE.chainW((emailAddress) =>
-        pipe(
-          fiscalCode,
-          checkIfFiscalCodeIsWhitelisted,
-          RTE.chainW(({ whitelisted }) =>
-            whitelisted
-              ? sendGenericEmail({ emailAddress, revokedAt })
-              : sendEmail({ emailAddress, revokedAt }),
-          ),
-        ),
+        sendGenericEmail({ emailAddress, revokedAt }),
       ),
       RTE.orElseFirstW(
         flow(
