@@ -1,7 +1,14 @@
+moved {
+  from = azurerm_monitor_metric_alert.function_app_user_response_time
+  to   = azurerm_monitor_metric_alert.function_app_user_response_time["01"]
+}
+
 resource "azurerm_monitor_metric_alert" "function_app_user_response_time" {
-  name                = "[${module.function_app_user.function_app.function_app.name}] Slow Response Time"
+  for_each = local.user_function_apps
+
+  name                = "[${each.value.function_app.name}] Slow Response Time"
   resource_group_name = var.resource_group_name
-  scopes              = [module.function_app_user.function_app.function_app.id]
+  scopes              = [each.value.function_app.id]
   description         = "Slow responses from the Function App. Beware: deployments may slow it down for some minutes. Always check in application insight. Runbook https://pagopa.atlassian.net/wiki/spaces/SIW/pages/1311735955/Runbook"
   severity            = 1
   frequency           = "PT5M"
@@ -44,10 +51,17 @@ resource "azurerm_monitor_metric_alert" "function_app_support_response_time" {
   tags = var.tags
 }
 
+moved {
+  from = azurerm_monitor_metric_alert.app_service_plan_cpu_alert
+  to   = azurerm_monitor_metric_alert.app_service_plan_cpu_alert["01"]
+}
+
 resource "azurerm_monitor_metric_alert" "app_service_plan_cpu_alert" {
-  name                = "[${module.function_app_user.function_app.plan.name}] High CPU Usage"
+  for_each = local.user_function_apps
+
+  name                = "[${each.value.plan.name}] High CPU Usage"
   resource_group_name = var.resource_group_name
-  scopes              = [module.function_app_user.function_app.plan.id]
+  scopes              = [each.value.plan.id]
   description         = "Critically high CPU usage detected on user App Service Plan"
   severity            = 1
   window_size         = "PT5M"

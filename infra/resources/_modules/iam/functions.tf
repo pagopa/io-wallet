@@ -1,8 +1,22 @@
+locals {
+  user_function_apps = {
+    "01" = var.function_app.user_func
+    "02" = var.function_app.user_func_02
+  }
+}
+
+moved {
+  from = module.func_app_user
+  to   = module.func_app_user["01"]
+}
+
 module "func_app_user" {
+  for_each = local.user_function_apps
+
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
 
-  principal_id    = var.function_app.user_func.principal_id
+  principal_id    = each.value.principal_id
   subscription_id = var.subscription_id
 
   cosmos = [
@@ -64,13 +78,18 @@ module "func_app_user" {
   ]
 }
 
+moved {
+  from = module.func_app_user_slot[0]
+  to   = module.func_app_user_slot["01"]
+}
+
 module "func_app_user_slot" {
-  count = var.function_app.user_func.staging_principal_id != null ? 1 : 0
+  for_each = local.user_function_apps
 
   source  = "pagopa-dx/azure-role-assignments/azurerm"
   version = "~> 1.3"
 
-  principal_id    = var.function_app.user_func.staging_principal_id
+  principal_id    = each.value.staging_principal_id
   subscription_id = var.subscription_id
 
   cosmos = [
@@ -132,17 +151,31 @@ module "func_app_user_slot" {
   ]
 }
 
+moved {
+  from = azurerm_role_assignment.func_app_user_key_vault_crypto_user
+  to   = azurerm_role_assignment.func_app_user_key_vault_crypto_user["01"]
+}
+
 resource "azurerm_role_assignment" "func_app_user_key_vault_crypto_user" {
+  for_each = local.user_function_apps
+
   scope                = var.key_vault_app.id
   role_definition_name = "Key Vault Crypto User"
-  principal_id         = var.function_app.user_func.principal_id
+  principal_id         = each.value.principal_id
   description          = "Allow Function App user to sign data with wallet provider Key Vault keys"
 }
 
+moved {
+  from = azurerm_role_assignment.func_app_user_slot_key_vault_crypto_user
+  to   = azurerm_role_assignment.func_app_user_slot_key_vault_crypto_user["01"]
+}
+
 resource "azurerm_role_assignment" "func_app_user_slot_key_vault_crypto_user" {
+  for_each = local.user_function_apps
+
   scope                = var.key_vault_app.id
   role_definition_name = "Key Vault Crypto User"
-  principal_id         = var.function_app.user_func.staging_principal_id
+  principal_id         = each.value.staging_principal_id
   description          = "Allow Function App user slot to sign data with wallet provider Key Vault keys"
 }
 

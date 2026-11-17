@@ -46,7 +46,14 @@ module "function_app_user" {
   tags = var.tags
 }
 
+moved {
+  from = module.function_app_user_autoscaler_02
+  to   = module.function_app_user_autoscaler_02["01"]
+}
+
 module "function_app_user_autoscaler_02" {
+  for_each = local.user_function_apps
+
   source  = "pagopa-dx/azure-app-service-plan-autoscaler/azurerm"
   version = "~> 2.0"
 
@@ -54,12 +61,12 @@ module "function_app_user_autoscaler_02" {
 
   location = var.environment.location
 
-  app_service_plan_id = module.function_app_user.function_app.plan.id
+  app_service_plan_id = each.value.plan.id
 
   target_service = {
     function_apps = [
       {
-        id = module.function_app_user.function_app.function_app.id
+        id = each.value.function_app.id
       }
     ]
   }

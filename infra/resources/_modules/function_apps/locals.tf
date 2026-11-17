@@ -1,4 +1,9 @@
 locals {
+  user_function_apps = {
+    "01" = module.function_app_user.function_app
+    "02" = module.function_app_user_02.function_app
+  }
+
   # app settings shared across both the user-uat and user-prod Function Apps
   function_app_user_envs_shared_app_settings = merge({
     NODE_ENV = "production"
@@ -126,6 +131,19 @@ locals {
     "sendEmailOnWalletInstanceCreation",
     "sendEmailOnWalletInstanceRevocation",
   ]
+
+  function_app_user_02_disabled = concat(
+    local.function_app_user_slot_disabled,
+    ["statusListPublicationMonitor"],
+  )
+
+  function_app_user_02_app_settings = merge(
+    local.function_app_user_common_app_settings,
+    {
+      for to_disable in local.function_app_user_02_disabled :
+      format("AzureWebJobs.%s.Disabled", to_disable) => 1
+    }
+  )
 
   function_app_user_uat_both_slots_disabled = [
     "sendEmailOnWalletInstanceCreation",
