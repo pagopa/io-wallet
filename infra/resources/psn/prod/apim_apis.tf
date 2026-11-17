@@ -77,6 +77,26 @@ resource "azurerm_api_management_backend" "func_user" {
   url                 = "https://${module.function_apps.function_app_user.default_hostname}${local.backend_paths.user_v1}"
 }
 
+resource "azapi_resource" "func_user_pool" {
+  type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
+  name      = "function-user-pool"
+  parent_id = module.apim.id
+
+  body = {
+    properties = {
+      description = "Function App User backend pool"
+      type        = "Pool"
+      pool = {
+        services = [
+          {
+            id = azurerm_api_management_backend.func_user.id
+          }
+        ]
+      }
+    }
+  }
+}
+
 resource "azurerm_api_management_backend" "func_user_uat" {
   name                = "function-user-uat-01"
   description         = "Function App User (UAT) Backend"
@@ -412,7 +432,7 @@ resource "azurerm_api_management_api_policy" "user_ioapp_v1" {
           <include-fragment fragment-id="${azurerm_api_management_policy_fragment.extract_user_fiscal_code.name}" />
         </when>
       </choose>
-      <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
+      <set-backend-service backend-id="${azapi_resource.func_user_pool.name}" />
   </inbound>
 </policies>
 XML
