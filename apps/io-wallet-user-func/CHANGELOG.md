@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.3
+
+### Patch Changes
+
+- 9ff0cae: Updated creation and revocation WI emails
+
 ## 5.2.2
 
 ### Patch Changes
