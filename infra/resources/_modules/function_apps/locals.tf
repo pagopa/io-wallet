@@ -99,7 +99,7 @@ locals {
       EntityConfigurationV1WalletProviderJwksKeyNames       = "wa-key-v1-prod"
       EntityConfigurationV2FederationEntityJwksKeyNames     = "intermediate-key-v2-prod"
       EntityConfigurationV2SigningKeyName                   = "intermediate-key-v2-prod"
-      EntityConfigurationV2WalletSolutionJwksKeyNames       = "leaf-key-v2-prod"
+      EntityConfigurationV2WalletSolutionJwksKeyNames       = "leaf-key-v2-prod,leaf-key-v2"
       FederationEntityV2LogoUri                             = "https://wallet.io.pagopa.it/images/logo-pagopa.svg"
       KeyOperationsApiBaseUrl                               = "https://apim.internal.wallet.io.pagopa.it/api/wallet/keys/v1"
       TokenStatusListSigningKeyName                         = "leaf-key-v2-prod"
