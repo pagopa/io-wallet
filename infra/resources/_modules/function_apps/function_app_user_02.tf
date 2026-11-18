@@ -12,7 +12,7 @@ module "function_app_user_02" {
   health_check_path   = var.health_check_path_user
   node_version        = 22
 
-  subnet_id   = try(data.azurerm_subnet.func_user_02[0].id, null)
+  subnet_id   = try(azurerm_subnet.func_user_02[0].id, null)
   subnet_cidr = var.subnet_route_table_id == null ? var.cidr_subnet_user_func_02 : null
 
   subnet_pep_id                        = var.private_endpoint_subnet_id

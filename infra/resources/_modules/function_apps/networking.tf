@@ -39,6 +39,16 @@ resource "azurerm_subnet" "func_user_02" {
 
   resource_group_name  = var.virtual_network.resource_group_name
   virtual_network_name = var.virtual_network.name
+
+  address_prefixes = [var.cidr_subnet_user_func_02]
+
+  delegation {
+    name = "default"
+    service_delegation {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
 }
 
 resource "azurerm_subnet" "func_support" {
