@@ -51,7 +51,7 @@ moved {
   to   = module.function_app_user_autoscaler_02["01"]
 }
 
-module "function_app_user_autoscaler" {
+module "function_app_user_autoscaler_02" {
   for_each = local.user_function_apps
 
   source  = "pagopa-dx/azure-app-service-plan-autoscaler/azurerm"
