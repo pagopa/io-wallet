@@ -5,11 +5,6 @@ locals {
   }
 }
 
-moved {
-  from = module.func_app_user
-  to   = module.func_app_user["01"]
-}
-
 module "func_app_user" {
   for_each = local.user_function_apps
 
@@ -76,11 +71,6 @@ module "func_app_user" {
       role                 = "owner"
     }
   ]
-}
-
-moved {
-  from = module.func_app_user_slot[0]
-  to   = module.func_app_user_slot["01"]
 }
 
 module "func_app_user_slot" {
