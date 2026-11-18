@@ -43,7 +43,7 @@ resource "azurerm_subnet" "func_user_02" {
   address_prefixes = [var.cidr_subnet_user_func_02]
 
   delegation {
-    name = "default"
+    name = "Microsoft.Web/serverFarms"
     service_delegation {
       name    = "Microsoft.Web/serverFarms"
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
