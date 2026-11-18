@@ -24,7 +24,7 @@ resource "azurerm_subnet" "func_user" {
   }
 }
 
-data "azurerm_subnet" "func_user_02" {
+resource "azurerm_subnet" "func_user_02" {
   count = var.subnet_route_table_id == null ? 0 : 1
 
   name = provider::dx::resource_name(merge(
