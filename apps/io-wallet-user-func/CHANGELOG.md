@@ -1,5 +1,17 @@
 # io-wallet-user-func
 
+## 5.2.4
+
+### Patch Changes
+
+- 03778d9: Removed Documenti su IO specific emails
+
+## 5.2.3
+
+### Patch Changes
+
+- 9ff0cae: Updated creation and revocation WI emails
+
 ## 5.2.2
 
 ### Patch Changes
