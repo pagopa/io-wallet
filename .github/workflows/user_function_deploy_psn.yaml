@@ -1,7 +1,17 @@
 name: Deploy Function App PSN (user-func)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      function_app:
+        description: Function app to deploy
+        type: choice
+        required: true
+        default: both
+        options:
+          - both
+          - iw-p-itn-user-func-01
+          - iw-p-itn-user-func-02
   push:
     branches:
       - master
@@ -19,9 +29,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        web_app_name:
-          - iw-p-itn-user-func-01
-          - iw-p-itn-user-func-02
+        web_app_name: >-
+          ${{ fromJSON(
+            inputs.function_app && inputs.function_app != 'both'
+            && format('["{0}"]', inputs.function_app)
+            || '["iw-p-itn-user-func-01","iw-p-itn-user-func-02"]'
+          ) }}
     uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@main
     secrets: inherit
     with:
