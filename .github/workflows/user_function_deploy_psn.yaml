@@ -15,14 +15,20 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Deploy (${{ matrix.web_app_name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        web_app_name:
+          - iw-p-itn-user-func-01
+          - iw-p-itn-user-func-02
     uses: pagopa/dx/.github/workflows/release-azure-appsvc-v1.yaml@main
     secrets: inherit
     with:
       workspace_name: io-wallet-user-func
       environment: app-psn-prod
       resource_group_name: iw-p-itn-wallet-rg-01
-      web_app_name: iw-p-itn-user-func-01
+      web_app_name: ${{ matrix.web_app_name }}
       disable_auto_staging_deploy: true
       use_labels: true
       override_labels: psn
