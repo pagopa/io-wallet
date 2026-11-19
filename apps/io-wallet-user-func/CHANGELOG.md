@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.5
+
+### Patch Changes
+
+- 8883856: Updated @pagopa/azure-tracing package
+
 ## 5.2.4
 
 ### Patch Changes

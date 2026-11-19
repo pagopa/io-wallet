@@ -1,0 +1,47 @@
+module "function_app_user_02" {
+  source  = "pagopa-dx/azure-function-app/azurerm"
+  version = "~> 7.0"
+
+  environment = merge(var.environment, {
+    app_name        = "user"
+    env_short       = var.environment.environment
+    instance_number = "02"
+  })
+
+  resource_group_name = var.resource_group_name
+  health_check_path   = var.health_check_path_user
+  node_version        = 22
+
+  subnet_id   = try(azurerm_subnet.func_user_02[0].id, null)
+  subnet_cidr = var.subnet_route_table_id == null ? var.cidr_subnet_user_func_02 : null
+
+  subnet_pep_id                        = var.private_endpoint_subnet_id
+  private_dns_zone_resource_group_name = var.private_dns_zone_resource_group_name
+  private_dns_zone_ids                 = var.private_dns_zone_ids
+  virtual_network = {
+    name                = var.virtual_network.name
+    resource_group_name = var.virtual_network.resource_group_name
+  }
+
+  app_settings      = local.function_app_user_02_app_settings
+  slot_app_settings = local.function_app_user_02_app_settings
+  sticky_app_setting_names = [
+    for to_disable in local.function_app_user_02_disabled :
+    format("AzureWebJobs.%s.Disabled", to_disable)
+  ]
+
+  application_insights_connection_string   = var.application_insights_connection_string
+  application_insights_sampling_percentage = 5
+
+  action_group_ids = concat(
+    [
+      var.action_group_wallet_id
+    ],
+    var.action_group_io_id == null ? [] : [var.action_group_io_id]
+  )
+
+  use_case = "high_load"
+  size     = "P3mv3"
+
+  tags = var.tags
+}

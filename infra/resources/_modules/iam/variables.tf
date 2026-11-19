@@ -22,6 +22,10 @@ variable "function_app" {
       principal_id         = string
       staging_principal_id = string
     })
+    user_func_02 = object({
+      principal_id         = string
+      staging_principal_id = string
+    })
     support_func = object({
       principal_id         = string
       staging_principal_id = string
