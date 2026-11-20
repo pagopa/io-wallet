@@ -16,6 +16,7 @@ output "function_app_user_02" {
     name                 = module.function_app_user_02.function_app.function_app.name
     principal_id         = module.function_app_user_02.function_app.function_app.principal_id
     staging_principal_id = module.function_app_user_02.function_app.function_app.slot.principal_id
+    default_hostname     = module.function_app_user_02.function_app.function_app.default_hostname
   }
 }
 
