@@ -140,8 +140,6 @@ locals {
 
   automation_prod_cd = {
     secrets = {
-      "ARM_CLIENT_ID"           = module.repo.identities.infra.cd.client_id
-      "ARM_SUBSCRIPTION_ID"     = module.repo.subscription_id
       "ARM_TENANT_ID"           = data.azurerm_client_config.current.tenant_id
       "ARM_PSN_CLIENT_ID"       = azurerm_user_assigned_identity.infra_psn_cd.client_id
       "ARM_PSN_SUBSCRIPTION_ID" = local.psn_subscription_id
@@ -329,14 +327,6 @@ resource "azurerm_federated_identity_credential" "github_opex_psn_cd" {
   issuer                    = local.ids.issuer
   user_assigned_identity_id = azurerm_user_assigned_identity.opex_psn_cd.id
   subject                   = "repo:pagopa/${local.repository.name}:environment:${format(local.ids.opex_environment_name, "cd")}"
-}
-
-resource "azurerm_federated_identity_credential" "github_automation_prod_cd" {
-  name                      = "dx-environment-infra-prod-automation-prod-cd"
-  audience                  = local.ids.audience
-  issuer                    = local.ids.issuer
-  user_assigned_identity_id = module.repo.identities.infra.cd.id
-  subject                   = "repo:pagopa/${local.repository.name}:environment:automation-prod-cd"
 }
 
 resource "azurerm_federated_identity_credential" "github_automation_prod_cd_psn" {
