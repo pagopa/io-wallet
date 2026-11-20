@@ -43,8 +43,6 @@ provider "github" {
   owner = "pagopa"
 }
 
-data "azurerm_subscription" "current" {}
-
 data "azurerm_client_config" "current" {}
 
 data "azurerm_container_app_environment" "runner" {
@@ -89,7 +87,7 @@ data "azuread_group" "developers" {
 
 module "repo" {
   source  = "pagopa-dx/azure-github-environment-bootstrap/azurerm"
-  version = "~> 3.0"
+  version = "~> 7.0"
 
   environment = {
     prefix          = local.prefix
@@ -98,9 +96,6 @@ module "repo" {
     domain          = local.domain
     instance_number = local.instance_number
   }
-
-  subscription_id = data.azurerm_subscription.current.id
-  tenant_id       = data.azurerm_client_config.current.tenant_id
 
   entraid_groups = {
     admins_object_id = data.azuread_group.admins.object_id
@@ -127,15 +122,8 @@ module "repo" {
     }
   }
 
-  apim_id                            = data.azurerm_api_management.apim.id
-  pep_vnet_id                        = data.azurerm_virtual_network.common.id
   private_dns_zone_resource_group_id = data.azurerm_resource_group.dns_zones.id
   opex_resource_group_id             = data.azurerm_resource_group.dashboards.id
-  keyvault_common_ids = [
-    data.azurerm_key_vault.common.id
-  ]
-
-  nat_gateway_resource_group_id = data.azurerm_resource_group.common_itn.id
 
   tags = local.tags
 }
