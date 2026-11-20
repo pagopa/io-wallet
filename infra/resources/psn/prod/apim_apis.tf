@@ -587,10 +587,7 @@ resource "azurerm_api_management_api_policy" "user_ioweb_v1" {
 <policies>
   <inbound>
       <base />
-      <set-header name="x-functions-key" exists-action="override">
-        <value>{{${azurerm_api_management_named_value.func_user_ioweb_key.display_name}}}</value>
-      </set-header>
-      <set-backend-service backend-id="${azurerm_api_management_backend.func_user.name}" />
+      <set-backend-service backend-id="${azapi_resource.func_user_ioweb_pool.name}" />
   </inbound>
 </policies>
 XML
