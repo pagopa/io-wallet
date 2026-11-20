@@ -136,7 +136,7 @@ const validateRequest: (input: {
             walletInstance.hardwareKey,
             walletInstance.signCount,
             userId,
-            walletInstance.deviceDetails?.platform,
+            walletInstance.deviceDetails,
           ),
     ),
   );
