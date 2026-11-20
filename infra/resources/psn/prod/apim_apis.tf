@@ -53,6 +53,39 @@ resource "azurerm_api_management_named_value" "func_user_pdnd_key" {
   }
 }
 
+resource "azurerm_api_management_named_value" "func_user_02_ioapp_key" {
+  name                = "user02-func-ioapp-key"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "User02IOAppFunctionKey"
+  secret              = true
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_02_ioapp_fn_key.versionless_id
+  }
+}
+
+resource "azurerm_api_management_named_value" "func_user_02_ioweb_key" {
+  name                = "user02-func-ioweb-key"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "User02IOWebFunctionKey"
+  secret              = true
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_02_ioweb_fn_key.versionless_id
+  }
+}
+
+resource "azurerm_api_management_named_value" "func_user_02_pdnd_key" {
+  name                = "user02-func-pdnd-key"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  display_name        = "User02PdndFunctionKey"
+  secret              = true
+  value_from_key_vault {
+    secret_id = azurerm_key_vault_secret.user_02_pdnd_fn_key.versionless_id
+  }
+}
+
 resource "azurerm_api_management_backend" "func_support" {
   name                = "function-support-01"
   description         = "Function App Support Backend"
@@ -77,6 +110,57 @@ resource "azurerm_api_management_backend" "func_user" {
   url                 = "https://${module.function_apps.function_app_user.default_hostname}${local.backend_paths.user_v1}"
 }
 
+resource "azurerm_api_management_backend" "func_user_ioapp" {
+  for_each = local.user_function_apps
+
+  name                = "function-user-ioapp-${each.key}"
+  description         = "Function App User ${each.key} IOApp Backend"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  protocol            = "http"
+  url                 = "https://${each.value.default_hostname}${local.backend_paths.user_v1}"
+
+  credentials {
+    header = {
+      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_ioapp_key.display_name}}}" : "{{${azurerm_api_management_named_value.func_user_02_ioapp_key.display_name}}}"
+    }
+  }
+}
+
+resource "azurerm_api_management_backend" "func_user_ioweb" {
+  for_each = local.user_function_apps
+
+  name                = "function-user-ioweb-${each.key}"
+  description         = "Function App User ${each.key} IOWeb Backend"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  protocol            = "http"
+  url                 = "https://${each.value.default_hostname}${local.backend_paths.user_v1}"
+
+  credentials {
+    header = {
+      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_ioweb_key.display_name}}}" : "{{${azurerm_api_management_named_value.func_user_02_ioweb_key.display_name}}}"
+    }
+  }
+}
+
+resource "azurerm_api_management_backend" "func_user_pdnd" {
+  for_each = local.user_function_apps
+
+  name                = "function-user-pdnd-${each.key}"
+  description         = "Function App User ${each.key} PDND Backend"
+  api_management_name = module.apim.name
+  resource_group_name = module.apim.resource_group_name
+  protocol            = "http"
+  url                 = "https://${each.value.default_hostname}${local.backend_paths.user_v1}"
+
+  credentials {
+    header = {
+      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_pdnd_key.display_name}}}" : "{{${azurerm_api_management_named_value.func_user_02_pdnd_key.display_name}}}"
+    }
+  }
+}
+
 resource "azapi_resource" "func_user_pool" {
   type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
   name      = "function-user-pool"
@@ -90,6 +174,66 @@ resource "azapi_resource" "func_user_pool" {
         services = [
           {
             id = azurerm_api_management_backend.func_user.id
+          }
+        ]
+      }
+    }
+  }
+}
+
+resource "azapi_resource" "func_user_ioapp_pool" {
+  type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
+  name      = "function-user-ioapp-pool"
+  parent_id = module.apim.id
+
+  body = {
+    properties = {
+      description = "Round-robin pool of Function App User IOApp backends"
+      type        = "Pool"
+      pool = {
+        services = [
+          for backend in values(azurerm_api_management_backend.func_user_ioapp) : {
+            id = backend.id
+          }
+        ]
+      }
+    }
+  }
+}
+
+resource "azapi_resource" "func_user_ioweb_pool" {
+  type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
+  name      = "function-user-ioweb-pool"
+  parent_id = module.apim.id
+
+  body = {
+    properties = {
+      description = "Round-robin pool of Function App User IOWeb backends"
+      type        = "Pool"
+      pool = {
+        services = [
+          for backend in values(azurerm_api_management_backend.func_user_ioweb) : {
+            id = backend.id
+          }
+        ]
+      }
+    }
+  }
+}
+
+resource "azapi_resource" "func_user_pdnd_pool" {
+  type      = "Microsoft.ApiManagement/service/backends@2024-05-01"
+  name      = "function-user-pdnd-pool"
+  parent_id = module.apim.id
+
+  body = {
+    properties = {
+      description = "Round-robin pool of Function App User PDND backends"
+      type        = "Pool"
+      pool = {
+        services = [
+          for backend in values(azurerm_api_management_backend.func_user_pdnd) : {
+            id = backend.id
           }
         ]
       }
