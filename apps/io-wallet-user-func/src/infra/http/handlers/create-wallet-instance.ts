@@ -28,11 +28,16 @@ import { consumeNonce, WalletInstanceRequest } from "@/wallet-instance-request";
 
 const WalletInstanceRequestPayload = t.intersection([
   t.type({
-    challenge: NonEmptyString,
     fiscal_code: FiscalCode,
     hardware_key_tag: NonEmptyString,
     key_attestation: NonEmptyString,
   }),
+  // Exactly one of `nonce` or `challenge` must be provided.
+  // `challenge` is deprecated and kept only for the migration grace period.
+  t.union([
+    t.type({ challenge: t.undefined, nonce: NonEmptyString }),
+    t.type({ challenge: NonEmptyString, nonce: t.undefined }),
+  ]),
   t.partial({ is_renewal: t.boolean }),
 ]);
 
@@ -51,8 +56,9 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
         hardware_key_tag,
         is_renewal,
         key_attestation,
+        nonce,
       }) => ({
-        challenge: challenge,
+        challenge: challenge ?? nonce,
         fiscalCode: fiscal_code,
         hardwareKeyTag: hardware_key_tag,
         isRenewal: is_renewal ?? false,

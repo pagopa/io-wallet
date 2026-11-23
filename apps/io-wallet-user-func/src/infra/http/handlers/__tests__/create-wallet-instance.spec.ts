@@ -29,8 +29,18 @@ describe("CreateWalletInstanceHandler", () => {
     key_attestation: attestation,
   };
 
+  const deleteNonceSpy = vi.fn<NonceRepository["delete"]>(() =>
+    TE.right(void 0),
+  );
+
+  const walletInstanceRequestWithoutChallenge = {
+    fiscal_code: mockFiscalCode,
+    hardware_key_tag: keyId,
+    key_attestation: attestation,
+  };
+
   const nonceRepository: NonceRepository = {
-    delete: () => TE.right(void 0),
+    delete: deleteNonceSpy,
     insert: () => TE.left(new Error("not implemented")),
   };
 
@@ -127,6 +137,7 @@ describe("CreateWalletInstanceHandler", () => {
       }),
     });
 
+    expect(deleteNonceSpy).toHaveBeenCalledWith(challenge);
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
     expect(allocateStatusBindingSpy).toHaveBeenCalledTimes(1);
     expect(insertWalletInstanceSpy).toHaveBeenCalledWith(
@@ -201,6 +212,85 @@ describe("CreateWalletInstanceHandler", () => {
     });
 
     expect(sendMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return a 204 HTTP response and consume the nonce when the request contains `nonce`", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: { ...walletInstanceRequestWithoutChallenge, nonce: challenge },
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      statusListAllocator,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({ statusCode: 204 }),
+    });
+
+    expect(deleteNonceSpy).toHaveBeenCalledWith(challenge);
+  });
+
+  it("should return a 422 HTTP response when the request contains both `nonce` and `challenge`", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: { ...walletInstanceRequest, nonce: challenge },
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      statusListAllocator,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({ statusCode: 422 }),
+    });
+
+    expect(deleteNonceSpy).not.toHaveBeenCalled();
+    expect(insertWalletInstanceSpy).not.toHaveBeenCalled();
+  });
+
+  it("should return a 422 HTTP response when the request contains neither `nonce` nor `challenge`", async () => {
+    const req = {
+      ...H.request("https://wallet-provider.example.org"),
+      body: walletInstanceRequestWithoutChallenge,
+      method: "POST",
+    };
+    const handler = CreateWalletInstanceHandler({
+      attestationService: mockAttestationService,
+      credentialRepository,
+      input: req,
+      inputDecoder: H.HttpRequest,
+      logger,
+      nonceRepository,
+      queueClient,
+      statusListAllocator,
+      walletInstanceRepository,
+    });
+
+    await expect(handler()).resolves.toEqual({
+      _tag: "Right",
+      right: expect.objectContaining({ statusCode: 422 }),
+    });
+
+    expect(deleteNonceSpy).not.toHaveBeenCalled();
   });
 
   it("should return a 422 HTTP response on invalid body", async () => {
