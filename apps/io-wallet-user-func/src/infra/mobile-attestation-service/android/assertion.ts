@@ -104,9 +104,9 @@ export const verifyAssertion = async (
         {
           retry: true,
           retryConfig: {
+            httpMethodsToRetry: ["POST"],
             retry: 3,
             retryDelay: 1000,
-            httpMethodsToRetry: ["POST"],
             statusCodesToRetry: [
               [429, 429],
               [503, 503],
