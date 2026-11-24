@@ -1,6 +1,6 @@
 {
   "name": "io-wallet-user-func",
-  "version": "5.2.5",
+  "version": "5.2.6",
   "private": true,
   "scripts": {
     "build": "tsup-node",
@@ -42,7 +42,7 @@
     "cbor-x": "^1.6.4",
     "dayjs": "^1.11.20",
     "fp-ts": "catalog:",
-    "googleapis": "^171.4.0",
+    "googleapis": "^190.0.0",
     "html-to-text": "9.0.5",
     "io-ts": "catalog:",
     "io-wallet-common": "workspace:^",
