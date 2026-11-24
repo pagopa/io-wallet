@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.6
+
+### Patch Changes
+
+- c62e2c5: Added retry Play Integrity Google API
+
 ## 5.2.5
 
 ### Patch Changes
