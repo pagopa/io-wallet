@@ -122,7 +122,7 @@ resource "azurerm_api_management_backend" "func_user_ioapp" {
 
   credentials {
     header = {
-      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_ioapp_key.display_name}}}" : "{{${azurerm_api_management_named_value.func_user_02_ioapp_key.display_name}}}"
+      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_ioapp_key.name}}}" : "{{${azurerm_api_management_named_value.func_user_02_ioapp_key.name}}}"
     }
   }
 }
@@ -139,7 +139,7 @@ resource "azurerm_api_management_backend" "func_user_ioweb" {
 
   credentials {
     header = {
-      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_ioweb_key.display_name}}}" : "{{${azurerm_api_management_named_value.func_user_02_ioweb_key.display_name}}}"
+      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_ioweb_key.name}}}" : "{{${azurerm_api_management_named_value.func_user_02_ioweb_key.name}}}"
     }
   }
 }
@@ -156,7 +156,7 @@ resource "azurerm_api_management_backend" "func_user_pdnd" {
 
   credentials {
     header = {
-      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_pdnd_key.display_name}}}" : "{{${azurerm_api_management_named_value.func_user_02_pdnd_key.display_name}}}"
+      "x-functions-key" = each.key == "01" ? "{{${azurerm_api_management_named_value.func_user_pdnd_key.name}}}" : "{{${azurerm_api_management_named_value.func_user_02_pdnd_key.name}}}"
     }
   }
 }
