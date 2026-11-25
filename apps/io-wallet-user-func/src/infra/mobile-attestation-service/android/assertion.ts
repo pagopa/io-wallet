@@ -94,12 +94,26 @@ export const verifyAssertion = async (
   for (const packageName of bundleIdentifiers) {
     let result;
     try {
-      result = await playintegrity.v1.decodeIntegrityToken({
-        packageName,
-        requestBody: {
-          integrityToken: integrityAssertion,
+      result = await playintegrity.v1.decodeIntegrityToken(
+        {
+          packageName,
+          requestBody: {
+            integrityToken: integrityAssertion,
+          },
         },
-      });
+        {
+          retry: true,
+          retryConfig: {
+            httpMethodsToRetry: ["POST"],
+            retry: 3,
+            retryDelay: 1000,
+            statusCodesToRetry: [
+              [429, 429],
+              [503, 503],
+            ],
+          },
+        },
+      );
     } catch {
       throw new ExternalServiceError();
     }
