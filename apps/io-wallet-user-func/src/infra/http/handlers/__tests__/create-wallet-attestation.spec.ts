@@ -25,7 +25,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { CreateWalletAttestationHandler } from "../create-wallet-attestation";
 import { privateEcKey, publicEcKey } from "./keys";
 
-const { assertion, nonce: challenge, hardwareKey, keyId } = iOSMockData;
+const { assertion, hardwareKey, keyId, nonce } = iOSMockData;
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -123,7 +123,7 @@ describe("CreateWalletAttestationHandler", async () => {
     hardware_signature: signature.toString("base64"),
     integrity_assertion: authenticatorData.toString("base64"),
     iss: "demokey",
-    nonce: challenge, // TODO: rename challenge in nonce
+    nonce: nonce,
     sub: "https://wallet-provider.example.org/",
   })
     .setProtectedHeader({

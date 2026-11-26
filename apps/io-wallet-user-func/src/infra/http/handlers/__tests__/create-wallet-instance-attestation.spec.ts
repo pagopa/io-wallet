@@ -28,7 +28,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { CreateWalletInstanceAttestationHandler } from "../create-wallet-instance-attestation";
 import { privateEcKey, publicEcKey } from "./keys";
 
-const { assertion, nonce: challenge, hardwareKey, keyId } = iOSMockData;
+const { assertion, hardwareKey, keyId, nonce } = iOSMockData;
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -145,7 +145,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     hardware_signature: signature.toString("base64"),
     integrity_assertion: authenticatorData.toString("base64"),
     iss: keyId,
-    nonce: challenge,
+    nonce: nonce,
     platform: "ios",
     sub: "https://wallet-provider.example.org/",
     wallet_solution_id: "appio",
@@ -169,7 +169,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
     hardware_signature: signature.toString("base64"),
     integrity_assertion: authenticatorData.toString("base64"),
     iss: keyId,
-    nonce: challenge,
+    nonce: nonce,
     platform: "android",
     sub: "https://wallet-provider.example.org/",
     wallet_solution_id: "appio",
@@ -746,7 +746,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       hardware_signature: signature.toString("base64"),
       integrity_assertion: authenticatorData.toString("base64"),
       iss: "invalid-issuer",
-      nonce: challenge,
+      nonce: nonce,
       platform: "ios",
       wallet_solution_id: "appio",
       wallet_solution_version: "3.25.0.1",
@@ -808,7 +808,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       hardware_signature: signature.toString("base64"),
       integrity_assertion: authenticatorData.toString("base64"),
       iss: keyId,
-      nonce: challenge,
+      nonce: nonce,
       platform: "ios",
       wallet_solution_id: "appio",
       wallet_solution_version: "3.25.0.1",
@@ -868,7 +868,7 @@ describe("CreateWalletInstanceAttestationHandler", async () => {
       hardware_signature: signature.toString("base64"),
       integrity_assertion: authenticatorData.toString("base64"),
       iss: keyId,
-      nonce: challenge,
+      nonce: nonce,
       platform: "ios",
       wallet_solution_id: "appio",
       wallet_solution_version: "3.25.0.1",
