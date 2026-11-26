@@ -388,15 +388,23 @@ components:
         key_attestation: string
     CreateWalletInstanceBody:
       required:
-        - challenge
         - key_attestation
         - hardware_key_tag
+      oneOf:
+        - required: [nonce]
+        - required: [challenge]
       type: object
       properties:
+        nonce:
+          minLength: 1
+          type: string
+          format: binary
         challenge:
           minLength: 1
           type: string
           format: binary
+          deprecated: true
+          description: Deprecated, use `nonce` instead. Exactly one of `nonce` or `challenge` must be provided.
         key_attestation:
           minLength: 1
           type: string
@@ -405,7 +413,7 @@ components:
           minLength: 1
           type: string
       example:
-        challenge: string
+        nonce: string
         key_attestation: string
         hardware_key_tag: string
         is_renewal:
