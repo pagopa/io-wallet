@@ -13,9 +13,9 @@ describe("iOSAttestationValidation", () => {
   const {
     attestation,
     bundleIdentifiers,
-    nonce: challenge,
     hardwareKey,
     keyId,
+    nonce: challenge,
     teamIdentifier,
   } = iOSMockData;
 
