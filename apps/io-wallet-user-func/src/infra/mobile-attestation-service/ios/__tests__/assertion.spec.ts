@@ -8,7 +8,7 @@ describe("iOSAssertionValidation", () => {
   const {
     assertion,
     bundleIdentifiers,
-    challenge,
+    nonce: challenge,
     ephemeralKey,
     hardwareKey,
     teamIdentifier,

@@ -30,7 +30,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { CreateKeyAttestationHandler } from "../create-key-attestation";
 import { privateEcKey, publicEcKey } from "./keys";
 
-const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
+const { assertion, nonce: challenge, hardwareKey, keyId } = iOSMockData;
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 

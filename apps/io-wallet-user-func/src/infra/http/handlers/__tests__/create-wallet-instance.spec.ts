@@ -20,20 +20,21 @@ import { CreateWalletInstanceHandler } from "../create-wallet-instance";
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
 describe("CreateWalletInstanceHandler", () => {
-  const { attestation, challenge, keyId } = iOSMockData;
+  const { attestation, keyId, nonce } = iOSMockData;
 
   const walletInstanceRequest = {
-    challenge,
     fiscal_code: mockFiscalCode,
     hardware_key_tag: keyId,
     key_attestation: attestation,
+    nonce: nonce,
   };
 
   const deleteNonceSpy = vi.fn<NonceRepository["delete"]>(() =>
     TE.right(void 0),
   );
 
-  const walletInstanceRequestWithoutChallenge = {
+  const walletInstanceRequestWithChallenge = {
+    challenge: nonce,
     fiscal_code: mockFiscalCode,
     hardware_key_tag: keyId,
     key_attestation: attestation,
@@ -137,7 +138,7 @@ describe("CreateWalletInstanceHandler", () => {
       }),
     });
 
-    expect(deleteNonceSpy).toHaveBeenCalledWith(challenge);
+    expect(deleteNonceSpy).toHaveBeenCalledWith(nonce);
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
     expect(allocateStatusBindingSpy).toHaveBeenCalledTimes(1);
     expect(insertWalletInstanceSpy).toHaveBeenCalledWith(
@@ -217,7 +218,7 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 204 HTTP response and consume the nonce when the request contains `nonce`", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
-      body: { ...walletInstanceRequestWithoutChallenge, nonce: challenge },
+      body: walletInstanceRequest,
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -237,13 +238,13 @@ describe("CreateWalletInstanceHandler", () => {
       right: expect.objectContaining({ statusCode: 204 }),
     });
 
-    expect(deleteNonceSpy).toHaveBeenCalledWith(challenge);
+    expect(deleteNonceSpy).toHaveBeenCalledWith(nonce);
   });
 
   it("should return a 422 HTTP response when the request contains both `nonce` and `challenge`", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
-      body: { ...walletInstanceRequest, nonce: challenge },
+      body: { ...walletInstanceRequest, challenge: nonce },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -270,7 +271,11 @@ describe("CreateWalletInstanceHandler", () => {
   it("should return a 422 HTTP response when the request contains neither `nonce` nor `challenge`", async () => {
     const req = {
       ...H.request("https://wallet-provider.example.org"),
-      body: walletInstanceRequestWithoutChallenge,
+      body: {
+        fiscal_code: walletInstanceRequestWithChallenge.fiscal_code,
+        hardware_key_tag: walletInstanceRequestWithChallenge.hardware_key_tag,
+        key_attestation: walletInstanceRequestWithChallenge.key_attestation,
+      },
       method: "POST",
     };
     const handler = CreateWalletInstanceHandler({
@@ -324,7 +329,7 @@ describe("CreateWalletInstanceHandler", () => {
     });
   });
 
-  it("should return a 500 HTTP response on validateChallenge error", async () => {
+  it("should return a 500 HTTP response on validateNonce error", async () => {
     const nonceRepositoryThatFailsOnDelete: NonceRepository = {
       delete: () => TE.left(new Error("failed on delete!")),
       insert: () => TE.left(new Error("not implemented")),

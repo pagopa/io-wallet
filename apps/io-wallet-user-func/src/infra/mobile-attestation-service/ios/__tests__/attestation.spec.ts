@@ -13,7 +13,7 @@ describe("iOSAttestationValidation", () => {
   const {
     attestation,
     bundleIdentifiers,
-    challenge,
+    nonce: challenge,
     hardwareKey,
     keyId,
     teamIdentifier,

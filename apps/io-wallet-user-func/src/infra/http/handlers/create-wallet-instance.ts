@@ -58,11 +58,11 @@ const requireWalletInstanceRequest = (req: H.HttpRequest) =>
         key_attestation,
         nonce,
       }) => ({
-        challenge: challenge ?? nonce,
         fiscalCode: fiscal_code,
         hardwareKeyTag: hardware_key_tag,
         isRenewal: is_renewal ?? false,
         keyAttestation: key_attestation,
+        nonce: challenge ?? nonce,
       }),
     ),
   );
@@ -95,7 +95,7 @@ export const CreateWalletInstanceHandler = H.of((req: H.HttpRequest) =>
     RTE.fromEither,
     RTE.chainW((walletInstanceRequest) =>
       pipe(
-        consumeNonce(walletInstanceRequest.challenge),
+        consumeNonce(walletInstanceRequest.nonce),
         RTE.chainW(() =>
           isLoadTestUser(walletInstanceRequest.fiscalCode)
             ? skipAttestationValidation(walletInstanceRequest)
