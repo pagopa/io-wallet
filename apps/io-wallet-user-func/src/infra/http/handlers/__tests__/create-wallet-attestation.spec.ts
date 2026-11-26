@@ -123,7 +123,7 @@ describe("CreateWalletAttestationHandler", async () => {
     hardware_signature: signature.toString("base64"),
     integrity_assertion: authenticatorData.toString("base64"),
     iss: "demokey",
-    nonce: nonce,
+    nonce,
     sub: "https://wallet-provider.example.org/",
   })
     .setProtectedHeader({
