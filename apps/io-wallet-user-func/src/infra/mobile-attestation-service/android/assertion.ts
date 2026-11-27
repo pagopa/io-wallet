@@ -87,9 +87,9 @@ export const verifyAssertion = async (
     version: "v1",
   });
 
-  let bundleIdentifier;
   let tokenPayloadExternal;
   let responseValidated;
+  let hasPlayIntegrityApiError = false;
 
   for (const packageName of bundleIdentifiers) {
     let result;
@@ -114,20 +114,23 @@ export const verifyAssertion = async (
           },
         },
       );
-    } catch {
-      throw new ExternalServiceError();
+    } catch (error) {
+      hasPlayIntegrityApiError = true;
+      errors.push(
+        `Unable to decode integrity token for ${packageName}: ${error}`,
+      );
+      continue;
     }
 
     const token = result.data.tokenPayloadExternal;
 
     if (token) {
-      bundleIdentifier = packageName;
       tokenPayloadExternal = token;
 
       try {
         responseValidated = validateIntegrityResponse(
           tokenPayloadExternal,
-          bundleIdentifier,
+          bundleIdentifiers,
           clientData,
           allowDevelopmentEnvironment,
           androidPlayStoreCertificateHash,
@@ -147,7 +150,11 @@ export const verifyAssertion = async (
     }
   }
 
-  if (!tokenPayloadExternal || !bundleIdentifier) {
+  if (!tokenPayloadExternal) {
+    if (hasPlayIntegrityApiError) {
+      throw new ExternalServiceError(errors.join(","));
+    }
+
     return {
       reason: `Invalid token payload from Play Integrity API response: ${errors.join(",")}`,
       success: false,
@@ -186,7 +193,7 @@ export const validateAssertionSignature = async (
 
 export const validateIntegrityResponse = (
   integrityResponse: playintegrity_v1.Schema$TokenPayloadExternal,
-  bundleIdentifier: string,
+  bundleIdentifiers: string[],
   clientData: string,
   allowDevelopmentEnvironment: boolean,
   androidPlayStoreCertificateHash: string,
@@ -194,7 +201,7 @@ export const validateIntegrityResponse = (
   /**
    * 1. You must first check that the values in the requestDetails field match those of the original
    * request before checking each integrity verdict. Verify the requestDetails part of the JSON payload
-   * by making sure that the requestPackageName and requestHash match what was sent in the original request
+   * by making sure that requestPackageName is allowed and requestHash matches the original request
    */
 
   const requestDetails = integrityResponse.requestDetails;
@@ -206,9 +213,12 @@ export const validateIntegrityResponse = (
     };
   }
 
-  if (requestDetails.requestPackageName !== bundleIdentifier) {
+  const bundleIdentifier = bundleIdentifiers.find(
+    (identifier) => identifier === requestDetails.requestPackageName,
+  );
+  if (!bundleIdentifier) {
     return {
-      reason: `The bundle identifier ${requestDetails.requestPackageName} does not match ${bundleIdentifier}.`,
+      reason: `The bundle identifier ${requestDetails.requestPackageName} does not match any of ${bundleIdentifiers}.`,
       success: false,
     };
   }

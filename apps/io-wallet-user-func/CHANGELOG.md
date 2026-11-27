@@ -1,5 +1,11 @@
 # io-wallet-user-func
 
+## 5.2.7
+
+### Patch Changes
+
+- 8e4b581: Fix Android integrity check failures when the app’s bundle ID is not first in the allowed list.
+
 ## 5.2.6
 
 ### Patch Changes
