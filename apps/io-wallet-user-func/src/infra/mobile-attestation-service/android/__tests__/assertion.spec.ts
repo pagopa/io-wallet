@@ -203,7 +203,7 @@ describe("AndroidAssertionValidation", async () => {
     integrityAssertion: androidMockData.integrityAssertion,
   };
 
-  const pocTokenPayload: playintegrity_v1.Schema$TokenPayloadExternal = {
+  const pocTokenPayload = {
     accountDetails: { appLicensingVerdict: "LICENSED" },
     appIntegrity: {
       appRecognitionVerdict: "PLAY_RECOGNIZED",
