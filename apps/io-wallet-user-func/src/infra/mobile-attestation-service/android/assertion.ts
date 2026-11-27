@@ -89,7 +89,7 @@ export const verifyAssertion = async (
 
   let tokenPayloadExternal;
   let responseValidated;
-  let hasDecodingError = false;
+  let hasPlayIntegrityApiError = false;
 
   for (const packageName of bundleIdentifiers) {
     let result;
@@ -115,7 +115,7 @@ export const verifyAssertion = async (
         },
       );
     } catch (error) {
-      hasDecodingError = true;
+      hasPlayIntegrityApiError = true;
       errors.push(
         `Unable to decode integrity token for ${packageName}: ${error}`,
       );
@@ -151,7 +151,7 @@ export const verifyAssertion = async (
   }
 
   if (!tokenPayloadExternal) {
-    if (hasDecodingError) {
+    if (hasPlayIntegrityApiError) {
       throw new ExternalServiceError(errors.join(","));
     }
 
