@@ -468,10 +468,16 @@ components:
     CreateWalletInstanceBody:
       type: object
       properties:
+        nonce:
+          type: string
+          minLength: 1
+          format: binary
         challenge:
           type: string
           minLength: 1
           format: binary
+          deprecated: true
+          description: Deprecated, use `nonce` instead. Exactly one of `nonce` or `challenge` must be provided.
         key_attestation:
           type: string
           minLength: 1
@@ -485,10 +491,12 @@ components:
         fiscal_code:
           $ref: "#/components/schemas/FiscalCode"
       required:
-        - challenge
         - key_attestation
         - hardware_key_tag
         - fiscal_code
+      oneOf:
+        - required: [nonce]
+        - required: [challenge]
 
     CreateWalletAttestationBody:
       type: object

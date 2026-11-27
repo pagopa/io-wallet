@@ -8,9 +8,9 @@ describe("iOSAssertionValidation", () => {
   const {
     assertion,
     bundleIdentifiers,
-    challenge,
     ephemeralKey,
     hardwareKey,
+    nonce: challenge,
     teamIdentifier,
   } = iOSMockData;
 

@@ -57,7 +57,7 @@ export const validateAttestation: (
   ({ attestationService }) =>
     attestationService.validateAttestation(
       walletInstanceRequest.keyAttestation,
-      walletInstanceRequest.challenge,
+      walletInstanceRequest.nonce,
       walletInstanceRequest.hardwareKeyTag,
       walletInstanceRequest.fiscalCode,
     );

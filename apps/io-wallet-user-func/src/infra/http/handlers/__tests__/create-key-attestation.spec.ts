@@ -30,7 +30,7 @@ import { WalletInstanceRepository } from "@/wallet-instance";
 import { CreateKeyAttestationHandler } from "../create-key-attestation";
 import { privateEcKey, publicEcKey } from "./keys";
 
-const { assertion, challenge, hardwareKey, keyId } = iOSMockData;
+const { assertion, hardwareKey, keyId, nonce } = iOSMockData;
 
 const mockFiscalCode = "AAACCC94E17H501P" as FiscalCode;
 
@@ -195,7 +195,7 @@ describe("CreateKeyAttestationHandler", async () => {
     integrity_assertion: authenticatorData.toString("base64"),
     iss: keyId,
     keys_to_attest: [keyToAttestJwtIos],
-    nonce: challenge,
+    nonce: nonce,
     platform: "iOS",
     sub: "https://wallet-provider.example.org/",
     wallet_solution_id: "appio",
@@ -238,7 +238,7 @@ describe("CreateKeyAttestationHandler", async () => {
     integrity_assertion: authenticatorData.toString("base64"),
     iss: keyId,
     keys_to_attest: [keyToAttestJwtAndroid],
-    nonce: challenge,
+    nonce: nonce,
     platform: "Android",
     sub: "https://wallet-provider.example.org/",
     wallet_solution_id: "appio",
@@ -281,7 +281,7 @@ describe("CreateKeyAttestationHandler", async () => {
     integrity_assertion: authenticatorData.toString("base64"),
     iss: keyId,
     keys_to_attest: [keyToAttestJwtAndroidWithoutKid],
-    nonce: challenge,
+    nonce: nonce,
     platform: "Android",
     sub: "https://wallet-provider.example.org/",
     wallet_solution_id: "appio",
@@ -629,7 +629,7 @@ describe("CreateKeyAttestationHandler", async () => {
 
     expect(verifyAndroidAttestation).toHaveBeenCalledWith(
       "base64_attestation",
-      challenge,
+      nonce,
     );
   });
 
@@ -846,7 +846,7 @@ describe("CreateKeyAttestationHandler", async () => {
 
     expect(verifyAndroidAttestation).toHaveBeenCalledWith(
       "base64_attestation",
-      challenge,
+      nonce,
     );
   });
 
@@ -879,7 +879,7 @@ describe("CreateKeyAttestationHandler", async () => {
         integrity_assertion: authenticatorData.toString("base64"),
         iss: keyId,
         keys_to_attest: [keyToAttestJwtAndroidWithoutAttestation],
-        nonce: challenge,
+        nonce: nonce,
         platform: "Android",
         wallet_solution_id: "appio",
         wallet_solution_version: "3.25.0.1",

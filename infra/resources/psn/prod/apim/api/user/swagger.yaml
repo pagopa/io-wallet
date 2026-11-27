@@ -235,37 +235,6 @@ paths:
           $ref: "#/components/responses/InternalServerError"
         "503":
           $ref: "#/components/responses/ServiceUnavailable"
-  "/wallet-unit-attestations":
-    post:
-      summary: CreateWalletUnitAttestation
-      description: Create and return a Wallet Unit Attestation (WUA)
-      operationId: createWalletUnitAttestation
-      parameters:
-        - $ref: "#/components/parameters/XUserHeader"
-      requestBody:
-        content:
-          text/plain:
-            schema:
-              $ref: "#/components/schemas/CreateWalletUnitAttestationBody"
-      responses:
-        "200":
-          description: Wallet Unit Attestation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WalletUnitAttestation"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/Conflict"
-        "422":
-          $ref: "#/components/responses/UnprocessableContent"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
   "/key-attestations":
     post:
       summary: CreateKeyAttestation
@@ -368,15 +337,6 @@ components:
           type: string
       example:
         wallet_instance_attestation: string
-    WalletUnitAttestation:
-      required:
-        - wallet_unit_attestation
-      type: object
-      properties:
-        wallet_unit_attestation:
-          type: string
-      example:
-        wallet_unit_attestation: string
     KeyAttestation:
       required:
         - key_attestation
@@ -388,15 +348,23 @@ components:
         key_attestation: string
     CreateWalletInstanceBody:
       required:
-        - challenge
         - key_attestation
         - hardware_key_tag
+      oneOf:
+        - required: [nonce]
+        - required: [challenge]
       type: object
       properties:
+        nonce:
+          minLength: 1
+          type: string
+          format: binary
         challenge:
           minLength: 1
           type: string
           format: binary
+          deprecated: true
+          description: Deprecated, use `nonce` instead. Exactly one of `nonce` or `challenge` must be provided.
         key_attestation:
           minLength: 1
           type: string
@@ -405,16 +373,13 @@ components:
           minLength: 1
           type: string
       example:
-        challenge: string
+        nonce: string
         key_attestation: string
         hardware_key_tag: string
         is_renewal:
           type: boolean
           default: false
     CreateWalletInstanceAttestationBody:
-      type: string
-      minLength: 1
-    CreateWalletUnitAttestationBody:
       type: string
       minLength: 1
     CreateKeyAttestationBody:

@@ -6,16 +6,16 @@ import * as t from "io-ts";
 import { deleteNonce, NonceEnvironment } from "./nonce";
 
 const WalletInstanceRequest = t.type({
-  challenge: NonEmptyString,
   fiscalCode: FiscalCode,
   hardwareKeyTag: NonEmptyString,
   keyAttestation: NonEmptyString,
+  nonce: NonEmptyString,
 });
 
 export type WalletInstanceRequest = t.TypeOf<typeof WalletInstanceRequest>;
 
 // This function is used for nonce validation. Instead of checking if the nonce exists and then deleting it, we delete it directly to ensure an atomic operation.
 export const consumeNonce = (
-  challenge: WalletInstanceRequest["challenge"],
+  nonce: WalletInstanceRequest["nonce"],
 ): RTE.ReaderTaskEither<NonceEnvironment, Error, void> =>
-  pipe(challenge, deleteNonce);
+  pipe(nonce, deleteNonce);
