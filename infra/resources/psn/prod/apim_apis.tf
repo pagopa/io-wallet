@@ -568,15 +568,12 @@ resource "azurerm_api_management_api_policy" "user_ioapp_v1" {
 <policies>
   <inbound>
       <base />
-      <set-header name="x-functions-key" exists-action="override">
-        <value>{{${azurerm_api_management_named_value.func_user_ioapp_key.display_name}}}</value>
-      </set-header>
       <choose>
         <when condition="@(!context.Variables.ContainsKey(&quot;skipFiscalCodeFragment&quot;))">
           <include-fragment fragment-id="${azurerm_api_management_policy_fragment.extract_user_fiscal_code.name}" />
         </when>
       </choose>
-      <set-backend-service backend-id="${azapi_resource.func_user_pool.name}" />
+      <set-backend-service backend-id="${azapi_resource.func_user_ioapp_pool.name}" />
   </inbound>
 </policies>
 XML
