@@ -90,6 +90,7 @@ export const verifyAssertion = async (
   let bundleIdentifier;
   let tokenPayloadExternal;
   let responseValidated;
+  let hasDecodingError = false;
 
   for (const packageName of bundleIdentifiers) {
     let result;
@@ -114,8 +115,12 @@ export const verifyAssertion = async (
           },
         },
       );
-    } catch {
-      throw new ExternalServiceError();
+    } catch (error) {
+      hasDecodingError = true;
+      errors.push(
+        `Unable to decode integrity token for ${packageName}: ${error}`,
+      );
+      continue;
     }
 
     const token = result.data.tokenPayloadExternal;
@@ -148,6 +153,10 @@ export const verifyAssertion = async (
   }
 
   if (!tokenPayloadExternal || !bundleIdentifier) {
+    if (hasDecodingError) {
+      throw new ExternalServiceError(errors.join(","));
+    }
+
     return {
       reason: `Invalid token payload from Play Integrity API response: ${errors.join(",")}`,
       success: false,
