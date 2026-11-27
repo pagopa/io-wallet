@@ -70,8 +70,8 @@ module "function_app_user_autoscaler_02" {
     maximum = 30
     spot_load = {
       name       = "main-gate"
-      start_date = "2026-11-30T06:00:00Z"
-      end_date   = "2026-12-01T06:00:00Z"
+      start_date = "2026-12-01T06:00:00Z"
+      end_date   = "2026-12-02T06:00:00Z"
       default    = 30
       minimum    = 30
     }
